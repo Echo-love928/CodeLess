@@ -1,2 +1,22 @@
 # CodeLess
 CodeLess是一款面向学生、社团和小型组织的AI Agent零代码Web应用生成与部署平台，旨在降低网页开发与发布门槛。平台拟根据用户的自然语言需求，完成项目规划、受控文件生成、沙箱构建和错误反馈修复，生成可预览的多文件Vue应用。用户可选中页面组件修改文案与样式，验证后发布网站、获取封面并下载源码。首版聚焦个人展示、活动页面、任务管理及搜索分类等场景，数据采用静态数据、Mock或LocalStorage，并提供任务进度、版本记录和基础管理功能。
+
+## 仓库结构
+
+```text
+apps/web/             平台界面
+services/api/         Java 业务与 Agent 服务
+services/runner/      构建、验证、预览与发布执行
+templates/vue/        受控生成模板
+contracts/            公共契约
+prompts/runtime/      平台运行时提示词
+tests/e2e/            真实浏览器业务流程测试
+tests/security/       安全测试
+evals/                生成与浏览器编辑评估
+infra/                基础设施配置
+scripts/              开发与维护脚本
+docs/                 项目文档
+.github/workflows/     CI 工作流
+```
+
+上述目录目前使用 `.gitkeep` 占位，后续功能文件直接放入对应目录。
