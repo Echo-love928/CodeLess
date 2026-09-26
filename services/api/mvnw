@@ -1,0 +1,31 @@
+#!/bin/sh
+set -eu
+
+MAVEN_VERSION=3.9.11
+MAVEN_DIST='https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.11/apache-maven-3.9.11-bin.zip'
+MAVEN_SHA512='03e2d65d4483a3396980629f260e25cac0d8b6f7f2791e4dc20bc83f9514db8d0f05b0479e699a5f34679250c49c8e52e961262ded468a20de0be254d8207076'
+MAVEN_CACHE="${MAVEN_USER_HOME:-$HOME/.m2}"
+MAVEN_BASE="$MAVEN_CACHE/wrapper/dists/codeless-maven-$MAVEN_VERSION"
+MAVEN_HOME="$MAVEN_BASE/apache-maven-$MAVEN_VERSION"
+
+if [ ! -x "$MAVEN_HOME/bin/mvn" ]; then
+  archive="$(mktemp "${TMPDIR:-/tmp}/codeless-maven.XXXXXX.zip")"
+  trap 'rm -f "$archive"' EXIT INT TERM
+  if command -v curl >/dev/null 2>&1; then
+    curl --fail --location --silent --show-error "$MAVEN_DIST" --output "$archive"
+  elif command -v wget >/dev/null 2>&1; then
+    wget -q "$MAVEN_DIST" -O "$archive"
+  else
+    echo 'Maven Wrapper requires curl or wget' >&2
+    exit 1
+  fi
+  actual="$(sha512sum "$archive" | awk '{print $1}')"
+  if [ "$actual" != "$MAVEN_SHA512" ]; then
+    echo 'Maven distribution checksum mismatch' >&2
+    exit 1
+  fi
+  mkdir -p "$MAVEN_BASE"
+  unzip -q -o "$archive" -d "$MAVEN_BASE"
+fi
+
+exec "$MAVEN_HOME/bin/mvn" "$@"
