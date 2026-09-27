@@ -62,7 +62,10 @@ jobs:
       - name: Install Chromium
         timeout-minutes: 3
         run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm verify:e2e
+      - name: Run browser smoke
+        run: pnpm verify:e2e
+        env:
+          DEBUG: pw:browser,pw:worker
 
   ci-gate:
     name: ci-gate
