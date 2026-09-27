@@ -8,7 +8,10 @@ const redoclyArgs = isWindows
 const commands = [
   ['node', ['scripts/verify-versions.mjs']],
   ['node', ['scripts/validate-contracts.mjs', 'all']],
-  [corepack, redoclyArgs]
+  [corepack, redoclyArgs],
+  [corepack, isWindows
+    ? ['/d', '/c', 'corepack', 'pnpm', '--filter', '@codeless/web', 'verify']
+    : ['pnpm', '--filter', '@codeless/web', 'verify']]
 ];
 
 for (const [command, args] of commands) {

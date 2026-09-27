@@ -13,10 +13,11 @@
     "verify:static": "node scripts/run-static.mjs",
     "verify:api": "node scripts/run-maven.mjs",
     "verify:runner": "node scripts/validate-contracts.mjs runner",
-    "verify:e2e": "node scripts/validate-contracts.mjs flow",
+    "verify:e2e": "node scripts/validate-contracts.mjs flow && pnpm --filter @codeless/web smoke",
     "ci:gate": "node scripts/ci-gate.mjs"
   },
   "devDependencies": {
+    "@playwright/test": "1.60.0",
     "@redocly/cli": "2.54.3",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1"

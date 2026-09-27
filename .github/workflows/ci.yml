@@ -50,7 +50,8 @@ jobs:
 
   e2e:
     name: verify:e2e
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -58,7 +59,13 @@ jobs:
           node-version: 24.16.0
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
-      - run: pnpm verify:e2e
+      - name: Install Chromium
+        timeout-minutes: 3
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run browser smoke
+        run: pnpm verify:e2e
+        env:
+          DEBUG: pw:browser,pw:worker
 
   ci-gate:
     name: ci-gate
