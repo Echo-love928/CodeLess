@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeless.dev/contracts/v0/build.schema.json",
+  "title": "Build",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "taskId", "versionId", "status", "exitCode", "createdAt"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "taskId": { "type": "string", "format": "uuid" },
+    "versionId": { "type": "string", "format": "uuid" },
+    "status": { "enum": ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED"] },
+    "exitCode": { "type": ["integer", "null"], "minimum": 0 },
+    "artifactDigest": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" },
+    "logUrl": { "type": ["string", "null"], "format": "uri" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "completedAt": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "SUCCEEDED" } }, "required": ["status"] },
+      "then": {
+        "properties": { "exitCode": { "const": 0 }, "artifactDigest": { "type": "string" }, "completedAt": { "type": "string" } },
+        "required": ["artifactDigest", "completedAt"]
+      }
+    },
+    {
+      "if": { "properties": { "status": { "const": "FAILED" } }, "required": ["status"] },
+      "then": {
+        "properties": { "exitCode": { "type": "integer", "minimum": 1 }, "completedAt": { "type": "string" } },
+        "required": ["completedAt"]
+      }
+    }
+  ]
+}

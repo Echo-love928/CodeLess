@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeless.dev/contracts/v0/task.schema.json",
+  "title": "GenerationTask",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "applicationId", "prompt", "status", "repairAttempts", "createdAt", "updatedAt"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "applicationId": { "type": "string", "format": "uuid" },
+    "prompt": { "type": "string", "minLength": 1, "maxLength": 8000 },
+    "status": { "enum": ["PLAN", "GENERATE", "VERIFY", "REPAIR", "READY", "FAILED"] },
+    "repairAttempts": { "type": "integer", "minimum": 0, "maximum": 3 },
+    "failureCode": { "type": ["string", "null"], "maxLength": 100 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

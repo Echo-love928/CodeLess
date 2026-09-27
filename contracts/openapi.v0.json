@@ -1,0 +1,218 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CodeLess API",
+    "version": "0.0.0",
+    "description": "D01 contract-first API. Task state is derived from real tool results; publication requires an authenticated user and a verified immutable version.",
+    "license": { "name": "Proprietary", "url": "https://codeless.dev/license" }
+  },
+  "servers": [{ "url": "https://api.codeless.dev", "description": "controlled trial" }],
+  "security": [{ "bearerAuth": [] }],
+  "tags": [
+    { "name": "system", "description": "Service health" },
+    { "name": "applications", "description": "Vue application metadata" },
+    { "name": "tasks", "description": "Generation lifecycle and events" },
+    { "name": "builds", "description": "Real runner build results" },
+    { "name": "versions", "description": "Immutable source versions" },
+    { "name": "publications", "description": "User-triggered publications" }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "operationId": "getHealth",
+        "summary": "Return API liveness",
+        "tags": ["system"],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "API is alive",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Health" }, "example": { "status": "UP", "service": "codeless-api" } } }
+          },
+          "429": { "description": "Rate limited", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/error.schema.json" } } } }
+        }
+      }
+    },
+    "/api/v0/applications": {
+      "post": {
+        "operationId": "createApplication",
+        "summary": "Create a Vue application shell",
+        "tags": ["applications"],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateApplicationRequest" }, "example": { "name": "社团活动页", "dataMode": "MOCK" } } }
+        },
+        "responses": {
+          "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/application.schema.json" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/api/v0/applications/{applicationId}": {
+      "parameters": [{ "$ref": "#/components/parameters/ApplicationId" }],
+      "get": {
+        "operationId": "getApplication",
+        "summary": "Get an application",
+        "tags": ["applications"],
+        "responses": {
+          "200": { "description": "Found", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/application.schema.json" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v0/tasks": {
+      "post": {
+        "operationId": "createTask",
+        "summary": "Start a generation task",
+        "description": "The server always creates the task in PLAN; clients cannot choose or assert a successful state.",
+        "tags": ["tasks"],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateTaskRequest" }, "example": { "applicationId": "11111111-1111-4111-8111-111111111111", "prompt": "生成活动页" } } }
+        },
+        "responses": {
+          "202": { "description": "Accepted in PLAN", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/task.schema.json" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/api/v0/tasks/{taskId}": {
+      "parameters": [{ "$ref": "#/components/parameters/TaskId" }],
+      "get": {
+        "operationId": "getTask",
+        "summary": "Get task state",
+        "tags": ["tasks"],
+        "responses": {
+          "200": { "description": "Found", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/task.schema.json" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v0/tasks/{taskId}/events": {
+      "parameters": [{ "$ref": "#/components/parameters/TaskId" }],
+      "get": {
+        "operationId": "listTaskEvents",
+        "summary": "List ordered task events",
+        "tags": ["tasks"],
+        "responses": {
+          "200": { "description": "Ordered by sequence", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "./schemas/v0/event.schema.json" } } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v0/builds/{buildId}": {
+      "parameters": [{ "$ref": "#/components/parameters/BuildId" }],
+      "get": {
+        "operationId": "getBuild",
+        "summary": "Get a real build result",
+        "tags": ["builds"],
+        "responses": {
+          "200": { "description": "Found", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/build.schema.json" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v0/versions/{versionId}": {
+      "parameters": [{ "$ref": "#/components/parameters/VersionId" }],
+      "get": {
+        "operationId": "getVersion",
+        "summary": "Get an immutable source version",
+        "tags": ["versions"],
+        "responses": {
+          "200": { "description": "Found", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/version.schema.json" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v0/publications": {
+      "post": {
+        "operationId": "createPublication",
+        "summary": "Publish a verified immutable version",
+        "description": "Must be explicitly requested by the authenticated owner. The server rejects unverified versions.",
+        "tags": ["publications"],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePublicationRequest" }, "example": { "applicationId": "11111111-1111-4111-8111-111111111111", "versionId": "55555555-5555-4555-8555-555555555555" } } }
+        },
+        "responses": {
+          "202": { "description": "Publication requested", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/publication.schema.json" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "409": { "description": "Version is not verified", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/error.schema.json" } } } }
+        }
+      }
+    },
+    "/api/v0/publications/{publicationId}": {
+      "parameters": [{ "$ref": "#/components/parameters/PublicationId" }],
+      "get": {
+        "operationId": "getPublication",
+        "summary": "Get publication state",
+        "tags": ["publications"],
+        "responses": {
+          "200": { "description": "Found", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/publication.schema.json" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    },
+    "parameters": {
+      "ApplicationId": { "name": "applicationId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
+      "TaskId": { "name": "taskId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
+      "BuildId": { "name": "buildId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
+      "VersionId": { "name": "versionId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
+      "PublicationId": { "name": "publicationId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+    },
+    "schemas": {
+      "Health": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "service"],
+        "properties": { "status": { "const": "UP" }, "service": { "const": "codeless-api" } }
+      },
+      "CreateApplicationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "dataMode"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "description": { "type": "string", "maxLength": 1000 },
+          "dataMode": { "enum": ["STATIC", "MOCK", "LOCAL_STORAGE"] }
+        }
+      },
+      "CreateTaskRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["applicationId", "prompt"],
+        "properties": {
+          "applicationId": { "type": "string", "format": "uuid" },
+          "prompt": { "type": "string", "minLength": 1, "maxLength": 8000 }
+        }
+      },
+      "CreatePublicationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["applicationId", "versionId"],
+        "properties": {
+          "applicationId": { "type": "string", "format": "uuid" },
+          "versionId": { "type": "string", "format": "uuid" }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": { "description": "Invalid request", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/error.schema.json" } } } },
+      "Unauthorized": { "description": "Authentication required", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/error.schema.json" } } } },
+      "NotFound": { "description": "Resource not found", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/error.schema.json" } } } }
+    }
+  }
+}

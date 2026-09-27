@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeless.dev/contracts/v0/event.schema.json",
+  "title": "TaskEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "taskId", "sequence", "type", "stage", "message", "occurredAt"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "taskId": { "type": "string", "format": "uuid" },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "type": { "enum": ["STAGE_STARTED", "STAGE_COMPLETED", "TOOL_RESULT", "REPAIR_REQUESTED", "TASK_FAILED"] },
+    "stage": { "enum": ["PLAN", "GENERATE", "VERIFY", "REPAIR", "READY", "FAILED"] },
+    "message": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "occurredAt": { "type": "string", "format": "date-time" }
+  }
+}

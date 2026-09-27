@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeless.dev/contracts/v0/application.schema.json",
+  "title": "Application",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "template", "dataMode", "createdAt", "updatedAt"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "description": { "type": "string", "maxLength": 1000 },
+    "template": { "const": "VUE" },
+    "dataMode": { "enum": ["STATIC", "MOCK", "LOCAL_STORAGE"] },
+    "latestReadyVersionId": { "type": ["string", "null"], "format": "uuid" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}
