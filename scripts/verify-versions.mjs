@@ -13,6 +13,10 @@ const actualPnpm = execFileSync(corepack, corepackArgs, { encoding: 'utf8' }).tr
 const failures = [];
 if (actualNode !== expectedNode) failures.push(`Node expected ${expectedNode}, got ${actualNode}`);
 if (actualPnpm !== expectedPnpm) failures.push(`pnpm expected ${expectedPnpm}, got ${actualPnpm}`);
+const web = JSON.parse(readFileSync(new URL('../apps/web/package.json', import.meta.url), 'utf8'));
+if (web.engines?.node !== expectedNode) failures.push(`apps/web Node must be ${expectedNode}`);
+if (web.engines?.pnpm !== expectedPnpm) failures.push(`apps/web pnpm must be ${expectedPnpm}`);
+if (web.packageManager !== pkg.packageManager) failures.push('apps/web packageManager must match the root');
 
 const lockedFiles = [
   ['services/api/pom.xml', ['<java.version>21</java.version>', '<version>4.1.1</version>', '<spring-ai.version>2.0.1</spring-ai.version>']],

@@ -58,6 +58,7 @@ jobs:
           node-version: 24.16.0
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm verify:e2e
 
   ci-gate:
