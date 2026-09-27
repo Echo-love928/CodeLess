@@ -50,7 +50,10 @@ jobs:
 
   e2e:
     name: verify:e2e
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      CODELESS_PLAYWRIGHT_CHANNEL: chrome
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -58,7 +61,7 @@ jobs:
           node-version: 24.16.0
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
+      - run: google-chrome --version
       - run: pnpm verify:e2e
 
   ci-gate:

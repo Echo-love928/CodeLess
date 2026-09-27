@@ -77,7 +77,7 @@ pnpm ci:gate
 - `pnpm verify:runner`：runner 安全边界所依赖的构建契约检查；真实 runner 尚未实现。
 - `pnpm verify:e2e`：跨资源生命周期契约检查，以及前端三页的 Playwright 浏览器冒烟；尚不覆盖真实生成、保存和发布。
 
-Linux CI 使用 `pnpm exec playwright install --with-deps chromium` 准备浏览器。Windows 可使用已安装的 Chrome：先设置 `$env:CODELESS_PLAYWRIGHT_CHANNEL='chrome'` 再执行门禁。API 门禁还要求 `JAVA_HOME` 指向 Java 21。
+Linux CI 使用 Ubuntu 24.04 镜像自带的 Chrome，先核验浏览器版本，再通过 `CODELESS_PLAYWRIGHT_CHANNEL=chrome` 运行同一套 Playwright 冒烟。Windows 也可使用已安装的 Chrome：先设置 `$env:CODELESS_PLAYWRIGHT_CHANNEL='chrome'` 再执行门禁。API 门禁还要求 `JAVA_HOME` 指向 Java 21。
 
 可用 `CODELESS_FORCE_FAIL=verify:runner pnpm ci:gate` 验证任一子检查失败时汇总门禁非零退出。该注入仅用于门禁自测。
 
