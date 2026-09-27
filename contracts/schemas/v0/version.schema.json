@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeless.dev/contracts/v0/version.schema.json",
+  "title": "ApplicationVersion",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "applicationId", "number", "sourceDigest", "status", "createdAt"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "applicationId": { "type": "string", "format": "uuid" },
+    "number": { "type": "integer", "minimum": 1 },
+    "sourceDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "status": { "enum": ["DRAFT", "VERIFIED", "FAILED"] },
+    "buildId": { "type": ["string", "null"], "format": "uuid" },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "VERIFIED" } }, "required": ["status"] },
+      "then": { "properties": { "buildId": { "type": "string" } }, "required": ["buildId"] }
+    }
+  ]
+}
