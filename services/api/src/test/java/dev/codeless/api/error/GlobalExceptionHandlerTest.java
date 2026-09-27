@@ -1,13 +1,16 @@
 package dev.codeless.api.error;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import dev.codeless.api.system.HealthController;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -21,7 +24,7 @@ class GlobalExceptionHandlerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new ValidationController())
+        mockMvc = MockMvcBuilders.standaloneSetup(new ValidationController(), new HealthController())
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
@@ -41,6 +44,15 @@ class GlobalExceptionHandlerTest {
                 .andExpect(jsonPath("$.details.name").isNotEmpty())
                 .andExpect(jsonPath("$.exception").doesNotExist())
                 .andExpect(jsonPath("$.stackTrace").doesNotExist());
+    }
+
+    @Test
+    void unsupportedMethodPreservesStatusAndAllowHeader() throws Exception {
+        mockMvc.perform(post("/api/health"))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(header().string(HttpHeaders.ALLOW, "GET"))
+                .andExpect(jsonPath("$.code").value("METHOD_NOT_ALLOWED"))
+                .andExpect(jsonPath("$.path").value("/api/health"));
     }
 
     @RestController

@@ -6,9 +6,11 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -34,6 +36,13 @@ public class GlobalExceptionHandler {
         return response(HttpStatus.NOT_FOUND, "NOT_FOUND", "Resource was not found", request, Map.of());
     }
 
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiError> methodNotAllowed(
+            HttpRequestMethodNotSupportedException exception, HttpServletRequest request) {
+        return response(HttpStatus.METHOD_NOT_ALLOWED, "METHOD_NOT_ALLOWED", "Method is not allowed",
+                request, Map.of(), exception.getHeaders());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> unexpected(Exception exception, HttpServletRequest request) {
         return response(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", "An unexpected error occurred", request, Map.of());
@@ -45,11 +54,21 @@ public class GlobalExceptionHandler {
             String message,
             HttpServletRequest request,
             Map<String, String> details) {
+        return response(status, code, message, request, details, new HttpHeaders());
+    }
+
+    private ResponseEntity<ApiError> response(
+            HttpStatus status,
+            String code,
+            String message,
+            HttpServletRequest request,
+            Map<String, String> details,
+            HttpHeaders headers) {
         String suppliedTraceId = request.getHeader("X-Request-ID");
         String traceId = suppliedTraceId == null || suppliedTraceId.isBlank()
                 ? UUID.randomUUID().toString()
                 : suppliedTraceId.substring(0, Math.min(suppliedTraceId.length(), 100));
         ApiError error = new ApiError(code, message, Instant.now(), request.getRequestURI(), traceId, details);
-        return ResponseEntity.status(status).body(error);
+        return ResponseEntity.status(status).headers(headers).body(error);
     }
 }
