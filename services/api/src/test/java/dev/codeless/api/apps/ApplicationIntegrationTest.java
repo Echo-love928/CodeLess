@@ -132,6 +132,8 @@ class ApplicationIntegrationTest extends PostgresTestBase {
                 .isZero();
         JsonNode boundary = create(demo, "{\"name\":\"" + "x".repeat(120)
                 + "\",\"dataMode\":\"MOCK\"}");
+        create(demo, "{\"name\":\"" + "😀".repeat(120)
+                + "\",\"dataMode\":\"MOCK\"}");
         mvc.perform(patch("/api/v0/applications/" + boundary.get("id").asText())
                         .session(demo.session()).header("X-CSRF-Token", demo.csrf())
                         .contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"  \"}"))

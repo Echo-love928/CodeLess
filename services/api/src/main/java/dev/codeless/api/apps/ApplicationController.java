@@ -84,7 +84,7 @@ public class ApplicationController {
 
     private static String name(JsonNode body) {
         String value = requiredText(body, "name").strip();
-        if (value.isEmpty() || value.length() > 120) invalid();
+        if (value.isEmpty() || value.codePointCount(0, value.length()) > 120) invalid();
         return value;
     }
 
@@ -97,7 +97,7 @@ public class ApplicationController {
     private static String optionalText(JsonNode body, String field, int max) {
         JsonNode value = body.get(field);
         if (value == null) return null;
-        if (!value.isTextual() || value.asText().length() > max) invalid();
+        if (!value.isTextual() || value.asText().codePointCount(0, value.asText().length()) > max) invalid();
         return value.asText();
     }
 
