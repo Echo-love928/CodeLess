@@ -1,0 +1,97 @@
+name: codeless-dev
+
+services:
+  postgres:
+    image: postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB is required}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:?POSTGRES_PORT is required}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    networks: [database]
+
+  platform-gateway:
+    image: nginx:1.27.5-alpine
+    ports:
+      - "127.0.0.1:${CODELESS_PLATFORM_PORT:?CODELESS_PLATFORM_PORT is required}:80"
+    environment:
+      CODELESS_PLATFORM_DOMAIN: ${CODELESS_PLATFORM_DOMAIN:?CODELESS_PLATFORM_DOMAIN is required}
+    volumes:
+      - ./nginx/platform.conf.template:/etc/nginx/templates/default.conf.template:ro
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    networks: [gateway]
+
+  preview-gateway:
+    image: nginx:1.27.5-alpine
+    ports:
+      - "127.0.0.1:${CODELESS_PREVIEW_PORT:?CODELESS_PREVIEW_PORT is required}:80"
+    environment:
+      CODELESS_PREVIEW_DOMAIN: ${CODELESS_PREVIEW_DOMAIN:?CODELESS_PREVIEW_DOMAIN is required}
+    volumes:
+      - ./nginx/preview.conf.template:/etc/nginx/templates/default.conf.template:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    networks: [gateway]
+
+  publication-gateway:
+    image: nginx:1.27.5-alpine
+    ports:
+      - "127.0.0.1:${CODELESS_PUBLICATION_PORT:?CODELESS_PUBLICATION_PORT is required}:80"
+    environment:
+      CODELESS_PUBLICATION_DOMAIN: ${CODELESS_PUBLICATION_DOMAIN:?CODELESS_PUBLICATION_DOMAIN is required}
+    volumes:
+      - ./nginx/publication.conf.template:/etc/nginx/templates/default.conf.template:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    networks: [gateway]
+
+  runner:
+    image: node:24.16.0-bookworm-slim
+    working_dir: /app
+    command: ["node", "services/runner/main.mjs"]
+    environment:
+      RUNNER_HOST: 0.0.0.0
+      RUNNER_PORT: 8787
+      RUNNER_CONTAINER_ONLY: "1"
+    volumes:
+      - ../services/runner:/app/services/runner:ro
+    read_only: true
+    user: node
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8787/internal/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    networks: [runner-internal]
+
+volumes:
+  postgres-data:
+
+networks:
+  database:
+    internal: true
+  gateway: {}
+  runner-internal:
+    internal: true

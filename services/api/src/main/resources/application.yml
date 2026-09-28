@@ -1,6 +1,12 @@
 spring:
   application:
     name: codeless-api
+  datasource:
+    url: ${CODELESS_DATABASE_URL}
+    username: ${CODELESS_DATABASE_USER}
+    password: ${CODELESS_DATABASE_PASSWORD}
+  flyway:
+    enabled: true
   jackson:
     default-property-inclusion: non-null
 server:

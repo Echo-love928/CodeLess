@@ -48,6 +48,18 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify:runner
 
+  infra:
+    name: infra-preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.16.0
+      - name: Check Docker, PostgreSQL and isolated services
+        run: bash infra/ci-preflight.sh .env.example
+
   e2e:
     name: verify:e2e
     runs-on: ubuntu-24.04
@@ -70,7 +82,7 @@ jobs:
   ci-gate:
     name: ci-gate
     if: always()
-    needs: [static, api, runner, e2e]
+    needs: [static, api, runner, e2e, infra]
     runs-on: ubuntu-latest
     steps:
       - name: Reject failed, cancelled, skipped, or unknown checks
@@ -79,7 +91,8 @@ jobs:
           API_RESULT: ${{ needs.api.result }}
           RUNNER_RESULT: ${{ needs.runner.result }}
           E2E_RESULT: ${{ needs.e2e.result }}
+          INFRA_RESULT: ${{ needs.infra.result }}
         run: |
-          for result in "$STATIC_RESULT" "$API_RESULT" "$RUNNER_RESULT" "$E2E_RESULT"; do
+          for result in "$STATIC_RESULT" "$API_RESULT" "$RUNNER_RESULT" "$E2E_RESULT" "$INFRA_RESULT"; do
             test "$result" = success || exit 1
           done

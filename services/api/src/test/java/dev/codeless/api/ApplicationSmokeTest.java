@@ -2,19 +2,16 @@ package dev.codeless.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import dev.codeless.api.data.PostgresTestBase;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.WebApplicationType;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
-class ApplicationSmokeTest {
+class ApplicationSmokeTest extends PostgresTestBase {
+    @Autowired ApplicationContext context;
+
     @Test
     void applicationContextStarts() {
-        try (ConfigurableApplicationContext context = new SpringApplicationBuilder(CodeLessApiApplication.class)
-                .web(WebApplicationType.NONE)
-                .properties("spring.main.banner-mode=off")
-                .run()) {
-            assertThat(context.isActive()).isTrue();
-        }
+        assertThat(context).isNotNull();
     }
 }
