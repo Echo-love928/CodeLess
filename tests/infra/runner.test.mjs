@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
 import { after, before, test } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { createServer as createTcpServer } from 'node:net';
+import { fileURLToPath } from 'node:url';
 import { createRunnerServer, runnerListenOptions } from '../../services/runner/health.mjs';
 import { toBuildContract } from '../../services/runner/build-contract.mjs';
 
@@ -46,6 +49,30 @@ test('runner refuses a public bind by default', () => {
   assert.throws(() => runnerListenOptions({ RUNNER_HOST: '0.0.0.0' }), /loopback/);
   assert.throws(() => runnerListenOptions({ RUNNER_PORT: '0' }), /RUNNER_PORT/);
   assert.deepEqual(runnerListenOptions({ RUNNER_HOST: '0.0.0.0', RUNNER_CONTAINER_ONLY: '1' }), { host: '0.0.0.0', port: 8787 });
+});
+
+test('runner entrypoint starts and serves health over a loopback socket', async () => {
+  const probe = createTcpServer();
+  await new Promise((resolve) => probe.listen(0, '127.0.0.1', resolve));
+  const port = probe.address().port;
+  await new Promise((resolve) => probe.close(resolve));
+  const child = spawn(process.execPath, [fileURLToPath(new URL('../../services/runner/main.mjs', import.meta.url))], {
+    env: { ...process.env, RUNNER_HOST: '127.0.0.1', RUNNER_PORT: String(port) },
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  try {
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error('runner did not start')), 5000);
+      child.stdout.once('data', () => { clearTimeout(timeout); resolve(); });
+      child.once('error', (error) => { clearTimeout(timeout); reject(error); });
+      child.once('exit', (code) => { clearTimeout(timeout); reject(new Error(`runner exited ${code}`)); });
+    });
+    const response = await fetch(`http://127.0.0.1:${port}/internal/health`);
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).service, 'codeless-runner');
+  } finally {
+    child.kill();
+  }
 });
 
 test('observed exit result maps to the shared build contract', () => {
