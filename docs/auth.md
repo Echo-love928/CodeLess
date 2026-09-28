@@ -20,10 +20,9 @@ and version checks join through applications; missing and foreign IDs have the s
 handlers must call these guards before returning or changing a resource. The D04
 application handlers do not yet exist, so no real CRUD authorization is claimed.
 
-The D01 shared OpenAPI still advertises Bearer/JWT, which conflicts with these session
-endpoints. The additive contract is in `contracts/auth/README.md`; the common contract
-maintainer must apply this difference alongside D03-B before enabling real UI auth.
-This task does not alter `contracts/openapi.v0.json`.
+The shared `contracts/openapi.v0.json` now declares the session cookie, CSRF header,
+and authentication endpoints. `contracts/auth/README.md` records the detailed
+authentication behavior and failure responses.
 
 Auth tests run against the same pinned PostgreSQL Testcontainers image as D02-A:
 `$env:JAVA_HOME='<Java 21 directory>'; corepack pnpm verify:api`. The report is

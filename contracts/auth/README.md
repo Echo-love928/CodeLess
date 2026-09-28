@@ -1,8 +1,8 @@
-# D03-A authentication contract (candidate)
+# Platform authentication contract
 
-This is the additive contract for D03-B integration. The D01 `openapi.v0.json` still
-declares Bearer authentication. Its maintainer must replace that shared declaration
-with the session scheme before the authenticated application APIs are enabled.
+The shared `contracts/openapi.v0.json` declares the same-origin `JSESSIONID` session
+cookie and CSRF header. This document records the authentication behavior used by
+the API and web client.
 
 All paths are under `/api/v0`. JSON requests use `Content-Type: application/json`.
 
