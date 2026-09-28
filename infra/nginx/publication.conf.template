@@ -1,0 +1,11 @@
+server {
+    listen 80;
+    server_name ${CODELESS_PUBLICATION_DOMAIN};
+    location = /health {
+        default_type application/json;
+        return 200 '{"status":"UP","service":"publication-gateway"}';
+    }
+    location / {
+        return 404;
+    }
+}
