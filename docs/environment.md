@@ -31,7 +31,7 @@ curl -H 'Host: publish.codeless.test' http://127.0.0.1:18082/health
 
 PowerShell 中复制配置用 `Copy-Item .env.example .env`，HTTP 检查可用 `Invoke-RestMethod -Headers @{Host='platform.codeless.test'} http://127.0.0.1:18080/health`，其余命令不变。停止用 `docker compose --env-file .env -f infra/compose.dev.yml down`；只有明确要清除开发数据库时才加 `-v`。
 
-平台网关把 `/api/` 转发到宿主机 `8080`，其余请求转发到宿主机 `5173`。先按 README 启动 API；合入 D02-A 后还需将 `.env` 的 `CODELESS_DATABASE_*` 三项加载到 API 进程环境。再以 `corepack pnpm --filter @codeless/web dev -- --host 0.0.0.0` 启动前端，随后检查 `http://127.0.0.1:18080/api/health`。此本机配置不提供 TLS。前端开发服务器绑定所有本机接口仅供受信任的开发网络使用。
+平台网关把 `/api/` 转发到宿主机 `8080`，其余请求转发到宿主机 `5173`。先按 README 启动 API；合入 D02-A 后还需将 `.env` 的 `CODELESS_DATABASE_*` 三项加载到 API 进程环境。再以 `corepack pnpm --filter @codeless/web exec vite --host 0.0.0.0` 启动前端，随后检查 `http://127.0.0.1:18080/api/health`。网关将开发服务器的 Host 头设为 `localhost`，以满足 Vite 的主机校验。此本机配置不提供 TLS。前端开发服务器绑定所有本机接口仅供受信任的开发网络使用。
 
 ## 失败和隔离验收
 
