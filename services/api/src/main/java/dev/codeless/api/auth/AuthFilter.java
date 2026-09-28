@@ -39,6 +39,16 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
         HttpSession session = request.getSession(false);
+        boolean publicAuth = path.equals("/api/v0/auth/csrf") || path.equals("/api/v0/auth/login");
+        AuthAccountRepository.Account account = null;
+        if (!publicAuth) {
+            UUID id = session == null ? null : (UUID) session.getAttribute(USER_ID);
+            account = id == null ? null : accounts.activeById(id).orElse(null);
+            if (account == null) {
+                error(response, request, HttpStatus.UNAUTHORIZED, "UNAUTHENTICATED");
+                return;
+            }
+        }
         if (!"GET".equals(request.getMethod()) && !"HEAD".equals(request.getMethod())
                 && !"OPTIONS".equals(request.getMethod())) {
             String expected = session == null ? null : (String) session.getAttribute(CSRF);
@@ -49,14 +59,8 @@ public class AuthFilter extends OncePerRequestFilter {
                 return;
             }
         }
-        if (path.equals("/api/v0/auth/csrf") || path.equals("/api/v0/auth/login")) {
+        if (publicAuth) {
             chain.doFilter(request, response);
-            return;
-        }
-        UUID id = session == null ? null : (UUID) session.getAttribute(USER_ID);
-        AuthAccountRepository.Account account = id == null ? null : accounts.activeById(id).orElse(null);
-        if (account == null) {
-            error(response, request, HttpStatus.UNAUTHORIZED, "UNAUTHENTICATED");
             return;
         }
         if (path.startsWith("/api/v0/admin/") && !"ADMIN".equals(account.role())) {

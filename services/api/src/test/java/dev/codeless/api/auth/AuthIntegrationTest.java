@@ -84,6 +84,8 @@ class AuthIntegrationTest extends PostgresTestBase {
     @Test
     void logoutInvalidatesSessionAndCsrfProtectsWrites() throws Exception {
         Browser demo = browser();
+        mvc.perform(post("/api/v0/auth/logout"))
+                .andExpect(status().isUnauthorized()).andExpect(jsonPath("$.code").value("UNAUTHENTICATED"));
         mvc.perform(post("/api/v0/auth/login").session(demo.session())
                         .contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("CSRF_INVALID"));
