@@ -31,7 +31,7 @@ for spec in \
   read -r port_key domain_key expected <<< "$spec"
   port="$(sed -n "s/^${port_key}=//p" "$env_file")"
   domain="$(sed -n "s/^${domain_key}=//p" "$env_file")"
-  body="$(curl --fail --silent --show-error -H "Host: ${domain}" "http://127.0.0.1:${port}/health")"
+  body="$(curl --noproxy 127.0.0.1 --fail --silent --show-error -H "Host: ${domain}" "http://127.0.0.1:${port}/health")"
   [[ "$body" == *'"status":"UP"'* && "$body" == *"\"service\":\"${expected}\""* ]]
 done
 
