@@ -2,8 +2,19 @@
 set -euo pipefail
 
 env_file="${1:-.env.example}"
-compose=(docker compose --env-file "$env_file" -f infra/compose.dev.yml)
-trap '"${compose[@]}" logs --no-color 2>/dev/null || true; "${compose[@]}" down -v --remove-orphans 2>/dev/null || true' EXIT
+project="codeless-preflight-${GITHUB_RUN_ID:-$$}"
+compose=(docker compose -p "$project" --env-file "$env_file" -f infra/compose.dev.yml)
+cleanup() {
+  status=$?
+  trap - EXIT
+  if (( status != 0 )); then "${compose[@]}" logs --no-color || true; fi
+  if ! "${compose[@]}" down -v --remove-orphans >/dev/null; then
+    echo 'preflight cleanup failed' >&2
+    status=1
+  fi
+  exit "$status"
+}
+trap cleanup EXIT
 
 node infra/check-config.mjs "$env_file"
 docker info --format 'Docker server: {{.ServerVersion}}'

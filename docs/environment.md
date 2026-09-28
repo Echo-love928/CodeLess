@@ -16,6 +16,8 @@ Docker Compose 提供本机开发的 PostgreSQL、平台网关、预览网关、
 
 需要 Docker Engine 与 Compose v2、Node 24.16.0 和 Corepack。在仓库根目录执行：
 
+Windows 用户目录安装的 Docker Desktop 若未把 CLI 加入 PATH，可在当前 PowerShell 会话先执行 `$env:Path = "$env:LOCALAPPDATA\Programs\DockerDesktop\resources\bin;$env:Path"`，然后以 `docker version` 确认引擎可用。
+
 ```bash
 cp .env.example .env
 node infra/check-config.mjs .env
@@ -37,7 +39,7 @@ PowerShell 中复制配置用 `Copy-Item .env.example .env`，HTTP 检查可用 
 
 清空 `POSTGRES_PASSWORD` 或删除 `CODELESS_PREVIEW_DOMAIN` 后，`node infra/check-config.mjs .env` 必须非零退出并列出缺失项；Compose 的 `${VAR:?}` 也拒绝缺失的必需服务变量。`RUNNER_HOST=0.0.0.0 node services/runner/main.mjs` 在未设置容器专用开关时必须非零退出。`docker compose ... port runner 8787` 不得返回宿主映射。健康响应固定为 `status` 和 `service`，不会读取密钥环境变量；`corepack pnpm verify:runner` 覆盖正常、失败和隔离路径。
 
-CI 的 `infra-preflight` 实际运行 `bash infra/ci-preflight.sh .env.example`：校验配置，执行 `docker info`、Compose 配置、拉起固定镜像、PostgreSQL `SELECT 1`、三个网关健康检查、runner 内部健康检查和无宿主端口断言。它的结果纳入 `ci-gate`；任何失败、取消、跳过或未知结果都不能通过汇总门禁。本机缺少 Docker 时必须记录未执行，不能以静态测试替代。
+CI 的 `infra-preflight` 实际运行 `bash infra/ci-preflight.sh .env.example`：以独立临时 Compose 项目校验配置，执行 `docker info`、拉起固定镜像、PostgreSQL `SELECT 1`、三个网关健康检查、runner 内部健康检查和无宿主端口断言；完成后只清理该临时项目。它的结果纳入 `ci-gate`；任何失败、取消、跳过或未知结果都不能通过汇总门禁。若 Docker 不可用必须记录未执行，不能以静态测试替代。
 
 ## 排障
 
