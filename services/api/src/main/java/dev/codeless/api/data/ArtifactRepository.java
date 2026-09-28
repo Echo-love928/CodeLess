@@ -38,8 +38,16 @@ public class ArtifactRepository {
     }
 
     public Build queueBuild(UUID id, UUID taskId, UUID versionId) {
-        jdbc.sql("INSERT INTO builds(id,task_id,version_id,status) VALUES (?,?,?,'QUEUED')")
-                .params(id, taskId, versionId).update();
+        int inserted = jdbc.sql("""
+                INSERT INTO builds(id, task_id, version_id, status)
+                SELECT ?, t.id, v.id, 'QUEUED'
+                FROM generation_tasks t
+                JOIN application_versions v ON v.application_id = t.application_id
+                WHERE t.id = ? AND v.id = ?
+                """).params(id, taskId, versionId).update();
+        if (inserted != 1) {
+            throw new IllegalArgumentException("Build task and version must belong to the same application");
+        }
         return findBuild(id).orElseThrow();
     }
 

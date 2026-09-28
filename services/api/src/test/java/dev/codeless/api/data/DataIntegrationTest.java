@@ -91,6 +91,41 @@ class DataIntegrationTest extends PostgresTestBase {
     }
 
     @Test
+    void failedInitialEventInsertRollsBackTaskCreation() {
+        TestData.Seed seed = TestData.task(repository, DataMode.STATIC);
+        UUID task = UUID.randomUUID();
+        String constraint = "task_events_reject_initial_event_test";
+        jdbc.execute("ALTER TABLE task_events ADD CONSTRAINT " + constraint
+                + " CHECK (task_id <> '" + task + "'::uuid)");
+        try {
+            assertThatThrownBy(() -> repository.createTask(task, seed.applicationId(), "Create a page"))
+                    .isInstanceOf(DataIntegrityViolationException.class)
+                    .hasMessageContaining(constraint);
+        } finally {
+            jdbc.execute("ALTER TABLE task_events DROP CONSTRAINT " + constraint);
+        }
+        assertThat(repository.findTask(task)).isEmpty();
+        assertThat(repository.listEvents(task)).isEmpty();
+    }
+
+    @Test
+    void buildQueueRejectsTaskAndVersionFromDifferentApplications() {
+        TestData.Seed first = TestData.task(repository, DataMode.MOCK);
+        TestData.Seed second = TestData.task(repository, DataMode.STATIC);
+        UUID version = UUID.randomUUID();
+        artifacts.createDraftVersion(version, second.applicationId(), 1, "sha256:" + "a".repeat(64));
+        UUID rejectedBuild = UUID.randomUUID();
+
+        assertThatThrownBy(() -> artifacts.queueBuild(rejectedBuild, first.taskId(), version))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("same application");
+        assertThat(artifacts.findBuild(rejectedBuild)).isEmpty();
+
+        UUID validBuild = UUID.randomUUID();
+        assertThat(artifacts.queueBuild(validBuild, second.taskId(), version).id()).isEqualTo(validBuild);
+    }
+
+    @Test
     void testProfileUsesContainerInsteadOfProductionVariable() throws Exception {
         assertThat(environment.getActiveProfiles()).contains("test");
         assertThat(environment.getProperty("CODELESS_DATABASE_URL"))
