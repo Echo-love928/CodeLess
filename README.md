@@ -59,7 +59,7 @@ pnpm install --frozen-lockfile
 pnpm --filter @codeless/web dev
 ```
 
-默认访问 `http://127.0.0.1:5173/login`。登录、应用列表和工作台当前使用本地演示数据；真实鉴权、生成和发布尚未接入。启动步骤应先完成 shim 准备，因为前端脚本及 Playwright 会继续调用 `pnpm`。
+默认访问 `http://127.0.0.1:5173/login`。D03-B 开发服务器把同源 `/api/` 请求代理到本机 `http://127.0.0.1:8080`；先启动 D03-A（PR #5）的真实 API 和 PostgreSQL，才能使用两组演示账号登录。直连 Vite 无需另起平台网关；若使用 D02 平台网关，应按 [环境文档](docs/environment.md) 以 `vite --host 0.0.0.0` 启动前端，再访问 `http://127.0.0.1:18080/login`。本机纯 HTTP 联调时，API 进程需设置 `CODELESS_COOKIE_SECURE=false`，生产 HTTPS 保持默认安全 Cookie。真实应用 CRUD、生成和发布尚未接入；应用列表明确使用本地测试替身。启动步骤应先完成 shim 准备，因为前端脚本及 Playwright 会继续调用 `pnpm`。
 
 ## 验证
 
