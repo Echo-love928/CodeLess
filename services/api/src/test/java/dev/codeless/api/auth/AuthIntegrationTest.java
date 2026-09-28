@@ -39,6 +39,7 @@ class AuthIntegrationTest extends PostgresTestBase {
     @Autowired PlatformRepository platform;
     @Autowired ArtifactRepository artifacts;
     @Autowired AuthAccountRepository accounts;
+    @Autowired LoginAttempts attempts;
 
     @BeforeEach
     void setUp() { mvc = MockMvcBuilders.webAppContextSetup(context).addFilters(filter).build(); }
@@ -157,6 +158,15 @@ class AuthIntegrationTest extends PostgresTestBase {
                         .header("X-CSRF-Token", browser.csrf()).contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isTooManyRequests())
                 .andExpect(jsonPath("$.code").value("LOGIN_RATE_LIMITED"));
+    }
+
+    @Test
+    void unknownEmailFloodDoesNotBlockCorrectPasswordForAnAccount() throws Exception {
+        for (int i = 0; i < 10_001; i++) attempts.failed("flood-" + i + "@example.test");
+        Browser admin = browser();
+        login(admin, "admin@codeless.local", "admin-password-for-test-only");
+        mvc.perform(get("/api/v0/auth/me").session(admin.session()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.role").value("ADMIN"));
     }
 
     @RestController

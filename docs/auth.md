@@ -28,5 +28,8 @@ This task does not alter `contracts/openapi.v0.json`.
 Auth tests run against the same pinned PostgreSQL Testcontainers image as D02-A:
 `$env:JAVA_HOME='<Java 21 directory>'; corepack pnpm verify:api`. The report is
 `services/api/target/surefire-reports/dev.codeless.api.auth.AuthIntegrationTest.txt`.
-No model provider is involved. Login limits are kept in memory for 15 minutes and
-must move to a shared store before serving multiple API instances.
+No model provider is involved. Login limits are kept in memory for 15 minutes.
+Known account counters are separate from anonymous email counters, so a flood of
+unknown identifiers cannot evict an existing account's lockout or deny a new
+account's correct login. Anonymous counters retain at most 10,000 recent keys.
+The limiter must move to a shared store before serving multiple API instances.

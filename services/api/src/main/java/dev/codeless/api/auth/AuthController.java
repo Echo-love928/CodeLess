@@ -59,16 +59,16 @@ public class AuthController {
         if (email.length() > 320 || password.length() > 1024) {
             throw new AuthFailure(HttpStatus.BAD_REQUEST, "INVALID_REQUEST");
         }
-        String key = email;
-        if (attempts.blocked(key)) {
+        AuthAccountRepository.Account account = accounts.activeByEmail(email).orElse(null);
+        if (account == null ? attempts.blocked(email) : attempts.blockedKnown(account.id())) {
             throw new AuthFailure(HttpStatus.TOO_MANY_REQUESTS, "LOGIN_RATE_LIMITED");
         }
-        AuthAccountRepository.Account account = accounts.activeByEmail(email).orElse(null);
         if (account == null || !encoder.matches(password, account.hash())) {
-            attempts.failed(key);
+            if (account == null) attempts.failed(email);
+            else attempts.failedKnown(account.id());
             throw new AuthFailure(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS");
         }
-        attempts.succeeded(key);
+        attempts.succeededKnown(account.id());
         request.changeSessionId();
         request.getSession(false).setAttribute(AuthFilter.USER_ID, account.id());
         return UserResponse.from(account);
