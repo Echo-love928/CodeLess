@@ -34,6 +34,11 @@ function validateOpenApiSurface() {
   const api = readJson('contracts/openapi.v0.json');
   const requiredPaths = [
     '/api/health',
+    '/api/v0/auth/csrf',
+    '/api/v0/auth/login',
+    '/api/v0/auth/me',
+    '/api/v0/auth/logout',
+    '/api/v0/admin/session',
     '/api/v0/applications',
     '/api/v0/tasks',
     '/api/v0/tasks/{taskId}/events',
@@ -50,8 +55,40 @@ function validateOpenApiSurface() {
       throw new Error(`OpenAPI does not reference ${kind} schema`);
     }
   }
-  if (api.security?.[0]?.bearerAuth === undefined) throw new Error('global bearer authentication missing');
+  const sessionCookie = api.components?.securitySchemes?.sessionCookie;
+  if (sessionCookie?.type !== 'apiKey' || sessionCookie.in !== 'cookie' || sessionCookie.name !== 'JSESSIONID') {
+    throw new Error('host-only session cookie security scheme missing');
+  }
+  if (api.security?.length !== 1 || api.security[0].sessionCookie === undefined) {
+    throw new Error('global session cookie authentication missing');
+  }
+  if (api.components.securitySchemes.bearerAuth || serialized.includes('bearerAuth')) {
+    throw new Error('obsolete bearer authentication remains');
+  }
   if (api.paths['/api/health'].get.security?.length !== 0) throw new Error('health must be explicitly public');
+  if (api.paths['/api/v0/auth/csrf'].get.security?.length !== 0
+      || api.paths['/api/v0/auth/login'].post.security?.length !== 0) {
+    throw new Error('CSRF bootstrap and login must allow anonymous sessions');
+  }
+  for (const [path, item] of Object.entries(api.paths)) {
+    if (!path.startsWith('/api/v0/')) continue;
+    for (const method of ['post', 'put', 'patch', 'delete']) {
+      const operation = item[method];
+      if (!operation) continue;
+      const parameters = [...(item.parameters ?? []), ...(operation.parameters ?? [])];
+      if (!parameters.some(parameter => parameter.$ref === '#/components/parameters/CsrfToken')
+          || !operation.responses?.['403']) {
+        throw new Error(`CSRF header or failure response missing: ${method.toUpperCase()} ${path}`);
+      }
+    }
+  }
+  for (const [path, method] of [['/api/v0/auth/me', 'get'], ['/api/v0/auth/logout', 'post'],
+    ['/api/v0/admin/session', 'get'], ['/api/v0/applications', 'post'],
+    ['/api/v0/tasks', 'post'], ['/api/v0/publications', 'post']]) {
+    if (api.paths[path][method].security?.length === 0) {
+      throw new Error(`authenticated operation is public: ${method.toUpperCase()} ${path}`);
+    }
+  }
   console.log('OpenAPI surface and authentication boundary passed');
 }
 
