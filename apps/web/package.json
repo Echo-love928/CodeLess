@@ -7,11 +7,12 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "lint": "eslint src vite.config.ts vitest.config.ts playwright.config.ts",
+    "lint": "eslint src vite.config.ts vitest.config.ts playwright.config.ts playwright.real-auth.config.ts",
     "typecheck": "vue-tsc --noEmit",
     "test": "vitest run",
     "verify": "pnpm lint && pnpm test && pnpm build",
-    "smoke": "pnpm build && playwright test --config playwright.config.ts"
+    "smoke": "pnpm build && playwright test --config playwright.config.ts",
+    "test:real-auth": "playwright test --config playwright.real-auth.config.ts"
   },
   "dependencies": {
     "element-plus": "2.9.7",

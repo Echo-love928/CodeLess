@@ -1,5 +1,6 @@
 package dev.codeless.api.error;
 
+import dev.codeless.api.auth.AuthFailure;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
@@ -18,6 +19,18 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(AuthFailure.class)
+    public ResponseEntity<ApiError> auth(AuthFailure exception, HttpServletRequest request) {
+        String message = switch (exception.code()) {
+            case "INVALID_CREDENTIALS" -> "Invalid email or password";
+            case "LOGIN_RATE_LIMITED" -> "Too many login attempts";
+            case "UNAUTHENTICATED" -> "Authentication required";
+            case "NOT_FOUND" -> "Resource was not found";
+            case "FORBIDDEN" -> "Access denied";
+            default -> "Request is invalid";
+        };
+        return response(exception.status(), exception.code(), message, request, Map.of());
+    }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> validation(MethodArgumentNotValidException exception, HttpServletRequest request) {
         Map<String, String> details = new LinkedHashMap<>();
