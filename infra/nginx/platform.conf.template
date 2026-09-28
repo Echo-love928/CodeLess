@@ -1,0 +1,19 @@
+server {
+    listen 80;
+    server_name ${CODELESS_PLATFORM_DOMAIN};
+    location = /health {
+        default_type application/json;
+        return 200 '{"status":"UP","service":"platform-gateway"}';
+    }
+    location /api/ {
+        proxy_pass http://host.docker.internal:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location / {
+        proxy_pass http://host.docker.internal:5173;
+        proxy_set_header Host $host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
