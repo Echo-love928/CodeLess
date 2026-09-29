@@ -26,6 +26,15 @@ function validateFixtures(selectedKinds = kinds) {
     if (validate(invalid)) {
       throw new Error(`${kind} invalid fixture unexpectedly passed`);
     }
+    if (kind === 'application') {
+      if (!validate.errors?.some(error => error.instancePath === '/template')) {
+        throw new Error('application invalid fixture must reject the unsupported template');
+      }
+      const draft = readJson('contracts/examples/v0/valid/application-draft.json');
+      if (!validate(draft)) {
+        throw new Error(`application draft response failed: ${ajv.errorsText(validate.errors)}`);
+      }
+    }
     console.log(`${kind}: valid accepted; invalid rejected`);
   }
 }
@@ -48,6 +57,10 @@ function validateOpenApiSurface() {
   ];
   for (const path of requiredPaths) {
     if (!api.paths[path]) throw new Error(`OpenAPI path missing: ${path}`);
+  }
+  if (!api.paths['/api/v0/applications'].get
+      || !api.paths['/api/v0/applications/{applicationId}'].patch) {
+    throw new Error('application pagination or rename operation missing');
   }
   const serialized = JSON.stringify(api);
   for (const kind of [...kinds, 'error']) {

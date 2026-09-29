@@ -102,6 +102,21 @@
       }
     },
     "/api/v0/applications": {
+      "get": {
+        "operationId": "listApplications",
+        "summary": "List the current user's applications",
+        "description": "Owner-scoped results use stable order by createdAt descending, then id descending.",
+        "tags": ["applications"],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "minimum": 0, "default": 0 } },
+          { "name": "size", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 } }
+        ],
+        "responses": {
+          "200": { "description": "Owner-scoped page", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApplicationPage" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      },
       "post": {
         "operationId": "createApplication",
         "summary": "Create a Vue application shell",
@@ -128,6 +143,20 @@
         "responses": {
           "200": { "description": "Found", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/application.schema.json" } } } },
           "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch": {
+        "operationId": "renameApplication",
+        "summary": "Rename an application owned by the current user",
+        "tags": ["applications"],
+        "parameters": [{ "$ref": "#/components/parameters/CsrfToken" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RenameApplicationRequest" } } } },
+        "responses": {
+          "200": { "description": "Renamed", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/application.schema.json" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
           "404": { "$ref": "#/components/responses/NotFound" }
         }
       }
@@ -293,7 +322,25 @@
         "properties": {
           "name": { "type": "string", "minLength": 1, "maxLength": 120 },
           "description": { "type": "string", "maxLength": 1000 },
-          "dataMode": { "enum": ["STATIC", "MOCK", "LOCAL_STORAGE"] }
+          "dataMode": { "enum": ["STATIC", "MOCK", "LOCAL_STORAGE"] },
+          "template": { "const": "VUE" }
+        }
+      },
+      "RenameApplicationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": { "name": { "type": "string", "minLength": 1, "maxLength": 120 } }
+      },
+      "ApplicationPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["items", "page", "size", "total"],
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "./schemas/v0/application.schema.json" } },
+          "page": { "type": "integer", "minimum": 0 },
+          "size": { "type": "integer", "minimum": 1, "maximum": 100 },
+          "total": { "type": "integer", "minimum": 0 }
         }
       },
       "CreateTaskRequest": {
