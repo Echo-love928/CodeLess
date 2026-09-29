@@ -99,6 +99,8 @@ class ApplicationIntegrationTest extends PostgresTestBase {
     @Test void invalidInputAndAuthenticationAreRejectedWithoutRows() throws Exception {
         Browser demo = login("demo@codeless.local", "demo-password-for-test-only");
         String[] invalid = {
+                "{\"dataMode\":\"MOCK\"}",
+                "{\"name\":7,\"dataMode\":\"MOCK\"}",
                 "{\"name\":\"\",\"dataMode\":\"MOCK\"}",
                 "{\"name\":\"   \",\"dataMode\":\"MOCK\"}",
                 "{\"name\":\"" + "x".repeat(121) + "\",\"dataMode\":\"MOCK\"}",
@@ -138,6 +140,15 @@ class ApplicationIntegrationTest extends PostgresTestBase {
                         .session(demo.session()).header("X-CSRF-Token", demo.csrf())
                         .contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"  \"}"))
                 .andExpect(status().isBadRequest());
+        mvc.perform(patch("/api/v0/applications/" + boundary.get("id").asText())
+                        .session(demo.session()).header("X-CSRF-Token", demo.csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"valid\",\"ownerId\":\"" + UUID.randomUUID() + "\"}"))
+                .andExpect(status().isBadRequest());
+        mvc.perform(get("/api/v0/applications/" + boundary.get("id").asText())
+                        .session(demo.session()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("x".repeat(120)));
     }
 
     @Test void paginationUsesStableTimestampAndIdOrdering() throws Exception {
