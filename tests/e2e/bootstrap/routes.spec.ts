@@ -56,6 +56,12 @@ test('workbench shows input, tasks and honest preview state', async ({ page }) =
 
 test('mobile routes have no horizontal overflow and keep the inspector reachable', async ({ page }) => {
   await installMockAuth(page)
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 844 })
+    await page.goto('/login')
+    await expect(page.getByRole('heading', { name: '开始你的第一件作品' })).toBeVisible()
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `/login at ${width}px`).toBeTruthy()
+  }
   await loginAsDemo(page)
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 })

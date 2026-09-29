@@ -5,6 +5,7 @@ import BrandLogo from '../../components/BrandLogo.vue'
 import UiIcon from '../../components/UiIcon.vue'
 import { ApiError } from '../../api/http'
 import { type Application, createApplication, listApplications } from './application-api'
+import { redirectOnUnauthorized } from './redirect-on-unauthorized'
 import { clearSession, session, signOut } from '../auth/session'
 
 const router = useRouter()
@@ -33,7 +34,11 @@ async function load() {
     apps.value = result.items
     total.value = result.total
   }
-  catch (cause) { loadError.value = cause instanceof Error ? cause.message : '应用列表加载失败。' }
+  catch (cause) {
+    if (!(await redirectOnUnauthorized(cause, router))) {
+      loadError.value = cause instanceof Error ? cause.message : '应用列表加载失败。'
+    }
+  }
   finally { loading.value = false }
 }
 onMounted(load)
@@ -55,7 +60,9 @@ async function createApp() {
     dialogOpen.value = false
     await router.push(`/workbench/${created.id}`)
   } catch (cause) {
-    createError.value = cause instanceof Error ? cause.message : '创建失败，请重试。'
+    if (!(await redirectOnUnauthorized(cause, router))) {
+      createError.value = cause instanceof Error ? cause.message : '创建失败，请重试。'
+    }
   } finally { creating.value = false }
 }
 

@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import BrandLogo from '../../components/BrandLogo.vue'
 import StatePanel from '../../components/StatePanel.vue'
 import UiIcon from '../../components/UiIcon.vue'
 import { ApiError } from '../../api/http'
 import { type Application, getApplication } from '../apps/application-api'
+import { redirectOnUnauthorized } from '../apps/redirect-on-unauthorized'
 import TaskStatus from './TaskStatus.vue'
 
 const props = defineProps<{ id: string }>()
+const router = useRouter()
 const app = ref<Application | null>(null)
 const loading = ref(true)
 const error = ref('')
@@ -24,9 +27,11 @@ async function load() {
     if (requestedId === props.id) app.value = result
   } catch (cause) {
     if (requestedId === props.id) {
-      error.value = cause instanceof ApiError && cause.status === 404
-        ? '应用不存在或你无权访问。'
-        : cause instanceof Error ? cause.message : '应用加载失败。'
+      if (!(await redirectOnUnauthorized(cause, router))) {
+        error.value = cause instanceof ApiError && cause.status === 404
+          ? '应用不存在或你无权访问。'
+          : cause instanceof Error ? cause.message : '应用加载失败。'
+      }
     }
   } finally {
     if (requestedId === props.id) loading.value = false
