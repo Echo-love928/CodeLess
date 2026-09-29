@@ -44,22 +44,24 @@ test('logout invalidates the mocked session and protects workbench again', async
   await expect(page).toHaveURL(/\/login\?redirect=/)
 })
 
-test('application CRUD is explicitly a local test double, scoped per user', async ({ page }) => {
+test('application API contract fixture is scoped per user', async ({ page }) => {
   await installMockAuth(page)
   await loginAsDemo(page)
-  await expect(page.getByText('应用接口：测试替身')).toBeVisible()
   await page.getByRole('button', { name: '新建应用' }).click()
   await page.getByLabel('应用名称').fill('我的作品')
   await page.getByLabel('数据模式').selectOption('LOCAL_STORAGE')
   await page.getByRole('dialog').getByRole('button', { name: '创建' }).click()
-  await expect(page.getByRole('heading', { name: '我的作品' })).toBeVisible()
-  await page.reload()
+  await expect(page).toHaveURL(/\/workbench\/00000000-0000-4000-8000-000000000001$/)
+  await expect(page.locator('.workbench-header__name')).toContainText('我的作品')
+  await page.goto('/apps')
   await expect(page.getByRole('heading', { name: '我的作品' })).toBeVisible()
   await page.getByRole('button', { name: '退出' }).click()
   await page.getByLabel('邮箱').fill('admin@codeless.local')
   await page.getByLabel('密码').fill('admin-password')
   await page.getByRole('button', { name: '登录' }).click()
   await expect(page.getByRole('heading', { name: '我的作品' })).toHaveCount(0)
+  await page.goto('/workbench/00000000-0000-4000-8000-000000000001')
+  await expect(page.getByRole('alert')).toContainText('应用不存在或你无权访问')
 })
 
 test('network failure does not admit anonymous users', async ({ page }) => {

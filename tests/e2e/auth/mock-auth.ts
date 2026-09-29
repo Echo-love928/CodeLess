@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test'
+import { installMockApplicationsApi } from '../apps/mock-applications-api'
 
 // TEST DOUBLE ONLY. Mirrors D03-A contracts/auth/README.md; no API server is started.
 export async function installMockAuth(page: Page) {
@@ -30,7 +31,8 @@ export async function installMockAuth(page: Page) {
     }
     return route.fulfill({ status: 404 })
   })
-  return { getSessionChecks: () => sessionChecks }
+  const applications = await installMockApplicationsApi(page, () => user?.id)
+  return { getSessionChecks: () => sessionChecks, ...applications }
 }
 
 export async function loginAsDemo(page: Page) {
