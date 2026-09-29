@@ -30,13 +30,13 @@ test('real demo account: CSRF JSON, failed retry, redirect, refresh and logout',
     expect.objectContaining({ name: 'JSESSIONID', httpOnly: true, sameSite: 'Lax', secure: false }),
   ]))
   await page.reload()
-  await expect(page.getByRole('heading', { name: '选中一处，调整一点。' })).toBeVisible()
+  await expect(page.getByRole('alert')).toContainText('无法打开工作台')
   const me = await page.request.get('/api/v0/auth/me')
   expect(me.status()).toBe(200)
   expect((await me.json()).email).toBe('demo@codeless.local')
 
   await page.goto('/apps')
-  await expect(page.getByText('应用接口：测试替身')).toBeVisible()
+  await expect(page.getByRole('heading', { name: '我的应用' })).toBeVisible()
   await page.getByRole('button', { name: '退出' }).click()
   await expect(page).toHaveURL(/\/login$/)
   expect((await page.request.get('/api/v0/auth/me')).status()).toBe(401)
