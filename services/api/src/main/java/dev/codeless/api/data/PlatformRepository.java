@@ -53,8 +53,21 @@ public class PlatformRepository {
 
     @Transactional
     public Task createTask(UUID id, UUID applicationId, String prompt) {
-        jdbc.sql("INSERT INTO generation_tasks(id, application_id, prompt, event_sequence) VALUES (?, ?, ?, 1)")
-                .params(id, applicationId, prompt).update();
+        return insertTask(id, applicationId, prompt, null, "FINISHED");
+    }
+
+    @Transactional
+    public Task createTask(UUID id, UUID applicationId, String prompt, String idempotencyKey) {
+        return insertTask(id, applicationId, prompt, idempotencyKey, "QUEUED");
+    }
+
+    private Task insertTask(UUID id, UUID applicationId, String prompt, String idempotencyKey,
+                            String queueState) {
+        jdbc.sql("""
+                INSERT INTO generation_tasks(id, application_id, prompt, event_sequence,
+                                             idempotency_key, queue_state, deadline_at)
+                VALUES (?, ?, ?, 1, ?, ?, now() + interval '12 minutes')
+                """).params(id, applicationId, prompt, idempotencyKey, queueState).update();
         jdbc.sql("INSERT INTO task_events(id, task_id, sequence, type, stage, message) "
                 + "VALUES (?, ?, 1, 'STAGE_STARTED', 'PLAN', 'Task accepted in PLAN')")
                 .params(UUID.randomUUID(), id).update();
