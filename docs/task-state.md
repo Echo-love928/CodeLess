@@ -19,8 +19,9 @@ Cancellation converts a nonterminal task to `FAILED/CANCELLED`. Repeating a
 cancel on a terminal task returns the existing resource without a new event.
 A queued task has a 12 minute deadline. A running claim has an opaque lease
 token, expiring no later than that deadline. Every worker write checks the
-token and time, then saves the stage and event in the same PostgreSQL
-transaction. An expired lease or deadline is recovered as
+token and time after locking the task row. The stage `UPDATE` checks both
+deadlines again with PostgreSQL `clock_timestamp()`; state and event share
+one transaction. An expired lease or deadline is recovered as
 `FAILED/INTERRUPTED`, never READY. After a process restart a still valid lease
 is left alone until its expiry; this also avoids stealing work from another
 live API instance. A stale worker cannot write after cancellation or expiry.

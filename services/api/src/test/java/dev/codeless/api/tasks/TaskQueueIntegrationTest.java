@@ -17,15 +17,19 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 class TaskQueueIntegrationTest extends PostgresTestBase {
     @Autowired PlatformRepository repository;
     @Autowired TaskQueueService queue;
     @Autowired JdbcTemplate jdbc;
+    @Autowired PlatformTransactionManager transactionManager;
 
     @BeforeEach void clearUnclaimedFixtures() {
         jdbc.update("UPDATE generation_tasks SET queue_state='FINISHED', lease_token=NULL, "
@@ -107,6 +111,79 @@ class TaskQueueIntegrationTest extends PostgresTestBase {
         assertThat(repository.listEvents(id)).hasSize(2);
         queue.cancel(seed.owner(), id);
         assertThat(repository.listEvents(id)).hasSize(2);
+    }
+
+    @Test void leaseExpiryWhileWaitingForTaskRowLockRejectsStageAndEvent() throws Exception {
+        Seed seed = seed();
+        UUID id = queue.create(seed.owner(), seed.app(), "Wait across expiry", null).id();
+        TaskQueueService.Claim claim = queue.claim().orElseThrow();
+        jdbc.update("UPDATE generation_tasks SET lease_expires_at = clock_timestamp() + interval '4 seconds' "
+                + "WHERE id = ?", id);
+
+        CountDownLatch rowLocked = new CountDownLatch(1);
+        CountDownLatch releaseLock = new CountDownLatch(1);
+        CountDownLatch workerReady = new CountDownLatch(1);
+        AtomicInteger workerPid = new AtomicInteger();
+        var pool = Executors.newFixedThreadPool(2);
+        try {
+            var holder = pool.submit(() -> new TransactionTemplate(transactionManager).executeWithoutResult(tx -> {
+                jdbc.queryForObject("SELECT id FROM generation_tasks WHERE id = ? FOR UPDATE", UUID.class, id);
+                rowLocked.countDown();
+                try {
+                    if (!releaseLock.await(10, TimeUnit.SECONDS)) throw new IllegalStateException("lock hold timed out");
+                } catch (InterruptedException exception) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException(exception);
+                }
+            }));
+            assertThat(rowLocked.await(5, TimeUnit.SECONDS)).isTrue();
+
+            var worker = pool.submit(() -> {
+                try {
+                    new TransactionTemplate(transactionManager).executeWithoutResult(tx -> {
+                        workerPid.set(jdbc.queryForObject("SELECT pg_backend_pid()", Integer.class));
+                        workerReady.countDown();
+                        queue.advance(claim, TaskStatus.GENERATE, EventType.STAGE_STARTED,
+                                "late stage", null);
+                    });
+                    return (RuntimeException) null;
+                } catch (RuntimeException exception) {
+                    return exception;
+                }
+            });
+            assertThat(workerReady.await(5, TimeUnit.SECONDS)).isTrue();
+            boolean waitingForLock = false;
+            long waitDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(2);
+            while (System.nanoTime() < waitDeadline) {
+                String waitType = jdbc.queryForObject("SELECT wait_event_type FROM pg_stat_activity WHERE pid = ?",
+                        String.class, workerPid.get());
+                if ("Lock".equals(waitType)) {
+                    waitingForLock = true;
+                    break;
+                }
+                Thread.sleep(20);
+            }
+            assertThat(waitingForLock).as("worker must be blocked on the task row").isTrue();
+            assertThat(jdbc.queryForObject("SELECT clock_timestamp() < lease_expires_at "
+                    + "FROM generation_tasks WHERE id = ?", Boolean.class, id)).isTrue();
+
+            long expiryDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(6);
+            while (System.nanoTime() < expiryDeadline && Boolean.FALSE.equals(jdbc.queryForObject(
+                    "SELECT clock_timestamp() >= lease_expires_at FROM generation_tasks WHERE id = ?",
+                    Boolean.class, id))) {
+                Thread.sleep(20);
+            }
+            assertThat(jdbc.queryForObject("SELECT clock_timestamp() >= lease_expires_at "
+                    + "FROM generation_tasks WHERE id = ?", Boolean.class, id)).isTrue();
+            releaseLock.countDown();
+            holder.get(5, TimeUnit.SECONDS);
+            assertThat(worker.get(5, TimeUnit.SECONDS)).isInstanceOf(IllegalStateException.class);
+            assertThat(repository.findTask(id).orElseThrow().status()).isEqualTo(TaskStatus.PLAN);
+            assertThat(repository.listEvents(id)).hasSize(1);
+        } finally {
+            releaseLock.countDown();
+            pool.shutdownNow();
+        }
     }
 
     @Test void freshSchedulerRecoversAbandonedExpiredLeaseAsInterruptedNeverReady() {

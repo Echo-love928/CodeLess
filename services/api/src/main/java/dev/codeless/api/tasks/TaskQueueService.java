@@ -84,7 +84,7 @@ public class TaskQueueService {
         Optional<UUID> candidate = jdbc.sql("""
                 SELECT t.id FROM generation_tasks t
                 JOIN applications a ON a.id = t.application_id
-                WHERE t.queue_state = 'QUEUED' AND t.status = 'PLAN' AND t.deadline_at > now()
+                WHERE t.queue_state = 'QUEUED' AND t.status = 'PLAN' AND t.deadline_at > clock_timestamp()
                   AND NOT EXISTS (SELECT 1 FROM generation_tasks active
                                   WHERE active.application_id = t.application_id
                                     AND active.queue_state = 'RUNNING')
@@ -93,24 +93,19 @@ public class TaskQueueService {
                 """).query(UUID.class).optional();
         if (candidate.isEmpty()) return Optional.empty();
         UUID token = UUID.randomUUID();
-        jdbc.sql("""
+        int changed = jdbc.sql("""
                 UPDATE generation_tasks SET queue_state = 'RUNNING', lease_token = ?,
                     lease_expires_at = deadline_at, row_version = row_version + 1
-                WHERE id = ?
+                WHERE id = ? AND deadline_at > clock_timestamp()
                 """).params(token, candidate.get()).update();
+        if (changed != 1) return Optional.empty();
         return Optional.of(new Claim(candidate.get(), token, TaskStatus.PLAN));
     }
 
     @Transactional
     public TaskView advance(Claim claim, TaskStatus next, EventType eventType,
                             String message, String failureCode) {
-        Task task = repository.findTask(claim.taskId()).orElseThrow();
-        boolean leased = jdbc.sql("""
-                SELECT EXISTS (SELECT 1 FROM generation_tasks WHERE id = ? AND queue_state = 'RUNNING'
-                    AND lease_token = ? AND lease_expires_at > now() AND deadline_at > now())
-                """).params(claim.taskId(), claim.token()).query(Boolean.class).single();
-        if (!leased || terminal(task.status())) throw new IllegalStateException("Lease is no longer active");
-        progress.transition(claim.taskId(), next, eventType, message, failureCode);
+        progress.transitionLeased(claim.taskId(), claim.token(), next, eventType, message, failureCode);
         if (terminal(next)) finish(claim.taskId());
         return TaskView.from(repository.findTask(claim.taskId()).orElseThrow());
     }
@@ -120,7 +115,8 @@ public class TaskQueueService {
         Optional<UUID> expired = jdbc.sql("""
                 SELECT id FROM generation_tasks
                 WHERE queue_state IN ('QUEUED', 'RUNNING')
-                  AND (deadline_at <= now() OR (queue_state = 'RUNNING' AND lease_expires_at <= now()))
+                  AND (deadline_at <= clock_timestamp()
+                       OR (queue_state = 'RUNNING' AND lease_expires_at <= clock_timestamp()))
                 ORDER BY deadline_at, id LIMIT 1 FOR UPDATE SKIP LOCKED
                 """).query(UUID.class).optional();
         if (expired.isEmpty()) return false;

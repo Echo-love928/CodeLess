@@ -92,19 +92,37 @@ public class PlatformRepository {
                 .query(PlatformRepository::task).optional().orElseThrow(() -> new IllegalArgumentException("Unknown task"));
     }
 
+    boolean hasValidLease(UUID taskId, UUID token) {
+        return jdbc.sql("""
+                SELECT EXISTS (SELECT 1 FROM generation_tasks
+                    WHERE id = ? AND queue_state = 'RUNNING' AND lease_token = ?
+                      AND lease_expires_at > clock_timestamp() AND deadline_at > clock_timestamp())
+                """).params(taskId, token).query(Boolean.class).single();
+    }
+
     void updateTaskAndAppendEvent(Task task, TaskStatus next, int repairs, String failureCode,
-                                  EventType type, String message) {
-        int changed = jdbc.sql("""
+                                  EventType type, String message, UUID leaseToken) {
+        String sql = """
                 UPDATE generation_tasks SET status = ?, repair_attempts = ?, failure_code = ?,
-                    event_sequence = event_sequence + 1, row_version = row_version + 1, updated_at = now()
+                    event_sequence = event_sequence + 1, row_version = row_version + 1,
+                    updated_at = clock_timestamp()
                 WHERE id = ? AND row_version = ?
-                """).params(next.name(), repairs, failureCode, task.id(), task.rowVersion()).update();
+                """;
+        if (leaseToken != null) {
+            sql += """
+                     AND queue_state = 'RUNNING' AND lease_token = ?
+                     AND lease_expires_at > clock_timestamp() AND deadline_at > clock_timestamp()
+                    """;
+        }
+        var statement = jdbc.sql(sql).params(next.name(), repairs, failureCode, task.id(), task.rowVersion());
+        if (leaseToken != null) statement = statement.param(leaseToken);
+        int changed = statement.update();
         if (changed != 1) {
             throw new IllegalStateException("Task changed concurrently");
         }
         jdbc.sql("""
-                INSERT INTO task_events(id, task_id, sequence, type, stage, message)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO task_events(id, task_id, sequence, type, stage, message, occurred_at)
+                VALUES (?, ?, ?, ?, ?, ?, clock_timestamp())
                 """).params(UUID.randomUUID(), task.id(), task.eventSequence() + 1,
                         type.name(), next.name(), message).update();
     }
