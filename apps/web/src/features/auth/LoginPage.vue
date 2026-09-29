@@ -13,9 +13,11 @@ const email = ref('')
 const password = ref('')
 const busy = ref(false)
 const error = ref('')
-const notice = computed(() => route.query.reason === 'unavailable' || session.status === 'unavailable'
-  ? '认证服务暂时不可用，请检查网络后重试。'
-  : route.query.reason === 'required' ? '请先登录，再继续访问工作台。' : '')
+const notice = computed(() => route.query.reason === 'expired'
+  ? '登录状态已过期，请重新登录。'
+  : route.query.reason === 'unavailable' || session.status === 'unavailable'
+    ? '认证服务暂时不可用，请检查网络后重试。'
+    : route.query.reason === 'required' ? '请先登录，再继续访问工作台。' : '')
 
 async function submit() {
   if (busy.value) return
