@@ -43,8 +43,9 @@ export async function build(source, output) {
     throw new Error('output must be a new empty directory')
   }
   const outputRoot = await realpath(target)
+  const user = typeof process.getuid === 'function' ? `${process.getuid()}:${process.getgid()}` : '1000:1000'
   const args = [
-    'run', '--rm', '--pull', 'never', '--network', 'none', '--read-only', '--user', '1000:1000', '--cap-drop', 'ALL',
+    'run', '--rm', '--pull', 'never', '--network', 'none', '--read-only', '--user', user, '--cap-drop', 'ALL',
     '--security-opt', 'no-new-privileges', '--pids-limit', '128', '--memory', '512m', '--cpus', '1',
     '--tmpfs', '/tmp:rw,nosuid,size=256m',
     '--mount', `type=bind,src=${input},dst=/input,readonly`,
