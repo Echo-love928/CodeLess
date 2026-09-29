@@ -5,6 +5,9 @@ This task-local contract extends the D01 v0 application resource. The shared
 are maintained separately; their owner must fold in the additive list, rename,
 `status`, and `baseVersionId` fields before these endpoints are advertised as
 the complete public v0 OpenAPI contract. D03-A session cookies and CSRF apply.
+The additive public-file change is prepared in [draft PR #9](https://github.com/Echo-love928/CodeLess/pull/9)
+for the registered contract maintainer to review. Until it is merged, the
+current shared schema rejects `status` and `baseVersionId`.
 
 ## Endpoints
 
