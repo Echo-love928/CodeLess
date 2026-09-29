@@ -59,6 +59,7 @@ test('application API contract fixture is scoped per user', async ({ page }) => 
   await page.getByLabel('邮箱').fill('admin@codeless.local')
   await page.getByLabel('密码').fill('admin-password')
   await page.getByRole('button', { name: '登录' }).click()
+  await expect(page).toHaveURL(/\/apps$/)
   await expect(page.getByRole('heading', { name: '我的作品' })).toHaveCount(0)
   await page.goto('/workbench/00000000-0000-4000-8000-000000000001')
   await expect(page.getByRole('alert')).toContainText('应用不存在或你无权访问')
