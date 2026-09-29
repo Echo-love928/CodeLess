@@ -1,12 +1,16 @@
 import type { Page } from '@playwright/test'
 import application from '../../../contracts/examples/v0/valid/application.json'
 
-type ApplicationFixture = Omit<typeof application, 'latestReadyVersionId'> & { latestReadyVersionId: string | null }
+type ApplicationFixture = Omit<typeof application, 'latestReadyVersionId'> & {
+  status: 'ACTIVE' | 'ARCHIVED'
+  baseVersionId: string
+  latestReadyVersionId?: string | null
+}
 
-// Contract fixture only. D04-A must provide the real paginated endpoint for live acceptance.
+// Contract fixture only. The real D04-A API is verified separately in tests/live-auth/apps.spec.ts.
 export async function installMockApplicationsApi(page: Page, getUserId: () => string | undefined) {
   const records = new Map<string, ApplicationFixture[]>()
-  records.set('user-1', [{ ...application }])
+  records.set('user-1', [{ ...application, status: 'ACTIVE', baseVersionId: application.latestReadyVersionId }])
   let createCount = 0
 
   await page.route('**/api/v0/applications**', async route => {
@@ -26,9 +30,9 @@ export async function installMockApplicationsApi(page: Page, getUserId: () => st
     if (!suffix && request.method() === 'POST') {
       if (request.headers()['x-csrf-token'] !== 'test-csrf-token') return route.fulfill({ status: 403 })
       const input = request.postDataJSON() as { name?: string; description?: string; dataMode?: string; ownerId?: string; template?: string }
-      if (!input.name?.trim() || input.name.trim().length > 120 || input.ownerId || input.template || !['STATIC', 'MOCK', 'LOCAL_STORAGE'].includes(input.dataMode ?? '')) return route.fulfill({ status: 400 })
+      if (!input.name?.trim() || Array.from(input.name.trim()).length > 120 || input.ownerId || input.template || !['STATIC', 'MOCK', 'LOCAL_STORAGE'].includes(input.dataMode ?? '')) return route.fulfill({ status: 400 })
       createCount += 1
-      const created = { ...application, id: `00000000-0000-4000-8000-${String(createCount).padStart(12, '0')}`, name: input.name.trim(), description: input.description ?? '', dataMode: input.dataMode as typeof application.dataMode, latestReadyVersionId: null as string | null }
+      const created: ApplicationFixture = { ...application, id: `00000000-0000-4000-8000-${String(createCount).padStart(12, '0')}`, name: input.name.trim(), description: input.description ?? '', dataMode: input.dataMode as typeof application.dataMode, status: 'ACTIVE', baseVersionId: `10000000-0000-4000-8000-${String(createCount).padStart(12, '0')}`, latestReadyVersionId: undefined }
       records.set(userId, [created, ...own])
       return json(201, created)
     }
