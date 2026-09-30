@@ -4,6 +4,34 @@ Public OpenAPI/schema files remain owned by the shared contract maintainer. This
 additive transport delta must be folded into OpenAPI by the final enabling PR.
 The existing v0 Event JSON shape is unchanged.
 
+## Reviewable OpenAPI handoff
+
+`openapi.patch.json` is a scoped RFC 6902 proposal for the shared maintainer. It
+tests the existing `listTaskEvents` operation identity and replaces only that GET
+operation; path parameters, global cookie authentication and other operations are
+preserved. It documents both response media types, canonical int32 cursors,
+header/query precedence, JSON page bounds, pre-stream JSON errors, comments,
+post-header errors and terminal EOF behavior. It does not add detailed tool text
+or change the v0 Event resource schema. `x-sse-protocol` describes framing details
+that a plain OpenAPI string schema cannot validate.
+
+Run from the repository root with the locked dependencies:
+
+```powershell
+node --test contracts/events/openapi.test.mjs
+node contracts/events/prepare-openapi.mjs
+corepack pnpm exec redocly lint .local-data/d06-events-contract/openapi.preview.json
+```
+
+The preview command writes an ignored, rebased copy; it never edits
+`contracts/openapi.v0.json`. The four tests validate scope/auth preservation,
+cursor/page boundaries, wire examples against the shared Event schema and error
+codes against the shared error envelope. The maintainer must apply the patch to
+the shared source and register these tests in the public contract gate. Existing
+`verify:static` alone does **not** execute this new transport suite and does not
+close the public-contract gap. Task cancel/idempotency deltas belong to the D05
+handoff and need separate maintainer coordination.
+
 ## Connect and resume
 
 - `GET /api/v0/tasks/{taskId}/events`, `Accept: text/event-stream`, session cookie.
@@ -77,3 +105,26 @@ used. No model request/build/READY claim is involved. The live sequence is:
 create PLAN -> consume id 1 -> disconnect -> GENERATE/VERIFY -> cancel FAILED ->
 reconnect with id 1 -> receive ids 2,3,4 -> read FAILED/CANCELLED. B's final enabling
 PR still must exercise its browser against this API and align the public OpenAPI.
+
+## Deployment evidence still required
+
+The direct Tomcat/PostgreSQL/Chrome tests prove HTTP replay and authentication;
+they do not prove behavior behind a deployed gateway. The checked-in
+`infra/nginx/platform.conf.template` has no explicit SSE buffering or write/read
+timeout directives. Do not infer deployed proxy behavior from an API header or
+from the mock capacity test. Deployment/infra owners must record the actual
+gateway version, effective config, resource limits and the following results:
+
+| Case | Required evidence |
+| --- | --- |
+| Buffering | Through the actual authenticated gateway, timestamp the first event and successive heartbeat bytes while the task remains running; record Cache-Control/X-Accel-Buffering, effective buffering config and whether comments arrive without waiting for EOF. |
+| Slow client | Keep several authenticated clients reading slowly or stalled while a normal client receives progress; measure delivery latency, open sockets, memory and worker availability. Confirm write/socket limits close stalled connections and slots are released, then verify a new normal subscription succeeds. |
+| Capacity/lifetime | Record the 65th connection's JSON 503, cleanup after client close/timeout, the active stream's 60s lifetime, and successful replay after proxy/transport interruption. Do not equate Java mock emitter cleanup with socket write interruption. |
+| Safety/state | Use isolated owned tasks and public test credentials; exclude raw secrets from traces. Slow-client/timeout tests must not change authoritative task state or discard durable events. |
+
+No production gateway credentials/configuration or deployment run was provided
+for this task. These cases remain unexecuted, and no throughput/production-load
+claim is made. Changes to `infra/**` require its maintainer; this handoff does not
+alter that module. Detailed file differences/build diagnostics also remain a
+future authorized, structured contract: restoring raw tool text would defeat
+history sanitization and is not a resolution of that data gap.
