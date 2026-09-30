@@ -4,6 +4,15 @@ import { resolve, relative, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 export const IMAGE = 'codeless-vue-build:d05'
+
+export function containerUser(uid = process.getuid?.(), gid = process.getgid?.()) {
+  if (uid === undefined && gid === undefined) return '1000:1000'
+  if (!Number.isSafeInteger(uid) || !Number.isSafeInteger(gid) || uid <= 0 || gid <= 0) {
+    throw new Error('template build worker must run as a non-root host user')
+  }
+  return `${uid}:${gid}`
+}
+
 const allowed = /^src\/(?:pages|components)\/[A-Za-z][A-Za-z0-9_-]*\.vue$|^src\/data\/[A-Za-z][A-Za-z0-9_-]*\.ts$/
 
 async function filesUnder(root, current = root) {
@@ -35,6 +44,7 @@ export async function validateSource(source) {
 }
 
 export async function build(source, output) {
+  const user = containerUser()
   const input = await validateSource(source)
   const target = resolve(output)
   if (target === input || target.startsWith(`${input}${sep}`)) throw new Error('output must be outside input')
@@ -43,7 +53,6 @@ export async function build(source, output) {
     throw new Error('output must be a new empty directory')
   }
   const outputRoot = await realpath(target)
-  const user = typeof process.getuid === 'function' ? `${process.getuid()}:${process.getgid()}` : '1000:1000'
   const args = [
     'run', '--rm', '--pull', 'never', '--network', 'none', '--read-only', '--user', user, '--cap-drop', 'ALL',
     '--security-opt', 'no-new-privileges', '--pids-limit', '128', '--memory', '512m', '--cpus', '1',

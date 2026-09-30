@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
-import { build, IMAGE, validateSource } from '../../../services/runner/src/template/build.mjs'
+import { build, containerUser, IMAGE, validateSource } from '../../../services/runner/src/template/build.mjs'
 
 const root = fileURLToPath(new URL('../../../', import.meta.url))
 const fixture = (name) => join(root, 'templates', 'vue', 'fixtures', name)
@@ -27,6 +27,13 @@ async function allFiles(directory) {
   }
   return result
 }
+
+test('root host identity cannot be passed to the build container', () => {
+  for (const [uid, gid] of [[0, 0], [0, 1000], [1000, 0]]) {
+    assert.throws(() => containerUser(uid, gid), /non-root host user/)
+  }
+  assert.equal(containerUser(1001, 1001), '1001:1001')
+})
 
 test('D05-B-T1: three fixtures build in the preinstalled image', { timeout: 120000 }, async () => {
   for (const name of ['showcase', 'tasks', 'catalog']) {
