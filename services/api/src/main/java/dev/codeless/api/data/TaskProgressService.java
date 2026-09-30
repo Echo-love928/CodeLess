@@ -3,6 +3,7 @@ package dev.codeless.api.data;
 import dev.codeless.api.data.PlatformModels.EventType;
 import dev.codeless.api.data.PlatformModels.Task;
 import dev.codeless.api.data.PlatformModels.TaskStatus;
+import java.util.Objects;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,23 @@ public class TaskProgressService {
     @Transactional
     public void transition(UUID taskId, TaskStatus next, EventType eventType,
                            String message, String failureCode) {
+        transitionLocked(taskId, next, eventType, message, failureCode, null);
+    }
+
+    /** The lease is checked only after the task row lock has been acquired. */
+    @Transactional
+    public void transitionLeased(UUID taskId, UUID leaseToken, TaskStatus next, EventType eventType,
+                                 String message, String failureCode) {
+        transitionLocked(taskId, next, eventType, message, failureCode,
+                Objects.requireNonNull(leaseToken, "leaseToken"));
+    }
+
+    private void transitionLocked(UUID taskId, TaskStatus next, EventType eventType,
+                                  String message, String failureCode, UUID leaseToken) {
         Task task = repository.lockTask(taskId);
+        if (leaseToken != null && !repository.hasValidLease(taskId, leaseToken)) {
+            throw new IllegalStateException("Lease is no longer active");
+        }
         if (!allowed(task.status(), next)) {
             throw new IllegalStateException("Invalid task transition: " + task.status() + " -> " + next);
         }
@@ -36,7 +53,7 @@ public class TaskProgressService {
         if (repairs > 3) {
             throw new IllegalStateException("Repair limit exceeded");
         }
-        repository.updateTaskAndAppendEvent(task, next, repairs, failureCode, eventType, message);
+        repository.updateTaskAndAppendEvent(task, next, repairs, failureCode, eventType, message, leaseToken);
     }
 
     private static boolean allowed(TaskStatus from, TaskStatus to) {
