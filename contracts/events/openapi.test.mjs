@@ -11,13 +11,15 @@ const read = path => JSON.parse(readFileSync(resolve(root, path), 'utf8'));
 const path = '/api/v0/tasks/{taskId}/events';
 const base = JSON.parse(readFileSync(basePath, 'utf8'));
 const candidate = compose(base);
-const operation = candidate.paths[path].get;
+// Validate the maintained source itself, not only a preview that could hide a missing patch.
+const operation = base.paths[path].get;
 const ajv = new Ajv2020({ strict: true, allErrors: true });
 addFormats(ajv);
 ajv.addSchema(read('contracts/schemas/v0/event.schema.json'), 'schemas/v0/event.schema.json');
 ajv.addSchema(read('contracts/schemas/v0/error.schema.json'), 'schemas/v0/error.schema.json');
 
 test('scoped patch preserves authentication, path identity and every unrelated operation', () => {
+  assert.deepEqual(operation, candidate.paths[path].get, 'shared OpenAPI must contain the SSE patch');
   assert.deepEqual(candidate.security, [{ sessionCookie: [] }]);
   assert.deepEqual(candidate.paths[path].parameters, base.paths[path].parameters);
   const restored = structuredClone(candidate);

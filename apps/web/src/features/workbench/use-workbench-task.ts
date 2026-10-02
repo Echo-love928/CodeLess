@@ -2,6 +2,7 @@ import { computed, ref } from 'vue'
 import { ApiError } from '../../api/http'
 import { connectTaskEvents, type TaskEvent } from '../../lib/events/task-events'
 import { cancelTask, createTask, getTask, running, uuid, type GenerationTask } from './task-api'
+import { getTaskDiagnostics, type TaskDiagnostics } from './task-diagnostics'
 
 export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) {
   const task = ref<GenerationTask | null>(null)
@@ -13,6 +14,10 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
   const connection = ref('')
   const connectionDetail = ref('')
   const persistenceWarning = ref('')
+  const diagnostics = ref<TaskDiagnostics | null>(null)
+  const diagnosticsError = ref('')
+  let diagnosticsRequest = 0
+  let diagnosticsAbort: AbortController | undefined
   let appId = ''
   let storageKey = ''
   let epoch = 0
@@ -45,13 +50,29 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
     task.value = value
   }
 
+  async function loadDiagnostics(id: string, version: number) {
+    diagnosticsAbort?.abort()
+    diagnosticsAbort = new AbortController()
+    const signal = diagnosticsAbort.signal
+    const request = ++diagnosticsRequest
+    try {
+      const value = await getTaskDiagnostics(id, signal)
+      if (signal.aborted || version !== epoch || request !== diagnosticsRequest || currentId !== id) return
+      diagnostics.value = value; diagnosticsError.value = ''
+    } catch (cause) {
+      if (signal.aborted || version !== epoch || request !== diagnosticsRequest || currentId !== id) return
+      diagnosticsError.value = '任务详情暂不可用，请刷新重试；缺失详情不能视为构建成功。'
+      if (cause instanceof ApiError && [401, 403, 404].includes(cause.status ?? 0)) await report(cause, version)
+    }
+  }
+
   function attach(id: string, version: number) {
     const streamVersion = ++subscription
     const active = () => version === epoch && streamVersion === subscription && currentId === id
     stop?.()
     stop = connectTaskEvents({ taskId: id, applicationId: appId,
       onTask: value => {
-        if (active()) updateTask(value)
+        if (active()) { updateTask(value); void loadDiagnostics(id, version) }
       },
       onEvents: value => { if (active()) events.value = value },
       onConnection: (value, detail) => {
@@ -61,9 +82,10 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
       },
       onError: cause => { if (active()) void report(cause, version) },
     })
+    void loadDiagnostics(id, version)
   }
 
-  function dispose() { epoch += 1; stop?.(); stop = undefined }
+  function dispose() { epoch += 1; stop?.(); stop = undefined; diagnosticsAbort?.abort() }
 
   async function restore(applicationId: string, userId: string, linkedId?: string) {
     dispose()
@@ -71,6 +93,7 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
     appId = applicationId
     storageKey = `codeless:task:v1:${userId}:${applicationId}`
     task.value = null; events.value = []; error.value = ''; busy.value = false; cancelling.value = false
+    diagnostics.value = null; diagnosticsError.value = ''
     connection.value = ''; connectionDetail.value = ''; persistenceWarning.value = ''; pending = undefined
     currentId = null
     try { currentId = linkedId ?? localStorage.getItem(storageKey) }
@@ -100,6 +123,7 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
       if (version !== epoch) return
       pending = undefined
       updateTask(value); events.value = []
+      diagnostics.value = null; diagnosticsError.value = ''
       remember(value.id)
       attach(value.id, version)
     } catch (cause) { await report(cause, version) }
@@ -113,7 +137,7 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
     cancelling.value = true; error.value = ''
     try {
       const value = await cancelTask(id, appId)
-      if (version === epoch) updateTask(value)
+      if (version === epoch) { updateTask(value); void loadDiagnostics(id, version) }
     } catch (cause) { await report(cause, version) }
     finally { if (version === epoch) cancelling.value = false }
   }
@@ -134,6 +158,6 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
   const canStart = computed(() => !busy.value && !restoring.value && !cancelling.value &&
     (!task.value ? !currentId : ['READY', 'FAILED'].includes(task.value.status)))
   const canCancel = computed(() => !!task.value && running(task.value) && !busy.value && !restoring.value && !cancelling.value)
-  return { task, events, busy, cancelling, restoring, error, connection, connectionDetail, persistenceWarning,
+  return { task, events, busy, cancelling, restoring, error, connection, connectionDetail, persistenceWarning, diagnostics, diagnosticsError,
     canStart, canCancel, start, cancel, restore, refresh, dispose }
 }

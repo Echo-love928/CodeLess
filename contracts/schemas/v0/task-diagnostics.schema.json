@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeless.dev/contracts/v0/task-diagnostics.schema.json",
+  "title": "TaskDiagnostics",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["taskId", "files", "builds"],
+  "properties": {
+    "taskId": { "type": "string", "format": "uuid" },
+    "files": {
+      "type": "object", "additionalProperties": false,
+      "required": ["available", "revision", "changes"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "revision": { "type": "integer", "minimum": 0 },
+        "changes": { "type": "array", "maxItems": 40, "items": { "$ref": "#/$defs/change" } }
+      },
+      "if": { "properties": { "available": { "const": false } } },
+      "then": { "properties": { "revision": { "const": 0 }, "changes": { "type": "array", "maxItems": 0 } } },
+      "else": { "properties": { "revision": { "type": "integer", "minimum": 1 } } }
+    },
+    "builds": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/build" } }
+  },
+  "$defs": {
+    "digest": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" },
+    "change": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "operation", "beforeDigest", "afterDigest"],
+      "properties": {
+        "path": { "type": "string", "maxLength": 240, "pattern": "^(src/(pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue|src/data/[A-Za-z][A-Za-z0-9_-]*\\.ts)$" },
+        "operation": { "enum": ["ADDED", "MODIFIED", "DELETED"] },
+        "beforeDigest": { "$ref": "#/$defs/digest" }, "afterDigest": { "$ref": "#/$defs/digest" }
+      },
+      "allOf": [
+        { "if": { "properties": { "operation": { "const": "ADDED" } } }, "then": { "properties": { "beforeDigest": { "type": "null" }, "afterDigest": { "type": "string" } } } },
+        { "if": { "properties": { "operation": { "const": "MODIFIED" } } }, "then": { "properties": { "beforeDigest": { "type": "string" }, "afterDigest": { "type": "string" } } } },
+        { "if": { "properties": { "operation": { "const": "DELETED" } } }, "then": { "properties": { "beforeDigest": { "type": "string" }, "afterDigest": { "type": "null" } } } }
+      ]
+    },
+    "build": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "versionId", "status", "exitCode", "artifactDigest", "createdAt", "completedAt"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" }, "versionId": { "type": "string", "format": "uuid" },
+        "status": { "enum": ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED"] },
+        "exitCode": { "type": ["integer", "null"], "minimum": 0 }, "artifactDigest": { "$ref": "#/$defs/digest" },
+        "createdAt": { "type": "string", "format": "date-time" }, "completedAt": { "type": ["string", "null"], "format": "date-time" }
+      },
+      "allOf": [
+        { "if": { "properties": { "status": { "enum": ["QUEUED", "RUNNING"] } } }, "then": { "properties": { "exitCode": { "type": "null" }, "completedAt": { "type": "null" } } } },
+        { "if": { "properties": { "status": { "const": "SUCCEEDED" } } }, "then": { "properties": { "exitCode": { "const": 0 }, "artifactDigest": { "type": "string" }, "completedAt": { "type": "string" } } } },
+        { "if": { "properties": { "status": { "const": "FAILED" } } }, "then": { "properties": { "exitCode": { "type": "integer", "minimum": 1 }, "completedAt": { "type": "string" } } } }
+      ]
+    }
+  }
+}

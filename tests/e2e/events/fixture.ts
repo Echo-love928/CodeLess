@@ -12,6 +12,7 @@ export async function installTaskFixture(page: Page) {
   let release: (() => void) | undefined
   let delayed = false
   let history = [event(1, 'STAGE_STARTED', 'PLAN')]
+  let details = { files: { available: false, revision: 0, changes: [] }, builds: [] } as unknown
   const cursors: string[] = []
   function event(sequence: number, type: string, stage: string, message = `Stage started: ${stage}`) {
     return { ...eventFixture, id: `00000000-0000-4000-8000-${String(sequence).padStart(12, '0')}`, taskId: task.id, sequence, type, stage, message }
@@ -27,8 +28,10 @@ export async function installTaskFixture(page: Page) {
       task = { ...task, prompt: request.postDataJSON().prompt, status: 'PLAN', failureCode: null }
       if (count > 1) task.id = '44444444-4444-4444-8444-444444444444'
       history = [event(1, 'STAGE_STARTED', 'PLAN')]
+      details = { files: { available: false, revision: 0, changes: [] }, builds: [] }
       return json(task, 202)
     }
+    if (url.pathname.endsWith('/diagnostics')) return json({ ...(details as object), taskId: task.id })
     if (url.pathname.endsWith('/cancel')) {
       if (request.headers()['x-csrf-token'] !== 'test-csrf-token') return json({}, 403)
       cancels += 1
@@ -54,6 +57,7 @@ export async function installTaskFixture(page: Page) {
   return {
     appId: task.applicationId,
     taskId: () => task.id,
+    setDetails(value: unknown) { details = value },
     setOffline(value: boolean) { offline = value },
     advance(stage: string, type = 'STAGE_STARTED', message?: string) {
       task = { ...task, status: stage, updatedAt: '2026-09-30T10:59:00Z' }

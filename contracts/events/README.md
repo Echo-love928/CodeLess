@@ -1,7 +1,7 @@
 # D06 task event transport delta
 
-Public OpenAPI/schema files remain owned by the shared contract maintainer. This
-additive transport delta must be folded into OpenAPI by the final enabling PR.
+The D06 integration branch folds this transport delta into shared OpenAPI and
+registers its tests in `verify:static`, under the user's 2026-10-02 integration authorization.
 The existing v0 Event JSON shape is unchanged.
 
 ## Reviewable OpenAPI handoff
@@ -26,11 +26,11 @@ corepack pnpm exec redocly lint .local-data/d06-events-contract/openapi.preview.
 The preview command writes an ignored, rebased copy; it never edits
 `contracts/openapi.v0.json`. The four tests validate scope/auth preservation,
 cursor/page boundaries, wire examples against the shared Event schema and error
-codes against the shared error envelope. The maintainer must apply the patch to
-the shared source and register these tests in the public contract gate. Existing
-`verify:static` alone does **not** execute this new transport suite and does not
-close the public-contract gap. Task cancel/idempotency deltas belong to the D05
-handoff and need separate maintainer coordination.
+codes against the shared error envelope. `verify:static` now executes this suite
+against `contracts/openapi.v0.json` itself; a preview cannot mask a missing public
+SSE operation. The scoped patch remains as provenance and a preview helper.
+The D05 task cancel/idempotency deltas are also folded into shared OpenAPI;
+`contracts/tasks/openapi.test.mjs` validates them and structured diagnostics.
 
 ## Connect and resume
 

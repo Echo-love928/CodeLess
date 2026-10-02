@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { installMockAuth, loginAsDemo } from '../auth/mock-auth'
 import { installTaskFixture } from './fixture'
+import diagnosticsFixture from '../../../contracts/examples/v0/valid/task-diagnostics.json'
 
 async function workbench(page: Parameters<typeof installTaskFixture>[0]) {
   await installMockAuth(page)
@@ -107,4 +108,22 @@ test('fixture: task 401 expires the session; task 404 blocks creation without cl
   await page.reload()
   await expect(page).toHaveURL(/\/login\?redirect=/)
   expect(fixture.counts().creates).toBe(1)
+})
+
+test('structured diagnostics fixture: files and persisted build result survive reload; corrupt details do not claim success', async ({ page }) => {
+  const fixture = await workbench(page)
+  await expect(page.getByText('尚无文件变更记录；生成生产者还未提供结果。')).toBeVisible()
+  fixture.setDetails(diagnosticsFixture)
+  await expect(page.locator('[data-file-path="src/pages/Home.vue"]')).toContainText('新增')
+  await expect(page.locator('[data-build-id]')).toContainText('构建失败')
+  await expect(page.locator('[data-build-id]')).toContainText('退出码：2')
+  await expect(page.locator('.task-status')).toContainText('正在规划')
+  await page.reload()
+  await expect(page.locator('[data-file-path="src/pages/Home.vue"]')).toBeVisible()
+  fixture.setDetails({ ...diagnosticsFixture, files: { ...diagnosticsFixture.files, changes: [{ ...diagnosticsFixture.files.changes[0], path: '../../.env' }] } })
+  await page.reload()
+  await expect(page.getByRole('alert')).toContainText('缺失详情不能视为构建成功')
+  await expect(page.locator('[data-file-path]')).toHaveCount(0)
+  await expect(page.locator('.task-status')).toContainText('正在规划')
+  await expect(page.getByRole('button', { name: '取消任务', exact: true })).toBeEnabled()
 })

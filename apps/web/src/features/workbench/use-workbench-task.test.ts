@@ -4,11 +4,16 @@ import taskFixture from '../../../../../contracts/examples/v0/valid/task.json'
 import { useWorkbenchTask } from './use-workbench-task'
 import { cancelTask, createTask, getTask } from './task-api'
 import { connectTaskEvents } from '../../lib/events/task-events'
+import { getTaskDiagnostics, type TaskDiagnostics } from './task-diagnostics'
 
 vi.mock('./task-api', async importOriginal => ({ ...await importOriginal<typeof import('./task-api')>(), getTask: vi.fn(), createTask: vi.fn(), cancelTask: vi.fn() }))
 vi.mock('../../lib/events/task-events', () => ({ connectTaskEvents: vi.fn(() => vi.fn()) }))
+vi.mock('./task-diagnostics', () => ({ getTaskDiagnostics: vi.fn() }))
 const running = { ...taskFixture, status: 'GENERATE', failureCode: null }
-beforeEach(() => { vi.clearAllMocks(); localStorage.clear() })
+beforeEach(() => {
+  vi.clearAllMocks(); localStorage.clear()
+  vi.mocked(getTaskDiagnostics).mockImplementation(async taskId => ({ taskId, files: { available: false, revision: 0, changes: [] }, builds: [] }))
+})
 
 describe('workbench action and lifecycle constraints', () => {
   it('failed cancellation keeps the active task; pending cancellation cannot retry', async () => {
@@ -139,6 +144,30 @@ describe('workbench action and lifecycle constraints', () => {
     expect(onError).not.toHaveBeenCalled()
     expect(localStorage.getItem(`codeless:task:v1:owner:${running.applicationId}`)).toBe(next.id)
     expect(current.taskId).toBe(next.id)
+    state.dispose()
+  })
+
+  it('late old-task diagnostics cannot replace a retry task; detail errors never change task success', async () => {
+    const state = useWorkbenchTask(async () => false)
+    await state.restore(running.applicationId, 'owner')
+    let resolve!: (value: TaskDiagnostics) => void
+    vi.mocked(getTaskDiagnostics).mockReturnValueOnce(new Promise(accept => { resolve = accept }))
+    vi.mocked(createTask).mockResolvedValueOnce(running)
+    await state.start('Build a page')
+    const old = vi.mocked(connectTaskEvents).mock.calls[0][0]
+    old.onTask({ ...running, status: 'FAILED', failureCode: 'CANCELLED' })
+    const next = { ...running, id: '44444444-4444-4444-8444-444444444444', status: 'PLAN' }
+    vi.mocked(createTask).mockResolvedValueOnce(next)
+    await state.start('Build a page')
+    resolve({ taskId: running.id, files: { available: true, revision: 8, changes: [] }, builds: [] })
+    await Promise.resolve()
+    expect(state.diagnostics.value?.taskId).toBe(next.id)
+    vi.mocked(getTaskDiagnostics).mockRejectedValueOnce(new ApiError('network'))
+    vi.mocked(connectTaskEvents).mock.calls[1][0].onTask(next)
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(state.diagnosticsError.value).toContain('不能视为构建成功')
+    expect(state.task.value?.status).toBe('PLAN')
     state.dispose()
   })
 })

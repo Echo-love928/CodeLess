@@ -1,4 +1,7 @@
 import { execFileSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { expect, test } from '@playwright/test'
 
 // Isolated Spring/PostgreSQL fixture, production scheduler disabled. No model/READY claim.
@@ -11,6 +14,24 @@ function advance(taskId: string, stage: 'GENERATE' | 'VERIFY') {
     SELECT gen_random_uuid(),id,event_sequence,'STAGE_STARTED','${stage}','Deterministic fixture stage' FROM generation_tasks WHERE id='${taskId}';
     COMMIT;`
   execFileSync('docker', ['exec', '-i', process.env.CODELESS_D06_DB_CONTAINER!, 'psql', '-U', 'codeless', '-d', 'codeless', '-v', 'ON_ERROR_STOP=1'], { input: sql })
+}
+
+// Explicit database fixture for structured metadata, not a real build execution claim.
+function seedDiagnostics(taskId: string) {
+  if (!/^[0-9a-f-]{36}$/i.test(taskId)) throw new Error('Invalid fixture task ID')
+  // pnpm --filter @codeless/web exec starts in apps/web; avoid mixing import.meta with Playwright's CJS transform.
+  const source = readFileSync(resolve(process.cwd(), '../../templates/vue/fixtures/showcase/src/pages/HomePage.vue'))
+  const digest = `sha256:${createHash('sha256').update(source).digest('hex')}`
+  const changes = JSON.stringify([{ path: 'src/pages/HomePage.vue', operation: 'ADDED', beforeDigest: null, afterDigest: digest }])
+  const sql = `BEGIN;
+    INSERT INTO task_file_snapshots(task_id,revision,changes) VALUES ('${taskId}',1,'${changes}'::jsonb);
+    INSERT INTO builds(id,task_id,version_id,status,exit_code,completed_at,log_url)
+    SELECT gen_random_uuid(),t.id,v.id,'FAILED',2,clock_timestamp(),'https://private.invalid/secret-fixture'
+    FROM generation_tasks t JOIN application_versions v ON v.application_id=t.application_id
+    WHERE t.id='${taskId}';
+    COMMIT;`
+  execFileSync('docker', ['exec', '-i', process.env.CODELESS_D06_DB_CONTAINER!, 'psql', '-U', 'codeless', '-d', 'codeless', '-v', 'ON_ERROR_STOP=1'], { input: sql })
+  return digest
 }
 
 test('live D06: real HTTP creation → durable SSE → offline catchup → reload/reopen → cancel → terminal stop', async ({ page, context }) => {
@@ -37,18 +58,25 @@ test('live D06: real HTTP creation → durable SSE → offline catchup → reloa
   await context.setOffline(true)
   advance(task.id, 'GENERATE')
   advance(task.id, 'VERIFY')
+  const fileDigest = seedDiagnostics(task.id)
   await expect(page.getByText(/连接中断，正在恢复/)).toBeVisible()
   await context.setOffline(false)
   await expect(page.locator('[data-sequence]')).toHaveCount(3)
   await expect(page.locator('.task-status')).toContainText('正在验证')
+  await expect(page.locator('[data-file-path="src/pages/HomePage.vue"]')).toContainText(fileDigest)
+  await expect(page.locator('[data-build-id]')).toContainText('构建失败')
+  await expect(page.locator('[data-build-id]')).toContainText('退出码：2')
+  await expect(page.getByText('secret-fixture')).toHaveCount(0)
   await expect.poll(() => transportIds.includes('3')).toBe(true)
   await page.reload()
   await expect(page.locator('[data-sequence]')).toHaveCount(3)
   await expect(page.locator('.task-status')).toContainText(task.id)
+  await expect(page.locator('[data-file-path="src/pages/HomePage.vue"]')).toBeVisible()
   const reopened = await context.newPage()
   await page.close()
   await reopened.goto(url)
   await expect(reopened.locator('[data-sequence]')).toHaveCount(3)
+  await expect(reopened.locator('[data-build-id]')).toContainText('退出码：2')
   await reopened.getByRole('button', { name: '取消任务', exact: true }).click()
   await expect(reopened.locator('.task-status')).toContainText('任务已取消')
   await expect(reopened.locator('[data-sequence]')).toHaveCount(4)

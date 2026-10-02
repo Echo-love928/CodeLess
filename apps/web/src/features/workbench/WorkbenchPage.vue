@@ -21,7 +21,7 @@ const error = ref('')
 const prompt = ref('')
 const device = ref<'desktop' | 'mobile'>('desktop')
 const { task, events, busy, cancelling, restoring, error: taskError, connection, connectionDetail,
-  persistenceWarning, canStart, canCancel, start, cancel, restore, refresh, dispose } = useWorkbenchTask(cause => redirectOnUnauthorized(cause, router))
+  persistenceWarning, diagnostics, diagnosticsError, canStart, canCancel, start, cancel, restore, refresh, dispose } = useWorkbenchTask(cause => redirectOnUnauthorized(cause, router))
 const connectionLabel = computed(() => ({ connecting: '正在连接事件服务', connected: '事件已连接', reconnecting: '连接中断，正在恢复', complete: '任务事件已同步', blocked: '事件连接不可用' })[connection.value] ?? '')
 const validPrompt = computed(() => !!prompt.value.trim() && Array.from(prompt.value.trim()).length <= 8000)
 const taskLink = computed(() => task.value ? { path: route.path, query: { taskId: task.value.id } } : undefined)
@@ -73,7 +73,7 @@ onBeforeUnmount(() => { loadVersion += 1; dispose() })
           <p v-if="connectionLabel" role="status">{{ connectionLabel }}<span v-if="connectionDetail">：{{ connectionDetail }}</span></p>
           <p v-if="taskError" role="alert">{{ taskError }}</p><p v-if="persistenceWarning" role="alert">{{ persistenceWarning }}</p>
           <div class="task-actions"><button v-if="task && !['READY', 'FAILED'].includes(task.status)" class="button-secondary" type="button" :disabled="!canCancel" @click="cancel">{{ cancelling ? '正在请求取消…' : '取消任务' }}</button><button v-if="task || taskError" class="button-secondary" type="button" :disabled="busy || cancelling || restoring" @click="refresh">刷新任务</button><router-link v-if="taskLink" :to="taskLink">任务恢复链接</router-link></div>
-          <TaskProgress :events="events" />
+          <TaskProgress :events="events" :diagnostics="diagnostics" :diagnostics-error="diagnosticsError" />
         </div>
       </aside>
       <section class="workbench-preview" aria-label="预览区"><div class="editor-toolbar"><span class="page-path"><UiIcon name="doc" :size="15" />预览 <span>/</span> 初始草稿版本：{{ app.baseVersionId }} <span>/</span> 当前可用版本：{{ app.latestReadyVersionId || '暂无' }}</span><div class="device-toggle" aria-label="预览设备"><button type="button" :aria-pressed="device === 'desktop'" @click="device = 'desktop'"><UiIcon name="monitor" :size="15" />桌面</button><button type="button" :aria-pressed="device === 'mobile'" @click="device = 'mobile'"><UiIcon name="phone" :size="15" />手机</button></div></div><div class="editor-canvas" :class="{ 'editor-canvas--mobile': device === 'mobile' }"><div class="canvas-address"><UiIcon name="lock" :size="12" />{{ app.name }} · 预览</div><StatePanel kind="empty" :title="app.latestReadyVersionId ? '预览尚未接入' : '暂无可预览版本'" :description="app.latestReadyVersionId ? '已验证版本存在；页面预览接口尚未接入。' : '初始草稿尚未生成内容；完成生成与验证后才能预览。'" /></div></section>
