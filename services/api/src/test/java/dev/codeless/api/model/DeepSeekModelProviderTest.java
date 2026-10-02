@@ -118,6 +118,27 @@ class DeepSeekModelProviderTest {
         assertThat(calls).hasValue(1);
     }
     @Test
+    void rejectsUnsafeCredentialCharactersBeforeHttpWithoutExposingThemInExceptions() {
+        for (String key : java.util.List.of(fakeKey + "\n", fakeKey + "\r\n", fakeKey + "\t", fakeKey + "\u0000",
+                " " + fakeKey, fakeKey + " ", fakeKey + "\u00e9", "x".repeat(4097))) {
+            assertThatThrownBy(() -> new DeepSeekModelProvider(URI.create("http://127.0.0.1/unused"), key, "test-model"))
+                    .isInstanceOf(ModelFailure.class).hasMessage("MODEL_CONFIGURATION").hasNoCause();
+        }
+        assertThat(calls).hasValue(0);
+    }
+    @Test
+    void alreadyReceived429AndSafeRequestIdSurviveAnUnfinishedResponseBody() {
+        status = 429; drip = true; delay = 1500; response = "must not wait for or expose this body";
+        try { call(Duration.ofMillis(500)); throw new AssertionError("expected rate limit"); }
+        catch (ModelFailure failure) {
+            assertThat(failure.code()).isEqualTo("MODEL_RATE_LIMITED");
+            assertThat(failure.evidence().requestId()).isEqualTo("transport-req-1");
+            assertThat(failure.evidence().usage().inputTokens()).isNull();
+            assertThat(failure.evidence().usage().totalTokens()).isNull();
+        }
+        assertThat(calls).hasValue(1);
+    }
+    @Test
     void classifiesHeaderTimeoutAndWholeResponseBodyTimeout() {
         delay = 1500;
         assertThatThrownBy(() -> call(Duration.ofMillis(500))).hasMessage("MODEL_TIMEOUT");

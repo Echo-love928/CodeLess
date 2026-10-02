@@ -13,9 +13,11 @@ Explicit unsupported requests receive `PLAN_UNSUPPORTED_REQUEST`. A conservative
 - Default/CI provider: **`deterministic-mock`**, model `plan-fixture-v1`. Stable fixture response, unknown usage; never evidence of real model quality.
 - Single real provider: **`deepseek`**, fixed HTTPS chat-completion endpoint. No endpoint override, redirects, provider fallback, retries, streaming or tools. Spring AI **2.0.1** supplies typed system/user messages; JDK HTTP preserves raw provider usage so missing counters never become Spring AI default zeros. All frozen versions remain unchanged.
 - Local environment: `CODELESS_MODEL_PROVIDER=deepseek`, `CODELESS_MODEL_API_KEY`, `CODELESS_MODEL_NAME`; model name is explicit rather than an unverified alias. Never commit a key. DeepSeek's [chat-completion contract](https://api-docs.deepseek.com/api/create-chat-completion/) defines JSON mode and response usage; [Spring AI messages](https://docs.spring.io/spring-ai/docs/current/api/org/springframework/ai/chat/messages/SystemMessage.html) define the typed prompt boundary.
+- Credentials must be a nonempty ASCII bearer token, at most 4096 characters, with no whitespace/control characters. Invalid configuration is rejected before constructing Authorization or making a request; exceptions contain only `MODEL_CONFIGURATION`, without a JDK cause that could echo headers. The real acceptance CLI writes a BLOCKED preflight and exits 2 for invalid configuration.
 - Every call has a local UUID, requested model, provider, actual response model when supplied, provider request ID (`x-request-id`, otherwise response ID), separate response ID, measured elapsed milliseconds, status, safe error code and timestamps. Missing provider identifiers remain null. No provider body, key or user prompt enters audit metadata.
 - `prompt_tokens`, `completion_tokens`, `total_tokens` are copied only when present and valid nonnegative integers. Null/absent/partial usage stays null. Raw usage preserves cache/reasoning fields; no total is inferred by addition. A real reported zero remains zero.
 - Errors include `MODEL_TIMEOUT`, `MODEL_RATE_LIMITED`, `MODEL_AUTHENTICATION`, `MODEL_UNAVAILABLE`, `MODEL_NETWORK`, `MODEL_INVALID_RESPONSE`, `MODEL_INVALID_USAGE`, `MODEL_RESPONSE_LIMIT`. Truncation, empty output, tool calls and invalid plans fail. Actual usage obtained with an invalid plan remains charged and recorded.
+- Safe request IDs are captured when response headers arrive. Non-200 status classification is preserved and the body subscription is cancelled immediately; an unfinished error body cannot turn an observed 429 into a timeout. Usage remains unknown for these responses. A successful HTTP response whose body later times out retains its safe header request ID.
 
 ## D05/D07-B integration
 
@@ -35,9 +37,11 @@ An audit outage stops the call or produces a failed DB record with whatever usag
 
 ```powershell
 node --test tests/model/plan-schema.test.mjs
-services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=PlanValidatorTest,DeepSeekModelProviderTest,PlanModelIntegrationTest' test
+services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=PlanValidatorTest,DeepSeekModelProviderTest,PlanAcceptanceCliTest,PlanModelIntegrationTest' test
 pnpm ci:gate
 tests/model/run-real-plan.ps1
 ```
 
 Java 21, frozen Node/pnpm and running Docker are required for API/runner gates. Java model tests run in the existing `verify:api`/CI entry; Ajv tests are an additional explicit command and do not edit the shared static entry. The real CLI loads the packaged schema/prompt and the same adapter/validator. It makes at most **one** real request, **2048** output tokens, **60 seconds**, never mock/fallback/retry. Success saves `t4-result.json` and `<callId>.plan.json`; missing credentials saves `t4-preflight.json` with BLOCKED and exits **2**; a real failure exits **1** with actual evidence. Runtime usage is separate from development-agent usage.
+
+If a validated plan cannot be saved, the CLI records FAILED / MODEL_AUDIT_UNAVAILABLE and exits 1 while retaining the already received actual model, request/response IDs and actual usage. The plan-storage error never replaces successful provider evidence with unknown counters. Its package-private test entry accepts a deterministic local provider and UUID solely to reproduce filesystem conflicts; the public CLI remains real-provider only. Regression tests use synthetic keys/local HTTP and incur no paid model requests. English negation requires complete `no`/`without` words and whitespace before a complete target word; `casino backend` cannot be mistaken for `no backend`.

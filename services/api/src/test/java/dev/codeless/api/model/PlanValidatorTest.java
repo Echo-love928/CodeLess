@@ -81,11 +81,16 @@ class PlanValidatorTest {
     @Test
     void explicitUnsupportedUserRequestsAreRejectedBeforeTheMockCanPretendSuccess() {
         var generator = new PlanGenerator(new MockModelProvider(), validator);
-        for (String request : List.of("生成后端", "接入微信支付", "use Stripe payment", "接入外部接口", "pnpm add axios", "使用 React")) {
+        for (String request : List.of("生成后端", "接入微信支付", "use Stripe payment", "接入外部接口", "pnpm add axios", "使用 React",
+                "Create a casino backend", "Create a piano backend", "Create a techno backend, no payment")) {
             assertThatThrownBy(() -> generator.generate(request, "STATIC", 1024, Duration.ofSeconds(1)))
                     .hasMessage("PLAN_UNSUPPORTED_REQUEST");
         }
         assertThat(generator.generate("静态个人展示页，无需后端，不需要支付", "STATIC", 1024, Duration.ofSeconds(1)).plan()).isNotNull();
+        for (String request : List.of("Static portfolio, no backend and no payment", "Static page WITHOUT backend",
+                "Static page without backend and without external services")) {
+            assertThat(generator.generate(request, "STATIC", 1024, Duration.ofSeconds(1)).plan()).isNotNull();
+        }
     }
 
     @Test

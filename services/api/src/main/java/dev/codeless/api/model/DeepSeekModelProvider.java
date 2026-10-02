@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.ai.chat.prompt.Prompt;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -34,7 +35,9 @@ public final class DeepSeekModelProvider implements ModelProvider {
     }
     /** Package-private endpoint injection is restricted to local transport tests. */
     DeepSeekModelProvider(URI endpoint, String key, String model) {
-        if (key == null || key.isBlank() || model == null || !model.matches("[A-Za-z0-9._-]{1,120}"))
+        // Validate before building Authorization: JDK header exceptions can contain the full value.
+        if (key == null || key.length() > 4096 || !key.matches("[A-Za-z0-9._~+/-]+=*")
+                || model == null || !model.matches("[A-Za-z0-9._-]{1,120}"))
             throw new ModelFailure("MODEL_CONFIGURATION");
         this.endpoint = endpoint; this.key = key; this.model = model;
         client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER)
@@ -53,32 +56,36 @@ public final class DeepSeekModelProvider implements ModelProvider {
         String body = mapper.writeValueAsString(Map.of("model", model, "messages", messages,
                 "max_tokens", maxOutputTokens, "stream", false, "response_format", Map.of("type", "json_object"),
                 "thinking", Map.of("type", "disabled")));
-        HttpRequest request = HttpRequest.newBuilder(endpoint).timeout(timeout)
-                .header("Content-Type", "application/json").header("Authorization", "Bearer " + key)
-                .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8)).build();
-        var pending = client.sendAsync(request, info -> new BoundedBody());
+        var received = new AtomicReference<>(new ResponseHead(null, Evidence.unknown()));
+        CompletableFuture<HttpResponse<byte[]>> pending;
+        try {
+            HttpRequest request = HttpRequest.newBuilder(endpoint).timeout(timeout)
+                    .header("Content-Type", "application/json").header("Authorization", "Bearer " + key)
+                    .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8)).build();
+            pending = client.sendAsync(request, info -> {
+                String requestId = info.headers().firstValue("x-request-id").filter(DeepSeekModelProvider::safeId).orElse(null);
+                var head = new ResponseHead(httpError(info.statusCode()), new Evidence(null, requestId, null, Usage.unknown()));
+                received.set(head);
+                return new BoundedBody(head.errorCode() == null ? null : head.failure(head.errorCode()));
+            });
+        } catch (IllegalArgumentException exception) {
+            // Never attach the JDK exception, which may echo request headers.
+            throw new ModelFailure("MODEL_CONFIGURATION");
+        }
         HttpResponse<byte[]> response;
         try {
             response = pending.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
         } catch (TimeoutException exception) {
-            pending.cancel(true); throw new ModelFailure("MODEL_TIMEOUT");
+            pending.cancel(true); throw received.get().failure("MODEL_TIMEOUT");
         } catch (InterruptedException exception) {
-            pending.cancel(true); Thread.currentThread().interrupt(); throw new ModelFailure("MODEL_INTERRUPTED");
+            pending.cancel(true); Thread.currentThread().interrupt(); throw received.get().failure("MODEL_INTERRUPTED");
         } catch (ExecutionException exception) {
-            if (exception.getCause() instanceof HttpTimeoutException) throw new ModelFailure("MODEL_TIMEOUT");
-            if (exception.getCause() instanceof ModelFailure failure) throw failure;
-            throw new ModelFailure("MODEL_NETWORK");
+            if (exception.getCause() instanceof HttpTimeoutException) throw received.get().failure("MODEL_TIMEOUT");
+            if (exception.getCause() instanceof ModelFailure failure) throw received.get().failure(failure.code());
+            throw received.get().failure("MODEL_NETWORK");
         }
-        String requestId = response.headers().firstValue("x-request-id").filter(DeepSeekModelProvider::safeId).orElse(null);
-        Evidence evidence = new Evidence(null, requestId, null, Usage.unknown());
-        if (response.statusCode() != 200) {
-            String code = switch (response.statusCode()) {
-                case 429 -> "MODEL_RATE_LIMITED";
-                case 401, 403 -> "MODEL_AUTHENTICATION";
-                default -> response.statusCode() >= 500 ? "MODEL_UNAVAILABLE" : "MODEL_HTTP_ERROR";
-            };
-            throw new ModelFailure(code, evidence);
-        }
+        Evidence evidence = received.get().evidence();
+        String requestId = evidence.requestId();
         try {
             JsonNode root = mapper.readTree(response.body());
             String actualModel = text(root.get("model"));
@@ -98,6 +105,20 @@ public final class DeepSeekModelProvider implements ModelProvider {
         catch (RuntimeException exception) { throw new ModelFailure("MODEL_INVALID_RESPONSE", evidence); }
     }
 
+    private static String httpError(int status) {
+        return switch (status) {
+            case 200 -> null;
+            case 429 -> "MODEL_RATE_LIMITED";
+            case 401, 403 -> "MODEL_AUTHENTICATION";
+            default -> status >= 500 ? "MODEL_UNAVAILABLE" : "MODEL_HTTP_ERROR";
+        };
+    }
+    private record ResponseHead(String errorCode, Evidence evidence) {
+        ModelFailure failure(String transportCode) {
+            return new ModelFailure(errorCode == null ? transportCode : errorCode, evidence);
+        }
+    }
+
     private static boolean safeId(String value) { return value.matches("[A-Za-z0-9._:/-]{1,200}"); }
     private static String text(JsonNode value) {
         return value != null && value.isString() && safeId(value.asText()) ? value.asText() : null;
@@ -107,8 +128,14 @@ public final class DeepSeekModelProvider implements ModelProvider {
         private final CompletableFuture<byte[]> result = new CompletableFuture<>();
         private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         private Flow.Subscription subscription;
+        private final ModelFailure rejection;
+        BoundedBody(ModelFailure rejection) { this.rejection = rejection; }
         public CompletionStage<byte[]> getBody() { return result; }
-        public void onSubscribe(Flow.Subscription subscription) { this.subscription = subscription; subscription.request(1); }
+        public void onSubscribe(Flow.Subscription subscription) {
+            this.subscription = subscription;
+            if (rejection != null) { subscription.cancel(); result.completeExceptionally(rejection); }
+            else subscription.request(1);
+        }
         public void onNext(List<ByteBuffer> buffers) {
             for (ByteBuffer buffer : buffers) {
                 if (bytes.size() + buffer.remaining() > 256 * 1024) {
