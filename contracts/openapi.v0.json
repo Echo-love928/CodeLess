@@ -165,18 +165,20 @@
       "post": {
         "operationId": "createTask",
         "summary": "Start a generation task",
-        "description": "The server always creates the task in PLAN; clients cannot choose or assert a successful state.",
+        "description": "New tasks start in PLAN. Idempotency-Key is scoped to one application: the same key and normalized prompt returns the original task (including its current state); a different prompt returns 409. Queue, leases and deadlines stay internal.",
         "tags": ["tasks"],
-        "parameters": [{ "$ref": "#/components/parameters/CsrfToken" }],
+        "parameters": [{ "$ref": "#/components/parameters/CsrfToken" }, { "name": "Idempotency-Key", "in": "header", "required": false, "schema": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9._:-]+$" } }],
         "requestBody": {
           "required": true,
           "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateTaskRequest" }, "example": { "applicationId": "11111111-1111-4111-8111-111111111111", "prompt": "生成活动页" } } }
         },
         "responses": {
-          "202": { "description": "Accepted in PLAN", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/task.schema.json" } } } },
+          "202": { "description": "New task or matching idempotent replay", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/task.schema.json" } } } },
           "400": { "$ref": "#/components/responses/BadRequest" },
           "401": { "$ref": "#/components/responses/Unauthorized" },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": {"description":"IDEMPOTENCY_CONFLICT","content":{"application/json":{"schema":{"allOf":[{"$ref":"./schemas/v0/error.schema.json"},{"type":"object","properties":{"code":{"const":"IDEMPOTENCY_CONFLICT"}}}]}}}}
         }
       }
     },
@@ -194,15 +196,341 @@
       }
     },
     "/api/v0/tasks/{taskId}/events": {
-      "parameters": [{ "$ref": "#/components/parameters/TaskId" }],
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/TaskId"
+        }
+      ],
       "get": {
         "operationId": "listTaskEvents",
-        "summary": "List ordered task events",
-        "tags": ["tasks"],
+        "summary": "Replay sanitized task events as JSON pages or resumable SSE",
+        "tags": [
+          "tasks"
+        ],
+        "description": "Authenticate every connection with the session cookie and check task ownership. Accept application/json (default) for bounded history or text/event-stream for task-event frames. SSE id is the task-local sequence, never the event resource UUID. Replays are strictly increasing and exclusive of the cursor. Last-Event-ID takes precedence over afterEventId only for SSE. Historical messages are fixed allowlisted summaries. READY/FAILED drains outstanding events then closes; EOF is not proof of task success. Query the task status, stop reconnecting at terminal state, and deduplicate by sequence. Unknown frames must not crash the client.",
+        "parameters": [
+          {
+            "name": "Last-Event-ID",
+            "in": "header",
+            "required": false,
+            "description": "SSE-only exclusive cursor. Canonical decimal int32 in [0,2147483647], default 0. A present header overrides afterEventId, including an invalid header; it is not used for JSON pages.",
+            "schema": {
+              "$ref": "#/paths/~1api~1v0~1tasks~1{taskId}~1events/get/parameters/1/schema"
+            },
+            "example": "3"
+          },
+          {
+            "name": "afterEventId",
+            "in": "query",
+            "required": false,
+            "description": "Exclusive task-local sequence cursor for JSON pages and SSE without Last-Event-ID. Canonical decimal int32, default 0. Empty, signed, padded, whitespace, UUID and overflow values fail with INVALID_EVENT_ID.",
+            "schema": {
+              "type": "string",
+              "default": "0",
+              "pattern": "^(0|[1-9][0-9]{0,8}|1[0-9]{9}|20[0-9]{8}|21[0-3][0-9]{7}|214[0-6][0-9]{6}|2147[0-3][0-9]{5}|21474[0-7][0-9]{4}|214748[0-2][0-9]{3}|2147483[0-5][0-9]{2}|21474836[0-3][0-9]|214748364[0-7])$"
+            },
+            "example": "3"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "JSON page size only; SSE backlog is always capped at 1000. Drain JSON pages by advancing afterEventId to the last applied sequence until a short or empty page, then subscribe at that cursor.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 1000
+            }
+          }
+        ],
         "responses": {
-          "200": { "description": "Ordered by sequence", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "./schemas/v0/event.schema.json" } } } } },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "200": {
+            "description": "JSON history page or SSE stream. Task-local integer sequence is distinct from the UUID data.id. A terminal task at its head returns an empty SSE body and closes.",
+            "headers": {
+              "Cache-Control": {
+                "description": "SSE response disables caching.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Accel-Buffering": {
+                "description": "SSE response requests no nginx buffering; deployment must also bound writes and sockets.",
+                "schema": {
+                  "type": "string",
+                  "const": "no"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 1000,
+                  "items": {
+                    "$ref": "./schemas/v0/event.schema.json"
+                  }
+                }
+              },
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "taskEvent": {
+                    "summary": "Persisted event followed by a non-business heartbeat",
+                    "value": "id:1\nevent:task-event\ndata:{\"id\":\"33333333-3333-4333-8333-333333333333\",\"taskId\":\"22222222-2222-4222-8222-222222222222\",\"sequence\":1,\"type\":\"STAGE_STARTED\",\"stage\":\"PLAN\",\"message\":\"Stage started: PLAN\",\"occurredAt\":\"2026-09-30T00:00:00Z\"}\n\n:heartbeat\nretry:1000\n\n"
+                  },
+                  "streamError": {
+                    "summary": "Post-header error has no id and closes the connection",
+                    "value": "event:stream-error\ndata:{\"code\":\"EVENT_BACKLOG_EXCEEDED\"}\n\n"
+                  },
+                  "terminalAtHead": {
+                    "summary": "Terminal task with no remaining events",
+                    "value": ""
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid cursor (INVALID_EVENT_ID), page size (INVALID_EVENT_LIMIT), or typed scalar/task UUID (INVALID_REQUEST). Pre-stream errors are JSON even when Accept is text/event-stream.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "./schemas/v0/error.schema.json"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INVALID_EVENT_ID",
+                            "INVALID_EVENT_LIMIT",
+                            "INVALID_REQUEST"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "description": "EVENT_CURSOR_AHEAD: cursor exceeds this task's durable head. EVENT_BACKLOG_EXCEEDED: initial SSE backlog exceeds 1000; JSON page and then reconnect without dropping records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "./schemas/v0/error.schema.json"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "EVENT_CURSOR_AHEAD",
+                            "EVENT_BACKLOG_EXCEEDED"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "INTERNAL_ERROR: inconsistent durable history, unknown stored state or other failure before streaming. No successful task state is implied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "./schemas/v0/error.schema.json"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "const": "INTERNAL_ERROR"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "EVENT_STREAM_CAPACITY: at most 64 active SSE connections per API instance.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "./schemas/v0/error.schema.json"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "const": "EVENT_STREAM_CAPACITY"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-sse-protocol": {
+          "businessEvent": "task-event",
+          "businessDataSchema": {
+            "$ref": "./schemas/v0/event.schema.json"
+          },
+          "transportId": "sequence",
+          "heartbeat": {
+            "comment": "heartbeat",
+            "retryMilliseconds": 1000,
+            "intervalMilliseconds": 15000,
+            "persisted": false
+          },
+          "postHeaderError": {
+            "event": "stream-error",
+            "id": false,
+            "codes": [
+              "EVENT_BACKLOG_EXCEEDED",
+              "NOT_FOUND",
+              "EVENT_STREAM_FAILED"
+            ]
+          },
+          "pollMilliseconds": 500,
+          "connectionLifetimeMilliseconds": 60000,
+          "maxBacklog": 1000,
+          "maxConnectionsPerInstance": 64
+        }
+      }
+    },
+    "/api/v0/tasks/{taskId}/cancel": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/TaskId"
+        }
+      ],
+      "post": {
+        "operationId": "cancelTask",
+        "summary": "Cancel an owned task",
+        "tags": [
+          "tasks"
+        ],
+        "description": "CSRF-protected and idempotent. An active task becomes FAILED/CANCELLED; a task already READY or FAILED remains unchanged. Task ownership is required even for administrators.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CsrfToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current authoritative task, including already-terminal tasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/task.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v0/tasks/{taskId}/diagnostics": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/TaskId"
+        }
+      ],
+      "get": {
+        "operationId": "getTaskDiagnostics",
+        "summary": "Read owned structured task metadata",
+        "tags": [
+          "tasks"
+        ],
+        "description": "Read-only owner-scoped snapshot. available=false means no file producer result, distinct from available=true with an empty change list. Only approved source paths and digests are returned; raw source, diffs, tool messages and log URLs are excluded. Builds reflect persisted QUEUED/RUNNING/SUCCEEDED/FAILED records and do not imply the task is READY. Maximum 40 file changes and 100 build records. Overflow or corrupt persisted metadata fails instead of silently truncating. Producers write internally with an active lease and expected revision; no public write endpoint.",
+        "responses": {
+          "200": {
+            "description": "Structured metadata; task state remains authoritative",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/task-diagnostics.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "description": "INTERNAL_ERROR",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "./schemas/v0/error.schema.json"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "const": "INTERNAL_ERROR"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
         }
       }
     },

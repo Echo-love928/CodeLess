@@ -4,7 +4,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
 const root = resolve(import.meta.dirname, '..');
-const kinds = ['application', 'task', 'event', 'build', 'version', 'publication'];
+const kinds = ['application', 'task', 'event', 'build', 'version', 'publication', 'task-diagnostics'];
 const readJson = (path) => JSON.parse(readFileSync(resolve(root, path), 'utf8'));
 const ajv = new Ajv2020({ allErrors: true, strict: true });
 addFormats(ajv);

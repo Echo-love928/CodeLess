@@ -28,14 +28,14 @@ class DataIntegrationTest extends PostgresTestBase {
     @Test
     void freshDatabaseMigratesOnceAndSecondRunDoesNotRecreateTables() {
         assertThat(jdbc.queryForObject("SELECT count(*) FROM flyway_schema_history WHERE success", Integer.class))
-                .isEqualTo(3);
+                .isEqualTo(4);
         assertThat(flyway.migrate().migrationsExecuted).isZero();
         assertThat(jdbc.queryForObject("SELECT count(*) FROM flyway_schema_history WHERE success", Integer.class))
-                .isEqualTo(3);
+                .isEqualTo(4);
         assertThat(jdbc.queryForObject("SELECT count(*) FROM information_schema.tables "
                 + "WHERE table_schema = 'public' AND table_name IN "
                 + "('platform_users','applications','generation_tasks','task_events',"
-                + "'application_versions','builds','publications','model_calls')", Integer.class)).isEqualTo(8);
+                + "'application_versions','builds','publications','model_calls','task_file_snapshots')", Integer.class)).isEqualTo(9);
     }
 
     @Test
