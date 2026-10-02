@@ -25,7 +25,7 @@ export async function installTaskFixture(page: Page) {
       if (request.headers()['x-csrf-token'] !== 'test-csrf-token') return json({}, 403)
       count += 1
       task = { ...task, prompt: request.postDataJSON().prompt, status: 'PLAN', failureCode: null }
-      if (count > 1) task.id = '22222222-2222-4222-8222-222222222222'
+      if (count > 1) task.id = '44444444-4444-4444-8444-444444444444'
       history = [event(1, 'STAGE_STARTED', 'PLAN')]
       return json(task, 202)
     }
@@ -53,6 +53,7 @@ export async function installTaskFixture(page: Page) {
   })
   return {
     appId: task.applicationId,
+    taskId: () => task.id,
     setOffline(value: boolean) { offline = value },
     advance(stage: string, type = 'STAGE_STARTED', message?: string) {
       task = { ...task, status: stage, updatedAt: '2026-09-30T10:59:00Z' }

@@ -16,6 +16,7 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
   let appId = ''
   let storageKey = ''
   let epoch = 0
+  let subscription = 0
   let stop: (() => void) | undefined
   let pending: { prompt: string; key: string } | undefined
   let currentId: string | null = null
@@ -34,23 +35,31 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
     }
   }
 
+  function updateTask(value: GenerationTask) {
+    const current = task.value
+    if (current?.id === value.id) {
+      // All status reads and mutation responses share the same stale-snapshot guard.
+      if (Date.parse(value.updatedAt) < Date.parse(current.updatedAt)) return
+      if (!running(current) && running(value)) return
+    }
+    task.value = value
+  }
+
   function attach(id: string, version: number) {
+    const streamVersion = ++subscription
+    const active = () => version === epoch && streamVersion === subscription && currentId === id
     stop?.()
     stop = connectTaskEvents({ taskId: id, applicationId: appId,
       onTask: value => {
-        if (version !== epoch) return
-        // A late status read must not replace a newer cancellation response.
-        if (task.value && task.value.id === value.id && Date.parse(value.updatedAt) < Date.parse(task.value.updatedAt)) return
-        if (task.value?.id === value.id && !running(task.value) && running(value)) return
-        task.value = value
+        if (active()) updateTask(value)
       },
-      onEvents: value => { if (version === epoch) events.value = value },
+      onEvents: value => { if (active()) events.value = value },
       onConnection: (value, detail) => {
-        if (version !== epoch) return
+        if (!active()) return
         connection.value = value
         connectionDetail.value = detail ?? ''
       },
-      onError: cause => { void report(cause, version) },
+      onError: cause => { if (active()) void report(cause, version) },
     })
   }
 
@@ -72,7 +81,7 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
       if (!uuid(currentId)) throw new Error('任务入口无效，请使用有效的任务链接。')
       const value = await getTask(currentId, appId)
       if (version !== epoch) return
-      task.value = value
+      updateTask(value)
       remember(value.id)
       attach(value.id, version)
     } catch (cause) { await report(cause, version) }
@@ -90,7 +99,7 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
       const value = await createTask(appId, prompt, pending.key)
       if (version !== epoch) return
       pending = undefined
-      task.value = value; events.value = []
+      updateTask(value); events.value = []
       remember(value.id)
       attach(value.id, version)
     } catch (cause) { await report(cause, version) }
@@ -104,7 +113,7 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
     cancelling.value = true; error.value = ''
     try {
       const value = await cancelTask(id, appId)
-      if (version === epoch) task.value = value
+      if (version === epoch) updateTask(value)
     } catch (cause) { await report(cause, version) }
     finally { if (version === epoch) cancelling.value = false }
   }
@@ -116,7 +125,7 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
     try {
       const value = await getTask(currentId, appId)
       if (version !== epoch) return
-      task.value = value
+      updateTask(value)
       attach(value.id, version)
     } catch (cause) { await report(cause, version) }
     finally { if (version === epoch) restoring.value = false }

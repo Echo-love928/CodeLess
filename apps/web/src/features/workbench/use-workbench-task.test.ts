@@ -72,4 +72,73 @@ describe('workbench action and lifecycle constraints', () => {
     expect(state.events.value).toEqual([])
     state.dispose()
   })
+
+  it.each([
+    ['FAILED', 'CANCELLED'], ['FAILED', 'BUILD_FAILED'], ['READY', null],
+  ])('delayed refresh cannot regress confirmed %s/%s, even with equal timestamps', async (status, failureCode) => {
+    const state = useWorkbenchTask(async () => false)
+    await state.restore(running.applicationId, 'owner')
+    vi.mocked(createTask).mockResolvedValue(running)
+    await state.start('Build a page')
+    const stream = vi.mocked(connectTaskEvents).mock.calls[0][0]
+    let resolve!: (value: typeof running) => void
+    vi.mocked(getTask).mockReturnValue(new Promise(accept => { resolve = accept }))
+    const refreshing = state.refresh()
+    stream.onTask({ ...running, status, failureCode })
+    expect(state.task.value?.status).toBe(status)
+    resolve(running)
+    await refreshing
+    expect(state.task.value?.status).toBe(status)
+    expect(state.task.value?.failureCode).toBe(failureCode)
+    expect(state.canCancel.value).toBe(false)
+    expect(state.canStart.value).toBe(true)
+    state.dispose()
+  })
+
+  it('delayed refresh cannot replace a newer running snapshot', async () => {
+    const state = useWorkbenchTask(async () => false)
+    await state.restore(running.applicationId, 'owner')
+    vi.mocked(createTask).mockResolvedValue(running)
+    await state.start('Build a page')
+    const stream = vi.mocked(connectTaskEvents).mock.calls[0][0]
+    let resolve!: (value: typeof running) => void
+    vi.mocked(getTask).mockReturnValue(new Promise(accept => { resolve = accept }))
+    const refreshing = state.refresh()
+    stream.onTask({ ...running, status: 'VERIFY', updatedAt: '2026-09-26T12:11:00Z' })
+    resolve(running)
+    await refreshing
+    expect(state.task.value?.status).toBe('VERIFY')
+    expect(state.task.value?.updatedAt).toBe('2026-09-26T12:11:00Z')
+    state.dispose()
+  })
+
+  it('retry switches task identity and history; callbacks from the old subscription are ignored', async () => {
+    const onError = vi.fn(async () => false)
+    const state = useWorkbenchTask(onError)
+    await state.restore(running.applicationId, 'owner')
+    vi.mocked(createTask).mockResolvedValueOnce(running)
+    await state.start('Build a page')
+    const old = vi.mocked(connectTaskEvents).mock.calls[0][0]
+    old.onTask({ ...running, status: 'FAILED', failureCode: 'CANCELLED' })
+    old.onEvents([{ id: 'old' } as never])
+    const next = { ...running, id: '44444444-4444-4444-8444-444444444444', status: 'PLAN' }
+    vi.mocked(createTask).mockResolvedValueOnce(next)
+    await state.start('Build a page')
+    expect(state.task.value?.id).toBe(next.id)
+    expect(state.events.value).toEqual([])
+    const current = vi.mocked(connectTaskEvents).mock.calls[1][0]
+    current.onEvents([{ id: 'new' } as never])
+    current.onConnection('connected')
+    old.onTask({ ...running, status: 'FAILED', failureCode: 'CANCELLED' })
+    old.onEvents([{ id: 'late-old' } as never])
+    old.onConnection('blocked', 'old connection')
+    old.onError(new ApiError('unauthorized', 401))
+    expect(state.task.value).toEqual(next)
+    expect(state.events.value).toEqual([{ id: 'new' }])
+    expect(state.connection.value).toBe('connected')
+    expect(onError).not.toHaveBeenCalled()
+    expect(localStorage.getItem(`codeless:task:v1:owner:${running.applicationId}`)).toBe(next.id)
+    expect(current.taskId).toBe(next.id)
+    state.dispose()
+  })
 })
