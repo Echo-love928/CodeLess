@@ -8,6 +8,7 @@ const redoclyArgs = isWindows
 const commands = [
   ['node', ['scripts/verify-versions.mjs']],
   ['node', ['scripts/validate-contracts.mjs', 'all']],
+  ['node', ['--test', 'contracts/events/openapi.test.mjs', 'contracts/tasks/openapi.test.mjs']],
   [corepack, redoclyArgs],
   [corepack, isWindows
     ? ['/d', '/c', 'corepack', 'pnpm', '--filter', '@codeless/web', 'verify']

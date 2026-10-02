@@ -2,6 +2,7 @@ package dev.codeless.api.error;
 
 import dev.codeless.api.auth.AuthFailure;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -39,7 +41,8 @@ public class GlobalExceptionHandler {
         return response(HttpStatus.BAD_REQUEST, "VALIDATION_FAILED", "Request validation failed", request, details);
     }
 
-    @ExceptionHandler({ConstraintViolationException.class, HttpMessageNotReadableException.class})
+    @ExceptionHandler({ConstraintViolationException.class, HttpMessageNotReadableException.class,
+            MethodArgumentTypeMismatchException.class})
     public ResponseEntity<ApiError> malformed(Exception exception, HttpServletRequest request) {
         return response(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "Request is malformed", request, Map.of());
     }
@@ -57,7 +60,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> unexpected(Exception exception, HttpServletRequest request) {
+    public ResponseEntity<ApiError> unexpected(Exception exception, HttpServletRequest request,
+                                              HttpServletResponse response) {
+        // A disconnected SSE socket cannot accept a second JSON response.
+        if (response.isCommitted()) return null;
         return response(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", "An unexpected error occurred", request, Map.of());
     }
 
@@ -82,6 +88,7 @@ public class GlobalExceptionHandler {
                 ? UUID.randomUUID().toString()
                 : suppliedTraceId.substring(0, Math.min(suppliedTraceId.length(), 100));
         ApiError error = new ApiError(code, message, Instant.now(), request.getRequestURI(), traceId, details);
-        return ResponseEntity.status(status).headers(headers).body(error);
+        return ResponseEntity.status(status).headers(headers)
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON).body(error);
     }
 }
