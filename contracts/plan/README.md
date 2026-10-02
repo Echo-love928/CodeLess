@@ -23,6 +23,8 @@ Explicit unsupported requests receive `PLAN_UNSUPPORTED_REQUEST`. A conservative
 
 The result is a validated `Candidate(callId, plan)`, never READY and never source/build/browser success. The final enabling adapter must persist/source-generate the approved plan, fence late/cancelled results with D05 `queue.advance`, validate each source bundle and consume D07-B's real build result and real browser assertions. `TaskStageRunner` remains unchanged and honestly unavailable in this PR. This service must not be called inside a transaction that could roll back a charged external call.
 
+There is a concrete internal integration delta: the existing `TaskStageRunner.execute(taskId, stage)` does not carry the original claim token. The enabling coordinator must pass the original `TaskQueueService.Claim.token` into the PLAN producer (through a reviewed execution-context addition or trusted composition). A late worker must never reload a newer token by task ID and impersonate the current lease. D07-B's standalone source-directory/build-result contract is unchanged by this delta.
+
 ## Persistence without a shared migration
 
 Existing PostgreSQL `model_calls` records stage/provider/requested model/status, nullable input/output usage, error and completion time. Request/response IDs, actual model, monotonic duration, total/raw usage and validated plan are atomically written to a **private platform audit volume**, keyed only by generated UUID. Configure `CODELESS_MODEL_AUDIT_ROOT` (default `.local-data/model-calls`); it must be durable, access restricted and never mounted into generated-code containers. No public model-call endpoint is added.

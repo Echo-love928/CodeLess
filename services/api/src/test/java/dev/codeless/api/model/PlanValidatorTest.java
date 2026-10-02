@@ -22,6 +22,12 @@ class PlanValidatorTest {
     void sameAjvFixturesAreAcceptedOrRejectedByTheRuntimeValidator() throws Exception {
         var fixture = mapper.readTree(valid());
         assertThat(validator.validate(valid(), "STATIC")).isEqualTo(fixture);
+        for (String number : List.of("1.0", "1e0")) {
+            assertThat(validator.validate(valid().replace("\"schemaVersion\": 1", "\"schemaVersion\": " + number), "STATIC")
+                    .get("schemaVersion").intValue()).isEqualTo(1);
+        }
+        assertThatThrownBy(() -> validator.validate(valid().replace("\"schemaVersion\": 1", "\"schemaVersion\": 1.5"), "STATIC"))
+                .hasMessage("PLAN_INVALID");
         for (var item : mapper.readTree(Files.readString(root.resolve("contracts/plan/fixtures/invalid/cases.json")))) {
             ObjectNode candidate = (ObjectNode) fixture.deepCopy();
             String pointer = item.get("pointer").asText();
@@ -56,6 +62,17 @@ class PlanValidatorTest {
         var duplicate = valid.deepCopy();
         ((tools.jackson.databind.node.ArrayNode) duplicate.get("files")).add(duplicate.get("files").get(0).deepCopy());
         assertThatThrownBy(() -> validator.validate(duplicate.toString(), "STATIC")).isInstanceOf(ModelFailure.class);
+        var caseCollision = valid.deepCopy();
+        var files = (tools.jackson.databind.node.ArrayNode) caseCollision.get("files");
+        files.addObject().put("path", "src/data/Seed.ts").put("purpose", "Static seed data");
+        files.addObject().put("path", "src/data/seed.ts").put("purpose", "Colliding seed data");
+        assertThatThrownBy(() -> validator.validate(caseCollision.toString(), "STATIC")).hasMessage("PLAN_INVALID");
+        var uncovered = valid.deepCopy();
+        ((tools.jackson.databind.node.ArrayNode) uncovered.get("pages")).addObject().put("route", "/tasks")
+                .put("file", "src/pages/TasksPage.vue").put("title", "Tasks").put("purpose", "Local tasks");
+        ((tools.jackson.databind.node.ArrayNode) uncovered.get("files")).addObject()
+                .put("path", "src/pages/TasksPage.vue").put("purpose", "Task page");
+        assertThatThrownBy(() -> validator.validate(uncovered.toString(), "STATIC")).hasMessage("PLAN_INVALID");
         var wrongName = valid.deepCopy();
         ((ObjectNode) wrongName.at("/components/0")).put("name", "Other");
         assertThatThrownBy(() -> validator.validate(wrongName.toString(), "STATIC")).isInstanceOf(ModelFailure.class);

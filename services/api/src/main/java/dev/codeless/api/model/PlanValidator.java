@@ -10,12 +10,14 @@ import org.springframework.stereotype.Component;
 import tools.jackson.core.StreamReadFeature;
 import tools.jackson.core.json.JsonReadFeature;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 
 /** Evaluates the deliberately small, closed plan schema; adds template/reference invariants. */
 @Component
 public final class PlanValidator {
     private final JsonMapper mapper = JsonMapper.builder()
+            .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
             .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
             .disable(JsonReadFeature.ALLOW_JAVA_COMMENTS).build();
     private final JsonNode schema;
@@ -108,15 +110,15 @@ public final class PlanValidator {
             case "object" -> value.isObject();
             case "array" -> value.isArray();
             case "string" -> value.isString();
-            case "integer" -> value.isIntegralNumber();
+            case "integer" -> value.isNumber() && value.decimalValue().stripTrailingZeros().scale() <= 0;
             case "boolean" -> value.isBoolean();
             default -> false;
         };
-        if (!type || (rule.has("const") && !rule.get("const").equals(value)))
+        if (!type || (rule.has("const") && !equivalent(rule.get("const"), value)))
             throw new ModelFailure("PLAN_INVALID");
         if (rule.has("enum")) {
             boolean present = false;
-            for (var option : rule.get("enum")) present |= option.equals(value);
+            for (var option : rule.get("enum")) present |= equivalent(option, value);
             if (!present) throw new ModelFailure("PLAN_INVALID");
         }
         if (value.isObject()) {
@@ -140,5 +142,10 @@ public final class PlanValidator {
                     || (rule.has("pattern") && !text.matches(rule.get("pattern").asText())))
                 throw new ModelFailure("PLAN_INVALID");
         }
+    }
+
+    private static boolean equivalent(JsonNode left, JsonNode right) {
+        return left.isNumber() && right.isNumber()
+                ? left.decimalValue().compareTo(right.decimalValue()) == 0 : left.equals(right);
     }
 }
