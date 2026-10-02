@@ -37,6 +37,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.springframework.ai</groupId>
+      <artifactId>spring-ai-model</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
@@ -79,6 +83,19 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource><directory>src/main/resources</directory></resource>
+      <resource>
+        <directory>../../contracts/plan</directory>
+        <targetPath>model/plan</targetPath>
+        <includes><include>*.json</include><include>fixtures/valid/*.json</include></includes>
+      </resource>
+      <resource>
+        <directory>../../prompts/runtime</directory>
+        <targetPath>model/prompts</targetPath>
+        <includes><include>*.txt</include></includes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
