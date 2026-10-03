@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "limits": {
+    "maxFiles": 40,
+    "maxFileBytes": 131072,
+    "maxTotalBytes": 524288,
+    "maxCalls": 20
+  },
+  "tools": [
+    {
+      "name": "files.list",
+      "description": "List controlled Vue source files and SHA-256 hashes.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "files.read",
+      "description": "Read one controlled Vue source file.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^(?!.*\\/(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Nn][Ii][Nn]|[Cc][Oo][Nn][Oo][Uu][Tt]|[Cc][Oo][Mm][0-9]+|[Ll][Pp][Tt][0-9]+)\\.(?:vue|ts)$)(?:src/(?:pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue|src/data/[A-Za-z][A-Za-z0-9_-]*\\.ts)$"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "files.create",
+      "description": "Create a controlled Vue source file without overwriting.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^(?!.*\\/(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Nn][Ii][Nn]|[Cc][Oo][Nn][Oo][Uu][Tt]|[Cc][Oo][Mm][0-9]+|[Ll][Pp][Tt][0-9]+)\\.(?:vue|ts)$)(?:src/(?:pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue|src/data/[A-Za-z][A-Za-z0-9_-]*\\.ts)$"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 131072
+          }
+        },
+        "required": [
+          "path",
+          "content"
+        ]
+      }
+    },
+    {
+      "name": "files.update",
+      "description": "Replace one controlled Vue source file if its hash still matches.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^(?!.*\\/(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Nn][Ii][Nn]|[Cc][Oo][Nn][Oo][Uu][Tt]|[Cc][Oo][Mm][0-9]+|[Ll][Pp][Tt][0-9]+)\\.(?:vue|ts)$)(?:src/(?:pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue|src/data/[A-Za-z][A-Za-z0-9_-]*\\.ts)$"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 131072
+          },
+          "expectedDigest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "path",
+          "content",
+          "expectedDigest"
+        ]
+      }
+    },
+    {
+      "name": "files.delete",
+      "description": "Delete one controlled Vue source file if its hash still matches.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^(?!.*\\/(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Nn][Ii][Nn]|[Cc][Oo][Nn][Oo][Uu][Tt]|[Cc][Oo][Mm][0-9]+|[Ll][Pp][Tt][0-9]+)\\.(?:vue|ts)$)(?:src/(?:pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue|src/data/[A-Za-z][A-Za-z0-9_-]*\\.ts)$"
+          },
+          "expectedDigest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "path",
+          "expectedDigest"
+        ]
+      }
+    }
+  ]
+}
