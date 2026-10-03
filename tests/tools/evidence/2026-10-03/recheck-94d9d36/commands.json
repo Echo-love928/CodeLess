@@ -1,0 +1,47 @@
+{
+  "peerCommit": "94d9d36289441a07add9585bb3157952031b4ea7",
+  "originalPeerCommit": "0208b5d080b86e5f7bb4ac70a5713d0fc743b26b",
+  "apiProducerCommit": "b7989cd557f95ff57f276a40ad84f3e87ce7852a",
+  "workflowTestDigest": "sha256:3e85c172a0b2d5a80ad1a79462236d8b1999e0bfe5dfc67d47e82b4f00e99b43",
+  "commands": [
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=FileToolRegistryTest,FileToolsIntegrationTest test",
+      "exitCode": 1,
+      "log": "<recheck>/tools-before-docker.log",
+      "logSha256": "sha256:1eee01fbe2aeb1f2a7a6de961e86634f9b5442b93bad3d3abad51b1e15543405"
+    },
+    {
+      "command": "node --test <peer>/tests/runner/browser/artifacts.test.mjs <peer>/tests/runner/browser/acceptance.test.mjs",
+      "exitCode": 1,
+      "log": "<recheck>/peer-acceptance-before-docker.log",
+      "logSha256": "sha256:dcfba6a1159c49537c3b54922eac79a1a49da50dd98e3cad91c01f61298aecca"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=FileToolRegistryTest,FileToolsIntegrationTest test",
+      "exitCode": 0,
+      "log": "<recheck>/tools.log",
+      "logSha256": "sha256:3d16e1bf6e630be5cfda0ab496af2bb7036cae09538bbbe36b6ad2e0ecbfcceb"
+    },
+    {
+      "command": "node --test <peer>/tests/runner/browser/artifacts.test.mjs <peer>/tests/runner/browser/acceptance.test.mjs",
+      "exitCode": 0,
+      "log": "<recheck>/peer-acceptance.log",
+      "logSha256": "sha256:e824f1f8eee294d8060d9a0e8430116f2ff578564b865caa4ef9d9dc55abcacd"
+    },
+    {
+      "command": "node --test tests/tools/peer-workflow.test.mjs",
+      "exitCode": 0,
+      "log": "<recheck>/peer-integration.log",
+      "logSha256": "sha256:7038b0b71adae3181f57f3f24891481bcc59fc8d6dd2d8c720c18e94e2f23546"
+    }
+  ],
+  "initialFailureReason": "Docker Desktop was stopped. Original failed logs retained. Started the installed daemon, confirmed docker info success, then reran without code/assertion changes.",
+  "reports": 23,
+  "pngBytesAndHashesChecked": 7,
+  "apiTests": 13,
+  "peerTests": 14,
+  "workflowTests": 1,
+  "skipped": 0,
+  "runtimeModelRequests": 0,
+  "developerTokenUsage": "unknown"
+}

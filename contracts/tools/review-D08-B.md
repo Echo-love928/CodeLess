@@ -1,5 +1,32 @@
 # D08-A 对 D08-B 的只读互审
 
+## 重新审查：94d9d36（当前结论）
+
+日期 2026-10-03。精确候选 `94d9d36289441a07add9585bb3157952031b4ea7`，base/main 均为 `4a8f75c4bb7600c03aa141ac68b7bd7e016b7828`。只复查相对 `0208b5d` 的修复和受影响范围；B 工作树保持只读且干净。审查人 `yuanqizuimeng`，作者 `Echo-love928`，无自批。
+
+### 阻塞问题
+
+原 P2 已修复，本次范围未发现未解决阻塞。`services/runner/src/artifacts/routes.mjs:2-7` 共享三个精确路由；`service.mjs:45-48` 仅映射文档请求到已校验、冻结在内存的 index；`worker.mjs:54-66` 仅允许同 origin 主 frame 的三个固定导航，资源仍须真实 manifest 路径。HTTP GET/HEAD、Tasks/Catalog 导航与刷新实际通过；未知路由、编码/越界、iframe/script/image/fetch 使用文档别名继续拒绝。不是通配 fallback。
+
+### 建议
+
+原 IPv6 兼容建议已落实：`worker.mjs:27` 显式绑定 `127.0.0.1`，本机真实 Chromium 控制连接和两次跨 PR 验证通过，网页目标策略未放宽。既有公共 Build 异常表达、browser evidence 与不可变版本 READY 持久关联、部署隔离/回收仍由公共维护者或最后启用 PR 接手；它们不是此次路由修复引入的问题，此批准不表示这些生命周期已接通。
+
+### 已核验内容
+
+- 读取新增共享路由、服务/worker 差异、README/交接及增量测试和报告，未见超出 B 卡范围、版本/依赖升级、秘密或弱化既有断言。两个新增测试保留未知路径/资源误用拒绝。
+- 独立执行 B 的 `artifacts.test.mjs` 与 `acceptance.test.mjs`，退出 **0，14/14，0跳过**。真实 Docker→Chromium 正常页通过，白屏/JS异常失败；PAGE_OPEN_TIMEOUT 与 SCREENSHOT_TIMEOUT 分类正确；内网管理服务实际命中0，云元数据/WebSocket被拒绝；watchdog 真实终止失控进程树。合法 Tasks 新增后刷新保留、Catalog 筛选/刷新通过。
+- 在 A 候选生产实现 `b7989cd` 独立重跑真实 PostgreSQL/文件工具：退出 **0，13/13，0 failures/errors/skips**，新生成三页不可变快照和 T1–T4 审计。增强 A 自己的 `tests/tools/peer-workflow.test.mjs`，保留根页/Tasks原断言，并增加14动作 Tasks刷新保留→Catalog筛选/刷新→返回Tasks保留；对未修改 B 候选运行退出 **0，1/1**，两次真实构建/浏览器结果均 VERIFIED，控制host127.0.0.1，错误集合为空，浏览器已关闭。
+- 源码摘要 `sha256:907860c4dcc8de6add6507a8bbeb13c852926943f7f00c944e0ab49226045ba8` 与 Java 工具快照、B扫描及浏览器报告一致；产物摘要 `sha256:d6c797d8bef781d074f6fa9d38806600d7d80892e75cd42ded50ea1bf19f1670` 与真实构建/浏览器一致。导出23份实际报告，重新读取校验7份PNG的字节数、签名和SHA-256。
+- 首次复测因本机 Docker Desktop 停止而退出1，API数据库10项报错、B两项真实构建失败；其余浏览器与静态用例12项通过。保留原失败日志；启动已有Docker并确认29.8.1就绪后重跑，未改B或失败断言。这里的成功以第二轮实际结果为准。
+- 精确候选的六项远端检查 `verify:static/api/runner/e2e`、`infra-preflight`、`ci-gate` 均 completed/success：[运行37104521374](https://github.com/Echo-love928/CodeLess/actions/runs/37104521374)。当前main与base一致，GraphQL reviewThreads为空且无下一页。未重复运行未受影响的本地全阶段；远端是该精确提交的真实结果。
+
+复现：在 A 根加载 `.local-data/d07-a/env.ps1`，设置 `CODELESS_FILE_EVIDENCE_DIR=.local-data/d08-a/recheck-94d9d36`（绝对路径）、`CODELESS_D08_B_REVIEW_ROOT=.local-data/d08-a/peer-review`（绝对路径）、`CODELESS_BROWSER_EVIDENCE_DIR=<evidence>/browser`。分别执行定向 Maven、`node --test <peer>/tests/runner/browser/artifacts.test.mjs <peer>/tests/runner/browser/acceptance.test.mjs`、`node --test tests/tools/peer-workflow.test.mjs`。完整命令、退出码、日志SHA-256与报告在 `tests/tools/evidence/2026-10-03/recheck-94d9d36/commands.json`；原始日志在 `.local-data/d08-a/recheck-94d9d36/`。
+
+结论：已由独立审查人提交[正式批准](https://github.com/Echo-love928/CodeLess/pull/17#pullrequestreview-5399531989)，对应精确候选94d9d36；PR保持草稿，未合并或修改main。开发token计量未知；平台真实模型调用0。
+
+## 首次审查记录（历史，已由上述复查更新）
+
 审查：[PR #17](https://github.com/Echo-love928/CodeLess/pull/17)，精确候选 `0208b5d080b86e5f7bb4ac70a5713d0fc743b26b`，base `4a8f75c`。
 只读工作树 `.local-data/d08-a/peer-review`；未修改 B 的代码、测试或契约。
 
