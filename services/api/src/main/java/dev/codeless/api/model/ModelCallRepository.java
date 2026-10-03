@@ -17,15 +17,25 @@ public class ModelCallRepository {
 
     @Transactional
     public Attempt start(UUID taskId, UUID leaseToken, String provider, String model) {
+        return reserve(taskId, leaseToken, provider, model, "PLAN", false);
+    }
+
+    @Transactional
+    public Attempt startStage(UUID taskId, UUID leaseToken, String provider, String model, String stage) {
+        if (!java.util.List.of("PLAN", "GENERATE").contains(stage)) throw new ModelFailure("MODEL_INVALID_INPUT");
+        return reserve(taskId, leaseToken, provider, model, stage, true);
+    }
+
+    private Attempt reserve(UUID taskId, UUID leaseToken, String provider, String model, String stage, boolean boundedLoop) {
         if (taskId == null || leaseToken == null) throw new ModelFailure("MODEL_INVALID_INPUT");
         jdbc.sql("SELECT id FROM generation_tasks WHERE id = ? FOR UPDATE").param(taskId)
                 .query(UUID.class).optional().orElseThrow(() -> new ModelFailure("MODEL_TASK_UNAVAILABLE"));
         var input = jdbc.sql("""
                 SELECT t.prompt, a.data_mode, t.deadline_at
                 FROM generation_tasks t JOIN applications a ON a.id = t.application_id
-                WHERE t.id = ? AND t.status = 'PLAN' AND t.queue_state = 'RUNNING' AND t.lease_token = ?
+                WHERE t.id = ? AND t.status = ? AND t.queue_state = 'RUNNING' AND t.lease_token = ?
                   AND t.lease_expires_at > clock_timestamp() AND t.deadline_at > clock_timestamp()
-                """).params(taskId, leaseToken).query((rs, row) -> new Attempt(null, rs.getString("prompt"),
+                """).params(taskId, stage, leaseToken).query((rs, row) -> new Attempt(null, rs.getString("prompt"),
                         rs.getString("data_mode"), rs.getObject("deadline_at", OffsetDateTime.class), null))
                 .optional().orElseThrow(() -> new ModelFailure("MODEL_LEASE_INVALID"));
         RequestPolicy.validate(input.prompt());
@@ -37,13 +47,17 @@ public class ModelCallRepository {
                 """).param(taskId).query((rs, row) -> new long[]{rs.getLong("calls"), rs.getLong("pending"),
                         rs.getLong("unknown"), rs.getLong("tokens")}).single();
         if (counts[1] > 0) throw new ModelFailure("MODEL_CALL_IN_PROGRESS");
-        if (counts[2] > 0) throw new ModelFailure("MODEL_BUDGET_UNKNOWN");
+        // Only the explicitly named offline mock may proceed with unknown usage, using the loop's
+        // persisted conservative reservations. Real providers always fail closed on unknown usage.
+        if (counts[2] > 0 && !(boundedLoop && provider.equals("deterministic-mock") &&
+                jdbc.sql("SELECT count(*) FROM model_calls WHERE task_id=? AND provider<>'deterministic-mock'")
+                    .param(taskId).query(Long.class).single() == 0)) throw new ModelFailure("MODEL_BUDGET_UNKNOWN");
         if (counts[0] >= 12 || counts[3] >= 50000) throw new ModelFailure("MODEL_BUDGET_EXCEEDED");
         UUID id = UUID.randomUUID();
         String created = jdbc.sql("""
                 INSERT INTO model_calls(id, task_id, stage, provider, model, status)
-                VALUES (?, ?, 'PLAN', ?, ?, 'REQUESTED') RETURNING created_at
-                """).params(id, taskId, provider, model).query(OffsetDateTime.class).single().toString();
+                VALUES (?, ?, ?, ?, ?, 'REQUESTED') RETURNING created_at
+                """).params(id, taskId, stage, provider, model).query(OffsetDateTime.class).single().toString();
         return new Attempt(id, input.prompt(), input.dataMode(), input.deadline(), created);
     }
 

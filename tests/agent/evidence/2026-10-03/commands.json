@@ -1,0 +1,27 @@
+{
+  "baseline": "f80ee105bd8207a65bcc46c9ce61f0eaf5497c26",
+  "branch": "codex/d09-a-agent-loop",
+  "taskCases": ["D09-A-T1", "D09-A-T2", "D09-A-T3", "D09-A-T4"],
+  "commands": [
+    {"command": "services/api/mvnw.cmd -f services/api/pom.xml -DskipTests compile", "exitCode": 0, "log": ".local-data/d09-a/compile.log", "meaning": "compile only"},
+    {"command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=AgentLoopIntegrationTest test", "exitCode": 1, "log": ".local-data/d09-a/agent-first.log", "reason": "environment-selected real provider exhausted conservative reservations"},
+    {"command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=AgentLoopIntegrationTest test", "exitCode": 1, "log": ".local-data/d09-a/agent-second.log", "reason": "actual build rejected mock fixture missing import semicolon"},
+    {"command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=AgentLoopIntegrationTest test", "exitCode": 0, "log": ".local-data/d09-a/agent-third.log", "tests": 6, "failures": 0, "errors": 0, "skipped": 0},
+    {"command": "pnpm ci:gate", "exitCode": 1, "log": ".local-data/d09-a/ci-gate.log", "reason": "new SQL NULL test incorrectly used JdbcClient.single; static/runner/e2e passed"},
+    {"command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealAgentAcceptanceIT test", "exitCode": 1, "log": ".local-data/d09-a/real-agent.log", "provider": "deepseek", "reason": "real generated JS SFC did not pass frozen strict TS build"},
+    {"command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealAgentAcceptanceIT test", "exitCode": 1, "log": ".local-data/d09-a/real-agent-typed.log", "provider": "deepseek", "reason": "MODEL_NETWORK in PLAN; usage unknown; no retry"},
+    {"command": "pnpm ci:gate", "exitCode": 0, "log": ".local-data/d09-a/ci-gate-final.log", "stages": [
+      {"command": "pnpm verify:static", "exitCode": 0, "contractTests": 7, "frontendTests": 24},
+      {"command": "pnpm verify:api", "exitCode": 0, "tests": 95, "agentTests": 8, "failures": 0, "errors": 0, "skipped": 0},
+      {"command": "pnpm verify:runner", "exitCode": 0, "tests": 30},
+      {"command": "pnpm verify:e2e", "exitCode": 0, "tests": 28}
+    ]},
+    {"command": "node tests/agent/export-evidence.mjs", "exitCode": 0, "result": "source and PNG bytes independently hashed before export"}
+  ],
+  "unexecuted": [
+    {"case": "D09-B preview gateway and iframe integration/review", "reason": "no D09-B PR/branch/contract delta/handoff/report available"}
+  ],
+  "realModelCompleteSuccess": false,
+  "platformPreviewComplete": false,
+  "merged": false
+}
