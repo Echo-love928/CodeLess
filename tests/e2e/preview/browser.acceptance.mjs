@@ -158,6 +158,20 @@ test('D09-B-T1/T3/T4: real Vue build and Chromium preview, platform isolation an
     expect(observed.every(item => !item.platformCookie && !item.forwardedSecret)).toBe(true)
     await page.screenshot({ path: join(evidence, 'T1-T3-platform-preview.png'), fullPage: true })
 
+
+    // Real client-side resource interruption must show an error despite a subsequent load event.
+    let breakResource = true
+    await page.route('**/assets/*.js', route => {
+      const uri = new URL(route.request().url())
+      if (breakResource && uri.hostname === 'v' + version1.replaceAll('-', '') + '.preview.codeless-preview.test')
+        return route.abort('failed')
+      return route.continue()
+    })
+    await page.getByRole('button', { name: '刷新预览', exact: true }).click()
+    await expect(page.getByRole('alert')).toContainText('预览凭据失效或产物不可用')
+    breakResource = false
+    await page.getByRole('button', { name: '刷新预览', exact: true }).click()
+    await expect(frame.locator('#app')).toContainText('展示')
     // Actual iframe document refresh preserves this immutable version and its isolated generated storage.
     await iframe.evaluate((element) => { element.contentWindow.postMessage('ignored', '*') })
     await page.frames().find(item => item.url().startsWith(previewOrigin.replace('https://', 'https://v' + version1.replaceAll('-', '') + '.')))
@@ -187,7 +201,7 @@ test('D09-B-T1/T3/T4: real Vue build and Chromium preview, platform isolation an
     await writeFile(join(evidence, 'acceptance.json'), JSON.stringify({
       task: 'D09-B', platformApiFixture: true, sourceFixture: true, generatedBuildFixture: false, browser: 'locked Chromium',
       T1: { status: 'PASSED', versionId: version1, buildId: first.build.id, artifactDigest: first.build.artifact.digest },
-      T2: { status: 'PASSED', expiredNavigationRejected: true },
+      T2: { status: 'PASSED', expiredNavigationRejected: true, resourceFailureRejected: true },
       T3: { status: 'PASSED', isolation, platformProbeHits, popupCount, noPlatformCookieAtGateway: observed.every(item => !item.platformCookie) },
       T4: { status: 'PASSED', versionId: version2, buildId: second.build.id, artifactDigest: second.build.artifact.digest, issues, changedText: text1 !== text2 },
     }, null, 2))

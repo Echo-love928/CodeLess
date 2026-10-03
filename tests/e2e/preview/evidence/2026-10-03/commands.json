@@ -65,18 +65,56 @@
       "exitCode": 0,
       "tests": 34,
       "note": "After adding valid-wire version tampering with original signature; production code unchanged after successful full gate."
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 1,
+      "log": ".local-data/d09-b/ci-gate-resource-proof.log",
+      "note": "Resource interruption/browser recovery passed; only headless normal gateway fixture failed. Preserve implicit HTML head compatibility rather than changing its assertion."
+    },
+    {
+      "command": "node --test tests/e2e/preview/gateway.acceptance.mjs",
+      "exitCode": 0,
+      "tests": 4,
+      "log": ".local-data/d09-b/gateway-resource-fixed.log"
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 0,
+      "log": ".local-data/d09-b/ci-gate-complete.log",
+      "stages": {
+        "static": {
+          "exitCode": 0,
+          "frontendTests": 30
+        },
+        "api": {
+          "exitCode": 0,
+          "tests": 88,
+          "skipped": 0
+        },
+        "runner": {
+          "exitCode": 0,
+          "tests": 34,
+          "skipped": 0
+        },
+        "e2e": {
+          "exitCode": 0,
+          "tests": 29,
+          "skipped": 0
+        }
+      }
     }
   ],
   "screenshots": [
     {
       "file": "T1-T3-platform-preview.png",
-      "bytes": 76555,
-      "digest": "sha256:12e860702268424a7e45588eef2e38ab414c7ee3fa283968cff19015b05e17ef"
+      "bytes": 77181,
+      "digest": "sha256:1a7ca27b7f5b18873651b307880031b73c140f4f78b17a027b14c56b7accee8a"
     },
     {
       "file": "T4-current-version.png",
-      "bytes": 76846,
-      "digest": "sha256:185d922f74fcb88b594167ad3cf6b00851927af275d51e9a9eaa6e72e8f6c5d8"
+      "bytes": 76830,
+      "digest": "sha256:45cf226d1312054c30f3f18d32ffe7ff7cdeaef688969619e61a64a062cd1648"
     },
     {
       "file": "version1-verification.png",
@@ -129,6 +167,22 @@
     {
       "file": ".local-data/d09-b/runner-forgery-proof.log",
       "digest": "sha256:b9e9803d8d96408c43bce7ed30248484ab903fe1f9aaaef6774d1ad155a31d94"
+    },
+    {
+      "file": ".local-data/d09-b/remote-api-first.log",
+      "digest": "sha256:c93940e5080775591eaa1cd6183597b96c4b61b290134b80f4f1cc9787be83fe"
+    },
+    {
+      "file": ".local-data/d09-b/ci-gate-resource-proof.log",
+      "digest": "sha256:06abc774d85d2126471313295f50a942242e7c456fce79f70a759ef5588962b2"
+    },
+    {
+      "file": ".local-data/d09-b/gateway-resource-fixed.log",
+      "digest": "sha256:fe4cf64e5845bc91fa633adb96d1e663f6ea1678c658b44366195c6521b9e246"
+    },
+    {
+      "file": ".local-data/d09-b/ci-gate-complete.log",
+      "digest": "sha256:0856795ad3efbe576633c9fa7a693916bc84f870a26ce98daf4257bf66708698"
     }
   ],
   "developmentTokens": {
@@ -140,5 +194,35 @@
   "modelAcceptance": {
     "executed": false,
     "tokenUsage": null
+  },
+  "remoteRuns": [
+    {
+      "head": "27fe0dc72328f31b850113cbbf117c4e1798dfd1",
+      "runId": 37116387344,
+      "ciGate": "FAILURE",
+      "checks": {
+        "static": "SUCCESS",
+        "api": "FAILURE",
+        "runner": "SUCCESS",
+        "e2e": "SUCCESS",
+        "infraPreflight": "SUCCESS"
+      },
+      "api": {
+        "tests": 88,
+        "errors": 1,
+        "skipped": 0,
+        "previewHttpTest": "PASSED",
+        "failure": "TaskQueueIntegrationTest.twoConsumersCannotClaimSameTaskOrRunTwoTasksForOneApplication: duplicate generation_tasks_one_running_per_application"
+      },
+      "queueImplementationMatchesMain": {
+        "gitBlob": "f7fefa021683e911d8492f8e6ca1d05192fa4788",
+        "modified": false
+      }
+    }
+  ],
+  "pr": {
+    "url": "https://github.com/Echo-love928/CodeLess/pull/20",
+    "draft": true,
+    "blocker": "Existing main task-claim concurrency defect; no rerun-only resolution or self approval."
   }
 }

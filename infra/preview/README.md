@@ -42,7 +42,7 @@ No arbitrary SPA fallback; /, /tasks and /catalog use D08's exact frozen routes.
 iframe and CSP sandbox allow only scripts + same-origin (generated LocalStorage requires this).
 Distinct version origin isolates platform and other versions. Popups, top navigation, forms,
 downloads, workers, frames, objects and external connections are blocked. frame-ancestors is the exact platform origin.
-The gateway appends a small load/status bridge to HTML, so iframe load on an HTTP error is not called success.
+The gateway injects a small load/status bridge before resources in the trusted template head, so HTTP errors, resource failures and page exceptions are not called loading success.
 Messages are constrained by iframe source and exact origin; they only affect display, never task verification.
 Served HTML contains this transport bridge; the stored artifact/source digests remain those of the original immutable bytes.
 

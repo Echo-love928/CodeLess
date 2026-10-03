@@ -58,7 +58,18 @@ export function createPreviewGateway({ signingKeyHex, previewOrigin, platformOri
       if (!upstream.ok) return deny(response, 502)
       // No user headers or platform/preview cookies leave this gateway. No arbitrary proxy destinations.
       let bytes = request.method === 'HEAD' ? undefined : Buffer.from(await upstream.arrayBuffer())
-      if (bytes && name === 'index.html') bytes = Buffer.concat([bytes, Buffer.from('<script>addEventListener("load",()=>parent.postMessage({type:"codeless-preview",state:"loaded"},' + JSON.stringify(platform.origin) + '))</script>')])
+      if (bytes && name === 'index.html') {
+        // Install before module/resources: window.load also fires after failed resources.
+        const bridge = '<script>(()=>{let failed=false;const report=state=>parent.postMessage({type:"codeless-preview",state},' +
+          JSON.stringify(platform.origin) + ');const fail=()=>{failed=true;report("unavailable")};' +
+          'addEventListener("error",fail,true);addEventListener("unhandledrejection",fail);' +
+          'addEventListener("load",()=>report(failed?"unavailable":"loaded"))})()</script>'
+        const html = bytes.toString('utf8')
+        // HTML may use an implicit head; preserve its doctype and install before any resource.
+        const boundary = html.match(/^\s*<!doctype html[^>]*>/i)?.[0].length ?? 0
+        bytes = Buffer.from(html.includes('<head>') ? html.replace('<head>', '<head>' + bridge) :
+          html.slice(0, boundary) + bridge + html.slice(boundary))
+      }
       response.writeHead(200, { ...headers, 'Content-Type': upstream.headers.get('content-type') ?? 'application/octet-stream',
         ...(bytes ? { 'Content-Length': bytes.length } : {}), 'Cross-Origin-Resource-Policy': 'same-origin' })
       response.end(bytes)
