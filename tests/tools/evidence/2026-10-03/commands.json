@@ -1,0 +1,50 @@
+[
+  {
+    "command": "node --test tests/tools/registry.test.mjs",
+    "exitCode": 0,
+    "log": "<evidence>/schema-final.log",
+    "logSha256": "sha256:b58c011d798d66b3047ec2a48a95410ed507b87036a101534429ce2d50f9ce1c"
+  },
+  {
+    "command": "services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=FileToolRegistryTest,FileToolsIntegrationTest' test",
+    "exitCode": 0,
+    "log": "<evidence>/tools-evidence.log",
+    "logSha256": "sha256:cccd9d0db8d107ad24f290d73623257d3d6674e06f6fe1c5581807610091b32e"
+  },
+  {
+    "command": "node --test tests/tools/fixed-project.test.mjs",
+    "exitCode": 0,
+    "log": "<evidence>/fixed-project-final.log",
+    "logSha256": "sha256:d4bcc47d5378105599f1bb492663873cabc7b2711bbb72a10846f7e48c2f80ee"
+  },
+  {
+    "command": "pnpm verify:api",
+    "exitCode": 0,
+    "log": "<evidence>/api-final.log",
+    "logSha256": "sha256:579bfe2baa7fa6cc2fceefbf77935b3ee5c54765000452ac87ac94cce4cd7509"
+  },
+  {
+    "command": "pnpm ci:gate",
+    "exitCode": 0,
+    "log": "<evidence>/ci-gate-final.log",
+    "logSha256": "sha256:57e18c763408c69637264c7c5d6525af2924ae231879ff50aaf8375524a99d84"
+  },
+  {
+    "command": "pnpm ci:gate (first, failed temp cleanup)",
+    "exitCode": 1,
+    "log": "<evidence>/ci-gate.log",
+    "logSha256": "sha256:063346f4d56c4e2800ab0ba4c246813b3c84644c11f389c6726aabcdb432cba2"
+  },
+  {
+    "command": "node --test tests/tools/peer-workflow.test.mjs",
+    "exitCode": 1,
+    "log": "<evidence>/peer-integration.log",
+    "logSha256": "sha256:46a776972ab0b85bc35a9f4b2b48bf2e2834a2f027044b9f966538672e83f9a8"
+  },
+  {
+    "command": "node --test <read-only-peer>/tests/runner/browser/artifacts.test.mjs <read-only-peer>/tests/runner/browser/acceptance.test.mjs",
+    "exitCode": 1,
+    "log": "<evidence>/peer-acceptance.log",
+    "logSha256": "sha256:90e460f296d53114bffdc40cea30fb7e71d71ec2664a7a5191cf64d49834726d"
+  }
+]
