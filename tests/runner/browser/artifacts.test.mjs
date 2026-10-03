@@ -107,3 +107,29 @@ test('controlled action grammar rejects scripts, arbitrary selectors, URLs and r
   assert.equal(copy[0].target.testId, 'name')
   assert.equal(limits({ screenshotTimeoutMs: 1 }).screenshotTimeoutMs, 1)
 })
+
+test('only the three fixed Vue document routes map to the frozen index; assets and unknown paths do not', async () => {
+  const fixture = await completedFixture(artifactRoot)
+  const service = await openArtifactService({ artifactRoot, ...fixture })
+  try {
+    const headers = { 'x-codeless-artifact-token': browserTarget(service).token }
+    const index = await get(service.origin, '/', headers)
+    for (const route of ['/', '/tasks', '/catalog']) {
+      const response = await get(service.origin, route, headers)
+      assert.equal(response.status, 200, 'fixed document ' + route)
+      assert.equal(response.body, index.body)
+      assert.equal(response.headers['content-type'], 'text/html; charset=utf-8')
+      const head = await get(service.origin, route, headers, 'HEAD')
+      assert.equal(head.status, 200)
+      assert.equal(head.body, '')
+      assert.equal(head.headers['content-length'], index.headers['content-length'])
+    }
+    for (const path of ['/tasks/', '/catalog/extra', '/other', '/api/v0/admin', '/tasks.js',
+      '/assets/missing.js', '/../tasks', '/%74asks']) assert.notEqual((await get(service.origin, path, headers)).status, 200, path)
+    for (const destination of ['script', 'image', 'empty', 'iframe']) {
+      assert.notEqual((await get(service.origin, '/tasks', { ...headers, 'Sec-Fetch-Dest': destination })).status, 200)
+    }
+    await writeFile(join(fixture.build.artifact.directory, 'index.html'), 'changed on disk')
+    assert.equal((await get(service.origin, '/tasks', headers)).body, index.body)
+  } finally { await service.close() }
+})

@@ -1,5 +1,6 @@
 import { chromium, expect } from '@playwright/test'
 import { locate, validateActions, limits as validateLimits } from './actions.mjs'
+import { artifactFile, isDocumentRoute } from '../artifacts/routes.mjs'
 
 const sendPhase = (phase) => process.send?.({ phase })
 let input = ''
@@ -12,7 +13,7 @@ const actions = validateActions(job.actions)
 const limits = validateLimits(job.limits)
 const allowed = new Set(job.paths)
 const diagnostics = { pageErrors: [], consoleErrors: [], blockedRequests: [], failedRequests: [], actions: [],
-  truncated: false, freshContext: null, visibleContent: null }
+  truncated: false, freshContext: null, visibleContent: null, controlHost: null }
 function record(key, value) {
   if (diagnostics[key].length < limits.diagnostics) diagnostics[key].push(value)
   else diagnostics.truncated = true
@@ -23,7 +24,7 @@ const result = { status: 'FAILED', failure: null, phase, diagnostics, browserClo
 function enter(value) { phase = value; sendPhase(value) }
 try {
   enter('LAUNCH')
-  server = await chromium.launchServer({ headless: true, timeout: limits.launchTimeoutMs,
+  server = await chromium.launchServer({ host: '127.0.0.1', headless: true, timeout: limits.launchTimeoutMs,
     // Proxy cannot forward any traffic; loopback targets must also pass through it.
     proxy: { server: job.origin, bypass: '<-loopback>' },
     args: ['--disable-quic', '--disable-background-networking', '--disable-extensions',
@@ -31,6 +32,7 @@ try {
       '--disable-features=WebTransport,Prerender2,SpeculationRulesPrefetch',
       '--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1'] })
   process.send?.({ browserPid: server.process().pid })
+  diagnostics.controlHost = new URL(server.wsEndpoint()).hostname
   browser = await chromium.connect(server.wsEndpoint(), { timeout: limits.launchTimeoutMs })
   context = await browser.newContext({ viewport: { width: 1280, height: 720 },
     serviceWorkers: 'block', acceptDownloads: false, javaScriptEnabled: true })
@@ -49,11 +51,13 @@ try {
   await context.route('**/*', async (route) => {
     const request = route.request()
     const url = new URL(request.url())
-    const path = url.pathname === '/' ? 'index.html' : url.pathname.slice(1)
-    const mainDocument = !request.isNavigationRequest() || request.frame() === page?.mainFrame()
-    if (request.url() === job.origin + '/favicon.ico' && !allowed.has('favicon.ico')) return route.fulfill({ status: 204 })
+    const navigation = request.isNavigationRequest()
+    const mainDocument = navigation && request.resourceType() === 'document' && request.frame() === page?.mainFrame()
+    const path = artifactFile(url.pathname, mainDocument)
+    const documentAllowed = !navigation || (mainDocument && isDocumentRoute(url.pathname))
+    if (!navigation && request.url() === job.origin + '/favicon.ico' && !allowed.has('favicon.ico')) return route.fulfill({ status: 204 })
     if (url.protocol !== 'http:' || url.origin !== job.origin || url.username || url.password ||
-        /%|\\/.test(url.pathname) || !allowed.has(path) || !mainDocument ||
+        /%|\\/.test(url.pathname) || !allowed.has(path) || !documentAllowed ||
         !['GET', 'HEAD'].includes(request.method())) {
       record('blockedRequests', { url: short(request.url()), reason: 'ORIGIN_PATH_METHOD_OR_NAVIGATION' })
       return route.abort('blockedbyclient')

@@ -3,6 +3,7 @@ import { createServer } from 'node:http'
 import { dirname, join, resolve } from 'node:path'
 import { lstat, realpath } from 'node:fs/promises'
 import { readSnapshot, isDigest } from './snapshot.mjs'
+import { artifactFile } from './routes.mjs'
 
 const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml',
@@ -41,8 +42,9 @@ export async function openArtifactService({ artifactRoot, build, sourceDigest })
     let url
     try { url = new URL(request.url, origin) } catch { return deny(400) }
     if (url.origin !== origin || url.username || url.password || /%|\\/.test(url.pathname)) return deny(403)
-    const name = url.pathname === '/' ? 'index.html' : url.pathname.slice(1)
-    const bytes = buffers.get(name)
+    const destination = request.headers['sec-fetch-dest']
+    const name = artifactFile(url.pathname, destination === undefined || destination === 'document')
+    const bytes = name === null ? undefined : buffers.get(name)
     if (!bytes) return deny(404) // Never map an arbitrary path or unknown route onto index.html.
     const extension = name.slice(name.lastIndexOf('.'))
     response.writeHead(200, { 'Content-Type': mime[extension] ?? 'application/octet-stream',

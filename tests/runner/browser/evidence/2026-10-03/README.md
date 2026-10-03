@@ -13,3 +13,5 @@ Reproduce from the root with locked dependencies and Docker/Chromium available:
 Set CODELESS_BROWSER_EVIDENCE_DIR to an evidence directory to retain raw screenshots/results after test scratch cleanup. Final local ci:gate exit=0: contracts 7/7, frontend 24/24, API/PostgreSQL 74/74, runner 29/29, e2e 28/28 including browser acceptance 7/7. No skips/retries. Timeouts and intentional failed pages remain FAILED, while their expected-outcome assertions pass.
 
 Each JSON references its actual screenshot, where captured, by a relative path. A null screenshot on timeout is not a fabricated image. Duplicate identical PNGs share one file by digest. Visible page screenshot resolution is 1280x720.
+
+The later review fix and fresh A+B integration have separate reports in peer-recheck/. Its commands.json records final runner 30/30, browser suite 8/8 and e2e 28/28; the original reports above remain the pre-review baseline.

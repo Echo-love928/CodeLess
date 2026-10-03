@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-03",
+  "peerCommit": "b7989cd557f95ff57f276a40ad84f3e87ce7852a",
+  "originalBCommit": "0208b5d080b86e5f7bb4ac70a5713d0fc743b26b",
+  "before": [
+    {
+      "command": "node --test tests/runner/browser/artifacts.test.mjs",
+      "exit": 1,
+      "pass": 5,
+      "fail": 1,
+      "log": ".local-data/d08-b/routes-before-static.log"
+    },
+    {
+      "command": "node --test --test-name-pattern=\"fixed Vue history routes\" tests/runner/browser/acceptance.test.mjs",
+      "exit": 1,
+      "fail": 1,
+      "skipped": 0,
+      "log": ".local-data/d08-b/routes-before-browser.log"
+    },
+    {
+      "command": "node --test tests/runner/browser/acceptance.test.mjs",
+      "exit": 1,
+      "pass": 0,
+      "fail": 8,
+      "reason": "Partially applied local patch referenced undefined navigation variable; corrected before final runs",
+      "log": ".local-data/d08-b/review-browser.log"
+    }
+  ],
+  "after": [
+    {
+      "command": "node --test tests/runner/browser/artifacts.test.mjs",
+      "exit": 0,
+      "pass": 6,
+      "skipped": 0,
+      "log": ".local-data/d08-b/routes-after-static.log"
+    },
+    {
+      "command": "node --test tests/runner/browser/acceptance.test.mjs",
+      "exit": 0,
+      "pass": 8,
+      "skipped": 0,
+      "log": ".local-data/d08-b/review-browser-fixed.log"
+    },
+    {
+      "command": "A: mvnw.cmd -f services/api/pom.xml -Dtest=FileToolRegistryTest,FileToolsIntegrationTest test",
+      "exit": 0,
+      "pass": 13,
+      "skipped": 0,
+      "log": ".local-data/d08-b/a-producer.log"
+    },
+    {
+      "command": "A: node --test tests/tools/peer-workflow.test.mjs (unmodified; fresh Java-produced evidence + B worktree)",
+      "exit": 0,
+      "pass": 1,
+      "skipped": 0,
+      "log": ".local-data/d08-b/a-peer-workflow.log"
+    },
+    {
+      "command": "B: node .local-data/d08-b/peer-catalog.mjs (fresh A snapshot)",
+      "exit": 0,
+      "actions": 14,
+      "status": "VERIFIED",
+      "log": ".local-data/d08-b/peer-catalog.log"
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exit": 0,
+      "contracts": 7,
+      "frontend": 24,
+      "api": 74,
+      "runner": 30,
+      "e2e": 28,
+      "browserSuite": 8,
+      "log": ".local-data/d08-b/review-ci-gate.log"
+    }
+  ],
+  "note": "Results are observed. All expected assertions were retained. Absolute filesystem paths alone are normalized; screenshots re-read and SHA-256 checked. This does not prove API/task/version READY integration."
+}

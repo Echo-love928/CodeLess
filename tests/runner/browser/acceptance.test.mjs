@@ -6,9 +6,10 @@ import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { after, before, test } from 'node:test'
-import { openArtifactService } from '../../../services/runner/src/artifacts/service.mjs'
+import { openArtifactService, browserTarget } from '../../../services/runner/src/artifacts/service.mjs'
 import { digest, readSnapshot } from '../../../services/runner/src/artifacts/snapshot.mjs'
 import { createBrowserVerifier } from '../../../services/runner/src/verify/verifier.mjs'
+import { createBuildRunner } from '../../../services/runner/src/build/runner.mjs'
 import { createBuildVerifier } from '../../../services/runner/src/verify/workflow.mjs'
 import { completedFixture } from './fixtures.mjs'
 
@@ -149,4 +150,68 @@ test('a controlled click that empties the Vue mount is rejected at the final vis
   assert.equal(result.failure, 'BLANK_PAGE', JSON.stringify(result))
   assert.equal(result.diagnostics.visibleContent, false)
   await record('D08-B-final-content', result, { fixture: true })
+})
+
+test('fixed Vue history routes navigate and reload with real task persistence and frozen document bytes', { timeout: 100000 }, async () => {
+  const image = spawnSync('docker', ['build', '--file', 'infra/build-image/Dockerfile', '--tag', 'codeless-vue-build:d05', '.'],
+    { cwd: root, encoding: 'utf8', timeout: 70000 })
+  assert.equal(image.status, 0, image.stderr)
+  const source = join(scratch, 'history-source')
+  await mkdir(join(source, 'src/pages'), { recursive: true })
+  for (const [fixture, name] of [['showcase', 'HomePage.vue'], ['tasks', 'TasksPage.vue'], ['catalog', 'CatalogPage.vue']]) {
+    await writeFile(join(source, 'src/pages', name), await readFile(join(root, 'templates/vue/fixtures', fixture, 'src/pages', name)))
+  }
+  const expected = await readSnapshot(source, { source: true, files: 40, bytes: 512 * 1024, fileBytes: 128 * 1024 })
+  const build = await (await createBuildRunner({ workRoot: join(scratch, 'history-work'), artifactRoot }))(source)
+  assert.equal(build.status, 'SUCCEEDED', JSON.stringify(build))
+  const handle = await openArtifactService({ artifactRoot, build, sourceDigest: expected.manifest.digest })
+  try {
+    const headers = { 'x-codeless-artifact-token': browserTarget(handle).token }
+    const documents = []
+    for (const path of ['/', '/tasks', '/catalog']) {
+      const response = await fetch(handle.origin + path, { headers })
+      const bytes = Buffer.from(await response.arrayBuffer())
+      documents.push({ path, status: response.status, digest: digest(bytes) })
+    }
+    await record('D08-B-fixed-route-http', { buildId: build.id, sourceDigest: expected.manifest.digest,
+      artifactDigest: build.artifact.digest, documents }, { fixture: false })
+    const index = build.artifact.files.find((file) => file.path === 'index.html')
+    assert.ok(documents.every((document) => document.status === 200 && document.digest === index.digest), JSON.stringify(documents))
+    const verify = await createBrowserVerifier({ evidenceRoot })
+    const cases = [
+      ['/tasks', '今日任务', [
+        { type: 'fill', target: { role: 'textbox', name: '新任务' }, value: '固定路由刷新保留' },
+        { type: 'click', target: { role: 'button', name: '添加' } },
+        { type: 'reload' },
+        { type: 'expectText', target: { text: '固定路由刷新保留' }, value: '固定路由刷新保留' }
+      ]],
+      ['/catalog', '寻找下一次灵感', [
+        { type: 'click', target: { role: 'button', name: '阅读' } },
+        { type: 'expectVisible', target: { role: 'heading', name: '山间书屋' } },
+        { type: 'reload' },
+        { type: 'expectVisible', target: { role: 'heading', name: '城市地图' } }
+      ]]
+    ]
+    for (const [path, heading, actions] of cases) {
+      const result = await verify(handle, [
+        { type: 'navigate', path },
+        { type: 'expectText', target: { role: 'heading', name: heading }, value: heading },
+        ...actions,
+        { type: 'expectText', target: { role: 'heading', name: heading }, value: heading }
+      ])
+      await record('D08-B-route-' + path.slice(1), result, { fixture: false, realBuild: build })
+      assert.equal(result.status, 'PASSED', JSON.stringify(result))
+      assert.equal(result.diagnostics.controlHost, '127.0.0.1')
+      assert.equal(result.sourceDigest, expected.manifest.digest)
+      assert.equal(result.artifactDigest, build.artifact.digest)
+      assert.ok(result.screenshot)
+    }
+    const resource = await fixtureVerify({ js: 'fetch("/tasks").catch(()=>{})' })
+    assert.equal(resource.status, 'FAILED')
+    assert.equal(resource.failure, 'NETWORK_BLOCKED', JSON.stringify(resource))
+    const unknown = await verify(handle, [{ type: 'navigate', path: '/not-a-template-route' }])
+    assert.equal(unknown.status, 'FAILED')
+    assert.ok(unknown.diagnostics.blockedRequests.some((item) => item.url.endsWith('/not-a-template-route')))
+    await record('D08-B-route-boundaries', { resource, unknown }, { fixture: true })
+  } finally { await handle.close() }
 })
