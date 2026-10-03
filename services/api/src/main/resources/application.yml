@@ -18,3 +18,7 @@ server:
         http-only: true
         secure: ${CODELESS_COOKIE_SECURE:true}
         same-site: lax
+codeless:
+  model:
+    provider: ${CODELESS_MODEL_PROVIDER:deterministic-mock}
+    audit-root: ${CODELESS_MODEL_AUDIT_ROOT:.local-data/model-calls}
