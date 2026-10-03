@@ -106,6 +106,15 @@ through its isolated preview gateway, with ownership and expiring credentials,
 without exposing journal files, host paths or platform cookies/storage. No new
 preview HTTP contract, iframe integration or automatic publication is added by A.
 
+A closes the live D08 handle after verification. B's gateway registration needs
+a live handle in the same trusted Node process; do not try to serialize that
+capability through JSON. The final enabling coordinator must reopen the saved
+successful build under the same private artifact root with matching source and
+browser evidence, then register and manage its lifetime/revocation. The explicit
+`tests/agent/preview-handoff.test.mjs` proves this handoff against the real T1
+artifact and a reviewed B checkout. It does not wire a production registry or
+replace the authenticated platform end-to-end acceptance.
+
 Reproduce (Java 21, frozen Node/pnpm, Docker):
 
 ```powershell

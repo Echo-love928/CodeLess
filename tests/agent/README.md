@@ -37,4 +37,19 @@ Portable reports in `evidence/2026-10-03` normalize only host path prefixes. The
 exporter rechecks every exported source and PNG digest. Full private receipts,
 original logs and failed attempts remain under `.local-data/d09-a` and the API
 target test volumes. The final handoff records each actual command/exit code.
-Platform iframe preview remains a separate D09-B integration requirement.
+The explicit peer review handoff command requires a checkout of the exact D09-B
+candidate and the private real T1 evidence (portable reports omit required host
+paths). It fails when either is unavailable:
+
+```powershell
+$env:CODELESS_D09_B_REVIEW_ROOT='C:/path/to/exact-reviewed-D09-B-checkout'
+node --test tests/agent/preview-handoff.test.mjs
+```
+
+This rereads A's real receipts/source/browser/PNG, then reopens the byte-checked
+artifact through B's trusted service and registers the exact version/build in
+its gateway. Assets retain their actual hashes; wrong-version hosts and expired
+credentials are rejected. Its issuer is a test fixture and transport is private
+loopback HTTP. B's separate real TLS/Chromium/platform UI test was also reviewed
+and executed, with explicit platform API fixtures. These tests do not establish
+the complete deployed platform chain or real-model generation success.
