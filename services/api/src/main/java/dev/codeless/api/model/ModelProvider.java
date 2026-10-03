@@ -4,7 +4,7 @@ import java.time.Duration;
 import org.springframework.ai.chat.prompt.Prompt;
 import tools.jackson.databind.JsonNode;
 
-/** One synchronous PLAN call, no tools, retries, fallback or state transitions. */
+/** One bounded synchronous JSON call; no native tools, retries, fallback or state transitions. */
 public interface ModelProvider {
     String id();
     String model();
