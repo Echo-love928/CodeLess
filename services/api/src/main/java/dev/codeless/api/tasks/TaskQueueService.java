@@ -93,10 +93,16 @@ public class TaskQueueService {
                 """).query(UUID.class).optional();
         if (candidate.isEmpty()) return Optional.empty();
         UUID token = UUID.randomUUID();
+        // The SELECT's snapshot may predate another claimant's commit even when the
+        // application row is now locked by us. A new READ COMMITTED statement must
+        // recheck the application before changing QUEUED to RUNNING.
         int changed = jdbc.sql("""
                 UPDATE generation_tasks SET queue_state = 'RUNNING', lease_token = ?,
                     lease_expires_at = deadline_at, row_version = row_version + 1
-                WHERE id = ? AND deadline_at > clock_timestamp()
+                WHERE id = ? AND queue_state = 'QUEUED' AND deadline_at > clock_timestamp()
+                  AND NOT EXISTS (SELECT 1 FROM generation_tasks active
+                                  WHERE active.application_id = generation_tasks.application_id
+                                    AND active.queue_state = 'RUNNING')
                 """).params(token, candidate.get()).update();
         if (changed != 1) return Optional.empty();
         return Optional.of(new Claim(candidate.get(), token, TaskStatus.PLAN));

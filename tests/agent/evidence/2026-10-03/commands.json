@@ -16,7 +16,15 @@
       {"command": "pnpm verify:runner", "exitCode": 0, "tests": 30},
       {"command": "pnpm verify:e2e", "exitCode": 0, "tests": 28}
     ]},
-    {"command": "node tests/agent/export-evidence.mjs", "exitCode": 0, "result": "source and PNG bytes independently hashed before export"}
+    {"command": "node tests/agent/export-evidence.mjs", "exitCode": 0, "result": "source and PNG bytes independently hashed before export"},
+    {"command": "GitHub required checks for 551da00", "exitCode": 1, "report": "remote-ci-551da00.json", "runId": 37116196879, "reason": "existing TaskQueueIntegrationTest concurrent claim unique-key race; Agent8/8 passed"},
+    {"command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=TaskQueueIntegrationTest test", "exitCode": 0, "log": ".local-data/d09-a/queue-race-fix.log", "tests": 7, "failures": 0, "errors": 0, "skipped": 0},
+    {"command": "pnpm ci:gate", "exitCode": 0, "log": ".local-data/d09-a/ci-gate-queue-fix.log", "meaning": "all stages rerun after claim fix", "stages": [
+      {"command": "pnpm verify:static", "exitCode": 0, "contractTests": 7, "frontendTests": 24},
+      {"command": "pnpm verify:api", "exitCode": 0, "tests": 95, "agentTests": 8, "failures": 0, "errors": 0, "skipped": 0},
+      {"command": "pnpm verify:runner", "exitCode": 0, "tests": 30},
+      {"command": "pnpm verify:e2e", "exitCode": 0, "tests": 28}
+    ]}
   ],
   "unexecuted": [
     {"case": "D09-B preview gateway and iframe integration/review", "reason": "no D09-B PR/branch/contract delta/handoff/report available"}
