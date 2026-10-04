@@ -53,3 +53,20 @@ credentials are rejected. Its issuer is a test fixture and transport is private
 loopback HTTP. B's separate real TLS/Chromium/platform UI test was also reviewed
 and executed, with explicit platform API fixtures. These tests do not establish
 the complete deployed platform chain or real-model generation success.
+
+The reviewed interruption regression is discovered by `verify:api` as
+`LocalBuildGatewayTest`. Its fixed Node fixture runs an actual parent/child with
+inherited pipes; it is explicitly a transport fixture, never build success
+evidence. The old implementation fails the 3.5-second interrupted join, the fix
+terminates both processes and preserves the interrupt flag. Deadline, normal
+protocol return and pre-expired deadline are covered too.
+
+Revision evidence is exported separately, preserving the original reports:
+
+```powershell
+node tests/agent/export-revision.mjs
+```
+
+See `evidence/2026-10-04/commands.json` for actual failures and checks. Paid-model
+failure evidence remains separate; its platform preview field describes this
+test's coverage rather than assuming B is unavailable.

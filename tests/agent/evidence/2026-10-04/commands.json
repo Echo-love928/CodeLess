@@ -1,0 +1,89 @@
+{
+  "parentCandidate": "5f29b335157fdbb3565b4e63be987cdd3c24a3c3",
+  "commands": [
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=LocalBuildGatewayTest test",
+      "exitCode": 1,
+      "result": "original implementation: 3/4 pass; interruption blocked with two real live processes",
+      "log": ".local-data/d09-a/revision-2026-10-04/gateway-before.log",
+      "logDigest": "sha256:89bf863767dcf24aeaaa47d744020168161f3d5d8071dfaea6df7026cf0a2cb2"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=LocalBuildGatewayTest test",
+      "exitCode": 0,
+      "result": "fix: 4/4 pass; interrupt preserved, both processes terminate",
+      "log": ".local-data/d09-a/revision-2026-10-04/gateway-after.log",
+      "logDigest": "sha256:595266b0b83ac57478d8f85262daf1324baa8b1d76ebdd5441cbe2e32427c694"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealAgentAcceptanceIT test",
+      "exitCode": 1,
+      "result": "real two-file TypeScript prop mismatch; build exit 2",
+      "log": ".local-data/d09-a/revision-2026-10-04/real-paid.log",
+      "logDigest": "sha256:70928f19d7353b16cb8f890750128b43555ef1822ade4c33a3b8d4ead21abaf8"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealAgentAcceptanceIT test",
+      "exitCode": 1,
+      "result": "readback prompt: PLAN MODEL_NETWORK; usage unknown; no further paid attempt",
+      "log": ".local-data/d09-a/revision-2026-10-04/real-readback.log",
+      "logDigest": "sha256:f2c168113ae8af305d2ca2a7ff77859d9ef0656866279186b51c324a5480c048"
+    },
+    {
+      "command": "pnpm --filter @codeless/web exec vitest run src/features/preview/preview-api.test.ts",
+      "exitCode": 0,
+      "result": "B worktree: 4/4",
+      "log": ".local-data/d09-a/revision-2026-10-04/peer-port.log",
+      "logDigest": "sha256:79de9a2f959a584f01d08412debd9e2c3525eae37f91ca018092e1b43a437063"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=TaskQueueIntegrationTest,PreviewHttpTest test",
+      "exitCode": 1,
+      "result": "B worktree: 8 errors: Docker was not running; original log retained",
+      "log": ".local-data/d09-a/revision-2026-10-04/peer-api.log",
+      "logDigest": "sha256:4936b0422c19d9e8fcbbea2574473dedb668bb65e4284f197cc9a3698299cbc4"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=TaskQueueIntegrationTest,PreviewHttpTest test",
+      "exitCode": 0,
+      "result": "B worktree: 8/8 after restoring Docker; assertions unchanged",
+      "log": ".local-data/d09-a/revision-2026-10-04/peer-api-recovered.log",
+      "logDigest": "sha256:044b3878a59166b03e93d1bd993877905db4d1a01c03a1079c4790daba23d163"
+    },
+    {
+      "command": "node --test tests/e2e/preview/browser.acceptance.mjs",
+      "exitCode": 0,
+      "result": "B worktree: 1/1 real Docker/TLS/Chromium, explicit platform API fixtures",
+      "log": ".local-data/d09-a/revision-2026-10-04/peer-browser.log",
+      "logDigest": "sha256:20b3fdd0694fc97b29b854e1fdf9ad70991610da2b0b01d322609f1648edaae8"
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 1,
+      "result": "API99: existing D08 temp-directory cleanup error; Agent/lifecycle tests passed, other gates passed",
+      "log": ".local-data/d09-a/revision-2026-10-04/ci-gate.log",
+      "logDigest": "sha256:66aaa6b6523e61a27fbd07375332c9e547cd4cff55a00938d7db1a6383b8102d"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=LocalBuildGatewayTest,FileToolsIntegrationTest test",
+      "exitCode": 0,
+      "result": "14/14; prior transient directory error not reproduced, root cause unconfirmed",
+      "log": ".local-data/d09-a/revision-2026-10-04/cleanup-diagnostic.log",
+      "logDigest": "sha256:807ddbaf13851fc602db712ab2e3c75e3b2dad8d916f54111a04e4e2ca2d0d59"
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 0,
+      "result": "static/API99/runner30/e2e28; no skipped checks",
+      "log": ".local-data/d09-a/revision-2026-10-04/ci-gate-final.log",
+      "logDigest": "sha256:a7a6652d9df07078e2e59a56e3a60432bdc4b0a3e1670b63df0f6d473e9210f8"
+    }
+  ],
+  "realModelCompleteSuccess": false,
+  "developmentTokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "source": "unknown"
+  }
+}
