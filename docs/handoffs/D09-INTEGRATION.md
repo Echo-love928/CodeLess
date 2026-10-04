@@ -3,7 +3,7 @@
 日期：2026-10-04（Asia/Shanghai）。任务：D09-B 互审修复与最后启用接线。
 分支 codex/d09-integration-preview；独立 worktree C:/Users/12058/.codex/worktrees/d09-integration-preview/CodeLess。
 基线 origin/main f80ee105bd8207a65bcc46c9ce61f0eaf5497c26，2026-10-04 实际 fetch 后仍相同。
-输入 A 草稿 #19 提交 5f29b335157fdbb3565b4e63be987cdd3c24a3c3；B 草稿 #20 互审修复提交 9e268846cb1f219c60c4ecac058b536c3470db58。候选为本交接所在 PR 的精确 HEAD；git rev-parse HEAD / gh pr view --json headRefOid 可核对。两份输入已合入该独立分支。原 main 指针、受跟踪内容及原 .idea/ 均保留。
+输入 A 草稿 #19 提交 502edfb17e1d87e34deac42b0fd1bd03f1add724（初次集成输入为5f29b33）；B 草稿 #20 互审修复提交 9e268846cb1f219c60c4ecac058b536c3470db58。候选为本交接所在 PR 的精确 HEAD；git rev-parse HEAD / gh pr view --json headRefOid 可核对。两份输入已合入该独立分支。原 main 指针、受跟踪内容及原 .idea/ 均保留。
 
 ## 授权与公共维护登记
 
@@ -30,7 +30,7 @@
 
 新注册suite首次发现健康检查未接入请求处理（1失败、2通过），修正后3/3；最初结果在本任务工具输出，最终日志单独保留。实际nginx整链首次退出1：测试进程重启使用新随机端口，而ingress upstream仍固定；修复测试以同一固定端口/接口重启，并等待新的真实签发响应后断言iframe。同期内部catalogue测试依赖未配置的demo seed而失败，改用该fixture自己创建的用户。deployment-first.log/.exit保留真实退出1及原失败，未将旧失败改写为成功或重复重试掩盖问题。第一次Node TLS整链成功也保留，不冒充nginx部署结果。
 
-## A 只读互审
+## A 首次只读互审（5f29b33 的历史）
 
 - 阻塞问题：真实模型完整验收仍未成功。A已记录严格TS构建失败（AGENT_BUILD_EXIT）及修正提示词后MODEL_NETWORK；本轮没有重试付费模型，未批准A/B或合并。公网wildcard DNS/可信TLS签发、正式服务部署及另一人批准仍是外部前置。A的宿主桥外部强制终止后Docker orphan回收限制仍按其交接保留，未声称本预览service解决全平台worker清理。
 - 建议：正式运行以受保护的固定roots/服务账号保留源、receipt、browser证据与产物并统一实施保留策略；预览mapping只自动撤销和回收本进程句柄，不删除其他任务数据。详细配置/上限/短期bearer logout行为见infra/preview/README.md。
@@ -45,7 +45,7 @@
 
 首次 pnpm ci:gate 的 static、API99/99、runner37/37 与 E2E29/29断言通过，但浏览器命令在结果输出后返回Windows原生退出码3221226505（外层-1073740791），因此ci-gate仍为真实失败。full-gate.log/.exit保留，不将断言通过等同命令成功。读取近期Windows Application Error未找到对应node错误；开启NODE_OPTIONS原生fatal report及DEBUG=pw:webserver后，单独pnpm verify:e2e退出0，29/29，明确记录webServer正常终止，未生成fatal report。该原生异常尚无可重复根因，不能宣称已修复；保留本地稳定性风险，完整门禁随后带相同诊断完成，退出0（见下表）；原异常的根因仍未确认。没有降并发、改版本、跳断言或吞退出码。
 
-## 最终本地四阶段门禁
+## 初次集成的本地四阶段门禁（4e8bd41）
 
 最终命令 pnpm ci:gate，保留NODE_OPTIONS fatal-report和DEBUG=pw:webserver诊断；退出0，末行all stages passed。完整日志full-gate-diagnostic.log/.exit；commands.json为已提交可移植摘要。最初失败full-gate.log/.exit与独立E2E诊断均保留，未改门禁代码或吞异常。
 
@@ -58,3 +58,22 @@
 | pnpm ci:gate | 0；四阶段实际串行完成。 |
 
 B修复提交9e26884的远端六项success，运行37190045251。集成草稿推送后以其精确HEAD的新六项Checks为准；本地success不替代Linux CI与同伴审批。PNG已实际查看、字节及摘要核验后导出，没有凭据URL、cookie、TLS私钥或模型key被提交。
+## 2026-10-04 同步 A 502edfb 与组件复审
+
+在既有独立集成分支合入 A `502edfb17e1d87e34deac42b0fd1bd03f1add724`，保留 A 原提交和分支，不改写其源码。合入后的源码候选 `5ca5e64358113f83a4c80fe79bdae2f0020fc24b` 与 A 的 Agent 实现、提示词、生命周期/生成测试及工具 fixture 逐字一致；本节所在后续提交仅更新本交接与集成证据。基线 main 仍 f80ee10，原工作区受跟踪内容、分支指针和 .idea/ 保留。
+
+- 阻塞问题：此前 LocalBuildGateway 中断时先关闭 executor 的 P2 已解除。新实现先终止自有父子进程，再取消 stdout/stderr 读取并 shutdownNow；原中断标志保留，不等待 executor.close。真实模型效果仍未通过：A 本次实际 TS2322（页面 Work 缺组件 WorkItem 所需 year）及后续 MODEL_NETWORK 都为失败；files.read 提示修订的效果没有成功证据，本次未重复付费请求。完整模型验收仍阻塞，不以本节 mock 整链代替。
+- 建议：报告标注改为 NOT_EXECUTED_BY_THIS_TEST，2026-10-03历史证据保持原样。正式部署仍需保护固定roots/账号、公共DNS/TLS，以及外部宿主强杀后的 Docker orphan 回收；本次进程清理修复没有宣称解决容器孤儿回收。
+- 已核验内容：生命周期4/4、Agent Loop8/8、队列7/7、真实鉴权平台预览1/1均在本次门禁通过。中断/超时报告均为进程存活数0，中断标志按预期保留；正常协议仅为明确transport fixture。确定性流水线的数据库、Docker与Chromium真实，伪造/错误摘要、构建失败与确切版本/事件断言没有削弱。新导出的 A 双文件源码/PNG摘要重新核验一致。公共契约、CI、锁、迁移、其他运行模块未修改，既有工具权限/预算/无自动重试上限保持。
+
+已按用户“作者修复后…按照仓库规则批准”的授权提交 [A PR #19 组件代码 APPROVED](https://github.com/Echo-love928/CodeLess/pull/19#pullrequestreview-5406219747)，精确提交502edfb；审查时A六项CI success、base与main一致、0未解决讨论。该批准限定组件实现，不是完整模型/最终功能验收。B PR #20 的9e26884也已由A正式批准；本集成PR #21仍须他人独立审查，没有自批或合并任何main。
+
+本次第一轮 `pnpm ci:gate` 实际退出1：本机 Docker Desktop Linux engine 未运行，Testcontainers/runner构建及两项浏览器测试因无法连接引擎失败；静态与新增生命周期4项通过。保留 `.local-data/d09-integration/a-revision-502edfb/ci-gate.log/.exit`。从实际docker CLI安装路径定位并隐藏启动已有Docker Desktop，确认 `docker info` 成功后再执行；没有安装/升级/改配置、改断言或覆盖失败日志。
+
+恢复后的完整 `pnpm ci:gate` 退出0、末行all stages passed：契约8类/前端34、API103/103、runner37/37、Chromium E2E29/29，0失败/错误/跳过。日志 `ci-gate-recovered.log/.exit`，受影响类与日志摘要见 `tests/e2e/preview/evidence/2026-10-04/a-revision-502edfb/peer-recheck.json`。
+
+真实登录→UI需求→独立PostgreSQL→明确mock多文件→真实Docker/Chromium→真实签发→常驻registry→实际nginx TLS→iframe再次通过，且重启恢复/回收撤销/内部接口拒绝/平台存储与会话隔离断言保持。新报告 `a-revision-502edfb/platform-acceptance.json` 和 `authenticated-platform-preview.png` 已逐字节核验截图摘要并实际查看；不覆盖初次集成报告，platformApiFixture/signingFixture均false，modelQualityAccepted仍false。
+
+真实模型累计计量沿用A新提交：14次尝试，12次已知+2次未知；已知input22695/output6047/reportedTotal28742，完整总量UNKNOWN。此复查0次真实模型调用；开发agent input/output/总量无逐任务实测，仍未知。
+
+后续推送的精确PR HEAD须重新通过远端六项检查；状态通过PR与实际CI run读取，旧HEAD成功不能替代。A #19与集成 #21保持Draft。真实模型成功、更新后的集成同伴审查和正式部署前置仍待完成，未合并或发布，未修改main。
