@@ -74,6 +74,8 @@ for(const [name,command] of [
 await save('real-artifact-ui-diagnostic.json',JSON.parse(await readFile(join(logs,'real-artifact-ui-diagnostic.json'),'utf8')))
 await save('reviewed-pr21-checks.json',JSON.parse(await readFile(join(logs,'pr21-checks.json'),'utf8')))
 await save('D09-A-ambiguous-browser.json',JSON.parse(await readFile(join(target,'agent-integration/evidence/D09-A-ambiguous-browser.json'),'utf8')))
+for(const name of ['D09-A-T1','D09-A-T2-model-forgery','D09-A-T2-hashes','D09-A-T3','D09-A-T4'])
+ await save(name+'.json',JSON.parse(await readFile(join(target,'agent-integration/evidence',name+'.json'),'utf8')))
 await save('commands.json',{reviewedIntegration:'2abc81ec95b54e39e6decc573f54fb94e39285fb',sourceCommit:execFileSync('git',['rev-parse','HEAD'],{cwd:checkout,encoding:'utf8'}).trim(),commands})
 await save('runtime-usage.json',{current:{requests,knownUsageCalls:requests,unknownUsageCalls:0,inputTokens:input,outputTokens:completion,providerReportedTotal:total,measurement:'PROVIDER_RESPONSE_AND_SQL'},cumulative:{requests:14+requests,knownUsageCalls:12+requests,unknownUsageCalls:2,inputTokensKnown:22695+input,outputTokensKnown:6047+completion,providerReportedTotalKnown:28742+total,completeTotal:null,measurement:'UNKNOWN_COMPLETE_TOTAL_DUE_TO_TWO_HISTORICAL_UNKNOWN_CALLS'},developer:{inputTokens:null,outputTokens:null,totalTokens:null,measurement:'UNKNOWN'}})
 console.log(JSON.stringify({requests,inputTokens:input,outputTokens:completion,providerReportedTotal:total,output}))
