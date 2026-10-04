@@ -70,3 +70,25 @@ node tests/agent/export-revision.mjs
 See `evidence/2026-10-04/commands.json` for actual failures and checks. Paid-model
 failure evidence remains separate; its platform preview field describes this
 test's coverage rather than assuming B is unavailable.
+
+The later integration-based A revision has one actual `deepseek-flash` generation
+that reached READY through two generated files, PostgreSQL, Docker and controlled
+Chromium. Its paid platform test subsequently failed loading the iframe, so the
+full platform acceptance remains false. The four explicit paid tasks, original
+failures, exact source/PNG bytes and separate usage are retained in
+`evidence/2026-10-05/platform/`. The interrupted third tool session has an unknown
+outer exit code; its real task/browser failure is still recorded.
+
+On the integration-based revision checkout, reproduce the explicit paid test:
+
+```powershell
+services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RealPreviewPlatformAcceptanceIT' test
+```
+
+`export-platform-evidence.mjs` exports these preserved evaluation runtimes when
+`CODELESS_AGENT_PLATFORM_LOG_DIR` points to their private logs. It checks actual
+source/artifact manifests, receipt, browser report and PNG bytes before export.
+The UI diagnostic explicitly uses API/signing fixtures and cannot replace the
+failed paid platform test. Added strict-protocol and ambiguous-browser regressions
+are discovered by the existing API gate; no automatic unwrap or relaxed locator
+has been introduced.

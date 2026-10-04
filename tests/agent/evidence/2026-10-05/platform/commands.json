@@ -1,0 +1,94 @@
+{
+  "reviewedIntegration": "2abc81ec95b54e39e6decc573f54fb94e39285fb",
+  "sourceCommit": "f32fb3ffd9a0bb7deb53c560c764401a95aa5e6c",
+  "commands": [
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealPreviewPlatformAcceptanceIT test",
+      "name": "first",
+      "commit": "2abc81ec95b54e39e6decc573f54fb94e39285fb",
+      "exitCode": 1,
+      "exitMeasurement": "ACTUAL_EXIT_FILE",
+      "taskStatus": "FAILED",
+      "failureCode": "FILE_NOT_FOUND",
+      "rawLog": "real-platform-first.log",
+      "logDigest": "sha256:e5a4e3e471fa3b0ccc00490a1d6ac23e263dce68cca552964c58ba4de90d8131",
+      "logBytes": 18934
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealPreviewPlatformAcceptanceIT test",
+      "name": "create-first",
+      "commit": "be06005958275bd8dc829e75e4477ce6cf228b8d",
+      "exitCode": 1,
+      "exitMeasurement": "ACTUAL_EXIT_FILE",
+      "taskStatus": "FAILED",
+      "failureCode": "AGENT_MODEL_PROTOCOL_INVALID",
+      "rawLog": "real-platform-create-first.log",
+      "logDigest": "sha256:b082405db892583795a86c9ab61d446bef0d8ef52eb13dbb97f26bf823870b77",
+      "logBytes": 17849
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealPreviewPlatformAcceptanceIT test",
+      "name": "closed-protocol",
+      "commit": "481f4884b58be5f79ae0140be5e69ef635432f1d",
+      "exitCode": null,
+      "exitMeasurement": "UNKNOWN_INTERRUPTED_TOOL_SESSION",
+      "taskStatus": "FAILED",
+      "failureCode": "AGENT_ACTION_FAILED",
+      "rawLog": "real-platform-closed-protocol.log",
+      "logDigest": "sha256:a916744eb7fe673ae318acaf906d8fe46fc346358114010cc2fe6d65c241a0da",
+      "logBytes": 15013
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealPreviewPlatformAcceptanceIT test",
+      "name": "unique-targets",
+      "commit": "f32fb3ffd9a0bb7deb53c560c764401a95aa5e6c",
+      "exitCode": 1,
+      "exitMeasurement": "ACTUAL_EXIT_FILE",
+      "taskStatus": "READY",
+      "failureCode": null,
+      "rawLog": "real-platform-unique-targets.log",
+      "logDigest": "sha256:265a0f57e0f5a92b4a3da172ed68fa4536acf7f244a53920a6656723db6d5b1c",
+      "logBytes": 33883
+    },
+    {
+      "name": "protocol-regression",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=AgentLoopIntegrationTest#D09AT2_modelCannotForgeSuccessOrInvokeVerifyToolsInGenerate test",
+      "exitCode": 0,
+      "logDigest": "sha256:e5dbfc2dbb7a520128cfe36ab9cfc9cc69076fb78fdaea7da819b1cbd1a5056b",
+      "logBytes": 14824,
+      "rawLog": "protocol-regression.log"
+    },
+    {
+      "name": "ambiguous-browser",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=AgentLoopIntegrationTest#ambiguousBrowserTargetsCannotPromoteEvenAfterARealSuccessfulBuild test",
+      "exitCode": 0,
+      "logDigest": "sha256:109580d9dafb921abb3123db8411f9c1a8853f838bd12a08b0913b95326c2305",
+      "logBytes": 14846,
+      "rawLog": "ambiguous-browser.log"
+    },
+    {
+      "name": "registry-gateway",
+      "command": "node --test tests/e2e/preview/registry.acceptance.mjs tests/e2e/preview/gateway.acceptance.mjs",
+      "exitCode": 0,
+      "logDigest": "sha256:5602aaeb4a08d8e4f403fd878dd920bbb88e55db30fe2addf2fd3ac35b00fe4b",
+      "logBytes": 972,
+      "rawLog": "registry-gateway.log"
+    },
+    {
+      "name": "static",
+      "command": "pnpm verify:static",
+      "exitCode": 0,
+      "logDigest": "sha256:1d9714eef4c1df03e1c2a2757622ce012d5184398a5230679c680c0867fa7ba6",
+      "logBytes": 4137,
+      "rawLog": "static.log"
+    },
+    {
+      "name": "ci-gate",
+      "command": "pnpm ci:gate",
+      "exitCode": 0,
+      "logDigest": "sha256:56cc42cce57c60bee90f5501aaf154cc86a705e3f4b2d56ff5795d79f58f1cc9",
+      "logBytes": 108091,
+      "rawLog": "ci-gate.log"
+    }
+  ]
+}
