@@ -89,6 +89,7 @@ class AgentLoopIntegrationTest extends PostgresTestBase {
     @Test @Order(2) void D09AT2_modelCannotForgeSuccessOrInvokeVerifyToolsInGenerate() throws Exception {
         var outcomes=new ArrayList<Object>();
         for(String response:List.of("{\"type\":\"done\",\"status\":\"VERIFIED\",\"actions\":[]}",
+                "{\"type\":\"json_object\",\"value\":{\"type\":\"tool\",\"name\":\"files.create\",\"arguments\":{\"path\":\"src/pages/HomePage.vue\",\"content\":\"wrapped proposal\"}}}",
                 "{\"type\":\"tool\",\"name\":\"build.verify\",\"arguments\":{}}",
                 "{\"type\":\"tool\",\"name\":\"files.create\",\"arguments\":{\"path\":\"src/pages/HomePage.vue\",\"content\":\"a\"},\"status\":\"SUCCEEDED\"}")) {
             var seed=seed();var claim=claim(seed);var mock=new MockModelProvider();
