@@ -9,6 +9,10 @@ import java.nio.charset.StandardCharsets;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -26,6 +30,8 @@ class PreviewHttpTest extends PostgresTestBase {
     @Value("${local.server.port}") int port;
     @Autowired JdbcClient jdbc;
     @Autowired ObjectMapper mapper;
+    @MockitoBean PreviewReadiness readiness; // Explicit control-plane fixture; full integration uses the real runtime.
+    @BeforeEach void registeredFixture() {when(readiness.ready(any(),any(),any(),any(),any())).thenReturn(true);}
     final HttpClient client = HttpClient.newHttpClient();
     record Session(String cookie, String csrf) {}
     record Seed(UUID app, UUID version, UUID build) {}

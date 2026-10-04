@@ -4,7 +4,7 @@ import { artifactFile } from '../artifacts/routes.mjs'
 import { readCredential, signingKey, previewOrigins, versionHost, uuid } from './credentials.mjs'
 
 // Trusted coordinator API only: mappings cannot be registered through HTTP or model arguments.
-export function createPreviewGateway({ signingKeyHex, previewOrigin, platformOrigin, now = Date.now }) {
+export function createPreviewGateway({ signingKeyHex, previewOrigin, platformOrigin, now = Date.now, isAvailable = () => true }) {
   const key = signingKey(signingKeyHex)
   const { preview, platform } = previewOrigins(previewOrigin, platformOrigin)
   const mappings = new Map()
@@ -20,6 +20,7 @@ export function createPreviewGateway({ signingKeyHex, previewOrigin, platformOri
   }
   const server = createServer(async (request, response) => {
     try {
+      if (!isAvailable()) return deny(response, 503)
       // Never consume forwarded Host, URL, Cookie or Authorization as routing authority.
       if (!['GET', 'HEAD'].includes(request.method) || !request.url?.startsWith('/') ||
           /[%\\]/.test(request.url) || /(?:^|\/)\.\.(?:\/|$)/.test(request.url)) return deny(response, 403)

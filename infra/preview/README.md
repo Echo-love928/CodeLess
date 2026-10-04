@@ -1,54 +1,41 @@
-# D09 preview contract and deployment
+# D09 preview runtime and deployment
 
-Ownership: D09-B owns API preview credentials, the gateway, and PreviewPanel.
-The public OpenAPI/CI/lock/migrations remain with their registered maintainers.
+D09-B owns the preview API, resident gateway and iframe. The user authorized an independent D09 integration branch to finish shared contracts and deployment; that branch is the temporary sole maintainer of contracts/openapi.v0.json, the new schema/examples, scripts/validate-contracts.mjs and tests/infra/preview.test.mjs. Root lock, CI and migrations remain unchanged. The D01 compose preview placeholder is unchanged; use this scoped overlay for the implemented feature.
 
-POST /api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials
-requires the existing session + X-CSRF-Token and ownership of both matching resources.
-Only ACTIVE application + VERIFIED version + matching completed SUCCEEDED build with actual exit 0 qualify.
-Returns {applicationId, versionId, url, expiresAt}, no-store; 401 unauthenticated,
-403 CSRF, 404 foreign/mismatched, 409 not ready, 503 missing/invalid configuration.
-VERIFIED must be set by the trusted coordinator after D08's real browser evidence.
-This endpoint never sets VERIFIED itself. Gateway registration separately requires the matching D08 result.
+POST /api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials requires a host-only platform session, CSRF and ownership. Only ACTIVE + VERIFIED + matching completed SUCCEEDED/exit0 build qualifies. The exact build/source/artifact must also be available in the resident registry. Response {applicationId,versionId,url,expiresAt} is no-store; 401 unauthenticated, 403 CSRF, 404 ownership/mismatch, 409 unverified, 503 unregistered/unavailable/misconfigured. Missing registry configuration fails closed. The public OpenAPI/schema are in contracts/. This endpoint cannot set VERIFIED or accept a path/upstream.
 
-Configuration (control-plane API/gateway only):
-CODELESS_PREVIEW_SIGNING_KEY: same 32 random bytes encoded as 64 lowercase hex.
-CODELESS_PREVIEW_ORIGIN=https://preview.codeless-preview.test
-CODELESS_PLATFORM_ORIGIN=https://platform.codeless.test
-VITE_CODELESS_PREVIEW_ORIGIN: preview origin for UI hostname validation.
-Use separate registrable sites. Supported suffixes: test/com/net/org/dev/app;
-multi-label public suffixes are deliberately unsupported. Do not put previews under the platform site.
-Wildcard DNS + TLS must cover *.preview.codeless-preview.test, including v<version UUID without hyphens>.
-Platform session remains host-only HttpOnly. Generated workers never receive signing/TLS/API/database keys.
+The trusted host runtime (services/runner/src/preview/main.mjs) polls the API's read-only /internal/preview/versions every second using a separate service key and a fixed IPv4 loopback origin. The private API requires loopback plus that key; platform cookies do not grant access. SQL admits only committed READY/FINISHED tasks, verified versions and successful builds of active applications. No HTTP registration endpoint exists.
 
-createPreviewGateway({signingKeyHex, previewOrigin, platformOrigin}) is a trusted host API.
-register({applicationId,versionId,handle,verification}) accepts only a live D08 artifact handle
-and matching PASSED result (exit 0, no timeout/failure, closed browser, screenshot).
-It cannot be invoked over HTTP. Version mappings are immutable, bounded (1000), explicitly revoked
-on retention/worker shutdown; close clears all mappings. Browser evidence must originate from
-the trusted verifier, not serialized model output. Restart requires trusted re-registration.
+Admission/restart checks the host-owned task journal, source snapshot/manifest, exact runner receipt, build and artifact manifest/bytes, matching browser report and PNG digest/dimensions. The runtime opens a fresh live D08 artifact handle in its own process and registers that handle with the gateway. Models and generated workers cannot write these private roots or choose trusted paths. Previously admitted bytes stay immutable in memory; disk mutation cannot replace them. Missing retained evidence/source/artifact revokes mappings on reconciliation; restart rechecks every byte. Shutdown closes all mappings/handles. A failed catalogue clears all mappings; a catalogue older than 3 seconds denies serving. The API's private readiness check waits at most 3 seconds for the next scheduled reconciliation and compares the exact committed binding before signing.
 
-The signed v1 credential binds app/version/build/sourceDigest/artifactDigest, issue/expiry (120s) and random nonce.
-Bootstrap /__preview/start?credential=... checks the exact version Host and internal mapping,
-then redirects to / and sets a host-only Secure HttpOnly SameSite=None Partitioned cookie.
-Every document/resource validates expiry and all bindings again. Credentials are temporary bearer capabilities;
-platform logout does not retrospectively revoke their remaining 120s without coordinator revoke.
-CHIPS support is required; unsupported/blocked preview cookies show unavailable rather than loading success.
-No credentials are persisted in platform storage. No-store and version-specific hosts prevent stale-version cache reuse.
-The gateway uses only validated loopback artifact handles; no caller URL/path/upstream registration.
-Cookie, Authorization, Forwarded, X-Forwarded-* and client capability headers are not forwarded.
-No arbitrary SPA fallback; /, /tasks and /catalog use D08's exact frozen routes.
+Memory is bounded to the newest 32 catalogued versions and 256 MiB (individual artifact max32 MiB); evicted versions return unavailable, not a guessed current version. Catalogue max1000 rows, evidence/journals/files are bounded. Retention is host-owned: delete a complete obsolete task's private receipts/artifacts/evidence and source snapshots after selecting the desired retention policy. The service detects removal; it does not delete databases or other tasks. Inactivation/archive removes SQL eligibility. Platform logout cannot retrospectively revoke an issued bearer capability's remaining 120 seconds. This is distinct from service shutdown/retention revocation.
 
-iframe and CSP sandbox allow only scripts + same-origin (generated LocalStorage requires this).
-Distinct version origin isolates platform and other versions. Popups, top navigation, forms,
-downloads, workers, frames, objects and external connections are blocked. frame-ancestors is the exact platform origin.
-The gateway injects a small load/status bridge before resources in the trusted template head, so HTTP errors, resource failures and page exceptions are not called loading success.
-Messages are constrained by iframe source and exact origin; they only affect display, never task verification.
-Served HTML contains this transport bridge; the stored artifact/source digests remain those of the original immutable bytes.
+Deployment inputs (trusted API and resident host only; never generated-code containers):
 
-The existing infra/compose.dev.yml preview service remains a D01 placeholder. This task provides
-infra/preview/nginx.conf.template as the deployment overlay for the gateway maintained by D09-B.
-Deploy the gateway on a private interface behind that TLS proxy, with Host preserved, no query/access logs,
-no proxy cache, and no platform API route. It is a gateway process, not a generated-code container.
-Main lacks D09-A's coordinator; wiring live verified versions, retention, public contract and production DNS/TLS
-is the final enabling PR's responsibility. Deterministic fixtures do not prove full generation integration.
+- CODELESS_PREVIEW_SIGNING_KEY: 32 random bytes as 64 lowercase hex, identical in API/runtime.
+- CODELESS_PREVIEW_REGISTRY_KEY: separate 32 random bytes as 64 lowercase hex, identical in API/runtime; must differ from signing key.
+- CODELESS_PLATFORM_ORIGIN / CODELESS_PREVIEW_ORIGIN: HTTPS origins on different registrable sites, supported suffixes test/com/net/org/dev/app; multi-label suffixes are rejected. This ingress uses one TLS port for both sites. Example: https://platform.codeless.test:18443 and https://preview.codeless-preview.test:18443.
+- CODELESS_PREVIEW_GATEWAY_INTERNAL_ORIGIN=http://127.0.0.1:8789 (API readiness); CODELESS_PREVIEW_API_INTERNAL_ORIGIN=http://127.0.0.1:8080 (runtime catalogue).
+- CODELESS_PREVIEW_CONTROL_PORT=8789; always loopback. CODELESS_PREVIEW_GATEWAY_PORT=8788; fixed across restarts. CODELESS_PREVIEW_GATEWAY_HOST=0.0.0.0 is needed for the Docker ingress to reach the trusted host; firewall this port to the private ingress network. API port must likewise be private. The host profile uses a private 0.0.0.0 API listener. This does not change generated worker isolation.
+- CODELESS_AGENT_REPOSITORY_ROOT: absolute checkout; CODELESS_AGENT_PRIVATE_ROOT: same persistent directory in API/runtime; CODELESS_FILE_WORKSPACE_ROOT: same persistent source root; CODELESS_FILE_AUDIT_ROOT / CODELESS_MODEL_AUDIT_ROOT: private host storage.
+- CODELESS_AGENT_NODE: Node24.16.0 executable; CODELESS_API_PORT=8080. Model provider/credentials remain API-owned, separate from preview secrets. deterministic-mock is explicit CI output, not a real model quality acceptance.
+
+Create the private/source roots before starting the resident service, owned by the unprivileged trusted host account. Start the API with infra/preview/application-preview.yml as an additional Spring config (for example Spring's --spring.config.additional-location=file:/absolute/checkout/infra/preview/application-preview.yml). Existing datasource/auth environment and Java21 configuration are still required. Enable the real A coordinator only through this profile and its fixed roots. Build the platform with VITE_CODELESS_PREVIEW_ORIGIN equal to the complete configured preview origin, including its port:
+
+    pnpm --filter @codeless/web build
+    node services/runner/src/preview/main.mjs
+
+For Linux service supervision, codeless-preview.service is an installable example with trusted account codeless, checkout /opt/codeless/current, a protected /etc/codeless/preview.env and fixed Node executable. Adjust those existing paths before installing; use a supervisor for both API and resident service. SIGTERM shuts down handles; the private health endpoint /internal/preview/health requires the registry key and reports catalogue health/mapping counts without secrets. The supplied units/configuration have been prepared, not installed as system services.
+
+The TLS ingress uses the existing pinned nginx1.27.5-alpine, a nonroot account matching the host renderer UID/GID (Windows uses101), read-only mounts, dropped capabilities and no privileged socket. Supply absolute CODELESS_TLS_CERT / CODELESS_TLS_KEY, CODELESS_WEB_DIST and CODELESS_PREVIEW_DEPLOY_ROOT. The certificate must cover the platform and *.preview host on their separate sites. Run render as the same unprivileged host account that owns/read-accesses these files:
+
+    node infra/preview/render.mjs
+    docker compose --file infra/preview/compose.yml --env-file /absolute/deploy-root/compose.env config
+    docker compose --file infra/preview/compose.yml --env-file /absolute/deploy-root/compose.env up -d
+    docker compose --file infra/preview/compose.yml --env-file /absolute/deploy-root/compose.env exec -T ingress nginx -t
+
+The overlay binds its public TLS port to host loopback for controlled local validation. Public exposure, trusted wildcard DNS/certificate issuance and network policy remain an explicit deployment operation; no public endpoint is deployed by these tests. A separate protected host TLS ingress may expose this fixed profile. The renderer validates sites, shared TLS port, fixed upstream ports and file inputs; it keeps nginx request variables untouched. Host routing is preserved, preview cookies only reach the preview gateway, platform sessions only reach public platform API routes. /internal/ is denied on the platform; preview hosts cannot proxy platform API. Request/query logs and caches are off. Neither service key nor model/platform secrets enter nginx or generated workers.
+
+Credential v1 binds app/version/build/source/artifact, issued/expiry(120s) and nonce. Bootstrap checks exact version Host, then 303 to / and sets Secure HttpOnly SameSite=None Partitioned host-only cookie. Every document/resource rechecks expiry and binding. Required CHIPS cookie support may fail with an honest unavailable UI. No credential is stored in platform storage. Each version uses a separate origin; same-version refresh preserves generated LocalStorage. The iframe/CSP allow only scripts + same-origin and deny popup/top navigation/forms/workers/frames/objects/external connections. Messages require exact iframe source/origin and only affect display. The load bridge does not promote task READY. All served content is no-store; injected bridge leaves stored artifact digest unchanged.
+
+Verification: PreviewPlatformIntegrationTest executes real HTTP login, task submission, isolated PostgreSQL scheduler, mock multi-file generation, real Docker build/Chromium verification, real signing, this nginx TLS profile and the platform iframe. It checks registry restart, retention revocation, session/storage isolation and public internal-route rejection. Registry unit fixtures are host-authored and are not claimed as build/model evidence. Existing D09 separated browser cases preserve their explicit platform API/signing fixtures and cover expiration, tampering, resource errors and two differing immutable versions. Original A real-model strict-TS failure and subsequent MODEL_NETWORK remain failed; no mock result replaces them.

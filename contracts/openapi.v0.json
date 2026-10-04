@@ -15,6 +15,7 @@
     { "name": "tasks", "description": "Generation lifecycle and events" },
     { "name": "builds", "description": "Real runner build results" },
     { "name": "versions", "description": "Immutable source versions" },
+    { "name": "preview", "description": "Short-lived isolated verified-version previews" },
     { "name": "publications", "description": "User-triggered publications" }
   ],
   "paths": {
@@ -557,6 +558,103 @@
           "200": { "description": "Found", "content": { "application/json": { "schema": { "$ref": "./schemas/v0/version.schema.json" } } } },
           "401": { "$ref": "#/components/responses/Unauthorized" },
           "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials": {
+      "parameters": [
+        {
+          "name": "applicationId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "versionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "createPreviewCredential",
+        "summary": "Issue a two-minute credential for a registered verified version",
+        "description": "Requires host-only platform session, CSRF and ownership. Exact committed build/source/artifact must already be registered by the trusted resident gateway. Response is no-store; url is a temporary bearer capability and must not be logged or persisted.",
+        "tags": [
+          "preview"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CsrfToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scoped credential, no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/preview-credential.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "CSRF token rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not owned or resource mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/build not verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Gateway unavailable, unregistered version, or invalid deployment configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          }
         }
       }
     },

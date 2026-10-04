@@ -22,12 +22,13 @@ public class PreviewController {
     private final String key;
     private final String preview;
     private final String platform;
+    private final PreviewReadiness readiness;
 
-    public PreviewController(OwnershipGuard ownership, JdbcClient jdbc,
+    public PreviewController(OwnershipGuard ownership, JdbcClient jdbc, PreviewReadiness readiness,
             @Value("${CODELESS_PREVIEW_SIGNING_KEY:}") String key,
             @Value("${CODELESS_PREVIEW_ORIGIN:}") String preview,
             @Value("${CODELESS_PLATFORM_ORIGIN:}") String platform) {
-        this.ownership = ownership; this.jdbc = jdbc; this.key = key; this.preview = preview; this.platform = platform;
+        this.ownership = ownership; this.jdbc = jdbc; this.readiness = readiness; this.key = key; this.preview = preview; this.platform = platform;
     }
 
     @PostMapping("/api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials")
@@ -59,6 +60,8 @@ public class PreviewController {
             return failure(HttpStatus.SERVICE_UNAVAILABLE, "PREVIEW_UNAVAILABLE", request);
         }
         Binding value = binding.get();
+        if (!readiness.ready(applicationId, versionId, value.build(), value.source(), value.artifact()))
+            return failure(HttpStatus.SERVICE_UNAVAILABLE, "PREVIEW_UNAVAILABLE", request);
         String token;
         try { token = new PreviewCredentials(key, Clock.systemUTC()).issue(applicationId, versionId,
                 value.build(), value.source(), value.artifact()); }

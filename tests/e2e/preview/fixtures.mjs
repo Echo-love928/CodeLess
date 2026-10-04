@@ -14,7 +14,7 @@ export function signed(handle, app, version, time = Date.now()) {
 export const passedFixture = handle => ({ status: 'PASSED', failure: null, workerExitCode: 0, timedOut: false,
   completedAt: new Date().toISOString(), cleanup: { browserClosed: true }, screenshot: { digest: 'fixture' },
   buildId: handle.buildId, sourceDigest: handle.sourceDigest, artifactDigest: handle.artifactDigest })
-export async function tlsServer(directory, listener) {
+export async function tlsServer(directory, listener, port = 0) {
   await mkdir(directory, { recursive: true })
   let openssl = 'openssl'
   if (process.platform === 'win32') {
@@ -27,7 +27,7 @@ export async function tlsServer(directory, listener) {
     '-days', '1', '-subj', '/CN=codeless-preview-test', '-addext', 'subjectAltName=DNS:*.preview.codeless-preview.test,DNS:platform.codeless.test'],
     { stdio: 'ignore', windowsHide: true, env: { ...process.env, MSYS_NO_PATHCONV: '1' } })
   const server = createServer({ cert: await readFile(cert), key: await readFile(key) }, listener)
-  await new Promise((done, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', done) })
+  await new Promise((done, reject) => { server.once('error', reject); server.listen(port, '127.0.0.1', done) })
   return server
 }
 export const closeServer = server => new Promise((done, reject) => {
