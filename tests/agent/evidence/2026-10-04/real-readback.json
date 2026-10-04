@@ -1,0 +1,66 @@
+{
+  "platformPreview": "NOT_EXECUTED_BY_THIS_TEST",
+  "modelCalls": [
+    {
+      "id": "ef00f31a-0ccc-4a72-9bf4-e8b1bf17d760",
+      "stage": "PLAN",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "status": "FAILED",
+      "inputTokens": null,
+      "outputTokens": null,
+      "errorCode": "MODEL_NETWORK"
+    }
+  ],
+  "events": [
+    {
+      "stage": "PLAN",
+      "sequence": 1,
+      "kind": "model.request",
+      "taskId": "3b21e06b-bc7b-41d9-914a-b4c17d119ed9",
+      "at": "2026-10-04T11:46:11.755094500Z",
+      "payload": {
+        "reservedTokens": 9434
+      }
+    },
+    {
+      "stage": "PLAN",
+      "sequence": 2,
+      "kind": "model.usage",
+      "taskId": "3b21e06b-bc7b-41d9-914a-b4c17d119ed9",
+      "at": "2026-10-04T11:46:12.565877700Z",
+      "payload": {
+        "reservationTokens": 9434,
+        "usage": {
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null,
+          "raw": null
+        },
+        "releasedTokens": 0
+      }
+    },
+    {
+      "stage": "PLAN",
+      "sequence": 3,
+      "kind": "failure",
+      "taskId": "3b21e06b-bc7b-41d9-914a-b4c17d119ed9",
+      "at": "2026-10-04T11:46:12.599989Z",
+      "payload": {
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+        "code": "MODEL_NETWORK"
+      }
+    }
+  ],
+  "task": {
+    "id": "3b21e06b-bc7b-41d9-914a-b4c17d119ed9",
+    "applicationId": "d09ada19-4f46-4dba-9e21-2a8b95323d0c",
+    "prompt": "生成一个 Ada Lovelace 个人展示页。使用静态数据，展示姓名、简短介绍和两件作品。最多两个文件：src/pages/HomePage.vue、src/components/ProfileCard.vue。不要外部图片或外部请求。",
+    "status": "FAILED",
+    "repairAttempts": 0,
+    "failureCode": "MODEL_NETWORK",
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-04T11:46:12.620418Z"
+  },
+  "fixture": false
+}

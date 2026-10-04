@@ -44,7 +44,7 @@ class RealAgentAcceptanceIT extends PostgresTestBase {
                     var value=new LinkedHashMap<String,Object>();value.put("id",rs.getObject(1));value.put("stage",rs.getString(2));value.put("provider",rs.getString(3));
                     value.put("model",rs.getString(4));value.put("status",rs.getString(5));value.put("inputTokens",rs.getObject(6));value.put("outputTokens",rs.getObject(7));value.put("errorCode",rs.getString(8));return value;
                 }).list();
-        Files.writeString(directory.resolve("real-result.json"),json.writeValueAsString(Map.of("task",view,"events",events,"modelCalls",usage,"fixture",false,"platformPreview","BLOCKED_D09_B_NOT_AVAILABLE")));
+        Files.writeString(directory.resolve("real-result.json"),json.writeValueAsString(Map.of("task",view,"events",events,"modelCalls",usage,"fixture",false,"platformPreview","NOT_EXECUTED_BY_THIS_TEST")));
         assertThat(view.status()).as(view.failureCode()).isEqualTo(TaskStatus.READY);
     }
 }

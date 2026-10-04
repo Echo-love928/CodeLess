@@ -138,3 +138,13 @@ Missing/invalid credentials write BLOCKED preflight and fail that command. A rea
 model, build or browser failure is preserved and fails acceptance. Neither the
 mock nor real backend/browser run proves platform iframe access; final D09-B
 integration must test that path using the exact verified version.
+
+Revision: real evaluation reports now say `NOT_EXECUTED_BY_THIS_TEST` for platform
+preview; historical reports are retained unchanged. Independent integration PR
+#21 supplies the platform chain and must synchronize the reviewed gateway fix.
+The host gateway terminates owned processes before cancelling output readers;
+it gives the live parent at most 250ms to reap children, preserves interruption,
+and does not await executor closure. `LocalBuildGatewayTest` uses real Node
+processes with explicit protocol fixtures to cover interruption/deadline/normal
+return and an already-expired deadline. Container orphan cleanup is still a
+deployment requirement after external worker termination.

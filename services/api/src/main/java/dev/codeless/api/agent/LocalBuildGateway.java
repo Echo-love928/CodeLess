@@ -19,7 +19,9 @@ public final class LocalBuildGateway implements BuildGateway {
     }
     public JsonNode run(JsonNode draft, OffsetDateTime deadline) {
         Process child=null;
-        try (var executor=Executors.newVirtualThreadPerTaskExecutor()) {
+        var executor=Executors.newVirtualThreadPerTaskExecutor();
+        Future<byte[]> stdout=null;Future<Boolean> stderr=null;
+        try {
             long timeout=Math.min(240000,Duration.between(Instant.now(),deadline.toInstant()).toMillis());
             if (timeout<=0) throw new AgentFailure("AGENT_RUNNER_TIMEOUT");
             var builder=new ProcessBuilder(node,bridge.toString(),work.toString(),artifacts.toString(),evidence.toString(),receipts.toString());
@@ -29,15 +31,12 @@ public final class LocalBuildGateway implements BuildGateway {
                 if(inherited.containsKey(name)) environment.put(name,inherited.get(name));
             child=builder.start();
             Process running=child;
-            var stdout=executor.submit(() -> running.getInputStream().readNBytes(2*1024*1024+1));
-            var stderr=executor.submit(() -> { running.getErrorStream().transferTo(java.io.OutputStream.nullOutputStream());return true; });
+            stdout=executor.submit(() -> running.getInputStream().readNBytes(2*1024*1024+1));
+            stderr=executor.submit(() -> { running.getErrorStream().transferTo(java.io.OutputStream.nullOutputStream());return true; });
             child.getOutputStream().write(json.writeValueAsString(Map.of("sourceDirectory",draft.path("sourceDirectory").asText(),
                     "sourceDigest",draft.path("sourceDigest").asText(),"actions",draft.path("actions"))).getBytes(StandardCharsets.UTF_8));
             child.getOutputStream().close();
             if(!child.waitFor(timeout,TimeUnit.MILLISECONDS)) {
-                // Owned descendants only. Docker cleanup after external host termination is unknown,
-                // never reported as successful; the deployment orphan reaper remains required.
-                child.descendants().forEach(ProcessHandle::destroyForcibly);child.destroyForcibly();
                 throw new AgentFailure("AGENT_RUNNER_TIMEOUT");
             }
             byte[] bytes=stdout.get(5,TimeUnit.SECONDS);stderr.get(5,TimeUnit.SECONDS);
@@ -49,6 +48,30 @@ public final class LocalBuildGateway implements BuildGateway {
         } catch(AgentFailure failure) {throw failure;}
         catch(InterruptedException failure) {Thread.currentThread().interrupt();throw new AgentFailure("AGENT_RUNNER_INTERRUPTED");}
         catch(Exception failure) {throw new AgentFailure("AGENT_RUNNER_UNAVAILABLE");}
-        finally {if(child!=null && child.isAlive()) {child.descendants().forEach(ProcessHandle::destroyForcibly);child.destroyForcibly();}}
+        finally {
+            // Kill owned processes before waiting for anything that may be reading their pipes.
+            // Executor.close() waits for those reads and can prevent interruption cleanup entirely.
+            // Docker cleanup after host termination is still unknown; its orphan reaper is required.
+            boolean interrupted=Thread.interrupted();
+            try {
+                if(child!=null) {
+                    var descendants=child.descendants().toList();
+                    descendants.forEach(ProcessHandle::destroyForcibly);
+                    // Give the still-live parent a bounded chance to reap its children on Unix.
+                    // Killing it first can leave orphan zombies even after a successful signal.
+                    long until=System.nanoTime()+TimeUnit.MILLISECONDS.toNanos(250);
+                    while(descendants.stream().anyMatch(ProcessHandle::isAlive) && System.nanoTime()<until) {
+                        try {Thread.sleep(10);} catch(InterruptedException failure) {interrupted=true;}
+                    }
+                    if(child.isAlive()) child.destroyForcibly();
+                }
+            } finally {
+                if(stdout!=null) stdout.cancel(true);
+                if(stderr!=null) stderr.cancel(true);
+                // Pipe I/O need not respond to thread interrupts; never join it without a bound.
+                executor.shutdownNow();
+                if(interrupted) Thread.currentThread().interrupt();
+            }
+        }
     }
 }
