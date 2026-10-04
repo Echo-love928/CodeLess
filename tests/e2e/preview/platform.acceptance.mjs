@@ -14,7 +14,7 @@ import { startPreviewRuntime } from '../../../services/runner/src/preview/main.m
 import { readSnapshot,digest } from '../../../services/runner/src/artifacts/snapshot.mjs'
 import { tlsServer,closeServer } from './fixtures.mjs'
 
-// Real HTTP/SQL/auth/issuer/runner/gateway; mock model output is explicitly separate from model quality.
+// Real HTTP/SQL/auth/issuer/runner/gateway. Paid evaluation is explicit and validated against SQL by its Java harness.
 const root=resolve(fileURLToPath(new URL('../../../',import.meta.url)))
 const evidence=resolve(process.env.CODELESS_PREVIEW_EVIDENCE_DIR)
 await mkdir(evidence,{recursive:true})
@@ -24,6 +24,9 @@ let runtime,browser,tls,deployment
 const project='codeless-preview-test-'+randomUUID()
 const compose=(args)=>spawnSync('docker',['compose','--project-name',project,'--file',join(root,'infra/preview/compose.yml'),'--env-file',deployment.envFile,...args],{encoding:'utf8',windowsHide:true,timeout:60000})
 const observed=[]
+const modelMode=process.env.CODELESS_PREVIEW_ACCEPTANCE_MODEL??'deterministic-mock'
+assert.ok(['deterministic-mock','deepseek'].includes(modelMode),'Unsupported acceptance model')
+const paid=modelMode==='deepseek'
 try {
   runtime=await startPreviewRuntime({...process.env,CODELESS_PREVIEW_GATEWAY_HOST:'0.0.0.0'})
   const dist=join(evidence,'platform-dist')
@@ -49,12 +52,30 @@ try {
   assert.equal(created.status,201);const app=created.body.id
   await page.evaluate(()=>{localStorage.setItem('platform-secret','private-platform-value');sessionStorage.setItem('platform-secret','private-platform-session')})
   await page.goto('/workbench/'+app)
-  await page.getByLabel('需求描述').fill('生成静态个人展示页，使用两个 Vue 文件展示 Ada Lovelace 与作品列表')
+  await page.getByLabel('需求描述').fill(paid
+    ? '生成 Ada Lovelace 个人展示页，静态数据展示姓名、简短介绍及两件作品：Analytical Engine 和 Note G。恰好两个文件：src/pages/HomePage.vue、src/components/ProfileCard.vue。先读取依赖源码，保持组件接口和页面数据类型一致。不要外部图片或请求。'
+    : '生成静态个人展示页，使用两个 Vue 文件展示 Ada Lovelace 与作品列表')
   const started=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v0/tasks'&&r.request().method()==='POST')
   await page.getByRole('button',{name:'开始生成',exact:true}).click()
-  const task=(await (await started).json()).id
+  const response=await started;assert.equal(response.status(),202)
+  const task=(await response.json()).id
+  await writeFile(join(evidence,'started.json'),JSON.stringify({applicationId:app,taskId:task,modelMode},null,2))
+  const generationDeadline=Date.now()+(paid?720000:90000)
+  let taskState
+  do {
+    const state=await call('tasks/'+task);assert.equal(state.status,200);taskState=state.body
+    await writeFile(join(evidence,'task.json'),JSON.stringify(taskState,null,2))
+    assert.notEqual(taskState.status,'FAILED','Generation failed: '+taskState.failureCode)
+    if(taskState.status==='READY')break
+    assert.ok(Date.now()<generationDeadline,'Generation deadline exceeded')
+    await new Promise(done=>setTimeout(done,500))
+  } while(true)
   const iframe=page.locator('iframe'),frame=page.frameLocator('iframe')
-  await expect(frame.getByTestId('profile-name')).toHaveText('Ada Lovelace',{timeout:90000})
+  const assertContent=async()=>{
+    if(paid){for(const text of ['Ada Lovelace','Analytical Engine','Note G'])await expect(frame.locator('body')).toContainText(text,{timeout:30000,useInnerText:true})}
+    else await expect(frame.getByTestId('profile-name')).toHaveText('Ada Lovelace',{timeout:30000})
+  }
+  await assertContent()
   const appState=await call('applications/'+app);const version=appState.body.latestReadyVersionId
   assert.ok(version);await expect(iframe).toHaveAttribute('src',new RegExp(version.replaceAll('-','')))
   const isolation=await frame.locator('#app').evaluate(()=>{
@@ -76,11 +97,22 @@ try {
   assert.equal((await fetch(apiOrigin+'/internal/preview/versions')).status,403)
   const publicInternal=await page.evaluate(async()=> (await fetch('/internal/preview/versions')).status);assert.equal(publicInternal,404)
   const firstStats=runtime.registry.stats();assert.equal(firstStats.mapped,1)
-  const gatewayPort=runtime.gateway.server.address().port;await runtime.close();runtime=await startPreviewRuntime({...process.env,CODELESS_PREVIEW_GATEWAY_HOST:'0.0.0.0',CODELESS_PREVIEW_GATEWAY_PORT:String(gatewayPort)});assert.equal(runtime.registry.stats().mapped,1)
+  const gatewayPort=runtime.gateway.server.address().port;await runtime.close()
+  // Real ingress failure: even error logs must not retain credential-bearing URLs.
+  const logMarker='CODELESS_SYNTHETIC_LOG_PROBE_'+randomUUID()
+  const faultStatus=await new Promise((done,reject)=>{
+    const request=httpsRequest('https://127.0.0.1:'+new URL(platformOrigin).port+'/__preview/start?credential='+logMarker,{rejectUnauthorized:false,headers:{Host:url.host}},response=>{response.resume();response.on('end',()=>done(response.statusCode))})
+    request.setTimeout(10000,()=>request.destroy(new Error('Ingress fault probe timeout')));request.on('error',reject);request.end()
+  })
+  assert.equal(faultStatus,502)
+  const ingressLogs=compose(['logs','--no-color','ingress']);assert.equal(ingressLogs.status,0)
+  assert.ok(!(ingressLogs.stdout+ingressLogs.stderr).includes(logMarker),'nginx logged credential-bearing URI')
+  await writeFile(join(evidence,'ingress-log-rejection.json'),JSON.stringify({upstreamStopped:true,httpStatus:faultStatus,syntheticMarkerLogged:false},null,2))
+  runtime=await startPreviewRuntime({...process.env,CODELESS_PREVIEW_GATEWAY_HOST:'0.0.0.0',CODELESS_PREVIEW_GATEWAY_PORT:String(gatewayPort)});assert.equal(runtime.registry.stats().mapped,1)
   const refreshed=page.waitForResponse(r=>r.url().includes('/preview-credentials')&&r.request().method()==='POST')
-  await page.getByRole('button',{name:'刷新预览',exact:true}).click();assert.equal((await refreshed).status(),200);await expect(frame.getByTestId('profile-name')).toHaveText('Ada Lovelace')
+  await page.getByRole('button',{name:'刷新预览',exact:true}).click();assert.equal((await refreshed).status(),200);await assertContent()
   assert.equal(await frame.locator('#app').evaluate(()=>localStorage.getItem('preview-only')),'retained-preview-value')
-  await page.reload();await expect(frame.getByTestId('profile-name')).toHaveText('Ada Lovelace')
+  await page.reload();await assertContent()
   const journal=(await readSnapshot(join(process.env.CODELESS_AGENT_PRIVATE_ROOT,'journal',task))).buffers
   const events=[...journal.values()].map(b=>JSON.parse(b.toString('utf8'))),draft=events.findLast(v=>v.kind==='draft').payload,result=events.findLast(v=>v.kind==='runner.result').payload
   assert.equal(draft.files.length,2);assert.equal(result.build.status,'SUCCEEDED');assert.equal(result.verification.status,'PASSED')
@@ -92,7 +124,7 @@ try {
   await writeFile(retainedReceipt,JSON.stringify(result),{flag:'wx'});await runtime.registry.sync();assert.equal(runtime.registry.stats().mapped,1)
   const screenshot=await readFile(join(evidence,'authenticated-platform-preview.png'))
   await writeFile(join(evidence,'acceptance.json'),JSON.stringify({applicationId:app,taskId:task,versionId:version,buildId:binding.buildId,sourceDigest:binding.sourceDigest,artifactDigest:binding.artifactDigest,sourceFiles:draft.files.length,
-    deploymentIngress:'nginx:1.27.5-alpine',modelProvider:'deterministic-mock',modelQualityAccepted:false,platformApiFixture:false,signingFixture:false,realDockerBuild:true,realBrowserVerification:true,residentRestartPassed:true,retentionRevocationPassed:true,publicInternalDenied:true,isolation,
+    deploymentIngress:'nginx:1.27.5-alpine',modelProvider:modelMode,modelQualityAccepted:false,modelQualityValidation:paid?'PENDING_SQL_VALIDATION':'NOT_MODEL_ACCEPTANCE',acceptanceScope:paid?'single-static-Ada-showcase':'deterministic-platform-integration',platformApiFixture:false,signingFixture:false,realDockerBuild:true,realBrowserVerification:true,residentRestartPassed:true,credentialErrorLogDenied:true,retentionRevocationPassed:true,publicInternalDenied:true,isolation,
     screenshot:{path:'authenticated-platform-preview.png',digest:digest(screenshot),bytes:screenshot.length}},null,2))
-  console.log('Authenticated platform preview, restart and retention acceptance passed (model: deterministic-mock).')
+  console.log('Authenticated platform preview, restart and retention acceptance passed (model: '+modelMode+').')
 } finally {await browser?.close();if(tls)await closeServer(tls);await runtime?.close();if(deployment){const down=compose(['down','--remove-orphans']);assert.equal(down.status,0,down.stdout+down.stderr)}}

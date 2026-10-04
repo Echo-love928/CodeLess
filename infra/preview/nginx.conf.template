@@ -37,6 +37,7 @@ server {
     ssl_certificate_key /certs/server.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     access_log off; # Bootstrap query contains a short-lived bearer credential.
+    error_log /dev/null; # Upstream errors otherwise log the full credential-bearing request URI.
     location / {
         proxy_pass http://host.docker.internal:${CODELESS_PREVIEW_GATEWAY_PORT};
         proxy_set_header Host $http_host;

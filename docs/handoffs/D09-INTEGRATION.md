@@ -77,3 +77,15 @@ B修复提交9e26884的远端六项success，运行37190045251。集成草稿推
 真实模型累计计量沿用A新提交：14次尝试，12次已知+2次未知；已知input22695/output6047/reportedTotal28742，完整总量UNKNOWN。此复查0次真实模型调用；开发agent input/output/总量无逐任务实测，仍未知。
 
 后续推送的精确PR HEAD须重新通过远端六项检查；状态通过PR与实际CI run读取，旧HEAD成功不能替代。A #19与集成 #21保持Draft。真实模型成功、更新后的集成同伴审查和正式部署前置仍待完成，未合并或发布，未修改main。
+
+## 2026-10-04 独立自动复审与真实模型整链入口
+
+针对“真实模型无成功证据、PR #21待独立复审”，在原独立集成分支完成三个fresh-context子代理只读审查。固定parent f83895c及增量修复范围、发现位置/复现方法/已核验内容详见 tests/e2e/preview/evidence/2026-10-04/real-preview-readiness/independent-review.md。这是独立自动审查，不替代另一GitHub账号批准；本账号是PR作者，保持Draft且不自批/合并/发布。
+
+修复实际复现的P2：nginx默认error_log在upstream拒连时记录含credential的完整URL。仅preview server关闭error_log，保留平台诊断；实际nginx502+唯一合成marker无日志回归通过，再复核同端口重启、真实签发、iframe隔离和回收撤销。文档明确catalogue超1000条导致全局503，此为既有安全容量行为，未扩容或改变fail-closed。
+
+新增显式 `RealPreviewPlatformAcceptanceIT`，命令 `services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealPreviewPlatformAcceptanceIT test`（Java21）。入口使用真实deepseek Bean、真实平台UI登录和需求提交、独立数据库与调度，经原Docker/Chromium/真实签发/常驻registry/nginx TLS/iframe及全部生命周期断言。默认Surefire不选择 *IT、原平台CI测试仍显式mock。付费请求仍受既有12次/20工具/50,000tokens/12分钟约束，没有自动重试或改变模型实现。API之外的prepare/browser/runner测试子进程移除模型key/name；可见内容采用innerText；先写modelQualityAccepted=false，仅SQL证明真实provider/配置model、每条成功非空usage、READY及全部断言成功后写true，范围限定一条静态Ada展示页需求。失败保留 started/task/model-calls/platform.log，不覆盖旧失败。
+
+用户选择“配置deepseek-flash后通知”，尚未给出已配置确认，本次0次新计费模型请求。Java21与Provider相同HTTPS客户端无Authorization GET收到401，确认当前DNS/TLS/连接可达，但不证明鉴权或模型效果。真实成功仍受阻，不将新的mock报告当模型证据。个人开发tokens实测未知；历史14次运行时模型用量分账保持，未改历史报告。
+
+新增Java类已编译，受影响PreviewPlatformIntegrationTest 1/1退出0；本次完整ci-gate退出0，原命令与源码摘要见 real-preview-readiness/commands.json，私有日志 .local-data/d09-integration/real-preview-readiness/ci-gate.log/.exit。新截图已查看、摘要/字节复核；portable平台报告仍明确modelQualityAccepted=false、API/signing fixture=false。精确新HEAD远端必需检查仍需重新读取；main保持f80ee105不变。
