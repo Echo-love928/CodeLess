@@ -10,10 +10,13 @@ export async function getPreviewCredential(applicationId: string, versionId: str
     method: 'POST', headers: { 'X-CSRF-Token': session.csrfToken }, signal, cache: 'no-store',
   })
   const trusted = new URL(import.meta.env.VITE_CODELESS_PREVIEW_ORIGIN || 'https://preview.codeless-preview.test')
+  if (trusted.protocol !== 'https:' || trusted.username || trusted.password || trusted.hash || trusted.search || trusted.pathname !== '/')
+    throw new Error('预览服务可信地址配置无效。')
+  const expected = new URL(trusted.origin)
+  expected.hostname = 'v' + versionId.replaceAll('-', '') + '.' + trusted.hostname
   const url = new URL(value.url)
   const expires = Date.parse(value.expiresAt)
-  if (value.applicationId !== applicationId || value.versionId !== versionId || url.protocol !== 'https:' ||
-      url.hostname !== 'v' + versionId.replaceAll('-', '') + '.' + trusted.hostname ||
+  if (value.applicationId !== applicationId || value.versionId !== versionId || url.origin !== expected.origin ||
       url.username || url.password || url.hash || url.pathname !== '/__preview/start' ||
       url.searchParams.size !== 1 || !url.searchParams.get('credential') ||
       !Number.isFinite(expires) || expires <= Date.now() || expires > Date.now() + 121_000)

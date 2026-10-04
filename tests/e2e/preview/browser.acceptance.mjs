@@ -75,6 +75,14 @@ test('D09-B-T1/T3/T4: real Vue build and Chromium preview, platform isolation an
   const port = tls.address().port
   const platformOrigin = 'https://platform.codeless.test:' + port
   const previewOrigin = 'https://preview.codeless-preview.test:' + port
+  // Compile the real platform UI with the exact dynamic trusted TLS origin.
+  const webDist = join(evidence, 'platform-dist-' + randomUUID())
+  const platformBuild = spawnSync(process.execPath, ['node_modules/vite/bin/vite.js', 'build', '--outDir', webDist], {
+    cwd: join(root, 'apps/web'), encoding: 'utf8', timeout: 30_000, windowsHide: true,
+    env: { ...process.env, VITE_CODELESS_PREVIEW_ORIGIN: previewOrigin },
+  })
+  expect(platformBuild.status, platformBuild.stdout + platformBuild.stderr).toBe(0)
+  const platformFiles = (await readSnapshot(webDist)).buffers
   const appId = application.id, version1 = randomUUID(), version2 = randomUUID()
   let current = version1, clock = Date.now(), issues = 0, platformProbeHits = 0
   const observed = []
@@ -85,9 +93,13 @@ test('D09-B-T1/T3/T4: real Vue build and Chromium preview, platform isolation an
     if (request.headers.host === new URL(platformOrigin).host) {
       if (request.url === '/probe') { platformProbeHits++; response.writeHead(200); return response.end('platform-private') }
       try {
-        const upstream = await fetch('http://127.0.0.1:4173' + request.url)
-        response.writeHead(upstream.status, { 'Content-Type': upstream.headers.get('content-type') || 'text/html', 'Cache-Control': 'no-store' })
-        response.end(Buffer.from(await upstream.arrayBuffer()))
+        const path = new URL(request.url, platformOrigin).pathname.slice(1)
+        const name = path.startsWith('assets/') ? path : 'index.html'
+        const bytes = platformFiles.get(name)
+        if (!bytes) { response.writeHead(404); return response.end() }
+        const type = name.endsWith('.js') ? 'application/javascript' : name.endsWith('.css') ? 'text/css' : 'text/html'
+        response.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-store' })
+        response.end(bytes)
       } catch { response.writeHead(502); response.end() }
     } else {
       observed.push({ platformCookie: (request.headers.cookie || '').includes('JSESSIONID='),
