@@ -86,6 +86,33 @@ class AgentLoopIntegrationTest extends PostgresTestBase {
         report("D09-A-T1",Map.of("task",task,"draft",draft,"runner",verified,"modelProvider","deterministic-mock",
                 "modelRequests",4,"inputTokens","UNKNOWN","outputTokens","UNKNOWN","toolCalls",4,"fixture",false));
     }
+    @Test @Order(10) void singlePageWithoutDependencyComponentsCanReachReady() throws Exception {
+        var seed=seed();var mock=new MockModelProvider();
+        var provider=new ModelProvider() {
+            public String id(){return "deterministic-mock";}public String model(){return "single-page-fixture";}
+            public Reply call(Prompt prompt,int max,Duration timeout) {
+                var input=json.readTree(prompt.getUserMessage().getText());
+                var result=mock.call(prompt,max,timeout);
+                if(!"GENERATE".equals(input.path("phase").asText())) {
+                    var plan=(tools.jackson.databind.node.ObjectNode)json.readTree(result.content());
+                    plan.putArray("components");plan.putArray("files").addObject().put("path","src/pages/HomePage.vue").put("purpose","Single page");
+                    return new Reply(plan.toString(),result.evidence());
+                }
+                String content=input.path("observations").isEmpty()
+                    ? json.writeValueAsString(Map.of("type","tool","name","files.create","arguments",Map.of("path","src/pages/HomePage.vue","content",
+                        "<script setup lang=\"ts\"></script><template><main><h1 data-testid=\"single-page\">Ada Lovelace</h1></main></template>")))
+                    : "{\"type\":\"done\",\"actions\":[{\"type\":\"navigate\",\"path\":\"/\"},{\"type\":\"expectText\",\"target\":{\"testId\":\"single-page\"},\"value\":\"Ada Lovelace\"}]}";
+                return new Reply(content,result.evidence());
+            }
+        };
+        new TaskScheduler(queue,loop(provider,gateway)).tick();
+        var task=queue.find(seed.owner(),seed.task()).orElseThrow();var events=journal.read(seed.task());
+        assertThat(task.status()).isEqualTo(TaskStatus.READY);
+        assertThat(AgentJournal.latest(events,"draft").path("files").size()).isEqualTo(1);
+        var completion=AgentJournal.latest(events,"completion");var runner=AgentJournal.latest(events,"runner.result");
+        assertThat(completion.path("buildId").asText()).isEqualTo(runner.path("build").path("id").asText());
+        assertThat(completion.path("versionId").asText()).isEqualTo(AgentJournal.latest(events,"draft").path("versionId").asText());
+    }
     @Test @Order(9) void ambiguousBrowserTargetsCannotPromoteEvenAfterARealSuccessfulBuild() throws Exception {
         var seed=seed();var mock=new MockModelProvider();
         var provider=new ModelProvider() {
