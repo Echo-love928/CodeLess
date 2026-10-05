@@ -113,6 +113,33 @@ class AgentLoopIntegrationTest extends PostgresTestBase {
         assertThat(completion.path("buildId").asText()).isEqualTo(runner.path("build").path("id").asText());
         assertThat(completion.path("versionId").asText()).isEqualTo(AgentJournal.latest(events,"draft").path("versionId").asText());
     }
+    @Test @Order(11) void textPrefixCannotPromoteEvenAfterARealSuccessfulBuild() throws Exception {
+        var seed=seed();var mock=new MockModelProvider();
+        var provider=new ModelProvider() {
+            public String id(){return "deterministic-mock";}public String model(){return "text-prefix-fixture";}
+            public Reply call(Prompt prompt,int max,Duration timeout) {
+                var reply=mock.call(prompt,max,timeout);var proposed=json.readTree(reply.content());
+                if(proposed.path("arguments").path("path").asText().equals("src/components/ProfileCard.vue"))
+                    ((tools.jackson.databind.node.ObjectNode)proposed.path("arguments")).put("content",
+                            "<script setup lang=\"ts\"></script><template><section><h1 data-testid=\"profile-name\">Ada Lovelace was an English mathematician</h1></section></template>");
+                return new Reply(proposed.toString(),reply.evidence());
+            }
+        };
+        new TaskScheduler(queue,loop(provider,gateway)).tick();
+        var task=queue.find(seed.owner(),seed.task()).orElseThrow();var events=journal.read(seed.task());
+        var actual=AgentJournal.latest(events,"runner.result");
+        assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_ACTION_FAILED");
+        assertThat(actual.path("build").path("status").asText()).isEqualTo("SUCCEEDED");
+        assertThat(actual.path("build").path("exitCode").asInt(-1)).isZero();
+        assertThat(actual.path("verification").path("status").asText()).isEqualTo("FAILED");
+        assertThat(actual.path("verification").path("error").asText()).contains("toHaveText", "Ada Lovelace was an English mathematician");
+        assertThat(jdbc.sql("SELECT count(*) FROM application_versions WHERE application_id=? AND status='VERIFIED'")
+                .param(seed.app()).query(Integer.class).single()).isZero();
+        assertThat(jdbc.sql("SELECT latest_ready_version_id IS NULL FROM applications WHERE id=?")
+                .param(seed.app()).query(Boolean.class).single()).isTrue();
+        report("D09-A-text-prefix",Map.of("task",task,"runner",actual,"modelProvider","deterministic-mock",
+                "realBuild",true,"realBrowser",true,"modelQualityEvidence",false));
+    }
     @Test @Order(9) void ambiguousBrowserTargetsCannotPromoteEvenAfterARealSuccessfulBuild() throws Exception {
         var seed=seed();var mock=new MockModelProvider();
         var provider=new ModelProvider() {
