@@ -86,9 +86,65 @@ class AgentLoopIntegrationTest extends PostgresTestBase {
         report("D09-A-T1",Map.of("task",task,"draft",draft,"runner",verified,"modelProvider","deterministic-mock",
                 "modelRequests",4,"inputTokens","UNKNOWN","outputTokens","UNKNOWN","toolCalls",4,"fixture",false));
     }
+    @Test @Order(10) void singlePageWithoutDependencyComponentsCanReachReady() throws Exception {
+        var seed=seed();var mock=new MockModelProvider();
+        var provider=new ModelProvider() {
+            public String id(){return "deterministic-mock";}public String model(){return "single-page-fixture";}
+            public Reply call(Prompt prompt,int max,Duration timeout) {
+                var input=json.readTree(prompt.getUserMessage().getText());
+                var result=mock.call(prompt,max,timeout);
+                if(!"GENERATE".equals(input.path("phase").asText())) {
+                    var plan=(tools.jackson.databind.node.ObjectNode)json.readTree(result.content());
+                    plan.putArray("components");plan.putArray("files").addObject().put("path","src/pages/HomePage.vue").put("purpose","Single page");
+                    return new Reply(plan.toString(),result.evidence());
+                }
+                String content=input.path("observations").isEmpty()
+                    ? json.writeValueAsString(Map.of("type","tool","name","files.create","arguments",Map.of("path","src/pages/HomePage.vue","content",
+                        "<script setup lang=\"ts\"></script><template><main><h1 data-testid=\"single-page\">Ada Lovelace</h1></main></template>")))
+                    : "{\"type\":\"done\",\"actions\":[{\"type\":\"navigate\",\"path\":\"/\"},{\"type\":\"expectText\",\"target\":{\"testId\":\"single-page\"},\"value\":\"Ada Lovelace\"}]}";
+                return new Reply(content,result.evidence());
+            }
+        };
+        new TaskScheduler(queue,loop(provider,gateway)).tick();
+        var task=queue.find(seed.owner(),seed.task()).orElseThrow();var events=journal.read(seed.task());
+        assertThat(task.status()).isEqualTo(TaskStatus.READY);
+        assertThat(AgentJournal.latest(events,"draft").path("files").size()).isEqualTo(1);
+        var completion=AgentJournal.latest(events,"completion");var runner=AgentJournal.latest(events,"runner.result");
+        assertThat(completion.path("buildId").asText()).isEqualTo(runner.path("build").path("id").asText());
+        assertThat(completion.path("versionId").asText()).isEqualTo(AgentJournal.latest(events,"draft").path("versionId").asText());
+    }
+    @Test @Order(9) void ambiguousBrowserTargetsCannotPromoteEvenAfterARealSuccessfulBuild() throws Exception {
+        var seed=seed();var mock=new MockModelProvider();
+        var provider=new ModelProvider() {
+            public String id(){return "deterministic-mock";}public String model(){return "ambiguous-target-fixture";}
+            public Reply call(Prompt prompt,int max,Duration timeout) {
+                var reply=mock.call(prompt,max,timeout);var proposed=json.readTree(reply.content());
+                if(proposed.path("arguments").path("path").asText().equals("src/components/ProfileCard.vue"))
+                    ((tools.jackson.databind.node.ObjectNode)proposed.path("arguments")).put("content",
+                            "<script setup lang=\"ts\"></script><template><section><h1 data-testid=\"profile-name\">Ada Lovelace</h1><h2 data-testid=\"profile-name\">Note G</h2></section></template>");
+                return new Reply(proposed.toString(),reply.evidence());
+            }
+        };
+        new TaskScheduler(queue,loop(provider,gateway)).tick();
+        var task=queue.find(seed.owner(),seed.task()).orElseThrow();var events=journal.read(seed.task());
+        var actual=AgentJournal.latest(events,"runner.result");
+        assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_ACTION_FAILED");
+        assertThat(actual.path("build").path("status").asText()).isEqualTo("SUCCEEDED");
+        assertThat(actual.path("build").path("exitCode").asInt(-1)).isZero();
+        assertThat(actual.path("verification").path("status").asText()).isEqualTo("FAILED");
+        assertThat(actual.path("verification").path("failure").asText()).isEqualTo("ACTION_FAILED");
+        assertThat(actual.path("verification").path("error").asText()).contains("strict mode violation");
+        assertThat(jdbc.sql("SELECT count(*) FROM application_versions WHERE application_id=? AND status='VERIFIED'")
+                .param(seed.app()).query(Integer.class).single()).isZero();
+        assertThat(jdbc.sql("SELECT latest_ready_version_id IS NULL FROM applications WHERE id=?")
+                .param(seed.app()).query(Boolean.class).single()).isTrue();
+        report("D09-A-ambiguous-browser",Map.of("task",task,"runner",actual,"modelProvider","deterministic-mock",
+                "realBuild",true,"realBrowser",true,"modelQualityEvidence",false));
+    }
     @Test @Order(2) void D09AT2_modelCannotForgeSuccessOrInvokeVerifyToolsInGenerate() throws Exception {
         var outcomes=new ArrayList<Object>();
         for(String response:List.of("{\"type\":\"done\",\"status\":\"VERIFIED\",\"actions\":[]}",
+                "{\"type\":\"json_object\",\"value\":{\"type\":\"tool\",\"name\":\"files.create\",\"arguments\":{\"path\":\"src/pages/HomePage.vue\",\"content\":\"wrapped proposal\"}}}",
                 "{\"type\":\"tool\",\"name\":\"build.verify\",\"arguments\":{}}",
                 "{\"type\":\"tool\",\"name\":\"files.create\",\"arguments\":{\"path\":\"src/pages/HomePage.vue\",\"content\":\"a\"},\"status\":\"SUCCEEDED\"}")) {
             var seed=seed();var claim=claim(seed);var mock=new MockModelProvider();

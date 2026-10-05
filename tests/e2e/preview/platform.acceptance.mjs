@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { previewDiagnostics } from './platform-diagnostics.mjs'
 import Ajv2020 from 'ajv/dist/2020.js'
 import addFormats from 'ajv-formats'
 import { chromium,expect } from '@playwright/test'
@@ -20,13 +21,14 @@ const evidence=resolve(process.env.CODELESS_PREVIEW_EVIDENCE_DIR)
 await mkdir(evidence,{recursive:true})
 const platformOrigin=process.env.CODELESS_PLATFORM_ORIGIN,previewOrigin=process.env.CODELESS_PREVIEW_ORIGIN
 const apiOrigin=process.env.CODELESS_PREVIEW_API_INTERNAL_ORIGIN
-let runtime,browser,tls,deployment
+let runtime,browser,tls,deployment,page,success=false
+const diagnostic=previewDiagnostics({platformOrigin,previewOrigin})
 const project='codeless-preview-test-'+randomUUID()
 const compose=(args)=>spawnSync('docker',['compose','--project-name',project,'--file',join(root,'infra/preview/compose.yml'),'--env-file',deployment.envFile,...args],{encoding:'utf8',windowsHide:true,timeout:60000})
 const observed=[]
 const modelMode=process.env.CODELESS_PREVIEW_ACCEPTANCE_MODEL??'deterministic-mock'
-assert.ok(['deterministic-mock','deepseek'].includes(modelMode),'Unsupported acceptance model')
-const paid=modelMode==='deepseek'
+assert.ok(['deterministic-mock','deepseek','recorded-source-replay'].includes(modelMode),'Unsupported acceptance model')
+const paid=modelMode==='deepseek',replay=modelMode==='recorded-source-replay'
 try {
   runtime=await startPreviewRuntime({...process.env,CODELESS_PREVIEW_GATEWAY_HOST:'0.0.0.0'})
   const dist=join(evidence,'platform-dist')
@@ -41,7 +43,17 @@ try {
   runtime.gateway.server.on('request',request=>observed.push({platformCookie:(request.headers.cookie??'').includes('JSESSIONID='),authorization:Boolean(request.headers.authorization)}))
   browser=await chromium.launch({args:['--host-resolver-rules=MAP *.codeless.test 127.0.0.1, MAP *.codeless-preview.test 127.0.0.1','--no-proxy-server']})
   const context=await browser.newContext({baseURL:platformOrigin,ignoreHTTPSErrors:true,viewport:{width:1440,height:1000},proxy:{server:'http://127.0.0.1:9',bypass:'*.codeless.test,*.codeless-preview.test,127.0.0.1'}})
-  const page=await context.newPage()
+  await context.addInitScript(()=>{
+    if(window!==window.top)return
+    window.__previewMessages=[]
+    addEventListener('message',event=>{
+      if(event.data?.type!=='codeless-preview'||!['loaded','unavailable'].includes(event.data.state))return
+      const iframe=document.querySelector('iframe')
+      let originMatches=false;try{originMatches=event.origin===new URL(iframe?.src).origin}catch{}
+      if(window.__previewMessages.length<32)window.__previewMessages.push({state:event.data.state,originMatches,sourceMatches:event.source===iframe?.contentWindow})
+    })
+  })
+  page=await context.newPage();diagnostic.attach(page)
   await page.goto('/login');await page.getByLabel('邮箱').fill('demo@codeless.local');await page.getByLabel('密码').fill('demo-password-for-test-only');await page.getByRole('button',{name:'登录',exact:true}).click();await expect(page).toHaveURL(/\/apps$/)
   const call=async(path,method='GET',body)=>page.evaluate(async({path,method,body})=>{
     const csrf=await (await fetch('/api/v0/auth/csrf')).json()
@@ -60,7 +72,7 @@ try {
   const response=await started;assert.equal(response.status(),202)
   const task=(await response.json()).id
   await writeFile(join(evidence,'started.json'),JSON.stringify({applicationId:app,taskId:task,modelMode},null,2))
-  const generationDeadline=Date.now()+(paid?720000:90000)
+  const generationDeadline=Date.now()+((paid||replay)?720000:90000)
   let taskState
   do {
     const state=await call('tasks/'+task);assert.equal(state.status,200);taskState=state.body
@@ -72,7 +84,7 @@ try {
   } while(true)
   const iframe=page.locator('iframe'),frame=page.frameLocator('iframe')
   const assertContent=async()=>{
-    if(paid){for(const text of ['Ada Lovelace','Analytical Engine','Note G'])await expect(frame.locator('body')).toContainText(text,{timeout:30000,useInnerText:true})}
+    if(paid||replay){for(const text of ['Ada Lovelace','Analytical Engine','Note G'])await expect(frame.locator('body')).toContainText(text,{timeout:30000,useInnerText:true})}
     else await expect(frame.getByTestId('profile-name')).toHaveText('Ada Lovelace',{timeout:30000})
   }
   await assertContent()
@@ -124,7 +136,21 @@ try {
   await writeFile(retainedReceipt,JSON.stringify(result),{flag:'wx'});await runtime.registry.sync();assert.equal(runtime.registry.stats().mapped,1)
   const screenshot=await readFile(join(evidence,'authenticated-platform-preview.png'))
   await writeFile(join(evidence,'acceptance.json'),JSON.stringify({applicationId:app,taskId:task,versionId:version,buildId:binding.buildId,sourceDigest:binding.sourceDigest,artifactDigest:binding.artifactDigest,sourceFiles:draft.files.length,
-    deploymentIngress:'nginx:1.27.5-alpine',modelProvider:modelMode,modelQualityAccepted:false,modelQualityValidation:paid?'PENDING_SQL_VALIDATION':'NOT_MODEL_ACCEPTANCE',acceptanceScope:paid?'single-static-Ada-showcase':'deterministic-platform-integration',platformApiFixture:false,signingFixture:false,realDockerBuild:true,realBrowserVerification:true,residentRestartPassed:true,credentialErrorLogDenied:true,retentionRevocationPassed:true,publicInternalDenied:true,isolation,
+    deploymentIngress:'nginx:1.27.5-alpine',modelProvider:modelMode,modelQualityAccepted:false,modelQualityValidation:paid?'PENDING_SQL_VALIDATION':'NOT_MODEL_ACCEPTANCE',acceptanceScope:paid?'single-static-Ada-showcase':replay?'recorded-real-source-with-fixture-provider':'deterministic-platform-integration',platformApiFixture:false,signingFixture:false,realDockerBuild:true,realBrowserVerification:true,residentRestartPassed:true,credentialErrorLogDenied:true,retentionRevocationPassed:true,publicInternalDenied:true,isolation,
     screenshot:{path:'authenticated-platform-preview.png',digest:digest(screenshot),bytes:screenshot.length}},null,2))
+  success=true
   console.log('Authenticated platform preview, restart and retention acceptance passed (model: '+modelMode+').')
-} finally {await browser?.close();if(tls)await closeServer(tls);await runtime?.close();if(deployment){const down=compose(['down','--remove-orphans']);assert.equal(down.status,0,down.stdout+down.stderr)}}
+} finally {
+  try {
+  let ui=null
+  if(page&&!page.isClosed())ui=await page.evaluate(()=>({
+    iframePresent:Boolean(document.querySelector('iframe')),
+    messages:window.__previewMessages??[],
+    previewState:document.querySelector('.preview-panel [role="alert"]')?'error':document.querySelector('.preview-panel__frame--loading')?'loading':document.querySelector('.preview-panel iframe')?'ready':'empty',
+  })).catch(()=>null)
+  await writeFile(join(evidence,'platform-diagnostics.json'),JSON.stringify({success,modelMode,platformApiFixture:false,signingFixture:false,registry:runtime?.registry.stats()??null,ui,...diagnostic.snapshot()},null,2))
+  } catch { console.error('Platform diagnostics could not be persisted.');if(success)process.exitCode=1 }
+  finally {
+  await browser?.close();if(tls)await closeServer(tls);await runtime?.close();if(deployment){const down=compose(['down','--remove-orphans']);assert.equal(down.status,0,down.stdout+down.stderr)}}
+
+}

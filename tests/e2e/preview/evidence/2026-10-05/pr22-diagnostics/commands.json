@@ -1,0 +1,108 @@
+{
+  "reviewedAHead": "5ec8adbc316c15c9c46a780aa1a7819dffbd8d18",
+  "integrationBaseline": "2abc81ec95b54e39e6decc573f54fb94e39285fb",
+  "commands": [
+    {
+      "name": "replay-before",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealSourcePreviewReplayIT test",
+      "exitCode": 1,
+      "setupFailure": "FIXTURE_UNKNOWN_USAGE_RESERVATION",
+      "rawLog": "replay-before.log",
+      "bytes": 18387,
+      "digest": "sha256:a5bc7666ab8de5bd7b3f40232fea9158171f5d778afedff0a128dcb617a77a40"
+    },
+    {
+      "name": "replay-source",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealSourcePreviewReplayIT test",
+      "exitCode": 1,
+      "setupFailure": "FIXTURE_UNKNOWN_USAGE_RESERVATION",
+      "rawLog": "replay-source.log",
+      "bytes": 17914,
+      "digest": "sha256:a1c846ad5957a64da4f6b8cc15643548ca8fe4daa2d8b9fb30fa75bdc01c7eee"
+    },
+    {
+      "name": "replay-and-agent",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealSourcePreviewReplayIT,AgentLoopIntegrationTest test",
+      "exitCode": 1,
+      "setupFailure": "JAVA_TEST_COMPILE_FAILURE",
+      "rawLog": "replay-and-agent.log",
+      "bytes": 3104,
+      "digest": "sha256:a91254c8b8a6672e4fa8df50fdff22149b1d1ae6e655e8f57322fb1145576dbf"
+    },
+    {
+      "name": "replay-and-agent-compiled",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealSourcePreviewReplayIT,AgentLoopIntegrationTest test",
+      "exitCode": 0,
+      "setupFailure": null,
+      "rawLog": "replay-and-agent-compiled.log",
+      "bytes": 24611,
+      "digest": "sha256:99210fe28b5899a1ffe38befe3ee3ad0ecbc215b3ce612c6563ce22322bde85f"
+    },
+    {
+      "name": "replay-delayed",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealSourcePreviewReplayIT -Dcodeless.preview.replay.delay-ms=25000 test",
+      "exitCode": 1,
+      "setupFailure": "TEST_HARNESS_90_SECOND_GENERATION_DEADLINE",
+      "rawLog": "replay-delayed.log",
+      "bytes": 18617,
+      "digest": "sha256:314272ea8b23385a7093070a3ee90b3cdb75b95e4961404651ca3e0286146f20"
+    },
+    {
+      "name": "replay-delayed-paid-deadline",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealSourcePreviewReplayIT -Dcodeless.preview.replay.delay-ms=25000 test",
+      "exitCode": 0,
+      "setupFailure": null,
+      "rawLog": "replay-delayed-paid-deadline.log",
+      "bytes": 16035,
+      "digest": "sha256:51b9d62e64e235f47384e7eab32b2340c6be8abb461c4f23e29571872cd86283"
+    },
+    {
+      "name": "replay-isolated-combined",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=PreviewPlatformIntegrationTest,RealSourcePreviewReplayIT test",
+      "exitCode": 0,
+      "setupFailure": null,
+      "rawLog": "replay-isolated-combined.log",
+      "bytes": 25465,
+      "digest": "sha256:16ee5e3f4a3fd17c06597dc9b9f9a088ba9ab38b8367fc0e8935b9a2a3633a4c"
+    },
+    {
+      "name": "static",
+      "command": "pnpm verify:static",
+      "exitCode": 0,
+      "setupFailure": null,
+      "rawLog": "static.log",
+      "bytes": 4136,
+      "digest": "sha256:654a26ecfad4ba3ef38eb4465b041aa8a790e15c341884bbc7010129640bc033"
+    },
+    {
+      "name": "ci-gate",
+      "command": "pnpm ci:gate",
+      "exitCode": 0,
+      "setupFailure": null,
+      "rawLog": "ci-gate.log",
+      "bytes": 108913,
+      "digest": "sha256:be7c5d967cc4290401f1dc1e98c6c0087fc8c7c664515a76e54899402c127057"
+    },
+    {
+      "name": "diagnostics",
+      "command": "node --test tests/e2e/preview/diagnostics.acceptance.mjs",
+      "exitCode": 0,
+      "setupFailure": null,
+      "rawLog": "diagnostics.log",
+      "bytes": 385,
+      "digest": "sha256:bd0f05f9e42b146c6753466a3c59ff0a129f26a209881d5467d9af44f87465f6"
+    }
+  ],
+  "testedSourceDigestsNormalizedLF": {
+    "prompts/runtime/agent-generate-v1.txt": "sha256:d09448bf03171a73adc359fb3bc1eb2bf18e3f9beb256e87192d85a4601dc4c9",
+    "services/api/src/test/java/dev/codeless/api/agent/AgentLoopIntegrationTest.java": "sha256:93f91f9df1920b3bdf4f917f961dfe15e7ddf3d410beae505f4100083ac1df40",
+    "services/api/src/test/java/dev/codeless/api/preview/RealSourcePreviewReplayIT.java": "sha256:9586b97a4ad8882872a82a8f1989615a5ed5c197a73cf5abed42cac33d9f852d",
+    "tests/e2e/preview/platform.acceptance.mjs": "sha256:e1e65a902b2b26974f6098356e6e1e032143e6e77d79e3b466f3def21f277132",
+    "tests/e2e/preview/platform-diagnostics.mjs": "sha256:9efdb86f76ddaa76ea61019d1d4470d5f387874f9863826e926d11826fd7fd8b"
+  },
+  "newPaidModelRequests": 0,
+  "fullRealModelPlatformAcceptance": false,
+  "oldIframeRootCause": "UNKNOWN_NOT_REPRODUCED",
+  "developerTokenMeasurement": "UNKNOWN",
+  "fixtureUsageChargedAsNewModelUsage": false
+}
