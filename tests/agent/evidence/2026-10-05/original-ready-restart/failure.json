@@ -1,0 +1,98 @@
+{
+  "sourceCommit": "f32fb3ffd9a0bb7deb53c560c764401a95aa5e6c",
+  "taskId": "a6deca3a-6856-4b1e-b765-c486cd43e37a",
+  "applicationId": "867fcb54-27f3-40e4-9a69-9cb8aa5e170a",
+  "taskStatus": "READY",
+  "versionId": "298c94db-6781-4638-b053-5e301c333bdf",
+  "buildId": "c543bee3-90f0-41c7-a76f-85d41dc496fa",
+  "sourceDigest": "sha256:e134292e23b28c436b23d8f200b089af92e613798518c87e0a6d5fefb5b605da",
+  "artifactDigest": "sha256:a753801f3a70f7b4dabafcf297f32e36f700ca8a569186f50af83f8638d7c39c",
+  "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealPreviewPlatformAcceptanceIT test",
+  "exitCode": 1,
+  "fullPlatformAcceptance": false,
+  "modelProvider": "deepseek",
+  "configuredModel": "deepseek-flash",
+  "originalModelRequests": 6,
+  "newModelRequests": 0,
+  "failure": {
+    "phase": "REFRESH_AFTER_INTENTIONAL_GATEWAY_STOP_FAULT_PROBE_AND_RESTART",
+    "file": "tests/e2e/preview/platform.acceptance.mjs",
+    "line": 113,
+    "matcher": "toContainText",
+    "locator": "locator('iframe').contentFrame().locator('body')",
+    "expectedSubstring": "Ada Lovelace",
+    "assertionTimeoutMs": 30000,
+    "error": "ELEMENT_NOT_FOUND_AT_FINAL_ASSERTION",
+    "observedFrameBody": "502 Bad Gateway\nnginx/1.27.5",
+    "bodyResolvedPolls": 33
+  },
+  "initialPreview": {
+    "contentAssertionsPassed": [
+      "Ada Lovelace",
+      "Analytical Engine",
+      "Note G"
+    ],
+    "iframePresent": true,
+    "evidence": "PRECEDING_ASSERTIONS_AND_ORIGINAL_SCREENSHOT",
+    "isolationAssertionsPassed": true,
+    "screenshot": {
+      "path": "initial-authenticated-platform-preview.png",
+      "digest": "sha256:5f787fcccfc72e6f0ab096c6c735163254c09355082f153845ca4c00b256bdda",
+      "bytes": 160715,
+      "modifiedAt": "2026-10-04T16:39:47.500Z",
+      "scope": "BEFORE_FAULT_INJECTION"
+    }
+  },
+  "issuer": {
+    "explicitInitialRequest": {
+      "status": 200,
+      "evidence": "PRECEDING_ASSERTION_LINE_90"
+    },
+    "postRestartRefreshRequest": {
+      "status": 200,
+      "evidence": "PRECEDING_ASSERTION_ON_FAILURE_LINE_113"
+    },
+    "rawHttpTrace": "NOT_CAPTURED"
+  },
+  "registry": {
+    "initialMapped": 1,
+    "postRestartMapped": 1,
+    "evidence": "PRECEDING_ASSERTIONS_LINES_99_AND_111",
+    "failureCounters": "NOT_CAPTURED"
+  },
+  "previewHttp": {
+    "intentionalStoppedUpstreamProbe": {
+      "upstreamStopped": true,
+      "httpStatus": 502,
+      "syntheticMarkerLogged": false
+    },
+    "postRestartResponseStatus": "NOT_CAPTURED",
+    "postRestartBrowserBody": "502 Bad Gateway\nnginx/1.27.5"
+  },
+  "ui": {
+    "iframePresentDuringFailedPolling": true,
+    "evidence": "PLAYWRIGHT_CONTENT_FRAME_BODY_RESOLVED_33_TIMES",
+    "finalDomIframeCount": "NOT_CAPTURED",
+    "finalTimeoutAlert": "页面未能在时限内加载，请刷新预览。",
+    "alertEvidence": "ORIGINAL_ARIA_LOG_MATCHES_FIXED_UI_TEXT_AFTER_CP936_TO_UTF8_LOSSY_DECODE",
+    "componentLoadTimeoutMs": 15000,
+    "componentTimeoutEvidence": "UNCHANGED_PREVIEW_PANEL_SOURCE",
+    "postFailureScreenshot": "NOT_CAPTURED"
+  },
+  "loadedMessage": {
+    "origin": "NOT_CAPTURED",
+    "source": "NOT_CAPTURED",
+    "state": "NOT_CAPTURED"
+  },
+  "safeNetworkDiagnostic": "NOT_CAPTURED_ORIGINAL_RUN_PREDATES_DIAGNOSTIC_COLLECTOR",
+  "upstreamRootCause": "UNKNOWN",
+  "rawLog": {
+    "shared": false,
+    "digest": "sha256:265a0f57e0f5a92b4a3da172ed68fa4536acf7f244a53920a6656723db6d5b1c",
+    "bytes": 33883,
+    "originalFailureUnmodified": true
+  },
+  "credentialUrlShared": false,
+  "cookieOrHeadersShared": false,
+  "correction": "Original initial authenticated preview succeeded. The full test failed during refresh after gateway restart; earlier handoff omitted the pre-fault success and restart failure location."
+}
