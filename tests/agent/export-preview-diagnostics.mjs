@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import {buildCleanupEvidence,browserCleanupEvidence} from './preview-diagnostic-projection.mjs'
 import {readFile,writeFile,readdir,mkdir} from 'node:fs/promises'
 import {resolve,join,dirname} from 'node:path'
 import {readSnapshot,digest} from '../../services/runner/src/artifacts/snapshot.mjs'
@@ -70,8 +71,8 @@ await save('result.json',{sourceCommit:commit,command:'services/api/mvnw.cmd -f 
   draft:draft?{versionId:draft.versionId,sourceDigest:draft.sourceDigest,files:draft.files,actions:draft.actions}:null,
   sourceSnapshot:source?{digest:source.digest,files:source.files}:null,
   toolResults,
-  runner:runner?{executionId:runner.executionId,status:runner.status,sourceDigest:runner.sourceDigest,build:{id:runner.build.id,status:runner.build.status,exitCode:runner.build.exitCode,failure:runner.build.failure,artifactDigest:runner.build.artifact?.digest,cleanup:runner.build.cleanup},
-    verification:verification?{id:verification.id,buildId:verification.buildId,status:verification.status,failure:verification.failure,phase:verification.phase,workerExitCode:verification.workerExitCode,actionResults:verification.diagnostics?.actions,errorDigest:verification.error?digest(Buffer.from(verification.error)):null,cleanup:verification.cleanup}:null}:null,
+  runner:runner?{executionId:runner.executionId,status:runner.status,sourceDigest:runner.sourceDigest,build:{id:runner.build.id,status:runner.build.status,exitCode:runner.build.exitCode,failure:runner.build.failure,artifactDigest:runner.build.artifact?.digest,cleanup:buildCleanupEvidence(runner.build.cleanup)},
+    verification:verification?{id:verification.id,buildId:verification.buildId,status:verification.status,failure:verification.failure,phase:verification.phase,workerExitCode:verification.workerExitCode,actionResults:verification.diagnostics?.actions,errorDigest:verification.error?digest(Buffer.from(verification.error)):null,cleanup:browserCleanupEvidence(verification.cleanup)}:null}:null,
   failure:events.findLast(e=>e.kind==='failure')?.payload??null,completion:events.findLast(e=>e.kind==='completion')?.payload??null,
   runtimeUsage:{requests:calls.length,inputTokens,outputTokens,providerReportedTotal,unknownUsageCalls:0,measurement:'PROVIDER_RESPONSE_AND_SQL'},calls:safeCalls,
   rawLog:{shared:false,bytes:rawLog.length,digest:digest(rawLog)},credentialShared:false})

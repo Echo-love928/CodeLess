@@ -1,5 +1,10 @@
 # Rendered once from validated, trusted deployment origins/ports by render.mjs.
 # Private service keys never enter ingress or generated-code containers.
+# These resolved addresses belong to one resident gateway. A stopped gateway must
+# not quarantine every address for the default 10s after it has restarted.
+upstream codeless_preview_gateway {
+    server host.docker.internal:${CODELESS_PREVIEW_GATEWAY_PORT} max_fails=0;
+}
 server {
     listen 8443 ssl default_server;
     server_name _;
@@ -39,7 +44,7 @@ server {
     access_log off; # Bootstrap query contains a short-lived bearer credential.
     error_log /dev/null; # Upstream errors otherwise log the full credential-bearing request URI.
     location / {
-        proxy_pass http://host.docker.internal:${CODELESS_PREVIEW_GATEWAY_PORT};
+        proxy_pass http://codeless_preview_gateway;
         proxy_set_header Host $http_host;
         proxy_set_header Cookie $http_cookie;
         proxy_set_header Authorization "";
