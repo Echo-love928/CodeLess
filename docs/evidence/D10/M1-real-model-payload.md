@@ -35,3 +35,5 @@ REPAIR会发送同一需求、原验收actions、该任务生成的Vue源码或�
 
 执行入口：`cd services/api; ./mvnw.cmd -Dtest=RealRepairPreviewPlatformAcceptanceIT test`。
 必须显式设置`CODELESS_M1_REAL_APPROVED=1`才可执行，只有得到上述payload/付费调用的明确授权后才设置。
+
+首个授权任务已执行：task57776370-dd0b-4ed7-9931-cf6ff55e9ec4，4请求/10101实测tokens，FAILED/AGENT_MODEL_PROTOCOL_INVALID。原有tool/done协议保持不变，未自动重试。下一个独立任务必须另有明确授权。

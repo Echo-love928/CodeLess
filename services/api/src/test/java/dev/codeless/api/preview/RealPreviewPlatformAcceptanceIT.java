@@ -51,8 +51,9 @@ class RealPreviewPlatformAcceptanceIT {
         boolean ended=process.waitFor(300,TimeUnit.SECONDS);if(!ended)process.destroyForcibly();
         assertThat(ended).isTrue();assertThat(process.exitValue()).isZero();
     }
+    protected String acceptanceScript(){return "../../tests/e2e/preview/platform.acceptance.mjs";}
     @Test void realModelThroughAuthenticatedPlatformPreview() throws Exception {
-        var builder=new ProcessBuilder("node","../../tests/e2e/preview/platform.acceptance.mjs").directory(Path.of(".").toFile());
+        var builder=new ProcessBuilder("node",acceptanceScript()).directory(Path.of(".").toFile());
         var env=builder.environment();
         // The browser/runner child needs no provider credential. Only the API owns that secret.
         env.remove("CODELESS_MODEL_API_KEY");env.remove("CODELESS_MODEL_NAME");

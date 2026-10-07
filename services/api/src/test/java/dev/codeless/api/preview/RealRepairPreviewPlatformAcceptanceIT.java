@@ -3,6 +3,10 @@ package dev.codeless.api.preview;
 import static org.assertj.core.api.Assertions.assertThat;
 import dev.codeless.api.agent.*;
 import dev.codeless.api.model.*;
+import dev.codeless.api.tools.FileToolService;
+import dev.codeless.api.tasks.TaskQueueService;
+import dev.codeless.api.data.PlatformModels.TaskStatus;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.security.MessageDigest;
@@ -22,6 +26,7 @@ import tools.jackson.databind.json.JsonMapper;
 @Import(RealRepairPreviewPlatformAcceptanceIT.RealConfiguration.class)
 class RealRepairPreviewPlatformAcceptanceIT extends RealPreviewPlatformAcceptanceIT {
     @Autowired RealFaultProvider faultProvider;
+    @Override protected String acceptanceScript(){return "../../tests/e2e/generation/m1-platform.acceptance.mjs";}
 
     @Override @Test void realModelThroughAuthenticatedPlatformPreview() throws Exception {
         assertThat(System.getenv("CODELESS_M1_REAL_APPROVED")).as("Explicit synthetic payload/paid approval required").isEqualTo("1");
@@ -53,45 +58,52 @@ class RealRepairPreviewPlatformAcceptanceIT extends RealPreviewPlatformAcceptanc
             Path evidence=ROOT.resolve("evidence");Files.createDirectories(evidence);
             var started=Files.exists(evidence.resolve("started.json"))?json.readTree(Files.readString(evidence.resolve("started.json"))):null;
             var taskState=Files.exists(evidence.resolve("task.json"))?json.readTree(Files.readString(evidence.resolve("task.json"))):json.readTree("{\"status\":\"UNKNOWN\"}");
+            var clientLastObserved=taskState;
+            if(started!=null) {
+                var authoritative=jdbc.sql("SELECT id,application_id,prompt,status,repair_attempts,failure_code FROM generation_tasks WHERE id=?")
+                    .param(UUID.fromString(started.path("taskId").asText())).query((rs,n)->{var row=new LinkedHashMap<String,Object>();row.put("id",rs.getObject(1));row.put("applicationId",rs.getObject(2));row.put("prompt",rs.getString(3));row.put("status",rs.getString(4));row.put("repairAttempts",rs.getInt(5));row.put("failureCode",rs.getString(6));return row;}).single();
+                taskState=json.valueToTree(authoritative);
+            }
             var events=started==null?List.<JsonNode>of():new AgentJournal(ROOT.resolve("private/journal")).read(UUID.fromString(started.path("taskId").asText()));
             var acceptance=Files.exists(evidence.resolve("acceptance.json"))?json.readTree(Files.readString(evidence.resolve("acceptance.json"))):json.createObjectNode();
             var calls=Files.exists(evidence.resolve("model-calls.json"))?json.readTree(Files.readString(evidence.resolve("model-calls.json"))):json.createArrayNode();
             Files.writeString(evidence.resolve("D10-M1-real-same-task.json"),json.writeValueAsString(Map.of(
                 "task",taskState,"events",events,"budget",RuntimeBudget.meter(events),"modelProvider","deepseek","modelQualityEvidence",accepted,
                 "extra",Map.of("M1",accepted?"PASSED":"NOT_PASSED","controlledFaultInjected",faultProvider.injected.get(),
-                    "faultOrigin","HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR","allModelStagesReal",true,"modelCalls",calls,"acceptance",acceptance))));
+                    "faultOrigin","HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR","allModelStagesReal",true,"modelCalls",calls,"acceptance",acceptance,"clientLastObservedTask",clientLastObserved,"authoritativeTaskCaptured",started!=null))));
         }
     }
 
     @TestConfiguration static class RealConfiguration {
-        @Bean @Primary RealFaultProvider realFaultProvider() { return new RealFaultProvider(); }
+        @Bean @Primary RealFaultProvider realFaultProvider(FileToolService files,AgentRunStore store,JdbcClient jdbc) { return new RealFaultProvider(new DeepSeekModelProvider(System.getenv("CODELESS_MODEL_API_KEY"),System.getenv("CODELESS_MODEL_NAME")),files,store,jdbc,ROOT.resolve("evidence")); }
     }
     static final class RealFaultProvider implements ModelProvider {
-        final ModelProvider delegate=new DeepSeekModelProvider(System.getenv("CODELESS_MODEL_API_KEY"),System.getenv("CODELESS_MODEL_NAME"));
-        final AtomicInteger injected=new AtomicInteger();
-        final JsonMapper mapper=JsonMapper.builder().build();
-        final Pattern importPath=Pattern.compile("(['\"])(\\.\\./components/ProfileCard\\.vue)\\1");
+        final ModelProvider delegate;final FileToolService files;final AgentRunStore store;final JdbcClient jdbc;final Path evidence;
+        final AtomicInteger injected=new AtomicInteger();final JsonMapper mapper=JsonMapper.builder().build();
+        final Pattern importPath=Pattern.compile(Pattern.quote("../components/ProfileCard.vue"));
+        RealFaultProvider(ModelProvider delegate,FileToolService files,AgentRunStore store,JdbcClient jdbc,Path evidence){this.delegate=delegate;this.files=files;this.store=store;this.jdbc=jdbc;this.evidence=evidence;}
         public String id(){return delegate.id();}public String model(){return delegate.model();}
         public Reply call(Prompt prompt,int max,Duration timeout) {
-            // No outer retry: the production delegate owns the exact bounded request.
-            var reply=delegate.call(prompt,max,timeout);var input=mapper.readTree(prompt.getUserMessage().getText());
-            var proposal=mapper.readTree(reply.content());
-            if(injected.get()==0 && input.path("phase").asText().equals("GENERATE") && proposal.path("type").asText().equals("tool")
-                    && List.of("files.create","files.update").contains(proposal.path("name").asText())
-                    && proposal.path("arguments").path("path").asText().equals("src/pages/HomePage.vue")) {
-                String before=proposal.path("arguments").path("content").asText();var match=importPath.matcher(before);
-                if(match.find()) {
-                    String after=match.replaceFirst("$1../components/M1MissingCard.vue$1");
-                    assertThat(before).isNotEqualTo(after);assertThat(injected.incrementAndGet()).isEqualTo(1);
-                    Path evidence=ROOT.resolve("evidence");try {Files.createDirectories(evidence);Files.writeString(evidence.resolve("controlled-fault.json"),mapper.writeValueAsString(Map.of(
-                        "path","src/pages/HomePage.vue","before",before,"after",after,"rawProviderReply",reply.content(),
-                        "beforeDigest",digest(before),"afterDigest",digest(after),"origin","HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR")));}
-                    catch(java.io.IOException error){throw new IllegalStateException("Controlled fault evidence unavailable");}
-                    ((tools.jackson.databind.node.ObjectNode)proposal.path("arguments")).put("content",after);
-                    return new Reply(proposal.toString(),reply.evidence());
-                }
+            var reply=delegate.call(prompt,max,timeout);var input=mapper.readTree(prompt.getUserMessage().getText());var proposal=mapper.readTree(reply.content());
+            // Inject only after the real generator is done. No later GENERATE call can repair it before VERIFY.
+            if(injected.get()==0 && input.path("phase").asText().equals("GENERATE") && proposal.path("type").asText().equals("done")) {
+                var active=jdbc.sql("SELECT id,lease_token FROM generation_tasks WHERE status='GENERATE' AND queue_state='RUNNING'")
+                    .query((rs,n)->new TaskQueueService.Claim((UUID)rs.getObject(1),(UUID)rs.getObject(2),TaskStatus.GENERATE)).list();
+                assertThat(active).hasSize(1);var claim=active.getFirst();String page="src/pages/HomePage.vue";
+                store.reserve(claim,TaskStatus.GENERATE,"tool.request",0);
+                var read=files.execute(claim.taskId(),claim.token(),"files.read",mapper.writeValueAsString(Map.of("path",page)));
+                store.append(claim,TaskStatus.GENERATE,"tool.result",read);assertThat(read.status()).isEqualTo("SUCCEEDED");
+                String before=read.content();var match=importPath.matcher(before);assertThat(match.find()).as("Generated relative ProfileCard import").isTrue();
+                String after=match.replaceFirst("../components/M1MissingCard.vue");
+                store.reserve(claim,TaskStatus.GENERATE,"tool.request",0);
+                var update=files.execute(claim.taskId(),claim.token(),"files.update",mapper.writeValueAsString(Map.of("path",page,"content",after,"expectedDigest",read.afterDigest())));
+                store.append(claim,TaskStatus.GENERATE,"tool.result",update);assertThat(update.status()).isEqualTo("SUCCEEDED");assertThat(injected.incrementAndGet()).isEqualTo(1);
+                try {Files.createDirectories(evidence);Files.writeString(evidence.resolve("controlled-fault.json"),mapper.writeValueAsString(Map.of(
+                    "path",page,"before",before,"after",after,"rawProviderDone",reply.content(),"beforeDigest",digest(before),"afterDigest",digest(after),
+                    "timing","AFTER_GENERATE_DONE_BEFORE_IMMUTABLE_SNAPSHOT","origin","HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR")));}
+                catch(java.io.IOException error){throw new IllegalStateException("Controlled fault evidence unavailable");}
             }
-            return reply;
+            return reply; // Every model reply, including done/actions, remains byte-for-byte unchanged.
         }
         static String digest(String text) {try{return "sha256:"+HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(text.getBytes(StandardCharsets.UTF_8)));}catch(Exception error){throw new IllegalStateException(error);}}
     }

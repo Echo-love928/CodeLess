@@ -51,8 +51,9 @@ class PreviewPlatformIntegrationTest {
         var process=builder.start();
         assertThat(process.waitFor(300,TimeUnit.SECONDS)).isTrue();assertThat(process.exitValue()).isZero();
     }
+    protected String acceptanceScript(){return "../../tests/e2e/preview/platform.acceptance.mjs";}
     @Test void realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures() throws Exception {
-        var builder=new ProcessBuilder("node","../../tests/e2e/preview/platform.acceptance.mjs").directory(Path.of(".").toFile());
+        var builder=new ProcessBuilder("node",acceptanceScript()).directory(Path.of(".").toFile());
         var env=builder.environment();
         env.remove("CODELESS_MODEL_API_KEY");env.remove("CODELESS_MODEL_NAME");
         env.put("CODELESS_PREVIEW_ACCEPTANCE_MODEL","deterministic-mock");
