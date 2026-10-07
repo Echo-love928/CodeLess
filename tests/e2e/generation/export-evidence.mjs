@@ -22,6 +22,7 @@ for (const [name, command] of [
   ['generation-corrected', 'node node_modules/@playwright/test/cli.js test --config playwright.config.ts --grep D10-B --workers=1'],
   ['generation-bootstrap-fixed', 'node node_modules/@playwright/test/cli.js test --config playwright.config.ts --grep D10-B --workers=1'],
   ['ci-gate', 'pnpm ci:gate'],
+  ['peer-followup-static', 'pnpm verify:static (peer-review failure-code followup)'],
 ]) {
   const raw = await readFile(join(privateRoot, name + '.log'))
   const exitCode = Number((await readFile(join(privateRoot, name + '.exit'), 'utf8')).trim())
@@ -42,4 +43,8 @@ const stages = Object.fromEntries(['static', 'api', 'runner', 'e2e'].map(name =>
 await writeFile(join(output, 'commands-and-results.json'), JSON.stringify({ date: '2026-10-07', timezone: 'Asia/Shanghai',
   baseline: 'adb79b86f221862a970733a406d09fd96e92250e', commands, stages, screenshots: shots,
   fixtureModelQualityAccepted: false, realModel: { status: 'BLOCKED_BY_APPROVAL_REVIEW', requests: 0, inputTokens: 0, outputTokens: 0 },
-  d10AIntegration: 'BLOCKED_NO_IMPLEMENTATION_OR_PR', developerTokens: { input: null, output: null, total: null, measurement: 'UNKNOWN' } }, null, 2) + '\n')
+  d10AIntegration: 'BLOCKED_REAL_REPAIR_AND_SAME_TASK_INTEGRATION',
+  d10AReview: { candidate: '85c39f3fd331265ccd15cd493b9cf0dbbadd5fad',
+    url: 'https://github.com/Echo-love928/CodeLess/pull/24#pullrequestreview-5439239058',
+    disposition: 'COMMENTED_NOT_APPROVED', deterministicTests: 13, deterministicExitCode: 0,
+    blockers: ['REAL_REPAIR_MODEL_NETWORK', 'WINDOWS_CLEANUP_UNKNOWN', 'REMOTE_RUNNER_AND_CI_GATE_FAILED', 'SAME_TASK_UI_REPAIR_PREVIEW_NOT_ACCEPTED'] }, developerTokens: { input: null, output: null, total: null, measurement: 'UNKNOWN' } }, null, 2) + '\n')

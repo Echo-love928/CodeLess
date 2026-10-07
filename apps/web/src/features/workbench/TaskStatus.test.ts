@@ -42,3 +42,18 @@ it('keeps unknown states and codes explicit without assuming success', () => {
   expect(unknown.text()).toContain('任务状态未知')
   expect(unknown.text()).not.toContain('生成完成')
 })
+
+it.each([
+  ['AGENT_BUILD_EXIT', '源码未通过构建'],
+  ['AGENT_REPAIR_NO_PROGRESS', '源码没有变化'],
+  ['AGENT_REPAIR_LIMIT_EXCEEDED', '最多 3 轮修复'],
+  ['AGENT_REPAIR_ACCEPTANCE_CHANGED', '改变了原有页面验收要求'],
+  ['AGENT_MODEL_BUDGET_EXCEEDED', '模型请求或 token 预算已耗尽'],
+])('explains actual backend failure %s without claiming success', (failureCode, explanation) => {
+  const wrapper = mount(TaskStatus, { props: { task: { ...task, status: 'FAILED', repairAttempts: 3, failureCode } } })
+  expect(wrapper.get('[role="alert"]').text()).toContain('生成失败')
+  expect(wrapper.text()).toContain(explanation)
+  expect(wrapper.text()).toContain(failureCode)
+  expect(wrapper.text()).toContain('已执行修复：3 / 3 轮')
+  expect(wrapper.text()).not.toContain('生成完成')
+})
