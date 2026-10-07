@@ -12,7 +12,7 @@ import tools.jackson.databind.JsonNode;
 
 /** Database row lock fences every private checkpoint and version commit with the original lease. */
 public final class AgentRunStore {
-    public record Context(String prompt, String dataMode, OffsetDateTime deadline) {}
+    public record Context(String prompt, String dataMode, OffsetDateTime deadline, int repairAttempts) {}
     private final JdbcClient jdbc;
     private final TransactionTemplate tx;
     private final AgentJournal journal;
@@ -23,12 +23,12 @@ public final class AgentRunStore {
         jdbc.sql("SELECT id FROM generation_tasks WHERE id=? FOR UPDATE").param(claim.taskId())
                 .query(UUID.class).optional().orElseThrow(() -> new AgentFailure("AGENT_TASK_UNAVAILABLE"));
         return jdbc.sql("""
-                SELECT t.prompt,a.data_mode,t.deadline_at FROM generation_tasks t
+                SELECT t.prompt,a.data_mode,t.deadline_at,t.repair_attempts FROM generation_tasks t
                 JOIN applications a ON a.id=t.application_id WHERE t.id=? AND t.lease_token=?
                 AND t.status=? AND t.queue_state='RUNNING' AND t.deadline_at>clock_timestamp()
                 AND t.lease_expires_at>clock_timestamp()
                 """).params(claim.taskId(),claim.token(),stage.name()).query((rs,n) -> new Context(
-                rs.getString(1),rs.getString(2),rs.getObject(3,OffsetDateTime.class))).optional()
+                rs.getString(1),rs.getString(2),rs.getObject(3,OffsetDateTime.class),rs.getInt(4))).optional()
                 .orElseThrow(() -> new AgentFailure("AGENT_LEASE_INVALID"));
     }
     public Context context(TaskQueueService.Claim claim, TaskStatus stage) { return tx.execute(s -> lock(claim,stage)); }
@@ -39,19 +39,22 @@ public final class AgentRunStore {
         tx.executeWithoutResult(s -> { lock(claim,stage); journal.append(claim.taskId(),stage.name(),kind,payload); lock(claim,stage); });
     }
     public void reserve(TaskQueueService.Claim claim, TaskStatus stage, String kind, int tokens) {
+        reserve(claim,stage,kind,tokens,1);
+    }
+    public void reserveVerification(TaskQueueService.Claim claim) {
+        // Reserve both fixed operations before launch, even if the build later prevents the browser.
+        reserve(claim,TaskStatus.VERIFY,"tool.request",0,2);
+    }
+    private void reserve(TaskQueueService.Claim claim, TaskStatus stage, String kind, int tokens, int slots) {
         tx.executeWithoutResult(s -> {
             lock(claim,stage);
             var events=journal.read(claim.taskId());
-            long models=events.stream().filter(e -> e.path("kind").asText().equals("model.request")).count();
-            long tools=events.stream().filter(e -> e.path("kind").asText().equals("tool.request")).count();
-            long reserved=events.stream().filter(e -> e.path("kind").asText().equals("model.request"))
-                    .mapToLong(e -> e.path("payload").path("reservedTokens").asLong()).sum();
-            reserved-=events.stream().filter(e -> e.path("kind").asText().equals("model.usage"))
-                    .mapToLong(e -> e.path("payload").path("releasedTokens").asLong()).sum();
-            if (kind.equals("model.request") && (models>=12 || tokens<1 || reserved+tokens>50000))
+            var meter=RuntimeBudget.meter(events);
+            if (kind.equals("model.request") && (meter.models()>=RuntimeBudget.MODEL_CALLS || tokens<1 || meter.chargedTokens()+tokens>RuntimeBudget.TOKENS))
                 throw new AgentFailure("AGENT_MODEL_BUDGET_EXCEEDED");
-            if (kind.equals("tool.request") && tools>=20) throw new AgentFailure("AGENT_TOOL_BUDGET_EXCEEDED");
-            journal.append(claim.taskId(),stage.name(),kind,Map.of("reservedTokens",tokens));
+            if (kind.equals("tool.request") && meter.tools()+slots>RuntimeBudget.TOOL_CALLS) throw new AgentFailure("AGENT_TOOL_BUDGET_EXCEEDED");
+            if(!Set.of("model.request","tool.request").contains(kind)) throw new AgentFailure("AGENT_RESERVATION_INVALID");
+            journal.append(claim.taskId(),stage.name(),kind,Map.of("reservedTokens",tokens,"slots",slots));
         });
     }
     public JsonNode draft(TaskQueueService.Claim claim, FileToolService.Snapshot snapshot, JsonNode actions) {

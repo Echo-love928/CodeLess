@@ -1,0 +1,174 @@
+{
+  "task": {
+    "id": "67e0f28a-aa2d-46e0-a11b-2654cf8be636",
+    "applicationId": "11b0d86c-7f74-4372-a8a1-1f634855d614",
+    "prompt": "修复 Ada Lovelace 静态个人展示页的组件 props 类型错误，保留姓名、简介和两件作品。只修改现有两个文件，禁止外部请求。",
+    "status": "FAILED",
+    "repairAttempts": 1,
+    "failureCode": "MODEL_NETWORK",
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-07T06:58:52.965956Z"
+  },
+  "budget": {
+    "models": 1,
+    "tools": 5,
+    "chargedTokens": 10553
+  },
+  "modelProvider": "deepseek",
+  "modelQualityEvidence": false,
+  "extra": {
+    "modelCalls": [
+      {
+        "id": "29cf3b27-dbcc-4023-8c6a-ea471fcdd49c",
+        "stage": "REPAIR",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "FAILED",
+        "inputTokens": null,
+        "outputTokens": null,
+        "errorCode": "MODEL_NETWORK"
+      }
+    ],
+    "paidStages": [
+      "REPAIR"
+    ],
+    "initialSource": "RECORDED_D09_A_REAL_MODEL_FAILURE",
+    "platformPreview": "NOT_EXECUTED_BY_THIS_TEST"
+  },
+  "candidates": [
+    {
+      "sourceDigest": "sha256:568af9694c6253db1cc1aed9085b06a22410bee4f4b48cd01ae953e83fdd7742",
+      "versionId": "2bdf4c22-2402-4e26-9731-efb6cedceeda",
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 2254,
+          "digest": "sha256:ffdb50ae235eac334a996a6df11ae41f0055fe830222c9c5f531ef8753adc2b0"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 1785,
+          "digest": "sha256:fbcefafeb407369c54bed1f95506b53175c289e230e6baf4a540d06742825763"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-real-repair/candidate-0",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "PRIVATE_PATH_RETAINED_LOCALLY"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "name"
+          },
+          "value": "Ada Lovelace"
+        },
+        {
+          "type": "expectVisible",
+          "target": {
+            "testId": "works-list"
+          }
+        }
+      ]
+    }
+  ],
+  "runners": [
+    {
+      "status": "FAILED",
+      "sourceDigest": "sha256:568af9694c6253db1cc1aed9085b06a22410bee4f4b48cd01ae953e83fdd7742",
+      "build": {
+        "id": "13099fcd-ccce-44ff-b12d-16072f37b210",
+        "imageId": "sha256:a5879bba772b24736e2627dd95cf7f867bb590898a6b9ab6ff7564826a661342",
+        "containerName": "codeless-build-13099fcd-ccce-44ff-b12d-16072f37b210",
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 2,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\nsrc/pages/HomePage.vue(45,10): error TS2322: Type 'Work[]' is not assignable to type 'WorkItem[]'.\n  Property 'year' is missing in type 'Work' but required in type 'WorkItem'.\n",
+          "bytes": 271,
+          "observedBytes": 271,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-07T06:58:47.811Z",
+        "completedAt": "2026-10-07T06:58:51.980Z"
+      },
+      "verification": null,
+      "executionId": "a426fa49-7bdf-430d-8e7d-ad94c7ca66fe"
+    }
+  ],
+  "usage": [
+    {
+      "stage": "REPAIR",
+      "reservationTokens": 10553,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      },
+      "releasedTokens": 0,
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "chargedTokens": 10553,
+      "estimated": true
+    }
+  ],
+  "decisions": [
+    {
+      "taskId": "67e0f28a-aa2d-46e0-a11b-2654cf8be636",
+      "at": "2026-10-07T06:58:47.404994600Z",
+      "payload": {
+        "next": "VERIFY"
+      },
+      "stage": "GENERATE",
+      "sequence": 8,
+      "kind": "stage.finished"
+    },
+    {
+      "taskId": "67e0f28a-aa2d-46e0-a11b-2654cf8be636",
+      "at": "2026-10-07T06:58:52.183847900Z",
+      "payload": {
+        "code": "AGENT_BUILD_EXIT",
+        "category": "CODE",
+        "fingerprint": "sha256:aa3cc35a1fa6b58d31e228ea28188413b63fdf18be1c63461e9c325baeacb289",
+        "diagnostic": "> @codeless/generated-vue@0.1.0 build\n\nsrc/pages/HomePage.vue(45,10): error TS2322: Type 'Work[]' is not assignable to type 'WorkItem[]'.\n Property 'year' is missing in type 'Work' but required in type 'WorkItem'.",
+        "sourceDigest": "sha256:568af9694c6253db1cc1aed9085b06a22410bee4f4b48cd01ae953e83fdd7742",
+        "repairAttempts": 0,
+        "decision": "REPAIR"
+      },
+      "stage": "VERIFY",
+      "sequence": 11,
+      "kind": "repair.failure"
+    },
+    {
+      "taskId": "67e0f28a-aa2d-46e0-a11b-2654cf8be636",
+      "at": "2026-10-07T06:58:52.217964400Z",
+      "payload": {
+        "next": "REPAIR"
+      },
+      "stage": "VERIFY",
+      "sequence": 12,
+      "kind": "stage.finished"
+    },
+    {
+      "taskId": "67e0f28a-aa2d-46e0-a11b-2654cf8be636",
+      "at": "2026-10-07T06:58:52.953380900Z",
+      "payload": {
+        "code": "MODEL_NETWORK",
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+        "category": "MODEL_INTERFACE"
+      },
+      "stage": "REPAIR",
+      "sequence": 15,
+      "kind": "failure"
+    }
+  ]
+}

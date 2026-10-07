@@ -1,0 +1,366 @@
+{
+  "acceptance": {
+    "applicationId": "31db6d20-69ee-47c7-af7a-4859e9e27a57",
+    "taskId": "2076baeb-9c72-4dc3-b959-afa6619ddb13",
+    "versionId": "86d16ae5-9290-417a-bf23-8da4a0d417f6",
+    "buildId": "c4032f2c-9c68-4bce-8c10-36cdf2ca5944",
+    "sourceDigest": "sha256:dd7b3942608ea3a34737625103fb86b087f8679a6f6b894d300f78424663d367",
+    "artifactDigest": "sha256:73e8dcea7c794d832690b3149a2f2bfd0e603f2edbccbd1f5c39e7078ec9d392",
+    "sourceFiles": 2,
+    "deploymentIngress": "nginx:1.27.5-alpine",
+    "modelProvider": "deepseek",
+    "modelQualityAccepted": true,
+    "modelQualityValidation": "REAL_PROVIDER_SQL_AND_VISIBLE_CONTENT",
+    "acceptanceScope": "single-static-Ada-showcase",
+    "platformApiFixture": false,
+    "signingFixture": false,
+    "realDockerBuild": true,
+    "realBrowserVerification": true,
+    "residentRestartPassed": true,
+    "credentialErrorLogDenied": true,
+    "retentionRevocationPassed": true,
+    "publicInternalDenied": true,
+    "isolation": {
+      "errors": [
+        "SecurityError",
+        "SecurityError",
+        "SecurityError"
+      ],
+      "cookie": "",
+      "platform": null
+    },
+    "screenshot": {
+      "path": "screenshots/real-platform.png",
+      "digest": "sha256:e2504ad61234b008bd1124a9b11c44e2382033c3f94a0d6c4891013c8a988643",
+      "bytes": 141700
+    }
+  },
+  "task": {
+    "id": "2076baeb-9c72-4dc3-b959-afa6619ddb13",
+    "applicationId": "31db6d20-69ee-47c7-af7a-4859e9e27a57",
+    "prompt": "生成 Ada Lovelace 个人展示页，静态数据展示姓名、简短介绍及两件作品：Analytical Engine 和 Note G。恰好两个文件：src/pages/HomePage.vue、src/components/ProfileCard.vue。先读取依赖源码，保持组件接口和页面数据类型一致。不要外部图片或请求。",
+    "status": "READY",
+    "repairAttempts": 0,
+    "createdAt": "2026-10-07T06:54:55.180934Z",
+    "updatedAt": "2026-10-07T06:55:18.099054Z"
+  },
+  "modelCalls": [
+    {
+      "id": "26719b77-5586-41db-b5db-7cc962983bfb",
+      "stage": "PLAN",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "status": "SUCCEEDED",
+      "inputTokens": 1264,
+      "outputTokens": 343
+    },
+    {
+      "id": "27c22395-5a4a-480b-ae7d-1a75700edf22",
+      "stage": "GENERATE",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "status": "SUCCEEDED",
+      "inputTokens": 2374,
+      "outputTokens": 619
+    },
+    {
+      "id": "49c2c063-601a-43de-abc2-a400c29f4da2",
+      "stage": "GENERATE",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "status": "SUCCEEDED",
+      "inputTokens": 2573,
+      "outputTokens": 23
+    },
+    {
+      "id": "39c71b28-c8f2-46b2-9668-9056c30a0285",
+      "stage": "GENERATE",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "status": "SUCCEEDED",
+      "inputTokens": 3403,
+      "outputTokens": 349
+    },
+    {
+      "id": "a1e504c5-ee6c-4f6b-8a9e-7066196353bd",
+      "stage": "GENERATE",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "status": "SUCCEEDED",
+      "inputTokens": 3673,
+      "outputTokens": 24
+    },
+    {
+      "id": "403f09f7-dcab-46ff-8d56-058220978989",
+      "stage": "GENERATE",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "status": "SUCCEEDED",
+      "inputTokens": 4298,
+      "outputTokens": 116
+    }
+  ],
+  "sourceDirectory": "source/real-platform",
+  "sourceManifest": [
+    {
+      "path": "src/components/ProfileCard.vue",
+      "bytes": 1456,
+      "digest": "sha256:53dcfcac52567d5697d49bfe1ca0bbe03ed955acbd6a421c75913ace415d0421"
+    },
+    {
+      "path": "src/pages/HomePage.vue",
+      "bytes": 1037,
+      "digest": "sha256:b0fd018db24aa41fb45c700d16cd0280974b52cfc5855fe8bc9d68f6a83e76c2"
+    }
+  ],
+  "runner": {
+    "status": "VERIFIED",
+    "sourceDigest": "sha256:dd7b3942608ea3a34737625103fb86b087f8679a6f6b894d300f78424663d367",
+    "build": {
+      "id": "c4032f2c-9c68-4bce-8c10-36cdf2ca5944",
+      "imageId": "sha256:47a5e2ed07b4c4291b323edba10b41a7c9fc7b86ca452e43b27450bf00948743",
+      "containerName": "PRIVATE_VALUE_RETAINED_LOCALLY",
+      "status": "SUCCEEDED",
+      "failure": null,
+      "exitCode": 0,
+      "oomKilled": false,
+      "timedOut": false,
+      "log": {
+        "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 33 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.36 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[35mindex-DQjxPB_w.css  \u001b[39m\u001b[1m\u001b[2m 0.77 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.36 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-VH5NVT4D.js   \u001b[39m\u001b[1m\u001b[2m85.39 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.96 kB\u001b[22m\n\u001b[32m✓ built in 1.19s\u001b[39m\n",
+        "bytes": 628,
+        "observedBytes": 628,
+        "truncated": false
+      },
+      "artifact": {
+        "digest": "sha256:73e8dcea7c794d832690b3149a2f2bfd0e603f2edbccbd1f5c39e7078ec9d392",
+        "bytes": 86527,
+        "files": [
+          {
+            "path": "PRIVATE_VALUE_RETAINED_LOCALLY",
+            "bytes": 770,
+            "digest": "sha256:6ef5d652b228851c145f7289353ba20af3024836404ec1d581df37943d8ea48e"
+          },
+          {
+            "path": "PRIVATE_VALUE_RETAINED_LOCALLY",
+            "bytes": 85394,
+            "digest": "sha256:faa018f468559b17b1577286f4d62424bb68009a647bd5a0a583648ace1f6039"
+          },
+          {
+            "path": "PRIVATE_VALUE_RETAINED_LOCALLY",
+            "bytes": 363,
+            "digest": "sha256:30fd1c53aeec2ab53d4ae25def021f9b725a221e726692c1eace9c505e5e0910"
+          }
+        ],
+        "directory": "PRIVATE_VALUE_RETAINED_LOCALLY"
+      },
+      "cleanup": {
+        "containerRemoved": true,
+        "workspaceRemoved": true,
+        "errors": []
+      },
+      "createdAt": "2026-10-07T06:55:10.384Z",
+      "completedAt": "2026-10-07T06:55:16.549Z"
+    },
+    "verification": {
+      "id": "11b9d882-2a26-4927-8669-600d38874251",
+      "buildId": "c4032f2c-9c68-4bce-8c10-36cdf2ca5944",
+      "sourceDigest": "sha256:dd7b3942608ea3a34737625103fb86b087f8679a6f6b894d300f78424663d367",
+      "artifactDigest": "sha256:73e8dcea7c794d832690b3149a2f2bfd0e603f2edbccbd1f5c39e7078ec9d392",
+      "status": "PASSED",
+      "failure": null,
+      "startedAt": "2026-10-07T06:55:16.584Z",
+      "completedAt": "2026-10-07T06:55:17.672Z",
+      "workerExitCode": 0,
+      "timedOut": false,
+      "phase": "SCREENSHOT",
+      "diagnostics": {
+        "pageErrors": [],
+        "consoleErrors": [],
+        "blockedRequests": [],
+        "failedRequests": [],
+        "actions": [
+          {
+            "index": 0,
+            "type": "navigate",
+            "status": "PASSED"
+          },
+          {
+            "index": 1,
+            "type": "expectText",
+            "status": "PASSED"
+          },
+          {
+            "index": 2,
+            "type": "expectText",
+            "status": "PASSED"
+          },
+          {
+            "index": 3,
+            "type": "expectVisible",
+            "status": "PASSED"
+          },
+          {
+            "index": 4,
+            "type": "expectVisible",
+            "status": "PASSED"
+          }
+        ],
+        "truncated": false,
+        "freshContext": {
+          "cookies": 0,
+          "pages": 1
+        },
+        "visibleContent": true,
+        "controlHost": "127.0.0.1"
+      },
+      "cleanup": {
+        "browserClosed": true,
+        "processTreeTerminated": null
+      },
+      "screenshot": {
+        "path": "PRIVATE_VALUE_RETAINED_LOCALLY",
+        "digest": "sha256:8a05962a92e6bc3945fd4f3453887f4447e055f6cc83286cd6817d571368f5a1",
+        "bytes": 23752,
+        "width": 1280,
+        "height": 720
+      },
+      "reportPath": "PRIVATE_VALUE_RETAINED_LOCALLY"
+    },
+    "executionId": "803b141a-c85e-4950-ac8b-2d31aaf99433"
+  },
+  "usage": [
+    {
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 1607,
+      "estimated": false,
+      "reservationTokens": 9516,
+      "usage": {
+        "inputTokens": 1264,
+        "outputTokens": 343,
+        "totalTokens": 1607,
+        "raw": {
+          "prompt_tokens": 1264,
+          "completion_tokens": 343,
+          "total_tokens": 1607,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 240
+        }
+      },
+      "releasedTokens": 7909
+    },
+    {
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 2993,
+      "estimated": false,
+      "reservationTokens": 13157,
+      "usage": {
+        "inputTokens": 2374,
+        "outputTokens": 619,
+        "totalTokens": 2993,
+        "raw": {
+          "prompt_tokens": 2374,
+          "completion_tokens": 619,
+          "total_tokens": 2993,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 1734
+        }
+      },
+      "releasedTokens": 10164
+    },
+    {
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 2596,
+      "estimated": false,
+      "reservationTokens": 13633,
+      "usage": {
+        "inputTokens": 2573,
+        "outputTokens": 23,
+        "totalTokens": 2596,
+        "raw": {
+          "prompt_tokens": 2573,
+          "completion_tokens": 23,
+          "total_tokens": 2596,
+          "prompt_tokens_details": {
+            "cached_tokens": 2304
+          },
+          "prompt_cache_hit_tokens": 2304,
+          "prompt_cache_miss_tokens": 269
+        }
+      },
+      "releasedTokens": 11037
+    },
+    {
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 3752,
+      "estimated": false,
+      "reservationTokens": 15747,
+      "usage": {
+        "inputTokens": 3403,
+        "outputTokens": 349,
+        "totalTokens": 3752,
+        "raw": {
+          "prompt_tokens": 3403,
+          "completion_tokens": 349,
+          "total_tokens": 3752,
+          "prompt_tokens_details": {
+            "cached_tokens": 2560
+          },
+          "prompt_cache_hit_tokens": 2560,
+          "prompt_cache_miss_tokens": 843
+        }
+      },
+      "releasedTokens": 11995
+    },
+    {
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 3697,
+      "estimated": false,
+      "reservationTokens": 16354,
+      "usage": {
+        "inputTokens": 3673,
+        "outputTokens": 24,
+        "totalTokens": 3697,
+        "raw": {
+          "prompt_tokens": 3673,
+          "completion_tokens": 24,
+          "total_tokens": 3697,
+          "prompt_tokens_details": {
+            "cached_tokens": 3328
+          },
+          "prompt_cache_hit_tokens": 3328,
+          "prompt_cache_miss_tokens": 345
+        }
+      },
+      "releasedTokens": 12657
+    },
+    {
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 4414,
+      "estimated": false,
+      "reservationTokens": 18117,
+      "usage": {
+        "inputTokens": 4298,
+        "outputTokens": 116,
+        "totalTokens": 4414,
+        "raw": {
+          "prompt_tokens": 4298,
+          "completion_tokens": 116,
+          "total_tokens": 4414,
+          "prompt_tokens_details": {
+            "cached_tokens": 3584
+          },
+          "prompt_cache_hit_tokens": 3584,
+          "prompt_cache_miss_tokens": 714
+        }
+      },
+      "releasedTokens": 13703
+    }
+  ],
+  "limitation": "This actual generated task required zero repair rounds; paid repair is evaluated separately."
+}

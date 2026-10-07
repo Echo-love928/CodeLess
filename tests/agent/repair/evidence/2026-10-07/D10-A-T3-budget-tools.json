@@ -1,0 +1,84 @@
+{
+  "task": {
+    "id": "76617d53-260b-4d01-83f6-892bb6d81f1f",
+    "applicationId": "af79aa80-c331-468f-97c8-beeb47371123",
+    "prompt": "生成 Ada Lovelace 静态个人展示页",
+    "status": "FAILED",
+    "repairAttempts": 0,
+    "failureCode": "AGENT_TOOL_BUDGET_EXCEEDED",
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-07T07:07:57.834188Z"
+  },
+  "budget": {
+    "models": 2,
+    "tools": 20,
+    "chargedTokens": 96
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "meter": {
+      "models": 2,
+      "tools": 20,
+      "chargedTokens": 96
+    },
+    "code": "AGENT_TOOL_BUDGET_EXCEEDED",
+    "budget": "tools"
+  },
+  "candidates": [],
+  "runners": [],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 9250,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 9202
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 12187,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 12139
+    }
+  ],
+  "decisions": [
+    {
+      "taskId": "76617d53-260b-4d01-83f6-892bb6d81f1f",
+      "kind": "stage.finished",
+      "sequence": 5,
+      "stage": "PLAN",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T07:07:56.243413600Z"
+    },
+    {
+      "taskId": "76617d53-260b-4d01-83f6-892bb6d81f1f",
+      "kind": "failure",
+      "sequence": 29,
+      "stage": "GENERATE",
+      "payload": {
+        "code": "AGENT_TOOL_BUDGET_EXCEEDED",
+        "category": "CONTROL",
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY"
+      },
+      "at": "2026-10-07T07:07:57.822241500Z"
+    }
+  ]
+}
