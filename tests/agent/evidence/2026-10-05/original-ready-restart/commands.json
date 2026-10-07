@@ -1,0 +1,56 @@
+{
+  "newModelCalls": 0,
+  "testedProductSource": "65a10833d717b9717c54c1619b3dc77412935859",
+  "previousGate": {
+    "rerunRequested": false,
+    "rootCause": "UNKNOWN",
+    "runner": "FAILURE",
+    "run": "https://github.com/Echo-love928/CodeLess/actions/runs/37264775641",
+    "ciGate": "FAILURE",
+    "candidate": "0c3d491ebfcfff53266a4ce609d2ded3515daabc"
+  },
+  "baseCandidate": "0c3d491ebfcfff53266a4ce609d2ded3515daabc",
+  "commands": [
+    {
+      "command": "node tests/agent/export-original-ready-failure.mjs services/api/target/real-preview-platform-5c629427-7618-447c-8603-e90c7bc838e4 <preserved original log absolute path> <preserved original exit-file absolute path>",
+      "exitCode": 0,
+      "name": "original-ready-export"
+    },
+    {
+      "originalFailurePreserved": true,
+      "logDigest": "sha256:03a27622914c0d080c1e0149dff02ed9ebf1430105f54938fac1c39ecca0beae",
+      "logBytes": 2398,
+      "exitCode": 1,
+      "command": "Node evidence guard comparing worktree bytes to Git bytes",
+      "rawLogShared": false,
+      "name": "original-ready-validation",
+      "failureReason": "WORKTREE_CRLF_VS_GIT_LF_COMPARISON",
+      "scope": "LOCAL_GUARD"
+    },
+    {
+      "logDigest": "sha256:126f876abb329092d80fb50a250c0b2c543ab4903206bfbf8a2fab4c29b523cb",
+      "logBytes": 288,
+      "exitCode": 0,
+      "command": "Node evidence guard comparing exact Git blobs and requiring no text diff in tested code",
+      "rawLogShared": false,
+      "name": "original-ready-validation-canonical",
+      "scope": "LOCAL_GUARD"
+    },
+    {
+      "logBytes": 4136,
+      "exitCode": 0,
+      "command": "pnpm verify:static",
+      "rawLogShared": false,
+      "name": "static-original-ready",
+      "logDigest": "sha256:6fa4534ab82d9445de1e53227fbb82a60c1dc1689e9a8a7e795e6d77aac421bf"
+    },
+    {
+      "modelCalls": 0,
+      "name": "credential-envelope-synthetic",
+      "command": "pwsh -NoProfile -File <repository-external Test-CredentialEnvelope.ps1>",
+      "scope": "SYNTHETIC_CREDENTIAL_CRYPTO_ONLY",
+      "logDigest": "sha256:14a20b55ee86b4cfa527a24bf5d22357934e7c1e5cc062f3fba95f79840dffb0",
+      "exitCode": 0
+    }
+  ]
+}

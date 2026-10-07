@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-04",
+  "timezone": "Asia/Shanghai",
+  "branch": "codex/d09-integration-preview",
+  "baseline": "f80ee105bd8207a65bcc46c9ce61f0eaf5497c26",
+  "modelProvider": "deterministic-mock",
+  "modelQualityAccepted": false,
+  "commands": [
+    {
+      "command": "Maven -Dtest=PreviewHttpTest,PreviewPlatformIntegrationTest test",
+      "exit": 0,
+      "tests": 2,
+      "log": "platform-first.log"
+    },
+    {
+      "command": "Maven -Dtest=PreviewReadinessTest,PreviewRegistryHttpTest,PreviewPlatformIntegrationTest test",
+      "exit": 1,
+      "log": "deployment-first.log",
+      "reason": "test restart used a new ephemeral gateway port; isolated catalogue fixture lacked its own user"
+    },
+    {
+      "command": "same targeted Maven tests after corrections",
+      "exit": 0,
+      "tests": 3,
+      "skipped": 0,
+      "log": "deployment-fixed.log"
+    },
+    {
+      "command": "node --test tests/e2e/preview/registry.acceptance.mjs",
+      "exit": 0,
+      "tests": 3,
+      "skipped": 0,
+      "log": "registry-fixed.log",
+      "hostEvidenceFixture": true
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exit": -1073740791,
+      "log": "full-gate.log",
+      "reason": "Windows native exit after 29 passed; root cause unconfirmed, retained as a stability risk"
+    },
+    {
+      "command": "pnpm verify:e2e with fatal-report and webserver diagnostics",
+      "exit": 0,
+      "tests": 29,
+      "log": "e2e-diagnostic.log"
+    },
+    {
+      "command": "pnpm ci:gate with same diagnostics",
+      "exit": 0,
+      "log": "full-gate-diagnostic.log",
+      "stages": {
+        "static": {
+          "frontendTests": 34,
+          "contractKinds": 8
+        },
+        "api": {
+          "tests": 99,
+          "skipped": 0
+        },
+        "runner": {
+          "tests": 37,
+          "skipped": 0
+        },
+        "e2e": {
+          "tests": 29,
+          "skipped": 0
+        }
+      }
+    }
+  ],
+  "originalLogs": "ignored .local-data/d09-integration/",
+  "mainModified": false,
+  "selfApproval": false,
+  "remaining": [
+    "real-model acceptance",
+    "trusted public wildcard DNS/TLS and actual production service deployment",
+    "independent peer approval"
+  ]
+}

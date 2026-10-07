@@ -1,0 +1,97 @@
+{
+  "task": "D09-A",
+  "reviewedBHead": "0d8f06f6e6316e013a1a33248e02bef02d0d8eb9",
+  "testedAProductHead": "c21925530ed58ec44875f77c20cd365720675b38",
+  "productTreesIdentical": true,
+  "commands": [
+    {
+      "command": "node --test tests/agent/preview-diagnostic-projection.test.mjs",
+      "exitCode": 0,
+      "passed": 2
+    },
+    {
+      "command": "node --test tests/e2e/preview/ingress-restart.acceptance.mjs",
+      "exitCode": 0,
+      "passed": 1
+    },
+    {
+      "command": "pnpm ci:gate",
+      "environment": {
+        "CODELESS_MODEL_PROVIDER": "deterministic-mock",
+        "modelKeyRemovedFromChild": true,
+        "modelNameRemovedFromChild": true
+      },
+      "exitCode": 0
+    }
+  ],
+  "stages": {
+    "static": {
+      "exitCode": 0,
+      "contracts": 7,
+      "frontend": 34
+    },
+    "api": {
+      "exitCode": 0,
+      "tests": 106,
+      "agent": 11,
+      "interruption": 4
+    },
+    "runner": {
+      "exitCode": 0,
+      "tests": 40
+    },
+    "e2e": {
+      "exitCode": 0,
+      "tests": 29
+    },
+    "ciGate": {
+      "exitCode": 0
+    }
+  },
+  "skipped": 0,
+  "initialFailure": {
+    "exitCode": 1,
+    "code": "MODEL_CONFIGURATION",
+    "apiErrors": 63,
+    "cause": "TEST_ENVIRONMENT_PROVIDER_DEEPSEEK_WITHOUT_CREDENTIAL",
+    "productCodeChangedForRetest": false
+  },
+  "logs": [
+    {
+      "name": "ci-gate-provider-misconfigured",
+      "exitCode": 1,
+      "rawLogShared": false,
+      "bytes": 1887512,
+      "digest": "sha256:22b56c6b23e252f2dc00503d3025a94f380fbfde8f6cdf443e555130625ff59d"
+    },
+    {
+      "name": "ci-gate",
+      "exitCode": 0,
+      "rawLogShared": false,
+      "bytes": 108976,
+      "digest": "sha256:1d26a9348413f9b4ec5ca1cfc4b89a597c0fdc98e6a3ee4ce5a31172b15896e7"
+    },
+    {
+      "name": "ingress",
+      "exitCode": 0,
+      "rawLogShared": false,
+      "bytes": 970,
+      "digest": "sha256:c35ee255136d04374303bc830073d8bf81d732a94c54e372dbe51765b7db2411"
+    },
+    {
+      "name": "projection",
+      "exitCode": 0,
+      "rawLogShared": false,
+      "bytes": 252,
+      "digest": "sha256:51ea6aa1fc86a4671f377d9e775c88854ac3bccf3524c37e6bf47007bd11e908"
+    }
+  ],
+  "newPaidCalls": 0,
+  "developerTokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "measurement": "UNKNOWN"
+  },
+  "historicalFailuresPreserved": true
+}

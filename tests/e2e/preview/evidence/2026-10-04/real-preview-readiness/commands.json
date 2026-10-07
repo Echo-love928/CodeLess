@@ -1,0 +1,88 @@
+{
+  "date": "2026-10-04",
+  "base": "f80ee105bd8207a65bcc46c9ce61f0eaf5497c26",
+  "reviewedParent": "f83895c5c62e4dab08c8dbe2ab0c0d5e8d30fb7c",
+  "sourceDigests": {
+    "infra/preview/nginx.conf.template": "sha256:98ec3b3fefd166f90836d6c31e4d2d900578849f660c569b6e77fdb77fa2be1e",
+    "services/api/src/test/java/dev/codeless/api/preview/PreviewPlatformIntegrationTest.java": "sha256:feffe0cac03346daf45afff57019868d9830b775b795713e342b0eeaaadfbafd",
+    "services/api/src/test/java/dev/codeless/api/preview/RealPreviewPlatformAcceptanceIT.java": "sha256:75926f82c7bb4aa017a97f22054c35ae48593d71fa680c8ae9fce911963ab764",
+    "tests/e2e/preview/platform.acceptance.mjs": "sha256:ea8a9b75117d8fe8db78e62da5286c8fa183493b00dd6da7a07294f260117291"
+  },
+  "commands": [
+    {
+      "command": "node --check tests/e2e/preview/platform.acceptance.mjs",
+      "exitCode": 0
+    },
+    {
+      "command": "Java21 mvnw -f services/api/pom.xml -Dtest=PreviewPlatformIntegrationTest test",
+      "exitCode": 0,
+      "tests": 1
+    },
+    {
+      "command": "node scripts/ci-gate.mjs",
+      "exitCode": 0,
+      "stages": [
+        "verify:static",
+        "verify:api",
+        "verify:runner",
+        "verify:e2e"
+      ]
+    }
+  ],
+  "transportProbe": {
+    "authorizationSent": false,
+    "method": "GET",
+    "endpoint": "https://api.deepseek.com/chat/completions",
+    "javaVersion": 21,
+    "httpStatus": 401,
+    "modelCall": false,
+    "acceptanceEvidence": false
+  },
+  "paidAcceptance": {
+    "status": "BLOCKED_WAITING_USER_CREDENTIAL_CONFIGURATION",
+    "model": "deepseek-flash",
+    "newModelRequests": 0,
+    "completeRealSuccess": false,
+    "explicitEntry": "mvnw -f services/api/pom.xml -Dtest=RealPreviewPlatformAcceptanceIT test"
+  },
+  "review": {
+    "type": "independent-automated-subagents",
+    "specialists": [
+      "security-contract",
+      "testing-lifecycle",
+      "adversarial"
+    ],
+    "sourceBlockersRemaining": 0,
+    "formalGitHubPeerApproval": false
+  },
+  "runtimeEvidenceRoot": "C:\\Users\\12058\\.codex\\worktrees\\d09-integration-preview\\CodeLess\\services\\api\\target\\preview-platform-f6d7f632-b57e-4ffe-a220-b5693d52ba24",
+  "rawLogs": "C:\\Users\\12058\\.codex\\worktrees\\d09-integration-preview\\CodeLess\\.local-data\\d09-integration\\real-preview-readiness",
+  "mainModified": false,
+  "merged": false,
+  "published": false,
+  "personalDevelopmentTokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "measurement": "UNKNOWN"
+  },
+  "historicalPaidUsage": {
+    "attempts": 14,
+    "known": 12,
+    "unknown": 2,
+    "inputTokensKnown": 22695,
+    "outputTokensKnown": 6047,
+    "reportedTotalKnown": 28742,
+    "completeTotal": "UNKNOWN",
+    "source": "tests/agent/evidence/2026-10-04/runtime-usage.json"
+  },
+  "gateResults": {
+    "contracts": 8,
+    "frontend": 34,
+    "api": 103,
+    "runner": 37,
+    "e2e": 29,
+    "failures": 0,
+    "skipped": 0
+  }
+}

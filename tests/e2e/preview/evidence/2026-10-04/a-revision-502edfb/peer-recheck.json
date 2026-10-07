@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-04",
+  "timezone": "Asia/Shanghai",
+  "baseline": "f80ee105bd8207a65bcc46c9ce61f0eaf5497c26",
+  "previousIntegrationHead": "4e8bd413fc1a121a48db7d46fdedc263c1f56f2a",
+  "testedIntegrationSourceHead": "5ca5e64358113f83a4c80fe79bdae2f0020fc24b",
+  "inputA": "502edfb17e1d87e34deac42b0fd1bd03f1add724",
+  "inputB": "9e268846cb1f219c60c4ecac058b536c3470db58",
+  "aSourceMatchesReviewedHead": true,
+  "review": {
+    "state": "APPROVED",
+    "commit": "502edfb17e1d87e34deac42b0fd1bd03f1add724",
+    "url": "https://github.com/Echo-love928/CodeLess/pull/19#pullrequestreview-5406219747",
+    "scope": "PR19 component implementation only; not complete model acceptance, integration approval, merge or release",
+    "integrationPR21Approved": false
+  },
+  "affectedSuites": [
+    {
+      "class": "dev.codeless.api.agent.LocalBuildGatewayTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "class": "dev.codeless.api.agent.AgentLoopIntegrationTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "class": "dev.codeless.api.tasks.TaskQueueIntegrationTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "class": "dev.codeless.api.preview.PreviewPlatformIntegrationTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "lifecycle": {
+    "interruption": {
+      "outcome": "AGENT_RUNNER_INTERRUPTED",
+      "realNodeProcesses": true,
+      "protocolFixture": true,
+      "gatewayReturned": true,
+      "interruptPreserved": true,
+      "aliveProcessCount": 0
+    },
+    "timeout": {
+      "outcome": "AGENT_RUNNER_TIMEOUT",
+      "realNodeProcesses": true,
+      "protocolFixture": true,
+      "gatewayReturned": true,
+      "interruptPreserved": false,
+      "aliveProcessCount": 0
+    }
+  },
+  "localGate": {
+    "command": "pnpm ci:gate",
+    "exit": 0,
+    "frontendTests": 34,
+    "contractKinds": 8,
+    "apiTests": 103,
+    "runnerTests": 37,
+    "e2eTests": 29,
+    "skipped": 0,
+    "log": ".local-data/d09-integration/a-revision-502edfb/ci-gate-recovered.log",
+    "logDigest": "sha256:7a3d04a90ad8845017e11dafa147f2dfe1d60ffee3ec631bc963ab72e4aa1676"
+  },
+  "firstAttempt": {
+    "exit": 1,
+    "reason": "Docker Desktop Linux engine was not running; actual docker info and dependent stages failed",
+    "log": ".local-data/d09-integration/a-revision-502edfb/ci-gate.log",
+    "logDigest": "sha256:eaeba0f92c80704c67728cf8f6e5e38a6791df59ea49943717370b88f826284b",
+    "recovery": "started existing per-user Docker Desktop, verified engine ready, separate full gate log; no source or assertion relaxation"
+  },
+  "modelProvider": "deterministic-mock",
+  "realModelCallsThisRecheck": 0,
+  "modelQualityAccepted": false,
+  "platformReport": "platform-acceptance.json",
+  "platformApiFixture": false,
+  "signingFixture": false,
+  "historicalEvidenceUnchanged": true,
+  "mainModified": false,
+  "remaining": [
+    "real model generation and authenticated preview acceptance",
+    "independent review of updated integration PR21",
+    "trusted public wildcard DNS/TLS and service deployment",
+    "orphan worker cleanup after external host termination"
+  ]
+}

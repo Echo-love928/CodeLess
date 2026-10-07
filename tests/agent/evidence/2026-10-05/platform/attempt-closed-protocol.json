@@ -1,0 +1,858 @@
+{
+  "commit": "481f4884b58be5f79ae0140be5e69ef635432f1d",
+  "fixture": false,
+  "generationAccepted": false,
+  "fullPlatformModelAcceptance": false,
+  "platformPreview": "NOT_REACHED",
+  "started": {
+    "applicationId": "ce659cc2-32b2-4e8e-b52b-38e10d850bac",
+    "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7",
+    "modelMode": "deepseek"
+  },
+  "task": {
+    "id": "076d5482-4fdc-4ccf-9b06-95816dfca3c7",
+    "applicationId": "ce659cc2-32b2-4e8e-b52b-38e10d850bac",
+    "prompt": "生成 Ada Lovelace 个人展示页，静态数据展示姓名、简短介绍及两件作品：Analytical Engine 和 Note G。恰好两个文件：src/pages/HomePage.vue、src/components/ProfileCard.vue。先读取依赖源码，保持组件接口和页面数据类型一致。不要外部图片或请求。",
+    "status": "FAILED",
+    "repairAttempts": 0,
+    "failureCode": "AGENT_ACTION_FAILED",
+    "createdAt": "2026-10-04T13:58:39.828934Z",
+    "updatedAt": "2026-10-04T13:58:57.291258Z"
+  },
+  "calls": [
+    {
+      "id": "b9ffc984-9ebf-43ae-8239-37a6c1e622e4",
+      "stage": "PLAN",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "status": "SUCCEEDED",
+      "inputTokens": 1276,
+      "outputTokens": 295
+    },
+    {
+      "id": "bf332d21-b68d-4ab9-abc3-09ba808bf3f9",
+      "stage": "GENERATE",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "status": "SUCCEEDED",
+      "inputTokens": 2175,
+      "outputTokens": 585
+    },
+    {
+      "id": "ce305df3-e75e-4108-8d8e-e800bd740680",
+      "stage": "GENERATE",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "status": "SUCCEEDED",
+      "inputTokens": 2379,
+      "outputTokens": 23
+    },
+    {
+      "id": "0c3b60ce-a46a-4e7b-8088-cc6c28d1debf",
+      "stage": "GENERATE",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "status": "SUCCEEDED",
+      "inputTokens": 3179,
+      "outputTokens": 326
+    },
+    {
+      "id": "0dfe2cfd-aa49-4625-b917-fd89119c1ab3",
+      "stage": "GENERATE",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "status": "SUCCEEDED",
+      "inputTokens": 3454,
+      "outputTokens": 24
+    },
+    {
+      "id": "8a78aea4-01b0-4ca2-9461-74a1489428d6",
+      "stage": "GENERATE",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "status": "SUCCEEDED",
+      "inputTokens": 4059,
+      "outputTokens": 74
+    }
+  ],
+  "events": [
+    {
+      "kind": "model.request",
+      "sequence": 1,
+      "stage": "PLAN",
+      "payload": {
+        "reservedTokens": 9522
+      },
+      "at": "2026-10-04T13:58:39.953448600Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.response",
+      "sequence": 2,
+      "stage": "PLAN",
+      "payload": {
+        "schemaVersion": 1,
+        "template": "VUE",
+        "dataMode": "STATIC",
+        "pages": [
+          {
+            "route": "/",
+            "file": "src/pages/HomePage.vue",
+            "title": "Ada Lovelace",
+            "purpose": "Show Ada Lovelace profile with name, short bio and two works: Analytical Engine and Note G."
+          }
+        ],
+        "components": [
+          {
+            "name": "ProfileCard",
+            "file": "src/components/ProfileCard.vue",
+            "purpose": "Display name, short introduction and list of two works passed as props."
+          }
+        ],
+        "files": [
+          {
+            "path": "src/pages/HomePage.vue",
+            "purpose": "Home page composing ProfileCard with static Ada Lovelace data."
+          },
+          {
+            "path": "src/components/ProfileCard.vue",
+            "purpose": "Reusable profile card showing name, intro and works."
+          }
+        ],
+        "acceptance": [
+          {
+            "id": "A1",
+            "route": "/",
+            "action": "Open the root route and read the profile heading.",
+            "expected": "Name 'Ada Lovelace' is visible."
+          },
+          {
+            "id": "A2",
+            "route": "/",
+            "action": "Read the introduction text below the name.",
+            "expected": "A short biography sentence is visible."
+          },
+          {
+            "id": "A3",
+            "route": "/",
+            "action": "Look at the works list on the page.",
+            "expected": "Exactly two works are listed: 'Analytical Engine' and 'Note G'."
+          }
+        ],
+        "capabilities": {
+          "backend": false,
+          "payments": false,
+          "externalServices": [],
+          "dependencies": []
+        }
+      },
+      "at": "2026-10-04T13:58:42.043505300Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.usage",
+      "sequence": 3,
+      "stage": "PLAN",
+      "payload": {
+        "releasedTokens": 7951,
+        "usage": {
+          "inputTokens": 1276,
+          "outputTokens": 295,
+          "totalTokens": 1571,
+          "raw": {
+            "prompt_tokens": 1276,
+            "completion_tokens": 295,
+            "total_tokens": 1571,
+            "prompt_tokens_details": {
+              "cached_tokens": 1024
+            },
+            "prompt_cache_hit_tokens": 1024,
+            "prompt_cache_miss_tokens": 252
+          }
+        },
+        "reservationTokens": 9522
+      },
+      "at": "2026-10-04T13:58:42.071166400Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "plan",
+      "sequence": 4,
+      "stage": "PLAN",
+      "payload": {
+        "schemaVersion": 1,
+        "template": "VUE",
+        "dataMode": "STATIC",
+        "pages": [
+          {
+            "route": "/",
+            "file": "src/pages/HomePage.vue",
+            "title": "Ada Lovelace",
+            "purpose": "Show Ada Lovelace profile with name, short bio and two works: Analytical Engine and Note G."
+          }
+        ],
+        "components": [
+          {
+            "name": "ProfileCard",
+            "file": "src/components/ProfileCard.vue",
+            "purpose": "Display name, short introduction and list of two works passed as props."
+          }
+        ],
+        "files": [
+          {
+            "path": "src/pages/HomePage.vue",
+            "purpose": "Home page composing ProfileCard with static Ada Lovelace data."
+          },
+          {
+            "path": "src/components/ProfileCard.vue",
+            "purpose": "Reusable profile card showing name, intro and works."
+          }
+        ],
+        "acceptance": [
+          {
+            "id": "A1",
+            "route": "/",
+            "action": "Open the root route and read the profile heading.",
+            "expected": "Name 'Ada Lovelace' is visible."
+          },
+          {
+            "id": "A2",
+            "route": "/",
+            "action": "Read the introduction text below the name.",
+            "expected": "A short biography sentence is visible."
+          },
+          {
+            "id": "A3",
+            "route": "/",
+            "action": "Look at the works list on the page.",
+            "expected": "Exactly two works are listed: 'Analytical Engine' and 'Note G'."
+          }
+        ],
+        "capabilities": {
+          "backend": false,
+          "payments": false,
+          "externalServices": [],
+          "dependencies": []
+        }
+      },
+      "at": "2026-10-04T13:58:42.098642800Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.request",
+      "sequence": 5,
+      "stage": "GENERATE",
+      "payload": {
+        "reservedTokens": 12161
+      },
+      "at": "2026-10-04T13:58:42.160336500Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.response",
+      "sequence": 6,
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.create",
+        "arguments": {
+          "path": "src/components/ProfileCard.vue",
+          "content": "<script setup lang=\"ts\">\ninterface Work {\n  title: string;\n  description: string;\n}\n\ndefineProps<{\n  name: string;\n  intro: string;\n  works: Work[];\n}>();\n</script>\n\n<template>\n  <section class=\"profile-card\">\n    <h1 class=\"profile-name\" data-testid=\"name\">{{ name }}</h1>\n    <p class=\"profile-intro\" data-testid=\"intro\">{{ intro }}</p>\n    <h2 class=\"works-heading\">Works</h2>\n    <ul class=\"works-list\" data-testid=\"works\">\n      <li v-for=\"work in works\" :key=\"work.title\" class=\"work-item\">\n        <h3 class=\"work-title\" data-testid=\"work-title\">{{ work.title }}</h3>\n        <p class=\"work-description\">{{ work.description }}</p>\n      </li>\n    </ul>\n  </section>\n</template>\n\n<style scoped>\n.profile-card {\n  max-width: 40rem;\n  margin: 0 auto;\n  padding: 2rem;\n  font-family: system-ui, sans-serif;\n  color: #1f2933;\n}\n\n.profile-name {\n  margin: 0 0 0.5rem;\n  font-size: 2rem;\n}\n\n.profile-intro {\n  margin: 0 0 1.5rem;\n  line-height: 1.6;\n  color: #52606d;\n}\n\n.works-heading {\n  font-size: 1.25rem;\n  margin: 0 0 0.75rem;\n}\n\n.works-list {\n  list-style: none;\n  padding: 0;\n  margin: 0;\n  display: grid;\n  gap: 1rem;\n}\n\n.work-item {\n  border: 1px solid #d9e2ec;\n  border-radius: 0.5rem;\n  padding: 1rem;\n}\n\n.work-title {\n  margin: 0 0 0.25rem;\n  font-size: 1rem;\n}\n\n.work-description {\n  margin: 0;\n  color: #52606d;\n  line-height: 1.5;\n}\n</style>\n"
+        }
+      },
+      "at": "2026-10-04T13:58:44.416840400Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.usage",
+      "sequence": 7,
+      "stage": "GENERATE",
+      "payload": {
+        "releasedTokens": 9401,
+        "usage": {
+          "inputTokens": 2175,
+          "outputTokens": 585,
+          "totalTokens": 2760,
+          "raw": {
+            "prompt_tokens": 2175,
+            "completion_tokens": 585,
+            "total_tokens": 2760,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            },
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 2175
+          }
+        },
+        "reservationTokens": 12161
+      },
+      "at": "2026-10-04T13:58:44.440217100Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "tool.request",
+      "sequence": 8,
+      "stage": "GENERATE",
+      "payload": {
+        "reservedTokens": 0
+      },
+      "at": "2026-10-04T13:58:44.482132700Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "tool.result",
+      "sequence": 9,
+      "stage": "GENERATE",
+      "payload": {
+        "callId": "75630102-9f09-4a8c-ad71-9cbb761a6ab2",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "content": null,
+        "beforeDigest": null,
+        "afterDigest": "sha256:65d673a8307af438bcb4632767990557968d3ce8546f2a19b479dccda71f7452",
+        "source": {
+          "files": [
+            {
+              "path": "src/components/ProfileCard.vue",
+              "bytes": 1358,
+              "digest": "sha256:65d673a8307af438bcb4632767990557968d3ce8546f2a19b479dccda71f7452"
+            }
+          ],
+          "totalBytes": 1358,
+          "sourceDigest": "sha256:291686c402ea204fc614a57154cd2997d3c6ccb2d57ee36e8ddb189414b3cb07"
+        }
+      },
+      "at": "2026-10-04T13:58:44.681123600Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.request",
+      "sequence": 10,
+      "stage": "GENERATE",
+      "payload": {
+        "reservedTokens": 12637
+      },
+      "at": "2026-10-04T13:58:44.721869300Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.response",
+      "sequence": 11,
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/components/ProfileCard.vue"
+        }
+      },
+      "at": "2026-10-04T13:58:45.602381600Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.usage",
+      "sequence": 12,
+      "stage": "GENERATE",
+      "payload": {
+        "releasedTokens": 10235,
+        "usage": {
+          "inputTokens": 2379,
+          "outputTokens": 23,
+          "totalTokens": 2402,
+          "raw": {
+            "prompt_tokens": 2379,
+            "completion_tokens": 23,
+            "total_tokens": 2402,
+            "prompt_tokens_details": {
+              "cached_tokens": 512
+            },
+            "prompt_cache_hit_tokens": 512,
+            "prompt_cache_miss_tokens": 1867
+          }
+        },
+        "reservationTokens": 12637
+      },
+      "at": "2026-10-04T13:58:45.641933200Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "tool.request",
+      "sequence": 13,
+      "stage": "GENERATE",
+      "payload": {
+        "reservedTokens": 0
+      },
+      "at": "2026-10-04T13:58:45.692984Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "tool.result",
+      "sequence": 14,
+      "stage": "GENERATE",
+      "payload": {
+        "callId": "48f94b23-7b80-47e1-a947-9e5500a4602a",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "content": "<script setup lang=\"ts\">\ninterface Work {\n  title: string;\n  description: string;\n}\n\ndefineProps<{\n  name: string;\n  intro: string;\n  works: Work[];\n}>();\n</script>\n\n<template>\n  <section class=\"profile-card\">\n    <h1 class=\"profile-name\" data-testid=\"name\">{{ name }}</h1>\n    <p class=\"profile-intro\" data-testid=\"intro\">{{ intro }}</p>\n    <h2 class=\"works-heading\">Works</h2>\n    <ul class=\"works-list\" data-testid=\"works\">\n      <li v-for=\"work in works\" :key=\"work.title\" class=\"work-item\">\n        <h3 class=\"work-title\" data-testid=\"work-title\">{{ work.title }}</h3>\n        <p class=\"work-description\">{{ work.description }}</p>\n      </li>\n    </ul>\n  </section>\n</template>\n\n<style scoped>\n.profile-card {\n  max-width: 40rem;\n  margin: 0 auto;\n  padding: 2rem;\n  font-family: system-ui, sans-serif;\n  color: #1f2933;\n}\n\n.profile-name {\n  margin: 0 0 0.5rem;\n  font-size: 2rem;\n}\n\n.profile-intro {\n  margin: 0 0 1.5rem;\n  line-height: 1.6;\n  color: #52606d;\n}\n\n.works-heading {\n  font-size: 1.25rem;\n  margin: 0 0 0.75rem;\n}\n\n.works-list {\n  list-style: none;\n  padding: 0;\n  margin: 0;\n  display: grid;\n  gap: 1rem;\n}\n\n.work-item {\n  border: 1px solid #d9e2ec;\n  border-radius: 0.5rem;\n  padding: 1rem;\n}\n\n.work-title {\n  margin: 0 0 0.25rem;\n  font-size: 1rem;\n}\n\n.work-description {\n  margin: 0;\n  color: #52606d;\n  line-height: 1.5;\n}\n</style>\n",
+        "beforeDigest": "sha256:65d673a8307af438bcb4632767990557968d3ce8546f2a19b479dccda71f7452",
+        "afterDigest": "sha256:65d673a8307af438bcb4632767990557968d3ce8546f2a19b479dccda71f7452",
+        "source": {
+          "files": [
+            {
+              "path": "src/components/ProfileCard.vue",
+              "bytes": 1358,
+              "digest": "sha256:65d673a8307af438bcb4632767990557968d3ce8546f2a19b479dccda71f7452"
+            }
+          ],
+          "totalBytes": 1358,
+          "sourceDigest": "sha256:291686c402ea204fc614a57154cd2997d3c6ccb2d57ee36e8ddb189414b3cb07"
+        }
+      },
+      "at": "2026-10-04T13:58:45.812885Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.request",
+      "sequence": 15,
+      "stage": "GENERATE",
+      "payload": {
+        "reservedTokens": 14646
+      },
+      "at": "2026-10-04T13:58:45.863527200Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.response",
+      "sequence": 16,
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.create",
+        "arguments": {
+          "path": "src/pages/HomePage.vue",
+          "content": "<script setup lang=\"ts\">\nimport ProfileCard from '../components/ProfileCard.vue';\n\ninterface Work {\n  title: string;\n  description: string;\n}\n\nconst name = 'Ada Lovelace';\nconst intro =\n  'Ada Lovelace was a 19th-century mathematician who wrote the first algorithm intended for a machine, the Analytical Engine.';\nconst works: Work[] = [\n  {\n    title: 'Analytical Engine',\n    description:\n      'A proposed mechanical general-purpose computer designed by Charles Babbage, which Ada studied in depth and described in her notes.',\n  },\n  {\n    title: 'Note G',\n    description:\n      'The final note in her translation of Menabrea\\'s paper, containing an algorithm for computing Bernoulli numbers.',\n  },\n];\n</script>\n\n<template>\n  <main class=\"home-page\">\n    <ProfileCard :name=\"name\" :intro=\"intro\" :works=\"works\" />\n  </main>\n</template>\n\n<style scoped>\n.home-page {\n  display: block;\n  min-height: 100vh;\n  padding: 2rem 1rem;\n  background: #f5f7fa;\n}\n</style>\n"
+        }
+      },
+      "at": "2026-10-04T13:58:47.815576100Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.usage",
+      "sequence": 17,
+      "stage": "GENERATE",
+      "payload": {
+        "releasedTokens": 11141,
+        "usage": {
+          "inputTokens": 3179,
+          "outputTokens": 326,
+          "totalTokens": 3505,
+          "raw": {
+            "prompt_tokens": 3179,
+            "completion_tokens": 326,
+            "total_tokens": 3505,
+            "prompt_tokens_details": {
+              "cached_tokens": 768
+            },
+            "prompt_cache_hit_tokens": 768,
+            "prompt_cache_miss_tokens": 2411
+          }
+        },
+        "reservationTokens": 14646
+      },
+      "at": "2026-10-04T13:58:47.846821900Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "tool.request",
+      "sequence": 18,
+      "stage": "GENERATE",
+      "payload": {
+        "reservedTokens": 0
+      },
+      "at": "2026-10-04T13:58:47.905935300Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "tool.result",
+      "sequence": 19,
+      "stage": "GENERATE",
+      "payload": {
+        "callId": "05b19e5f-35a3-4b3d-96e1-82f0dc274875",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "content": null,
+        "beforeDigest": null,
+        "afterDigest": "sha256:d8a25645a2ef08a40a676d92607678b69624aa2cb46318b9dc97dbd5aa467b0c",
+        "source": {
+          "files": [
+            {
+              "path": "src/components/ProfileCard.vue",
+              "bytes": 1358,
+              "digest": "sha256:65d673a8307af438bcb4632767990557968d3ce8546f2a19b479dccda71f7452"
+            },
+            {
+              "path": "src/pages/HomePage.vue",
+              "bytes": 966,
+              "digest": "sha256:d8a25645a2ef08a40a676d92607678b69624aa2cb46318b9dc97dbd5aa467b0c"
+            }
+          ],
+          "totalBytes": 2324,
+          "sourceDigest": "sha256:ca6f43a4ce5869b7a5683d1374fceb2a0bc7229a19ecf12d303ef9b90cc4a574"
+        }
+      },
+      "at": "2026-10-04T13:58:48.096334600Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.request",
+      "sequence": 20,
+      "stage": "GENERATE",
+      "payload": {
+        "reservedTokens": 15252
+      },
+      "at": "2026-10-04T13:58:48.159317900Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.response",
+      "sequence": 21,
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/pages/HomePage.vue"
+        }
+      },
+      "at": "2026-10-04T13:58:48.774097Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.usage",
+      "sequence": 22,
+      "stage": "GENERATE",
+      "payload": {
+        "releasedTokens": 11774,
+        "usage": {
+          "inputTokens": 3454,
+          "outputTokens": 24,
+          "totalTokens": 3478,
+          "raw": {
+            "prompt_tokens": 3454,
+            "completion_tokens": 24,
+            "total_tokens": 3478,
+            "prompt_tokens_details": {
+              "cached_tokens": 1536
+            },
+            "prompt_cache_hit_tokens": 1536,
+            "prompt_cache_miss_tokens": 1918
+          }
+        },
+        "reservationTokens": 15252
+      },
+      "at": "2026-10-04T13:58:48.808941300Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "tool.request",
+      "sequence": 23,
+      "stage": "GENERATE",
+      "payload": {
+        "reservedTokens": 0
+      },
+      "at": "2026-10-04T13:58:48.874875800Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "tool.result",
+      "sequence": 24,
+      "stage": "GENERATE",
+      "payload": {
+        "callId": "941bb25c-962d-489b-966e-438bcb21aa86",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "content": "<script setup lang=\"ts\">\nimport ProfileCard from '../components/ProfileCard.vue';\n\ninterface Work {\n  title: string;\n  description: string;\n}\n\nconst name = 'Ada Lovelace';\nconst intro =\n  'Ada Lovelace was a 19th-century mathematician who wrote the first algorithm intended for a machine, the Analytical Engine.';\nconst works: Work[] = [\n  {\n    title: 'Analytical Engine',\n    description:\n      'A proposed mechanical general-purpose computer designed by Charles Babbage, which Ada studied in depth and described in her notes.',\n  },\n  {\n    title: 'Note G',\n    description:\n      'The final note in her translation of Menabrea\\'s paper, containing an algorithm for computing Bernoulli numbers.',\n  },\n];\n</script>\n\n<template>\n  <main class=\"home-page\">\n    <ProfileCard :name=\"name\" :intro=\"intro\" :works=\"works\" />\n  </main>\n</template>\n\n<style scoped>\n.home-page {\n  display: block;\n  min-height: 100vh;\n  padding: 2rem 1rem;\n  background: #f5f7fa;\n}\n</style>\n",
+        "beforeDigest": "sha256:d8a25645a2ef08a40a676d92607678b69624aa2cb46318b9dc97dbd5aa467b0c",
+        "afterDigest": "sha256:d8a25645a2ef08a40a676d92607678b69624aa2cb46318b9dc97dbd5aa467b0c",
+        "source": {
+          "files": [
+            {
+              "path": "src/components/ProfileCard.vue",
+              "bytes": 1358,
+              "digest": "sha256:65d673a8307af438bcb4632767990557968d3ce8546f2a19b479dccda71f7452"
+            },
+            {
+              "path": "src/pages/HomePage.vue",
+              "bytes": 966,
+              "digest": "sha256:d8a25645a2ef08a40a676d92607678b69624aa2cb46318b9dc97dbd5aa467b0c"
+            }
+          ],
+          "totalBytes": 2324,
+          "sourceDigest": "sha256:ca6f43a4ce5869b7a5683d1374fceb2a0bc7229a19ecf12d303ef9b90cc4a574"
+        }
+      },
+      "at": "2026-10-04T13:58:49.024031100Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.request",
+      "sequence": 25,
+      "stage": "GENERATE",
+      "payload": {
+        "reservedTokens": 16941
+      },
+      "at": "2026-10-04T13:58:49.088971600Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.response",
+      "sequence": 26,
+      "stage": "GENERATE",
+      "payload": {
+        "type": "done",
+        "actions": [
+          {
+            "type": "navigate",
+            "path": "/"
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "name"
+            },
+            "value": "Ada Lovelace"
+          },
+          {
+            "type": "expectVisible",
+            "target": {
+              "testId": "intro"
+            }
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "work-title"
+            },
+            "value": "Analytical Engine"
+          }
+        ]
+      },
+      "at": "2026-10-04T13:58:50.026957800Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "model.usage",
+      "sequence": 27,
+      "stage": "GENERATE",
+      "payload": {
+        "releasedTokens": 12808,
+        "usage": {
+          "inputTokens": 4059,
+          "outputTokens": 74,
+          "totalTokens": 4133,
+          "raw": {
+            "prompt_tokens": 4059,
+            "completion_tokens": 74,
+            "total_tokens": 4133,
+            "prompt_tokens_details": {
+              "cached_tokens": 1792
+            },
+            "prompt_cache_hit_tokens": 1792,
+            "prompt_cache_miss_tokens": 2267
+          }
+        },
+        "reservationTokens": 16941
+      },
+      "at": "2026-10-04T13:58:50.070218600Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "tool.request",
+      "sequence": 28,
+      "stage": "GENERATE",
+      "payload": {
+        "reservedTokens": 0
+      },
+      "at": "2026-10-04T13:58:50.157801500Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "draft",
+      "sequence": 29,
+      "stage": "GENERATE",
+      "payload": {
+        "actions": [
+          {
+            "type": "navigate",
+            "path": "/"
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "name"
+            },
+            "value": "Ada Lovelace"
+          },
+          {
+            "type": "expectVisible",
+            "target": {
+              "testId": "intro"
+            }
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "work-title"
+            },
+            "value": "Analytical Engine"
+          }
+        ],
+        "sourceDirectory": "/workspace\\services\\api\\target\\real-preview-platform-6331d8e5-6610-42e1-896e-e7dc9409172f\\workspaces\\076d5482-4fdc-4ccf-9b06-95816dfca3c7\\snapshots\\f6b70523-0ac6-4a2d-a9c0-24d1dcd8ab2c",
+        "files": [
+          {
+            "path": "src/components/ProfileCard.vue",
+            "bytes": 1358,
+            "digest": "sha256:65d673a8307af438bcb4632767990557968d3ce8546f2a19b479dccda71f7452"
+          },
+          {
+            "path": "src/pages/HomePage.vue",
+            "bytes": 966,
+            "digest": "sha256:d8a25645a2ef08a40a676d92607678b69624aa2cb46318b9dc97dbd5aa467b0c"
+          }
+        ],
+        "versionId": "b44f8d99-a06d-4c2f-8513-0cef4b832a48",
+        "sourceDigest": "sha256:ca6f43a4ce5869b7a5683d1374fceb2a0bc7229a19ecf12d303ef9b90cc4a574"
+      },
+      "at": "2026-10-04T13:58:50.303721Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "tool.request",
+      "sequence": 30,
+      "stage": "VERIFY",
+      "payload": {
+        "reservedTokens": 0
+      },
+      "at": "2026-10-04T13:58:50.462382400Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "runner.result",
+      "sequence": 31,
+      "stage": "VERIFY",
+      "payload": {
+        "status": "FAILED",
+        "sourceDigest": "sha256:ca6f43a4ce5869b7a5683d1374fceb2a0bc7229a19ecf12d303ef9b90cc4a574",
+        "build": {
+          "id": "c1d7c18e-6a7e-4f9e-9516-cd2da77d4b32",
+          "imageId": "sha256:5495f11ecb7b52b1414232f8c32e0b0f39d42ac5477a82ac36512a3cf1ad49e0",
+          "containerName": "codeless-build-c1d7c18e-6a7e-4f9e-9516-cd2da77d4b32",
+          "status": "SUCCEEDED",
+          "failure": null,
+          "exitCode": 0,
+          "oomKilled": false,
+          "timedOut": false,
+          "log": {
+            "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 33 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.36 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[35mindex-D9Lk99jZ.css  \u001b[39m\u001b[1m\u001b[2m 0.74 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.35 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-xGfCoRQ6.js   \u001b[39m\u001b[1m\u001b[2m85.34 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.91 kB\u001b[22m\n\u001b[32m✓ built in 1.12s\u001b[39m\n",
+            "bytes": 628,
+            "observedBytes": 628,
+            "truncated": false
+          },
+          "artifact": {
+            "digest": "sha256:c1c9b77ce0cdaebd92d56a75eeb3a2570280538720f479f8be73389a9890a0b3",
+            "bytes": 86442,
+            "files": [
+              {
+                "path": "assets/index-D9Lk99jZ.css",
+                "bytes": 737,
+                "digest": "sha256:07c37c0063351781c6b4f28f34d1e1c07e410d1095e4bc2de3b0c9db2c60aa5b"
+              },
+              {
+                "path": "assets/index-xGfCoRQ6.js",
+                "bytes": 85342,
+                "digest": "sha256:cfba933f096e092c2f8e5a4d5afa484560dc504e950754367681df87903483f6"
+              },
+              {
+                "path": "index.html",
+                "bytes": 363,
+                "digest": "sha256:196d720e7f4c41393b429c38b69c49ceaf5fa02a49f170c88bc5beeabdd69543"
+              }
+            ],
+            "directory": "/workspace\\services\\api\\target\\real-preview-platform-6331d8e5-6610-42e1-896e-e7dc9409172f\\private\\artifacts\\c1d7c18e-6a7e-4f9e-9516-cd2da77d4b32"
+          },
+          "cleanup": {
+            "containerRemoved": true,
+            "workspaceRemoved": true,
+            "errors": []
+          },
+          "createdAt": "2026-10-04T13:58:50.795Z",
+          "completedAt": "2026-10-04T13:58:56.349Z"
+        },
+        "verification": {
+          "id": "c9372e39-d2dc-440b-91a1-5cafc80435be",
+          "buildId": "c1d7c18e-6a7e-4f9e-9516-cd2da77d4b32",
+          "sourceDigest": "sha256:ca6f43a4ce5869b7a5683d1374fceb2a0bc7229a19ecf12d303ef9b90cc4a574",
+          "artifactDigest": "sha256:c1c9b77ce0cdaebd92d56a75eeb3a2570280538720f479f8be73389a9890a0b3",
+          "status": "FAILED",
+          "failure": "ACTION_FAILED",
+          "startedAt": "2026-10-04T13:58:56.373Z",
+          "completedAt": "2026-10-04T13:58:57.113Z",
+          "workerExitCode": 1,
+          "timedOut": false,
+          "phase": "ACTION",
+          "diagnostics": {
+            "pageErrors": [],
+            "consoleErrors": [],
+            "blockedRequests": [],
+            "failedRequests": [],
+            "actions": [
+              {
+                "index": 0,
+                "type": "navigate",
+                "status": "PASSED"
+              },
+              {
+                "index": 1,
+                "type": "expectText",
+                "status": "PASSED"
+              },
+              {
+                "index": 2,
+                "type": "expectVisible",
+                "status": "PASSED"
+              }
+            ],
+            "truncated": false,
+            "freshContext": {
+              "cookies": 0,
+              "pages": 1
+            },
+            "visibleContent": true,
+            "controlHost": "127.0.0.1"
+          },
+          "cleanup": {
+            "browserClosed": true,
+            "processTreeTerminated": null
+          },
+          "screenshot": null,
+          "reportPath": "/workspace\\services\\api\\target\\real-preview-platform-6331d8e5-6610-42e1-896e-e7dc9409172f\\private\\evidence\\c9372e39-d2dc-440b-91a1-5cafc80435be\\result.json",
+          "error": "locator.waitFor: Error: strict mode violation: getByTestId('work-title') resolved to 2 elements:\n    1) <h3 data-v-e3d18e03=\"\" class=\"work-title\" data-testid=\"work-title\">Analytical Engine</h3> aka getByRole('heading', { name: 'Analytical Engine' })\n    2) <h3 data-v-e3d18e03=\"\" class=\"work-title\" data-testid=\"work-title\">Note G</h3> aka getByRole('heading', { name: 'Note G' })\n\nCall log:\n\u001b[2m  - waiting for getByTestId('work-title') to be visible\u001b[22m\n"
+        },
+        "executionId": "c9e58148-e115-48f7-a94e-cf90e9cea669"
+      },
+      "at": "2026-10-04T13:58:57.196960700Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    },
+    {
+      "kind": "failure",
+      "sequence": 32,
+      "stage": "VERIFY",
+      "payload": {
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+        "code": "AGENT_ACTION_FAILED"
+      },
+      "at": "2026-10-04T13:58:57.276857400Z",
+      "taskId": "076d5482-4fdc-4ccf-9b06-95816dfca3c7"
+    }
+  ]
+}
