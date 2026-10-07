@@ -10,7 +10,8 @@ const digest=bytes=>'sha256:'+createHash('sha256').update(bytes).digest('hex')
 const portable=value=>{
   if(Array.isArray(value)) return value.map(portable)
   if(value && typeof value==='object') return Object.fromEntries(Object.entries(value).map(([key,item])=>[key,
-    typeof item==='string' && ['directory','sourceDirectory','reportPath','path'].includes(key) && (isAbsolute(item)||/^[A-Za-z]:[\\/]/.test(item))?'PRIVATE_PATH_RETAINED_LOCALLY':portable(item)]))
+    typeof item==='string' && ['directory','sourceDirectory','reportPath','path'].includes(key) &&
+    !(key==='path' && value.type==='navigate') && (isAbsolute(item)||/^[A-Za-z]:[\\/]/.test(item))?'PRIVATE_PATH_RETAINED_LOCALLY':portable(item)]))
   return value
 }
 await mkdir(output,{recursive:true})
@@ -43,8 +44,18 @@ for(const name of (await readdir(input)).filter(name=>/^D10-A-[A-Za-z0-9-]+\.jso
       } else runners.push(portable(actual))
     }
   }
+  const extra=portable(report.extra)
+  const platformScreenshot=extra?.acceptance?.screenshot
+  if(platformScreenshot) {
+    assert.equal(platformScreenshot.path,'authenticated-platform-preview.png')
+    const bytes=await readFile(join(input,platformScreenshot.path))
+    assert.equal(digest(bytes),platformScreenshot.digest);assert.equal(bytes.length,platformScreenshot.bytes)
+    const relative=`screenshots/${outputName.slice(0,-5)}-platform.png`
+    await mkdir(join(output,'screenshots'),{recursive:true});await writeFile(join(output,relative),bytes)
+    platformScreenshot.path=relative
+  }
   await writeFile(join(output,outputName),JSON.stringify({task:report.task,budget:report.budget,modelProvider:report.modelProvider,
-    modelQualityEvidence:report.modelQualityEvidence,extra:report.extra,candidates,runners,
+    modelQualityEvidence:report.modelQualityEvidence,extra,candidates,runners,
     usage:report.events.filter(e=>e.kind==='model.usage').map(e=>({stage:e.stage,...e.payload})),
     decisions:report.events.filter(e=>['repair.failure','failure','completion','stage.finished'].includes(e.kind)).map(portable)},null,2)+'\n')
 }

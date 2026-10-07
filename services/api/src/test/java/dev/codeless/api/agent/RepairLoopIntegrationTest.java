@@ -31,6 +31,10 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
     private static final String PAGE="src/pages/HomePage.vue";
     private static final String BROKEN="<script setup lang=\"ts\">import ProfileCard from '../components/MissingCard.vue';</script><template><main><ProfileCard/></main></template>";
     private static final String FIXED=BROKEN.replace("MissingCard.vue","ProfileCard.vue");
+    private static final String BROWSER_ERROR="<script setup lang=\"ts\">import { onMounted } from 'vue';"
+            +"import ProfileCard from '../components/ProfileCard.vue';"
+            +"onMounted(() => { window.setTimeout(() => { throw new Error('D10_A_BROWSER_PAGE_EXCEPTION'); }, 0); });"
+            +"</script><template><main><ProfileCard/></main></template>";
     record Seed(UUID owner,UUID app,UUID task) {}
     @BeforeAll static void runtime() throws Exception {
         var process=new ProcessBuilder("node","../../tests/agent/prepare-runtime.mjs").inheritIO().start();
@@ -59,9 +63,15 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
             if(!phase.equals("REPAIR")) {
                 var reply=mock.call(prompt,max,timeout);var node=json.readTree(reply.content());
                 if(node.path("arguments").path("path").asText().equals(PAGE))
-                    ((tools.jackson.databind.node.ObjectNode)node.path("arguments")).put("content",BROKEN);
+                    ((tools.jackson.databind.node.ObjectNode)node.path("arguments")).put("content",mode.equals("browser")?BROWSER_ERROR:BROKEN);
                 content=node.toString();
             } else {
+                if(mode.equals("browser")) {
+                    assertThat(input.path("failure").path("code").asText()).isEqualTo("AGENT_PAGE_EXCEPTION");
+                    assertThat(input.path("failure").path("diagnostic").asText()).contains("D10_A_BROWSER_PAGE_EXCEPTION");
+                    assertThat(queue.find(seed.owner(),seed.task()).orElseThrow().status()).isEqualTo(TaskStatus.REPAIR);
+                    assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
+                }
                 if(mode.equals("network")) throw new ModelFailure("MODEL_NETWORK");
                 if(mode.equals("cancel")) queue.cancel(seed.owner(),seed.task());
                 if(mode.equals("timeout")) jdbc.sql("UPDATE generation_tasks SET deadline_at=clock_timestamp()-interval '1 second',lease_expires_at=clock_timestamp()-interval '1 second' WHERE id=?").param(seed.task()).update();
@@ -78,7 +88,7 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                 } else if(observed==0) content=json.writeValueAsString(Map.of("type","tool","name","files.read","arguments",Map.of("path",PAGE)));
                 else if(observed==1) {
                     JsonNode actual=input.path("observations").get(0);
-                    assertThat(actual.path("content").asText()).isEqualTo(BROKEN);
+                    assertThat(actual.path("content").asText()).isEqualTo(mode.equals("browser")?BROWSER_ERROR:BROKEN);
                     content=json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of(
                             "path",PAGE,"expectedDigest",actual.path("afterDigest").asText(),"content",FIXED)));
                 } else content=json.writeValueAsString(Map.of("type","done","actions",input.path("originalActions")));
@@ -86,6 +96,28 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
             Usage usage=mode.equals("unknown")?Usage.unknown():new Usage(31,17,48,null);
             return new Reply(content,new Evidence(model(),"explicit-fixture-request","explicit-fixture-response",usage));
         }
+    }
+    @Test void realBrowserPageExceptionRepairsWithoutChangingOriginalAcceptance() throws Exception {
+        var seed=seed();var provider=new Fixture("browser",seed);var task=run(seed,provider);
+        assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);assertThat(task.repairAttempts()).isEqualTo(1);
+        var events=journal.read(seed.task());var results=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
+        assertThat(results).hasSize(2);
+        assertThat(results.getFirst().path("build").path("status").asText()).isEqualTo("SUCCEEDED");
+        assertThat(results.getFirst().path("build").path("exitCode").asInt(-1)).isZero();
+        var failed=results.getFirst().path("verification");
+        assertThat(failed.path("failure").asText()).isEqualTo("PAGE_EXCEPTION");
+        assertThat(failed.path("workerExitCode").asInt(-1)).isEqualTo(1);
+        assertThat(failed.path("cleanup").path("browserClosed").asBoolean()).isTrue();
+        assertThat(failed.path("diagnostics").path("pageErrors").toString()).contains("D10_A_BROWSER_PAGE_EXCEPTION");
+        assertThat(results.getLast().path("build").path("exitCode").asInt(-1)).isZero();
+        assertThat(results.getLast().path("verification").path("status").asText()).isEqualTo("PASSED");
+        assertThat(results.getLast().path("verification").path("diagnostics").path("pageErrors")).isEmpty();
+        var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
+        assertThat(drafts).hasSize(2);assertThat(drafts.getFirst().path("sourceDigest")).isNotEqualTo(drafts.getLast().path("sourceDigest"));
+        assertThat(drafts.getFirst().path("actions")).isEqualTo(drafts.getLast().path("actions"));
+        assertThat(jdbc.sql("SELECT count(*) FROM application_versions WHERE application_id=? AND status='FAILED'").param(seed.app()).query(Integer.class).single()).isEqualTo(1);
+        assertThat(provider.count.get()).isEqualTo(7);assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(10);
+        report("D10-A-browser-error",seed,Map.of("before",BROWSER_ERROR,"after",FIXED,"realBuild",true,"realBrowser",true,"originalActionsPreserved",true));
     }
     void report(String name,Seed seed,Object extra) throws Exception {
         String configured=System.getenv("CODELESS_REPAIR_EVIDENCE_DIR");Path directory=configured==null?Path.of("target/repair-integration/evidence"):Path.of(configured);
