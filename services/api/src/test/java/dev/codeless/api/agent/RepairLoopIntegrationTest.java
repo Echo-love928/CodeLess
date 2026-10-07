@@ -31,6 +31,10 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
     private static final String PAGE="src/pages/HomePage.vue";
     private static final String BROKEN="<script setup lang=\"ts\">import ProfileCard from '../components/MissingCard.vue';</script><template><main><ProfileCard/></main></template>";
     private static final String FIXED=BROKEN.replace("MissingCard.vue","ProfileCard.vue");
+    private static String recordedInvalidReply() {
+        try {return Files.readString(Path.of("../../tests/agent/repair/fixtures/model-json-object.json")).strip();}
+        catch(java.io.IOException error){throw new IllegalStateException(error);}
+    }
     private static final String BROWSER_ERROR="<script setup lang=\"ts\">import { onMounted } from 'vue';"
             +"import ProfileCard from '../components/ProfileCard.vue';"
             +"onMounted(() => { window.setTimeout(() => { throw new Error('D10_A_BROWSER_PAGE_EXCEPTION'); }, 0); });"
@@ -60,11 +64,20 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         public Reply call(Prompt prompt,int max,Duration timeout) {
             count.incrementAndGet();var input=json.readTree(prompt.getUserMessage().getText());inputs.add(input);
             String phase=input.path("phase").asText();String content;
+            if(Set.of("GENERATE","REPAIR").contains(phase)) {
+                assertThat(prompt.getSystemMessage().getText()).contains("Application proposal protocol", "never json_object", "Invalid replies terminate");
+                assertThat(max).isEqualTo(RuntimeBudget.OUTPUT_TOKENS);
+            }
             if(!phase.equals("REPAIR")) {
                 var reply=mock.call(prompt,max,timeout);var node=json.readTree(reply.content());
                 if(node.path("arguments").path("path").asText().equals(PAGE))
                     ((tools.jackson.databind.node.ObjectNode)node.path("arguments")).put("content",mode.equals("browser")?BROWSER_ERROR:BROKEN);
                 content=node.toString();
+                if(mode.equals("invalid-generate") && phase.equals("GENERATE")) {
+                    int observed=input.path("observations").size();
+                    if(observed==1)content=json.writeValueAsString(Map.of("type","tool","name","files.read","arguments",Map.of("path","src/components/ProfileCard.vue")));
+                    if(observed==2)content=recordedInvalidReply();
+                }
             } else {
                 if(mode.equals("browser")) {
                     assertThat(input.path("failure").path("code").asText()).isEqualTo("AGENT_PAGE_EXCEPTION");
@@ -72,6 +85,7 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                     assertThat(queue.find(seed.owner(),seed.task()).orElseThrow().status()).isEqualTo(TaskStatus.REPAIR);
                     assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
                 }
+                if(mode.equals("invalid-repair")) return new Reply(recordedInvalidReply(),new Evidence(model(),"explicit-recorded-protocol-fixture","explicit-recorded-protocol-fixture",new Usage(31,17,48,null)));
                 if(mode.equals("network")) throw new ModelFailure("MODEL_NETWORK");
                 if(mode.equals("cancel")) queue.cancel(seed.owner(),seed.task());
                 if(mode.equals("timeout")) jdbc.sql("UPDATE generation_tasks SET deadline_at=clock_timestamp()-interval '1 second',lease_expires_at=clock_timestamp()-interval '1 second' WHERE id=?").param(seed.task()).update();
@@ -96,6 +110,30 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
             Usage usage=mode.equals("unknown")?Usage.unknown():new Usage(31,17,48,null);
             return new Reply(content,new Evidence(model(),"explicit-fixture-request","explicit-fixture-response",usage));
         }
+    }
+    @Test void recordedJsonObjectReplyStopsGenerateBeforeAnyRunnerOrRepair() throws Exception {
+        var seed=seed();var provider=new Fixture("invalid-generate",seed);
+        new TaskScheduler(queue,loop(provider,(draft,deadline)->{throw new AssertionError("invalid proposal must never launch runner");})).tick();
+        assertRecordedInvalidTerminal(seed,provider,"GENERATE",4,0);
+        assertThat(RuntimeBudget.meter(journal.read(seed.task())).tools()).isEqualTo(2);
+    }
+    @Test void recordedJsonObjectReplyStopsRepairWithoutFurtherEditsOrRetries() throws Exception {
+        var seed=seed();var provider=new Fixture("invalid-repair",seed);run(seed,provider);
+        assertRecordedInvalidTerminal(seed,provider,"REPAIR",5,1);
+        assertThat(RuntimeBudget.meter(journal.read(seed.task())).tools()).isEqualTo(5);
+        assertThat(journal.read(seed.task()).stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(1);
+    }
+    private void assertRecordedInvalidTerminal(Seed seed,Fixture provider,String stage,int modelCalls,int repairs) throws Exception {
+        var task=queue.find(seed.owner(),seed.task()).orElseThrow();
+        assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_MODEL_PROTOCOL_INVALID");
+        assertThat(task.repairAttempts()).isEqualTo(repairs);assertThat(provider.count.get()).isEqualTo(modelCalls);
+        var events=journal.read(seed.task());assertThat(RuntimeBudget.meter(events).models()).isEqualTo(modelCalls);
+        assertThat(AgentJournal.latest(events,"model.response")).isEqualTo(json.readTree(recordedInvalidReply()));
+        assertThat(AgentJournal.latest(events,"failure").path("category").asText()).isEqualTo("MODEL_INTERFACE");
+        assertThat(jdbc.sql("SELECT count(*) FROM model_calls WHERE task_id=? AND stage=?").params(seed.task(),stage).query(Integer.class).single()).isEqualTo(stage.equals("GENERATE")?3:1);
+        assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
+        report("D10-A-protocol-"+stage.toLowerCase(Locale.ROOT),seed,Map.of("recordedReply",json.readTree(recordedInvalidReply()),
+                "originTask","57776370-dd0b-4ed7-9931-cf6ff55e9ec4","originCandidate","7ea187f","realModelCallsInThisTest",0,"automaticRetries",0));
     }
     @Test void realBrowserPageExceptionRepairsWithoutChangingOriginalAcceptance() throws Exception {
         var seed=seed();var provider=new Fixture("browser",seed);var task=run(seed,provider);

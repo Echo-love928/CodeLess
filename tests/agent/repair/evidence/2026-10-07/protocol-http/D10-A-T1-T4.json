@@ -1,0 +1,406 @@
+{
+  "task": {
+    "id": "bf68c355-7fdf-49eb-bacf-ab91e9e33e90",
+    "applicationId": "e92866d9-996a-4463-b5f8-597dfd032e9a",
+    "prompt": "生成 Ada Lovelace 静态个人展示页",
+    "status": "READY",
+    "repairAttempts": 1,
+    "failureCode": null,
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-07T13:07:35.006902Z"
+  },
+  "budget": {
+    "models": 7,
+    "tools": 10,
+    "chargedTokens": 336
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "realBrowser": true,
+    "after": "<script setup lang=\"ts\">import ProfileCard from '../components/ProfileCard.vue';</script><template><main><ProfileCard/></main></template>",
+    "before": "<script setup lang=\"ts\">import ProfileCard from '../components/MissingCard.vue';</script><template><main><ProfileCard/></main></template>",
+    "realBuild": true
+  },
+  "candidates": [
+    {
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 137,
+          "digest": "sha256:2bb84476d299cb9aae768121e3b99f4e6554b4595e56f87b9d37cb3356234870"
+        }
+      ],
+      "versionId": "f8f3a436-ca92-4e96-b1cb-33a5ca8055ec",
+      "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-T1-T4/candidate-0"
+    },
+    {
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 137,
+          "digest": "sha256:e6d3d42b532e6b59340492667cf58f2d22104037d059c8fc8ab295638edcb508"
+        }
+      ],
+      "versionId": "d0222078-8eb2-47be-a5e8-9d2e56c1bede",
+      "sourceDigest": "sha256:6073f6c676790f70374e1736da73f224b0b781ec44847c5f15ff89fde683e3fa",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-T1-T4/candidate-1"
+    }
+  ],
+  "runners": [
+    {
+      "status": "FAILED",
+      "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+      "build": {
+        "id": "07ac3b31-fbc0-4b27-99f6-5fbe5e53726f",
+        "imageId": "sha256:73b3092c40ebb8c38370a1faa449d03f0804aec63545bf134a27937fc815eee3",
+        "containerName": "codeless-build-07ac3b31-fbc0-4b27-99f6-5fbe5e53726f",
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 2,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/MissingCard.vue' or its corresponding type declarations.\n",
+          "bytes": 230,
+          "observedBytes": 230,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-07T13:07:24.298Z",
+        "completedAt": "2026-10-07T13:07:27.535Z"
+      },
+      "verification": null,
+      "executionId": "cff35e52-0687-4636-8ad1-7b390d130cf4"
+    },
+    {
+      "status": "VERIFIED",
+      "sourceDigest": "sha256:6073f6c676790f70374e1736da73f224b0b781ec44847c5f15ff89fde683e3fa",
+      "build": {
+        "id": "e9568408-da1e-41a4-bb75-2f0c28615d9b",
+        "imageId": "sha256:73b3092c40ebb8c38370a1faa449d03f0804aec63545bf134a27937fc815eee3",
+        "containerName": "codeless-build-e9568408-da1e-41a4-bb75-2f0c28615d9b",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 30 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-BvbGrT7E.js  \u001b[39m\u001b[1m\u001b[2m83.36 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.04 kB\u001b[22m\n\u001b[32m✓ built in 987ms\u001b[39m\n",
+          "bytes": 507,
+          "observedBytes": 507,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:9a0e4f82a38bcc7deb25679696e152445a46b971fced633dd1d252aed06f33c0",
+          "bytes": 83655,
+          "files": [
+            {
+              "path": "assets/index-BvbGrT7E.js",
+              "bytes": 83364,
+              "digest": "sha256:e6f27fb8c78404d3e5d607e9d7ed857811c163c535e29df64c32e85911f60ab6"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:e93e5fc0f2b6b14cb202453037d15177943da22049fa10202b619db73e589727"
+            }
+          ],
+          "directory": "PRIVATE_PATH_RETAINED_LOCALLY"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-07T13:07:29.277Z",
+        "completedAt": "2026-10-07T13:07:33.747Z"
+      },
+      "verification": {
+        "id": "e54be2f0-d1b6-48c0-9ffe-1e62b98a28d3",
+        "buildId": "e9568408-da1e-41a4-bb75-2f0c28615d9b",
+        "sourceDigest": "sha256:6073f6c676790f70374e1736da73f224b0b781ec44847c5f15ff89fde683e3fa",
+        "artifactDigest": "sha256:9a0e4f82a38bcc7deb25679696e152445a46b971fced633dd1d252aed06f33c0",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-07T13:07:33.769Z",
+        "completedAt": "2026-10-07T13:07:34.749Z",
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "navigate",
+              "status": "PASSED"
+            },
+            {
+              "index": 1,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1"
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "screenshots/D10-A-T1-T4-1.png",
+          "digest": "sha256:448408c7bd100d0635f043ecf219a95c910c0966a7a0b4dd9c60e6001595111d",
+          "bytes": 8890,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "PRIVATE_PATH_RETAINED_LOCALLY"
+      },
+      "executionId": "4e36cdee-4eec-4b46-a81f-d2fe0796ef0a"
+    }
+  ],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "releasedTokens": 9202,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 9250,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 12556,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 12604,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 13030,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 13078,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 13634,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 13682,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "REPAIR",
+      "releasedTokens": 10815,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 10863,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "REPAIR",
+      "releasedTokens": 11624,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 11672,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "REPAIR",
+      "releasedTokens": 12297,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 12345,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE"
+    }
+  ],
+  "decisions": [
+    {
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T13:07:23.233049900Z",
+      "taskId": "bf68c355-7fdf-49eb-bacf-ab91e9e33e90",
+      "kind": "stage.finished",
+      "sequence": 5,
+      "stage": "PLAN"
+    },
+    {
+      "payload": {
+        "next": "VERIFY"
+      },
+      "at": "2026-10-07T13:07:23.976424700Z",
+      "taskId": "bf68c355-7fdf-49eb-bacf-ab91e9e33e90",
+      "kind": "stage.finished",
+      "sequence": 21,
+      "stage": "GENERATE"
+    },
+    {
+      "payload": {
+        "code": "AGENT_BUILD_EXIT",
+        "category": "CODE",
+        "fingerprint": "sha256:8ba9982c7fcbe5e6d5221f8ac6b6b56e65eb55698bfaf2923731a178233a0bfb",
+        "diagnostic": "> @codeless/generated-vue@0.1.0 build\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/MissingCard.vue' or its corresponding type declarations.",
+        "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+        "repairAttempts": 0,
+        "decision": "REPAIR"
+      },
+      "at": "2026-10-07T13:07:27.686997100Z",
+      "taskId": "bf68c355-7fdf-49eb-bacf-ab91e9e33e90",
+      "kind": "repair.failure",
+      "sequence": 24,
+      "stage": "VERIFY"
+    },
+    {
+      "payload": {
+        "next": "REPAIR"
+      },
+      "at": "2026-10-07T13:07:27.716931500Z",
+      "taskId": "bf68c355-7fdf-49eb-bacf-ab91e9e33e90",
+      "kind": "stage.finished",
+      "sequence": 25,
+      "stage": "VERIFY"
+    },
+    {
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T13:07:28.624787500Z",
+      "taskId": "bf68c355-7fdf-49eb-bacf-ab91e9e33e90",
+      "kind": "stage.finished",
+      "sequence": 40,
+      "stage": "REPAIR"
+    },
+    {
+      "payload": {
+        "next": "VERIFY"
+      },
+      "at": "2026-10-07T13:07:28.905838100Z",
+      "taskId": "bf68c355-7fdf-49eb-bacf-ab91e9e33e90",
+      "kind": "stage.finished",
+      "sequence": 43,
+      "stage": "GENERATE"
+    },
+    {
+      "payload": {
+        "next": "READY"
+      },
+      "at": "2026-10-07T13:07:34.922101500Z",
+      "taskId": "bf68c355-7fdf-49eb-bacf-ab91e9e33e90",
+      "kind": "stage.finished",
+      "sequence": 46,
+      "stage": "VERIFY"
+    },
+    {
+      "payload": {
+        "artifactDigest": "sha256:9a0e4f82a38bcc7deb25679696e152445a46b971fced633dd1d252aed06f33c0",
+        "versionId": "d0222078-8eb2-47be-a5e8-9d2e56c1bede",
+        "sourceDigest": "sha256:6073f6c676790f70374e1736da73f224b0b781ec44847c5f15ff89fde683e3fa",
+        "buildId": "e9568408-da1e-41a4-bb75-2f0c28615d9b",
+        "verificationId": "e54be2f0-d1b6-48c0-9ffe-1e62b98a28d3"
+      },
+      "at": "2026-10-07T13:07:35.042965800Z",
+      "taskId": "bf68c355-7fdf-49eb-bacf-ab91e9e33e90",
+      "kind": "completion",
+      "sequence": 47,
+      "stage": "VERIFY"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+Application proposal protocol: type is tool or done, never json_object; response_format is transport only.
+Shape examples: {"type":"tool","name":"files.list","arguments":{}}
+{"type":"done","actions":[{"type":"navigate","path":"/"},{"type":"expectVisible","target":{"testId":"profile-name"}}]}
+Use actual observed targets; REPAIR copies input.originalActions unchanged.
+Invalid replies terminate; no unwrap or retry.
