@@ -1,0 +1,314 @@
+{
+  "task": {
+    "id": "effc8694-0d32-4827-8ed6-56858e1f3435",
+    "applicationId": "f2f54ebb-cffb-4e82-9014-9413391d9f72",
+    "prompt": "生成 Ada Lovelace 静态个人展示页",
+    "status": "FAILED",
+    "repairAttempts": 1,
+    "failureCode": "AGENT_REPAIR_NO_PROGRESS",
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-07T07:09:02.185326Z"
+  },
+  "budget": {
+    "models": 5,
+    "tools": 8,
+    "chargedTokens": 240
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "actualBuilds": 2
+  },
+  "candidates": [
+    {
+      "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "PRIVATE_PATH_RETAINED_LOCALLY"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-T2-no-progress/candidate-0",
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 137,
+          "digest": "sha256:2bb84476d299cb9aae768121e3b99f4e6554b4595e56f87b9d37cb3356234870"
+        }
+      ],
+      "versionId": "dc441bad-896a-46c4-9907-1a8e20a4e48d"
+    },
+    {
+      "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "PRIVATE_PATH_RETAINED_LOCALLY"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-T2-no-progress/candidate-1",
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 137,
+          "digest": "sha256:2bb84476d299cb9aae768121e3b99f4e6554b4595e56f87b9d37cb3356234870"
+        }
+      ],
+      "versionId": "87c943ad-5bb5-484c-81e5-d98c0cb4cf57"
+    }
+  ],
+  "runners": [
+    {
+      "status": "FAILED",
+      "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+      "build": {
+        "id": "d76b7871-4733-4128-b1cb-2e878866f4f6",
+        "imageId": "sha256:b7760062f2e95473864cd30b7376c3244afea6aaa950f27330b0e0e0dd6ae298",
+        "containerName": "codeless-build-d76b7871-4733-4128-b1cb-2e878866f4f6",
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 2,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/MissingCard.vue' or its corresponding type declarations.\n",
+          "bytes": 230,
+          "observedBytes": 230,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-07T07:08:53.304Z",
+        "completedAt": "2026-10-07T07:08:57.011Z"
+      },
+      "verification": null,
+      "executionId": "8c127197-babf-45dd-a044-6ae2931c72e4"
+    },
+    {
+      "status": "FAILED",
+      "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+      "build": {
+        "id": "0624dfea-4ffa-431c-ba12-579974b6a638",
+        "imageId": "sha256:b7760062f2e95473864cd30b7376c3244afea6aaa950f27330b0e0e0dd6ae298",
+        "containerName": "codeless-build-0624dfea-4ffa-431c-ba12-579974b6a638",
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 2,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/MissingCard.vue' or its corresponding type declarations.\n",
+          "bytes": 230,
+          "observedBytes": 230,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-07T07:08:58.570Z",
+        "completedAt": "2026-10-07T07:09:01.835Z"
+      },
+      "verification": null,
+      "executionId": "0ef88b00-0304-49f4-9799-cf8260c978be"
+    }
+  ],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 9250,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 9202
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 12187,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 12139
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 12661,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 12613
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 13265,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 13217
+    },
+    {
+      "stage": "REPAIR",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 10339,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 10291
+    }
+  ],
+  "decisions": [
+    {
+      "taskId": "effc8694-0d32-4827-8ed6-56858e1f3435",
+      "kind": "stage.finished",
+      "sequence": 5,
+      "stage": "PLAN",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T07:08:51.592043500Z"
+    },
+    {
+      "taskId": "effc8694-0d32-4827-8ed6-56858e1f3435",
+      "kind": "stage.finished",
+      "sequence": 21,
+      "stage": "GENERATE",
+      "payload": {
+        "next": "VERIFY"
+      },
+      "at": "2026-10-07T07:08:52.914288100Z"
+    },
+    {
+      "taskId": "effc8694-0d32-4827-8ed6-56858e1f3435",
+      "kind": "repair.failure",
+      "sequence": 24,
+      "stage": "VERIFY",
+      "payload": {
+        "code": "AGENT_BUILD_EXIT",
+        "category": "CODE",
+        "fingerprint": "sha256:8ba9982c7fcbe5e6d5221f8ac6b6b56e65eb55698bfaf2923731a178233a0bfb",
+        "diagnostic": "> @codeless/generated-vue@0.1.0 build\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/MissingCard.vue' or its corresponding type declarations.",
+        "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+        "repairAttempts": 0,
+        "decision": "REPAIR"
+      },
+      "at": "2026-10-07T07:08:57.237519200Z"
+    },
+    {
+      "taskId": "effc8694-0d32-4827-8ed6-56858e1f3435",
+      "kind": "stage.finished",
+      "sequence": 25,
+      "stage": "VERIFY",
+      "payload": {
+        "next": "REPAIR"
+      },
+      "at": "2026-10-07T07:08:57.294442500Z"
+    },
+    {
+      "taskId": "effc8694-0d32-4827-8ed6-56858e1f3435",
+      "kind": "stage.finished",
+      "sequence": 30,
+      "stage": "REPAIR",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T07:08:57.697109200Z"
+    },
+    {
+      "taskId": "effc8694-0d32-4827-8ed6-56858e1f3435",
+      "kind": "stage.finished",
+      "sequence": 33,
+      "stage": "GENERATE",
+      "payload": {
+        "next": "VERIFY"
+      },
+      "at": "2026-10-07T07:08:58.138046100Z"
+    },
+    {
+      "taskId": "effc8694-0d32-4827-8ed6-56858e1f3435",
+      "kind": "repair.failure",
+      "sequence": 36,
+      "stage": "VERIFY",
+      "payload": {
+        "code": "AGENT_BUILD_EXIT",
+        "category": "CODE",
+        "fingerprint": "sha256:8ba9982c7fcbe5e6d5221f8ac6b6b56e65eb55698bfaf2923731a178233a0bfb",
+        "diagnostic": "> @codeless/generated-vue@0.1.0 build\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/MissingCard.vue' or its corresponding type declarations.",
+        "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+        "repairAttempts": 1,
+        "decision": "AGENT_REPAIR_NO_PROGRESS"
+      },
+      "at": "2026-10-07T07:09:02.105776400Z"
+    },
+    {
+      "taskId": "effc8694-0d32-4827-8ed6-56858e1f3435",
+      "kind": "failure",
+      "sequence": 37,
+      "stage": "VERIFY",
+      "payload": {
+        "code": "AGENT_REPAIR_NO_PROGRESS",
+        "category": "CONTROL",
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY"
+      },
+      "at": "2026-10-07T07:09:02.173309900Z"
+    }
+  ]
+}

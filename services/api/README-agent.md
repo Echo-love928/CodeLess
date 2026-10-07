@@ -1,6 +1,8 @@
 # D09-A generation loop
 
-The opt-in trusted adapter runs `PLAN -> GENERATE -> VERIFY -> PREVIEW_READY`.
+The opt-in trusted adapter runs `PLAN -> GENERATE -> VERIFY -> PREVIEW_READY`, with
+the D10 bounded `VERIFY -> REPAIR -> GENERATE -> VERIFY` path for observed code errors.
+See [repair stop conditions and budget policy](README-repair.md).
 `PREVIEW_READY` maps to the existing v0 task status `READY`; it is not publication.
 Enable it with Spring properties (for example command-line `--codeless.agent.enabled=true`):
 
@@ -9,6 +11,7 @@ codeless.agent.enabled=true
 codeless.agent.repository-root=/absolute/controlled/checkout
 codeless.agent.private-root=/absolute/private/persistent/agent-volume
 codeless.agent.node=node
+codeless.agent.repair.enabled=true
 ```
 
 Keep D01 versions and configure the existing PostgreSQL/auth/model settings. The
@@ -44,6 +47,9 @@ selection; CI tests therefore also pin the provider in their test properties.
   file mutations. `services/api/agent-runner.mjs` validates action parameters and
   source hash, then consumes D08's `createBuildVerifier`. Invocation roots are
   trusted process configuration; model data cannot set a command or a root.
+- REPAIR exposes only the existing planned file tools. It preserves original
+  acceptance actions, applies at most three rounds, then GENERATE freezes the
+  actual changed source. Infrastructure/model errors stop without code retries.
 - The API re-reads the bridge receipt, source, full artifact manifest, browser
   report and PNG bytes before accepting VERIFIED, and repeats validation before
   commit. Success requires matching source/build/artifact IDs, real exit 0,
@@ -52,13 +58,14 @@ selection; CI tests therefore also pin the provider in their test properties.
 
 Reservations persist under the task row lock: at most 12 model requests, 20 total
 tool operations (including source snapshot and build+browser verification),
-50000 runtime tokens and the existing 12-minute DB deadline. Next-call input is
+50000 runtime tokens and the existing 12-minute DB deadline. Build and browser
+reserve two slots together before launch. Next-call input is
 conservatively reserved using UTF-8 bytes plus message framing margin and 4096
 output tokens for the configured BPE adapter. Measured input/output and total
-usage release unused reservations. A real provider's unknown usage prevents the
-next request; the explicitly named offline mock retains full reservations while
-actual usage remains null. No repair is automatically attempted (0 rounds, within
-the 3-round maximum). These bounds are not a promise that every valid large plan
+usage release unused reservations. Missing usage retains a conservative charge
+for unavailable counters with an explicit estimate; actual unknown usage remains
+null. This applies to the bounded loop for real and mock providers; standalone
+D07 PLAN still fails closed without its own meter. These bounds are not a promise that every valid large plan
 fits the remaining budget.
 
 ## Evidence, failure and commit
@@ -72,7 +79,8 @@ D08 file audits remain authoritative for their respective operations.
 
 Failure preserves checkpoints, source and real results; the task becomes FAILED.
 Cancelled/expired workers cannot commit late results or impersonate a newer lease.
-Re-entering an already attempted stage returns `AGENT_RECOVERY_REQUIRED`; an
+Re-entering an already attempted stage without a durable completed transition
+returns `AGENT_RECOVERY_REQUIRED`; an
 operator must inspect the durable record and explicitly create a new task.
 There is no automatic restart/replay endpoint. A process crash is recovered by
 the existing queue as INTERRUPTED; pending observations are unknown, never zero.
