@@ -18,3 +18,5 @@ v2唯一故障注入时点：收到真实GENERATE的done后、生产冻结源码
 同一任务上限仍12模型请求、20工具、50,000运行时tokens、12分钟、最多3轮修复；模型/网络失败立刻停止，不做外层重试。
 如果另行授权，将只执行1个新任务、单独计费/计量。此前本轮12请求/38,336实测tokens与A原历史失败均保留，不覆盖、不合并到成功任务。
 执行入口仍 `cd services/api; ./mvnw.cmd -Dtest=RealRepairPreviewPlatformAcceptanceIT test`，必须新增明确授权后才能设置CODELESS_M1_REAL_APPROVED=1。
+
+最终决定（2026-10-07）：用户停止追加付费。本v2未获执行授权，未执行第三个任务；M1仍NOT_PASSED。
