@@ -1,0 +1,200 @@
+{
+  "baseline": "f80ee105bd8207a65bcc46c9ce61f0eaf5497c26",
+  "branch": "codex/d09-a-agent-loop",
+  "taskCases": [
+    "D09-A-T1",
+    "D09-A-T2",
+    "D09-A-T3",
+    "D09-A-T4"
+  ],
+  "commands": [
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -DskipTests compile",
+      "exitCode": 0,
+      "log": ".local-data/d09-a/compile.log",
+      "meaning": "compile only"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=AgentLoopIntegrationTest test",
+      "exitCode": 1,
+      "log": ".local-data/d09-a/agent-first.log",
+      "reason": "environment-selected real provider exhausted conservative reservations"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=AgentLoopIntegrationTest test",
+      "exitCode": 1,
+      "log": ".local-data/d09-a/agent-second.log",
+      "reason": "actual build rejected mock fixture missing import semicolon"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=AgentLoopIntegrationTest test",
+      "exitCode": 0,
+      "log": ".local-data/d09-a/agent-third.log",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 1,
+      "log": ".local-data/d09-a/ci-gate.log",
+      "reason": "new SQL NULL test incorrectly used JdbcClient.single; static/runner/e2e passed"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealAgentAcceptanceIT test",
+      "exitCode": 1,
+      "log": ".local-data/d09-a/real-agent.log",
+      "provider": "deepseek",
+      "reason": "real generated JS SFC did not pass frozen strict TS build"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealAgentAcceptanceIT test",
+      "exitCode": 1,
+      "log": ".local-data/d09-a/real-agent-typed.log",
+      "provider": "deepseek",
+      "reason": "MODEL_NETWORK in PLAN; usage unknown; no retry"
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 0,
+      "log": ".local-data/d09-a/ci-gate-final.log",
+      "stages": [
+        {
+          "command": "pnpm verify:static",
+          "exitCode": 0,
+          "contractTests": 7,
+          "frontendTests": 24
+        },
+        {
+          "command": "pnpm verify:api",
+          "exitCode": 0,
+          "tests": 95,
+          "agentTests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "command": "pnpm verify:runner",
+          "exitCode": 0,
+          "tests": 30
+        },
+        {
+          "command": "pnpm verify:e2e",
+          "exitCode": 0,
+          "tests": 28
+        }
+      ]
+    },
+    {
+      "command": "node tests/agent/export-evidence.mjs",
+      "exitCode": 0,
+      "result": "source and PNG bytes independently hashed before export"
+    },
+    {
+      "command": "GitHub required checks for 551da00",
+      "exitCode": 1,
+      "report": "remote-ci-551da00.json",
+      "runId": 37116196879,
+      "reason": "existing TaskQueueIntegrationTest concurrent claim unique-key race; Agent8/8 passed"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=TaskQueueIntegrationTest test",
+      "exitCode": 0,
+      "log": ".local-data/d09-a/queue-race-fix.log",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 0,
+      "log": ".local-data/d09-a/ci-gate-queue-fix.log",
+      "meaning": "all stages rerun after claim fix",
+      "stages": [
+        {
+          "command": "pnpm verify:static",
+          "exitCode": 0,
+          "contractTests": 7,
+          "frontendTests": 24
+        },
+        {
+          "command": "pnpm verify:api",
+          "exitCode": 0,
+          "tests": 95,
+          "agentTests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "command": "pnpm verify:runner",
+          "exitCode": 0,
+          "tests": 30
+        },
+        {
+          "command": "pnpm verify:e2e",
+          "exitCode": 0,
+          "tests": 28
+        }
+      ]
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=PreviewHttpTest test",
+      "log": ".local-data/d09-a/peer-api.log",
+      "exitCode": 0,
+      "tests": 1,
+      "peerHead": "27fe0dc72328f31b850113cbbf117c4e1798dfd1",
+      "unchangedAtReviewedHead": true,
+      "logDigest": "sha256:032524a0394b11d125c12540fcbec698d2c34c30607184eb066eda0a87046fb1"
+    },
+    {
+      "command": "pnpm --filter @codeless/web test -- src/features/preview/PreviewPanel.test.ts",
+      "log": ".local-data/d09-a/peer-web.log",
+      "exitCode": 0,
+      "tests": 30,
+      "previewTests": 6,
+      "unchangedAtReviewedHead": true,
+      "logDigest": "sha256:1b55b74d606205e3dbb3cc9caf8a77d06adc8b5fc7179509ba23708a0ef40266"
+    },
+    {
+      "command": "pnpm --filter @codeless/web build",
+      "log": ".local-data/d09-a/peer-web-build.log",
+      "exitCode": 0,
+      "logDigest": "sha256:8b17d88bfaef956938b68f1e8ee83f392fd71ae157a7b66392c43cf2d72bd5df"
+    },
+    {
+      "command": "node --test tests/e2e/preview/gateway.acceptance.mjs",
+      "log": ".local-data/d09-a/peer-gateway.log",
+      "exitCode": 0,
+      "tests": 4,
+      "logDigest": "sha256:eeb4ee4b6d6f273a81412cfe9d088d717d13a8f523c31aea6cb2a97674991432"
+    },
+    {
+      "command": "pnpm --filter @codeless/web exec playwright test --config playwright.config.ts preview/flow.spec.ts",
+      "log": ".local-data/d09-a/peer-browser.log",
+      "exitCode": 0,
+      "tests": 1,
+      "logDigest": "sha256:682cfd70e121f2d4b49903dddd42650ded60246181d8493ae3cb867986060343"
+    },
+    {
+      "command": "node --test tests/agent/preview-handoff.test.mjs",
+      "log": ".local-data/d09-a/peer-handoff.log",
+      "exitCode": 0,
+      "tests": 1,
+      "logDigest": "sha256:f00aef20fffbf170e7ceb16a38674844124c1cbb62d8c9cc3c9bd0f796dd18be"
+    }
+  ],
+  "unexecuted": [
+    {
+      "case": "complete authenticated platform generation-to-preview integration",
+      "reason": "Trusted live-handle registry and deployment/public-contract integration remain unwired; separate API/browser and A-to-B artifact handoff tests explicitly identify fixture boundaries."
+    }
+  ],
+  "realModelCompleteSuccess": false,
+  "platformPreviewComplete": false,
+  "merged": false,
+  "peerReviewComplete": true
+}

@@ -1,0 +1,166 @@
+{
+  "peerPR": "https://github.com/Echo-love928/CodeLess/pull/20",
+  "reviewedHead": "3a774b92f80a764fd678dfdf798fdef433853e2a",
+  "reviewReadOnly": true,
+  "trackedPeerFilesModified": false,
+  "approvalSubmitted": false,
+  "commands": [
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=PreviewHttpTest test",
+      "log": "peer-api.log",
+      "exitCode": 0,
+      "tests": 1,
+      "peerHead": "27fe0dc72328f31b850113cbbf117c4e1798dfd1",
+      "unchangedAtReviewedHead": true,
+      "logDigest": "sha256:032524a0394b11d125c12540fcbec698d2c34c30607184eb066eda0a87046fb1"
+    },
+    {
+      "command": "pnpm --filter @codeless/web test -- src/features/preview/PreviewPanel.test.ts",
+      "log": "peer-web.log",
+      "exitCode": 0,
+      "tests": 30,
+      "previewTests": 6,
+      "unchangedAtReviewedHead": true,
+      "logDigest": "sha256:1b55b74d606205e3dbb3cc9caf8a77d06adc8b5fc7179509ba23708a0ef40266"
+    },
+    {
+      "command": "pnpm --filter @codeless/web build",
+      "log": "peer-web-build.log",
+      "exitCode": 0,
+      "logDigest": "sha256:8b17d88bfaef956938b68f1e8ee83f392fd71ae157a7b66392c43cf2d72bd5df"
+    },
+    {
+      "command": "node --test tests/e2e/preview/gateway.acceptance.mjs",
+      "log": "peer-gateway.log",
+      "exitCode": 0,
+      "tests": 4,
+      "logDigest": "sha256:eeb4ee4b6d6f273a81412cfe9d088d717d13a8f523c31aea6cb2a97674991432"
+    },
+    {
+      "command": "pnpm --filter @codeless/web exec playwright test --config playwright.config.ts preview/flow.spec.ts",
+      "log": "peer-browser.log",
+      "exitCode": 0,
+      "tests": 1,
+      "logDigest": "sha256:682cfd70e121f2d4b49903dddd42650ded60246181d8493ae3cb867986060343"
+    },
+    {
+      "command": "node --test tests/agent/preview-handoff.test.mjs",
+      "log": "peer-handoff.log",
+      "exitCode": 0,
+      "tests": 1,
+      "logDigest": "sha256:f00aef20fffbf170e7ceb16a38674844124c1cbb62d8c9cc3c9bd0f796dd18be"
+    }
+  ],
+  "checks": {
+    "base": "f80ee105bd8207a65bcc46c9ce61f0eaf5497c26",
+    "number": 20,
+    "checks": [
+      {
+        "name": "ci-gate",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/Echo-love928/CodeLess/actions/runs/37117512602/job/111187289126"
+      },
+      {
+        "name": "infra-preflight",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/Echo-love928/CodeLess/actions/runs/37117512602/job/111187065942"
+      },
+      {
+        "name": "verify:api",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/Echo-love928/CodeLess/actions/runs/37117512602/job/111187065904"
+      },
+      {
+        "name": "verify:e2e",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/Echo-love928/CodeLess/actions/runs/37117512602/job/111187065871"
+      },
+      {
+        "name": "verify:static",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/Echo-love928/CodeLess/actions/runs/37117512602/job/111187065853"
+      },
+      {
+        "name": "verify:runner",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/Echo-love928/CodeLess/actions/runs/37117512602/job/111187065790"
+      }
+    ],
+    "head": "3a774b92f80a764fd678dfdf798fdef433853e2a",
+    "sampledAt": "2026-10-03T10:52:35.5544090Z",
+    "draft": true
+  },
+  "browser": {
+    "task": "D09-B",
+    "platformApiFixture": true,
+    "sourceFixture": true,
+    "generatedBuildFixture": false,
+    "browser": "locked Chromium",
+    "T1": {
+      "status": "PASSED",
+      "versionId": "ee8d9d59-2de4-4943-8b19-1f5fa10eaeaa",
+      "buildId": "657a4c03-64a6-41d7-8dba-cbca17abf090",
+      "artifactDigest": "sha256:f1e28077fb4c8a552b75815fa470dcca51b8ca995a2cb08d7c7c571fd040830f"
+    },
+    "T2": {
+      "status": "PASSED",
+      "expiredNavigationRejected": true,
+      "resourceFailureRejected": true
+    },
+    "T3": {
+      "status": "PASSED",
+      "isolation": {
+        "errors": [
+          "SecurityError",
+          "SecurityError",
+          "SecurityError"
+        ],
+        "cookie": "",
+        "platformStorage": null,
+        "topNavigation": "SecurityError",
+        "popupBlocked": true
+      },
+      "platformProbeHits": 0,
+      "popupCount": 0,
+      "noPlatformCookieAtGateway": true
+    },
+    "T4": {
+      "status": "PASSED",
+      "versionId": "b9af6b1f-307a-4f81-8279-0f9343e7c593",
+      "buildId": "cd1c29a5-29c1-4475-b0b2-935acd5709e5",
+      "artifactDigest": "sha256:e1ede9a2a883e66657fbffc92764ec9b71afda266127871c98eaaadf2f39848b",
+      "issues": 6,
+      "changedText": true
+    }
+  },
+  "blocking": [
+    {
+      "location": "services/api/src/main/java/dev/codeless/api/tasks/TaskQueueService.java:97",
+      "reason": "Known concurrent-claim race remains in B; remote first-candidate API failed. A fixed it at 0a8e990, B requires synchronization; later green run does not resolve source defect."
+    },
+    {
+      "location": "services/runner/src/preview/gateway.mjs:87",
+      "reason": "Final feature enabling still needs trusted persistent live-handle registration/lifetime, shared configuration, public endpoint contract synchronization and deployed DNS/TLS. Partial handoff and isolated browser/API tests do not prove the complete platform chain."
+    }
+  ],
+  "suggestions": [
+    {
+      "location": "apps/web/src/features/preview/preview-api.ts:15",
+      "reason": "Validate configured port/full expected origin as well as HTTPS/version hostname; currently issuer is trusted configuration, so defensive suggestion, not demonstrated bypass."
+    }
+  ],
+  "developerTokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "source": "unknown"
+  },
+  "realModelEvaluationPerformedByPeerReview": false,
+  "platformEndToEnd": false
+}

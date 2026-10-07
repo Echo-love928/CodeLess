@@ -1,0 +1,228 @@
+{
+  "date": "2026-10-03",
+  "timezone": "Asia/Shanghai",
+  "baseline": "f80ee105bd8207a65bcc46c9ce61f0eaf5497c26",
+  "commands": [
+    {
+      "command": "pnpm install --frozen-lockfile",
+      "exitCode": 0
+    },
+    {
+      "command": "node --test tests/e2e/preview/gateway.test.mjs",
+      "exitCode": 0,
+      "tests": 4,
+      "note": "First execution used gateway.test.mjs before renaming to avoid Playwright discovery."
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=PreviewHttpTest test",
+      "exitCode": 1,
+      "note": "Initial fixture violated existing build immutability; retained as failure."
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=PreviewHttpTest test",
+      "exitCode": 0,
+      "tests": 1,
+      "note": "Actual PostgreSQL and HTTP session; failed build created directly."
+    },
+    {
+      "command": "pnpm --filter @codeless/web exec playwright test --config playwright.config.ts preview/flow.spec.ts",
+      "exitCode": 0,
+      "tests": 1,
+      "note": "Two actual Vue builds, actual D08 verification and TLS iframe; platform APIs are explicit fixtures."
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 1,
+      "note": "First gate: two ambiguous task-alert locators plus shared Docker image tag race; no assertions skipped."
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 0,
+      "stages": {
+        "static": {
+          "exitCode": 0,
+          "frontendTests": 30
+        },
+        "api": {
+          "exitCode": 0,
+          "tests": 88,
+          "skipped": 0
+        },
+        "runner": {
+          "exitCode": 0,
+          "tests": 34,
+          "skipped": 0
+        },
+        "e2e": {
+          "exitCode": 0,
+          "tests": 29,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "command": "pnpm verify:runner",
+      "exitCode": 0,
+      "tests": 34,
+      "note": "After adding valid-wire version tampering with original signature; production code unchanged after successful full gate."
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 1,
+      "log": ".local-data/d09-b/ci-gate-resource-proof.log",
+      "note": "Resource interruption/browser recovery passed; only headless normal gateway fixture failed. Preserve implicit HTML head compatibility rather than changing its assertion."
+    },
+    {
+      "command": "node --test tests/e2e/preview/gateway.acceptance.mjs",
+      "exitCode": 0,
+      "tests": 4,
+      "log": ".local-data/d09-b/gateway-resource-fixed.log"
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 0,
+      "log": ".local-data/d09-b/ci-gate-complete.log",
+      "stages": {
+        "static": {
+          "exitCode": 0,
+          "frontendTests": 30
+        },
+        "api": {
+          "exitCode": 0,
+          "tests": 88,
+          "skipped": 0
+        },
+        "runner": {
+          "exitCode": 0,
+          "tests": 34,
+          "skipped": 0
+        },
+        "e2e": {
+          "exitCode": 0,
+          "tests": 29,
+          "skipped": 0
+        }
+      }
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "T1-T3-platform-preview.png",
+      "bytes": 77181,
+      "digest": "sha256:1a7ca27b7f5b18873651b307880031b73c140f4f78b17a027b14c56b7accee8a"
+    },
+    {
+      "file": "T4-current-version.png",
+      "bytes": 76830,
+      "digest": "sha256:45cf226d1312054c30f3f18d32ffe7ff7cdeaef688969619e61a64a062cd1648"
+    },
+    {
+      "file": "version1-verification.png",
+      "bytes": 29358,
+      "digest": "sha256:823d4562bb212155b32616f4ac18565f6c09c10c6f11fbc0ca5c2f24ca038d48"
+    },
+    {
+      "file": "version2-verification.png",
+      "bytes": 29004,
+      "digest": "sha256:f26afeca8100d279712d305e144c01c584fbd1be349f8d314dca5e56f5a6d090"
+    }
+  ],
+  "originalLogDigests": [
+    {
+      "file": ".local-data/d09-b/gateway-first.log",
+      "digest": "sha256:343706ca34ca86d0cb6c2b5ae119d96eb86d0cc8c632cc537f0f98e0ba899fac"
+    },
+    {
+      "file": ".local-data/d09-b/static-first.log",
+      "digest": "sha256:9dcc5141e1cdca16034dff20069af345c97d9b854b0dbab909c6127df3887ba9"
+    },
+    {
+      "file": ".local-data/d09-b/api-preview-first.log",
+      "digest": "sha256:959a5d715d7a7f49b0402282f73bc6b9d1a91b2c8e820d7cebff56cd95d05fd7"
+    },
+    {
+      "file": ".local-data/d09-b/api-preview-fixed.log",
+      "digest": "sha256:d1a70fe0c9f1bbd457086eb13d3bbc25751aca6d404ad885a45ac2d93436bfea"
+    },
+    {
+      "file": ".local-data/d09-b/preview-browser-first.log",
+      "digest": "sha256:1ef367e44afa1e203ce1d6123bc194e3b05292e84805dca564c0482a05f0fdc9"
+    },
+    {
+      "file": ".local-data/d09-b/preview-browser-native.log",
+      "digest": "sha256:02f4537e5116ad3a86992b2ad76bbcfa07d7ee882e987dce22b504a4efc739b2"
+    },
+    {
+      "file": ".local-data/d09-b/preview-browser-proxy-fixed.log",
+      "digest": "sha256:5fc58ece51bbcd61c1020c32588f2e10c7d96aa227c66c595b6e19d66d1ae2e0"
+    },
+    {
+      "file": ".local-data/d09-b/ci-gate.log",
+      "digest": "sha256:f11bc6ae414edcae2058764dab1ba711635584349f7e755ae1281b4e546ab04b"
+    },
+    {
+      "file": ".local-data/d09-b/ci-gate-final.log",
+      "digest": "sha256:40b4aad430f59e6fdc7dab57c7e179c758354c946c9ed4c1683b83b653a78300"
+    },
+    {
+      "file": ".local-data/d09-b/runner-forgery-proof.log",
+      "digest": "sha256:b9e9803d8d96408c43bce7ed30248484ab903fe1f9aaaef6774d1ad155a31d94"
+    },
+    {
+      "file": ".local-data/d09-b/remote-api-first.log",
+      "digest": "sha256:c93940e5080775591eaa1cd6183597b96c4b61b290134b80f4f1cc9787be83fe"
+    },
+    {
+      "file": ".local-data/d09-b/ci-gate-resource-proof.log",
+      "digest": "sha256:06abc774d85d2126471313295f50a942242e7c456fce79f70a759ef5588962b2"
+    },
+    {
+      "file": ".local-data/d09-b/gateway-resource-fixed.log",
+      "digest": "sha256:fe4cf64e5845bc91fa633adb96d1e663f6ea1678c658b44366195c6521b9e246"
+    },
+    {
+      "file": ".local-data/d09-b/ci-gate-complete.log",
+      "digest": "sha256:0856795ad3efbe576633c9fa7a693916bc84f870a26ce98daf4257bf66708698"
+    }
+  ],
+  "developmentTokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "source": "unavailable"
+  },
+  "modelAcceptance": {
+    "executed": false,
+    "tokenUsage": null
+  },
+  "remoteRuns": [
+    {
+      "head": "27fe0dc72328f31b850113cbbf117c4e1798dfd1",
+      "runId": 37116387344,
+      "ciGate": "FAILURE",
+      "checks": {
+        "static": "SUCCESS",
+        "api": "FAILURE",
+        "runner": "SUCCESS",
+        "e2e": "SUCCESS",
+        "infraPreflight": "SUCCESS"
+      },
+      "api": {
+        "tests": 88,
+        "errors": 1,
+        "skipped": 0,
+        "previewHttpTest": "PASSED",
+        "failure": "TaskQueueIntegrationTest.twoConsumersCannotClaimSameTaskOrRunTwoTasksForOneApplication: duplicate generation_tasks_one_running_per_application"
+      },
+      "queueImplementationMatchesMain": {
+        "gitBlob": "f7fefa021683e911d8492f8e6ca1d05192fa4788",
+        "modified": false
+      }
+    }
+  ],
+  "pr": {
+    "url": "https://github.com/Echo-love928/CodeLess/pull/20",
+    "draft": true,
+    "blocker": "Existing main task-claim concurrency defect; no rerun-only resolution or self approval."
+  }
+}

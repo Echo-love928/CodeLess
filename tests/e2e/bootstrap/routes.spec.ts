@@ -45,7 +45,7 @@ test('workbench shows input, tasks and honest preview state', async ({ page }) =
   await page.getByLabel('需求描述').fill('创建一个活动日程页')
   await expect(page.getByLabel('需求描述')).toHaveValue('创建一个活动日程页')
   await expect(page.getByText('暂无生成任务')).toBeVisible()
-  await expect(page.getByText('预览尚未接入')).toBeVisible()
+  await expect(page.getByText('服务暂时不可用，请稍后重试。')).toBeVisible()
   await expect(page.getByText(/当前可用版本：55555555/)).toBeVisible()
   await expect(page.getByRole('button', { name: /开始生成/ })).toBeEnabled()
   await page.getByRole('button', { name: '手机' }).click()

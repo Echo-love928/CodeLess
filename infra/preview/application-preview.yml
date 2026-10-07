@@ -1,0 +1,13 @@
+# Additional Spring configuration for this trusted host profile.
+server:
+  port: ${CODELESS_API_PORT:8080}
+  address: 0.0.0.0 # Private host interface; firewall allows ingress only. Never expose this port publicly.
+codeless:
+  agent:
+    enabled: true
+    repository-root: ${CODELESS_AGENT_REPOSITORY_ROOT}
+    private-root: ${CODELESS_AGENT_PRIVATE_ROOT}
+    node: ${CODELESS_AGENT_NODE:node}
+  tasks:
+    enabled: true
+    poll-ms: 1000

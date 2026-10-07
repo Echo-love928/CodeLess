@@ -1,0 +1,72 @@
+{
+  "task": {
+    "id": "f787f891-9c9d-425a-b732-d9ce83092d6a",
+    "applicationId": "37b0487b-1af3-456f-9d8b-f24f00dd0974",
+    "prompt": "生成静态个人展示页",
+    "status": "FAILED",
+    "repairAttempts": 0,
+    "failureCode": "AGENT_BUILD_EXIT",
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-04T11:57:14.085652Z"
+  },
+  "runner": {
+    "status": "FAILED",
+    "sourceDigest": "sha256:850dacd635f062365dd582531b3e876adf491d1decc8e13027eeb4d61670b97e",
+    "build": {
+      "id": "9c1d7c2c-14a8-41d4-9a5a-817c457c97ab",
+      "imageId": "sha256:9af9a9ca7e531e1cd8fadcaba98548859870087d4b863cd118215020c93d359c",
+      "containerName": "codeless-build-9c1d7c2c-14a8-41d4-9a5a-817c457c97ab",
+      "status": "FAILED",
+      "failure": "BUILD_EXIT",
+      "exitCode": 1,
+      "oomKilled": false,
+      "timedOut": false,
+      "log": {
+        "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 7 modules transformed.\n\u001b[31m✗\u001b[39m Build failed in 109ms\n\u001b[31merror during build:\n\u001b[31m[vite:vue] [plugin vite:vue] src/pages/HomePage.vue (1:17): Element is missing end tag.\u001b[31m\nfile: \u001b[36m/tmp/codeless-build/src/pages/HomePage.vue:1:17\u001b[31m\nSyntaxError: [plugin vite:vue] src/pages/HomePage.vue (1:17): Element is missing end tag.\n    at createCompilerError (/opt/codeless/template/node_modules/.pnpm/@vue+compiler-core@3.5.13/node_modules/@vue/compiler-core/dist/compiler-core.cjs.prod.js:1360:17)\n    at emitError (/opt/codeless/template/node_modules/.pnpm/@vue+compiler-core@3.5.13/node_modules/@vue/compiler-core/dist/compiler-core.cjs.prod.js:2915:5)\n    at Object.onclosetag (/opt/codeless/template/node_modules/.pnpm/@vue+compiler-core@3.5.13/node_modules/@vue/compiler-core/dist/compiler-core.cjs.prod.js:2304:13)\n    at Tokenizer.stateInClosingTagName (/opt/codeless/template/node_modules/.pnpm/@vue+compiler-core@3.5.13/node_modules/@vue/compiler-core/dist/compiler-core.cjs.prod.js:785:16)\n    at Tokenizer.parse (/opt/codeless/template/node_modules/.pnpm/@vue+compiler-core@3.5.13/node_modules/@vue/compiler-core/dist/compiler-core.cjs.prod.js:1143:16)\n    at Object.baseParse (/opt/codeless/template/node_modules/.pnpm/@vue+compiler-core@3.5.13/node_modules/@vue/compiler-core/dist/compiler-core.cjs.prod.js:2947:13)\n    at Object.parse (/opt/codeless/template/node_modules/.pnpm/@vue+compiler-dom@3.5.13/node_modules/@vue/compiler-dom/dist/compiler-dom.cjs.prod.js:662:23)\n    at Object.parse$1 [as parse] (/opt/codeless/template/node_modules/.pnpm/@vue+compiler-sfc@3.5.13/node_modules/@vue/compiler-sfc/dist/compiler-sfc.cjs.js:1794:24)\n    at createDescriptor (file:///opt/codeless/template/node_modules/.pnpm/@vitejs+plugin-vue@5.2.3_vite@6.2.3_vue@3.5.13_typescript@5.8.2_/node_modules/@vitejs/plugin-vue/dist/index.mjs:71:43)\n    at transformMain (file:///opt/codeless/template/node_modules/.pnpm/@vitejs+plugin-vue@5.2.3_vite@6.2.3_vue@3.5.13_typescript@5.8.2_/node_modules/@vitejs/plugin-vue/dist/index.mjs:2421:34)\u001b[39m\n",
+        "bytes": 2232,
+        "observedBytes": 2232,
+        "truncated": false
+      },
+      "artifact": null,
+      "cleanup": {
+        "containerRemoved": true,
+        "workspaceRemoved": true,
+        "errors": []
+      },
+      "createdAt": "2026-10-04T11:57:09.707Z",
+      "completedAt": "2026-10-04T11:57:13.932Z"
+    },
+    "verification": null,
+    "executionId": "03240600-cd5b-4a1a-a7eb-4ec66bfb5d74"
+  },
+  "draft": {
+    "sourceDigest": "sha256:850dacd635f062365dd582531b3e876adf491d1decc8e13027eeb4d61670b97e",
+    "versionId": "69f4a68e-f779-4237-807e-92acb2e0ab5b",
+    "files": [
+      {
+        "path": "src/components/ProfileCard.vue",
+        "bytes": 122,
+        "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+      },
+      {
+        "path": "src/pages/HomePage.vue",
+        "bytes": 37,
+        "digest": "sha256:17ebe2059580e480e551e547b047d256d4912396e6e801542997411551aa5005"
+      }
+    ],
+    "sourceDirectory": "/workspace/services/api/target/agent-integration/workspaces/f787f891-9c9d-425a-b732-d9ce83092d6a/snapshots/27005c4d-1231-46a3-ade7-4947ec558d71",
+    "actions": [
+      {
+        "type": "navigate",
+        "path": "/"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "profile-name"
+        },
+        "value": "Ada Lovelace"
+      }
+    ]
+  }
+}
