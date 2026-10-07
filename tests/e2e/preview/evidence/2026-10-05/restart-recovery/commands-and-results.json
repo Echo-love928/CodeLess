@@ -1,0 +1,136 @@
+{
+  "testedProductCommit": "bc035b68bf4cfac3f90563dba06e3aac1f81d49e",
+  "mainCommit": "f80ee105bd8207a65bcc46c9ce61f0eaf5497c26",
+  "syncedAHead": "f48c92b0bb082a55c8676537ad3a995e05c1de3f",
+  "mainModified": false,
+  "commands": [
+    {
+      "name": "paid-platform",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealPreviewPlatformAcceptanceIT test",
+      "exitCode": 0,
+      "rawLogShared": false,
+      "rawLogBytes": 16451,
+      "rawLogDigest": "sha256:b2fde8ec70bbae0221416a59da380ffb9031ec35c78e0a09b655c5a167f5f1c6"
+    },
+    {
+      "name": "ci-gate",
+      "command": "pnpm ci:gate",
+      "exitCode": 0,
+      "rawLogShared": false,
+      "rawLogBytes": 109795,
+      "rawLogDigest": "sha256:19ff947835d1e7209be64f20533286541ce5e6a9fdaed2f733496b3dc6ec9004"
+    }
+  ],
+  "localGate": {
+    "exitCode": 0,
+    "api": 106,
+    "agent": 11,
+    "runner": 40,
+    "e2e": 29,
+    "skipped": 0
+  },
+  "rootCause": {
+    "reproducedOnB": true,
+    "mechanism": "NGINX_PASSIVE_FAILURE_QUARANTINE_OF_MULTIPLE_RESOLVED_ADDRESSES_FOR_ONE_GATEWAY",
+    "oldFailurePhase": "REFRESH_AFTER_INTENTIONAL_GATEWAY_STOP_FAULT_PROBE_AND_RESTART",
+    "oldRawNetwork": "NOT_CAPTURED",
+    "oldReportUnmodified": true
+  },
+  "credentialImport": {
+    "authenticated": true,
+    "configuredModel": "deepseek-flash",
+    "plaintextFileWritten": false,
+    "keyShared": false,
+    "sourceComment": "https://github.com/Echo-love928/CodeLess/pull/21#issuecomment-5992713534"
+  },
+  "paidAcceptance": {
+    "exitCode": 0,
+    "taskId": "110ea1c3-6ae2-406a-9837-ee8e9c1128e6",
+    "versionId": "63132df1-15a2-4d09-a8cc-1bf14675c65b",
+    "buildId": "80133be4-ed95-4ba4-8f0c-f29da6e285f6",
+    "fullPlatformAcceptance": true,
+    "modelQualityAccepted": true,
+    "requests": 6,
+    "inputTokens": 16503,
+    "outputTokens": 1040,
+    "providerReportedTotal": 17543,
+    "measurement": "PROVIDER_RESPONSE_AND_SQL",
+    "apiFixture": false,
+    "signingFixture": false,
+    "automaticRepairAttempts": 0,
+    "evidence": "tests/agent/evidence/2026-10-05/diagnostics/real-platform-restart-fix"
+  },
+  "developerTokens": {
+    "input": "UNKNOWN",
+    "output": "UNKNOWN",
+    "total": "UNKNOWN"
+  },
+  "sourceHashes": [
+    {
+      "path": "infra/preview/nginx.conf.template",
+      "bytes": 2298,
+      "digest": "sha256:5eeee8fcaa5e5e5719ae42a2140dae1c4e715eb0b9a2b9e2c004370265c403d4",
+      "measurement": "COMMITTED_GIT_BLOB_LF"
+    },
+    {
+      "path": "infra/preview/render.mjs",
+      "bytes": 2692,
+      "digest": "sha256:433e5e12e05a61a76229c0f1b3ef2741c3239064dd16ab9ed59a513046858538",
+      "measurement": "COMMITTED_GIT_BLOB_LF"
+    },
+    {
+      "path": "services/runner/src/preview/main.mjs",
+      "bytes": 5293,
+      "digest": "sha256:50c16de3cdb9829efd3e4491316164ae3fdec9b97f894f40fb3d1b4d71bb3d0e",
+      "measurement": "COMMITTED_GIT_BLOB_LF"
+    },
+    {
+      "path": "tests/e2e/preview/platform.acceptance.mjs",
+      "bytes": 15123,
+      "digest": "sha256:e1e65a902b2b26974f6098356e6e1e032143e6e77d79e3b466f3def21f277132",
+      "measurement": "COMMITTED_GIT_BLOB_LF"
+    },
+    {
+      "path": "tests/e2e/preview/ingress-restart.acceptance.mjs",
+      "bytes": 5371,
+      "digest": "sha256:0d0e70df3bc084f8df880ab6763ea35df6b201f6d45e6a0c6ff163eb8517eac2",
+      "measurement": "COMMITTED_GIT_BLOB_LF"
+    },
+    {
+      "path": "tests/agent/export-preview-diagnostics.mjs",
+      "bytes": 7395,
+      "digest": "sha256:96f294a104b6646302065139a1e1be400627816cdd58b234e68686045d0805ad",
+      "measurement": "COMMITTED_GIT_BLOB_LF"
+    },
+    {
+      "path": "tests/agent/preview-diagnostic-projection.mjs",
+      "bytes": 703,
+      "digest": "sha256:b6a383a31cc975f5006a7aaaf5eb9c714bd03f91d16d5a001d552435e044e983",
+      "measurement": "COMMITTED_GIT_BLOB_LF"
+    },
+    {
+      "path": "tests/agent/preview-diagnostic-projection.test.mjs",
+      "bytes": 1152,
+      "digest": "sha256:7c27d821a692b54bf5d231d491ee80aa6a38521fbfedab711629a1b93e62f2a1",
+      "measurement": "COMMITTED_GIT_BLOB_LF"
+    },
+    {
+      "path": "prompts/runtime/agent-generate-v1.txt",
+      "bytes": 3968,
+      "digest": "sha256:70608aaa8ed4b7350e9564edac29c503cc12dd5e472e6597964ba3efadf521ee",
+      "measurement": "COMMITTED_GIT_BLOB_LF"
+    },
+    {
+      "path": "services/api/src/test/java/dev/codeless/api/agent/AgentLoopIntegrationTest.java",
+      "bytes": 27276,
+      "digest": "sha256:69300abb54ecab340c2f0fccca8772c97ce74927e515a922e94b90297ce0abb7",
+      "measurement": "COMMITTED_GIT_BLOB_LF"
+    },
+    {
+      "path": "services/api/src/test/java/dev/codeless/api/preview/RealPreviewPlatformAcceptanceIT.java",
+      "bytes": 7685,
+      "digest": "sha256:75926f82c7bb4aa017a97f22054c35ae48593d71fa680c8ae9fce911963ab764",
+      "measurement": "COMMITTED_GIT_BLOB_LF"
+    }
+  ]
+}

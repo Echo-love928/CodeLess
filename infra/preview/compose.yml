@@ -1,0 +1,21 @@
+name: codeless-preview
+services:
+  ingress:
+    image: nginx:1.27.5-alpine
+    user: "${CODELESS_INGRESS_UID:?required}:${CODELESS_INGRESS_GID:?required}"
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${CODELESS_TLS_PORT:?required}:8443"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - ${CODELESS_PREVIEW_INGRESS_CONFIG:?required}:/etc/nginx/conf.d/default.conf:ro
+      - ${CODELESS_TLS_CERT:?required}:/certs/server.pem:ro
+      - ${CODELESS_TLS_KEY:?required}:/certs/server.key:ro
+      - ${CODELESS_WEB_DIST:?required}:/usr/share/nginx/html:ro
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:uid=${CODELESS_INGRESS_UID},gid=${CODELESS_INGRESS_GID},mode=0700
+      - /var/run:uid=${CODELESS_INGRESS_UID},gid=${CODELESS_INGRESS_GID},mode=0700
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]

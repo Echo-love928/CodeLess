@@ -2,7 +2,8 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import BrandLogo from '../../components/BrandLogo.vue'
-import StatePanel from '../../components/StatePanel.vue'
+import PreviewPanel from "../preview/PreviewPanel.vue"
+// D09-B: minimal preview mounting; task ownership stays with workbench.
 import UiIcon from '../../components/UiIcon.vue'
 import { ApiError } from '../../api/http'
 import { type Application, getApplication } from '../apps/application-api'
@@ -26,6 +27,7 @@ const connectionLabel = computed(() => ({ connecting: '正在连接事件服务'
 const validPrompt = computed(() => !!prompt.value.trim() && Array.from(prompt.value.trim()).length <= 8000)
 const taskLink = computed(() => task.value ? { path: route.path, query: { taskId: task.value.id } } : undefined)
 let loadVersion = 0
+let previewRequest = 0
 
 async function load() {
   const version = ++loadVersion
@@ -56,6 +58,13 @@ async function load() {
   }
 }
 
+async function refreshPreviewVersion() {
+  const id = props.id, version = loadVersion, request = ++previewRequest
+  const value = await getApplication(id)
+  if (version === loadVersion && request === previewRequest) app.value = value
+}
+watch(() => task.value?.status, status => { if (status === `READY`) void refreshPreviewVersion().catch(cause => redirectOnUnauthorized(cause, router)) })
+
 watch(() => [props.id, route.query.taskId], load, { immediate: true })
 onBeforeUnmount(() => { loadVersion += 1; dispose() })
 </script>
@@ -76,7 +85,7 @@ onBeforeUnmount(() => { loadVersion += 1; dispose() })
           <TaskProgress :events="events" :diagnostics="diagnostics" :diagnostics-error="diagnosticsError" />
         </div>
       </aside>
-      <section class="workbench-preview" aria-label="预览区"><div class="editor-toolbar"><span class="page-path"><UiIcon name="doc" :size="15" />预览 <span>/</span> 初始草稿版本：{{ app.baseVersionId }} <span>/</span> 当前可用版本：{{ app.latestReadyVersionId || '暂无' }}</span><div class="device-toggle" aria-label="预览设备"><button type="button" :aria-pressed="device === 'desktop'" @click="device = 'desktop'"><UiIcon name="monitor" :size="15" />桌面</button><button type="button" :aria-pressed="device === 'mobile'" @click="device = 'mobile'"><UiIcon name="phone" :size="15" />手机</button></div></div><div class="editor-canvas" :class="{ 'editor-canvas--mobile': device === 'mobile' }"><div class="canvas-address"><UiIcon name="lock" :size="12" />{{ app.name }} · 预览</div><StatePanel kind="empty" :title="app.latestReadyVersionId ? '预览尚未接入' : '暂无可预览版本'" :description="app.latestReadyVersionId ? '已验证版本存在；页面预览接口尚未接入。' : '初始草稿尚未生成内容；完成生成与验证后才能预览。'" /></div></section>
+      <section class="workbench-preview" aria-label="预览区"><div class="editor-toolbar"><span class="page-path"><UiIcon name="doc" :size="15" />预览 <span>/</span> 初始草稿版本：{{ app.baseVersionId }} <span>/</span> 当前可用版本：{{ app.latestReadyVersionId || '暂无' }}</span><div class="device-toggle" aria-label="预览设备"><button type="button" :aria-pressed="device === 'desktop'" @click="device = 'desktop'"><UiIcon name="monitor" :size="15" />桌面</button><button type="button" :aria-pressed="device === 'mobile'" @click="device = 'mobile'"><UiIcon name="phone" :size="15" />手机</button></div></div><div class="editor-canvas" :class="{ 'editor-canvas--mobile': device === 'mobile' }"><div class="canvas-address"><UiIcon name="lock" :size="12" />{{ app.name }} · 预览</div><PreviewPanel :application-id="app.id" :version-id="app.latestReadyVersionId" :build-failed="task?.status === `FAILED`" :refresh-version="refreshPreviewVersion" @unauthorized="router.replace(`/login`)" /></div></section>
     </div>
   </div>
 </template>

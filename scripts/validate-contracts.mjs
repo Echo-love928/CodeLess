@@ -4,7 +4,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
 const root = resolve(import.meta.dirname, '..');
-const kinds = ['application', 'task', 'event', 'build', 'version', 'publication', 'task-diagnostics'];
+const kinds = ['application', 'task', 'event', 'build', 'version', 'publication', 'task-diagnostics', 'preview-credential'];
 const readJson = (path) => JSON.parse(readFileSync(resolve(root, path), 'utf8'));
 const ajv = new Ajv2020({ allErrors: true, strict: true });
 addFormats(ajv);
@@ -53,6 +53,7 @@ function validateOpenApiSurface() {
     '/api/v0/tasks/{taskId}/events',
     '/api/v0/builds/{buildId}',
     '/api/v0/versions/{versionId}',
+    '/api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials',
     '/api/v0/publications'
   ];
   for (const path of requiredPaths) {

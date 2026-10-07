@@ -62,13 +62,22 @@ public class TaskEventReplay {
         if (after < 0) invalidCursor();
         if (after > head.sequence()) throw new AuthFailure(HttpStatus.CONFLICT, "EVENT_CURSOR_AHEAD");
         List<Event> events = jdbc.sql("""
-                SELECT id, task_id, sequence, type, stage, occurred_at FROM task_events
-                WHERE task_id = ? AND sequence > ? ORDER BY sequence LIMIT ?
+                SELECT e.id, e.task_id, e.sequence, e.type, e.stage, e.occurred_at,
+                    CASE WHEN e.type='STAGE_COMPLETED' AND e.stage='READY' THEN
+                        (SELECT b.id FROM builds b JOIN application_versions v ON v.build_id=b.id
+                         WHERE b.task_id=e.task_id AND b.status='SUCCEEDED' AND v.status='VERIFIED') END AS ready_build_id,
+                    CASE WHEN e.type='STAGE_COMPLETED' AND e.stage='READY' THEN
+                        (SELECT v.id FROM builds b JOIN application_versions v ON v.build_id=b.id
+                         WHERE b.task_id=e.task_id AND b.status='SUCCEEDED' AND v.status='VERIFIED') END AS ready_version_id
+                FROM task_events e WHERE e.task_id = ? AND e.sequence > ? ORDER BY e.sequence LIMIT ?
                 """).params(task, after, limit).query((rs, row) -> {
                     EventType type = EventType.valueOf(rs.getString("type"));
                     TaskStatus stage = TaskStatus.valueOf(rs.getString("stage"));
+                    UUID build = rs.getObject("ready_build_id", UUID.class), version = rs.getObject("ready_version_id", UUID.class);
+                    String message = build != null && version != null
+                            ? "PREVIEW_READY versionId=" + version + " buildId=" + build : safeMessage(type, stage);
                     return new Event(rs.getObject("id", UUID.class), rs.getObject("task_id", UUID.class),
-                            rs.getInt("sequence"), type, stage, safeMessage(type, stage),
+                            rs.getInt("sequence"), type, stage, message,
                             rs.getObject("occurred_at", OffsetDateTime.class));
                 }).list();
         if (events.size() > MAX_BACKLOG)

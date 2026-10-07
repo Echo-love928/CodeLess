@@ -28,7 +28,7 @@ public class TaskScheduler {
         for (int i = 0; i < 12; i++) {
             TaskStageRunner.StageResult result;
             try {
-                result = runner.execute(claim.taskId(), stage);
+                result = runner.execute(claim, stage);
             } catch (Exception exception) {
                 failIfLeased(claim, "RUNNER_ERROR");
                 return;
@@ -40,7 +40,7 @@ public class TaskScheduler {
                     case REPAIR -> EventType.REPAIR_REQUESTED;
                     default -> EventType.STAGE_STARTED;
                 };
-                stage = queue.advance(claim, result.next(), type, result.message(), result.failureCode()).status();
+                stage = runner.advance(queue, claim, result, type).status();
                 if (stage == TaskStatus.FAILED || stage == TaskStatus.READY) return;
             } catch (RuntimeException exception) {
                 failIfLeased(claim, "INVALID_STAGE_RESULT");

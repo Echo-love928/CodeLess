@@ -1,0 +1,97 @@
+{
+  "localGate": {
+    "isolatedStaticExitCode": 0,
+    "runner": {
+      "skipped": 0,
+      "passed": 37,
+      "separateExitMeasurement": null,
+      "failed": 0
+    },
+    "api": {
+      "skipped": 0,
+      "passed": 106,
+      "separateExitMeasurement": null,
+      "failed": 0
+    },
+    "e2e": {
+      "skipped": 0,
+      "passed": 29,
+      "separateExitMeasurement": null,
+      "failed": 0
+    },
+    "failure": "LIBUV_HANDLE_CLOSING_ASSERTION_AFTER_OPENAPI_VALIDATION",
+    "originalFailurePreserved": true,
+    "rootCause": "UNKNOWN",
+    "failureStage": "verify:static",
+    "exitCode": -1073740791
+  },
+  "sourceCommit": "65a10833d717b9717c54c1619b3dc77412935859",
+  "task": "D09-A",
+  "commands": [
+    {
+      "commit": "5ec8adbc316c15c9c46a780aa1a7819dffbd8d18",
+      "logDigest": "sha256:9b9193c3d6b558be8a33b772ff42959425de6cc614e7b567b9af32304961f433",
+      "rawLogShared": false,
+      "logBytes": 14989,
+      "modifiedSourceFrom": "360a12062fc22b778e871478e9bbdbf8d3a4763a",
+      "name": "single-page",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=AgentLoopIntegrationTest#singlePageWithoutDependencyComponentsCanReachReady test",
+      "exitCode": 0
+    },
+    {
+      "commit": "5dcecebbeceefb3562d2f5a2cfa73dae3bdf1aaa",
+      "logDigest": "sha256:c8c01296c424aecf88d403e2be137fb0b4fa902a2c6ee4378a7269ac82553272",
+      "rawLogShared": false,
+      "logBytes": 14841,
+      "name": "text-prefix",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=AgentLoopIntegrationTest#textPrefixCannotPromoteEvenAfterARealSuccessfulBuild test",
+      "workingSource": "committed-as-65a10833d717b9717c54c1619b3dc77412935859",
+      "exitCode": 0
+    },
+    {
+      "commit": "360a12062fc22b778e871478e9bbdbf8d3a4763a",
+      "logDigest": "sha256:fd1f6a28e29b0b04b2fc4cf02f1f94a2519b0a9ad6de293b06931934f473e6b9",
+      "rawLogShared": false,
+      "logBytes": 384,
+      "name": "redaction",
+      "command": "node --test tests/e2e/preview/diagnostics.acceptance.mjs",
+      "exitCode": 0
+    },
+    {
+      "commit": "360a12062fc22b778e871478e9bbdbf8d3a4763a",
+      "logDigest": "sha256:6b316db8d0026cd649fd803cfbc0716ac4415614d932296256f17d6f3ec17a3a",
+      "rawLogShared": false,
+      "logBytes": 18971,
+      "name": "paid-platform",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealPreviewPlatformAcceptanceIT test",
+      "exitCode": 1
+    },
+    {
+      "commit": "65a10833d717b9717c54c1619b3dc77412935859",
+      "logDigest": "sha256:6f07fc22765ee69244c5f28235a225a99fd9b5745882c3388cda1318c83c16b1",
+      "rawLogShared": false,
+      "logBytes": 17874,
+      "name": "paid-exact-text",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealPreviewPlatformAcceptanceIT test",
+      "exitCode": 1
+    },
+    {
+      "commit": "65a10833d717b9717c54c1619b3dc77412935859",
+      "logDigest": "sha256:516e821b3e4d7d670015bf604b8fe34372adcf05c4fd3003899993503788866e",
+      "rawLogShared": false,
+      "logBytes": 107296,
+      "name": "ci-gate",
+      "command": "pnpm ci:gate",
+      "exitCode": -1073740791
+    },
+    {
+      "commit": "65a10833d717b9717c54c1619b3dc77412935859",
+      "logDigest": "sha256:277b27b1c63f2fb91499fdb699c80e77c3d09d75201a079c7c62a17aa9b9af70",
+      "rawLogShared": false,
+      "logBytes": 4136,
+      "name": "static-isolated",
+      "command": "pnpm verify:static",
+      "exitCode": 0
+    }
+  ]
+}
