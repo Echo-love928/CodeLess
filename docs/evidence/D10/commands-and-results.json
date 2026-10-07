@@ -1,0 +1,125 @@
+{
+  "date": "2026-10-07",
+  "timezone": "Asia/Shanghai",
+  "baseline": "adb79b86f221862a970733a406d09fd96e92250e",
+  "commands": [
+    {
+      "name": "static",
+      "command": "pnpm verify:static",
+      "exitCode": 0,
+      "privateLog": ".local-data/d10-b/static.log",
+      "bytes": 4129,
+      "digest": "sha256:f7dacadcd68b1aa993711f617ef0b76bd1d8b6537b484de022509eeb173ed93b"
+    },
+    {
+      "name": "generation",
+      "command": "pnpm --filter @codeless/web exec playwright test --config playwright.config.ts generation",
+      "exitCode": 1,
+      "privateLog": ".local-data/d10-b/generation.log",
+      "bytes": 13411,
+      "digest": "sha256:e3fab117ce02be5d4b9c2ed1dc4eed177a50ca2205d6dc183cd2f2f503f89573"
+    },
+    {
+      "name": "generation-focused",
+      "command": "node node_modules/@playwright/test/cli.js test --config playwright.config.ts generation --workers=1",
+      "exitCode": 1,
+      "privateLog": ".local-data/d10-b/generation-focused.log",
+      "bytes": 8656,
+      "digest": "sha256:a96dfbf3b13f00a9c4b07afa627f8007fbd54455326b7e3a5bacd15df13dfa2c"
+    },
+    {
+      "name": "generation-corrected",
+      "command": "node node_modules/@playwright/test/cli.js test --config playwright.config.ts --grep D10-B --workers=1",
+      "exitCode": 1,
+      "privateLog": ".local-data/d10-b/generation-corrected.log",
+      "bytes": 12469,
+      "digest": "sha256:041678c0786015393e31fe49f0d8e48e2d2aef98e4b2dc7184b7c45ac57d63ac"
+    },
+    {
+      "name": "generation-bootstrap-fixed",
+      "command": "node node_modules/@playwright/test/cli.js test --config playwright.config.ts --grep D10-B --workers=1",
+      "exitCode": 0,
+      "privateLog": ".local-data/d10-b/generation-bootstrap-fixed.log",
+      "bytes": 1287,
+      "digest": "sha256:8ebf597909f17b687a89ba657e07d33e683ff25ec690a06ebadf06257652292d"
+    },
+    {
+      "name": "ci-gate",
+      "command": "pnpm ci:gate",
+      "exitCode": 0,
+      "privateLog": ".local-data/d10-b/ci-gate.log",
+      "bytes": 112052,
+      "digest": "sha256:3ff4c5ef20352d5d4a27eccaf68818bf63a9bfc528f882f247c7ba565c28894b"
+    }
+  ],
+  "stages": {
+    "static": {
+      "command": "pnpm verify:static",
+      "exitCode": 0,
+      "measurement": "CI_GATE_CHILD_EXIT_STATUS_AGGREGATION"
+    },
+    "api": {
+      "command": "pnpm verify:api",
+      "exitCode": 0,
+      "measurement": "CI_GATE_CHILD_EXIT_STATUS_AGGREGATION"
+    },
+    "runner": {
+      "command": "pnpm verify:runner",
+      "exitCode": 0,
+      "measurement": "CI_GATE_CHILD_EXIT_STATUS_AGGREGATION"
+    },
+    "e2e": {
+      "command": "pnpm verify:e2e",
+      "exitCode": 0,
+      "measurement": "CI_GATE_CHILD_EXIT_STATUS_AGGREGATION"
+    }
+  },
+  "screenshots": [
+    {
+      "name": "success",
+      "path": "deterministic/success.png",
+      "bytes": 125450,
+      "digest": "sha256:dd070803bf0a89e37f0e13fb39d7586dc7988ccc9dd9d21af9798b44e6067963",
+      "provider": "d10-source-fixture",
+      "modelQualityAccepted": false
+    },
+    {
+      "name": "failure",
+      "path": "deterministic/failure.png",
+      "bytes": 107972,
+      "digest": "sha256:ff0a9874a9b0507de0dc094a00aac64104e5934da11c30651bb7025fdf3289ac",
+      "provider": "d10-source-fixture",
+      "modelQualityAccepted": false
+    },
+    {
+      "name": "cancelled",
+      "path": "deterministic/cancelled.png",
+      "bytes": 91873,
+      "digest": "sha256:ec6449e2c97f23a0af6e1592636dfcaa0d9da1b3ee4cda313329cf4ed3c8da47",
+      "provider": "d10-source-fixture",
+      "modelQualityAccepted": false
+    },
+    {
+      "name": "recovered",
+      "path": "deterministic/recovered.png",
+      "bytes": 111962,
+      "digest": "sha256:47dfaca725e32a4dd98b49394ed24ea1cf0c17e579e9fb1ab7d765cd9e192bcb",
+      "provider": "d10-source-fixture",
+      "modelQualityAccepted": false
+    }
+  ],
+  "fixtureModelQualityAccepted": false,
+  "realModel": {
+    "status": "BLOCKED_BY_APPROVAL_REVIEW",
+    "requests": 0,
+    "inputTokens": 0,
+    "outputTokens": 0
+  },
+  "d10AIntegration": "BLOCKED_NO_IMPLEMENTATION_OR_PR",
+  "developerTokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "measurement": "UNKNOWN"
+  }
+}
