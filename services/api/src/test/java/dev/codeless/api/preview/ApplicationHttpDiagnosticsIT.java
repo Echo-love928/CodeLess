@@ -26,7 +26,7 @@ class ApplicationHttpDiagnosticsIT extends FaultAtFreezePreviewAcceptanceIT {
             assertThat(timings.path("entries").toString()).contains("application","csrf");accepted=true;
         } finally {
             Path directory=ROOT.resolve("evidence");Files.createDirectories(directory);
-            String lines=captured.getAll().lines().filter(line->line.contains(" : application.lifecycle phase=")||line.contains(" : csrf.lifecycle phase="))
+            String lines=captured.getAll().lines().filter(line->line.contains(" : application.lifecycle phase=")||line.contains(" : csrf.lifecycle phase=")||line.contains(" : task.lifecycle phase="))
                     .reduce("",(all,line)->all+line+"\n");
             Files.writeString(directory.resolve("api-lifecycle.log"),lines);
             if(Files.exists(directory.resolve("task.json"))) {

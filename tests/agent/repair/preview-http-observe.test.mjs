@@ -8,6 +8,7 @@ test('test-only nginx logging excludes credential/query/header fields and preser
   const instrumented=instrumentConfig(source),format=instrumented.split('\n').find(line=>line.startsWith('log_format'))
   for(const forbidden of ['$request_uri','$args','$http_cookie','$http_authorization','$request_body'])assert.ok(!format.includes(forbidden))
   assert.ok(instrumented.includes('default 0;'))
+  assert.ok(instrumented.includes('GET:/api/v0/tasks/'))
   for(const original of ['proxy_read_timeout 600s;','proxy_read_timeout 5s;','max_fails=0;','error_log /dev/null;','proxy_set_header Authorization "";'])assert.ok(instrumented.includes(original))
 })
 
@@ -24,6 +25,9 @@ test('nginx connect/read evidence and missing timings stay distinct without pers
     `[error] connect() failed (111: Connection refused) while connecting to upstream, request: "GET /api/v0/applications/${id} HTTP/1.1", upstream: "http://[fd00::1]:1234/path"`)
   assert.equal(partial.entries[0].connectSeconds,'-, 0.001');assert.equal(partial.entries[0].upstreamStatus,'502, 200')
   assert.equal(partial.entries[1].errorClass,'CONNECTION_REFUSED');assert.equal(partial.entries[1].errno,'111')
+  const task=parseIngressLogs(JSON.stringify({...JSON.parse(access),route:'task'})+'\n'+line('while connecting to upstream').replace('applications/','tasks/'))
+  assert.deepEqual(task.entries.map(item=>item.route),['task','task'])
+  assert.equal(parseIngressLogs(line('while connecting to upstream').replace('applications/','tasks/').replace('?private=', '/events?private=')).entries.length,0)
 })
 
 test('bounded capture records truncation explicitly',()=>{

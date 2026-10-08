@@ -17,6 +17,7 @@ map "$request_method:$uri" $d10_api_route {
     default 0;
     "GET:/api/v0/auth/csrf" csrf;
     "~^GET:/api/v0/applications/${uuid}$" application;
+    "~^GET:/api/v0/tasks/${uuid}$" task;
 }
 `
   return config.replace('upstream codeless_preview_gateway {',format+'upstream codeless_preview_gateway {')
@@ -31,13 +32,13 @@ export function parseIngressLogs(raw) {
   for(const line of raw.split(/\r?\n/)) {
     const offset=line.indexOf('{"kind":"ingress.api"')
     if(offset>=0) {
-      const item=JSON.parse(line.slice(offset));assert.ok(['csrf','application'].includes(item.route))
+      const item=JSON.parse(line.slice(offset));assert.ok(['csrf','application','task'].includes(item.route))
       entries.push({kind:'ingress.api',route:item.route,at:/^\d{4}-\d\d-\d\dT[0-9:+-]+$/.test(item.at??'')?item.at:null,
         id:new RegExp('^'+uuid+'$').test(item.id??'')?item.id:null,status:Number.isInteger(item.status)&&item.status>=100&&item.status<=599?item.status:null,
         upstream:addresses(item.upstream),requestSeconds:numeric(item.requestSeconds),connectSeconds:numeric(item.connectSeconds),
         headerSeconds:numeric(item.headerSeconds),responseSeconds:numeric(item.responseSeconds),upstreamStatus:numeric(item.upstreamStatus)})
-    } else if(/\[error\]/.test(line) && /request: "GET \/api\/v0\/(auth\/csrf|applications\/[0-9a-f-]{36})/.test(line)) {
-      entries.push({kind:'ingress.error',route:line.includes('GET /api/v0/auth/csrf')?'csrf':'application',
+    } else if(/\[error\]/.test(line) && /request: "GET \/api\/v0\/(auth\/csrf|(?:applications|tasks)\/[0-9a-f-]{36})(?:[? ]|$)/.test(line)) {
+      entries.push({kind:'ingress.error',route:line.includes('GET /api/v0/auth/csrf')?'csrf':line.includes('GET /api/v0/tasks/')?'task':'application',
         phase:line.includes('while connecting to upstream')?'CONNECT':line.includes('while reading response header from upstream')?'READ_HEADER':'UNKNOWN',
         errorClass:line.includes('Connection refused')?'CONNECTION_REFUSED':line.includes('Network is unreachable')?'NETWORK_UNREACHABLE':line.includes('upstream timed out')?'TIMEOUT':'UNKNOWN',
         errno:line.match(/connect\(\) failed \((\d+):/)?.[1]??null,
@@ -53,20 +54,35 @@ if(process.env.CODELESS_REPAIR_HTTP_DIAGNOSTICS==='1') {
   let instrumented=false,configDigest=null
   childProcess.spawnSync=function(command,args,options) {
     if(command==='docker' && args?.[0]==='compose' && args[1]==='--project-name' && /^codeless-preview-test-[0-9a-f-]{36}$/.test(args[2]??'')) {
-      const envIndex=args.indexOf('--env-file');assert.ok(envIndex>0)
-      assert.equal(resolve(args[envIndex+1]),join(evidence,'ingress/compose.env'))
+      const envIndex=args.indexOf('--env-file')
+      const validateEnvironment=()=>{
+        assert.ok(envIndex>0)
+        assert.equal(resolve(args[envIndex+1]),join(evidence,'ingress/compose.env'))
+      }
+      if(args.includes('down')) {
+        const fail=()=>{if(!process.exitCode)process.exitCode=1}
+        let down
+        try {
+          validateEnvironment()
+          const logs=original(command,[...args.slice(0,envIndex+2),'logs','--no-color','ingress'],{...options,timeout:10000})
+          let report={captureExitCode:logs.status??null,instrumented,configDigest,entries:[],truncated:false}
+          try {report={...report,...parseIngressLogs((logs.stdout??'')+'\n'+(logs.stderr??''))}}
+          catch {report.parseFailure='INGRESS_DIAGNOSTIC_INVALID';fail()}
+          if(logs.status!==0)fail()
+          writeFileSync(join(evidence,'ingress-api-timings.json'),JSON.stringify(report,null,2)+'\n')
+        } catch {
+          fail();console.error('Ingress diagnostics could not be captured or persisted.')
+        } finally {
+          // Diagnostics must never bypass the caller's cleanup or change its arguments/result.
+          down=original(command,args,options)
+        }
+        return down
+      }
+      validateEnvironment()
       if(args.includes('up')) {
         assert.equal(instrumented,false)
         const path=join(evidence,'ingress/nginx.conf'),config=instrumentConfig(readFileSync(path,'utf8'))
         writeFileSync(path,config);configDigest=digest(config);instrumented=true
-      }
-      if(args.includes('down')) {
-        const logs=original(command,[...args.slice(0,envIndex+2),'logs','--no-color','ingress'],{...options,timeout:10000})
-        let report={captureExitCode:logs.status??null,instrumented,configDigest,entries:[],truncated:false}
-        try {report={...report,...parseIngressLogs((logs.stdout??'')+'\n'+(logs.stderr??''))}}
-        catch {report.parseFailure='INGRESS_DIAGNOSTIC_INVALID';process.exitCode=1}
-        if(logs.status!==0)process.exitCode=1
-        writeFileSync(join(evidence,'ingress-api-timings.json'),JSON.stringify(report,null,2)+'\n')
       }
     }
     return original(command,args,options)
