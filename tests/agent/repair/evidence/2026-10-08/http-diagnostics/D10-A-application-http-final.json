@@ -1,0 +1,672 @@
+{
+  "task": {
+    "id": "6212c574-5326-4f07-a0bf-f8fc50beedb3",
+    "applicationId": "f577daa5-7079-483e-a2b9-bd01239e1249",
+    "prompt": "生成静态个人展示页，使用两个 Vue 文件展示 Ada Lovelace 与作品列表",
+    "status": "READY",
+    "repairAttempts": 1,
+    "createdAt": "2026-10-08T07:25:03.280211Z",
+    "updatedAt": "2026-10-08T07:25:17.870998Z"
+  },
+  "budget": {
+    "models": 7,
+    "tools": 12,
+    "chargedTokens": 336
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "completeAcceptancePassed": true,
+    "realModelCalls": 0,
+    "historical504RootCause": "UNKNOWN",
+    "historicalApplicationGetRootCause": "UNKNOWN",
+    "ingressTimings": {
+      "captureExitCode": 0,
+      "instrumented": true,
+      "configDigest": "sha256:d10dcb449fc57c62b046a915f8c3781cbbac1e210457e50ea111c4f410021ff5",
+      "entries": [
+        {
+          "kind": "ingress.error",
+          "route": "csrf",
+          "phase": "CONNECT",
+          "errorClass": "UNKNOWN",
+          "errno": null,
+          "timedOut": false,
+          "upstream": "[fdc4:f303:9324::254]:52604"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "csrf",
+          "at": "2026-10-08T07:25:02+00:00",
+          "id": "aec1cdaf-f15f-43a7-bbd6-3a6f508522df",
+          "status": 200,
+          "upstream": "[fdc4:f303:9324::254]:52604, 192.168.65.254:52604",
+          "requestSeconds": "0.018",
+          "connectSeconds": "-, 0.002",
+          "headerSeconds": "-, 0.018",
+          "responseSeconds": "0.000, 0.018",
+          "upstreamStatus": "502, 200"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "csrf",
+          "at": "2026-10-08T07:25:03+00:00",
+          "id": "e1506757-0d6a-4b2d-b100-6024a07ed32b",
+          "status": 200,
+          "upstream": "192.168.65.254:52604",
+          "requestSeconds": "0.004",
+          "connectSeconds": "0.002",
+          "headerSeconds": "0.005",
+          "responseSeconds": "0.005",
+          "upstreamStatus": "200"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "csrf",
+          "at": "2026-10-08T07:25:03+00:00",
+          "id": "36f248cb-c8b0-45f8-8a95-4b76c274277d",
+          "status": 200,
+          "upstream": "192.168.65.254:52604",
+          "requestSeconds": "0.005",
+          "connectSeconds": "0.002",
+          "headerSeconds": "0.006",
+          "responseSeconds": "0.006",
+          "upstreamStatus": "200"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "csrf",
+          "at": "2026-10-08T07:25:03+00:00",
+          "id": "b4855d5b-ff38-4916-9720-adf58f46f2d6",
+          "status": 200,
+          "upstream": "192.168.65.254:52604",
+          "requestSeconds": "0.005",
+          "connectSeconds": "0.002",
+          "headerSeconds": "0.005",
+          "responseSeconds": "0.005",
+          "upstreamStatus": "200"
+        },
+        {
+          "kind": "ingress.error",
+          "route": "csrf",
+          "phase": "CONNECT",
+          "errorClass": "UNKNOWN",
+          "errno": null,
+          "timedOut": false,
+          "upstream": "[fdc4:f303:9324::254]:52604"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "csrf",
+          "at": "2026-10-08T07:25:03+00:00",
+          "id": "a3ab89ee-880e-470b-8dcc-46ca06364b0f",
+          "status": 200,
+          "upstream": "[fdc4:f303:9324::254]:52604, 192.168.65.254:52604",
+          "requestSeconds": "0.006",
+          "connectSeconds": "-, 0.003",
+          "headerSeconds": "-, 0.006",
+          "responseSeconds": "0.000, 0.006",
+          "upstreamStatus": "502, 200"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "application",
+          "at": "2026-10-08T07:25:03+00:00",
+          "id": "52aefecb-25f8-4759-9d24-bce4257b6758",
+          "status": 200,
+          "upstream": "192.168.65.254:52604",
+          "requestSeconds": "0.010",
+          "connectSeconds": "0.002",
+          "headerSeconds": "0.010",
+          "responseSeconds": "0.010",
+          "upstreamStatus": "200"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "application",
+          "at": "2026-10-08T07:25:18+00:00",
+          "id": "7aa97a6d-5bf5-4d7d-8d95-a2ad8bfa6eb9",
+          "status": 200,
+          "upstream": "192.168.65.254:52604",
+          "requestSeconds": "0.007",
+          "connectSeconds": "0.001",
+          "headerSeconds": "0.007",
+          "responseSeconds": "0.007",
+          "upstreamStatus": "200"
+        },
+        {
+          "kind": "ingress.error",
+          "route": "application",
+          "phase": "CONNECT",
+          "errorClass": "UNKNOWN",
+          "errno": null,
+          "timedOut": false,
+          "upstream": "[fdc4:f303:9324::254]:52604"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "application",
+          "at": "2026-10-08T07:25:19+00:00",
+          "id": "cee97431-bede-4ea7-87d7-ac3bb5c6ffc4",
+          "status": 200,
+          "upstream": "[fdc4:f303:9324::254]:52604, 192.168.65.254:52604",
+          "requestSeconds": "0.009",
+          "connectSeconds": "-, 0.002",
+          "headerSeconds": "-, 0.009",
+          "responseSeconds": "0.000, 0.009",
+          "upstreamStatus": "502, 200"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "csrf",
+          "at": "2026-10-08T07:25:19+00:00",
+          "id": "d44bf6ae-8078-49d4-8fcd-b7f25e2dd463",
+          "status": 200,
+          "upstream": "192.168.65.254:52604",
+          "requestSeconds": "0.004",
+          "connectSeconds": "0.002",
+          "headerSeconds": "0.004",
+          "responseSeconds": "0.004",
+          "upstreamStatus": "200"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "application",
+          "at": "2026-10-08T07:25:20+00:00",
+          "id": "ddf87028-4a12-4359-88ad-81f6c864437a",
+          "status": 200,
+          "upstream": "192.168.65.254:52604",
+          "requestSeconds": "0.029",
+          "connectSeconds": "0.007",
+          "headerSeconds": "0.030",
+          "responseSeconds": "0.030",
+          "upstreamStatus": "200"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "csrf",
+          "at": "2026-10-08T07:25:20+00:00",
+          "id": "bcc21515-12d2-49a5-b36d-2196963fdeb6",
+          "status": 200,
+          "upstream": "192.168.65.254:52604",
+          "requestSeconds": "0.005",
+          "connectSeconds": "0.003",
+          "headerSeconds": "0.006",
+          "responseSeconds": "0.006",
+          "upstreamStatus": "200"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "application",
+          "at": "2026-10-08T07:25:20+00:00",
+          "id": "231f428a-934a-4a2a-a11b-87fc87c5cda5",
+          "status": 200,
+          "upstream": "192.168.65.254:52604",
+          "requestSeconds": "0.009",
+          "connectSeconds": "0.002",
+          "headerSeconds": "0.008",
+          "responseSeconds": "0.008",
+          "upstreamStatus": "200"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "application",
+          "at": "2026-10-08T07:25:20+00:00",
+          "id": "6d054480-5e80-4aeb-b092-8652ca8917e2",
+          "status": 200,
+          "upstream": "192.168.65.254:52604",
+          "requestSeconds": "0.046",
+          "connectSeconds": "0.004",
+          "headerSeconds": "0.046",
+          "responseSeconds": "0.046",
+          "upstreamStatus": "200"
+        },
+        {
+          "kind": "ingress.api",
+          "route": "csrf",
+          "at": "2026-10-08T07:25:20+00:00",
+          "id": "d26e0050-fa4d-4e5b-9548-8e6d095f445e",
+          "status": 200,
+          "upstream": "192.168.65.254:52604",
+          "requestSeconds": "0.006",
+          "connectSeconds": "0.002",
+          "headerSeconds": "0.006",
+          "responseSeconds": "0.006",
+          "upstreamStatus": "200"
+        }
+      ],
+      "truncated": false
+    },
+    "acceptance": {
+      "applicationId": "f577daa5-7079-483e-a2b9-bd01239e1249",
+      "taskId": "6212c574-5326-4f07-a0bf-f8fc50beedb3",
+      "versionId": "2b487fd8-fe95-4e42-bd89-dd0ae2f5530d",
+      "buildId": "949e40d7-c72b-4e2f-9471-8f4d15b3c739",
+      "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+      "artifactDigest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+      "sourceFiles": 2,
+      "deploymentIngress": "nginx:1.27.5-alpine",
+      "modelProvider": "deterministic-mock",
+      "modelQualityAccepted": false,
+      "modelQualityValidation": "NOT_MODEL_ACCEPTANCE",
+      "acceptanceScope": "deterministic-platform-integration",
+      "platformApiFixture": false,
+      "signingFixture": false,
+      "realDockerBuild": true,
+      "realBrowserVerification": true,
+      "residentRestartPassed": true,
+      "credentialErrorLogDenied": true,
+      "retentionRevocationPassed": true,
+      "publicInternalDenied": true,
+      "isolation": {
+        "errors": [
+          "SecurityError",
+          "SecurityError",
+          "SecurityError"
+        ],
+        "cookie": "",
+        "platform": null
+      },
+      "screenshot": {
+        "path": "screenshots/D10-A-application-http-final-platform.png",
+        "digest": "sha256:773ffdc0a1365a0c4af3a05ac498cf73f7f98405c147f510ae7fd40e7aff3d5d",
+        "bytes": 145950
+      }
+    }
+  },
+  "candidates": [
+    {
+      "sourceDirectory": "source/D10-A-application-http-final/candidate-0",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDigest": "sha256:b53d561f55bb14832db3051b71cdb2791b70516fadb82fcb86ecd1cfe15ecd23",
+      "versionId": "fcb53f49-ad93-42cd-b9b7-80a604ff73b1",
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 172,
+          "digest": "sha256:21a7b310b1f194ec98594a08d93b642f8da5bffd5cb65c19ce578e8ceedb3610"
+        }
+      ]
+    },
+    {
+      "sourceDirectory": "source/D10-A-application-http-final/candidate-1",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+      "versionId": "2b487fd8-fe95-4e42-bd89-dd0ae2f5530d",
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 170,
+          "digest": "sha256:4c5bed2face90e8ce06f9aff9bc7c60792d737980b8fb426011559ef48163e87"
+        }
+      ]
+    }
+  ],
+  "runners": [
+    {
+      "status": "FAILED",
+      "sourceDigest": "sha256:b53d561f55bb14832db3051b71cdb2791b70516fadb82fcb86ecd1cfe15ecd23",
+      "build": {
+        "id": "d5146e35-a3e1-419f-b0f6-9f2f45a7c87f",
+        "imageId": "sha256:bb26a4cd0148516b3f6b58ecc1a44ecda3f55d1fc0d3826bb08939c6f782fdd5",
+        "containerName": "codeless-build-d5146e35-a3e1-419f-b0f6-9f2f45a7c87f",
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 2,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/M1MissingCard.vue' or its corresponding type declarations.\n",
+          "bytes": 232,
+          "observedBytes": 232,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-08T07:25:05.195Z",
+        "completedAt": "2026-10-08T07:25:09.396Z"
+      },
+      "verification": null,
+      "executionId": "12fc7e05-b709-47f2-9026-a4154c76c857"
+    },
+    {
+      "status": "VERIFIED",
+      "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+      "build": {
+        "id": "949e40d7-c72b-4e2f-9471-8f4d15b3c739",
+        "imageId": "sha256:bb26a4cd0148516b3f6b58ecc1a44ecda3f55d1fc0d3826bb08939c6f782fdd5",
+        "containerName": "codeless-build-949e40d7-c72b-4e2f-9471-8f4d15b3c739",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 30 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-BmOy7POk.js  \u001b[39m\u001b[1m\u001b[2m83.42 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.08 kB\u001b[22m\n\u001b[32m✓ built in 1.15s\u001b[39m\n",
+          "bytes": 507,
+          "observedBytes": 507,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+          "bytes": 83713,
+          "files": [
+            {
+              "path": "assets/index-BmOy7POk.js",
+              "bytes": 83422,
+              "digest": "sha256:a9f85a10a51cbc549218837a8982a036a25c0ab77b1c27f0cd3c83cd5d17a189"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:fd3c7c6de8c6fe409ce803408537067150f4b45b1bcf8cc7e851c37b91ea2f1b"
+            }
+          ],
+          "directory": "PRIVATE_PATH_RETAINED_LOCALLY"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-08T07:25:11.448Z",
+        "completedAt": "2026-10-08T07:25:16.555Z"
+      },
+      "verification": {
+        "id": "b05f59b1-f389-4eaf-9dfc-50185543b94a",
+        "buildId": "949e40d7-c72b-4e2f-9471-8f4d15b3c739",
+        "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+        "artifactDigest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-08T07:25:16.578Z",
+        "completedAt": "2026-10-08T07:25:17.597Z",
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "navigate",
+              "status": "PASSED"
+            },
+            {
+              "index": 1,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1"
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "screenshots/D10-A-application-http-final-1.png",
+          "digest": "sha256:50ef5f8654547ed799076e340aa3ed28c32b3fbde6cc385e29b42786ac8b0462",
+          "bytes": 10310,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "PRIVATE_PATH_RETAINED_LOCALLY"
+      },
+      "executionId": "0068d3eb-4bf2-4ab9-89e8-b0d929c9f12f"
+    }
+  ],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "chargedTokens": 48,
+      "estimated": false,
+      "reservationTokens": 9297,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS"
+        }
+      },
+      "releasedTokens": 9249,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "GENERATE",
+      "chargedTokens": 48,
+      "estimated": false,
+      "reservationTokens": 12651,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS"
+        }
+      },
+      "releasedTokens": 12603,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "GENERATE",
+      "chargedTokens": 48,
+      "estimated": false,
+      "reservationTokens": 13125,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS"
+        }
+      },
+      "releasedTokens": 13077,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "GENERATE",
+      "chargedTokens": 48,
+      "estimated": false,
+      "reservationTokens": 13729,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS"
+        }
+      },
+      "releasedTokens": 13681,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "REPAIR",
+      "chargedTokens": 48,
+      "estimated": false,
+      "reservationTokens": 10912,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS"
+        }
+      },
+      "releasedTokens": 10864,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "REPAIR",
+      "chargedTokens": 48,
+      "estimated": false,
+      "reservationTokens": 11756,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS"
+        }
+      },
+      "releasedTokens": 11708,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "REPAIR",
+      "chargedTokens": 48,
+      "estimated": false,
+      "reservationTokens": 12429,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS"
+        }
+      },
+      "releasedTokens": 12381,
+      "meteringSource": "PROVIDER_USAGE"
+    }
+  ],
+  "decisions": [
+    {
+      "stage": "PLAN",
+      "sequence": 5,
+      "kind": "stage.finished",
+      "taskId": "6212c574-5326-4f07-a0bf-f8fc50beedb3",
+      "at": "2026-10-08T07:25:03.540906700Z",
+      "payload": {
+        "next": "GENERATE"
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "sequence": 25,
+      "kind": "stage.finished",
+      "taskId": "6212c574-5326-4f07-a0bf-f8fc50beedb3",
+      "at": "2026-10-08T07:25:04.826160Z",
+      "payload": {
+        "next": "VERIFY"
+      }
+    },
+    {
+      "stage": "VERIFY",
+      "sequence": 28,
+      "kind": "repair.failure",
+      "taskId": "6212c574-5326-4f07-a0bf-f8fc50beedb3",
+      "at": "2026-10-08T07:25:09.562608700Z",
+      "payload": {
+        "code": "AGENT_BUILD_EXIT",
+        "category": "CODE",
+        "fingerprint": "sha256:19ea1b6699db2ceaebdeccc68de55d9b5155c390188ad2e433e66cc9246d8a14",
+        "diagnostic": "> @codeless/generated-vue@0.1.0 build\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/M1MissingCard.vue' or its corresponding type declarations.",
+        "sourceDigest": "sha256:b53d561f55bb14832db3051b71cdb2791b70516fadb82fcb86ecd1cfe15ecd23",
+        "repairAttempts": 0,
+        "decision": "REPAIR"
+      }
+    },
+    {
+      "stage": "VERIFY",
+      "sequence": 29,
+      "kind": "stage.finished",
+      "taskId": "6212c574-5326-4f07-a0bf-f8fc50beedb3",
+      "at": "2026-10-08T07:25:09.597185700Z",
+      "payload": {
+        "next": "REPAIR"
+      }
+    },
+    {
+      "stage": "REPAIR",
+      "sequence": 44,
+      "kind": "stage.finished",
+      "taskId": "6212c574-5326-4f07-a0bf-f8fc50beedb3",
+      "at": "2026-10-08T07:25:10.697466400Z",
+      "payload": {
+        "next": "GENERATE"
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "sequence": 47,
+      "kind": "stage.finished",
+      "taskId": "6212c574-5326-4f07-a0bf-f8fc50beedb3",
+      "at": "2026-10-08T07:25:11.028313400Z",
+      "payload": {
+        "next": "VERIFY"
+      }
+    },
+    {
+      "stage": "VERIFY",
+      "sequence": 50,
+      "kind": "stage.finished",
+      "taskId": "6212c574-5326-4f07-a0bf-f8fc50beedb3",
+      "at": "2026-10-08T07:25:17.777303100Z",
+      "payload": {
+        "next": "READY"
+      }
+    },
+    {
+      "stage": "VERIFY",
+      "sequence": 51,
+      "kind": "completion",
+      "taskId": "6212c574-5326-4f07-a0bf-f8fc50beedb3",
+      "at": "2026-10-08T07:25:17.914098700Z",
+      "payload": {
+        "buildId": "949e40d7-c72b-4e2f-9471-8f4d15b3c739",
+        "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+        "versionId": "2b487fd8-fe95-4e42-bd89-dd0ae2f5530d",
+        "artifactDigest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+        "verificationId": "b05f59b1-f389-4eaf-9dfc-50185543b94a"
+      }
+    }
+  ]
+}

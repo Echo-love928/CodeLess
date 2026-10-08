@@ -24,7 +24,8 @@ import tools.jackson.databind.json.JsonMapper;
         "codeless.model.provider=deterministic-mock","codeless.agent.enabled=true","codeless.agent.repository-root=../..",
         "codeless.agent.private-root=target/csrf-generation/runtime","CODELESS_FILE_WORKSPACE_ROOT=target/csrf-generation/workspaces",
         "CODELESS_FILE_AUDIT_ROOT=target/csrf-generation/audit","codeless.model.audit-root=target/csrf-generation/models",
-        "codeless.diagnostics.csrf.enabled=true","CODELESS_DEMO_PASSWORD=demo-password-for-test-only","CODELESS_ADMIN_PASSWORD=admin-password-for-test-only"})
+        "codeless.diagnostics.csrf.enabled=true","codeless.diagnostics.application.enabled=true",
+        "CODELESS_DEMO_PASSWORD=demo-password-for-test-only","CODELESS_ADMIN_PASSWORD=admin-password-for-test-only"})
 @DirtiesContext(classMode=DirtiesContext.ClassMode.AFTER_CLASS)
 @org.junit.jupiter.api.extension.ExtendWith(OutputCaptureExtension.class)
 class CsrfDuringGenerationTest extends PostgresTestBase {
@@ -73,14 +74,19 @@ class CsrfDuringGenerationTest extends PostgresTestBase {
                     long start=System.nanoTime();var reply=get(client,base+"auth/csrf?diagnostic=PRIVATE_QUERY_MARKER",cookie);
                     assertThat(reply.statusCode()).isEqualTo(200);assertThat(json.readTree(reply.body()).path("token").asText()).isEqualTo(token);
                     String id=reply.headers().firstValue("X-Codeless-Diagnostic-Id").orElseThrow();UUID.fromString(id);
-                    timings.add(Map.of("id",id,"status",reply.statusCode(),"elapsedMs",(System.nanoTime()-start)/1_000_000));
+                    timings.add(Map.of("endpoint","csrf","id",id,"status",reply.statusCode(),"elapsedMs",(System.nanoTime()-start)/1_000_000));
+                    start=System.nanoTime();var application=get(client,base+"applications/"+appId+"?diagnostic=PRIVATE_QUERY_MARKER",cookie);
+                    assertThat(json.readTree(application.body()).path("id").asText()).isEqualTo(appId.toString());
+                    String applicationId=application.headers().firstValue("X-Codeless-Diagnostic-Id").orElseThrow();UUID.fromString(applicationId);
+                    timings.add(Map.of("endpoint","application","id",applicationId,"status",application.statusCode(),"elapsedMs",(System.nanoTime()-start)/1_000_000));
                 }
             } finally {release.countDown();}
             running.get(120,TimeUnit.SECONDS);
             assertThat(queue.find(owner,task).orElseThrow().status().name()).isEqualTo("READY");
             assertThat(AgentJournal.latest(journal.read(task),"runner.result").path("verification").path("status").asText()).isEqualTo("PASSED");
-            assertThat(output.getOut()).contains("csrf.lifecycle phase=started","csrf.lifecycle phase=finished","status=200 returned=true")
-                    .doesNotContain("PRIVATE_QUERY_MARKER",token,cookie);
+            assertThat(output.getOut()).contains("csrf.lifecycle phase=started","csrf.lifecycle phase=finished",
+                    "application.lifecycle phase=started","application.lifecycle phase=finished","status=200 returned=true")
+                    .doesNotContain("PRIVATE_QUERY_MARKER",token,cookie,appId.toString());
             Path directory=Path.of(System.getenv().getOrDefault("CODELESS_HTTP_EVIDENCE_DIR","target/csrf-generation/evidence"));Files.createDirectories(directory);
             Files.writeString(directory.resolve("D10-A-csrf-concurrency.json"),json.writeValueAsString(Map.of("task",queue.find(owner,task).orElseThrow(),
                     "events",journal.read(task),"modelProvider","deterministic-mock","modelQualityEvidence",false,"extra",Map.of(

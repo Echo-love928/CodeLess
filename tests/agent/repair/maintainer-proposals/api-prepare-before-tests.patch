@@ -1,0 +1,12 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -33,4 +33,8 @@ jobs:
+           distribution: temurin
+           java-version: 21
+       - run: corepack enable
++      - run: pnpm install --frozen-lockfile
++      - name: Install locked Chromium before API test containers start
++        timeout-minutes: 3
++        run: pnpm exec playwright install --with-deps chromium
+       - run: pnpm verify:api
