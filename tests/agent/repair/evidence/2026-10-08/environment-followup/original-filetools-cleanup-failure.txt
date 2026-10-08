@@ -1,0 +1,43 @@
+-------------------------------------------------------------------------------
+Test set: dev.codeless.api.tools.FileToolsIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 10, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 10.18 s <<< FAILURE! -- in dev.codeless.api.tools.FileToolsIntegrationTest
+dev.codeless.api.tools.FileToolsIntegrationTest.d08aT2TraversalAbsoluteProtectedFilesAndSymlinkDirectoriesAreRejected -- Time elapsed: 0.507 s <<< ERROR!
+org.junit.platform.commons.JUnitException: Failed to close extension context
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.io.IOException: Failed to delete temp directory F:\JAVA\CodeLess\CodeLess\services\api\target\file-tool-test-workspaces\task-10742938227558746829. The following paths could not be deleted (see suppressed exceptions for details): <root>, audit, audit\e2541c50-9ac8-4eda-a414-9f0fbe12d904
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.stream.SortedOps$RefSortingSink.end(SortedOps.java:395)
+	at java.base/java.util.stream.Sink$ChainedReference.end(Sink.java:261)
+	at java.base/java.util.stream.Sink$ChainedReference.end(Sink.java:261)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	... 2 more
+	Suppressed: java.nio.file.DirectoryNotEmptyException: F:\JAVA\CodeLess\CodeLess\services\api\target\file-tool-test-workspaces\task-10742938227558746829
+		at java.base/sun.nio.fs.WindowsFileSystemProvider.implDelete(WindowsFileSystemProvider.java:270)
+		at java.base/sun.nio.fs.AbstractFileSystemProvider.delete(AbstractFileSystemProvider.java:105)
+		at java.base/java.nio.file.Files.delete(Files.java:1153)
+		at java.base/java.nio.file.Files.walkFileTree(Files.java:2816)
+		at java.base/java.nio.file.Files.walkFileTree(Files.java:2870)
+		... 13 more
+	Suppressed: java.nio.file.DirectoryNotEmptyException: F:\JAVA\CodeLess\CodeLess\services\api\target\file-tool-test-workspaces\task-10742938227558746829\audit
+		at java.base/sun.nio.fs.WindowsFileSystemProvider.implDelete(WindowsFileSystemProvider.java:270)
+		at java.base/sun.nio.fs.AbstractFileSystemProvider.delete(AbstractFileSystemProvider.java:105)
+		at java.base/java.nio.file.Files.delete(Files.java:1153)
+		at java.base/java.nio.file.Files.walkFileTree(Files.java:2816)
+		at java.base/java.nio.file.Files.walkFileTree(Files.java:2870)
+		... 13 more
+	Suppressed: java.nio.file.DirectoryNotEmptyException: F:\JAVA\CodeLess\CodeLess\services\api\target\file-tool-test-workspaces\task-10742938227558746829\audit\e2541c50-9ac8-4eda-a414-9f0fbe12d904
+		at java.base/sun.nio.fs.WindowsFileSystemProvider.implDelete(WindowsFileSystemProvider.java:270)
+		at java.base/sun.nio.fs.AbstractFileSystemProvider.delete(AbstractFileSystemProvider.java:105)
+		at java.base/java.nio.file.Files.delete(Files.java:1153)
+		at java.base/java.nio.file.Files.walkFileTree(Files.java:2816)
+		at java.base/java.nio.file.Files.walkFileTree(Files.java:2870)
+		... 13 more
+
