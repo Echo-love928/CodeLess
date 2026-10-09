@@ -1,0 +1,38 @@
+[
+  {
+    "command": "mvnw -Dtest=CsrfDuringGenerationTest,ApplicationHttpDiagnosticsIT -DreuseForks=false -DforkCount=1 test (Docker unavailable; bodies not executed)",
+    "exitCode": 1,
+    "log": ".local-data/d10-a/review-http-2026-10-08.log",
+    "logDigest": "sha256:4578e8474e26aadbedbc08fe8392871a768a43ac5b29f5b20ec994e53bbb0167"
+  },
+  {
+    "command": "mvnw -Dtest=CsrfDuringGenerationTest,ApplicationHttpDiagnosticsIT -DreuseForks=false -DforkCount=1 test (after starting installed Docker Desktop)",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/review-http-ready-2026-10-08.log",
+    "logDigest": "sha256:2af73c9252a9419cdfeaa1a92990a42f268a2acccb0b0d26fed6c934d53dfe19"
+  },
+  {
+    "command": "node --test tests/agent/repair/preview-http-observe.test.mjs (final parser)",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/observe-tests-2026-10-08.log",
+    "logDigest": "sha256:17d13b023e8fa319f68a170fe13120510ae8f7b5938481f86feb5b26c528b2ac"
+  },
+  {
+    "command": "pnpm ci:gate",
+    "exitCode": -1073740791,
+    "log": ".local-data/d10-a/review-gate-2026-10-08.log",
+    "logDigest": "sha256:7afe8bef6a23e172f6b6a91188d133da9a94fe6792591c46eaa85f7dea52090d"
+  },
+  {
+    "command": "mvnw -Dtest=ApplicationHttpDiagnosticsIT -DreuseForks=false -DforkCount=1 test (final parser fields)",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/application-http-final-2026-10-08.log",
+    "logDigest": "sha256:a2ef930f2d407ab1a3c439e5b0d55c5026d66075eb700e790257d947e41c12f8"
+  },
+  {
+    "command": "pnpm --filter @codeless/web verify (previously unexecuted static sub-step; not a replacement gate)",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/web-static-complement-2026-10-08.log",
+    "logDigest": "sha256:0118a35d7a676ef4176116e1d47a1f4d3518fc8b9789e375b97b188fa843cb64"
+  }
+]

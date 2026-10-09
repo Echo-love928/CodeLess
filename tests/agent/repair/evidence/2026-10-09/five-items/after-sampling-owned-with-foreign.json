@@ -1,0 +1,166 @@
+{
+  "samples": [
+    {
+      "at": "2026-10-09T08:36:43.8665546Z",
+      "captureId": "5166ba54-2d1b-4c29-aa18-fa85f677c90a",
+      "apiPort": 12345,
+      "root": "preview-platform-4e14b86e-9557-4c42-83eb-5dfa811bb215",
+      "hostTcp": {
+        "truncated": false,
+        "connections": [],
+        "ipv6ExitCode": 0,
+        "exitCode": 0,
+        "ipv6State": "OBSERVED",
+        "state": "OBSERVED"
+      },
+      "project": "codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "containerLookup": {
+        "found": true,
+        "candidateLimitExceeded": false,
+        "exitCode": 0,
+        "state": "OBSERVED",
+        "mountQueries": [
+          {
+            "matched": true,
+            "expectedRoot": "preview-platform-4e14b86e-9557-4c42-83eb-5dfa811bb215",
+            "exitCode": 0,
+            "state": "OBSERVED",
+            "observedRoot": "preview-platform-4e14b86e-9557-4c42-83eb-5dfa811bb215"
+          }
+        ]
+      },
+      "hosts": {
+        "addresses": [
+          "127.0.0.1"
+        ],
+        "exitCode": 0,
+        "state": "OBSERVED"
+      },
+      "ipv4Routes": {
+        "exitCode": 0,
+        "state": "OBSERVED",
+        "entries": [],
+        "truncated": false
+      },
+      "tcpProbes": [
+        {
+          "connected": true,
+          "state": "OBSERVED",
+          "address": "127.0.0.1",
+          "exitCode": 0,
+          "port": 12345,
+          "at": "2026-10-09T08:36:43.9112292Z"
+        }
+      ]
+    }
+  ],
+  "dockerStub": true,
+  "realTcp": false,
+  "lifecycle": {
+    "captureId": "5166ba54-2d1b-4c29-aa18-fa85f677c90a",
+    "completed": true,
+    "collectorTimedOut": false,
+    "primaryExceptionType": null,
+    "primaryOutcome": "COMPLETED",
+    "childExitCode": 0,
+    "process": {
+      "started": true,
+      "stopRequested": false,
+      "terminated": true,
+      "nativeExitCode": 0,
+      "state": "EXITED",
+      "activeBefore": 0,
+      "remainingProcesses": 0
+    },
+    "resources": {
+      "state": "DOWN_COMPLETED",
+      "downAttempted": true,
+      "downExitCode": 0,
+      "containers": {
+        "queryExitCode": 0,
+        "remaining": 0,
+        "state": "OBSERVED"
+      },
+      "networks": {
+        "queryExitCode": 0,
+        "remaining": 0,
+        "state": "OBSERVED"
+      },
+      "project": "codeless-preview-test-11111111-1111-1111-1111-111111111111"
+    },
+    "cleanupFailed": false
+  },
+  "networkCaptured": true,
+  "collectorExit": 0,
+  "modelCalls": 0,
+  "mode": "owned-with-foreign",
+  "mavenExecuted": false,
+  "probePorts": [
+    12345
+  ],
+  "calls": [
+    [
+      "ps",
+      "--filter",
+      "label=com.docker.compose.project=codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "--format",
+      "{{.ID}}|{{.Label \"com.docker.compose.project\"}}"
+    ],
+    [
+      "inspect",
+      "--format",
+      "{{range .Mounts}}{{if eq .Destination \"/etc/nginx/conf.d/default.conf\"}}{{.Source}}{{end}}{{end}}",
+      "abcdef123456"
+    ],
+    [
+      "exec",
+      "abcdef123456",
+      "cat",
+      "/etc/hosts"
+    ],
+    [
+      "exec",
+      "abcdef123456",
+      "cat",
+      "/proc/net/route"
+    ],
+    [
+      "exec",
+      "abcdef123456",
+      "nc",
+      "-z",
+      "-w",
+      "2",
+      "127.0.0.1",
+      "12345"
+    ],
+    [
+      "compose",
+      "--project-name",
+      "codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "--file",
+      "F:\\JAVA\\CodeLess\\CodeLess\\infra\\preview\\compose.yml",
+      "--env-file",
+      "F:\\JAVA\\CodeLess\\CodeLess\\services\\api\\target\\preview-platform-4e14b86e-9557-4c42-83eb-5dfa811bb215\\evidence\\ingress\\compose.env",
+      "down",
+      "--remove-orphans"
+    ],
+    [
+      "ps",
+      "--all",
+      "--filter",
+      "label=com.docker.compose.project=codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "--format",
+      "{{.ID}}"
+    ],
+    [
+      "network",
+      "ls",
+      "--filter",
+      "label=com.docker.compose.project=codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "--format",
+      "{{.ID}}"
+    ]
+  ],
+  "fixture": true
+}

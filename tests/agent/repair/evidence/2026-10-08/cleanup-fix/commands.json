@@ -1,0 +1,38 @@
+[
+  {
+    "command": "node --test tests/agent/repair/preview-http-cleanup.test.mjs (unfixed observer; regression failures retained)",
+    "exitCode": 1,
+    "log": ".local-data/d10-a/cleanup-before.log",
+    "logDigest": "sha256:8ea19645555af50293f9c76c5fe113579508728a5536d566c935b89a13c7a290"
+  },
+  {
+    "command": "node --test tests/agent/repair/preview-http-observe.test.mjs tests/agent/repair/preview-http-cleanup.test.mjs",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/cleanup-after.log",
+    "logDigest": "sha256:c21110bd6ff8e7ec0647d2099df7452b46d2fa9541607f908daf146f0f01a86a"
+  },
+  {
+    "command": "mvnw -Dtest=PreviewPlatformIntegrationTest,ApplicationHttpDiagnosticsIT -DreuseForks=false -DforkCount=1 test (first compile failed)",
+    "exitCode": 1,
+    "log": ".local-data/d10-a/cleanup-real-entry.log",
+    "logDigest": "sha256:2412adf69b1fbd0ab32615b642498dbba6998108215d139a01ee05f64a071d46"
+  },
+  {
+    "command": "mvnw -Dtest=PreviewPlatformIntegrationTest,ApplicationHttpDiagnosticsIT -DreuseForks=false -DforkCount=1 test (real task GET502 retained)",
+    "exitCode": 1,
+    "log": ".local-data/d10-a/cleanup-real-entry-final.log",
+    "logDigest": "sha256:ba1e7039ebdaf556a9d38391a6063cc24ad215f892c7f7f1a9641b1ef90a7d59"
+  },
+  {
+    "command": "mvnw -Dtest=HttpDiagnosticsCleanupIT -DreuseForks=false -DforkCount=1 test (expected Node1, actual compose down and resource inspection)",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/cleanup-real-fault.log",
+    "logDigest": "sha256:347a586e43f8a1d84cbd1b30da4bf8ec4de177d21f7709f7d6ea5cf9d4235a37"
+  },
+  {
+    "command": "pnpm ci:gate (after cleanup fix and actual-entry diagnostic wiring)",
+    "exitCode": 1,
+    "log": ".local-data/d10-a/cleanup-ci-gate.log",
+    "logDigest": "sha256:6d76f88f91dbb19ef340f791ad82f2f24f4adde45b23464da342ded0207a2788"
+  }
+]

@@ -1,0 +1,348 @@
+{
+  "task": {
+    "id": "6d61e6a4-e787-4f20-8202-9eaab5e5c01e",
+    "applicationId": "2878d364-4390-44f3-a091-8c8173fe6af1",
+    "prompt": "生成静态个人展示页，使用两个 Vue 文件展示 Ada Lovelace 与作品列表",
+    "status": "READY",
+    "repairAttempts": 0,
+    "createdAt": "2026-10-08T08:33:00.952424Z",
+    "updatedAt": "2026-10-08T08:33:09.444003Z"
+  },
+  "budget": {
+    "models": 4,
+    "tools": 5,
+    "chargedTokens": 48802
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "acceptance": {
+      "applicationId": "2878d364-4390-44f3-a091-8c8173fe6af1",
+      "taskId": "6d61e6a4-e787-4f20-8202-9eaab5e5c01e",
+      "versionId": "0e3f61cd-73b1-41c7-9da5-27a3149cf842",
+      "buildId": "5bd78db4-93be-4b36-b465-7458914d426b",
+      "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+      "artifactDigest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+      "sourceFiles": 2,
+      "deploymentIngress": "nginx:1.27.5-alpine",
+      "modelProvider": "deterministic-mock",
+      "modelQualityAccepted": false,
+      "modelQualityValidation": "NOT_MODEL_ACCEPTANCE",
+      "acceptanceScope": "deterministic-platform-integration",
+      "platformApiFixture": false,
+      "signingFixture": false,
+      "realDockerBuild": true,
+      "realBrowserVerification": true,
+      "residentRestartPassed": true,
+      "credentialErrorLogDenied": true,
+      "retentionRevocationPassed": true,
+      "publicInternalDenied": true,
+      "isolation": {
+        "errors": [
+          "SecurityError",
+          "SecurityError",
+          "SecurityError"
+        ],
+        "cookie": "",
+        "platform": null
+      },
+      "screenshot": {
+        "path": "screenshots/D10-A-real-cleanup-fault-platform.png",
+        "digest": "sha256:3ac304521326973fa47daf0b732872b6f2043f3513649feeb06cf4315105e1d0",
+        "bytes": 119395
+      }
+    },
+    "realModelCalls": 0,
+    "historicalRootCauses": "UNKNOWN",
+    "budgetMeasurement": "Journal charges use RuntimeBudget.meter arithmetic; synthetic/estimated fixture usage is not real model usage",
+    "expectedFailure": {
+      "modelProvider": "deterministic-mock",
+      "acceptance": {
+        "applicationId": "2878d364-4390-44f3-a091-8c8173fe6af1",
+        "taskId": "6d61e6a4-e787-4f20-8202-9eaab5e5c01e",
+        "versionId": "0e3f61cd-73b1-41c7-9da5-27a3149cf842",
+        "buildId": "5bd78db4-93be-4b36-b465-7458914d426b",
+        "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+        "artifactDigest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+        "sourceFiles": 2,
+        "deploymentIngress": "nginx:1.27.5-alpine",
+        "modelProvider": "deterministic-mock",
+        "modelQualityAccepted": false,
+        "modelQualityValidation": "NOT_MODEL_ACCEPTANCE",
+        "acceptanceScope": "deterministic-platform-integration",
+        "platformApiFixture": false,
+        "signingFixture": false,
+        "realDockerBuild": true,
+        "realBrowserVerification": true,
+        "residentRestartPassed": true,
+        "credentialErrorLogDenied": true,
+        "retentionRevocationPassed": true,
+        "publicInternalDenied": true,
+        "isolation": {
+          "errors": [
+            "SecurityError",
+            "SecurityError",
+            "SecurityError"
+          ],
+          "cookie": "",
+          "platform": null
+        },
+        "screenshot": {
+          "path": "authenticated-platform-preview.png",
+          "digest": "sha256:3ac304521326973fa47daf0b732872b6f2043f3513649feeb06cf4315105e1d0",
+          "bytes": 119395
+        }
+      },
+      "diagnosticFailurePreserved": true,
+      "expectedNodeExitCode": 1,
+      "realModelCalls": 0,
+      "modelQualityEvidence": false,
+      "cleanup": {
+        "diagnosticFault": "EISDIR",
+        "downExitCode": 0,
+        "containers": {
+          "exitCode": 0,
+          "remaining": 0
+        },
+        "networks": {
+          "exitCode": 0,
+          "remaining": 0
+        },
+        "realDocker": true
+      }
+    }
+  },
+  "candidates": [
+    {
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 170,
+          "digest": "sha256:4c5bed2face90e8ce06f9aff9bc7c60792d737980b8fb426011559ef48163e87"
+        }
+      ],
+      "versionId": "0e3f61cd-73b1-41c7-9da5-27a3149cf842",
+      "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-real-cleanup-fault/candidate-0"
+    }
+  ],
+  "runners": [
+    {
+      "status": "VERIFIED",
+      "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+      "build": {
+        "id": "5bd78db4-93be-4b36-b465-7458914d426b",
+        "imageId": "sha256:7ee56caa809fcb8c006af1473b4bf7ee779cb337e39fc7e4cf03e324511b01fa",
+        "containerName": "codeless-build-5bd78db4-93be-4b36-b465-7458914d426b",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 30 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-BmOy7POk.js  \u001b[39m\u001b[1m\u001b[2m83.42 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.08 kB\u001b[22m\n\u001b[32m✓ built in 1.15s\u001b[39m\n",
+          "bytes": 507,
+          "observedBytes": 507,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+          "bytes": 83713,
+          "files": [
+            {
+              "path": "assets/index-BmOy7POk.js",
+              "bytes": 83422,
+              "digest": "sha256:a9f85a10a51cbc549218837a8982a036a25c0ab77b1c27f0cd3c83cd5d17a189"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:fd3c7c6de8c6fe409ce803408537067150f4b45b1bcf8cc7e851c37b91ea2f1b"
+            }
+          ],
+          "directory": "PRIVATE_PATH_RETAINED_LOCALLY"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-08T08:33:02.806Z",
+        "completedAt": "2026-10-08T08:33:08.142Z"
+      },
+      "verification": {
+        "id": "df9c04ad-7e5a-492a-8f73-6e7129025127",
+        "buildId": "5bd78db4-93be-4b36-b465-7458914d426b",
+        "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+        "artifactDigest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-08T08:33:08.166Z",
+        "completedAt": "2026-10-08T08:33:09.211Z",
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "navigate",
+              "status": "PASSED"
+            },
+            {
+              "index": 1,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1"
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "screenshots/D10-A-real-cleanup-fault-0.png",
+          "digest": "sha256:50ef5f8654547ed799076e340aa3ed28c32b3fbde6cc385e29b42786ac8b0462",
+          "bytes": 10310,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "PRIVATE_PATH_RETAINED_LOCALLY"
+      },
+      "executionId": "f0661254-2f23-4f76-8cd7-ed3f9939e3b7"
+    }
+  ],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "releasedTokens": 0,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      },
+      "reservationTokens": 9297,
+      "estimated": true,
+      "chargedTokens": 9297
+    },
+    {
+      "stage": "GENERATE",
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "releasedTokens": 0,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      },
+      "reservationTokens": 12651,
+      "estimated": true,
+      "chargedTokens": 12651
+    },
+    {
+      "stage": "GENERATE",
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "releasedTokens": 0,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      },
+      "reservationTokens": 13125,
+      "estimated": true,
+      "chargedTokens": 13125
+    },
+    {
+      "stage": "GENERATE",
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "releasedTokens": 0,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      },
+      "reservationTokens": 13729,
+      "estimated": true,
+      "chargedTokens": 13729
+    }
+  ],
+  "decisions": [
+    {
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-08T08:33:01.501083800Z",
+      "taskId": "6d61e6a4-e787-4f20-8202-9eaab5e5c01e",
+      "kind": "stage.finished",
+      "sequence": 5,
+      "stage": "PLAN"
+    },
+    {
+      "payload": {
+        "next": "VERIFY"
+      },
+      "at": "2026-10-08T08:33:02.436459500Z",
+      "taskId": "6d61e6a4-e787-4f20-8202-9eaab5e5c01e",
+      "kind": "stage.finished",
+      "sequence": 21,
+      "stage": "GENERATE"
+    },
+    {
+      "payload": {
+        "next": "READY"
+      },
+      "at": "2026-10-08T08:33:09.362509700Z",
+      "taskId": "6d61e6a4-e787-4f20-8202-9eaab5e5c01e",
+      "kind": "stage.finished",
+      "sequence": 24,
+      "stage": "VERIFY"
+    },
+    {
+      "payload": {
+        "verificationId": "df9c04ad-7e5a-492a-8f73-6e7129025127",
+        "artifactDigest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+        "versionId": "0e3f61cd-73b1-41c7-9da5-27a3149cf842",
+        "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+        "buildId": "5bd78db4-93be-4b36-b465-7458914d426b"
+      },
+      "at": "2026-10-08T08:33:09.470803800Z",
+      "taskId": "6d61e6a4-e787-4f20-8202-9eaab5e5c01e",
+      "kind": "completion",
+      "sequence": 25,
+      "stage": "VERIFY"
+    }
+  ]
+}

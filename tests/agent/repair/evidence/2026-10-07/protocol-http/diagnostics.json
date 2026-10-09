@@ -1,0 +1,332 @@
+{
+  "base": "7c3a502ce34db66c64b06d8dd21293e3b92ae05a",
+  "realModelCallsThisRevision": 0,
+  "paidRepair": "PAUSED_BY_USER",
+  "developmentRegression": {
+    "firstCommand": "pnpm ci:gate",
+    "firstExitCode": 1,
+    "apiTests": 123,
+    "apiFailures": 6,
+    "apiErrors": 3,
+    "apiSkipped": 0,
+    "cause": "Appending 857 bytes to each GENERATE policy pushed existing missing-usage fixtures over the conservative 50,000 token budget before their last proposal; later checkpoint errors were consequences of the failed prerequisite.",
+    "correction": "Compact the shared policy to 416 bytes. Keep real closed JSON examples and transport/application distinction, original strict parser and all assertions.",
+    "minimumReproduction": "mvnw -Dtest=AgentLoopIntegrationTest#D09AT1_mockProviderGeneratesMultipleFilesThroughRealDatabaseDockerAndBrowser test",
+    "unchangedLimits": {
+      "repairs": 3,
+      "modelRequests": 12,
+      "toolSlots": 20,
+      "chargedTokens": 50000,
+      "taskMinutes": 12,
+      "outputTokensPerCall": 4096
+    }
+  },
+  "network": {
+    "command": "java tests/agent/repair/NetworkEnvironmentProbe.java",
+    "exitCode": 0,
+    "logDigest": "sha256:b483c94772aaa68098aa25d8414e4d776dc76f3560c0ce1d4da4eb8c186e5bb0",
+    "outerProcess": {
+      "autoConfigPresent": false,
+      "proxyEnvironment": [
+        {
+          "scope": "Process",
+          "present": true,
+          "host": "127.0.0.1",
+          "port": 7897,
+          "name": "HTTP_PROXY"
+        },
+        {
+          "scope": "Process",
+          "present": true,
+          "host": "127.0.0.1",
+          "port": 7897,
+          "name": "HTTPS_PROXY"
+        },
+        {
+          "scope": "Process",
+          "present": true,
+          "host": "127.0.0.1",
+          "port": 7897,
+          "name": "ALL_PROXY"
+        },
+        {
+          "scope": "Process",
+          "present": false,
+          "host": null,
+          "port": null,
+          "name": "NO_PROXY"
+        },
+        {
+          "scope": "User",
+          "present": false,
+          "host": null,
+          "port": null,
+          "name": "HTTP_PROXY"
+        },
+        {
+          "scope": "User",
+          "present": false,
+          "host": null,
+          "port": null,
+          "name": "HTTPS_PROXY"
+        },
+        {
+          "scope": "User",
+          "present": false,
+          "host": null,
+          "port": null,
+          "name": "ALL_PROXY"
+        },
+        {
+          "scope": "User",
+          "present": false,
+          "host": null,
+          "port": null,
+          "name": "NO_PROXY"
+        },
+        {
+          "scope": "Machine",
+          "present": false,
+          "host": null,
+          "port": null,
+          "name": "HTTP_PROXY"
+        },
+        {
+          "scope": "Machine",
+          "present": false,
+          "host": null,
+          "port": null,
+          "name": "HTTPS_PROXY"
+        },
+        {
+          "scope": "Machine",
+          "present": false,
+          "host": null,
+          "port": null,
+          "name": "ALL_PROXY"
+        },
+        {
+          "scope": "Machine",
+          "present": false,
+          "host": null,
+          "port": null,
+          "name": "NO_PROXY"
+        }
+      ],
+      "windowsProxyEnabled": true,
+      "windowsProxyServerPresent": true,
+      "historicalProxyConfiguration": "NOT_CAPTURED",
+      "sampledAt": "2026-10-07T12:45:55.0230837Z"
+    },
+    "observations": [
+      {
+        "kind": "environment",
+        "java": "21.0.12.1+1-LTS",
+        "dns": [
+          "198.18.0.34"
+        ],
+        "defaultProxySelector": "sun.net.spi.DefaultProxySelector",
+        "selectedProxy": "[DIRECT]",
+        "useSystemProxies": "false",
+        "customTrustStore": false,
+        "credentialsUsed": false,
+        "modelCalls": 0
+      },
+      {
+        "kind": "transport",
+        "route": "DEFAULT",
+        "requestedProtocol": "HTTP_1_1",
+        "receivedProtocol": "HTTP_1_1",
+        "status": 401,
+        "elapsedMs": 1172,
+        "defaultTlsValidated": true,
+        "peerChain": [
+          {
+            "subjectCN": "*.deepseek.com",
+            "issuerCN": "Amazon RSA 2048 M01",
+            "sha256": "0b11247609057dad781691852f01ae2ea52c9c47cd63290f32f85cba525b475d"
+          },
+          {
+            "subjectCN": "Amazon RSA 2048 M01",
+            "issuerCN": "Amazon Root CA 1",
+            "sha256": "5338ebec8fb2ac60996126d3e76aa34fd0f3318ac78ebb7ac8f6f1361f484b33"
+          },
+          {
+            "subjectCN": "Amazon Root CA 1",
+            "issuerCN": "Starfield Services Root Certificate Authority - G2",
+            "sha256": "87dcd4dc74640a322cd205552506d1be64f12596258096544986b4850bc72706"
+          }
+        ]
+      },
+      {
+        "kind": "transport",
+        "route": "DEFAULT",
+        "requestedProtocol": "HTTP_2",
+        "receivedProtocol": "HTTP_2",
+        "status": 401,
+        "elapsedMs": 632,
+        "defaultTlsValidated": true,
+        "peerChain": [
+          {
+            "subjectCN": "*.deepseek.com",
+            "issuerCN": "Amazon RSA 2048 M01",
+            "sha256": "0b11247609057dad781691852f01ae2ea52c9c47cd63290f32f85cba525b475d"
+          },
+          {
+            "subjectCN": "Amazon RSA 2048 M01",
+            "issuerCN": "Amazon Root CA 1",
+            "sha256": "5338ebec8fb2ac60996126d3e76aa34fd0f3318ac78ebb7ac8f6f1361f484b33"
+          },
+          {
+            "subjectCN": "Amazon Root CA 1",
+            "issuerCN": "Starfield Services Root Certificate Authority - G2",
+            "sha256": "87dcd4dc74640a322cd205552506d1be64f12596258096544986b4850bc72706"
+          }
+        ]
+      },
+      {
+        "kind": "transport",
+        "route": "EXPLICIT_LOOPBACK_PROXY",
+        "requestedProtocol": "HTTP_1_1",
+        "receivedProtocol": "HTTP_1_1",
+        "status": 401,
+        "elapsedMs": 631,
+        "defaultTlsValidated": true,
+        "peerChain": [
+          {
+            "subjectCN": "*.deepseek.com",
+            "issuerCN": "Amazon RSA 2048 M01",
+            "sha256": "0b11247609057dad781691852f01ae2ea52c9c47cd63290f32f85cba525b475d"
+          },
+          {
+            "subjectCN": "Amazon RSA 2048 M01",
+            "issuerCN": "Amazon Root CA 1",
+            "sha256": "5338ebec8fb2ac60996126d3e76aa34fd0f3318ac78ebb7ac8f6f1361f484b33"
+          },
+          {
+            "subjectCN": "Amazon Root CA 1",
+            "issuerCN": "Starfield Services Root Certificate Authority - G2",
+            "sha256": "87dcd4dc74640a322cd205552506d1be64f12596258096544986b4850bc72706"
+          }
+        ]
+      },
+      {
+        "kind": "transport",
+        "route": "EXPLICIT_LOOPBACK_PROXY",
+        "requestedProtocol": "HTTP_2",
+        "receivedProtocol": "HTTP_2",
+        "status": 401,
+        "elapsedMs": 623,
+        "defaultTlsValidated": true,
+        "peerChain": [
+          {
+            "subjectCN": "*.deepseek.com",
+            "issuerCN": "Amazon RSA 2048 M01",
+            "sha256": "0b11247609057dad781691852f01ae2ea52c9c47cd63290f32f85cba525b475d"
+          },
+          {
+            "subjectCN": "Amazon RSA 2048 M01",
+            "issuerCN": "Amazon Root CA 1",
+            "sha256": "5338ebec8fb2ac60996126d3e76aa34fd0f3318ac78ebb7ac8f6f1361f484b33"
+          },
+          {
+            "subjectCN": "Amazon Root CA 1",
+            "issuerCN": "Starfield Services Root Certificate Authority - G2",
+            "sha256": "87dcd4dc74640a322cd205552506d1be64f12596258096544986b4850bc72706"
+          }
+        ]
+      }
+    ],
+    "childEnvironment": "env.ps1 selects locked Java 21 and removes HTTP_PROXY/HTTPS_PROXY/ALL_PROXY only in child shell; DEFAULT selector observed DIRECT. Explicit proxy probe uses 127.0.0.1:7897.",
+    "earlierA": {
+      "source": "tests/agent/repair/evidence/2026-10-07/followup.json",
+      "dns": [
+        "198.18.0.19"
+      ],
+      "http2Status": 401,
+      "http1ExceptionClasses": [
+        "ExecutionException",
+        "SSLHandshakeException",
+        "ValidatorException",
+        "SunCertPathBuilderException"
+      ],
+      "certificateChain": "NOT_CAPTURED",
+      "proxyConfiguration": "NOT_CAPTURED"
+    },
+    "earlierB": {
+      "source": "docs/handoffs/D10-M1.md (reported; original private log unavailable here)",
+      "dns": [
+        "120.232.219.129",
+        "120.240.157.195"
+      ],
+      "fourUnauthenticatedStatuses": [
+        401,
+        401,
+        401,
+        401
+      ],
+      "certificateChain": "api.deepseek.com -> TrustAsia -> DigiCert; hashes NOT_CAPTURED"
+    },
+    "historicalPaidNetworkFailureRootCause": "UNKNOWN",
+    "conclusion": "Current four connections validated default TLS and returned 401. DNS and presented certificate chain differ from recorded earlier observations; this does not establish the historical failure cause or model repair quality."
+  },
+  "http504": {
+    "taskId": "291be524-7417-4b96-820f-a03f26ac6b85",
+    "endpoint": "/api/v0/auth/csrf",
+    "observedStatus": 504,
+    "rootCause": "UNKNOWN",
+    "browserCachedUpdatedAt": "2026-10-07T11:04:23.787885Z",
+    "journalCompletionAt": "2026-10-07T11:04:36.729790Z",
+    "requestStartAt": null,
+    "requestEndAt": null,
+    "serverLogs": "NOT_AVAILABLE_IN_THIS_WORKSPACE; .local-data/d10-m1 absent; historical nginx container absent before new regression",
+    "codeFacts": [
+      "GET csrf is public and bypasses account SQL lookup; handler uses HttpSession and a local random token, no model/queue operation.",
+      "Platform nginx proxies to host.docker.internal API and sets proxy_read_timeout 600s. Access logging is disabled in the existing template.",
+      "Opt-in CsrfTimingFilter logs exact endpoint start/finish/time/status, internally generated id; no cookies, tokens, bodies, headers or query values. Default is disabled."
+    ],
+    "nextEvidence": [
+      "B browser request start/end and response metadata",
+      "API and nginx error logs covering request; upstream address; connecting vs reading response header",
+      "If API started but did not finish: contemporaneous thread/GC/socket observations"
+    ],
+    "regressionMeaning": "Current unpaid HTTP and platform regressions prove those runs only. Fewer CSRF requests and new timing logs do not explain or repair the historical 504."
+  },
+  "ownership": {
+    "windowsCleanup": {
+      "ownerRole": "D08-A file-tool / environment maintainer",
+      "rootCause": "UNKNOWN"
+    },
+    "exit137OomFalse": {
+      "ownerRole": "D07-B runner / environment maintainer",
+      "rootCause": "UNKNOWN",
+      "exitCode": 137,
+      "oomKilled": false
+    },
+    "humanCoordination": "Requested through follow-up draft PR and PR #25; no ownership acceptance assumed."
+  },
+  "retainedHistoricalEvidence": [
+    {
+      "path": "tests/agent/repair/evidence/2026-10-07/followup.json",
+      "digest": "sha256:9f7c7c320db666f71486bf82cb831aae80ff5b400cbdcdddf753c0b991b9ead0"
+    },
+    {
+      "path": "tests/agent/repair/evidence/2026-10-07/D10-A-local-api-failure.json",
+      "digest": "sha256:8b4c018eb772efee6ddb37d4635917d06a32bf4b69091ad74445579fe591a0b3"
+    },
+    {
+      "path": "docs/evidence/D10/M1/57776370-dd0b-4ed7-9931-cf6ff55e9ec4/acceptance.json",
+      "digest": "sha256:8e84f6cb03d72ab8d29e0795e2f3d98bd1d9c3f151d31d57f6b8f699af0ae5da"
+    },
+    {
+      "path": "docs/evidence/D10/M1/291be524-7417-4b96-820f-a03f26ac6b85/acceptance.json",
+      "digest": "sha256:cbf36f702e53978a6a70ff637fdf1cd49876d298f9884500dde1c4fb3ae4c0cf"
+    }
+  ],
+  "developmentTokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "meteringSource": "UNKNOWN"
+  }
+}

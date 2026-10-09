@@ -1,0 +1,227 @@
+{
+  "task": "D10-A",
+  "baseline": "7c3a502ce34db66c64b06d8dd21293e3b92ae05a",
+  "reviewedHead": "1d5ff519755de3ed932a553e681e77e099e29ba1",
+  "review": {
+    "url": "https://github.com/Echo-love928/CodeLess/pull/26#pullrequestreview-5453701190",
+    "state": "COMMENTED",
+    "approval": false,
+    "reportedAffectedTests": 2,
+    "reportedParserTests": 3,
+    "rawBPackage": "NOT_AVAILABLE_ON_THIS_HOST"
+  },
+  "regression": {
+    "before": {
+      "tests": 11,
+      "pass": 6,
+      "fail": 5,
+      "exitCode": 1,
+      "cause": "Diagnostic write/capture/environment exceptions bypassed original down; isolated child-process stubs confirmed downCalls=0"
+    },
+    "after": {
+      "tests": 14,
+      "pass": 14,
+      "fail": 0,
+      "exitCode": 0,
+      "scope": "11 cleanup fault scenarios plus3 parser/safety tests; isolated subprocess calls are stubs, not Docker evidence"
+    }
+  },
+  "realFault": {
+    "javaTests": 1,
+    "javaExitCode": 0,
+    "expectedNodeExitCode": 1,
+    "cleanup": {
+      "diagnosticFault": "EISDIR",
+      "downExitCode": 0,
+      "containers": {
+        "exitCode": 0,
+        "remaining": 0
+      },
+      "networks": {
+        "exitCode": 0,
+        "remaining": 0
+      },
+      "realDocker": true
+    },
+    "provider": "deterministic-mock",
+    "modelQualityEvidence": false
+  },
+  "compileFailure": {
+    "exitCode": 1,
+    "testBodiesExecuted": false,
+    "errors": 4,
+    "correction": "IOException import, taskLogger avoids inherited logger shadowing, explicit FilterRegistrationBean generic; no version change"
+  },
+  "realEntryCommand": {
+    "exitCode": 1,
+    "tests": 2,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "defaultEntry": "PASSED",
+    "repairEntry": "FAILED_HTTP502; retained, no unchanged retry"
+  },
+  "connectionFailure": {
+    "endpoint": "/api/v0/tasks/:id",
+    "failureStage": "UPSTREAM_TCP_CONNECT",
+    "underlyingRootCause": "UNKNOWN",
+    "failedAccess": {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-08T08:30:10+00:00",
+      "id": null,
+      "status": 502,
+      "upstream": "192.168.65.254:59307, [fdc4:f303:9324::254]:59307",
+      "requestSeconds": "60.070",
+      "connectSeconds": "-, -",
+      "headerSeconds": "-, -",
+      "responseSeconds": "60.061, 0.000",
+      "upstreamStatus": "504, 502"
+    },
+    "errors": [
+      {
+        "kind": "ingress.error",
+        "route": "task",
+        "phase": "CONNECT",
+        "errorClass": "UNKNOWN",
+        "errno": null,
+        "timedOut": false,
+        "upstream": "[fdc4:f303:9324::254]:59307"
+      },
+      {
+        "kind": "ingress.error",
+        "route": "task",
+        "phase": "CONNECT",
+        "errorClass": "UNKNOWN",
+        "errno": null,
+        "timedOut": false,
+        "upstream": "[fdc4:f303:9324::254]:59307"
+      },
+      {
+        "kind": "ingress.error",
+        "route": "task",
+        "phase": "CONNECT",
+        "errorClass": "UNKNOWN",
+        "errno": null,
+        "timedOut": false,
+        "upstream": "[fdc4:f303:9324::254]:59307"
+      },
+      {
+        "kind": "ingress.error",
+        "route": "task",
+        "phase": "CONNECT",
+        "errorClass": "TIMEOUT",
+        "errno": null,
+        "timedOut": true,
+        "upstream": "192.168.65.254:59307"
+      },
+      {
+        "kind": "ingress.error",
+        "route": "task",
+        "phase": "CONNECT",
+        "errorClass": "UNKNOWN",
+        "errno": null,
+        "timedOut": false,
+        "upstream": "[fdc4:f303:9324::254]:59307"
+      }
+    ],
+    "apiCorrelationId": null,
+    "conclusion": "This request got no API diagnostic response ID; nginx records IPv4 connection timeout then IPv6 CONNECT error, upstream504→502 and final502. This does not establish the earlier remote Failed-to-fetch or historical504 root causes."
+  },
+  "matched": {
+    "failed-repair-entry": {
+      "matchedIds": 54,
+      "missingIds": 1,
+      "truncated": false
+    },
+    "default-entry": {
+      "matchedIds": 61,
+      "missingIds": 0,
+      "truncated": false
+    }
+  },
+  "copied": [
+    {
+      "path": "failed-repair-entry-ingress-api-timings.json",
+      "bytes": 23024,
+      "digest": "sha256:7ebf9cf08e673fb4bf9b6f6651c83813aba8fcba1f34129b0e9781f360aee274"
+    },
+    {
+      "path": "failed-repair-entry-platform-diagnostics.json",
+      "bytes": 33628,
+      "digest": "sha256:4fc85c1d89207d081718cb1a36ba968ac100b64043dcbd3c90caa4c7d9dee6f9"
+    },
+    {
+      "path": "default-entry-ingress-api-timings.json",
+      "bytes": 24657,
+      "digest": "sha256:e8f57315ef7133ba698f598b2f14c14db2b3d6512abc40d2499734e12093c2de"
+    },
+    {
+      "path": "default-entry-platform-diagnostics.json",
+      "bytes": 39906,
+      "digest": "sha256:4a74136ebf7d757d990a2e0b96dc3fd58dc6d2188223002f1021c0eea85d9003"
+    },
+    {
+      "path": "real-cleanup-fault-cleanup-observed.json",
+      "bytes": 197,
+      "digest": "sha256:092fa56c4174b63d9d6f088ed30c7b22189996e6e95919d1e231e7a255af9986"
+    },
+    {
+      "path": "real-cleanup-fault-platform-diagnostics.json",
+      "bytes": 38462,
+      "digest": "sha256:4207c642f1b2c45d2f951a7d2a5b1e8ef15263df2c515b01b4d699ca3b8a57b1"
+    },
+    {
+      "path": "entry-api-lifecycle.log",
+      "bytes": 56146,
+      "digest": "sha256:514f064666b921ae240b60bf23e98c0ad7a6cbdb40428220546b41de0e515526"
+    }
+  ],
+  "localGate": {
+    "command": "pnpm ci:gate",
+    "exitCode": 1,
+    "status": "FAILURE",
+    "static": {
+      "status": "SUCCESS",
+      "frontendTests": 41
+    },
+    "runner": {
+      "status": "SUCCESS",
+      "tests": 40
+    },
+    "e2e": {
+      "status": "SUCCESS",
+      "tests": 33
+    },
+    "api": {
+      "status": "FAILURE",
+      "tests": 123,
+      "failures": 0,
+      "errors": 1,
+      "skipped": 0,
+      "repairTestsPassed": 13,
+      "platformPreviewPassed": 1,
+      "failingTest": "FileToolsIntegrationTest.d08aT2TraversalAbsoluteProtectedFilesAndSymlinkDirectoriesAreRejected",
+      "phase": "JUnit TempDir cleanup",
+      "exception": "IOException; suppressed DirectoryNotEmptyException",
+      "locations": [
+        "services/api/src/test/java/dev/codeless/api/tools/FileToolsIntegrationTest.java:29",
+        "services/api/src/test/java/dev/codeless/api/tools/FileToolsIntegrationTest.java:106"
+      ],
+      "rootCause": "UNKNOWN; no assertion skip or unchanged retry; failure site retained for D08-A / Windows environment maintainer"
+    }
+  },
+  "currentCandidateRemote": "PENDING_ON_SUBMISSION; final exact HEAD state tracked in PR26 and PR25 coordination comment",
+  "sharedModulesChanged": false,
+  "productionPermissionsOrBudgetsChanged": false,
+  "paidRepair": "PAUSED_BY_USER",
+  "realModelCallsThisRevision": 0,
+  "developmentTokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "measurement": "UNKNOWN"
+  },
+  "historicalTlsCleanupExit137Roots": "UNKNOWN_RETAINED",
+  "historicalHashNote": "Earlier receipt hashes name Windows CRLF working-tree bytes; B verified their LF Git blob conversion and retained old blobs. New evidence is -text; old files were not rewritten."
+}

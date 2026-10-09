@@ -1,6 +1,7 @@
 package dev.codeless.api.preview;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.file.*;
 import java.util.*;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.*;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.context.annotation.Import;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 import tools.jackson.databind.ObjectMapper;
@@ -18,10 +20,12 @@ import tools.jackson.databind.ObjectMapper;
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT,properties={
     "codeless.model.provider=deterministic-mock","codeless.agent.enabled=true","codeless.agent.repository-root=../..",
     "codeless.tasks.enabled=true","codeless.tasks.poll-ms=200",
+    "codeless.diagnostics.csrf.enabled=true","codeless.diagnostics.application.enabled=true",
     "CODELESS_DEMO_PASSWORD=demo-password-for-test-only","CODELESS_ADMIN_PASSWORD=admin-password-for-test-only",
     "CODELESS_PREVIEW_SIGNING_KEY=1111111111111111111111111111111111111111111111111111111111111111",
     "CODELESS_PREVIEW_REGISTRY_KEY=4444444444444444444444444444444444444444444444444444444444444444"})
 @ActiveProfiles("test")
+@Import(PlatformHttpDiagnosticsConfiguration.class)
 class PreviewPlatformIntegrationTest {
     // Dedicated database prevents this real scheduler claiming tasks from other test classes.
     static final PostgreSQLContainer DATABASE=new PostgreSQLContainer(DockerImageName.parse(
@@ -51,7 +55,7 @@ class PreviewPlatformIntegrationTest {
         var process=builder.start();
         assertThat(process.waitFor(300,TimeUnit.SECONDS)).isTrue();assertThat(process.exitValue()).isZero();
     }
-    protected String acceptanceScript(){return "../../tests/e2e/preview/platform.acceptance.mjs";}
+    protected String acceptanceScript(){return "../../tests/agent/repair/preview-platform-http-diagnostics.acceptance.mjs";}
     @Test void realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures() throws Exception {
         var builder=new ProcessBuilder("node",acceptanceScript()).directory(Path.of(".").toFile());
         var env=builder.environment();
@@ -66,7 +70,16 @@ class PreviewPlatformIntegrationTest {
         env.put("CODELESS_PREVIEW_ORIGIN","https://preview.codeless-preview.test:"+TLS);env.put("CODELESS_PLATFORM_ORIGIN","https://platform.codeless.test:"+TLS);
         Path log=ROOT.resolve("platform.log");var process=builder.redirectErrorStream(true).redirectOutput(log.toFile()).start();
         boolean ended=process.waitFor(180,TimeUnit.SECONDS);if(!ended)process.destroyForcibly();
-        assertThat(ended).as(log.toString()).isTrue();assertThat(process.exitValue()).as(Files.readString(log)).isZero();
+        String failure=Files.readString(log);
+        if(!ended||process.exitValue()!=0) {
+            for(String name:List.of("platform-diagnostics.json","ingress-api-timings.json")) {
+                try {
+                    Path diagnostic=ROOT.resolve("evidence").resolve(name);
+                    failure+="\n"+name+": "+(Files.exists(diagnostic)&&Files.size(diagnostic)<=65_536?Files.readString(diagnostic):"UNAVAILABLE_OR_TOO_LARGE");
+                } catch(IOException error){failure+="\n"+name+": UNAVAILABLE";}
+            }
+        }
+        assertThat(ended).as(failure).isTrue();assertThat(process.exitValue()).as(failure).isZero();
         var report=json.readTree(Files.readString(ROOT.resolve("evidence/acceptance.json")));
         UUID task=UUID.fromString(report.path("taskId").asText());
         assertThat(jdbc.sql("SELECT status FROM generation_tasks WHERE id=?").param(task).query(String.class).single()).isEqualTo("READY");

@@ -1,11 +1,14 @@
 import assert from 'node:assert/strict'
 import { readFile, writeFile, mkdir, readdir, copyFile } from 'node:fs/promises'
-import { resolve, join, isAbsolute, dirname } from 'node:path'
+import { resolve, join, isAbsolute, dirname, relative } from 'node:path'
 import { createHash } from 'node:crypto'
 
 // Export byte-checked evidence from one explicit run, never convert failures/unknowns to success.
 const input=resolve(process.argv[2]??'.local-data/d10-a/evidence')
-const output=resolve('tests/agent/repair/evidence/2026-10-07')
+const evidenceRoot=resolve('tests/agent/repair/evidence')
+const output=resolve(process.argv[4]??join(evidenceRoot,'2026-10-07'))
+const outputRelative=relative(evidenceRoot,output)
+assert.ok(outputRelative && !isAbsolute(outputRelative) && !outputRelative.startsWith('..'), 'Output must stay below task evidence root')
 const digest=bytes=>'sha256:'+createHash('sha256').update(bytes).digest('hex')
 const portable=value=>{
   if(Array.isArray(value)) return value.map(portable)
@@ -15,8 +18,11 @@ const portable=value=>{
   return value
 }
 await mkdir(output,{recursive:true})
-for(const name of (await readdir(input)).filter(name=>/^D10-A-[A-Za-z0-9-]+\.json$/.test(name)).sort()) {
-  const outputName=process.argv[3]??name
+const reports=(await readdir(input)).filter(name=>/^D10-A-[A-Za-z0-9-]+\.json$/.test(name)).sort()
+const rename=process.argv[3] && process.argv[3]!=='--keep-names'?process.argv[3]:null
+assert.ok(!rename || reports.length<=1,'A renamed export requires a single report')
+for(const name of reports) {
+  const outputName=rename??name
   assert.match(outputName,/^D10-A-[A-Za-z0-9-]+\.json$/)
   const report=JSON.parse(await readFile(join(input,name),'utf8'))
   const candidates=[];const runners=[]
@@ -60,7 +66,15 @@ for(const name of (await readdir(input)).filter(name=>/^D10-A-[A-Za-z0-9-]+\.jso
     decisions:report.events.filter(e=>['repair.failure','failure','completion','stage.finished'].includes(e.kind)).map(portable)},null,2)+'\n')
 }
 const commands=[]
-for(const [stem,command] of [
+const currentCommands=[
+  ['protocol-tests','mvnw -Dtest=RepairLoopIntegrationTest,RepairPolicyTest,DeepSeekModelProviderTest test'],
+  ['csrf-regression','mvnw -Dtest=CsrfDuringGenerationTest test'],
+  ['protocol-http-ci-gate','pnpm ci:gate (first run; prompt-size budget regression retained)'],
+  ['protocol-http-ci-gate-final','pnpm ci:gate (after compacting protocol instructions; same hard limits)'],
+  ['protocol-http-preview','mvnw -Dtest=FaultAtFreezePreviewAcceptanceIT -DreuseForks=false -DforkCount=1 test'],
+  ['network-current','java tests/agent/repair/NetworkEnvironmentProbe.java (no credentials, TLS validation enabled)'],
+]
+for(const [stem,command] of process.argv[4]?currentCommands:[
   ['compile','mvnw -DskipTests compile'],
   ['repair-first','mvnw -Dtest=RepairPolicyTest,RepairLoopIntegrationTest test'],
   ['ci-gate','pnpm ci:gate'],

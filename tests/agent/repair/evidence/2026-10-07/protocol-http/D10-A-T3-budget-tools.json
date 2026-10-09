@@ -1,0 +1,84 @@
+{
+  "task": {
+    "id": "78b51991-a0e0-4a5e-bb8e-8871c2c0883f",
+    "applicationId": "6fc1538b-2943-4697-abbb-b91af5a6000b",
+    "prompt": "生成 Ada Lovelace 静态个人展示页",
+    "status": "FAILED",
+    "repairAttempts": 0,
+    "failureCode": "AGENT_TOOL_BUDGET_EXCEEDED",
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-07T13:07:22.063687Z"
+  },
+  "budget": {
+    "models": 2,
+    "tools": 20,
+    "chargedTokens": 96
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "budget": "tools",
+    "meter": {
+      "models": 2,
+      "tools": 20,
+      "chargedTokens": 96
+    },
+    "code": "AGENT_TOOL_BUDGET_EXCEEDED"
+  },
+  "candidates": [],
+  "runners": [],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "releasedTokens": 9202,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 9250,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 12556,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 12604,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE"
+    }
+  ],
+  "decisions": [
+    {
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T13:07:21.134827600Z",
+      "taskId": "78b51991-a0e0-4a5e-bb8e-8871c2c0883f",
+      "kind": "stage.finished",
+      "sequence": 5,
+      "stage": "PLAN"
+    },
+    {
+      "payload": {
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+        "code": "AGENT_TOOL_BUDGET_EXCEEDED",
+        "category": "CONTROL"
+      },
+      "at": "2026-10-07T13:07:22.051607300Z",
+      "taskId": "78b51991-a0e0-4a5e-bb8e-8871c2c0883f",
+      "kind": "failure",
+      "sequence": 29,
+      "stage": "GENERATE"
+    }
+  ]
+}

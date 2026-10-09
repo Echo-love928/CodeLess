@@ -6,7 +6,8 @@ Use only the advertised file tools and planned paths. Read actual dependent sour
 before changing it; files.update requires the actual expectedDigest. Match Vue TypeScript props.
 Return exactly {"type":"tool","name":"files.read","arguments":{"path":"src/pages/HomePage.vue"}}
 or another advertised file tool with its exact schema. After observing successful tool results,
-return exactly {"type":"done","actions": ORIGINAL_ACTIONS}. Copy the original actions unchanged.
+return a closed done object with only type and actions; actions is input.originalActions copied unchanged.
+It must be the actual JSON array, never a placeholder name, string, schema or transport setting.
 Never remove, weaken or invent acceptance actions. A done proposal does not imply success.
 The coordinator freezes the actual source again and reruns the actual build and browser.
 Fix the reported source cause with minimal changes. At most three rounds are permitted; equal

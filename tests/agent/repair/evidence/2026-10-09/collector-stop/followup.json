@@ -1,0 +1,634 @@
+{
+  "task": "D10-A",
+  "branch": "codex/d10-a-protocol-http",
+  "baseline": "7c3a502ce34db66c64b06d8dd21293e3b92ae05a",
+  "previousHead": "deb305e8316844351a896003785f3bba35daa341",
+  "peer": {
+    "url": "https://github.com/Echo-love928/CodeLess/pull/26#pullrequestreview-5464541370",
+    "state": "COMMENTED",
+    "approved": false,
+    "rawPackage": "B_REPORTED/UNAVAILABLE_ON_THIS_HOST"
+  },
+  "defect": {
+    "cause": "Dispose releases a Process object; it does not terminate the live hidden child tree. Old finally also lacked owned compose cleanup.",
+    "fixed": "Finally stops only its native child subtree with bounded wait, then cleans only the trusted capture/project/root witness recorded before compose up. Primary exception/nonzero/interrupt is preserved.",
+    "cases": [
+      {
+        "phase": "before",
+        "mode": "cancel-error",
+        "path": "before-cancel-error.json",
+        "parentExit": 1,
+        "childAlive": true,
+        "grandchildAlive": true,
+        "downCalls": 0
+      },
+      {
+        "phase": "before",
+        "mode": "child-nonzero",
+        "path": "before-child-nonzero.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 0
+      },
+      {
+        "phase": "before",
+        "mode": "child-success",
+        "path": "before-child-success.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 0
+      },
+      {
+        "phase": "before",
+        "mode": "cleanup-nonzero",
+        "path": "before-cleanup-nonzero.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 0
+      },
+      {
+        "phase": "before",
+        "mode": "invalid-owner",
+        "path": "before-invalid-owner.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 0
+      },
+      {
+        "phase": "before",
+        "mode": "missing-owner",
+        "path": "before-missing-owner.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 0
+      },
+      {
+        "phase": "before",
+        "mode": "parent-error",
+        "path": "before-parent-error.json",
+        "parentExit": 1,
+        "childAlive": true,
+        "grandchildAlive": true,
+        "downCalls": 0
+      },
+      {
+        "phase": "before",
+        "mode": "pipeline-stop",
+        "path": "before-pipeline-stop.json",
+        "parentExit": null,
+        "childAlive": true,
+        "grandchildAlive": true,
+        "downCalls": 0
+      },
+      {
+        "phase": "before",
+        "mode": "report-write-error",
+        "path": "before-report-write-error.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 0
+      },
+      {
+        "phase": "before",
+        "mode": "timeout",
+        "path": "before-timeout.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 0
+      },
+      {
+        "phase": "after",
+        "mode": "both-fail",
+        "path": "after-both-fail.json",
+        "parentExit": 7,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 1
+      },
+      {
+        "phase": "after",
+        "mode": "cancel-error",
+        "path": "after-cancel-error.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 1
+      },
+      {
+        "phase": "after",
+        "mode": "child-nonzero",
+        "path": "after-child-nonzero.json",
+        "parentExit": 7,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 1
+      },
+      {
+        "phase": "after",
+        "mode": "child-success",
+        "path": "after-child-success.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 1
+      },
+      {
+        "phase": "after",
+        "mode": "cleanup-nonzero",
+        "path": "after-cleanup-nonzero.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 1
+      },
+      {
+        "phase": "after",
+        "mode": "cleanup-throws",
+        "path": "after-cleanup-throws.json",
+        "parentExit": 7,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 1
+      },
+      {
+        "phase": "after",
+        "mode": "invalid-owner",
+        "path": "after-invalid-owner.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 0
+      },
+      {
+        "phase": "after",
+        "mode": "lifecycle-write-error",
+        "path": "after-lifecycle-write-error.json",
+        "parentExit": 7,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 1
+      },
+      {
+        "phase": "after",
+        "mode": "missing-owner",
+        "path": "after-missing-owner.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 0
+      },
+      {
+        "phase": "after",
+        "mode": "parent-error",
+        "path": "after-parent-error.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 1
+      },
+      {
+        "phase": "after",
+        "mode": "pipeline-stop",
+        "path": "after-pipeline-stop.json",
+        "parentExit": null,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 1
+      },
+      {
+        "phase": "after",
+        "mode": "report-write-error",
+        "path": "after-report-write-error.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 1
+      },
+      {
+        "phase": "after",
+        "mode": "start-gap",
+        "path": "after-start-gap.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 0
+      },
+      {
+        "phase": "after",
+        "mode": "timeout",
+        "path": "after-timeout.json",
+        "parentExit": 1,
+        "childAlive": false,
+        "grandchildAlive": false,
+        "downCalls": 1
+      }
+    ],
+    "regressions": {
+      "isolated": 14,
+      "ownerAndExisting": 18
+    }
+  },
+  "normal": {
+    "collectorExitCode": 0,
+    "mavenExitCode": 0,
+    "tests": 1,
+    "completeAcceptancePassed": true,
+    "taskId": "5078fb98-0ed4-4291-86d1-e92d8033ab9d",
+    "budget": {
+      "models": 7,
+      "tools": 12,
+      "chargedTokens": 336
+    },
+    "tokensMeasurement": "EXPLICIT_FIXTURE_SYNTHETIC",
+    "samples": 3,
+    "matchedDiagnosticIds": 65,
+    "modelQualityEvidence": false
+  },
+  "fault": {
+    "assertionHarnessExitCode": 0,
+    "actualParentExitCode": 1,
+    "mavenExitCode": null,
+    "completePlatformAcceptancePassed": false,
+    "realDocker": true,
+    "actualIngressObserved": true,
+    "processTerminated": true,
+    "composeDownExitCode": 0,
+    "containersRemaining": 0,
+    "networksRemaining": 0,
+    "modelProvider": "deterministic-mock",
+    "runtimeUsage": null,
+    "usageMeasurement": "UNKNOWN: INTERRUPTED_BEFORE_TASK_JOURNAL; do not convert missing usage into zero",
+    "modelQualityEvidence": false
+  },
+  "gates": {
+    "local": {
+      "ciGate": "FAILURE",
+      "exitCode": -1073740791,
+      "unsignedExitCode": 3221226505,
+      "static": {
+        "state": "FAILURE",
+        "exitCode": -1073740791,
+        "reason": "UV_HANDLE_CLOSING at Redocly exit; frontend verify NOT_REACHED"
+      },
+      "api": {
+        "state": "FAILURE",
+        "exitCode": 1,
+        "tests": 123,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0,
+        "repairLoopTests": 13
+      },
+      "runner": {
+        "state": "SUCCESS",
+        "exitCode": 0,
+        "tests": 40
+      },
+      "e2e": {
+        "state": "FAILURE",
+        "exitCode": -1073740791,
+        "assertionsPassed": 33,
+        "processSuccess": false
+      }
+    },
+    "candidateRemote": "PENDING_UNTIL_EXACT_HEAD_CHECKS",
+    "previousRemote": "deb305e 6/6 SUCCESS run37797662574"
+  },
+  "currentWindowsCleanup": {
+    "test": "FileToolsIntegrationTest.twoApiInstancesCreatingOnePathSerializeOnTheTaskRowAndProduceOneSuccess",
+    "source": "services/api/src/test/java/dev/codeless/api/tools/FileToolsIntegrationTest.java:238",
+    "root": "task-8941921740866107035",
+    "audit": "28fabb73-5762-413a-819e-629115bf0dff",
+    "inspectedAt": "2026-10-09T06:56:15.990Z",
+    "sceneExists": false,
+    "sceneDisappearanceCause": "UNKNOWN",
+    "handleOwner": null,
+    "rootCause": "UNKNOWN",
+    "resolved": false
+  },
+  "limits": {
+    "collectorLoopCheckSeconds": 600,
+    "hardWallClockDeadline": false,
+    "reason": "A started bounded Observe-Network operation completes before the next loop check; stop/down/query may add bounded cleanup time.",
+    "maxSamples": 8,
+    "intervalSeconds": 10,
+    "processWaitMs": 5000,
+    "composeDownTimeoutMs": 60000
+  },
+  "coverage": {
+    "ordinaryParentException": true,
+    "operationCancelledException": true,
+    "powerShellPipelineStop": true,
+    "timeout": true,
+    "startBeforeFlagException": true,
+    "reportWriteFailure": true,
+    "cleanupFailure": true,
+    "nativeForcedParentKill": false,
+    "powerLoss": false
+  },
+  "limitations": [
+    "Old Windows cleanup/TCP/CSRF504/resident GET/remote Failed-to-fetch/TLS/exit137/oomKilled=false/Linux dpkg evidence retained; current success is not historical root-cause closure",
+    "Production limits and strict protocol unchanged",
+    "Real M1 PAUSED_BY_USER/NOT_PASSED",
+    "No main push, merge or self approval; B new-head re-review pending"
+  ],
+  "developmentTokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "measurement": "UNKNOWN"
+  },
+  "realModelCalls": 0,
+  "commands": [
+    {
+      "command": "CODELESS_COLLECTOR_TEST_SOURCE=.local-data/d10-a/collector-deb305e.ps1 node --test tests/agent/repair/collector-lifecycle.test.mjs (10-case version at execution)",
+      "exitCode": 1,
+      "result": "0/10, old deb305e real Windows orphan reproduced; Docker stub",
+      "log": ".local-data\\d10-a\\collector-baseline-fixed-fixture.log",
+      "logDigest": "sha256:3807f3a0dc0099f352454bf6205e1c1e5562a0ce5cf1e64403b3f15a223fee4d"
+    },
+    {
+      "command": "node --test tests/agent/repair/collector-lifecycle.test.mjs (first valid 10-case version)",
+      "exitCode": 1,
+      "result": "9/10; wrong expected exception type in new fixture, corrected to observed NotSupportedException",
+      "log": ".local-data\\d10-a\\collector-after-fixed-fixture.log",
+      "logDigest": "sha256:b50043dad64ba76c3dddd7f6cfceaac25f25d858a7e10a79c6fc1be717a66176"
+    },
+    {
+      "command": "node --test tests/agent/repair/collector-lifecycle.test.mjs",
+      "exitCode": 0,
+      "result": "14/14; real Windows processes, Docker stub",
+      "log": ".local-data\\d10-a\\collector-lifecycle-final14.log",
+      "logDigest": "sha256:2fcdcf1aef5d67acbd7fd7b13d84ef0a1d542d51b3a4e1471145a1c725f4e669"
+    },
+    {
+      "command": "node --test tests/agent/repair/collector-owner.test.mjs tests/agent/repair/preview-http-observe.test.mjs tests/agent/repair/preview-http-cleanup.test.mjs",
+      "exitCode": 0,
+      "result": "18/18; owner binding4 + existing parser/cleanup14, no Docker",
+      "log": ".local-data\\d10-a\\collector-owner-node.log",
+      "logDigest": "sha256:52cd7cfce2ca39ec91545100590a74282eecc31ff037ca4d3ed57877f4a56fe8"
+    },
+    {
+      "command": "pwsh -NoProfile -File tests/agent/repair/capture-platform-network.ps1 -LogDirectory .local-data/d10-a/collector-real-normal",
+      "exitCode": 0,
+      "result": "real mock platform full acceptance1/1, Maven0,3samples",
+      "log": ".local-data\\d10-a\\collector-real-normal.log",
+      "logDigest": "sha256:6fec22ad511a33a5318a990a392e1d41dd5633b60b80d4ea5404a319da63a609"
+    },
+    {
+      "command": "pwsh -NoProfile -File tests/agent/repair/fixtures/collector-real-interrupt.ps1",
+      "exitCode": 0,
+      "result": "assertion harness0; actual parent1, intentionally incomplete Maven/platform",
+      "log": ".local-data\\d10-a\\collector-real-interrupt-final.log",
+      "logDigest": "sha256:83ae398446c0d424c21da481a7e48b414a4ac1129c059419a41127e8e3e98a73"
+    },
+    {
+      "command": "corepack pnpm ci:gate",
+      "exitCode": -1073740791,
+      "result": "FAILURE; Windows signed C0000409, unsigned3221226505; API also failed1",
+      "log": ".local-data\\d10-a\\collector-ci-gate.log",
+      "logDigest": "sha256:11fe8520aa999a3a936d68bc185b47b31d5a8dc5ca9073e643bd837d2c611f81"
+    },
+    {
+      "command": "fixed child Maven -Dtest=ApplicationHttpDiagnosticsIT -DreuseForks=false -DforkCount=1 test",
+      "exitCode": 0,
+      "log": ".local-data\\d10-a\\collector-real-normal\\platform-network-it.log",
+      "logDigest": "sha256:1888091dbac85de6195562ce2e40ee7a0cc7284f63f827aa89377d9f87e910ca",
+      "result": "1/1 no failures/errors/skips"
+    }
+  ],
+  "files": [
+    {
+      "path": "before-cancel-error.json",
+      "bytes": 291,
+      "digest": "sha256:dd68b71cd5c7cb041d656559c588dc4f3c45d4e38924b90a6297075134e5539c"
+    },
+    {
+      "path": "before-cancel-error-pids.json",
+      "bytes": 48,
+      "digest": "sha256:fd313296d19ecd6d93500164805c24b12ecd07eb8278cee68e92cc185849cb75"
+    },
+    {
+      "path": "before-child-nonzero.json",
+      "bytes": 294,
+      "digest": "sha256:dc30943276f135efc69c57be76a469d1ffb9ed89bfe6a8deacfc3394599eaef0"
+    },
+    {
+      "path": "before-child-success.json",
+      "bytes": 294,
+      "digest": "sha256:123750806796141d8373d71f5ed2ca35819ccaccbed00a0bf48299c5643a72b2"
+    },
+    {
+      "path": "before-cleanup-nonzero.json",
+      "bytes": 296,
+      "digest": "sha256:2b83c33b31dcfc5d969163071f2a713161b15ce0a34a05b9a3f49147007fb6cb"
+    },
+    {
+      "path": "before-invalid-owner.json",
+      "bytes": 294,
+      "digest": "sha256:4da7a7737246c2bbecdb882551e7109debc3f2e56435fdbb0c55c2954ce08262"
+    },
+    {
+      "path": "before-missing-owner.json",
+      "bytes": 294,
+      "digest": "sha256:8e6d8a3f3941ed9dce0be2c4e62a9c1b65f63942eda9c2c618904590eb3ec3f8"
+    },
+    {
+      "path": "before-parent-error.json",
+      "bytes": 291,
+      "digest": "sha256:74cbb8ee8c9993953c2620ef5221259a43b4e26bdfec40588cac285e8762763e"
+    },
+    {
+      "path": "before-parent-error-pids.json",
+      "bytes": 48,
+      "digest": "sha256:605f50e807be436a6e7de4628c6afacd2dfbe41024b431707326ed6827cb7483"
+    },
+    {
+      "path": "before-pipeline-stop.json",
+      "bytes": 300,
+      "digest": "sha256:68f608601957abddc1b48440ce8ff28e89979496143665941686fad0fdd8ec9d"
+    },
+    {
+      "path": "before-pipeline-stop-pids.json",
+      "bytes": 47,
+      "digest": "sha256:30ce861bb1bcd262ec7c68b6b7ed503448771282afd0043d46343736212ed8ef"
+    },
+    {
+      "path": "before-report-write-error.json",
+      "bytes": 299,
+      "digest": "sha256:e1abb1925941b94e47b8b96d907dbb477a4a5cc20e26c423766694cb1f229783"
+    },
+    {
+      "path": "before-timeout.json",
+      "bytes": 288,
+      "digest": "sha256:7e5b0ffd6acfa6fa8ff9e07d528a24fc4f085dfe8d71cf75bee06ee01dcd37d1"
+    },
+    {
+      "path": "after-both-fail.json",
+      "bytes": 1126,
+      "digest": "sha256:fcdb9361355fc6f93e19d823d378a1776b0012c0514b2dc156ec440ff0688155"
+    },
+    {
+      "path": "after-cancel-error.json",
+      "bytes": 1150,
+      "digest": "sha256:e0e160fb001a8f87461b5f8e48913933c8f146ac7d6b886b4f4c70cec9f1717e"
+    },
+    {
+      "path": "after-cancel-error-pids.json",
+      "bytes": 48,
+      "digest": "sha256:d421b147165e8fd371b1ade64135bf6d74c4df81decb486a308d816ad6325d05"
+    },
+    {
+      "path": "after-child-nonzero.json",
+      "bytes": 1123,
+      "digest": "sha256:ba5b9ed3c49be09bb0a74f87b1a2beac437683bac15f7efbcafbce61a1f290b7"
+    },
+    {
+      "path": "after-child-success.json",
+      "bytes": 1123,
+      "digest": "sha256:94eaba554deef78923c7efaf1c6391dd2487b81a4caa7913259feba452209927"
+    },
+    {
+      "path": "after-cleanup-nonzero.json",
+      "bytes": 1134,
+      "digest": "sha256:5e43d4473cce4eff740fcc1f7a2e0685f4ce02fecacd3a2862dcd2836e39e8c3"
+    },
+    {
+      "path": "after-cleanup-throws.json",
+      "bytes": 1128,
+      "digest": "sha256:9605baa9e420f5961cbc12095bb43b80b12e429a5343247e7a08dce28fd722f0"
+    },
+    {
+      "path": "after-invalid-owner.json",
+      "bytes": 874,
+      "digest": "sha256:7afc41e4d60397e71b5e397eb59f2ec97266bb542800c132cb13897e82d2d5ca"
+    },
+    {
+      "path": "after-lifecycle-write-error.json",
+      "bytes": 302,
+      "digest": "sha256:5d3e31d5031741bbbb01c33f26b01ca6ec1190cc2e950738270e4308994f2a0c"
+    },
+    {
+      "path": "after-missing-owner.json",
+      "bytes": 868,
+      "digest": "sha256:b512fa5d40f0ce8bc6ad08d894ffbcb46d1a254cb84116fcd84e6ce861859dd4"
+    },
+    {
+      "path": "after-parent-error.json",
+      "bytes": 1149,
+      "digest": "sha256:d294531221edb63f0f180a5ac6c623acdbf45fc574954294edaf94ac58c5ef27"
+    },
+    {
+      "path": "after-parent-error-pids.json",
+      "bytes": 48,
+      "digest": "sha256:f62d6ad2c97750b8f0e37724f038f6e4f3b586c7f578f243f05311b47711a3c0"
+    },
+    {
+      "path": "after-pipeline-stop.json",
+      "bytes": 1137,
+      "digest": "sha256:8f297cd1abf767788371e221347bea9f78d1b476338e0bfe0f835cc8689db463"
+    },
+    {
+      "path": "after-pipeline-stop-pids.json",
+      "bytes": 48,
+      "digest": "sha256:1df039aead3c9d807b269c64323963bc2fc9f8db9151db30d3800da4eaedd39c"
+    },
+    {
+      "path": "after-report-write-error.json",
+      "bytes": 1150,
+      "digest": "sha256:bf5b4088802a5b444c29d794fc8b9b4a56670997981b72604c2a2820a1c47fd6"
+    },
+    {
+      "path": "after-start-gap.json",
+      "bytes": 889,
+      "digest": "sha256:c9a30f23c82b51eff34f1e2926ab993001e5efe66458fcf4c260bbf1f7592fa4"
+    },
+    {
+      "path": "after-start-gap-pids.json",
+      "bytes": 47,
+      "digest": "sha256:80674610400e51545aaa891990a615dd61a95b4b4ef55679180915b8c4a5d934"
+    },
+    {
+      "path": "after-timeout.json",
+      "bytes": 1119,
+      "digest": "sha256:f269a52e3fbe0e1408ec3ae569856a87b991ce0b16dcecae7d69aeadb6241a59"
+    },
+    {
+      "path": "normal-lifecycle.json",
+      "bytes": 771,
+      "digest": "sha256:5cdbb2e640637b41102210bd9154b6680c31b58424b24a0a4b2f64b10247a07e"
+    },
+    {
+      "path": "normal-owner.json",
+      "bytes": 391,
+      "digest": "sha256:d2a6cce9c8a71cee17fd5814803bae5bfbd0a02001a2f8a7a4072e25d6d1de52"
+    },
+    {
+      "path": "fault-lifecycle.json",
+      "bytes": 798,
+      "digest": "sha256:2caff904b9bd0532800514115da6fa2115bfb4c43e0b0e625a03bfe1b10be206"
+    },
+    {
+      "path": "fault-owner.json",
+      "bytes": 391,
+      "digest": "sha256:3f2ad59feaa2c9d51f377d0fd9e3d8668d9c0a7f8988cfbe2e413b0ee042d046"
+    },
+    {
+      "path": "normal-network.json",
+      "bytes": 6165,
+      "digest": "sha256:cde57f8036341dfeb3d58c0b2120b86a38afb3e5b038e497d56797b1f48f0ce7"
+    },
+    {
+      "path": "real-interrupt-acceptance.json",
+      "bytes": 1359,
+      "digest": "sha256:123d7c3f506458f6e1a774fffb4eae161e92d3d7e3d364a646101baf2a2f82a9"
+    },
+    {
+      "path": "fault-injected.json",
+      "bytes": 231,
+      "digest": "sha256:42c01bb08c46ff9fb4841f88e3a1bac89038e605e977dd94081d345fb1ea368a"
+    },
+    {
+      "path": "normal-D10-A-application-http.json",
+      "bytes": 44358,
+      "digest": "sha256:b22779cce55d1a5dfec0f49c77fcb62ab51c67ec2812e3a8167d707045e90e75"
+    },
+    {
+      "path": "normal-acceptance.json",
+      "bytes": 1252,
+      "digest": "sha256:17aa587f536b1231568bb92ca0be0fcb56b5b63d4397d8d508942ff7f4f555c3"
+    },
+    {
+      "path": "normal-ingress-api-timings.json",
+      "bytes": 25917,
+      "digest": "sha256:25378b5ebc366789dabb68ec5d4e1b266c1327ae51d9e481a3475083b30df562"
+    },
+    {
+      "path": "normal-api-lifecycle.log",
+      "bytes": 31760,
+      "digest": "sha256:2e7b86461bd1139252658a8d11a42ac70484db47befcdc79e0d60b4f307edd58"
+    },
+    {
+      "path": "normal-platform-preview.png",
+      "bytes": 146220,
+      "digest": "sha256:56cc42da0be71944ac9cf49f0feb8b9bd97b1522cb2d4524952332d2058f89e7"
+    },
+    {
+      "path": "current-filetools-cleanup-failure.txt",
+      "bytes": 3321,
+      "digest": "sha256:7d66a34bc62c01690e132c7cf3f8eca212b47cafa05768795b783b3bc473e1fa"
+    },
+    {
+      "path": "ci-gate-excerpts.txt",
+      "bytes": 3528,
+      "digest": "sha256:035ff885d126557eb62c56678da40639fd680a167964e5e190cb9e2dd9cade26"
+    }
+  ]
+}

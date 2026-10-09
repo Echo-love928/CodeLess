@@ -1,0 +1,103 @@
+{
+  "fixture": true,
+  "realModelCalls": 0,
+  "exitCode": 0,
+  "network": {
+    "command": "java tests/agent/repair/NetworkEnvironmentProbe.java",
+    "exitCode": 0,
+    "measurement": "PROVIDED_OBSERVATIONS_REPLAY; exporter does not execute network requests",
+    "observedAt": null,
+    "logDigest": "sha256:e2763ceddcd17cdd0cda0944f6bc1412158c939f6c29df5b90fa71f306237a83",
+    "outerProcess": {
+      "fixture": true,
+      "credentialsUsed": false
+    },
+    "observations": [
+      {
+        "kind": "environment",
+        "credentialsUsed": false,
+        "modelCalls": 0,
+        "selectedProxy": "[DIRECT]",
+        "defaultProxySelector": "explicit-fixture-selector"
+      },
+      {
+        "kind": "transport",
+        "route": "DEFAULT",
+        "requestedProtocol": "HTTP_1_1",
+        "status": 401,
+        "peerChain": []
+      },
+      {
+        "kind": "transport",
+        "route": "DEFAULT",
+        "requestedProtocol": "HTTP_2",
+        "status": 401,
+        "defaultTlsValidated": true,
+        "peerChain": []
+      },
+      {
+        "kind": "transport",
+        "route": "EXPLICIT_LOOPBACK_PROXY",
+        "requestedProtocol": "HTTP_1_1",
+        "status": 401,
+        "defaultTlsValidated": true,
+        "peerChain": []
+      },
+      {
+        "kind": "transport",
+        "route": "EXPLICIT_LOOPBACK_PROXY",
+        "requestedProtocol": "HTTP_2",
+        "status": 401,
+        "defaultTlsValidated": true,
+        "peerChain": []
+      }
+    ],
+    "summary": {
+      "expectedConnections": 4,
+      "observedConnections": 4,
+      "complete": true,
+      "truncated": false,
+      "validatedTlsConnections": 3,
+      "http401Connections": 4,
+      "allTlsAnd401": null,
+      "state": "UNKNOWN",
+      "conclusion": "Observed 3 validated TLS connections and 4 HTTP 401 responses out of 4 records; overall UNKNOWN. No complete TLS/401 success established; historical cause remains UNKNOWN."
+    },
+    "childEnvironment": {
+      "defaultSelectedProxy": "[DIRECT]",
+      "defaultSelector": "explicit-fixture-selector",
+      "measurement": "OBSERVED_ENVIRONMENT_RECORD; missing fields remain UNKNOWN"
+    },
+    "earlierA": {
+      "source": "tests/agent/repair/evidence/2026-10-07/followup.json",
+      "dns": [
+        "198.18.0.19"
+      ],
+      "http2Status": 401,
+      "http1ExceptionClasses": [
+        "ExecutionException",
+        "SSLHandshakeException",
+        "ValidatorException",
+        "SunCertPathBuilderException"
+      ],
+      "certificateChain": "NOT_CAPTURED",
+      "proxyConfiguration": "NOT_CAPTURED"
+    },
+    "earlierB": {
+      "source": "docs/handoffs/D10-M1.md (reported; original private log unavailable here)",
+      "dns": [
+        "120.232.219.129",
+        "120.240.157.195"
+      ],
+      "fourUnauthenticatedStatuses": [
+        401,
+        401,
+        401,
+        401
+      ],
+      "certificateChain": "api.deepseek.com -> TrustAsia -> DigiCert; hashes NOT_CAPTURED"
+    },
+    "historicalPaidNetworkFailureRootCause": "UNKNOWN",
+    "conclusion": "Observed 3 validated TLS connections and 4 HTTP 401 responses out of 4 records; overall UNKNOWN. No complete TLS/401 success established; historical cause remains UNKNOWN."
+  }
+}

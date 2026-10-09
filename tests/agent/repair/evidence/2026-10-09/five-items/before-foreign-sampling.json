@@ -1,0 +1,104 @@
+{
+  "networkCaptured": true,
+  "modelCalls": 0,
+  "fixture": true,
+  "collectorExit": 0,
+  "probePorts": [
+    45678
+  ],
+  "samples": [
+    {
+      "at": "2026-10-09T08:30:43.7468069Z",
+      "apiPort": 45678,
+      "root": "preview-platform-39523ed3-b14d-4beb-8b8b-967dabd84abc",
+      "hostTcp": {
+        "ipv6State": "OBSERVED",
+        "truncated": false,
+        "ipv6ExitCode": 0,
+        "connections": [],
+        "exitCode": 0,
+        "state": "OBSERVED"
+      },
+      "project": "codeless-preview-test-22222222-2222-2222-2222-222222222222",
+      "containerLookup": {
+        "state": "OBSERVED",
+        "candidateLimitExceeded": false,
+        "found": true,
+        "mountQueries": [
+          {
+            "state": "OBSERVED",
+            "expectedRoot": "preview-platform-39523ed3-b14d-4beb-8b8b-967dabd84abc",
+            "matched": true,
+            "observedRoot": "preview-platform-39523ed3-b14d-4beb-8b8b-967dabd84abc",
+            "exitCode": 0
+          }
+        ],
+        "exitCode": 0
+      },
+      "hosts": {
+        "state": "OBSERVED",
+        "addresses": [
+          "127.0.0.1"
+        ],
+        "exitCode": 0
+      },
+      "ipv4Routes": {
+        "state": "OBSERVED",
+        "truncated": false,
+        "entries": [],
+        "exitCode": 0
+      },
+      "tcpProbes": [
+        {
+          "connected": true,
+          "address": "127.0.0.1",
+          "state": "OBSERVED",
+          "exitCode": 0,
+          "at": "2026-10-09T08:30:43.8279663Z",
+          "port": 45678
+        }
+      ]
+    }
+  ],
+  "calls": [
+    [
+      "ps",
+      "--filter",
+      "label=com.docker.compose.project",
+      "--format",
+      "{{.ID}}|{{.Label \"com.docker.compose.project\"}}"
+    ],
+    [
+      "inspect",
+      "--format",
+      "{{range .Mounts}}{{if eq .Destination \"/etc/nginx/conf.d/default.conf\"}}{{.Source}}{{end}}{{end}}",
+      "abcdef123456"
+    ],
+    [
+      "exec",
+      "abcdef123456",
+      "cat",
+      "/etc/hosts"
+    ],
+    [
+      "exec",
+      "abcdef123456",
+      "cat",
+      "/proc/net/route"
+    ],
+    [
+      "exec",
+      "abcdef123456",
+      "nc",
+      "-z",
+      "-w",
+      "2",
+      "127.0.0.1",
+      "45678"
+    ]
+  ],
+  "dockerStub": true,
+  "mode": "absent",
+  "mavenExecuted": false,
+  "realTcp": false
+}
