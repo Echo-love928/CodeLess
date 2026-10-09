@@ -1,4 +1,4 @@
-param([switch]$Child, [string]$LogDirectory = '.local-data/d10-a/environment-followup')
+param([switch]$Child, [string]$LogDirectory = '.local-data/d10-a/environment-followup', [string]$CaptureId)
 $ErrorActionPreference = 'Stop'
 $repository = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))
 $output = [IO.Path]::GetFullPath((Join-Path $repository $LogDirectory))
@@ -8,11 +8,16 @@ if (-not $IsWindows -or -not $output.StartsWith($privateParent, [StringCompariso
 }
 Set-Location -LiteralPath $repository
 New-Item -ItemType Directory -Path $output -Force | Out-Null
+if(-not $CaptureId){$CaptureId=[guid]::NewGuid().ToString()}
+if($CaptureId -cnotmatch '^[a-f0-9-]{36}$'){throw 'Invalid private capture ID'}
+. (Join-Path $PSScriptRoot 'collector-lifecycle.ps1')
 if ($Child) {
     # Only the named mock fixture; no Real*IT, provider key, extra CSRF request or changed browser action.
     . (Join-Path $repository '.local-data/d07-a/env.ps1')
     Remove-Item Env:CODELESS_MODEL_API_KEY,Env:CODELESS_MODEL_NAME,Env:CODELESS_M1_REAL_APPROVED,Env:CODELESS_PLAYWRIGHT_CHANNEL -ErrorAction SilentlyContinue
     $env:CODELESS_MODEL_PROVIDER = 'deterministic-mock'
+    $env:CODELESS_REPAIR_CAPTURE_ID=$CaptureId
+    $env:CODELESS_REPAIR_CAPTURE_OWNER_FILE=Join-Path $output ('capture-owner-'+$CaptureId+'.json')
     & (Join-Path $repository 'services/api/mvnw.cmd') -f services/api/pom.xml '-Dtest=ApplicationHttpDiagnosticsIT' '-DreuseForks=false' '-DforkCount=1' test *> (Join-Path $output 'platform-network-it.log')
     $result = $LASTEXITCODE
     [IO.File]::WriteAllText((Join-Path $output 'platform-network-it.exit'), [string]$result)
@@ -28,8 +33,10 @@ function Invoke-Bounded([string]$Command, [string[]]$Arguments, [int]$TimeoutMs 
     foreach ($argument in $Arguments) { $info.ArgumentList.Add($argument) }
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $info
+    $startedProcess=$false
     try {
         [void]$process.Start()
+        $startedProcess=$true
         $stdout = $process.StandardOutput.ReadToEndAsync()
         $stderr = $process.StandardError.ReadToEndAsync()
         if (-not $process.WaitForExit($TimeoutMs)) {
@@ -43,7 +50,12 @@ function Invoke-Bounded([string]$Command, [string[]]$Arguments, [int]$TimeoutMs 
         if ($raw.Length -gt 32768) { return @{exitCode=$process.ExitCode;state='TRUNCATED';text=''} }
         return @{exitCode=$process.ExitCode;state='OBSERVED';text=$raw}
     } catch { return @{exitCode=$null;state='UNAVAILABLE';text=''} }
-    finally { $process.Dispose() }
+    finally {
+        if(-not $startedProcess){try{[void]$process.Id;$startedProcess=$true}catch{}}
+        try {if($startedProcess -and -not $process.HasExited){$process.Kill($true);[void]$process.WaitForExit(1000)}}catch { # returned UNAVAILABLE/TIMEOUT stays unknown
+        }
+        $process.Dispose()
+    }
 }
 
 function Observe-Network([IO.DirectoryInfo]$Root, [int]$Port) {
@@ -116,11 +128,13 @@ $started = [DateTime]::UtcNow
 $shellPath = (Get-Process -Id $PID).Path
 $childInfo = [Diagnostics.ProcessStartInfo]::new($shellPath)
 $childInfo.UseShellExecute = $false; $childInfo.CreateNoWindow = $true
-foreach ($argument in @('-NoProfile','-File',$PSCommandPath,'-Child','-LogDirectory',$LogDirectory)) { $childInfo.ArgumentList.Add($argument) }
+foreach ($argument in @('-NoProfile','-File',$PSCommandPath,'-Child','-LogDirectory',$LogDirectory,'-CaptureId',$CaptureId)) { $childInfo.ArgumentList.Add($argument) }
 $childProcess = [Diagnostics.Process]::new(); $childProcess.StartInfo = $childInfo
 $samples = @(); $samplingErrors = @(); $lastSample = [DateTime]::MinValue; $roots = @()
+$childStarted=$false;$primaryError=$null;$timedOut=$false;$exitCode=$null;$returnCode=1;$completed=$false;$cleanupFailed=$false
 try {
     [void]$childProcess.Start()
+    $childStarted=$true
     while (-not $childProcess.HasExited -and ([DateTime]::UtcNow-$started).TotalSeconds -lt 600) {
         if ($samples.Count -lt 8 -and ([DateTime]::UtcNow-$lastSample).TotalSeconds -ge 10) {
             try {
@@ -141,12 +155,32 @@ try {
         Start-Sleep -Milliseconds 1000
     }
     $timedOut = -not $childProcess.HasExited
-    if ($timedOut) { $childProcess.Kill($true); [void]$childProcess.WaitForExit(5000) }
     $exitCode = $(if($timedOut){$null}else{$childProcess.ExitCode})
     $captured = @($samples | Where-Object { $_.containerLookup.found -and $_.hosts.addresses.Count -gt 0 -and $_.tcpProbes.Count -gt 0 }).Count -gt 0
     $report = [ordered]@{startedAt=$started.ToString('o');finishedAt=[DateTime]::UtcNow.ToString('o');modelProvider='deterministic-mock';realModelCalls=0;modelQualityEvidence=$false;mavenExitCode=$exitCode;collectorTimedOut=$timedOut;networkCaptured=$captured;samples=$samples;samplingErrors=$samplingErrors;rootCount=$roots.Count;historicalTcpRootCause='UNKNOWN';sampleLimit=8;probeTimeoutMs=3500;log='platform-network-it.log'}
     $report | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath (Join-Path $output 'platform-network-observed.json') -Encoding utf8
     Write-Output "Maven exit=$exitCode; samples=$($samples.Count); samplingErrors=$($samplingErrors.Count); historical TCP root cause UNKNOWN."
-    if ($timedOut -or -not $captured) { exit 1 }
-    exit $exitCode
-} finally { $childProcess.Dispose() }
+    if(-not $timedOut){$returnCode=$(if($exitCode -ne 0){$exitCode}elseif($captured){0}else{1})}
+    $completed=$true
+} catch {$primaryError=$_;throw}
+finally {
+    # Every ordinary exception, PowerShell pipeline interruption and timeout reaches the same stop/cleanup path.
+    # Native forced termination/power loss cannot run finally and is not claimed as covered.
+    $processResult=$null;$resources=$null
+    try {$processResult=Stop-CollectorChild $childProcess $childStarted}
+    catch {$processResult=@{started=$childStarted;terminated=$null;state='STOP_UNAVAILABLE'}}
+    try {$resources=Clear-CollectorResources $repository $output $CaptureId}
+    catch {$resources=@{state='CLEANUP_UNAVAILABLE';downExitCode=$null}}
+    $cleanupFailed=($processResult.started -and $processResult.terminated -ne $true) -or
+        ($resources.state -ne 'NOT_CREATED' -and ($resources.downExitCode -ne 0 -or $resources.containers.remaining -ne 0 -or $resources.networks.remaining -ne 0))
+    try {
+        $lifecycle=[ordered]@{captureId=$CaptureId;completed=$completed;collectorTimedOut=$timedOut;
+            primaryExceptionType=$(if($primaryError){$primaryError.Exception.GetType().Name}else{$null});
+            primaryOutcome=$(if($primaryError){'EXCEPTION'}elseif($completed){'COMPLETED'}else{'INTERRUPTED'});
+            childExitCode=$exitCode;process=$processResult;resources=$resources;cleanupFailed=$cleanupFailed}
+        [IO.File]::WriteAllText((Join-Path $output 'collector-lifecycle.json'),($lifecycle|ConvertTo-Json -Depth 10))
+    }catch{$cleanupFailed=$true;[Console]::Error.WriteLine('Collector lifecycle report unavailable after cleanup.')}
+    try {$childProcess.Dispose()}catch{$cleanupFailed=$true}
+}
+if($cleanupFailed -and $returnCode -eq 0){$returnCode=1}
+exit $returnCode

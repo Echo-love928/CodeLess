@@ -1,12 +1,30 @@
 import assert from 'node:assert/strict'
 import childProcess from 'node:child_process'
 import { syncBuiltinESMExports } from 'node:module'
-import { readFileSync, writeFileSync } from 'node:fs'
-import { resolve, join } from 'node:path'
+import { readFileSync, writeFileSync, realpathSync, lstatSync } from 'node:fs'
+import { resolve, join, dirname, basename, sep } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { createHash } from 'node:crypto'
 
 const uuid='[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
 const digest=value=>'sha256:'+createHash('sha256').update(value).digest('hex')
+
+// Only the trusted mock harness writes this witness, before its first real compose up.
+export function recordCaptureOwner(evidence,args,env=process.env) {
+  if(!env.CODELESS_REPAIR_CAPTURE_OWNER_FILE&&!env.CODELESS_REPAIR_CAPTURE_ID)return
+  const id=env.CODELESS_REPAIR_CAPTURE_ID,repository=resolve(fileURLToPath(new URL('../../../',import.meta.url)))
+  assert.match(id??'',new RegExp('^'+uuid+'$'))
+  const path=resolve(env.CODELESS_REPAIR_CAPTURE_OWNER_FILE),parent=dirname(path),privateRoot=join(repository,'.local-data/d10-a')
+  assert.ok(parent.startsWith(privateRoot+sep));assert.equal(realpathSync(parent),parent)
+  assert.equal(basename(path),'capture-owner-'+id+'.json')
+  const root=dirname(resolve(evidence)),target=join(repository,'services/api/target')
+  assert.equal(dirname(root),target);assert.match(basename(root),new RegExp('^preview-platform-'+uuid+'$'))
+  assert.equal(realpathSync(root),root);assert.equal(lstatSync(root).isSymbolicLink(),false)
+  const index=args.indexOf('--env-file'),envFile=resolve(args[index+1])
+  assert.ok(index>0);assert.equal(envFile,join(root,'evidence/ingress/compose.env'))
+  assert.match(args[2],new RegExp('^codeless-preview-test-'+uuid+'$'))
+  writeFileSync(path,JSON.stringify({captureId:id,project:args[2],root,envFile})+'\n',{flag:'wx'})
+}
 
 // Test-private rendered configuration only. Timeouts, upstreams, routes and credential isolation stay unchanged.
 export function instrumentConfig(config) {
@@ -81,6 +99,7 @@ if(process.env.CODELESS_REPAIR_HTTP_DIAGNOSTICS==='1') {
       validateEnvironment()
       if(args.includes('up')) {
         assert.equal(instrumented,false)
+        recordCaptureOwner(evidence,args)
         const path=join(evidence,'ingress/nginx.conf'),config=instrumentConfig(readFileSync(path,'utf8'))
         writeFileSync(path,config);configDigest=digest(config);instrumented=true
       }
