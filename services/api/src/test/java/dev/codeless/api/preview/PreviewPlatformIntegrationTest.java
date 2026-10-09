@@ -52,8 +52,9 @@ class PreviewPlatformIntegrationTest {
         for(String dir:List.of("private","workspaces","evidence"))Files.createDirectories(ROOT.resolve(dir));
         var builder=new ProcessBuilder("node","../../tests/agent/prepare-runtime.mjs").inheritIO();
         builder.environment().remove("CODELESS_MODEL_API_KEY");builder.environment().remove("CODELESS_MODEL_NAME");
-        var process=builder.start();
-        assertThat(process.waitFor(300,TimeUnit.SECONDS)).isTrue();assertThat(process.exitValue()).isZero();
+        try(var owned=new PreviewAcceptanceProcess(builder,ROOT.resolve("prepare-process"),null)) {
+            assertThat(owned.await(java.time.Duration.ofSeconds(300))).isTrue();assertThat(owned.exitValue()).isZero();
+        }
     }
     protected String acceptanceScript(){return "../../tests/agent/repair/preview-platform-http-diagnostics.acceptance.mjs";}
     @Test void realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures() throws Exception {
@@ -68,8 +69,9 @@ class PreviewPlatformIntegrationTest {
         env.put("CODELESS_PREVIEW_CONTROL_PORT",Integer.toString(CONTROL));env.put("CODELESS_PREVIEW_GATEWAY_PORT","0");
         env.put("CODELESS_PREVIEW_SIGNING_KEY","11".repeat(32));env.put("CODELESS_PREVIEW_REGISTRY_KEY","44".repeat(32));
         env.put("CODELESS_PREVIEW_ORIGIN","https://preview.codeless-preview.test:"+TLS);env.put("CODELESS_PLATFORM_ORIGIN","https://platform.codeless.test:"+TLS);
-        Path log=ROOT.resolve("platform.log");var process=builder.redirectErrorStream(true).redirectOutput(log.toFile()).start();
-        boolean ended=process.waitFor(180,TimeUnit.SECONDS);if(!ended)process.destroyForcibly();
+        Path log=ROOT.resolve("platform.log");builder.redirectErrorStream(true).redirectOutput(log.toFile());
+        try(var process=new PreviewAcceptanceProcess(builder,ROOT.resolve("acceptance-process"),ROOT.resolve("evidence"))) {
+        boolean ended=process.await(java.time.Duration.ofSeconds(180));
         String failure=Files.readString(log);
         if(!ended||process.exitValue()!=0) {
             for(String name:List.of("platform-diagnostics.json","ingress-api-timings.json")) {
@@ -86,5 +88,6 @@ class PreviewPlatformIntegrationTest {
         assertThat(report.path("platformApiFixture").asBoolean()).isFalse();assertThat(report.path("signingFixture").asBoolean()).isFalse();
         assertThat(report.path("modelProvider").asText()).isEqualTo("deterministic-mock");
         assertThat(report.path("modelQualityAccepted").asBoolean()).isFalse();
+        }
     }
 }

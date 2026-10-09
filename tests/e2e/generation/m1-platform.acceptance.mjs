@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import {cleanupPreviewResources,recordPreviewDeployment} from './platform-cleanup.mjs'
 import { previewDiagnostics } from '../preview/platform-diagnostics.mjs'
 import Ajv2020 from 'ajv/dist/2020.js'
 import addFormats from 'ajv-formats'
@@ -21,7 +22,7 @@ const evidence=resolve(process.env.CODELESS_PREVIEW_EVIDENCE_DIR)
 await mkdir(evidence,{recursive:true})
 const platformOrigin=process.env.CODELESS_PLATFORM_ORIGIN,previewOrigin=process.env.CODELESS_PREVIEW_ORIGIN
 const apiOrigin=process.env.CODELESS_PREVIEW_API_INTERNAL_ORIGIN
-let runtime,browser,tls,deployment,page,success=false
+let runtime,browser,tls,deployment,page,success=false,primaryFailure=null
 const diagnostic=previewDiagnostics({platformOrigin,previewOrigin})
 const project='codeless-preview-test-'+randomUUID()
 const compose=(args)=>spawnSync('docker',['compose','--project-name',project,'--file',join(root,'infra/preview/compose.yml'),'--env-file',deployment.envFile,...args],{encoding:'utf8',windowsHide:true,timeout:60000})
@@ -36,6 +37,7 @@ try {
   assert.equal(build.status,0,build.stdout+build.stderr)
   tls=await tlsServer(join(evidence,'tls'),()=>{});await closeServer(tls);tls=null
   deployment=await renderPreviewDeployment({...process.env,CODELESS_PREVIEW_DEPLOY_ROOT:join(evidence,'ingress'),CODELESS_TLS_CERT:join(evidence,'tls/test-cert.pem'),CODELESS_TLS_KEY:join(evidence,'tls/test-key.pem'),CODELESS_WEB_DIST:dist,CODELESS_API_PORT:new URL(apiOrigin).port,CODELESS_PREVIEW_GATEWAY_PORT:String(runtime.gateway.server.address().port)})
+  recordPreviewDeployment(evidence,project,deployment,process.env.CODELESS_PREVIEW_CLEANUP_NONCE??randomUUID())
   const up=compose(['up','-d']);assert.equal(up.status,0,up.stdout+up.stderr)
   const syntax=compose(['exec','-T','ingress','nginx','-t']);assert.equal(syntax.status,0,syntax.stdout+syntax.stderr)
   const reachable=()=>new Promise(done=>{const req=httpsRequest('https://127.0.0.1:'+new URL(platformOrigin).port,{rejectUnauthorized:false,headers:{Host:new URL(platformOrigin).host}},res=>{res.resume();res.on('end',()=>done(res.statusCode===200))});req.setTimeout(1000,()=>req.destroy());req.on('error',()=>done(false));req.end()})
@@ -143,7 +145,7 @@ try {
     screenshot:{path:'authenticated-platform-preview.png',digest:digest(screenshot),bytes:screenshot.length}},null,2))
   success=true
   console.log('Authenticated platform preview, restart and retention acceptance passed (model: '+modelMode+').')
-} finally {
+} catch(error) {primaryFailure=error;throw error} finally {
   try {
   let ui=null
   if(page&&!page.isClosed())ui=await page.evaluate(()=>({
@@ -154,6 +156,13 @@ try {
   await writeFile(join(evidence,'platform-diagnostics.json'),JSON.stringify({success,modelMode,platformApiFixture:false,signingFixture:false,registry:runtime?.registry.stats()??null,ui,...diagnostic.snapshot()},null,2))
   } catch { console.error('Platform diagnostics could not be persisted.');if(success)process.exitCode=1 }
   finally {
-  await browser?.close();if(tls)await closeServer(tls);await runtime?.close();if(deployment){const down=compose(['down','--remove-orphans']);assert.equal(down.status,0,down.stdout+down.stderr)}}
+  const cleanup=await cleanupPreviewResources({browser,tls,runtime,closeServer,deployment,compose,project,runDocker:spawnSync})
+  try {await writeFile(join(evidence,'resource-cleanup.json'),JSON.stringify(cleanup.report,null,2)+'\n')}catch(error){cleanup.failures.push(error)}
+  if(cleanup.failures.length){
+    process.exitCode=1
+    if(primaryFailure)primaryFailure.cleanupFailures=cleanup.failures
+    else throw new AggregateError(cleanup.failures,'Preview acceptance cleanup failed')
+  }
+  }
 
 }

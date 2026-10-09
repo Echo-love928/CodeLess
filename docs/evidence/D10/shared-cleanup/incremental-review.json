@@ -1,0 +1,12 @@
+{
+ "date":"2026-10-09","baseline":"18f05d5023b92ece4ff9a257c218f97e566be524","scope":"B shared acceptance cleanup and final changed fallback/watchdog fixture",
+ "reviewType":"independent agent read-only incremental review; not A peer approval",
+ "blockingFindings":[],"suggestions":[],
+ "verified":[
+  {"file":"services/api/src/test/java/dev/codeless/api/preview/PreviewAcceptanceProcess.java","line":49,"finding":"Fallback CLI is independently supervised; evidence=null prevents recursive fallback; inner process nonce and outer project nonce have separate validation responsibilities."},
+  {"file":"services/api/src/test/java/dev/codeless/api/preview/PreviewAcceptanceProcess.java","line":56,"finding":"Interrupted await clears the temporary flag to avoid busy spinning, with final restoration; stop/report errors still reach project cleanup."},
+  {"file":"services/api/src/test/java/dev/codeless/api/preview/PreviewAcceptanceProcessTest.java","line":45,"finding":"Stop marker write failure keeps original parent exception and checks descendants plus fallback process remaining=0."},
+  {"file":"tests/runner/browser/acceptance.test.mjs","line":134,"finding":"Host fixture getter blocks only in CONTENT; original failure/timedOut/tree termination assertions remain, precise CONTENT_TIMEOUT assertion added; production budgets unchanged."}
+ ],
+ "limitations":["This agent did not run Maven/browser/paid model; actual commands are recorded separately.","Mocks and fixture tests cannot prove M1 model quality.","Earlier full cleanup review addressed independent deadlines, immutable ownership, and preservation of primary errors; final peer approval is still required."]
+}
