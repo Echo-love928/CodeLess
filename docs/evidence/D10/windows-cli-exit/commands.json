@@ -1,0 +1,41 @@
+{
+  "baseline": "3e5c691444b4756148363cda3c1678088d0c170e",
+  "commands": [
+    {
+      "id": "regression",
+      "command": "node --test tests/infra/static-cli.test.mjs",
+      "exitCode": 0,
+      "rawLogDigest": "sha256:2b6efdc416cad91fcd022379129425d232a1e983e450684d8ce2f2bc43cb2f51",
+      "rawLogPath": ".local-data/d10-b-windows-libuv/regression.log"
+    },
+    {
+      "id": "regression-final",
+      "command": "node --test tests/infra/static-cli.test.mjs",
+      "exitCode": 0,
+      "rawLogDigest": "sha256:2718ab7e4f10f41227a83726cee1473618337f496c99cb6758832a033496ab43",
+      "rawLogPath": ".local-data/d10-b-windows-libuv/regression-final.log"
+    },
+    {
+      "id": "baseline-static-regression",
+      "command": "node --test --test-name-pattern=\"actual static gate\" .local-data/d10-b-windows-libuv/baseline-static-regression.mjs",
+      "exitCode": 1,
+      "rawLogDigest": "sha256:61d528ec2129464cb88c08a17ecc31c64b1ee634f2e4f04a4e613e42ed4c972c",
+      "rawLogPath": ".local-data/d10-b-windows-libuv/baseline-static-regression.log"
+    },
+    {
+      "id": "ci-gate-fixed",
+      "command": "corepack pnpm ci:gate *> .local-data/d10-b-windows-libuv/ci-gate-fixed.log",
+      "exitCode": 0,
+      "rawLogDigest": "sha256:9789a04c3e94482df834c7ff58bcf4ed15e422421559d3a2a9a980228101ffa7",
+      "rawLogPath": ".local-data/d10-b-windows-libuv/ci-gate-fixed.log"
+    },
+    {
+      "id": "historical-original",
+      "exitCode": -1073740791,
+      "rawLogDigest": "sha256:26d4fc6b4f9e2a7f56e4e52266941c3c3e0020d563199adea38f572992bd1371",
+      "rawLogPath": ".local-data/d10-b-shared-cleanup/ci-gate-release.log",
+      "preserved": true
+    }
+  ],
+  "modelCallsPaid": 0
+}
