@@ -1,0 +1,206 @@
+{
+  "baseline": "18f05d5023b92ece4ff9a257c218f97e566be524",
+  "paidCalls": 0,
+  "commands": [
+    {
+      "id": "after-node-v2",
+      "command": "node --test tests/e2e/generation/shared-cleanup.regression.mjs tests/e2e/generation/project-cleanup.regression.mjs",
+      "exitCode": 0,
+      "rawLog": ".local-data/d10-b-shared-cleanup/after-node-v2.log",
+      "rawLogDigest": "sha256:e880af68fe3533e05298f17fda1015969dd4eec43622874a34289b79917755a9",
+      "note": "22/22 initial resource/ownership regressions."
+    },
+    {
+      "id": "after-node-v3",
+      "command": "node --test tests/e2e/generation/shared-cleanup.regression.mjs tests/e2e/generation/project-cleanup.regression.mjs",
+      "exitCode": 0,
+      "rawLog": ".local-data/d10-b-shared-cleanup/after-node-v3.log",
+      "rawLogDigest": "sha256:50a37f0accb7a086e81d62f1e7a583cbcb19eef02d1294520eacf12979f7a0d7",
+      "note": "27/27 including never-settling close and original-success cleanup failure."
+    },
+    {
+      "id": "after-node",
+      "command": "node --test tests/e2e/generation/shared-cleanup.regression.mjs tests/e2e/generation/project-cleanup.regression.mjs",
+      "exitCode": 1,
+      "rawLog": ".local-data/d10-b-shared-cleanup/after-node.log",
+      "rawLogDigest": "sha256:9f9444170fbd359fe2878ff4890d43de64814e24472acbd9d3e2ccfa68a0b7c1",
+      "note": "Test scaffolding missing join import; retained."
+    },
+    {
+      "id": "before-node-confirmed",
+      "command": "node --test tests/e2e/generation/shared-cleanup.regression.mjs tests/e2e/generation/project-cleanup.regression.mjs",
+      "exitCode": 1,
+      "rawLog": ".local-data/d10-b-shared-cleanup/before-node-confirmed.log",
+      "rawLogDigest": "sha256:b283d38526f68f9f241d00ff2a8e9cb935a85ade3d1fa13f6d4a3672a0b046cd",
+      "note": "Original two finally paths: 6 pass/6 fail; browser/TLS/runtime rejection skips subsequent cleanup."
+    },
+    {
+      "id": "before-node-real",
+      "command": "node --test tests/e2e/generation/shared-cleanup.regression.mjs tests/e2e/generation/project-cleanup.regression.mjs",
+      "exitCode": 1,
+      "rawLog": ".local-data/d10-b-shared-cleanup/before-node-real.log",
+      "rawLogDigest": "sha256:aba012c82395f09eec75cf9c4d32ab757cba009f23db3dbe49a26c5c7caa9d60",
+      "note": "Preparation/reproduction outcome retained; not silently converted to success."
+    },
+    {
+      "id": "before-node",
+      "command": "node --test tests/e2e/generation/shared-cleanup.regression.mjs tests/e2e/generation/project-cleanup.regression.mjs",
+      "exitCode": 1,
+      "rawLog": ".local-data/d10-b-shared-cleanup/before-node.log",
+      "rawLogDigest": "sha256:8a3894f5acb6e352e20f0ef69b6af767e87d61f76114315bf424957c60440690",
+      "note": "Preparation/reproduction outcome retained; not silently converted to success."
+    },
+    {
+      "id": "ci-gate-final",
+      "command": "corepack pnpm ci:gate (redirected log)",
+      "exitCode": 1,
+      "rawLog": ".local-data/d10-b-shared-cleanup/ci-gate-final.log",
+      "rawLogDigest": "sha256:eaa915ccf50484b3d19fe842f679bd7d30d97ea494c16e4bfeda2308838b8487",
+      "note": "Second full gate failed: API134,runner40; E2E32/33; original watchdog navigation timeout happened before whole-run deadline."
+    },
+    {
+      "id": "ci-gate-release",
+      "command": "corepack pnpm ci:gate (redirected log)",
+      "exitCode": -1073740791,
+      "rawLog": ".local-data/d10-b-shared-cleanup/ci-gate-release.log",
+      "rawLogDigest": "sha256:26d4fc6b4f9e2a7f56e4e52266941c3c3e0020d563199adea38f572992bd1371",
+      "note": "Final frozen source complete four-gate run; original redirected static stage native UV_HANDLE_CLOSING failure retained; actual final exit controls this report."
+    },
+    {
+      "id": "ci-gate",
+      "command": "corepack pnpm ci:gate (redirected log)",
+      "exitCode": 1,
+      "rawLog": ".local-data/d10-b-shared-cleanup/ci-gate.log",
+      "rawLogDigest": "sha256:569df05704d4cf784457ae0240d8db142b8f8b13c74eba11c6ed381cec2fe4c8",
+      "note": "First full gate failed due newly added Node .test discovery/cwd pollution. API134,runner40 passed; E2E27 passed3 failed3 did not run."
+    },
+    {
+      "id": "e2e-after-discovery-fix",
+      "command": "private bounded reproduction; source/log retained locally",
+      "exitCode": 0,
+      "rawLog": ".local-data/d10-b-shared-cleanup/e2e-after-discovery-fix.log",
+      "rawLogDigest": "sha256:b3ab031a3410e0ca67b2c90e478cdda0acd0332b53c36560be1217e577679757",
+      "note": "Unchanged E2E33/33 after .regression isolation; retained separately from later failure."
+    },
+    {
+      "id": "java-final",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=PreviewAcceptanceProcessTest test",
+      "exitCode": 0,
+      "rawLog": ".local-data/d10-b-shared-cleanup/java-final.log",
+      "rawLogDigest": "sha256:581a60c2777c82a761b5c1709e6828d40d55c28732c3bf9e63c238320137292e",
+      "note": "7/7 after Node discovery isolation."
+    },
+    {
+      "id": "java-process-v2",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=PreviewAcceptanceProcessTest test",
+      "exitCode": 1,
+      "rawLog": ".local-data/d10-b-shared-cleanup/java-process-v2.log",
+      "rawLogDigest": "sha256:9fe8e8cd360c3c147c8fc7449b3aeab59e0eef3b88b55274d7b3a2ac9e467e93",
+      "note": "Initial Redirect.Type scaffold compile failure; retained."
+    },
+    {
+      "id": "java-process-v3",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=PreviewAcceptanceProcessTest test",
+      "exitCode": 1,
+      "rawLog": ".local-data/d10-b-shared-cleanup/java-process-v3.log",
+      "rawLogDigest": "sha256:f07aa8a2a6a48a5efecc09526cf82f22c8cb9b36da2c222c7c1ed35bbf0f5f76",
+      "note": "5/6; interrupt flag not restored by original await; fixed and retained."
+    },
+    {
+      "id": "java-process-v4",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=PreviewAcceptanceProcessTest test",
+      "exitCode": 0,
+      "rawLog": ".local-data/d10-b-shared-cleanup/java-process-v4.log",
+      "rawLogDigest": "sha256:f7cb78381d8500e3c525d623a1996dcc6a51b333451c53700f34fa7c8a816fcb",
+      "note": "6/6 lifecycle initial pass."
+    },
+    {
+      "id": "java-process",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=PreviewAcceptanceProcessTest test",
+      "exitCode": 1,
+      "rawLog": ".local-data/d10-b-shared-cleanup/java-process.log",
+      "rawLogDigest": "sha256:6c0ddce30e15d8794f688679f580c3fceae2cb940268ad512e26bedd801ee7d0",
+      "note": "Initial Java scaffold compound var compile failure; retained."
+    },
+    {
+      "id": "legacy-java-before",
+      "command": "private bounded reproduction; source/log retained locally",
+      "exitCode": 0,
+      "rawLog": ".local-data/d10-b-shared-cleanup/legacy-java-before.log",
+      "rawLogDigest": "sha256:8366b8408db66eb2c666bf588e0f59bc669633a2b7969bca0a361245cb5568e0",
+      "note": "Invalid reproduction cwd; does not prove root cause."
+    },
+    {
+      "id": "legacy-java-confirmed",
+      "command": "private bounded reproduction; source/log retained locally",
+      "exitCode": 1,
+      "rawLog": ".local-data/d10-b-shared-cleanup/legacy-java-confirmed.log",
+      "rawLogDigest": "sha256:ee9dc2bc278ed73d92fe1986ab68cbf9b4084774f0847c82a570b34d6b42fc51",
+      "note": "Original wait ended=false; rootAlive=true; descendants3. Finally test-only reaped its own tree; original AssertionError retained."
+    },
+    {
+      "id": "linux-probe",
+      "command": "private bounded reproduction; source/log retained locally",
+      "exitCode": 0,
+      "rawLog": ".local-data/d10-b-shared-cleanup/linux-probe.log",
+      "rawLogDigest": "sha256:5110c4baa5f1453868098a995abafb330f1bdf6443297fe2fd4d1d96f0f198b8",
+      "note": "Three offline isolated Linux sessions: native0/native7/stop1, remaining0, foreign unaffected."
+    },
+    {
+      "id": "platform-final-docker-ready",
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=PreviewAcceptanceProcessTest,RepairPreviewPlatformAcceptanceIT,PreviewAcceptanceCleanupIT,PreviewAcceptanceInterruptIT -DreuseForks=false -DforkCount=1 test",
+      "exitCode": 0,
+      "rawLog": ".local-data/d10-b-shared-cleanup/platform-final-docker-ready.log",
+      "rawLogDigest": "sha256:20d5666cd1f493f45f1d5f59afcd9cd6fe72cb9f118d420cdf0f4bc422685083",
+      "note": "Final frozen-source Java8 plus three mock actual-platform cases."
+    },
+    {
+      "id": "platform-final-v2",
+      "command": "private bounded reproduction; source/log retained locally",
+      "exitCode": 1,
+      "rawLog": ".local-data/d10-b-shared-cleanup/platform-final-v2.log",
+      "rawLogDigest": "sha256:96d6d61cc5ad147d2cb199b5dc34b5d1e13ee6d4d6ab619fb34cc60380d7e038",
+      "note": "Java8/8; 3 actual-platform initialization errors because Docker engine not running. No task/model created."
+    },
+    {
+      "id": "platform-targeted",
+      "command": "private bounded reproduction; source/log retained locally",
+      "exitCode": 0,
+      "rawLog": ".local-data/d10-b-shared-cleanup/platform-targeted.log",
+      "rawLogDigest": "sha256:a5edcfa489ecda07597747976f1ad994e42b2cbd8000cdab05fccfcadbb8bd76",
+      "note": "10/10 initial mock actual-platform coverage."
+    },
+    {
+      "id": "static-pty",
+      "command": "corepack pnpm verify:static (PTY)",
+      "exitCode": 0,
+      "rawLog": ".local-data/d10-b-shared-cleanup/static-pty.log",
+      "rawLogDigest": "sha256:3520c3cf061e01df485f49bd6857b165608dbdaff93578b818c04fe5f9dec377",
+      "note": "Same source original verify:static on PTY: exit0. Does not establish libuv root cause or erase redirected gate failure."
+    },
+    {
+      "id": "watchdog-final",
+      "command": "node --test --test-name-pattern=\"whole-run watchdog\" tests/runner/browser/acceptance.test.mjs",
+      "exitCode": 0,
+      "rawLog": ".local-data/d10-b-shared-cleanup/watchdog-final.log",
+      "rawLogDigest": "sha256:3d25601292c3c6f9e9d15b8f3053fc9871e38030c0b64bac3f3e82bab27d6c1e",
+      "note": "Original watchdog test plus stricter CONTENT classification;1/1."
+    },
+    {
+      "id": "watchdog-probe-bounded",
+      "command": "node .local-data/d10-b-shared-cleanup/watchdog-probe-bounded.mjs",
+      "exitCode": 0,
+      "rawLog": ".local-data/d10-b-shared-cleanup/watchdog-probe-bounded.log",
+      "rawLogDigest": "sha256:738ecdaa057e0349e7c151c8a6d028633a18cdde8d8c2882fdbc488b61f56403",
+      "note": "Test-private 10s deadline reaches CONTENT_TIMEOUT with actual tree termination."
+    },
+    {
+      "id": "watchdog-probe",
+      "command": "node .local-data/d10-b-shared-cleanup/watchdog-probe.mjs",
+      "exitCode": 1,
+      "rawLog": ".local-data/d10-b-shared-cleanup/watchdog-probe.log",
+      "rawLogDigest": "sha256:0a288a51edb8fe2e266134c987d9946dc1d8f72c21f4a4e1a7a4ab4ac824f5d6",
+      "note": "Cold launch reached LAUNCH_TIMEOUT before CONTENT; failing probe retained, not reported as CONTENT coverage."
+    }
+  ]
+}

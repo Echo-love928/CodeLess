@@ -47,9 +47,9 @@ class RealPreviewPlatformAcceptanceIT {
         for(String dir:List.of("private","workspaces","evidence"))Files.createDirectories(ROOT.resolve(dir));
         var builder=new ProcessBuilder("node","../../tests/agent/prepare-runtime.mjs").inheritIO();
         builder.environment().remove("CODELESS_MODEL_API_KEY");builder.environment().remove("CODELESS_MODEL_NAME");
-        var process=builder.start();
-        boolean ended=process.waitFor(300,TimeUnit.SECONDS);if(!ended)process.destroyForcibly();
-        assertThat(ended).isTrue();assertThat(process.exitValue()).isZero();
+        try(var owned=new PreviewAcceptanceProcess(builder,ROOT.resolve("prepare-process"),null)) {
+            assertThat(owned.await(java.time.Duration.ofSeconds(300))).isTrue();assertThat(owned.exitValue()).isZero();
+        }
     }
     protected String acceptanceScript(){return "../../tests/e2e/preview/platform.acceptance.mjs";}
     @Test void realModelThroughAuthenticatedPlatformPreview() throws Exception {
@@ -65,9 +65,9 @@ class RealPreviewPlatformAcceptanceIT {
         env.put("CODELESS_PREVIEW_CONTROL_PORT",Integer.toString(CONTROL));env.put("CODELESS_PREVIEW_GATEWAY_PORT","0");
         env.put("CODELESS_PREVIEW_SIGNING_KEY","11".repeat(32));env.put("CODELESS_PREVIEW_REGISTRY_KEY","44".repeat(32));
         env.put("CODELESS_PREVIEW_ORIGIN","https://preview.codeless-preview.test:"+TLS);env.put("CODELESS_PLATFORM_ORIGIN","https://platform.codeless.test:"+TLS);
-        Path log=ROOT.resolve("platform.log");var process=builder.redirectErrorStream(true).redirectOutput(log.toFile()).start();
-        boolean ended=process.waitFor(840,TimeUnit.SECONDS);
-        if(!ended){process.destroy();if(!process.waitFor(10,TimeUnit.SECONDS))process.destroyForcibly();}
+        Path log=ROOT.resolve("platform.log");builder.redirectErrorStream(true).redirectOutput(log.toFile());
+        try(var process=new PreviewAcceptanceProcess(builder,ROOT.resolve("acceptance-process"),ROOT.resolve("evidence"))) {
+        boolean ended=process.await(java.time.Duration.ofSeconds(840));
         Path evidence=ROOT.resolve("evidence");
         var report=Files.exists(evidence.resolve("acceptance.json"))?json.readTree(Files.readString(evidence.resolve("acceptance.json"))):json.createObjectNode();
         var started=Files.exists(evidence.resolve("started.json"))?json.readTree(Files.readString(evidence.resolve("started.json"))):null;
@@ -86,6 +86,9 @@ class RealPreviewPlatformAcceptanceIT {
             assertThat(call.get("provider")).isEqualTo("deepseek");assertThat(call.get("model")).isEqualTo(System.getenv("CODELESS_MODEL_NAME"));
             assertThat(call.get("status")).isEqualTo("SUCCEEDED");assertThat(call.get("inputTokens")).isNotNull();assertThat(call.get("outputTokens")).isNotNull();
         });
+        } // A cleanup failure must not publish model-quality acceptance.
+        Path evidence=ROOT.resolve("evidence");
+        var report=json.readTree(Files.readString(evidence.resolve("acceptance.json")));
         ((tools.jackson.databind.node.ObjectNode)report).put("modelQualityAccepted",true).put("modelQualityValidation","REAL_PROVIDER_SQL_AND_VISIBLE_CONTENT");
         Files.writeString(evidence.resolve("acceptance.json"),json.writeValueAsString(report));
         System.out.println("Paid real-model platform evidence: "+evidence);
