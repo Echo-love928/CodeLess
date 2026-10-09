@@ -1,0 +1,48 @@
+✖ actual static gate scopes offline settings to Redocly and preserves other child environments (850.4589ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 934.7217
+
+✖ failing tests:
+
+test at .local-data\d10-b-windows-libuv\baseline-static-regression.mjs:72:1
+✖ actual static gate scopes offline settings to Redocly and preserves other child environments (850.4589ms)
+  AssertionError [ERR_ASSERTION]:
+      ╔═══════════════════════════════════════════════════════╗
+      ║                                                       ║
+      ║  A new version of Redocly CLI (2.62.1) is available.  ║
+      ║  Update now: `npm i -g @redocly/cli@latest`.          ║
+      ║  Changelog: https://redocly.com/docs/cli/changelog/   ║
+      ║                                                       ║
+      ╚═══════════════════════════════════════════════════════╝
+
+  No configurations were provided -- using built in recommended configuration by default.
+
+  validating contracts\openapi.v0.json...
+  contracts\openapi.v0.json: validated in 54ms
+
+  Woohoo! Your API description is valid. 🎉
+
+  Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 94
+
+
+  3221226505 !== 0
+
+      at file:///PRIVATE_WORKTREE/.local-data/d10-b-windows-libuv/baseline-static-regression.mjs:82:128
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async fixture (file:///PRIVATE_WORKTREE/.local-data/d10-b-windows-libuv/baseline-static-regression.mjs:37:9)
+      at async TestContext.<anonymous> (file:///PRIVATE_WORKTREE/.local-data/d10-b-windows-libuv/baseline-static-regression.mjs:73:3)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 3221226505,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
