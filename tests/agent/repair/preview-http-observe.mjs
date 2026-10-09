@@ -23,7 +23,10 @@ export function recordCaptureOwner(evidence,args,env=process.env) {
   const index=args.indexOf('--env-file'),envFile=resolve(args[index+1])
   assert.ok(index>0);assert.equal(envFile,join(root,'evidence/ingress/compose.env'))
   assert.match(args[2],new RegExp('^codeless-preview-test-'+uuid+'$'))
-  writeFileSync(path,JSON.stringify({captureId:id,project:args[2],root,envFile})+'\n',{flag:'wx'})
+  const config=join(evidence,'ingress/nginx.conf');assert.equal(realpathSync(config),config)
+  const ports=[...readFileSync(config,'utf8').matchAll(/^\s*proxy_pass http:\/\/host\.docker\.internal:(\d{1,5});\s*$/gm)]
+  assert.equal(ports.length,1);const apiPort=Number(ports[0][1]);assert.ok(apiPort>0&&apiPort<=65535)
+  writeFileSync(path,JSON.stringify({captureId:id,project:args[2],root,envFile,apiPort})+'\n',{flag:'wx'})
 }
 
 // Test-private rendered configuration only. Timeouts, upstreams, routes and credential isolation stay unchanged.

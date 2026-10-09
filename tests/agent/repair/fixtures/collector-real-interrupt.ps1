@@ -27,6 +27,7 @@ if([regex]::Matches($source,[regex]::Escape('Start-Sleep -Milliseconds 1000')).C
 $source=$source.Replace('Start-Sleep -Milliseconds 1000',$fault)
 $copy=Join-Path $output 'collector.ps1';[IO.File]::WriteAllText($copy,$source)
 Copy-Item -LiteralPath (Join-Path $repository 'tests/agent/repair/collector-lifecycle.ps1') -Destination (Join-Path $output 'collector-lifecycle.ps1')
+Copy-Item -LiteralPath (Join-Path $repository 'tests/agent/repair/collector-job.cs') -Destination (Join-Path $output 'collector-job.cs')
 & (Get-Process -Id $PID).Path -NoProfile -File $copy -LogDirectory $LogDirectory *> (Join-Path $output 'controlled-parent.log')
 $exitCode=$LASTEXITCODE
 [IO.File]::WriteAllText((Join-Path $output 'controlled-parent.exit'),[string]$exitCode)

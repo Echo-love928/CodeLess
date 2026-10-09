@@ -8,7 +8,7 @@ import {randomUUID} from 'node:crypto'
 assert.equal(process.platform,'win32','Windows native process lifecycle regression requires Windows')
 const directory=resolve('.local-data/d10-a/collector-lifecycle-tests-'+randomUUID())
 mkdirSync(directory,{recursive:true})
-for(const mode of ['start-gap','parent-error','cancel-error','pipeline-stop','timeout','child-success','child-nonzero','cleanup-nonzero','both-fail','cleanup-throws','invalid-owner','missing-owner','report-write-error','lifecycle-write-error']) {
+for(const mode of ['start-gap','parent-error','cancel-error','pipeline-stop','timeout','child-success','child-nonzero','orphan-zero','orphan-nonzero','truncated-query','cleanup-nonzero','both-fail','cleanup-throws','invalid-owner','missing-owner','report-write-error','lifecycle-write-error']) {
   test('collector stops its process tree and preserves outcome: '+mode,()=>{
     const output=join(directory,mode)
     const arguments_=['-NoProfile','-File','tests/agent/repair/fixtures/collector-lifecycle.ps1','-Mode',mode,'-Output',output]
@@ -22,10 +22,11 @@ for(const mode of ['start-gap','parent-error','cancel-error','pipeline-stop','ti
     assert.equal(observed.grandchildAlive,false,'the owned descendant must also stop')
     assert.equal(observed.downCalls,['start-gap','invalid-owner','missing-owner'].includes(mode)?0:1)
     if(mode==='pipeline-stop'){assert.equal(observed.pipelineState,'Stopped');assert.equal(observed.lifecycle.primaryOutcome,'INTERRUPTED')}
-    else assert.equal(observed.parentExit,['child-nonzero','both-fail','cleanup-throws','lifecycle-write-error'].includes(mode)?7:1)
+    else assert.equal(observed.parentExit,['child-nonzero','orphan-nonzero','both-fail','cleanup-throws','lifecycle-write-error'].includes(mode)?7:1)
     // No network was collected in this isolated process fixture: even child0 must keep collector failure.
     if(mode==='lifecycle-write-error'){assert.equal(observed.lifecycle,null);return}
     assert.equal(observed.lifecycle?.process?.terminated,true)
+    if(mode==='truncated-query')for(const kind of ['containers','networks'])assert.equal(observed.lifecycle.resources[kind].remaining,null)
     if(mode==='cleanup-nonzero')assert.equal(observed.lifecycle.resources.downExitCode,8)
     if(mode==='both-fail'){assert.equal(observed.lifecycle.resources.downExitCode,8);assert.equal(observed.lifecycle.childExitCode,7)}
     if(mode==='cleanup-throws'){assert.equal(observed.lifecycle.resources.state,'DOWN_UNAVAILABLE');assert.equal(observed.lifecycle.cleanupFailed,true)}

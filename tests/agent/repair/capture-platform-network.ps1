@@ -58,8 +58,8 @@ function Invoke-Bounded([string]$Command, [string[]]$Arguments, [int]$TimeoutMs 
     }
 }
 
-function Observe-Network([IO.DirectoryInfo]$Root, [int]$Port) {
-    $sample = [ordered]@{at=[DateTime]::UtcNow.ToString('o');apiPort=$Port;root=$Root.Name}
+function Observe-Network([IO.DirectoryInfo]$Root, [int]$Port,[string]$OwnedProject) {
+    $sample = [ordered]@{at=[DateTime]::UtcNow.ToString('o');captureId=$CaptureId;apiPort=$Port;root=$Root.Name}
     $netstat = Invoke-Bounded 'netstat.exe' @('-ano','-p','tcp')
     $netstat6 = Invoke-Bounded 'netstat.exe' @('-ano','-p','tcpv6')
     $connections = @()
@@ -71,20 +71,21 @@ function Observe-Network([IO.DirectoryInfo]$Root, [int]$Port) {
         }
     }
     $sample.hostTcp = @{exitCode=$netstat.exitCode;state=$netstat.state;ipv6ExitCode=$netstat6.exitCode;ipv6State=$netstat6.state;connections=@($connections | Select-Object -First 64);truncated=($connections.Count -gt 64)}
-    $list = Invoke-Bounded 'docker' @('ps','--filter','label=com.docker.compose.project','--format','{{.ID}}|{{.Label "com.docker.compose.project"}}')
+    $list = Invoke-Bounded 'docker' @('ps','--filter',('label=com.docker.compose.project='+$OwnedProject),'--format','{{.ID}}|{{.Label "com.docker.compose.project"}}')
     $container = $null
     $candidateCount = 0
     $mountQueries = @()
     foreach ($line in ($list.text -split '\r?\n')) {
-        if ($line -notmatch '^([a-f0-9]{12})\|(codeless-preview-test-[a-f0-9-]{36})$') { continue }
+        if ($list.state -ne 'OBSERVED' -or $list.exitCode -ne 0 -or $line -notmatch '^([a-f0-9]{12})\|(codeless-preview-test-[a-f0-9-]{36})$') { continue }
         if (++$candidateCount -gt 8) { break }
         $candidate = $Matches[1]; $project = $Matches[2]
+        if($project -cne $OwnedProject){continue}
         $mount = Invoke-Bounded 'docker' @('inspect','--format','{{range .Mounts}}{{if eq .Destination "/etc/nginx/conf.d/default.conf"}}{{.Source}}{{end}}{{end}}',$candidate)
         $expected = (Join-Path $Root.FullName 'evidence/ingress/nginx.conf').Replace('\','/')
         $observedMount = $mount.text.Trim().Replace('\','/')
         if ($observedMount -match '^/(?:run/desktop/mnt/host|host_mnt)/([a-zA-Z])/(.*)$') { $observedMount = $Matches[1] + ':/' + $Matches[2] }
         if ($observedMount.StartsWith('//?/')) { $observedMount = $observedMount.Substring(4) }
-        $matched = $mount.exitCode -eq 0 -and $observedMount.Equals($expected,[StringComparison]::OrdinalIgnoreCase)
+        $matched = $mount.state -eq 'OBSERVED' -and $mount.exitCode -eq 0 -and $observedMount.Equals($expected,[StringComparison]::OrdinalIgnoreCase)
         $safeRoot = $null
         if ($observedMount -match '(preview-platform-[a-f0-9-]{36})/evidence/ingress/nginx\.conf$') { $safeRoot = $Matches[1] }
         $mountQueries += @{exitCode=$mount.exitCode;state=$mount.state;matched=$matched;observedRoot=$safeRoot;expectedRoot=$Root.Name}
@@ -99,6 +100,7 @@ function Observe-Network([IO.DirectoryInfo]$Root, [int]$Port) {
     $hosts = Invoke-Bounded 'docker' @('exec',$container,'cat','/etc/hosts')
     $addresses = @()
     foreach ($line in ($hosts.text -split '\r?\n')) {
+        if($hosts.state -ne 'OBSERVED' -or $hosts.exitCode -ne 0){break}
         if ($line -match '^\s*([0-9a-fA-F:.]+)\s+host\.docker\.internal(?:\s|$)') {
             $address = $null
             if ([Net.IPAddress]::TryParse($Matches[1],[ref]$address)) { $addresses += $address.ToString() }
@@ -118,7 +120,7 @@ function Observe-Network([IO.DirectoryInfo]$Root, [int]$Port) {
         $probeAt = [DateTime]::UtcNow.ToString('o')
         # TCP only, to this fixture's API port and its own ingress host mapping. No HTTP/auth/model call.
         $probe = Invoke-Bounded 'docker' @('exec',$container,'nc','-z','-w','2',$address,[string]$Port) 3500
-        $probes += @{at=$probeAt;address=$address;port=$Port;exitCode=$probe.exitCode;state=$probe.state;connected=$(if($probe.exitCode -eq 0){$true}else{$null})}
+        $probes += @{at=$probeAt;address=$address;port=$Port;exitCode=$probe.exitCode;state=$probe.state;connected=$(if($probe.state -eq 'OBSERVED' -and $probe.exitCode -eq 0){$true}else{$null})}
     }
     $sample.tcpProbes = $probes
     return $sample
@@ -128,27 +130,24 @@ $started = [DateTime]::UtcNow
 $shellPath = (Get-Process -Id $PID).Path
 $childInfo = [Diagnostics.ProcessStartInfo]::new($shellPath)
 $childInfo.UseShellExecute = $false; $childInfo.CreateNoWindow = $true
+$childInfo.WorkingDirectory=$repository
 foreach ($argument in @('-NoProfile','-File',$PSCommandPath,'-Child','-LogDirectory',$LogDirectory,'-CaptureId',$CaptureId)) { $childInfo.ArgumentList.Add($argument) }
-$childProcess = [Diagnostics.Process]::new(); $childProcess.StartInfo = $childInfo
+$childJob=New-CollectorJob;$childProcess=$null
 $samples = @(); $samplingErrors = @(); $lastSample = [DateTime]::MinValue; $roots = @()
 $childStarted=$false;$primaryError=$null;$timedOut=$false;$exitCode=$null;$returnCode=1;$completed=$false;$cleanupFailed=$false
 try {
-    [void]$childProcess.Start()
+    [void]$childJob.Start($childInfo)
+    $childProcess=$childJob.Process
     $childStarted=$true
     while (-not $childProcess.HasExited -and ([DateTime]::UtcNow-$started).TotalSeconds -lt 600) {
         if ($samples.Count -lt 8 -and ([DateTime]::UtcNow-$lastSample).TotalSeconds -ge 10) {
             try {
-                $roots = @(Get-ChildItem -LiteralPath (Join-Path $repository 'services/api/target') -Directory -Filter 'preview-platform-*' | Where-Object { $_.CreationTimeUtc -ge $started })
-                if ($roots.Count -eq 1) {
-                    $configPath = Join-Path $roots[0].FullName 'evidence/ingress/nginx.conf'
-                    if (Test-Path -LiteralPath $configPath) {
-                        # Port from the rendered fixture config. compose.env contains private mount paths.
-                        $portLine = Get-Content -LiteralPath $configPath | Where-Object { $_ -match '^\s*proxy_pass http://host\.docker\.internal:\d{1,5};\s*$' }
-                        if (@($portLine).Count -eq 1) {
-                            $port = [int]([regex]::Match($portLine,':(\d{1,5});').Groups[1].Value)
-                            if ($port -gt 0 -and $port -le 65535) { $samples += Observe-Network $roots[0] $port; $lastSample=[DateTime]::UtcNow }
-                        }
-                    }
+                $binding=Read-CollectorOwner $repository $output $CaptureId -ForSampling
+                $roots=@()
+                if($binding.state -eq 'OWNED'){
+                    $owner=$binding.owner;$roots=@(Get-Item -LiteralPath $owner.root)
+                    $samples+=Observe-Network $roots[0] ([int]$owner.apiPort) $owner.project
+                    $lastSample=[DateTime]::UtcNow
                 }
             } catch { $samplingErrors += @{at=[DateTime]::UtcNow.ToString('o');state='UNAVAILABLE';exceptionType=$_.Exception.GetType().Name}; $lastSample=[DateTime]::UtcNow }
         }
@@ -167,7 +166,8 @@ finally {
     # Every ordinary exception, PowerShell pipeline interruption and timeout reaches the same stop/cleanup path.
     # Native forced termination/power loss cannot run finally and is not claimed as covered.
     $processResult=$null;$resources=$null
-    try {$processResult=Stop-CollectorChild $childProcess $childStarted}
+    if($null -eq $childProcess){$childProcess=$childJob.Process}
+    try {$processResult=Stop-CollectorChild $childProcess $childStarted $childJob}
     catch {$processResult=@{started=$childStarted;terminated=$null;state='STOP_UNAVAILABLE'}}
     try {$resources=Clear-CollectorResources $repository $output $CaptureId}
     catch {$resources=@{state='CLEANUP_UNAVAILABLE';downExitCode=$null}}
@@ -180,7 +180,7 @@ finally {
             childExitCode=$exitCode;process=$processResult;resources=$resources;cleanupFailed=$cleanupFailed}
         [IO.File]::WriteAllText((Join-Path $output 'collector-lifecycle.json'),($lifecycle|ConvertTo-Json -Depth 10))
     }catch{$cleanupFailed=$true;[Console]::Error.WriteLine('Collector lifecycle report unavailable after cleanup.')}
-    try {$childProcess.Dispose()}catch{$cleanupFailed=$true}
+    try {$childJob.Dispose();if($childProcess){$childProcess.Dispose()}}catch{$cleanupFailed=$true}
 }
 if($cleanupFailed -and $returnCode -eq 0){$returnCode=1}
 exit $returnCode

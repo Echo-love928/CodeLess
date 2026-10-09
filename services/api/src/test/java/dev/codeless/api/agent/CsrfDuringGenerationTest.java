@@ -38,7 +38,10 @@ class CsrfDuringGenerationTest extends PostgresTestBase {
     @BeforeAll static void prepare() throws Exception {
         var builder=new ProcessBuilder("node","../../tests/agent/prepare-runtime.mjs").inheritIO();
         builder.environment().remove("CODELESS_MODEL_API_KEY");builder.environment().remove("CODELESS_MODEL_NAME");
-        var process=builder.start();assertThat(process.waitFor(300,TimeUnit.SECONDS)).isTrue();assertThat(process.exitValue()).isZero();
+        try(var owned=new PreparationProcess(builder)) {
+            assertThat(owned.await(Duration.ofSeconds(300))).as("runtime preparation completed before its original deadline").isTrue();
+            assertThat(owned.process().exitValue()).isZero();
+        }
     }
     @Test void csrfRemainsResponsiveWhileRealGenerationIsWaiting(CapturedOutput output) throws Exception {
         var entered=new CountDownLatch(1);var release=new CountDownLatch(1);var mock=new MockModelProvider();

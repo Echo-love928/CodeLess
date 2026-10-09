@@ -33,7 +33,8 @@ if ($Child) {
     }
     @{child=$PID;grandchild=$(if($grand){$grand.Id}else{$null})}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $output 'started.json') -Encoding utf8
     if('FIXTURE_MODE' -eq 'child-success'){exit 0}
-    if('FIXTURE_MODE' -in @('child-nonzero','both-fail','cleanup-throws','lifecycle-write-error')){exit 7}
+    if('FIXTURE_MODE' -eq 'orphan-zero'){exit 0}
+    if('FIXTURE_MODE' -in @('child-nonzero','orphan-nonzero','both-fail','cleanup-throws','lifecycle-write-error')){exit 7}
     [Threading.Thread]::Sleep(30000)
     exit 0
 }
@@ -52,11 +53,12 @@ function Invoke-Bounded([string]$Command,[string[]]$Arguments,[int]$TimeoutMs=50
         if('FIXTURE_MODE' -eq 'cleanup-throws'){throw [IO.IOException]::new('Controlled cleanup error')}
         return @{exitCode=$(if('FIXTURE_MODE' -in @('cleanup-nonzero','both-fail')){8}else{0});state='OBSERVED';text=''}
     }
+    if('FIXTURE_MODE' -eq 'truncated-query' -and ($Arguments -contains 'ps' -or $Arguments -contains 'network')){return @{exitCode=0;state='TRUNCATED';text=''}}
     return @{exitCode=0;state='OBSERVED';text=''}
 }
 '@
 $source=$source.Replace('$started = [DateTime]::UtcNow',$stub.Replace('FIXTURE_MODE',$Mode)+"`n"+'$started = [DateTime]::UtcNow')
-if($Mode -in @('timeout','cleanup-nonzero','invalid-owner','missing-owner')){$source=$source.Replace('.TotalSeconds -lt 600','.TotalSeconds -lt 3')}
+if($Mode -in @('timeout','truncated-query','cleanup-nonzero','invalid-owner','missing-owner')){$source=$source.Replace('.TotalSeconds -lt 600','.TotalSeconds -lt 3')}
 $tick=@'
 if(Test-Path -LiteralPath (Join-Path $output 'started.json')) {
     if('FIXTURE_MODE' -eq 'parent-error'){throw [InvalidOperationException]::new('Controlled parent error')}
@@ -67,17 +69,20 @@ if(Test-Path -LiteralPath (Join-Path $output 'started.json')) {
 $source=$source.Replace('Start-Sleep -Milliseconds 1000',$tick.Replace('FIXTURE_MODE',$Mode))
 if($Mode -eq 'start-gap'){
     $gap=@'
-[void]$childProcess.Start()
+[void]$childJob.Start($childInfo)
+$childProcess=$childJob.Process
 @{child=$childProcess.Id;grandchild=$null}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $output 'started.json') -Encoding utf8
 throw [InvalidOperationException]::new('Controlled stop before started flag')
 '@
-    $source=$source.Replace('[void]$childProcess.Start()',$gap)
+    if($source.Contains('[void]$childJob.Start($childInfo)')){$source=$source.Replace('[void]$childJob.Start($childInfo)',$gap)}
+    else{$source=$source.Replace('[void]$childProcess.Start()',$gap.Replace('[void]$childJob.Start($childInfo)', '[void]$childProcess.Start()').Replace('$childProcess=$childJob.Process',''))}
 }
 if($Mode -eq 'report-write-error'){New-Item -ItemType Directory -Path (Join-Path $Output 'platform-network-observed.json')|Out-Null;$source=$source.Replace('.TotalSeconds -lt 600','.TotalSeconds -lt 3')}
 if($Mode -eq 'lifecycle-write-error'){New-Item -ItemType Directory -Path (Join-Path $Output 'collector-lifecycle.json')|Out-Null}
 $copy=Join-Path $Output 'collector.ps1';[IO.File]::WriteAllText($copy,$source)
 $module=Join-Path $repository 'tests/agent/repair/collector-lifecycle.ps1'
 if(Test-Path -LiteralPath $module){Copy-Item -LiteralPath $module -Destination (Join-Path $Output 'collector-lifecycle.ps1')}
+Copy-Item -LiteralPath (Join-Path $repository 'tests/agent/repair/collector-job.cs') -Destination (Join-Path $Output 'collector-job.cs')
 $parent=$null;$pipeline=$null;$async=$null;$parentExit=$null;$pipelineState=$null;$pids=$null
 $relativeOutput=[IO.Path]::GetRelativePath($repository,$Output)
 $alive={param($id) if($null -eq $id){return $false};try{$p=[Diagnostics.Process]::GetProcessById([int]$id);$live=-not $p.HasExited;$p.Dispose();return $live}catch{return $false}}

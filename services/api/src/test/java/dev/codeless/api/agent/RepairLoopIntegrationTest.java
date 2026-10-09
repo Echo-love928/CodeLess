@@ -65,7 +65,8 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
             count.incrementAndGet();var input=json.readTree(prompt.getUserMessage().getText());inputs.add(input);
             String phase=input.path("phase").asText();String content;
             if(Set.of("GENERATE","REPAIR").contains(phase)) {
-                assertThat(prompt.getSystemMessage().getText()).contains("Application proposal protocol", "never json_object", "Invalid replies terminate");
+                assertThat(prompt.getSystemMessage().getText()).startsWith("Application proposal protocol")
+                    .contains("never json_object", "Invalid replies terminate", "REPAIR copies input.originalActions exactly into actions");
                 assertThat(max).isEqualTo(RuntimeBudget.OUTPUT_TOKENS);
             }
             if(!phase.equals("REPAIR")) {
