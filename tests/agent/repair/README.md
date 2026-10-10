@@ -31,3 +31,45 @@ services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RealPreviewPlatformAccepta
 ```
 
 Actual outcomes and remaining M1/integration limitations are in `docs/handoffs/D10-A.md`.
+
+## Recorded M1 read-loop regression (zero paid requests)
+
+The immutable PR #29 task `45d37a80-c152-4672-9c0c-1fcf425fa014` is the input to
+`RepairContextTest` and `RecordedRepairFixture`. The original Windows policy is
+kept byte-for-byte in `fixtures/m1-repair-policy-before.txt`: the regression
+reproduces reservations 12,332 / 13,962 / 15,458 / 17,089 and the refusal of the
+next 18,720-token request with 18,404 remaining. The original FAILED result is
+preserved.
+
+Run the current controller and original same-task platform acceptance with all
+paid credentials removed from this process:
+
+```powershell
+Remove-Item Env:CODELESS_MODEL_API_KEY,Env:CODELESS_MODEL_NAME,Env:CODELESS_M1_REAL_APPROVED -ErrorAction SilentlyContinue
+$env:CODELESS_MODEL_PROVIDER='deterministic-mock'
+services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RepairContextTest,RepairPolicyTest,RepairLoopIntegrationTest,RecordedRepairPreviewIT' '-DreuseForks=false' '-DforkCount=1' test
+corepack pnpm ci:gate
+```
+
+The first ten replies replay recorded proposals and prior usage, not new provider
+measurements. The eleventh reply supplies a declared synthetic patch with a
+5,180-token charge; the twelfth `done` has unknown usage and is charged its full
+conservative reservation. Real PostgreSQL, digest-guarded writes, failed Docker
+build, repaired immutable snapshot, new Docker build, Chromium actions and
+authenticated signed preview use one task. The original actions and all runtime
+limits remain unchanged. `RecordedRepairPreviewIT` is opt-in and never calls a
+paid provider. Its log gives the exact `target/preview-platform-*/evidence`
+directory; `D10-A-recorded-context.json` contains the full journal and budget.
+
+Default API regressions also assert that a further unchanged read stops with
+`AGENT_REPAIR_NO_PROGRESS`, and unknown patch usage consumes the full reservation
+and refuses `done` when insufficient budget remains. No text is truncated to make
+a request fit. The model sees one current observation per tool/path and a current
+source manifest; original full receipts stay in the durable journal. After an
+actual source change, old read text is marked stale until a real reread.
+
+The exported current run, source diff, original-budget replay, cleanup reports and
+digest manifest are in `evidence/2026-10-10/repair-context/`. These deterministic
+results prove controller feasibility for the stated usage scenario. Real model
+patch/done behavior and paid M1 remain unaccepted; a new paid task requires new
+authorization.

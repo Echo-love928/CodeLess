@@ -92,14 +92,18 @@ public final class AgentLoop implements TaskStageRunner {
         var observations=new ArrayList<JsonNode>();
         JsonNode previousDraft=repair?AgentJournal.latest(store.read(claim,stage),"draft"):null;
         JsonNode originalActions=repair?previousDraft.path("actions"):null;
+        RepairContext repairContext=repair?new RepairContext(previousDraft):null;
         Set<String> planned=new TreeSet<>();plan.path("files").forEach(f -> planned.add(f.path("path").asText()));
         Set<String> names=new HashSet<>();registry.definitions().path("tools").forEach(t -> names.add(t.path("name").asText()));
         for(int i=0;i<RuntimeBudget.MODEL_CALLS;i++) {
             var input=new LinkedHashMap<String,Object>();input.put("phase",stage.name());input.put("request",context.prompt());
             input.put("dataMode",context.dataMode());input.put("plan",plan);input.put("tools",registry.definitions().path("tools"));
-            input.put("observations",observations);
-            if(repair) {input.put("failure",failure);input.put("originalActions",originalActions);input.put("sourceFiles",previousDraft.path("files"));
-                input.put("repairAttempt",context.repairAttempts());}
+            input.put("observations",repair?repairContext.observations():observations);
+            if(repair) {input.put("failure",failure);input.put("originalActions",originalActions);input.put("sourceFiles",repairContext.sourceFiles());
+                input.put("repairAttempt",context.repairAttempts());input.put("repairProgress",repairContext.progress());
+                var meter=RuntimeBudget.meter(store.read(claim,stage));
+                input.put("budget",Map.of("modelCallsRemaining",RuntimeBudget.MODEL_CALLS-meter.models(),
+                        "toolCallsRemaining",RuntimeBudget.TOOL_CALLS-meter.tools(),"tokensRemaining",RuntimeBudget.TOKENS-meter.chargedTokens()));}
             JsonNode reply=model.call(claim,stage,repair?repairPolicy:generationPolicy,json.valueToTree(input));
             if(reply.path("type").asText().equals("tool")) {
                 closed(reply,Set.of("type","name","arguments"));
@@ -110,8 +114,13 @@ public final class AgentLoop implements TaskStageRunner {
                 store.reserve(claim,stage,"tool.request",0);
                 FileToolService.Result actual=files.execute(claim.taskId(),claim.token(),name,arguments.toString());
                 JsonNode observed=json.valueToTree(actual);
-                store.append(claim,stage,"tool.result",observed);observations.add(observed);
+                store.append(claim,stage,"tool.result",observed);
                 if(!actual.status().equals("SUCCEEDED")) throw new AgentFailure(actual.errorCode());
+                if(repair) {
+                    boolean repeated=repairContext.observe(name,arguments,observed);
+                    if(repeated)store.append(claim,stage,"repair.read.repeat",Map.of("tool",name,"path",arguments.path("path").asText(),
+                            "callId",actual.callId(),"progress",repairContext.progress()));
+                } else observations.add(observed);
             } else if(reply.path("type").asText().equals("done")) {
                 closed(reply,Set.of("type","actions"));
                 validateCoverage(plan,reply.path("actions"));
