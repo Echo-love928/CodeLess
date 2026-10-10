@@ -32,6 +32,7 @@ class DeepSeekModelProviderTest {
     private volatile boolean requestHeader = true;
     private final String fakeKey = "local-transport-test-only-secret";
     private DeepSeekModelProvider provider;
+    private volatile byte[] requestBytes;
 
     @BeforeEach
     void start() throws Exception {
@@ -43,7 +44,7 @@ class DeepSeekModelProviderTest {
             calls.incrementAndGet();
             assertThat(exchange.getRequestMethod()).isEqualTo("POST");
             assertThat(exchange.getRequestHeaders().getFirst("Authorization")).isEqualTo("Bearer " + fakeKey);
-            var body = mapper.readTree(exchange.getRequestBody().readAllBytes());
+            requestBytes=exchange.getRequestBody().readAllBytes();var body = mapper.readTree(requestBytes);
             assertThat(body.get("max_tokens").intValue()).isEqualTo(1024);
             assertThat(body.get("stream").booleanValue()).isFalse();
             assertThat(body.path("response_format").path("type").asText()).isEqualTo("json_object");
@@ -81,6 +82,17 @@ class DeepSeekModelProviderTest {
                 + (usage == null ? "" : ",\"usage\":" + usage) + "}";
     }
 
+    @Test
+    void requestFingerprintMatchesActualBytesWithoutDispatchOrLoggingThePromptOrKey() throws Exception {
+        var prompt=new Prompt(java.util.List.of(new SystemMessage("json policy"),new UserMessage("private repair input")));
+        var metadata=provider.requestMetadata(prompt,1024);assertThat(calls).hasValue(0);
+        response=completion("stop","{\"type\":\"json_object\",\"error\":\"Invalid protocol reply.\"}","{\"prompt_tokens\":12,\"completion_tokens\":7,\"total_tokens\":19}");
+        var reply=provider.call(prompt,1024,Duration.ofSeconds(5));assertThat(calls).hasValue(1);
+        assertThat(mapper.readTree(reply.content())).isEqualTo(mapper.readTree("{\"type\":\"json_object\",\"error\":\"Invalid protocol reply.\"}"));
+        assertThat(metadata.get("bodyDigest")).isEqualTo("sha256:"+java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(requestBytes)));
+        assertThat(metadata.get("bodyBytes")).isEqualTo(requestBytes.length);
+        assertThat(mapper.writeValueAsString(metadata)).doesNotContain(fakeKey,"private repair input","json policy","Authorization");
+    }
     @Test
     void capturesActualModelRequestIdDurationInputsAndRawUsageWithoutRetry() {
         var reply = call(Duration.ofSeconds(5));

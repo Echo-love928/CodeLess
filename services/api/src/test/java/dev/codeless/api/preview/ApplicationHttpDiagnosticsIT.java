@@ -23,10 +23,10 @@ class ApplicationHttpDiagnosticsIT extends FaultAtFreezePreviewAcceptanceIT {
             var timings=json.readTree(Files.readString(ROOT.resolve("evidence/ingress-api-timings.json")));
             assertThat(timings.path("captureExitCode").asInt(-1)).isZero();assertThat(timings.path("instrumented").asBoolean()).isTrue();
             assertThat(timings.path("truncated").asBoolean()).isFalse();
-            assertThat(timings.path("entries").toString()).contains("application","csrf");accepted=true;
+            assertThat(timings.path("entries").toString()).contains("application","csrf","auth");accepted=true;
         } finally {
             Path directory=ROOT.resolve("evidence");Files.createDirectories(directory);
-            String lines=captured.getAll().lines().filter(line->line.contains(" : application.lifecycle phase=")||line.contains(" : csrf.lifecycle phase=")||line.contains(" : task.lifecycle phase="))
+            String lines=captured.getAll().lines().filter(line->line.contains(" : application.lifecycle phase=")||line.contains(" : csrf.lifecycle phase=")||line.contains(" : task.lifecycle phase=")||line.contains(" : auth.lifecycle phase="))
                     .reduce("",(all,line)->all+line+"\n");
             Files.writeString(directory.resolve("api-lifecycle.log"),lines);
             if(Files.exists(directory.resolve("task.json"))) {

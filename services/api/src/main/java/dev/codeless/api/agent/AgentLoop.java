@@ -35,7 +35,8 @@ public final class AgentLoop implements TaskStageRunner {
             planPolicy=new ClassPathResource("model/prompts/plan-v1.txt").getContentAsString(StandardCharsets.UTF_8)+"\nJSON schema:\n"+plans.schemaJson();
             String proposalPolicy=new ClassPathResource("model/prompts/agent-proposal-protocol-v1.txt").getContentAsString(StandardCharsets.UTF_8)+"\n";
             generationPolicy=proposalPolicy+new ClassPathResource("model/prompts/agent-generate-v1.txt").getContentAsString(StandardCharsets.UTF_8);
-            repairPolicy=proposalPolicy+new ClassPathResource("model/prompts/repair/agent-repair-v1.txt").getContentAsString(StandardCharsets.UTF_8);
+            // REPAIR owns a complete patch protocol; GENERATE's coordinator verdict hints are not repair instructions.
+            repairPolicy=new ClassPathResource("model/prompts/repair/agent-repair-v1.txt").getContentAsString(StandardCharsets.UTF_8);
         } catch(Exception failure) {throw new AgentFailure("AGENT_CONFIGURATION");}
     }
     public StageResult execute(UUID taskId,TaskStatus stage) {throw new AgentFailure("AGENT_ORIGINAL_CLAIM_REQUIRED");}

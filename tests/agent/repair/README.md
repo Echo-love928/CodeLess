@@ -73,3 +73,72 @@ digest manifest are in `evidence/2026-10-10/repair-context/`. These deterministi
 results prove controller feasibility for the stated usage scenario. Real model
 patch/done behavior and paid M1 remain unaccepted; a new paid task requires new
 authorization.
+
+## PR31 complete protocol-error regression (zero paid requests)
+
+The immutable PR #31 task `17f440cf-7970-46cc-b598-dd2d91a20ade` ended with the
+complete reply `{"type":"json_object","error":"Invalid protocol reply."}`.
+Default `RepairLoopIntegrationTest` replays all nine recorded proposals through
+the production DeepSeek serializer, loopback HTTP and response parser. It asserts
+FAILED / AGENT_MODEL_PROTOCOL_INVALID, 9 calls / 11 tools / 28,515 recorded
+tokens, no retry, no repair done and no ready version. These are replayed prior
+usage values, not new provider measurements. The original paid failure remains.
+
+`ProtocolRepairPreviewIT` replays the first eight proposals, then supplies a
+declared synthetic patch (5,180 tokens) and an unknown-usage done charged at the
+full conservative reservation. It runs the unchanged original
+`tests/e2e/generation/m1-platform.acceptance.mjs` in its recorded-source-replay mode
+(the actual provider remains explicitly deterministic-mock):
+real PostgreSQL, files, Docker build failure, repaired snapshot, rebuilt app,
+Chromium, same-task signed preview, refresh/restart/revocation and isolation.
+The browser-created request text is that script's mock variant; the recorded
+source and original generation/repair acceptance actions are unchanged.
+
+```powershell
+Remove-Item Env:CODELESS_MODEL_API_KEY,Env:CODELESS_MODEL_NAME,Env:CODELESS_M1_REAL_APPROVED -ErrorAction SilentlyContinue
+$env:CODELESS_MODEL_PROVIDER='deterministic-mock'
+corepack pnpm ci:gate
+services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=ProtocolRepairPreviewIT' '-DreuseForks=false' '-DforkCount=1' test
+```
+
+REPAIR now owns its complete operation protocol and guides patching after a
+successful read. Strict parsing, original actions and runtime limits remain.
+Private `model.input` journal events contain policy/input SHA256, UTF-8 lengths,
+message roles and transport-body SHA256/format/options, never prompt text or
+Authorization. Provider metadata serialization is pure and makes no request;
+unavailable metadata stays UNAVAILABLE. The paid test wrapper forwards the same
+metadata but retains its existing paid-authorization guard.
+
+The new evidence directory is `evidence/2026-10-10/repair-protocol/`. Offline
+loopback bodies are explicitly labeled; PR31's actual historical wire body was
+not captured and the model's internal cause remains UNKNOWN. Offline legal
+patch/done success does not establish model quality or close real M1. A new paid
+test requires B review and renewed authorization.
+
+The additional legacy `RecordedRepairPreviewIT` failed after resident restart
+and platform reload in this turn; its failure, journal and cleanup remain in
+`earlier-failures/`. Its root cause is UNKNOWN. A successful PR31 replay must not
+be used to close that independent failure.
+
+### Follow-up correction and complete private capture
+
+The preceding legacy-failure description refers to the **first** selected run.
+The second selected run actually passed `RecordedRepairPreviewIT` 1/1; that
+suite failed only `ProtocolRepairPreviewIT` in the wrong CLI mode. The prior
+handoff incorrectly labeled both tests failed. Corrected first/second JUnit,
+task provenance and recorded runtime are appended in `blocker-followup/`;
+the original artifact bytes remain unchanged. A further original-flow run of
+`ApplicationHttpDiagnosticsIT,RecordedRepairPreviewIT` passes 2/2 and correlates
+auth/me ingress timings with API diagnostic IDs. The original historical cause
+remains UNKNOWN, rather than being declared fixed by a passing run.
+
+Future authorized `RealRepairPreviewPlatformAcceptanceIT` uses test-only
+`PrivateModelCapture`. `target/real-preview-platform-*/private/model-wire/`
+contains 01-request.json / 01-result.json through at most 12 calls. Requests
+use the same production body serializer and retain exact bytes; results retain
+the complete application reply content and available usage, including illegal
+replies and transport failures. No headers or keys are captured; these private
+task texts must be reviewed before any export. Capture failure before dispatch
+stops without a request, and result-write failure preserves measured usage.
+No paid approval guard, runtime limit, retry, transport or proposal parser is
+changed. This prevents another paid failure being archived without its input.

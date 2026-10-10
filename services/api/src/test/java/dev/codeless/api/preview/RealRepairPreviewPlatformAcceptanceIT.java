@@ -75,7 +75,10 @@ class RealRepairPreviewPlatformAcceptanceIT extends RealPreviewPlatformAcceptanc
     }
 
     @TestConfiguration static class RealConfiguration {
-        @Bean @Primary RealFaultProvider realFaultProvider(FileToolService files,AgentRunStore store,JdbcClient jdbc) { return new RealFaultProvider(new DeepSeekModelProvider(System.getenv("CODELESS_MODEL_API_KEY"),System.getenv("CODELESS_MODEL_NAME")),files,store,jdbc,ROOT.resolve("evidence")); }
+        @Bean @Primary RealFaultProvider realFaultProvider(FileToolService files,AgentRunStore store,JdbcClient jdbc) {
+            var captured=new PrivateModelCapture(new DeepSeekModelProvider(System.getenv("CODELESS_MODEL_API_KEY"),System.getenv("CODELESS_MODEL_NAME")),ROOT.resolve("private/model-wire"));
+            return new RealFaultProvider(captured,files,store,jdbc,ROOT.resolve("evidence"));
+        }
     }
     static final class RealFaultProvider implements ModelProvider {
         final ModelProvider delegate;final FileToolService files;final AgentRunStore store;final JdbcClient jdbc;final Path evidence;
@@ -83,6 +86,7 @@ class RealRepairPreviewPlatformAcceptanceIT extends RealPreviewPlatformAcceptanc
         final Pattern importPath=Pattern.compile(Pattern.quote("../components/ProfileCard.vue"));
         RealFaultProvider(ModelProvider delegate,FileToolService files,AgentRunStore store,JdbcClient jdbc,Path evidence){this.delegate=delegate;this.files=files;this.store=store;this.jdbc=jdbc;this.evidence=evidence;}
         public String id(){return delegate.id();}public String model(){return delegate.model();}
+        @Override public Map<String,Object> requestMetadata(Prompt prompt,int max) {return delegate.requestMetadata(prompt,max);}
         public Reply call(Prompt prompt,int max,Duration timeout) {
             var reply=delegate.call(prompt,max,timeout);var input=mapper.readTree(prompt.getUserMessage().getText());var proposal=mapper.readTree(reply.content());
             // Inject only after the real generator is done. No later GENERATE call can repair it before VERIFY.

@@ -17,7 +17,9 @@ final class RepairContext {
     List<JsonNode> observations(){return List.copyOf(latest.values());}
     JsonNode sourceFiles(){return sourceFiles;}
     Map<String,Object> progress(){return Map.of("repeatedReads",repeatedReads,"sourceChanged",changed,
-            "next",changed?"DONE_OR_READ_REMAINING_DEPENDENCY":repeatedReads>0?"PATCH_USING_OBSERVED_DIGEST":"READ_REQUIRED_DEPENDENCIES_ONCE");}
+            "next",repeatedReads>0?"PATCH_USING_OBSERVED_DIGEST":changed?"DONE_OR_READ_REMAINING_DEPENDENCY":
+                    latest.values().stream().anyMatch(o->o.path("tool").asText().equals("files.read"))?
+                            "PATCH_OR_READ_MISSING_DEPENDENCY":"READ_REQUIRED_DEPENDENCIES_ONCE");}
     boolean observe(String name,JsonNode arguments,JsonNode actual) {
         var source=actual.path("source");String digest=source.path("sourceDigest").asText();
         if(!source.path("files").isArray()||digest.isBlank())throw new AgentFailure("AGENT_CHECKPOINT_INVALID");

@@ -1,0 +1,83 @@
+{
+  "branch": "codex/d10-a-repair-protocol",
+  "baseline": "4c1bdad9f3f12785294c20ca60b547107865bc17",
+  "commands": [
+    {
+      "command": "corepack pnpm ci:gate",
+      "exitCode": 0,
+      "log": "protocol31-ci-gate.log",
+      "digest": "sha256:6f4c5ad62ed31bd5898a3326dde1f5c0e692c14e1239d7f8991e332acceaa71f"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=ProtocolRepairPreviewIT -DreuseForks=false -DforkCount=1 test",
+      "exitCode": 0,
+      "log": "protocol31-preview-final.log",
+      "digest": "sha256:9209dbb36dda267e0841bac89e7909e53fb7300deb13b1ed8118b2ee87ab25d4"
+    }
+  ],
+  "earlierFailures": [
+    {
+      "command": "Selected tests before Docker Desktop was ready",
+      "exitCode": 1,
+      "log": "protocol31-targeted.log",
+      "digest": "sha256:01160947188b59408708e3428605d80903e08df8bae82c36cb4d3b19235eecfc"
+    },
+    {
+      "command": "First full selected suite: preserved strict markers and wrong generic UI entry",
+      "exitCode": 1,
+      "log": "protocol31-targeted-ready.log",
+      "digest": "sha256:a2a85a3ad300e07b027d279e3de79f95279c5e87f65c12291d7abcf83cd3d837"
+    },
+    {
+      "command": "Protocol31 mock-mode entry mismatch; legacy preview restart failure",
+      "exitCode": 1,
+      "log": "protocol31-preview-attempt2.log",
+      "digest": "sha256:20eddc4d8d158ae50cb3f81f7de5ffa5687c075b5a5c7243ac3d8cf68ca8b756"
+    }
+  ],
+  "stages": {
+    "static": {
+      "status": "SUCCESS",
+      "frontendTests": 41
+    },
+    "api": {
+      "status": "SUCCESS",
+      "tests": 145
+    },
+    "runner": {
+      "status": "SUCCESS",
+      "tests": 44
+    },
+    "e2e": {
+      "status": "SUCCESS",
+      "tests": 33
+    }
+  },
+  "optInPlatformTests": 1,
+  "legacyRecordedPreviewRegression": "FAILED_AFTER_RESTART_NOT_CLOSED",
+  "currentTask": "bf70edb3-9baf-485a-81ed-be33d771e03d",
+  "currentRuntime": {
+    "models": 10,
+    "tools": 15,
+    "chargedTokens": 43039
+  },
+  "currentMeasurement": "REPLAY_AND_SYNTHETIC_FUTURE_NOT_PROVIDER_EVALUATION",
+  "newPaidCalls": 0,
+  "modelQualityEvidence": false,
+  "realModelM1": "NOT_PASSED",
+  "originalPaidTask": "17f440cf-7970-46cc-b598-dd2d91a20ade",
+  "originalPaidMeter": {
+    "models": 9,
+    "tools": 11,
+    "inputTokens": 26947,
+    "outputTokens": 1568,
+    "totalTokens": 28515
+  },
+  "historicalWireCaptured": false,
+  "developmentAgent": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "measurement": "UNKNOWN"
+  }
+}
