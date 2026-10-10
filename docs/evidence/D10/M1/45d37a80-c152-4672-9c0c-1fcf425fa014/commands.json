@@ -1,0 +1,91 @@
+[
+  {
+    "stem": "owner-preflight",
+    "command": "test-private owner-preflight",
+    "exitCode": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-4ebf0bb/owner-preflight.log",
+    "privateLogDigest": "sha256:e40f223a681f27d024287e623f318a5bc66c3c2db8674d9c7a17a084b4ec86ec"
+  },
+  {
+    "stem": "job-preflight",
+    "command": "test-private job-preflight",
+    "exitCode": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-4ebf0bb/job-preflight.log",
+    "privateLogDigest": "sha256:0f8564729e6c23a1f00555a7ff69e2bcd764070bb57f3014730f3162162c105e"
+  },
+  {
+    "stem": "prepare",
+    "command": "node tests/agent/prepare-runtime.mjs",
+    "exitCode": 1,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-4ebf0bb/prepare.log",
+    "privateLogDigest": "sha256:392972013f36b5a8cbbbb762a1267aa1e3f108b2d290b9d0aafcbd90d042a1eb"
+  },
+  {
+    "stem": "prepare-after-desktop-start",
+    "command": "node tests/agent/prepare-runtime.mjs",
+    "exitCode": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-4ebf0bb/prepare-after-desktop-start.log",
+    "privateLogDigest": "sha256:c923fb8d3a7e2bad737384ee9e2e69ed927ac25dface52e9bac3ac7cd612951c"
+  },
+  {
+    "stem": "test-compile",
+    "command": "services/api/mvnw.cmd -f services/api/pom.xml -DskipTests test-compile",
+    "exitCode": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-4ebf0bb/test-compile.log",
+    "privateLogDigest": "sha256:6c81b63eeb95623305ad5c50c997d8ac072b96563fa9d9970c31f310609dc947"
+  },
+  {
+    "stem": "m1-real",
+    "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealRepairPreviewPlatformAcceptanceIT -DreuseForks=false -DforkCount=1 test",
+    "exitCode": 1,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-4ebf0bb/m1-real.log",
+    "privateLogDigest": "sha256:65cd1e827e00d983d99a79736ed72a4c95179db01789e7fd7e936586891d8ee4"
+  },
+  {
+    "stem": "orchestration",
+    "command": "test-private orchestration",
+    "exitCode": 1,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-4ebf0bb/orchestration.log",
+    "privateLogDigest": "sha256:98c25ff353c53deb9502fe65b2cb92fb5e1465e858b45f507276720ead42f5ae"
+  },
+  {
+    "stem": "export",
+    "command": "node tests/e2e/generation/export-m1-evidence.mjs <actual evidence>",
+    "exitCode": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-4ebf0bb/export.log",
+    "privateLogDigest": "sha256:4fc704591280c2ff5d48973d11a3eb1ba6eebd2adcad0b551b196623953c2365"
+  },
+  {
+    "stem": "budget-replay",
+    "command": "java -cp <actual JUnit java.class.path> BudgetReplay.java <actual report> <replay.json>",
+    "exitCode": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-4ebf0bb/budget-replay.log",
+    "privateLogDigest": "sha256:dfe03c94f43e054536eaee8502700959507721bea55519caf7c1d386d3ed7638"
+  },
+  {
+    "stem": "collect-evidence",
+    "command": "test-private evidence integrity audit",
+    "exitCode": 0,
+    "additionalModelRequests": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-4ebf0bb/collect-evidence.log",
+    "privateLogDigest": "sha256:bde59792d223c5b8dfba3c12b6764aa60787013204e8b26a1534d61500209949"
+  },
+  {
+    "stem": "budget-public-replay",
+    "command": "java -cp <actual JUnit classpath> <published BudgetReplay.java> <published synthetic event-replay.json> <new output>",
+    "exitCode": 1,
+    "additionalModelRequests": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-4ebf0bb/budget-public-replay.log",
+    "privateLogDigest": "sha256:6c518797000d469d1cfd17f3bc127a2734d0383c4a94ba4c939df4eb51c128a3",
+    "cause": "PUBLIC_FIXTURE_MISSING_TOOL_REQUEST_EVENTS",
+    "correctedIn": "budget-public-replay-corrected"
+  },
+  {
+    "stem": "budget-public-replay-corrected",
+    "command": "java -cp <actual JUnit classpath> <published BudgetReplay.java> <published synthetic event-replay.json> <new output>",
+    "exitCode": 0,
+    "additionalModelRequests": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-4ebf0bb/budget-public-replay-corrected.log",
+    "privateLogDigest": "sha256:c43e899ec72e76960e0afce784363939f33880cef0da7d4da60ff0e111ac73cb"
+  }
+]

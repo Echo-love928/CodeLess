@@ -1,0 +1,737 @@
+{
+  "task": {
+    "id": "45d37a80-c152-4672-9c0c-1fcf425fa014",
+    "applicationId": "7222daae-27aa-4a19-923c-ce7f8da2aa1b",
+    "prompt": "生成 Ada Lovelace 个人展示页，静态数据展示姓名、简短介绍及两件作品：Analytical Engine 和 Note G。恰好两个文件：src/pages/HomePage.vue、src/components/ProfileCard.vue。先读取依赖源码，保持组件接口和页面数据类型一致。不要外部图片或请求。",
+    "status": "FAILED",
+    "repairAttempts": 1,
+    "failureCode": "AGENT_MODEL_BUDGET_EXCEEDED"
+  },
+  "budget": {
+    "models": 10,
+    "tools": 13,
+    "chargedTokens": 31596
+  },
+  "modelProvider": "deepseek",
+  "modelQualityEvidence": false,
+  "extra": {
+    "acceptance": {},
+    "controlledFaultInjected": 1,
+    "M1": "NOT_PASSED",
+    "authoritativeTaskCaptured": true,
+    "clientLastObservedTask": {
+      "id": "45d37a80-c152-4672-9c0c-1fcf425fa014",
+      "applicationId": "7222daae-27aa-4a19-923c-ce7f8da2aa1b",
+      "prompt": "生成 Ada Lovelace 个人展示页，静态数据展示姓名、简短介绍及两件作品：Analytical Engine 和 Note G。恰好两个文件：src/pages/HomePage.vue、src/components/ProfileCard.vue。先读取依赖源码，保持组件接口和页面数据类型一致。不要外部图片或请求。",
+      "status": "FAILED",
+      "repairAttempts": 1,
+      "failureCode": "AGENT_MODEL_BUDGET_EXCEEDED",
+      "createdAt": "2026-10-10T07:02:02.112486Z",
+      "updatedAt": "2026-10-10T07:02:53.567384Z"
+    },
+    "modelCalls": [
+      {
+        "id": "fa25761f-e234-4b02-9a38-3f194fab92ce",
+        "stage": "PLAN",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 1276,
+        "outputTokens": 331
+      },
+      {
+        "id": "7ed9284a-62bb-43b5-86e0-a5e830794015",
+        "stage": "GENERATE",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 2465,
+        "outputTokens": 320
+      },
+      {
+        "id": "984cf946-aea2-4f89-81f9-e938198eb0ab",
+        "stage": "GENERATE",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 2677,
+        "outputTokens": 23
+      },
+      {
+        "id": "03684608-25a9-42e3-8798-3f82efc0284a",
+        "stage": "GENERATE",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 3224,
+        "outputTokens": 299
+      },
+      {
+        "id": "9529ed9d-604f-43c7-9ed9-0a4e3c2ac1d5",
+        "stage": "GENERATE",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 3501,
+        "outputTokens": 24
+      },
+      {
+        "id": "fc3727c2-c2ac-4670-80e7-e572044275ab",
+        "stage": "GENERATE",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 4093,
+        "outputTokens": 165
+      },
+      {
+        "id": "5699f22d-009e-47be-ad11-ea49b166debd",
+        "stage": "REPAIR",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 2396,
+        "outputTokens": 24
+      },
+      {
+        "id": "c2d23ae6-5707-4da1-ad7d-071671b6cdc1",
+        "stage": "REPAIR",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 2973,
+        "outputTokens": 23
+      },
+      {
+        "id": "9b24fb5d-1278-4abd-934d-eac0c3d00db0",
+        "stage": "REPAIR",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 3578,
+        "outputTokens": 24
+      },
+      {
+        "id": "24707846-3789-4ede-887c-8a7e291dd19c",
+        "stage": "REPAIR",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 4156,
+        "outputTokens": 24
+      }
+    ],
+    "allModelStagesReal": true,
+    "faultOrigin": "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR"
+  },
+  "fault": {
+    "path": "src/pages/HomePage.vue",
+    "origin": "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR",
+    "before": "<script setup lang=\"ts\">\nimport ProfileCard from '../components/ProfileCard.vue';\n\ninterface Work {\n  title: string;\n  description: string;\n}\n\nconst name = 'Ada Lovelace';\nconst bio = 'English mathematician and writer, chiefly known for her work on Charles Babbage\\'s proposed mechanical general-purpose computer, the Analytical Engine.';\nconst works: Work[] = [\n  {\n    title: 'Analytical Engine',\n    description: 'A proposed mechanical general-purpose computer designed by Charles Babbage, for which Ada wrote the first algorithm.',\n  },\n  {\n    title: 'Note G',\n    description: 'The final note in Ada Lovelace\\'s translation of Menabrea\\'s paper, containing an algorithm for computing Bernoulli numbers.',\n  },\n];\n</script>\n\n<template>\n  <main class=\"home-page\">\n    <ProfileCard :name=\"name\" :bio=\"bio\" :works=\"works\" />\n  </main>\n</template>\n\n<style scoped>\n.home-page {\n  padding: 2rem 1rem;\n}\n</style>\n",
+    "after": "<script setup lang=\"ts\">\nimport ProfileCard from '../components/M1MissingCard.vue';\n\ninterface Work {\n  title: string;\n  description: string;\n}\n\nconst name = 'Ada Lovelace';\nconst bio = 'English mathematician and writer, chiefly known for her work on Charles Babbage\\'s proposed mechanical general-purpose computer, the Analytical Engine.';\nconst works: Work[] = [\n  {\n    title: 'Analytical Engine',\n    description: 'A proposed mechanical general-purpose computer designed by Charles Babbage, for which Ada wrote the first algorithm.',\n  },\n  {\n    title: 'Note G',\n    description: 'The final note in Ada Lovelace\\'s translation of Menabrea\\'s paper, containing an algorithm for computing Bernoulli numbers.',\n  },\n];\n</script>\n\n<template>\n  <main class=\"home-page\">\n    <ProfileCard :name=\"name\" :bio=\"bio\" :works=\"works\" />\n  </main>\n</template>\n\n<style scoped>\n.home-page {\n  padding: 2rem 1rem;\n}\n</style>\n",
+    "beforeDigest": "sha256:2da21d893c51c8b1fc2c1ce805dfea0abeca86e7fd8db999c8be5ce10a16c7d6",
+    "afterDigest": "sha256:4577d556543354cd3a18f2653729a2d9b054055595d6db64c5250fdc260cee52"
+  },
+  "candidates": [
+    {
+      "sourceDigest": "sha256:bc4328c1b467b92fa62d0e0bd3926b0f652cbd93967cd3bc3490a7d09b575133",
+      "versionId": "1c55b433-61a0-4260-a31e-f1da2be9ec19",
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 767,
+          "digest": "sha256:08cc1a6e4f36ebb2726b23ceb1d30749873671eedd73a881c308d7a74062ed7d"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 913,
+          "digest": "sha256:4577d556543354cd3a18f2653729a2d9b054055595d6db64c5250fdc260cee52"
+        }
+      ],
+      "sourceDirectory": "source/candidate-0",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-bio"
+          },
+          "value": "English mathematician and writer, chiefly known for her work on Charles Babbage's proposed mechanical general-purpose computer, the Analytical Engine."
+        },
+        {
+          "type": "expectVisible",
+          "target": {
+            "testId": "work-item-0"
+          }
+        },
+        {
+          "type": "expectVisible",
+          "target": {
+            "testId": "work-item-1"
+          }
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "role": "heading",
+            "name": "Analytical Engine"
+          },
+          "value": "Analytical Engine"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "role": "heading",
+            "name": "Note G"
+          },
+          "value": "Note G"
+        }
+      ]
+    }
+  ],
+  "runners": [
+    {
+      "status": "FAILED",
+      "sourceDigest": "sha256:bc4328c1b467b92fa62d0e0bd3926b0f652cbd93967cd3bc3490a7d09b575133",
+      "build": {
+        "id": "d5571754-2352-4c2a-8847-48ec264cac20",
+        "imageId": "sha256:abccb2b50eecdbf62128554de71b0d8cfd9bd32aa7c19d018bce25adaab64e31",
+        "containerName": "codeless-build-d5571754-2352-4c2a-8847-48ec264cac20",
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 2,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\nsrc/pages/HomePage.vue(2,25): error TS2307: Cannot find module '../components/M1MissingCard.vue' or its corresponding type declarations.\n",
+          "bytes": 232,
+          "observedBytes": 232,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-10T07:02:28.521Z",
+        "completedAt": "2026-10-10T07:02:32.640Z"
+      },
+      "verification": null,
+      "executionId": "72734f98-5136-4db6-90ec-5086bde6ab79"
+    }
+  ],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "usage": {
+        "inputTokens": 1276,
+        "outputTokens": 331,
+        "totalTokens": 1607,
+        "raw": {
+          "prompt_tokens": 1276,
+          "completion_tokens": 331,
+          "total_tokens": 1607,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 252
+        }
+      },
+      "releasedTokens": 7915,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 1607,
+      "estimated": false,
+      "reservationTokens": 9522
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 2465,
+        "outputTokens": 320,
+        "totalTokens": 2785,
+        "raw": {
+          "prompt_tokens": 2465,
+          "completion_tokens": 320,
+          "total_tokens": 2785,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 2465
+        }
+      },
+      "releasedTokens": 10749,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 2785,
+      "estimated": false,
+      "reservationTokens": 13534
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 2677,
+        "outputTokens": 23,
+        "totalTokens": 2700,
+        "raw": {
+          "prompt_tokens": 2677,
+          "completion_tokens": 23,
+          "total_tokens": 2700,
+          "prompt_tokens_details": {
+            "cached_tokens": 2432
+          },
+          "prompt_cache_hit_tokens": 2432,
+          "prompt_cache_miss_tokens": 245
+        }
+      },
+      "releasedTokens": 11308,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 2700,
+      "estimated": false,
+      "reservationTokens": 14008
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 3224,
+        "outputTokens": 299,
+        "totalTokens": 3523,
+        "raw": {
+          "prompt_tokens": 3224,
+          "completion_tokens": 299,
+          "total_tokens": 3523,
+          "prompt_tokens_details": {
+            "cached_tokens": 2560
+          },
+          "prompt_cache_hit_tokens": 2560,
+          "prompt_cache_miss_tokens": 664
+        }
+      },
+      "releasedTokens": 11851,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 3523,
+      "estimated": false,
+      "reservationTokens": 15374
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 3501,
+        "outputTokens": 24,
+        "totalTokens": 3525,
+        "raw": {
+          "prompt_tokens": 3501,
+          "completion_tokens": 24,
+          "total_tokens": 3525,
+          "prompt_tokens_details": {
+            "cached_tokens": 3200
+          },
+          "prompt_cache_hit_tokens": 3200,
+          "prompt_cache_miss_tokens": 301
+        }
+      },
+      "releasedTokens": 12454,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 3525,
+      "estimated": false,
+      "reservationTokens": 15979
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 4093,
+        "outputTokens": 165,
+        "totalTokens": 4258,
+        "raw": {
+          "prompt_tokens": 4093,
+          "completion_tokens": 165,
+          "total_tokens": 4258,
+          "prompt_tokens_details": {
+            "cached_tokens": 3456
+          },
+          "prompt_cache_hit_tokens": 3456,
+          "prompt_cache_miss_tokens": 637
+        }
+      },
+      "releasedTokens": 13350,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 4258,
+      "estimated": false,
+      "reservationTokens": 17608
+    },
+    {
+      "stage": "REPAIR",
+      "usage": {
+        "inputTokens": 2396,
+        "outputTokens": 24,
+        "totalTokens": 2420,
+        "raw": {
+          "prompt_tokens": 2396,
+          "completion_tokens": 24,
+          "total_tokens": 2420,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 2396
+        }
+      },
+      "releasedTokens": 9912,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 2420,
+      "estimated": false,
+      "reservationTokens": 12332
+    },
+    {
+      "stage": "REPAIR",
+      "usage": {
+        "inputTokens": 2973,
+        "outputTokens": 23,
+        "totalTokens": 2996,
+        "raw": {
+          "prompt_tokens": 2973,
+          "completion_tokens": 23,
+          "total_tokens": 2996,
+          "prompt_tokens_details": {
+            "cached_tokens": 1792
+          },
+          "prompt_cache_hit_tokens": 1792,
+          "prompt_cache_miss_tokens": 1181
+        }
+      },
+      "releasedTokens": 10966,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 2996,
+      "estimated": false,
+      "reservationTokens": 13962
+    },
+    {
+      "stage": "REPAIR",
+      "usage": {
+        "inputTokens": 3578,
+        "outputTokens": 24,
+        "totalTokens": 3602,
+        "raw": {
+          "prompt_tokens": 3578,
+          "completion_tokens": 24,
+          "total_tokens": 3602,
+          "prompt_tokens_details": {
+            "cached_tokens": 2304
+          },
+          "prompt_cache_hit_tokens": 2304,
+          "prompt_cache_miss_tokens": 1274
+        }
+      },
+      "releasedTokens": 11856,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 3602,
+      "estimated": false,
+      "reservationTokens": 15458
+    },
+    {
+      "stage": "REPAIR",
+      "usage": {
+        "inputTokens": 4156,
+        "outputTokens": 24,
+        "totalTokens": 4180,
+        "raw": {
+          "prompt_tokens": 4156,
+          "completion_tokens": 24,
+          "total_tokens": 4180,
+          "prompt_tokens_details": {
+            "cached_tokens": 2944
+          },
+          "prompt_cache_hit_tokens": 2944,
+          "prompt_cache_miss_tokens": 1212
+        }
+      },
+      "releasedTokens": 12909,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 4180,
+      "estimated": false,
+      "reservationTokens": 17089
+    }
+  ],
+  "protocolResponses": [
+    {
+      "stage": "PLAN",
+      "payload": {
+        "schemaVersion": 1,
+        "template": "VUE",
+        "dataMode": "STATIC",
+        "pages": [
+          {
+            "route": "/",
+            "file": "src/pages/HomePage.vue",
+            "title": "Ada Lovelace",
+            "purpose": "展示 Ada Lovelace 姓名、简短介绍及两件作品。使用 ProfileCard 组件渲染个人资料与作品列表。"
+          }
+        ],
+        "components": [
+          {
+            "name": "ProfileCard",
+            "file": "src/components/ProfileCard.vue",
+            "purpose": "接收 name、bio 与 works 属性并渲染个人资料卡与作品列表，用于首页静态展示。"
+          }
+        ],
+        "files": [
+          {
+            "path": "src/pages/HomePage.vue",
+            "purpose": "首页页面，定义静态的姓名、简介与两件作品数据，并引入 ProfileCard 展示。"
+          },
+          {
+            "path": "src/components/ProfileCard.vue",
+            "purpose": "展示型组件，props 接 name、bio、works，输出个人资料卡与作品项。"
+          }
+        ],
+        "acceptance": [
+          {
+            "id": "A1",
+            "route": "/",
+            "action": "打开首页 / 并等待渲染完成。",
+            "expected": "页面可见标题“Ada Lovelace”及简短介绍文字。"
+          },
+          {
+            "id": "A2",
+            "route": "/",
+            "action": "查看首页作品列表区域。",
+            "expected": "列表恰好包含两项且名称分别为 Analytical Engine 和 Note G。"
+          },
+          {
+            "id": "A3",
+            "route": "/",
+            "action": "检查页面渲染来源。",
+            "expected": "页面无外部图片或网络请求，作品数据来自本地静态内容。"
+          }
+        ],
+        "capabilities": {
+          "backend": false,
+          "payments": false,
+          "externalServices": [],
+          "dependencies": []
+        }
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.create",
+        "arguments": {
+          "path": "src/components/ProfileCard.vue",
+          "content": "<script setup lang=\"ts\">\ninterface Work {\n  title: string;\n  description: string;\n}\n\ndefineProps<{\n  name: string;\n  bio: string;\n  works: Work[];\n}>();\n</script>\n\n<template>\n  <section class=\"profile-card\">\n    <h1 data-testid=\"profile-name\">{{ name }}</h1>\n    <p data-testid=\"profile-bio\">{{ bio }}</p>\n    <h2>Works</h2>\n    <ul class=\"works\">\n      <li v-for=\"(work, index) in works\" :key=\"work.title\" :data-testid=\"`work-item-${index}`\">\n        <h3>{{ work.title }}</h3>\n        <p>{{ work.description }}</p>\n      </li>\n    </ul>\n  </section>\n</template>\n\n<style scoped>\n.profile-card {\n  max-width: 640px;\n  margin: 0 auto;\n  padding: 1.5rem;\n  font-family: system-ui, sans-serif;\n  text-align: left;\n}\n\n.works {\n  list-style: none;\n  padding: 0;\n}\n</style>\n"
+        }
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/components/ProfileCard.vue"
+        }
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.create",
+        "arguments": {
+          "path": "src/pages/HomePage.vue",
+          "content": "<script setup lang=\"ts\">\nimport ProfileCard from '../components/ProfileCard.vue';\n\ninterface Work {\n  title: string;\n  description: string;\n}\n\nconst name = 'Ada Lovelace';\nconst bio = 'English mathematician and writer, chiefly known for her work on Charles Babbage\\'s proposed mechanical general-purpose computer, the Analytical Engine.';\nconst works: Work[] = [\n  {\n    title: 'Analytical Engine',\n    description: 'A proposed mechanical general-purpose computer designed by Charles Babbage, for which Ada wrote the first algorithm.',\n  },\n  {\n    title: 'Note G',\n    description: 'The final note in Ada Lovelace\\'s translation of Menabrea\\'s paper, containing an algorithm for computing Bernoulli numbers.',\n  },\n];\n</script>\n\n<template>\n  <main class=\"home-page\">\n    <ProfileCard :name=\"name\" :bio=\"bio\" :works=\"works\" />\n  </main>\n</template>\n\n<style scoped>\n.home-page {\n  padding: 2rem 1rem;\n}\n</style>\n"
+        }
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/pages/HomePage.vue"
+        }
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "type": "done",
+        "actions": [
+          {
+            "type": "navigate",
+            "path": "/"
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "profile-name"
+            },
+            "value": "Ada Lovelace"
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "profile-bio"
+            },
+            "value": "English mathematician and writer, chiefly known for her work on Charles Babbage's proposed mechanical general-purpose computer, the Analytical Engine."
+          },
+          {
+            "type": "expectVisible",
+            "target": {
+              "testId": "work-item-0"
+            }
+          },
+          {
+            "type": "expectVisible",
+            "target": {
+              "testId": "work-item-1"
+            }
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "role": "heading",
+              "name": "Analytical Engine"
+            },
+            "value": "Analytical Engine"
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "role": "heading",
+              "name": "Note G"
+            },
+            "value": "Note G"
+          }
+        ]
+      }
+    },
+    {
+      "stage": "REPAIR",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/pages/HomePage.vue"
+        }
+      }
+    },
+    {
+      "stage": "REPAIR",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/components/ProfileCard.vue"
+        }
+      }
+    },
+    {
+      "stage": "REPAIR",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/pages/HomePage.vue"
+        }
+      }
+    },
+    {
+      "stage": "REPAIR",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/pages/HomePage.vue"
+        }
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "taskId": "45d37a80-c152-4672-9c0c-1fcf425fa014",
+      "at": "2026-10-10T07:02:05.974587400Z",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "stage": "PLAN",
+      "sequence": 5,
+      "kind": "stage.finished"
+    },
+    {
+      "taskId": "45d37a80-c152-4672-9c0c-1fcf425fa014",
+      "at": "2026-10-10T07:02:27.083766700Z",
+      "payload": {
+        "next": "VERIFY"
+      },
+      "stage": "GENERATE",
+      "sequence": 35,
+      "kind": "stage.finished"
+    },
+    {
+      "taskId": "45d37a80-c152-4672-9c0c-1fcf425fa014",
+      "at": "2026-10-10T07:02:33.856457200Z",
+      "payload": {
+        "code": "AGENT_BUILD_EXIT",
+        "category": "CODE",
+        "fingerprint": "sha256:1344a767e0d8d74fefdc5ac057b17089169d47dc8ee9ac5f32828f388da513a9",
+        "diagnostic": "> @codeless/generated-vue@0.1.0 build\n\nsrc/pages/HomePage.vue(2,25): error TS2307: Cannot find module '../components/M1MissingCard.vue' or its corresponding type declarations.",
+        "sourceDigest": "sha256:bc4328c1b467b92fa62d0e0bd3926b0f652cbd93967cd3bc3490a7d09b575133",
+        "repairAttempts": 0,
+        "decision": "REPAIR"
+      },
+      "stage": "VERIFY",
+      "sequence": 38,
+      "kind": "repair.failure"
+    },
+    {
+      "taskId": "45d37a80-c152-4672-9c0c-1fcf425fa014",
+      "at": "2026-10-10T07:02:34.240250800Z",
+      "payload": {
+        "next": "REPAIR"
+      },
+      "stage": "VERIFY",
+      "sequence": 39,
+      "kind": "stage.finished"
+    },
+    {
+      "taskId": "45d37a80-c152-4672-9c0c-1fcf425fa014",
+      "at": "2026-10-10T07:02:53.532859500Z",
+      "payload": {
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+        "category": "CONTROL",
+        "code": "AGENT_MODEL_BUDGET_EXCEEDED"
+      },
+      "stage": "REPAIR",
+      "sequence": 60,
+      "kind": "failure"
+    }
+  ],
+  "measuredUsage": {
+    "attempts": 10,
+    "knownAttempts": 10,
+    "unknownAttempts": 0,
+    "inputTokens": 30339,
+    "outputTokens": 1257,
+    "completeTotalTokens": 31596
+  },
+  "historicalEvidencePreserved": [
+    "tests/agent/repair/evidence/2026-10-07/D10-A-real-repair.json",
+    "tests/agent/repair/evidence/2026-10-07/D10-A-real-repair-confirm.json",
+    "tests/agent/repair/evidence/2026-10-07/D10-A-local-api-failure.json",
+    "tests/agent/repair/evidence/2026-10-07/followup.json"
+  ]
+}
