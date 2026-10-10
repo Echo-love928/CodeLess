@@ -252,4 +252,33 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
             report("D10-A-T3-budget-"+exhausted,seed,outcomes.getLast());
         }
     }
+    @Test void recordedUnchangedReadLoopStopsBeforeAnotherModelOrBuild() throws Exception {
+        var seed=seed();var provider=recordedProvider(seed,"loop");var task=run(seed,provider);
+        assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_REPAIR_NO_PROGRESS");
+        assertThat(provider.count).isEqualTo(11);var events=journal.read(seed.task());
+        assertThat(RuntimeBudget.meter(events).models()).isEqualTo(11);assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(14);
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("tool.result")&&e.path("stage").asText().equals("REPAIR")).count()).isEqualTo(5);
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(1);
+        assertThat(AgentJournal.latest(events,"failure").path("category").asText()).isEqualTo("CONTROL");
+        assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
+        report("D10-A-repeated-read-stop",seed,Map.of("recordedProvider",provider.model(),"extraModelCalls",0,"outerRetries",0));
+    }
+    @Test void recordedUnknownPatchUsageRetainsFullReservationAndStopsBeforeDone() throws Exception {
+        var seed=seed();var provider=recordedProvider(seed,"unknown-patch");var task=run(seed,provider);
+        assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_MODEL_BUDGET_EXCEEDED");assertThat(provider.count).isEqualTo(11);
+        var events=journal.read(seed.task());var usage=AgentJournal.latest(events,"model.usage");assertThat(usage.path("estimated").asBoolean()).isTrue();
+        assertThat(usage.path("chargedTokens")).isEqualTo(usage.path("reservationTokens"));assertThat(usage.path("usage").path("totalTokens").isNull()).isTrue();
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.done")).count()).isZero();assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(14);
+        assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
+        report("D10-A-recorded-unknown-budget",seed,Map.of("recordedProvider",provider.model(),"doneProviderCalled",false,"outerRetries",0));
+    }
+    private RecordedRepairFixture recordedProvider(Seed seed,String mode) {
+        return new RecordedRepairFixture(mode,reply->{
+            var claim=jdbc.sql("SELECT lease_token FROM generation_tasks WHERE id=?").param(seed.task()).query(UUID.class).single();
+            var lease=new TaskQueueService.Claim(seed.task(),claim,TaskStatus.GENERATE);
+            store.reserve(lease,TaskStatus.GENERATE,"tool.request",0);var read=files.execute(seed.task(),claim,"files.read",json.writeValueAsString(Map.of("path",PAGE)));store.append(lease,TaskStatus.GENERATE,"tool.result",read);assertThat(read.status()).isEqualTo("SUCCEEDED");
+            store.reserve(lease,TaskStatus.GENERATE,"tool.request",0);var write=files.execute(seed.task(),claim,"files.update",json.writeValueAsString(Map.of("path",PAGE,"content",read.content().replace("../components/ProfileCard.vue","../components/M1MissingCard.vue"),"expectedDigest",read.afterDigest())));
+            store.append(lease,TaskStatus.GENERATE,"tool.result",write);assertThat(write.status()).isEqualTo("SUCCEEDED");
+        });
+    }
 }
