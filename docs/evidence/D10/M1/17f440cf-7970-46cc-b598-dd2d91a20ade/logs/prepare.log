@@ -1,0 +1,55 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.30kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:24.16.0-bookworm-slim@sha256:2c87ef9bd3c6a3bd4b472b4bec2ce9d16354b0c574f736c476489d09f560a203
+#2 DONE 0.1s
+
+#3 [internal] load build context
+#3 transferring context:
+#3 transferring context: 974B 0.0s done
+#3 DONE 0.0s
+
+#4 [ 1/10] FROM docker.io/library/node:24.16.0-bookworm-slim@sha256:2c87ef9bd3c6a3bd4b472b4bec2ce9d16354b0c574f736c476489d09f560a203
+#4 resolve docker.io/library/node:24.16.0-bookworm-slim@sha256:2c87ef9bd3c6a3bd4b472b4bec2ce9d16354b0c574f736c476489d09f560a203 0.0s done
+#4 DONE 0.1s
+
+#5 [ 5/10] COPY infra/build-image/verify-dependencies.mjs /opt/codeless/verify-dependencies.mjs
+#5 CACHED
+
+#6 [ 8/10] COPY templates/vue/index.html templates/vue/tsconfig.json templates/vue/vite.config.ts ./
+#6 CACHED
+
+#7 [ 7/10] RUN corepack enable && corepack prepare pnpm@12.6.0 --activate && corepack pnpm install --frozen-lockfile
+#7 CACHED
+
+#8 [ 2/10] WORKDIR /opt/codeless/template
+#8 CACHED
+
+#9 [ 9/10] COPY templates/vue/src ./src
+#9 CACHED
+
+#10 [ 4/10] COPY templates/vue/allowed-dependencies.json ./
+#10 CACHED
+
+#11 [ 6/10] RUN node /opt/codeless/verify-dependencies.mjs
+#11 CACHED
+
+#12 [ 3/10] COPY templates/vue/package.json templates/vue/pnpm-lock.yaml templates/vue/pnpm-workspace.yaml ./
+#12 CACHED
+
+#13 [10/10] COPY infra/build-image/container-build.mjs /opt/codeless/container-build.mjs
+#13 CACHED
+
+#14 exporting to image
+#14 exporting layers done
+#14 exporting manifest sha256:741b5368e21b94d8485a9db0d76be9b8f22fa4e14cb89c29661eaf8a10b2ea13 done
+#14 exporting config sha256:08ffc07a20e4ef6247fb05bb9fc20a93daff1be1e7d80c79161089afcbff4d33 done
+#14 exporting attestation manifest sha256:c9e0c7801b7f18bdade9c112f356c53848a1f4f6fe48965001e4601a5d87a449
+#14 exporting attestation manifest sha256:c9e0c7801b7f18bdade9c112f356c53848a1f4f6fe48965001e4601a5d87a449 0.0s done
+#14 exporting manifest list sha256:860afccbd383342ec3dfd5c6e18c2581d69d00d44e708627ccae87b797775e49 0.0s done
+#14 naming to docker.io/library/codeless-vue-build:d05 done
+#14 unpacking to docker.io/library/codeless-vue-build:d05 0.0s done
+#14 DONE 0.2s
