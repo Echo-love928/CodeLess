@@ -19,7 +19,7 @@ class RepairContextTest {
     JsonNode latest(JsonNode doc,String kind){JsonNode found=null;for(var event:doc.path("events"))if(event.path("kind").asText().equals(kind))found=event.path("payload");return Objects.requireNonNull(found);}
     List<JsonNode> results(JsonNode doc){var out=new ArrayList<JsonNode>();for(var event:doc.path("events"))if(event.path("stage").asText().equals("REPAIR")&&event.path("kind").asText().equals("tool.result"))out.add(event.path("payload"));return out;}
     List<JsonNode> proposals() throws Exception {var out=new ArrayList<JsonNode>();for(var reply:json.readTree(Files.readString(RECORD.resolve("acceptance.json"))).path("protocolResponses"))if(reply.path("stage").asText().equals("REPAIR"))out.add(reply.path("payload"));return out;}
-    String policy() throws Exception{return new ClassPathResource("model/prompts/agent-proposal-protocol-v1.txt").getContentAsString(StandardCharsets.UTF_8)+"\n"+new ClassPathResource("model/prompts/repair/agent-repair-v1.txt").getContentAsString(StandardCharsets.UTF_8);}
+    String policy() throws Exception{return new ClassPathResource("model/prompts/repair/agent-repair-v1.txt").getContentAsString(StandardCharsets.UTF_8);}
     JsonNode input(JsonNode doc,List<JsonNode> observed,RepairContext context) {
         return input(doc,observed,context,new RuntimeBudget.Meter(10,13,31596));
     }
@@ -72,7 +72,9 @@ class RepairContextTest {
     }
     @Test void unchangedReadLoopStopsAndActualSourceProgressAllowsAFreshRead() throws Exception {
         var doc=doc();var context=new RepairContext(latest(doc,"draft"));var result=results(doc).getFirst();var args=proposals().getFirst().path("arguments");
-        context.observe("files.read",args,result);context.observe("files.read",args,result);context.observe("files.read",args,result);
+        assertThat(context.progress().get("next")).isEqualTo("READ_REQUIRED_DEPENDENCIES_ONCE");
+        context.observe("files.read",args,result);assertThat(context.progress().get("next")).isEqualTo("PATCH_OR_READ_MISSING_DEPENDENCY");
+        context.observe("files.read",args,result);context.observe("files.read",args,result);
         assertThatThrownBy(()->context.observe("files.read",args,result)).isInstanceOf(AgentFailure.class).hasMessage("AGENT_REPAIR_NO_PROGRESS");
         var changed=writeResult(result);context.observe("files.update",args,changed);assertThat(context.observations().getFirst().path("stale").asBoolean()).isTrue();assertThat(context.observations().getFirst().path("content").isNull()).isTrue();
         var fresh=(tools.jackson.databind.node.ObjectNode)changed.deepCopy();fresh.put("content","fresh actual text");fresh.put("beforeDigest",fresh.path("afterDigest").asText());context.observe("files.read",args,fresh);

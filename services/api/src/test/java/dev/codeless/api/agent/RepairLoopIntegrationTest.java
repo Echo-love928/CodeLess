@@ -273,12 +273,37 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         report("D10-A-recorded-unknown-budget",seed,Map.of("recordedProvider",provider.model(),"doneProviderCalled",false,"outerRetries",0));
     }
     private RecordedRepairFixture recordedProvider(Seed seed,String mode) {
+        return recordedProvider(seed,mode,RepairContextTest.RECORD);
+    }
+    private RecordedRepairFixture recordedProvider(Seed seed,String mode,Path directory) {
         return new RecordedRepairFixture(mode,reply->{
             var claim=jdbc.sql("SELECT lease_token FROM generation_tasks WHERE id=?").param(seed.task()).query(UUID.class).single();
             var lease=new TaskQueueService.Claim(seed.task(),claim,TaskStatus.GENERATE);
             store.reserve(lease,TaskStatus.GENERATE,"tool.request",0);var read=files.execute(seed.task(),claim,"files.read",json.writeValueAsString(Map.of("path",PAGE)));store.append(lease,TaskStatus.GENERATE,"tool.result",read);assertThat(read.status()).isEqualTo("SUCCEEDED");
             store.reserve(lease,TaskStatus.GENERATE,"tool.request",0);var write=files.execute(seed.task(),claim,"files.update",json.writeValueAsString(Map.of("path",PAGE,"content",read.content().replace("../components/ProfileCard.vue","../components/M1MissingCard.vue"),"expectedDigest",read.afterDigest())));
             store.append(lease,TaskStatus.GENERATE,"tool.result",write);assertThat(write.status()).isEqualTo("SUCCEEDED");
-        });
+        },directory);
+    }
+    @Test void completePaidProtocolErrorSurvivesRealWireParsingAndStopsWithoutRepairOrRetry() throws Exception {
+        var seed=seed();Path directory=Path.of("../../docs/evidence/D10/M1/17f440cf-7970-46cc-b598-dd2d91a20ade");
+        var provider=recordedProvider(seed,"recorded-invalid",directory);
+        try(var wire=new dev.codeless.api.model.RecordedRepairWireFixture(provider)) {
+            var task=run(seed,wire);var events=journal.read(seed.task());
+            assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_MODEL_PROTOCOL_INVALID");
+            assertThat(provider.count).isEqualTo(9);assertThat(wire.requests).hasSize(9);wire.assertHealthy();
+            assertThat(RuntimeBudget.meter(events)).isEqualTo(new RuntimeBudget.Meter(9,11,28515));
+            assertThat(AgentJournal.latest(events,"model.response")).isEqualTo(json.readTree("{\"type\":\"json_object\",\"error\":\"Invalid protocol reply.\"}"));
+            assertThat(AgentJournal.latest(events,"failure").path("category").asText()).isEqualTo("MODEL_INTERFACE");
+            assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(1);
+            assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.done")).count()).isZero();
+            assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
+            var fingerprints=events.stream().filter(e->e.path("kind").asText().equals("model.input")).map(e->e.path("payload")).toList();
+            assertThat(fingerprints).hasSize(9);for(int i=0;i<9;i++)assertThat(fingerprints.get(i).path("transport").path("bodyDigest").asText()).isEqualTo(wire.digests.get(i));
+            var input=json.readTree(wire.requests.getLast().path("messages").get(1).path("content").asText());
+            assertThat(input.path("observations")).hasSize(2);assertThat(input.path("repairProgress").path("next").asText()).isEqualTo("PATCH_OR_READ_MISSING_DEPENDENCY");
+            assertThat(input.path("budget").path("tokensRemaining").asLong()).isEqualTo(25090);
+            report("D10-A-protocol31-invalid",seed,Map.of("originTask","17f440cf-7970-46cc-b598-dd2d91a20ade",
+                    "offlineWireRequests",wire.requests,"wireDigests",wire.digests,"paidCalls",0,"outerRetries",0,"historicalWireCaptured",false));
+        }
     }
 }

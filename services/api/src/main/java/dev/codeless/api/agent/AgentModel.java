@@ -41,7 +41,13 @@ public final class AgentModel {
             Duration remaining=Duration.between(Instant.now(),context.deadline().toInstant());
             Duration timeout=remaining.compareTo(Duration.ofSeconds(60))<0?remaining:Duration.ofSeconds(60);
             if (timeout.toMillis()<1) throw new ModelFailure("MODEL_TIMEOUT");
-            var reply=provider.call(new Prompt(List.of(new SystemMessage(policy),new UserMessage(user))),RuntimeBudget.OUTPUT_TOKENS,timeout);
+            var prompt=new Prompt(List.of(new SystemMessage(policy),new UserMessage(user)));
+            // Correlate the actual inputs without persisting task text, generated source or Authorization.
+            store.append(claim,stage,"model.input",java.util.Map.of("callId",attempt.callId(),"policyDigest",digest(policy),
+                    "inputDigest",digest(user),"policyBytes",policy.getBytes(StandardCharsets.UTF_8).length,
+                    "inputBytes",user.getBytes(StandardCharsets.UTF_8).length,"roles",List.of("system","user"),
+                    "transport",provider.requestMetadata(prompt,RuntimeBudget.OUTPUT_TOKENS)));
+            var reply=provider.call(prompt,RuntimeBudget.OUTPUT_TOKENS,timeout);
             evidence=reply.evidence();
             if (reply.content()==null || reply.content().getBytes(StandardCharsets.UTF_8).length>256*1024)
                 throw new ModelFailure("MODEL_RESPONSE_LIMIT",evidence);
@@ -73,6 +79,11 @@ public final class AgentModel {
             records.finish(attempt.callId(),error,evidence.usage());
             if(checkpointFailure!=null) throw checkpointFailure;
         }
+    }
+    private static String digest(String value) {
+        try {return "sha256:"+java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256")
+                .digest(value.getBytes(StandardCharsets.UTF_8)));}
+        catch(java.security.NoSuchAlgorithmException impossible){throw new AgentFailure("AGENT_CONFIGURATION");}
     }
     private ModelCallAudit.Record record(ModelCallRepository.Attempt attempt, TaskQueueService.Claim claim, TaskStatus stage,
                                         ModelProvider.Evidence evidence,String status,String error,Long duration) {

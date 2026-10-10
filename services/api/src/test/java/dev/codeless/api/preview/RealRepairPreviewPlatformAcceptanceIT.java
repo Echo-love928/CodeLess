@@ -83,6 +83,7 @@ class RealRepairPreviewPlatformAcceptanceIT extends RealPreviewPlatformAcceptanc
         final Pattern importPath=Pattern.compile(Pattern.quote("../components/ProfileCard.vue"));
         RealFaultProvider(ModelProvider delegate,FileToolService files,AgentRunStore store,JdbcClient jdbc,Path evidence){this.delegate=delegate;this.files=files;this.store=store;this.jdbc=jdbc;this.evidence=evidence;}
         public String id(){return delegate.id();}public String model(){return delegate.model();}
+        @Override public Map<String,Object> requestMetadata(Prompt prompt,int max) {return delegate.requestMetadata(prompt,max);}
         public Reply call(Prompt prompt,int max,Duration timeout) {
             var reply=delegate.call(prompt,max,timeout);var input=mapper.readTree(prompt.getUserMessage().getText());var proposal=mapper.readTree(reply.content());
             // Inject only after the real generator is done. No later GENERATE call can repair it before VERIFY.
