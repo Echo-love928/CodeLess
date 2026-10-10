@@ -46,7 +46,7 @@ public final class DeepSeekModelProvider implements ModelProvider {
     public String id() { return "deepseek"; }
     public String model() { return model; }
 
-    private String requestBody(Prompt prompt,int maxOutputTokens) {
+    String requestBody(Prompt prompt,int maxOutputTokens) {
         var messages = prompt.getInstructions().stream().map(message -> Map.of(
                 "role", message.getMessageType().name().toLowerCase(java.util.Locale.ROOT),
                 "content", message.getText())).toList();

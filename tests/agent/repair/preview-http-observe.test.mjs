@@ -34,3 +34,10 @@ test('bounded capture records truncation explicitly',()=>{
   const raw=Array.from({length:257},()=>'{"kind":"ingress.api","route":"csrf","status":200}').join('\n')
   const report=parseIngressLogs(raw);assert.equal(report.entries.length,256);assert.equal(report.truncated,true)
 })
+
+test('auth reload timings distinguish pre-API connection failure without retaining credentials',()=>{
+  const raw='[error] upstream timed out while connecting to upstream, request: "GET /api/v0/auth/me?secret=PRIVATE_AUTH_DATA HTTP/1.1", upstream: "http://[fd00::1]:1234/auth/me"';
+  const report=parseIngressLogs(raw+'\n'+JSON.stringify({kind:'ingress.api',route:'auth',status:499,connectSeconds:'-',headerSeconds:'-',upstreamStatus:'-'}));
+  assert.deepEqual(report.entries.map(e=>e.route),['auth','auth']);assert.equal(report.entries[0].phase,'CONNECT');assert.equal(report.entries[1].connectSeconds,null);
+  assert.ok(!JSON.stringify(report).includes('PRIVATE_AUTH_DATA'));
+});

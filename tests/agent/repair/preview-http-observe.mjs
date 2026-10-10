@@ -37,6 +37,7 @@ export function instrumentConfig(config) {
 map "$request_method:$uri" $d10_api_route {
     default 0;
     "GET:/api/v0/auth/csrf" csrf;
+    "GET:/api/v0/auth/me" auth;
     "~^GET:/api/v0/applications/${uuid}$" application;
     "~^GET:/api/v0/tasks/${uuid}$" task;
 }
@@ -53,13 +54,13 @@ export function parseIngressLogs(raw) {
   for(const line of raw.split(/\r?\n/)) {
     const offset=line.indexOf('{"kind":"ingress.api"')
     if(offset>=0) {
-      const item=JSON.parse(line.slice(offset));assert.ok(['csrf','application','task'].includes(item.route))
+      const item=JSON.parse(line.slice(offset));assert.ok(['csrf','application','task','auth'].includes(item.route))
       entries.push({kind:'ingress.api',route:item.route,at:/^\d{4}-\d\d-\d\dT[0-9:+-]+$/.test(item.at??'')?item.at:null,
         id:new RegExp('^'+uuid+'$').test(item.id??'')?item.id:null,status:Number.isInteger(item.status)&&item.status>=100&&item.status<=599?item.status:null,
         upstream:addresses(item.upstream),requestSeconds:numeric(item.requestSeconds),connectSeconds:numeric(item.connectSeconds),
         headerSeconds:numeric(item.headerSeconds),responseSeconds:numeric(item.responseSeconds),upstreamStatus:numeric(item.upstreamStatus)})
-    } else if(/\[error\]/.test(line) && /request: "GET \/api\/v0\/(auth\/csrf|(?:applications|tasks)\/[0-9a-f-]{36})(?:[? ]|$)/.test(line)) {
-      entries.push({kind:'ingress.error',route:line.includes('GET /api/v0/auth/csrf')?'csrf':line.includes('GET /api/v0/tasks/')?'task':'application',
+    } else if(/\[error\]/.test(line) && /request: "GET \/api\/v0\/(auth\/(?:csrf|me)|(?:applications|tasks)\/[0-9a-f-]{36})(?:[? ]|$)/.test(line)) {
+      entries.push({kind:'ingress.error',route:line.includes('GET /api/v0/auth/csrf')?'csrf':line.includes('GET /api/v0/auth/me')?'auth':line.includes('GET /api/v0/tasks/')?'task':'application',
         phase:line.includes('while connecting to upstream')?'CONNECT':line.includes('while reading response header from upstream')?'READ_HEADER':'UNKNOWN',
         errorClass:line.includes('Connection refused')?'CONNECTION_REFUSED':line.includes('Network is unreachable')?'NETWORK_UNREACHABLE':line.includes('upstream timed out')?'TIMEOUT':'UNKNOWN',
         errno:line.match(/connect\(\) failed \((\d+):/)?.[1]??null,

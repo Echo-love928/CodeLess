@@ -75,7 +75,10 @@ class RealRepairPreviewPlatformAcceptanceIT extends RealPreviewPlatformAcceptanc
     }
 
     @TestConfiguration static class RealConfiguration {
-        @Bean @Primary RealFaultProvider realFaultProvider(FileToolService files,AgentRunStore store,JdbcClient jdbc) { return new RealFaultProvider(new DeepSeekModelProvider(System.getenv("CODELESS_MODEL_API_KEY"),System.getenv("CODELESS_MODEL_NAME")),files,store,jdbc,ROOT.resolve("evidence")); }
+        @Bean @Primary RealFaultProvider realFaultProvider(FileToolService files,AgentRunStore store,JdbcClient jdbc) {
+            var captured=new PrivateModelCapture(new DeepSeekModelProvider(System.getenv("CODELESS_MODEL_API_KEY"),System.getenv("CODELESS_MODEL_NAME")),ROOT.resolve("private/model-wire"));
+            return new RealFaultProvider(captured,files,store,jdbc,ROOT.resolve("evidence"));
+        }
     }
     static final class RealFaultProvider implements ModelProvider {
         final ModelProvider delegate;final FileToolService files;final AgentRunStore store;final JdbcClient jdbc;final Path evidence;

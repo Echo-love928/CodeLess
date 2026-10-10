@@ -1,0 +1,41 @@
+{
+  "commands": [
+    {
+      "command": "node --test tests/agent/repair/preview-http-observe.test.mjs tests/agent/repair/preview-http-cleanup.test.mjs",
+      "tests": 15,
+      "exitCode": 0,
+      "log": "blocker-observe.log",
+      "digest": "sha256:cb01f31f90a7b9589c1377555ceed0aadf9ec3f32f82b29b320b08df20e76e98"
+    },
+    {
+      "command": "mvnw -Dtest=PrivateModelCaptureTest,DeepSeekModelProviderTest,RepairProviderMetadataTest test",
+      "tests": 14,
+      "exitCode": 0,
+      "log": "blocker-capture.log",
+      "digest": "sha256:5e086e70149ac3e370358e05546e5de1dcc36940c30c83f019cb2a497d0f449b"
+    },
+    {
+      "command": "mvnw -Dtest=ApplicationHttpDiagnosticsIT,RecordedRepairPreviewIT -DreuseForks=false -DforkCount=1 test",
+      "tests": 2,
+      "exitCode": 0,
+      "log": "blocker-platform.log",
+      "digest": "sha256:0d801518b7ab7c6ad24f2c98b97ab580640d28d109da272e236d0ec26c21ec5d"
+    },
+    {
+      "command": "corepack pnpm ci:gate",
+      "tests": null,
+      "exitCode": 0,
+      "log": "blocker-ci-gate.log",
+      "digest": "sha256:21b6b2597845b9e4f7fd429a639df55c651175aa99998271120b1b47b16c1acb"
+    }
+  ],
+  "newPaidCalls": 0,
+  "realM1": "NOT_PASSED",
+  "historicalEnvironmentCauses": "UNKNOWN",
+  "developmentAgent": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "measurement": "UNKNOWN"
+  }
+}

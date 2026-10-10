@@ -119,3 +119,26 @@ The additional legacy `RecordedRepairPreviewIT` failed after resident restart
 and platform reload in this turn; its failure, journal and cleanup remain in
 `earlier-failures/`. Its root cause is UNKNOWN. A successful PR31 replay must not
 be used to close that independent failure.
+
+### Follow-up correction and complete private capture
+
+The preceding legacy-failure description refers to the **first** selected run.
+The second selected run actually passed `RecordedRepairPreviewIT` 1/1; that
+suite failed only `ProtocolRepairPreviewIT` in the wrong CLI mode. The prior
+handoff incorrectly labeled both tests failed. Corrected first/second JUnit,
+task provenance and recorded runtime are appended in `blocker-followup/`;
+the original artifact bytes remain unchanged. A further original-flow run of
+`ApplicationHttpDiagnosticsIT,RecordedRepairPreviewIT` passes 2/2 and correlates
+auth/me ingress timings with API diagnostic IDs. The original historical cause
+remains UNKNOWN, rather than being declared fixed by a passing run.
+
+Future authorized `RealRepairPreviewPlatformAcceptanceIT` uses test-only
+`PrivateModelCapture`. `target/real-preview-platform-*/private/model-wire/`
+contains 01-request.json / 01-result.json through at most 12 calls. Requests
+use the same production body serializer and retain exact bytes; results retain
+the complete application reply content and available usage, including illegal
+replies and transport failures. No headers or keys are captured; these private
+task texts must be reviewed before any export. Capture failure before dispatch
+stops without a request, and result-write failure preserves measured usage.
+No paid approval guard, runtime limit, retry, transport or proposal parser is
+changed. This prevents another paid failure being archived without its input.
