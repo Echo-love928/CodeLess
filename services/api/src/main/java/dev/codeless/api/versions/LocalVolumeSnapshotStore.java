@@ -74,14 +74,22 @@ public final class LocalVolumeSnapshotStore implements SnapshotStore {
         check(base, true);
         var entries = new ArrayList<Entry>();
         var names = new HashSet<String>();
-        long total = 0;
+        long total = 0; int visited = 0;
         try (var paths = Files.walk(base)) {
             var iterator = paths.iterator();
             while (iterator.hasNext()) {
                 Path file = iterator.next();
+                if (++visited > (source ? 45 : 4000)) throw new SnapshotFailure("SNAPSHOT_LIMIT_EXCEEDED");
                 check(file, Files.isDirectory(file, LinkOption.NOFOLLOW_LINKS));
-                if (Files.isDirectory(file, LinkOption.NOFOLLOW_LINKS)) continue;
                 String name = base.relativize(file).toString().replace('\\', '/');
+                if (Files.isDirectory(file, LinkOption.NOFOLLOW_LINKS)) {
+                    if (!name.isEmpty()) {
+                        if (source && !Set.of("src", "src/pages", "src/components", "src/data").contains(name))
+                            throw new SnapshotFailure("SNAPSHOT_PATH_REJECTED");
+                        if (!source) artifactPath(name);
+                    }
+                    continue;
+                }
                 if (source) sourcePath(name); else artifactPath(name);
                 if (!names.add(name.toLowerCase(Locale.ROOT))) throw new SnapshotFailure("SNAPSHOT_PATH_REJECTED");
                 byte[] bytes = read(file, source ? 131072 : 32 * 1024 * 1024);

@@ -31,9 +31,13 @@ Filesystem and PostgreSQL are not one transaction. A process crash or DB rollbac
 ```powershell
 . ./.local-data/d07-a/env.ps1
 $env:CODELESS_VERSION_EVIDENCE_DIR = Join-Path (Get-Location) 'tests/versions/evidence/2026-10-11'
+$env:CODELESS_MODEL_PROVIDER = 'deterministic-mock'
+Remove-Item Env:CODELESS_MODEL_API_KEY,Env:CODELESS_MODEL_NAME,Env:CODELESS_PLAYWRIGHT_CHANNEL -ErrorAction SilentlyContinue
 services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=LocalVolumeSnapshotStoreTest,VersionHttpIntegrationTest' test
 node --test tests/versions/contracts.test.mjs
 pnpm ci:gate
 ```
 
 The successful acceptance path uses explicitly named deterministic-mock proposals, real PostgreSQL, Docker and Chromium. Failed-worker fixture is explicitly named and does not claim a real failed build. Required D09/D10 failure and repair suites run in the API gate. No paid-model quality claim.
+
+`PreviewPlatformIntegrationTest` additionally reads the source/snapshot APIs after the existing actual authenticated platform iframe acceptance; the same `versionId`, build ID, source/artifact hashes and every source file hash must agree. `tests/versions/evidence/2026-10-11/preview-source-consistency.json` and the actual hash-checked PNG preserve this independent integration result. This does not claim D11-B UI acceptance.

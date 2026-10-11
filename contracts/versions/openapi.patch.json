@@ -19,7 +19,7 @@
         ],
         "security": [
           {
-            "SessionCookie": []
+            "sessionCookie": []
           }
         ],
         "parameters": [
@@ -61,7 +61,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "./response.schema.json#/$defs/list"
+                  "$ref": "./versions/response.schema.json#/$defs/list"
                 }
               }
             }
@@ -71,7 +71,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -81,7 +81,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -91,7 +91,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -101,7 +101,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -111,12 +111,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
           }
-        }
+        },
+        "summary": "List immutable application versions"
       }
     },
     "/api/v0/versions/{versionId}/files": {
@@ -138,7 +139,7 @@
         ],
         "security": [
           {
-            "SessionCookie": []
+            "sessionCookie": []
           }
         ],
         "parameters": [],
@@ -148,7 +149,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "./response.schema.json#/$defs/files"
+                  "$ref": "./versions/response.schema.json#/$defs/files"
                 }
               }
             }
@@ -158,7 +159,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -168,7 +169,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -178,7 +179,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -188,7 +189,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -198,12 +199,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
           }
-        }
+        },
+        "summary": "List read-only version source files"
       }
     },
     "/api/v0/versions/{versionId}/files/content": {
@@ -225,7 +227,7 @@
         ],
         "security": [
           {
-            "SessionCookie": []
+            "sessionCookie": []
           }
         ],
         "parameters": [
@@ -245,7 +247,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "./response.schema.json#/$defs/file"
+                  "$ref": "./versions/response.schema.json#/$defs/file"
                 }
               }
             }
@@ -255,7 +257,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -265,7 +267,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -275,7 +277,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -285,7 +287,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -295,12 +297,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
           }
-        }
+        },
+        "summary": "Read a source file from an immutable version"
       }
     },
     "/api/v0/versions/{versionId}/snapshot": {
@@ -322,7 +325,7 @@
         ],
         "security": [
           {
-            "SessionCookie": []
+            "sessionCookie": []
           }
         ],
         "parameters": [],
@@ -332,7 +335,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "./response.schema.json#/$defs/snapshot"
+                  "$ref": "./versions/response.schema.json#/$defs/snapshot"
                 }
               }
             }
@@ -342,7 +345,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -352,7 +355,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -362,7 +365,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -372,7 +375,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
@@ -382,12 +385,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "../schemas/v0/error.schema.json"
+                  "$ref": "./schemas/v0/error.schema.json"
                 }
               }
             }
           }
-        }
+        },
+        "summary": "Read version manifests and verification report"
       }
     }
   }
