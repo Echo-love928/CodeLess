@@ -17,10 +17,16 @@ async function fixture(run) {
   })
   await new Promise(done => server.listen(0, '127.0.0.1', done))
   const preload = join(directory, 'local-fetch.cjs'), trace = join(directory, 'trace.jsonl')
+  const lifecycleTrace = join(directory, 'lifecycle.jsonl')
   await writeFile(preload, `const fs=require('node:fs');const nativeFetch=globalThis.fetch;
-globalThis.fetch=async()=>{fs.appendFileSync(process.env.CODELESS_CLI_TEST_TRACE,'fetch\\n');return nativeFetch(process.env.CODELESS_CLI_TEST_ORIGIN)};`)
+const record=event=>{if(process.env.CODELESS_CLI_TEST_LIFECYCLE==='1')fs.appendFileSync(process.env.CODELESS_CLI_TEST_LIFECYCLE_TRACE,JSON.stringify(event)+'\\n')};
+let inBeforeExit=false;const emit=process.emit,exit=process.exit;
+process.emit=function(event,...args){if(event==='beforeExit'){inBeforeExit=true;record({event:'beforeExit',code:args[0]})}try{return emit.call(this,event,...args)}finally{if(event==='beforeExit')inBeforeExit=false}};
+process.exit=function(code){record({event:'forcedExit',code,inBeforeExit,caller:new Error().stack});return exit.call(this,code)};
+globalThis.fetch=async()=>{fs.appendFileSync(process.env.CODELESS_CLI_TEST_TRACE,'fetch\\n');try{return await nativeFetch(process.env.CODELESS_CLI_TEST_ORIGIN)}catch(error){record({event:'fetchRejected',message:error.message,cause:error.cause?.message});throw error}};`)
   const parent = { ...process.env, REDOCLY_SUPPRESS_UPDATE_NOTICE: 'true',
-    CODELESS_CLI_TEST_TRACE: trace, CODELESS_CLI_TEST_ORIGIN: 'http://127.0.0.1:' + server.address().port }
+    CODELESS_CLI_TEST_TRACE: trace, CODELESS_CLI_TEST_LIFECYCLE_TRACE: lifecycleTrace,
+    CODELESS_CLI_TEST_ORIGIN: 'http://127.0.0.1:' + server.address().port }
   delete parent.REDOCLY_TELEMETRY
   for (const name of ['CODELESS_MODEL_API_KEY', 'CODELESS_MODEL_NAME', 'CODELESS_M1_REAL_APPROVED']) delete parent[name]
   const execute = async (env, specification = 'contracts/openapi.v0.json') => {
@@ -38,14 +44,34 @@ globalThis.fetch=async()=>{fs.appendFileSync(process.env.CODELESS_CLI_TEST_TRACE
   finally { server.closeAllConnections(); await new Promise(done => server.close(done)); await rm(directory, { recursive: true, force: true }) }
 }
 
-test('locked Redocly default probe reaches the known Windows forced-exit failure path', { timeout: 20000 }, async () => {
+test('locked Redocly default probe rejects redirects then forces exit from beforeExit', { timeout: 20000 }, async context => {
   await fixture(async ({ execute, parent, hits }) => {
+    parent.CODELESS_CLI_TEST_LIFECYCLE = '1'
     const result = await execute(parent)
     assert.ok(hits.length > 0, 'the actual CLI performed its optional probe')
     assert.match(result.stdout + result.stderr, /API description is valid/)
-    if (process.platform === 'win32') {
-      assert.equal(result.code, 3221226505); assert.match(result.stderr, /UV_HANDLE_CLOSING/)
-    } else { assert.equal(result.code, 0, result.stderr) }
+    const events = (await readFile(parent.CODELESS_CLI_TEST_LIFECYCLE_TRACE, 'utf8')).trim().split('\n').map(JSON.parse)
+    const rejected = events.findIndex(event => event.event === 'fetchRejected')
+    const beforeExit = events.findIndex(event => event.event === 'beforeExit')
+    const forcedExit = events.findIndex(event => event.event === 'forcedExit')
+    assert.ok(rejected >= 0, 'the real loopback redirect probe must reject')
+    assert.equal(events[rejected].cause, 'redirect count exceeded')
+    assert.ok(beforeExit > rejected, 'the CLI reaches beforeExit after the rejected probe')
+    assert.ok(forcedExit > beforeExit, 'the CLI actually invokes process.exit in beforeExit')
+    assert.equal(events[forcedExit].inBeforeExit, true)
+    assert.equal(events[forcedExit].code, 0)
+    assert.match(events[forcedExit].caller, /@redocly[\\/]cli[\\/]lib[\\/]index\.js/)
+    assert.equal(result.signal, null)
+    // The fault-triggering call chain is mandatory. Native teardown timing is an
+    // observation: previous identical invocations produced both exits on Windows.
+    if (process.platform === 'win32' && result.code === 3221226505) {
+      assert.match(result.stderr, /UV_HANDLE_CLOSING/)
+      context.diagnostic('Actual forced-exit path: native UV_HANDLE_CLOSING crash, exit 3221226505')
+    } else {
+      assert.equal(result.code, 0, result.stderr)
+      assert.doesNotMatch(result.stderr, /UV_HANDLE_CLOSING/)
+      context.diagnostic('Actual forced-exit path: exit 0; native crash NOT_OBSERVED in this invocation')
+    }
   })
 })
 
