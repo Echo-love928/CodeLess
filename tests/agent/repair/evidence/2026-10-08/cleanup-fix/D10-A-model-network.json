@@ -1,0 +1,218 @@
+{
+  "task": {
+    "id": "1e38dc62-4143-4666-b622-cf629e4106aa",
+    "applicationId": "2b402b0d-329e-45b1-ae4d-2383e5fa7caf",
+    "prompt": "生成 Ada Lovelace 静态个人展示页",
+    "status": "FAILED",
+    "repairAttempts": 1,
+    "failureCode": "MODEL_NETWORK",
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-08T08:36:17.425052Z"
+  },
+  "budget": {
+    "models": 5,
+    "tools": 5,
+    "chargedTokens": 11055
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "codeEditsAfterNetworkFailure": 0
+  },
+  "candidates": [
+    {
+      "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+      "versionId": "7bff99da-a066-4589-a2ce-d255ad73333a",
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 137,
+          "digest": "sha256:2bb84476d299cb9aae768121e3b99f4e6554b4595e56f87b9d37cb3356234870"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-model-network/candidate-0",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ]
+    }
+  ],
+  "runners": [
+    {
+      "status": "FAILED",
+      "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+      "build": {
+        "id": "92399424-4521-4be5-bf5c-0940c2b12a12",
+        "imageId": "sha256:dd6953e8ff36cc25fca92d35ae8a22982831060de442ed77f04eef53a7532cf4",
+        "containerName": "codeless-build-92399424-4521-4be5-bf5c-0940c2b12a12",
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 2,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/MissingCard.vue' or its corresponding type declarations.\n",
+          "bytes": 230,
+          "observedBytes": 230,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-08T08:36:13.101Z",
+        "completedAt": "2026-10-08T08:36:16.848Z"
+      },
+      "verification": null,
+      "executionId": "69a34ea2-07a4-42a0-acb9-bfc9742aa3f5"
+    }
+  ],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "reservationTokens": 9250,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "releasedTokens": 9202,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 48,
+      "estimated": false
+    },
+    {
+      "stage": "GENERATE",
+      "reservationTokens": 12604,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "releasedTokens": 12556,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 48,
+      "estimated": false
+    },
+    {
+      "stage": "GENERATE",
+      "reservationTokens": 13078,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "releasedTokens": 13030,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 48,
+      "estimated": false
+    },
+    {
+      "stage": "GENERATE",
+      "reservationTokens": 13682,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "releasedTokens": 13634,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 48,
+      "estimated": false
+    },
+    {
+      "stage": "REPAIR",
+      "reservationTokens": 10863,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      },
+      "releasedTokens": 0,
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "chargedTokens": 10863,
+      "estimated": true
+    }
+  ],
+  "decisions": [
+    {
+      "taskId": "1e38dc62-4143-4666-b622-cf629e4106aa",
+      "at": "2026-10-08T08:36:11.418056600Z",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "stage": "PLAN",
+      "sequence": 5,
+      "kind": "stage.finished"
+    },
+    {
+      "taskId": "1e38dc62-4143-4666-b622-cf629e4106aa",
+      "at": "2026-10-08T08:36:12.687204Z",
+      "payload": {
+        "next": "VERIFY"
+      },
+      "stage": "GENERATE",
+      "sequence": 21,
+      "kind": "stage.finished"
+    },
+    {
+      "taskId": "1e38dc62-4143-4666-b622-cf629e4106aa",
+      "at": "2026-10-08T08:36:17.061386Z",
+      "payload": {
+        "code": "AGENT_BUILD_EXIT",
+        "category": "CODE",
+        "fingerprint": "sha256:8ba9982c7fcbe5e6d5221f8ac6b6b56e65eb55698bfaf2923731a178233a0bfb",
+        "diagnostic": "> @codeless/generated-vue@0.1.0 build\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/MissingCard.vue' or its corresponding type declarations.",
+        "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+        "repairAttempts": 0,
+        "decision": "REPAIR"
+      },
+      "stage": "VERIFY",
+      "sequence": 24,
+      "kind": "repair.failure"
+    },
+    {
+      "taskId": "1e38dc62-4143-4666-b622-cf629e4106aa",
+      "at": "2026-10-08T08:36:17.107262400Z",
+      "payload": {
+        "next": "REPAIR"
+      },
+      "stage": "VERIFY",
+      "sequence": 25,
+      "kind": "stage.finished"
+    },
+    {
+      "taskId": "1e38dc62-4143-4666-b622-cf629e4106aa",
+      "at": "2026-10-08T08:36:17.417038200Z",
+      "payload": {
+        "code": "MODEL_NETWORK",
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+        "category": "MODEL_INTERFACE"
+      },
+      "stage": "REPAIR",
+      "sequence": 28,
+      "kind": "failure"
+    }
+  ]
+}

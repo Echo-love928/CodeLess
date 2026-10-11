@@ -1,0 +1,71 @@
+$ node scripts/ci-gate.mjs
+
+[ci-gate] verify:static
+$ node scripts/run-static.mjs
+version check passed: Node 24.16.0, pnpm 12.6.0; Java/Spring/Maven locks consistent
+application: valid accepted; invalid rejected
+task: valid accepted; invalid rejected
+event: valid accepted; invalid rejected
+build: valid accepted; invalid rejected
+version: valid accepted; invalid rejected
+publication: valid accepted; invalid rejected
+task-diagnostics: valid accepted; invalid rejected
+preview-credential: valid accepted; invalid rejected
+OpenAPI surface and authentication boundary passed
+build: valid accepted; invalid rejected
+version: valid accepted; invalid rejected
+runner contract boundary passed
+application: valid accepted; invalid rejected
+task: valid accepted; invalid rejected
+event: valid accepted; invalid rejected
+build: valid accepted; invalid rejected
+version: valid accepted; invalid rejected
+publication: valid accepted; invalid rejected
+task-diagnostics: valid accepted; invalid rejected
+preview-credential: valid accepted; invalid rejected
+cross-resource READY/publication flow passed
+✔ scoped patch preserves authentication, path identity and every unrelated operation (2.644ms)
+✔ wire cursor schema rejects UUIDs, padding, signs and int32 overflow; page limits are bounded (2.8602ms)
+✔ documented wire examples match the existing event schema and separate comments/errors from persisted IDs (6.829ms)
+✔ pre-stream errors remain JSON and validate their actual codes with the shared error envelope (8.9898ms)
+✔ shared task create contract preserves CSRF and bounds application-scoped idempotency keys (25.5269ms)
+✔ shared cancel contract has owner identity, CSRF and real terminal task response (0.5311ms)
+✔ structured diagnostics contract distinguishes absent, empty and actual metadata and rejects unsafe paths/false build success (12.983ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 223.8804
+
+    ╔═══════════════════════════════════════════════════════╗
+    ║                                                       ║
+    ║  A new version of Redocly CLI (2.60.0) is available.  ║
+    ║  Update now: `npm i -g @redocly/cli@latest`.          ║
+    ║  Changelog: https://redocly.com/docs/cli/changelog/   ║
+    ║                                                       ║
+    ╚═══════════════════════════════════════════════════════╝
+
+No configurations were provided -- using built in recommended configuration by default.
+
+validating contracts\openapi.v0.json...
+contracts\openapi.v0.json: validated in 61ms
+
+Woohoo! Your API description is valid. 🎉
+
+Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 94
+[ELIFECYCLE] Command failed with exit code -1073740791.
+
+[ci-gate] verify:static
+[ELIFECYCLE] Command failed with exit code -1073740791.
+[ci-gate] verify:api
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 94.93 s -- in dev.codeless.api.agent.RepairLoopIntegrationTest
+[ERROR] Tests run: 123, Failures: 0, Errors: 1, Skipped: 0
+[ELIFECYCLE] Command failed with exit code 1.
+[ci-gate] verify:runner
+[ci-gate] verify:e2e
+  33 passed (41.9s)
+[ci-gate] failed with exit code 3221226505
+[ELIFECYCLE] Command failed with exit code -1073740791.

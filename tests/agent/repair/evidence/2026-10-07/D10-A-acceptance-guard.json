@@ -1,0 +1,218 @@
+{
+  "task": {
+    "id": "7fe165f1-b520-4e0a-b26e-e426f6e6f1ac",
+    "applicationId": "e37cf7ed-0d29-4650-aebc-bb82f5414c83",
+    "prompt": "生成 Ada Lovelace 静态个人展示页",
+    "status": "FAILED",
+    "repairAttempts": 1,
+    "failureCode": "AGENT_REPAIR_ACCEPTANCE_CHANGED",
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-07T07:08:44.170778Z"
+  },
+  "budget": {
+    "models": 5,
+    "tools": 5,
+    "chargedTokens": 240
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "weakenedActionsAccepted": false
+  },
+  "candidates": [
+    {
+      "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "PRIVATE_PATH_RETAINED_LOCALLY"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-acceptance-guard/candidate-0",
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 137,
+          "digest": "sha256:2bb84476d299cb9aae768121e3b99f4e6554b4595e56f87b9d37cb3356234870"
+        }
+      ],
+      "versionId": "2739abe0-df89-4b02-8073-491f0b7ef66e"
+    }
+  ],
+  "runners": [
+    {
+      "status": "FAILED",
+      "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+      "build": {
+        "id": "6c70a815-538a-4b1a-a5cc-6f57b241dccd",
+        "imageId": "sha256:b7760062f2e95473864cd30b7376c3244afea6aaa950f27330b0e0e0dd6ae298",
+        "containerName": "codeless-build-6c70a815-538a-4b1a-a5cc-6f57b241dccd",
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 2,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/MissingCard.vue' or its corresponding type declarations.\n",
+          "bytes": 230,
+          "observedBytes": 230,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-07T07:08:39.967Z",
+        "completedAt": "2026-10-07T07:08:43.391Z"
+      },
+      "verification": null,
+      "executionId": "824f1cba-4eaa-46d5-85b7-6e2108f5512f"
+    }
+  ],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 9250,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 9202
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 12187,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 12139
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 12661,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 12613
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 13265,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 13217
+    },
+    {
+      "stage": "REPAIR",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 10339,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 10291
+    }
+  ],
+  "decisions": [
+    {
+      "taskId": "7fe165f1-b520-4e0a-b26e-e426f6e6f1ac",
+      "kind": "stage.finished",
+      "sequence": 5,
+      "stage": "PLAN",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T07:08:38.366031300Z"
+    },
+    {
+      "taskId": "7fe165f1-b520-4e0a-b26e-e426f6e6f1ac",
+      "kind": "stage.finished",
+      "sequence": 21,
+      "stage": "GENERATE",
+      "payload": {
+        "next": "VERIFY"
+      },
+      "at": "2026-10-07T07:08:39.582243300Z"
+    },
+    {
+      "taskId": "7fe165f1-b520-4e0a-b26e-e426f6e6f1ac",
+      "kind": "repair.failure",
+      "sequence": 24,
+      "stage": "VERIFY",
+      "payload": {
+        "code": "AGENT_BUILD_EXIT",
+        "category": "CODE",
+        "fingerprint": "sha256:8ba9982c7fcbe5e6d5221f8ac6b6b56e65eb55698bfaf2923731a178233a0bfb",
+        "diagnostic": "> @codeless/generated-vue@0.1.0 build\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/MissingCard.vue' or its corresponding type declarations.",
+        "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+        "repairAttempts": 0,
+        "decision": "REPAIR"
+      },
+      "at": "2026-10-07T07:08:43.676240300Z"
+    },
+    {
+      "taskId": "7fe165f1-b520-4e0a-b26e-e426f6e6f1ac",
+      "kind": "stage.finished",
+      "sequence": 25,
+      "stage": "VERIFY",
+      "payload": {
+        "next": "REPAIR"
+      },
+      "at": "2026-10-07T07:08:43.727137900Z"
+    },
+    {
+      "taskId": "7fe165f1-b520-4e0a-b26e-e426f6e6f1ac",
+      "kind": "failure",
+      "sequence": 29,
+      "stage": "REPAIR",
+      "payload": {
+        "code": "AGENT_REPAIR_ACCEPTANCE_CHANGED",
+        "category": "INFRASTRUCTURE",
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY"
+      },
+      "at": "2026-10-07T07:08:44.155612400Z"
+    }
+  ]
+}

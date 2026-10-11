@@ -1,0 +1,281 @@
+{
+  "task": {
+    "id": "57776370-dd0b-4ed7-9931-cf6ff55e9ec4",
+    "applicationId": "79237023-eee6-45b9-8780-166b461d34ce",
+    "prompt": "生成 Ada Lovelace 个人展示页，静态数据展示姓名、简短介绍及两件作品：Analytical Engine 和 Note G。恰好两个文件：src/pages/HomePage.vue、src/components/ProfileCard.vue。先读取依赖源码，保持组件接口和页面数据类型一致。不要外部图片或请求。",
+    "status": "FAILED",
+    "repairAttempts": 0,
+    "failureCode": "AGENT_MODEL_PROTOCOL_INVALID",
+    "createdAt": "2026-10-07T10:56:08.111419Z",
+    "updatedAt": "2026-10-07T10:56:15.140971Z"
+  },
+  "budget": {
+    "models": 4,
+    "tools": 2,
+    "chargedTokens": 10101
+  },
+  "modelProvider": "deepseek",
+  "modelQualityEvidence": false,
+  "extra": {
+    "M1": "NOT_PASSED",
+    "modelCalls": [
+      {
+        "id": "b395c1b3-15bb-4660-aca7-07508db3f381",
+        "stage": "PLAN",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 1276,
+        "outputTokens": 293
+      },
+      {
+        "id": "183c0682-4306-4809-8847-bb69d0c1c64e",
+        "stage": "GENERATE",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 2324,
+        "outputTokens": 443
+      },
+      {
+        "id": "202b54b5-5fe0-4c4b-b890-18bdde1d498c",
+        "stage": "GENERATE",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 2536,
+        "outputTokens": 23
+      },
+      {
+        "id": "b339a5b5-b2c2-4b10-a9ff-5c1eedc0ee1a",
+        "stage": "GENERATE",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "inputTokens": 3200,
+        "outputTokens": 6
+      }
+    ],
+    "allModelStagesReal": true,
+    "controlledFaultInjected": 0,
+    "acceptance": {},
+    "faultOrigin": "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR"
+  },
+  "fault": null,
+  "candidates": [],
+  "runners": [],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "chargedTokens": 1569,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 7953,
+      "usage": {
+        "inputTokens": 1276,
+        "outputTokens": 293,
+        "totalTokens": 1569,
+        "raw": {
+          "prompt_tokens": 1276,
+          "completion_tokens": 293,
+          "total_tokens": 1569,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 252
+        }
+      },
+      "reservationTokens": 9522,
+      "estimated": false
+    },
+    {
+      "stage": "GENERATE",
+      "chargedTokens": 2767,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 10221,
+      "usage": {
+        "inputTokens": 2324,
+        "outputTokens": 443,
+        "totalTokens": 2767,
+        "raw": {
+          "prompt_tokens": 2324,
+          "completion_tokens": 443,
+          "total_tokens": 2767,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 1556
+        }
+      },
+      "reservationTokens": 12988,
+      "estimated": false
+    },
+    {
+      "stage": "GENERATE",
+      "chargedTokens": 2559,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 10905,
+      "usage": {
+        "inputTokens": 2536,
+        "outputTokens": 23,
+        "totalTokens": 2559,
+        "raw": {
+          "prompt_tokens": 2536,
+          "completion_tokens": 23,
+          "total_tokens": 2559,
+          "prompt_tokens_details": {
+            "cached_tokens": 2304
+          },
+          "prompt_cache_hit_tokens": 2304,
+          "prompt_cache_miss_tokens": 232
+        }
+      },
+      "reservationTokens": 13464,
+      "estimated": false
+    },
+    {
+      "stage": "GENERATE",
+      "chargedTokens": 3206,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 11904,
+      "usage": {
+        "inputTokens": 3200,
+        "outputTokens": 6,
+        "totalTokens": 3206,
+        "raw": {
+          "prompt_tokens": 3200,
+          "completion_tokens": 6,
+          "total_tokens": 3206,
+          "prompt_tokens_details": {
+            "cached_tokens": 2432
+          },
+          "prompt_cache_hit_tokens": 2432,
+          "prompt_cache_miss_tokens": 768
+        }
+      },
+      "reservationTokens": 15110,
+      "estimated": false
+    }
+  ],
+  "protocolResponses": [
+    {
+      "stage": "PLAN",
+      "payload": {
+        "schemaVersion": 1,
+        "template": "VUE",
+        "dataMode": "STATIC",
+        "pages": [
+          {
+            "route": "/",
+            "file": "src/pages/HomePage.vue",
+            "title": "Ada Lovelace",
+            "purpose": "Profile showcase page presenting Ada Lovelace's name, short bio, and two works using local static data."
+          }
+        ],
+        "components": [
+          {
+            "name": "ProfileCard",
+            "file": "src/components/ProfileCard.vue",
+            "purpose": "Reusable card component displaying a name, short introduction, and a list of works passed in as props."
+          }
+        ],
+        "files": [
+          {
+            "path": "src/pages/HomePage.vue",
+            "purpose": "Imports ProfileCard and renders it with a static profile object containing name, intro, and the two works."
+          },
+          {
+            "path": "src/components/ProfileCard.vue",
+            "purpose": "Accepts name, intro, and works props and renders them as a styled card."
+          }
+        ],
+        "acceptance": [
+          {
+            "id": "A1",
+            "route": "/",
+            "action": "Open / and inspect the page heading and profile content.",
+            "expected": "Ada Lovelace's name and a short introduction are visible on the page."
+          },
+          {
+            "id": "A2",
+            "route": "/",
+            "action": "Inspect the works list rendered inside the ProfileCard on /.",
+            "expected": "Exactly two works are listed: Analytical Engine and Note G."
+          }
+        ],
+        "capabilities": {
+          "backend": false,
+          "payments": false,
+          "externalServices": [],
+          "dependencies": []
+        }
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.create",
+        "arguments": {
+          "path": "src/components/ProfileCard.vue",
+          "content": "<script setup lang=\"ts\">\ninterface Work {\n  id: string;\n  title: string;\n  summary: string;\n}\n\ndefineProps<{\n  name: string;\n  intro: string;\n  works: Work[];\n}>();\n</script>\n\n<template>\n  <section class=\"profile-card\">\n    <h1 data-testid=\"profile-name\">{{ name }}</h1>\n    <p data-testid=\"profile-intro\">{{ intro }}</p>\n    <h2 data-testid=\"works-heading\">Works</h2>\n    <ul class=\"works\">\n      <li v-for=\"work in works\" :key=\"work.id\" :data-testid=\"`work-${work.id}`\">\n        <h3 data-testid=\"work-title\">{{ work.title }}</h3>\n        <p data-testid=\"work-summary\">{{ work.summary }}</p>\n      </li>\n    </ul>\n  </section>\n</template>\n\n<style scoped>\n.profile-card {\n  max-width: 40rem;\n  margin: 0 auto;\n  padding: 1.5rem;\n  border: 1px solid #d0d7de;\n  border-radius: 8px;\n  font-family: system-ui, sans-serif;\n}\n\n.works {\n  list-style: none;\n  padding: 0;\n  margin: 0;\n}\n\n.works li {\n  padding: 0.75rem 0;\n  border-top: 1px solid #eaeef2;\n}\n\n.works h3 {\n  margin: 0 0 0.25rem;\n}\n\n.works p {\n  margin: 0;\n}\n</style>\n"
+        }
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/components/ProfileCard.vue"
+        }
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "type": "json_object"
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "stage": "PLAN",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T10:56:10.271625800Z",
+      "taskId": "57776370-dd0b-4ed7-9931-cf6ff55e9ec4",
+      "kind": "stage.finished",
+      "sequence": 5
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "category": "MODEL_INTERFACE",
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+        "code": "AGENT_MODEL_PROTOCOL_INVALID"
+      },
+      "at": "2026-10-07T10:56:15.128269300Z",
+      "taskId": "57776370-dd0b-4ed7-9931-cf6ff55e9ec4",
+      "kind": "failure",
+      "sequence": 19
+    }
+  ],
+  "measuredUsage": {
+    "attempts": 4,
+    "knownAttempts": 4,
+    "unknownAttempts": 0,
+    "inputTokens": 9336,
+    "outputTokens": 765,
+    "completeTotalTokens": 10101
+  },
+  "historicalEvidencePreserved": [
+    "tests/agent/repair/evidence/2026-10-07/D10-A-real-repair.json",
+    "tests/agent/repair/evidence/2026-10-07/D10-A-real-repair-confirm.json",
+    "tests/agent/repair/evidence/2026-10-07/D10-A-local-api-failure.json",
+    "tests/agent/repair/evidence/2026-10-07/followup.json"
+  ]
+}

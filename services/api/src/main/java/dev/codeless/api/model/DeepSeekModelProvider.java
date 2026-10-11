@@ -46,16 +46,28 @@ public final class DeepSeekModelProvider implements ModelProvider {
     public String id() { return "deepseek"; }
     public String model() { return model; }
 
+    String requestBody(Prompt prompt,int maxOutputTokens) {
+        var messages = prompt.getInstructions().stream().map(message -> Map.of(
+                "role", message.getMessageType().name().toLowerCase(java.util.Locale.ROOT),
+                "content", message.getText())).toList();
+        return mapper.writeValueAsString(Map.of("model", model, "messages", messages,
+                "max_tokens", maxOutputTokens, "stream", false, "response_format", Map.of("type", "json_object"),
+                "thinking", Map.of("type", "disabled")));
+    }
+    @Override public Map<String,Object> requestMetadata(Prompt prompt,int maxOutputTokens) {
+        byte[] bytes=requestBody(prompt,maxOutputTokens).getBytes(StandardCharsets.UTF_8);
+        try {
+            return Map.of("kind","DEEPSEEK_CHAT_JSON_V1","bodyDigest","sha256:"+java.util.HexFormat.of().formatHex(
+                    java.security.MessageDigest.getInstance("SHA-256").digest(bytes)),"bodyBytes",bytes.length,
+                    "responseFormat","json_object","maxOutputTokens",maxOutputTokens,"stream",false,"thinking","disabled");
+        } catch(java.security.NoSuchAlgorithmException impossible){throw new ModelFailure("MODEL_CONFIGURATION");}
+    }
+
     public Reply call(Prompt prompt, int maxOutputTokens, Duration timeout) {
         if (maxOutputTokens < 256 || maxOutputTokens > 4096 || timeout.isNegative()
                 || timeout.toMillis() < 1 || timeout.compareTo(Duration.ofSeconds(120)) > 0)
             throw new ModelFailure("MODEL_INVALID_INPUT");
-        var messages = prompt.getInstructions().stream().map(message -> Map.of(
-                "role", message.getMessageType().name().toLowerCase(java.util.Locale.ROOT),
-                "content", message.getText())).toList();
-        String body = mapper.writeValueAsString(Map.of("model", model, "messages", messages,
-                "max_tokens", maxOutputTokens, "stream", false, "response_format", Map.of("type", "json_object"),
-                "thinking", Map.of("type", "disabled")));
+        String body=requestBody(prompt,maxOutputTokens);
         var received = new AtomicReference<>(new ResponseHead(null, Evidence.unknown()));
         CompletableFuture<HttpResponse<byte[]>> pending;
         try {

@@ -1,0 +1,1 @@
+<template><section><h1 data-testid="profile-name">Ada Lovelace</h1><p>静态个人资料与作品</p></section></template>

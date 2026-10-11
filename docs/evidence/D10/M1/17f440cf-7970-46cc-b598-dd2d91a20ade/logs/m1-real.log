@@ -1,0 +1,169 @@
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ---------------------< dev.codeless:codeless-api >----------------------
+[INFO] Building codeless-api 0.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-toolchain) @ codeless-api ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireJavaVersion passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.version.RequireMavenVersion passed
+[INFO]
+[INFO] --- resources:3.5.0:resources (default-resources) @ codeless-api ---
+[INFO] Copying 6 resources from src\main\resources to target\classes
+[INFO] Copying 1 resource from ..\..\contracts\tools to target\classes\tools
+[INFO] Copying 2 resources from ..\..\contracts\plan to target\classes\model\plan
+[INFO] Copying 5 resources from ..\..\prompts\runtime to target\classes\model\prompts
+[INFO]
+[INFO] --- compiler:3.15.0:compile (default-compile) @ codeless-api ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ codeless-api ---
+[INFO] Copying 2 resources from src\test\resources to target\test-classes
+[INFO]
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ codeless-api ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- surefire:3.5.6:test (default-test) @ codeless-api ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running dev.codeless.api.preview.RealRepairPreviewPlatformAcceptanceIT
+17:12:14.242 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration dev.codeless.api.CodeLessApiApplication for test class dev.codeless.api.preview.RealRepairPreviewPlatformAcceptanceIT
+17:12:14.329 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [dev.codeless.api.preview.RealPreviewPlatformAcceptanceIT]: RealPreviewPlatformAcceptanceIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+17:12:14.332 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration dev.codeless.api.CodeLessApiApplication for test class dev.codeless.api.preview.RealRepairPreviewPlatformAcceptanceIT
+17:12:14.396 [main] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+17:12:14.398 [main] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+17:12:14.440 [main] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 2.0.5
+17:12:14.660 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.NpipeSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+17:12:15.063 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Npipe socket (npipe:////./pipe/docker_engine)
+17:12:15.063 [main] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+17:12:15.081 [main] INFO org.testcontainers.DockerClientFactory -- Connected to docker:
+  Server Version: 29.8.0
+  API Version: 1.56
+  Operating System: Docker Desktop
+  Total Memory: 11852 MB
+  Labels:
+    com.docker.desktop.address=npipe://\\.\pipe\docker_cli
+17:12:15.089 [main] WARN org.testcontainers.utility.ConfigurationFileImageNameSubstitutor -- Image name testcontainers/ryuk:0.14.0 was substituted by configuration to testcontainers/ryuk:0.14.0@sha256:7c1a8a9a47c780ed0f983770a662f80deb115d95cce3e2daa3d12115b8cd28f0. This approach is deprecated and will be removed in the future
+17:12:15.089 [main] INFO org.testcontainers.utility.ImageNameSubstitutor -- Using testcontainers/ryuk:0.14.0@sha256:7c1a8a9a47c780ed0f983770a662f80deb115d95cce3e2daa3d12115b8cd28f0 as a substitute image for testcontainers/ryuk:0.14.0 (using image substitutor: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor'))
+17:12:15.207 [main] INFO tc.testcontainers/ryuk:0.14.0@sha256:7c1a8a... -- Creating container for image: testcontainers/ryuk:0.14.0@sha256:7c1a8a9a47c780ed0f983770a662f80deb115d95cce3e2daa3d12115b8cd28f0
+17:12:15.330 [main] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-desktop) does not have credentials for https://index.docker.io/v1/
+17:12:15.499 [main] INFO tc.testcontainers/ryuk:0.14.0@sha256:7c1a8a... -- Container testcontainers/ryuk:0.14.0@sha256:7c1a8a9a47c780ed0f983770a662f80deb115d95cce3e2daa3d12115b8cd28f0 is starting: 036f9c70702d7aa8580dce3b6d05045cb9f6e291e5699d079578993cad868187
+17:12:15.850 [main] INFO tc.testcontainers/ryuk:0.14.0@sha256:7c1a8a... -- Container testcontainers/ryuk:0.14.0@sha256:7c1a8a9a47c780ed0f983770a662f80deb115d95cce3e2daa3d12115b8cd28f0 started in PT0.6427995S
+17:12:15.856 [main] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+17:12:15.856 [main] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+17:12:15.857 [main] INFO org.testcontainers.DockerClientFactory -- ?? Docker server version should be at least 1.6.0
+17:12:15.892 [main] INFO tc.postgres:17.6-alpine@sha256:ef257d... -- Creating container for image: postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+17:12:16.003 [main] INFO tc.postgres:17.6-alpine@sha256:ef257d... -- Container postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94 is starting: e88e265ada26668aae864f6816a71bf33aff5bf3b841413286605a32600d1979
+17:12:18.269 [main] INFO tc.postgres:17.6-alpine@sha256:ef257d... -- Container postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94 started in PT2.3775964S
+17:12:18.270 [main] INFO tc.postgres:17.6-alpine@sha256:ef257d... -- Container is started (JDBC URL: jdbc:postgresql://localhost:61040/real_preview_platform?loggerLevel=OFF)
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-10T17:12:23.432+08:00  INFO 63156 --- [codeless-api] [           main] .p.RealRepairPreviewPlatformAcceptanceIT : Starting RealRepairPreviewPlatformAcceptanceIT using Java 21.0.12.1 with PID 63156 (started by 12058 in [PRIVATE_REPOSITORY]\services\api)
+2026-10-10T17:12:23.434+08:00  INFO 63156 --- [codeless-api] [           main] .p.RealRepairPreviewPlatformAcceptanceIT : The following 1 profile is active: "test"
+2026-10-10T17:12:24.719+08:00  INFO 63156 --- [codeless-api] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-10T17:12:24.734+08:00  INFO 63156 --- [codeless-api] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-10T17:12:24.734+08:00  INFO 63156 --- [codeless-api] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-10T17:12:24.834+08:00  INFO 63156 --- [codeless-api] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1382 ms
+2026-10-10T17:12:25.023+08:00  INFO 63156 --- [codeless-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-10T17:12:25.158+08:00  INFO 63156 --- [codeless-api] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@43dddfdd
+2026-10-10T17:12:25.159+08:00  INFO 63156 --- [codeless-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-10T17:12:25.193+08:00  INFO 63156 --- [codeless-api] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:61040/real_preview_platform?loggerLevel=OFF (PostgreSQL 17.6)
+2026-10-10T17:12:25.263+08:00  INFO 63156 --- [codeless-api] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-10T17:12:25.266+08:00  INFO 63156 --- [codeless-api] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 4 migrations (execution time 00:00.023s)
+2026-10-10T17:12:25.287+08:00  INFO 63156 --- [codeless-api] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-10T17:12:25.349+08:00  INFO 63156 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-10T17:12:25.371+08:00  INFO 63156 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - platform data"
+2026-10-10T17:12:25.454+08:00  INFO 63156 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - authentication"
+2026-10-10T17:12:25.475+08:00  INFO 63156 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - task queue"
+2026-10-10T17:12:25.501+08:00  INFO 63156 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - task file snapshots"
+2026-10-10T17:12:25.519+08:00  INFO 63156 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 4 migrations to schema "public", now at version v4 (execution time 00:00.089s)
+2026-10-10T17:12:26.162+08:00  INFO 63156 --- [codeless-api] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 57415 (http) with context path '/'
+2026-10-10T17:12:26.169+08:00  INFO 63156 --- [codeless-api] [           main] o.s.s.config.TaskSchedulerRouter         : No TaskScheduler/ScheduledExecutorService bean found for scheduled processing
+2026-10-10T17:12:26.177+08:00  INFO 63156 --- [codeless-api] [           main] .p.RealRepairPreviewPlatformAcceptanceIT : Started RealRepairPreviewPlatformAcceptanceIT in 3.045 seconds (process running for 12.79)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically ([PRIVATE_USER]\.m2\repository\net\bytebuddy\byte-buddy-agent\1.18.11\byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-10-10T17:12:29.802+08:00  INFO 63156 --- [codeless-api] [o-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-10T17:12:29.803+08:00  INFO 63156 --- [codeless-api] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-10T17:12:29.804+08:00  INFO 63156 --- [codeless-api] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 49.89 s <<< FAILURE! -- in dev.codeless.api.preview.RealRepairPreviewPlatformAcceptanceIT
+[ERROR] dev.codeless.api.preview.RealRepairPreviewPlatformAcceptanceIT.realModelThroughAuthenticatedPlatformPreview -- Time elapsed: 37.49 s <<< FAILURE!
+org.opentest4j.AssertionFailedError:
+[node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Generation failed: AGENT_MODEL_PROTOCOL_INVALID
+    at file:///[PRIVATE_REPOSITORY]/tests/e2e/generation/m1-platform.acceptance.mjs:85:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'FAILED',
+  expected: 'FAILED',
+  operator: 'notStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.16.0
+]
+expected: 0
+ but was: 1
+	at dev.codeless.api.preview.RealPreviewPlatformAcceptanceIT.realModelThroughAuthenticatedPlatformPreview(RealPreviewPlatformAcceptanceIT.java:80)
+	at dev.codeless.api.preview.RealRepairPreviewPlatformAcceptanceIT.realModelThroughAuthenticatedPlatformPreview(RealRepairPreviewPlatformAcceptanceIT.java:35)
+
+[INFO]
+[INFO] Results:
+[INFO]
+[ERROR] Failures:
+[ERROR]   RealRepairPreviewPlatformAcceptanceIT.realModelThroughAuthenticatedPlatformPreview:35->RealPreviewPlatformAcceptanceIT.realModelThroughAuthenticatedPlatformPreview:80 [node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Generation failed: AGENT_MODEL_PROTOCOL_INVALID
+    at file:///[PRIVATE_REPOSITORY]/tests/e2e/generation/m1-platform.acceptance.mjs:85:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'FAILED',
+  expected: 'FAILED',
+  operator: 'notStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.16.0
+]
+expected: 0
+ but was: 1
+[INFO]
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  53.520 s
+[INFO] Finished at: 2026-10-10T17:13:04+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.6:test (default-test) on project codeless-api: There are test failures.
+[ERROR]
+[ERROR] See [PRIVATE_REPOSITORY]\services\api\target\surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

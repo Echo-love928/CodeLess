@@ -1,0 +1,248 @@
+{
+  "task": "D10-A",
+  "baseline": "7c3a502ce34db66c64b06d8dd21293e3b92ae05a",
+  "reviewedCandidate": "2e26b30f936db718389512c1802775507b7fca1c",
+  "pr": "https://github.com/Echo-love928/CodeLess/pull/26",
+  "peerReview": {
+    "url": "https://github.com/Echo-love928/CodeLess/pull/26#pullrequestreview-5450903393",
+    "state": "COMMENTED",
+    "submittedAt": "2026-10-08T03:09:57Z",
+    "independentTests": 36,
+    "exitCode": 0,
+    "source": "B_REPORTED; review read, raw local package unavailable here",
+    "approval": false
+  },
+  "historical504": {
+    "taskId": "291be524-7417-4b96-820f-a03f26ac6b85",
+    "endpoint": "/api/v0/auth/csrf",
+    "requestElapsedMs": 18399,
+    "responseElapsedMs": 78461,
+    "durationMs": 60062,
+    "status": 504,
+    "evidenceSource": "B_VERIFIED_AND_REPORTED; LOCAL_RAW_PACKAGE_NOT_AVAILABLE",
+    "reportedDigest": "sha256:d65ef4840317bbf78fae5ca91f7f0931f0018485fc85822130bcd848b79a775b",
+    "truncated": false,
+    "requestStartedAt": null,
+    "responseAt": null,
+    "apiGatewayCorrelationId": null,
+    "serverLogs": "NOT_AVAILABLE",
+    "rootCause": "UNKNOWN"
+  },
+  "runs": [
+    {
+      "label": "first",
+      "models": 7,
+      "modelQualityEvidence": false,
+      "firstBuildExit": 2,
+      "lastBrowser": "PASSED",
+      "tools": 12,
+      "taskId": "cac663f5-2b78-48bd-a9fd-f047abaa10cd",
+      "sourceDigests": [
+        "sha256:b53d561f55bb14832db3051b71cdb2791b70516fadb82fcb86ecd1cfe15ecd23",
+        "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6"
+      ],
+      "modelProvider": "deterministic-mock",
+      "repairAttempts": 1,
+      "originalActionsPreserved": true,
+      "apiGatewayMatchedIds": 14,
+      "applicationGets": 6,
+      "ingressErrors": [
+        {
+          "kind": "ingress.error",
+          "route": "csrf",
+          "phase": "CONNECT",
+          "timedOut": false,
+          "upstream": "[fdc4:f303:9324::254]:64401"
+        },
+        {
+          "kind": "ingress.error",
+          "route": "application",
+          "phase": "CONNECT",
+          "timedOut": false,
+          "upstream": "[fdc4:f303:9324::254]:64401"
+        },
+        {
+          "kind": "ingress.error",
+          "route": "csrf",
+          "phase": "CONNECT",
+          "timedOut": false,
+          "upstream": "[fdc4:f303:9324::254]:64401"
+        }
+      ],
+      "browserEvents": 226,
+      "truncated": false,
+      "copied": [
+        {
+          "path": "first-ingress-api-timings.json",
+          "digest": "sha256:24dc7825b0404ab9855e8cc1be01b12ca8c30c427d74ef762a343a04ef9885dc",
+          "bytes": 6199
+        },
+        {
+          "path": "first-api-lifecycle.log",
+          "digest": "sha256:ea813802d040f82e347ddfded66e2e449bb52383a014d2bb586615386425acf6",
+          "bytes": 6908
+        },
+        {
+          "path": "first-platform-diagnostics.json",
+          "digest": "sha256:cfc78b631105013e6f3a59025b4ca20f9e4eca29bc41fda71cd722228a895098",
+          "bytes": 40843
+        },
+        {
+          "path": "first-late-fault-regression.json",
+          "digest": "sha256:1901c878a62c9898d245ce3d68a506d8896fd758250d17738afcc3879b20cb5f",
+          "bytes": 396
+        }
+      ],
+      "interpretation": "CURRENT_RUN_ONLY; IPv6 CONNECT phase errors followed by IPv4 HTTP200. ErrorClass/errno unavailable remain UNKNOWN/null; historical root causes stay UNKNOWN."
+    },
+    {
+      "label": "final",
+      "models": 7,
+      "originalActionsPreserved": true,
+      "repairAttempts": 1,
+      "modelProvider": "deterministic-mock",
+      "sourceDigests": [
+        "sha256:b53d561f55bb14832db3051b71cdb2791b70516fadb82fcb86ecd1cfe15ecd23",
+        "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6"
+      ],
+      "taskId": "6212c574-5326-4f07-a0bf-f8fc50beedb3",
+      "tools": 12,
+      "lastBrowser": "PASSED",
+      "firstBuildExit": 2,
+      "modelQualityEvidence": false,
+      "apiGatewayMatchedIds": 14,
+      "applicationGets": 6,
+      "ingressErrors": [
+        {
+          "kind": "ingress.error",
+          "route": "csrf",
+          "phase": "CONNECT",
+          "errorClass": "UNKNOWN",
+          "errno": null,
+          "timedOut": false,
+          "upstream": "[fdc4:f303:9324::254]:52604"
+        },
+        {
+          "kind": "ingress.error",
+          "route": "csrf",
+          "phase": "CONNECT",
+          "errorClass": "UNKNOWN",
+          "errno": null,
+          "timedOut": false,
+          "upstream": "[fdc4:f303:9324::254]:52604"
+        },
+        {
+          "kind": "ingress.error",
+          "route": "application",
+          "phase": "CONNECT",
+          "errorClass": "UNKNOWN",
+          "errno": null,
+          "timedOut": false,
+          "upstream": "[fdc4:f303:9324::254]:52604"
+        }
+      ],
+      "browserEvents": 218,
+      "truncated": false,
+      "copied": [
+        {
+          "path": "final-ingress-api-timings.json",
+          "digest": "sha256:2f482ba75baa6bfef29b96e036df5a184f0939d9ce2c30d501a1095296b33fad",
+          "bytes": 6391
+        },
+        {
+          "path": "final-api-lifecycle.log",
+          "digest": "sha256:1dd5473fe5e05e11354c60a6e4cfe5eb26a4f5bdfa485731420073cdab05a16d",
+          "bytes": 6913
+        },
+        {
+          "path": "final-platform-diagnostics.json",
+          "digest": "sha256:775c21310cb59a662ca65d5fa7857d95b6d8bb143e2d7b6bce6f32c794efda41",
+          "bytes": 39295
+        },
+        {
+          "path": "final-late-fault-regression.json",
+          "digest": "sha256:ac56708c1a8bfcea217073d89deaeaa3c835318f255b6aa47de8df5aee62587b",
+          "bytes": 396
+        }
+      ],
+      "interpretation": "CURRENT_RUN_ONLY; IPv6 CONNECT phase errors followed by IPv4 HTTP200. ErrorClass/errno unavailable remain UNKNOWN/null; historical root causes stay UNKNOWN."
+    }
+  ],
+  "localGate": {
+    "status": "FAILURE",
+    "exitCode": -1073740791,
+    "unsignedExitCode": 3221226505,
+    "static": "FAILURE: Redocly valid then libuv UV_HANDLE_CLOSING assertion; frontend verify not reached in gate",
+    "api": {
+      "tests": 123,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "SUCCESS"
+    },
+    "runner": {
+      "tests": 40,
+      "status": "SUCCESS"
+    },
+    "e2e": {
+      "testsPassed": 33,
+      "status": "FAILURE: process exited abnormally after assertions passed"
+    },
+    "frontendComplement": {
+      "tests": 41,
+      "exitCode": 0,
+      "gateReplacement": false
+    },
+    "processRootCause": "UNKNOWN; Application event log query found no matching error1000/1001 in two-hour interval. No unchanged gate retry or version change."
+  },
+  "remoteReviewedHead": {
+    "sha": "2e26b30f936db718389512c1802775507b7fca1c",
+    "runId": 37627559420,
+    "api": "FAILURE",
+    "ciGate": "FAILURE",
+    "cause": "Playwright host preparation exceeded 240 seconds; surviving apt-get/dpkg lock blocked later BeforeAll. Initial installation delay UNKNOWN."
+  },
+  "newCandidateRemoteChecks": "PENDING_ON_SUBMISSION; exact final HEAD outcome is tracked in PR26 and PR25 coordination comment",
+  "ciProposal": {
+    "path": "tests/agent/repair/maintainer-proposals/api-prepare-before-tests.patch",
+    "applied": false,
+    "ownerAccepted": false,
+    "applicabilityExitCode": 0,
+    "firstMalformedHunkExitCode": 128,
+    "linuxValidation": "NOT_EXECUTED; registered maintainer scope"
+  },
+  "limitsUnchanged": {
+    "repairs": 3,
+    "models": 12,
+    "tools": 20,
+    "chargedTokens": 50000,
+    "minutes": 12,
+    "outputPerCall": 4096
+  },
+  "paidRepair": "PAUSED_BY_USER",
+  "realModelCallsThisRevision": 0,
+  "developmentTokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "measurement": "UNKNOWN"
+  },
+  "historicalTlsRootCause": "UNKNOWN",
+  "historicalWindowsCleanupRootCause": "UNKNOWN",
+  "historicalExit137OomFalseRootCause": "UNKNOWN",
+  "historicalApplicationGetRootCause": "UNKNOWN",
+  "retained": [
+    {
+      "path": "tests/agent/repair/evidence/2026-10-07/protocol-http/diagnostics.json",
+      "digest": "sha256:5392ee476388b3419756bdd281dc29161c7e8592d3f325da7ae6249d4db27357"
+    },
+    {
+      "path": "tests/agent/repair/evidence/2026-10-07/protocol-http/D10-A-preview-regression-failure.json",
+      "digest": "sha256:43413a66196c3e63df9d2d6fc5a87d48c3998c4f6f4f2ed2b11a79e363b434a9"
+    },
+    {
+      "path": "docs/evidence/D10/M1/291be524-7417-4b96-820f-a03f26ac6b85/acceptance.json",
+      "digest": "sha256:cbf36f702e53978a6a70ff637fdf1cd49876d298f9884500dde1c4fb3ae4c0cf"
+    }
+  ]
+}

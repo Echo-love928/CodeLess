@@ -1,0 +1,104 @@
+{
+  "collectorExit": 1,
+  "mavenExecuted": false,
+  "networkCaptured": false,
+  "lifecycle": {
+    "captureId": "081f3813-06d4-45ee-bc2e-ed63ceb20691",
+    "completed": true,
+    "collectorTimedOut": false,
+    "primaryExceptionType": null,
+    "primaryOutcome": "COMPLETED",
+    "childExitCode": 0,
+    "process": {
+      "started": true,
+      "stopRequested": false,
+      "terminated": true,
+      "nativeExitCode": 0,
+      "state": "EXITED",
+      "activeBefore": 0,
+      "remainingProcesses": 0
+    },
+    "resources": {
+      "state": "DOWN_COMPLETED",
+      "downAttempted": true,
+      "downExitCode": 0,
+      "containers": {
+        "state": "OBSERVED",
+        "queryExitCode": 0,
+        "remaining": 0
+      },
+      "networks": {
+        "state": "OBSERVED",
+        "queryExitCode": 0,
+        "remaining": 0
+      },
+      "project": "codeless-preview-test-11111111-1111-1111-1111-111111111111"
+    },
+    "cleanupFailed": false
+  },
+  "mode": "truncated-list",
+  "probePorts": [],
+  "dockerStub": true,
+  "samples": [
+    {
+      "at": "2026-10-09T08:37:02.8237435Z",
+      "captureId": "081f3813-06d4-45ee-bc2e-ed63ceb20691",
+      "apiPort": 12345,
+      "root": "preview-platform-683d6873-f512-43bb-8c07-e74c2ac96959",
+      "hostTcp": {
+        "connections": [],
+        "ipv6ExitCode": 0,
+        "truncated": false,
+        "ipv6State": "OBSERVED",
+        "state": "OBSERVED",
+        "exitCode": 0
+      },
+      "containerLookup": {
+        "candidateLimitExceeded": false,
+        "state": "TRUNCATED",
+        "exitCode": 0,
+        "mountQueries": [],
+        "found": false
+      }
+    }
+  ],
+  "realTcp": false,
+  "modelCalls": 0,
+  "calls": [
+    [
+      "ps",
+      "--filter",
+      "label=com.docker.compose.project=codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "--format",
+      "{{.ID}}|{{.Label \"com.docker.compose.project\"}}"
+    ],
+    [
+      "compose",
+      "--project-name",
+      "codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "--file",
+      "F:\\JAVA\\CodeLess\\CodeLess\\infra\\preview\\compose.yml",
+      "--env-file",
+      "F:\\JAVA\\CodeLess\\CodeLess\\services\\api\\target\\preview-platform-683d6873-f512-43bb-8c07-e74c2ac96959\\evidence\\ingress\\compose.env",
+      "down",
+      "--remove-orphans"
+    ],
+    [
+      "ps",
+      "--all",
+      "--filter",
+      "label=com.docker.compose.project=codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "--format",
+      "{{.ID}}"
+    ],
+    [
+      "network",
+      "ls",
+      "--filter",
+      "label=com.docker.compose.project=codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "--format",
+      "{{.ID}}"
+    ]
+  ],
+  "fixture": true
+}

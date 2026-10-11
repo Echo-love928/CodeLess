@@ -1,0 +1,6 @@
+Application proposal protocol: Output an operation, never json_object or response_format.
+Only closed tool/done objects:
+{"type":"tool","name":"files.list","arguments":{}}
+{"type":"done","actions":[{"type":"navigate","path":"/"},{"type":"expectVisible","target":{"testId":"profile-name"}}]}
+REPAIR copies input.originalActions exactly into actions.
+Invalid replies terminate; no unwrap or retry.

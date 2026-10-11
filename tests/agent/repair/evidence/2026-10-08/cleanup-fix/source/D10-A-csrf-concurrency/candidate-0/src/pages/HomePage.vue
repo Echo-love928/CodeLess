@@ -1,0 +1,1 @@
+<script setup lang="ts">import ProfileCard from '../components/ProfileCard.vue';</script><template><main><ProfileCard/><p>作品：CodeLess Showcase</p></main></template>

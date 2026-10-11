@@ -1,0 +1,146 @@
+{
+  "taskId": "D10-A",
+  "base": "adb79b86f221862a970733a406d09fd96e92250e",
+  "reviewedA": "85c39f3fd331265ccd15cd493b9cf0dbbadd5fad",
+  "testedB": "9f1a9ea883b6279bb420efd7bb8c49ba9195c613",
+  "followupCandidate": "PR 24 commit containing these test/evidence changes; remote checks are reported separately for its exact HEAD",
+  "privateCombinedCandidate": "85c39f3 + 9f1a9ea uncommitted merge + RepairPreviewPlatformAcceptanceIT fixture",
+  "commands": [
+    {
+      "command": "cd services/api; ./mvnw.cmd -Dtest=RepairLoopIntegrationTest#realBrowserPageExceptionRepairsWithoutChangingOriginalAcceptance test",
+      "exitCode": 0,
+      "logPath": ".local-data/d10-a/revision-browser.log",
+      "logDigest": "sha256:536fb69f0140f20e7c2fa6721bbc941af4dc7d7df6c57746c38605fc6013ed96",
+      "details": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 0,
+      "logPath": ".local-data/d10-a/revision-ci-gate.log",
+      "logDigest": "sha256:fc45fdc6ed7af50c9ef4a4271d30902b1917f02ca51415a28bfc36c55d75475d",
+      "details": {
+        "apiTests": 120,
+        "repairTests": 14,
+        "runnerTests": 40,
+        "e2eTests": 29,
+        "frontendTests": 34,
+        "allStages": "SUCCESS"
+      }
+    },
+    {
+      "command": "pnpm install --offline --frozen-lockfile (private A+B candidate)",
+      "exitCode": 0,
+      "logPath": ".local-data/d10-a/revision-combined-install.log",
+      "logDigest": "sha256:2b09ef336ed6237ef3e17a12c93d1343ca32c0030cd981e8e811f142d0b1bc3b",
+      "details": {}
+    },
+    {
+      "command": "cd combined/services/api; ./mvnw.cmd -Dtest=RepairPreviewPlatformAcceptanceIT test",
+      "exitCode": 0,
+      "logPath": ".local-data/d10-a/revision-combined.log",
+      "logDigest": "sha256:3d2288b90cfb5dd0733e20c152b66431dcca2216dc47d5bc494a7d6c06b6ec51",
+      "details": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "modelQualityEvidence": false
+      }
+    },
+    {
+      "command": "pnpm --filter @codeless/web test -- src/features/workbench/TaskStatus.test.ts (B 9f1a9ea)",
+      "exitCode": 0,
+      "logPath": ".local-data/d10-a/revision-peer-web.log",
+      "logDigest": "sha256:055ada8c3258958079d275b2e0ab36841a6c22392c4d8cdf80d10ca73014fade",
+      "details": {
+        "frontendTests": 41
+      }
+    },
+    {
+      "command": "java tests/agent/repair/TransportProbe.java",
+      "exitCode": 0,
+      "logPath": ".local-data/d10-a/transport-probe.log",
+      "logDigest": "sha256:230663d29445254d069af88c2bd4611d483c7603492e87b66901cada4276b969",
+      "details": {
+        "modelCalls": 0,
+        "credentialsUsed": false
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "services/api/src/test/java/dev/codeless/api/agent/RepairLoopIntegrationTest.java",
+      "workingTreeDigest": "sha256:1e8d01bd531b18d662b755b4b32aec367b6db6a6f998a080f5de125e5450e429"
+    },
+    {
+      "path": "services/api/src/test/java/dev/codeless/api/preview/RepairPreviewPlatformAcceptanceIT.java",
+      "workingTreeDigest": "sha256:657b14ad7835c5b96d45336fcb491271c7f892d45e8c79c0aac460a73fa6b4c7"
+    },
+    {
+      "path": "tests/agent/repair/TransportProbe.java",
+      "workingTreeDigest": "sha256:d1493d159a1ab8b630269410ffaa0801ee131090f03d7e1804a89ad9e5b928e6"
+    },
+    {
+      "path": "tests/agent/repair/export-evidence.mjs",
+      "workingTreeDigest": "sha256:a02b3577f71cc1e07a07d44cbc0716cfa32c4dbab3d7ac60096cacff3e3f5ad0"
+    }
+  ],
+  "historicalFailure": [
+    {
+      "path": ".local-data/d10-a/api-final.log",
+      "logDigest": "sha256:a1e8f15577e94a6798539be8b87881ae7860a6a27b77bd1a52037e517c6793fc",
+      "rootCause": "UNKNOWN",
+      "failureRetained": true
+    },
+    {
+      "path": ".local-data/d10-a/remote-runner.log",
+      "logDigest": "sha256:2d63823b1822e5469dde94b9e68449f520540914f01686f9a7a76c694421417d",
+      "rootCause": "UNKNOWN",
+      "failureRetained": true
+    }
+  ],
+  "transportDiagnostic": {
+    "unauthenticatedFixedEndpoint": "https://api.deepseek.com/chat/completions",
+    "requests": 2,
+    "modelCalls": 0,
+    "observedLines": [
+      "requested=HTTP_2 received=HTTP_2 status=401 elapsedMs=1479",
+      "requested=HTTP_1_1 elapsedMs=425 exceptionClasses=java.util.concurrent.ExecutionException javax.net.ssl.SSLHandshakeException sun.security.validator.ValidatorException sun.security.provider.certpath.SunCertPathBuilderException"
+    ],
+    "observedDns": "198.18.0.19",
+    "originalPaidRequestRootCause": "UNKNOWN; no original exception chain retained",
+    "tlsVerificationDisabled": false,
+    "paidRetryAfterDiagnostic": false
+  },
+  "peerReview": {
+    "reviewId": 5439536925,
+    "commit": "9f1a9ea883b6279bb420efd7bb8c49ba9195c613",
+    "state": "COMMENTED",
+    "approval": false,
+    "affectedFrontendTests": 41,
+    "remoteChecks": "6 actual success for B only; run 37591835726"
+  },
+  "modelQuality": {
+    "paidNewAttempts": 0,
+    "M1": "NOT_PASSED",
+    "sameTaskFixturePassed": true,
+    "realModelRepair": "BLOCKED_MODEL_NETWORK",
+    "realModelSameTaskPreview": "NOT_EXECUTED"
+  },
+  "developmentUsage": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "meteringSource": "UNKNOWN"
+  },
+  "runtimeUsage": {
+    "paidNewAttempts": 0,
+    "priorUsage": "runtime-usage.json",
+    "fixtureExcluded": true
+  }
+}

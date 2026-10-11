@@ -1,0 +1,350 @@
+{
+  "task": {
+    "id": "13c46007-d329-422f-b8bb-1b430e46b773",
+    "applicationId": "15c22f09-1a05-4d8f-8b33-060abdd032e2",
+    "prompt": "生成 Ada Lovelace 静态个人展示页",
+    "status": "READY",
+    "repairAttempts": 0,
+    "failureCode": null,
+    "createdAt": "1899-12-31T15:00:00Z",
+    "updatedAt": "2026-10-08T07:19:53.865923Z"
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "historical504RootCause": "UNKNOWN",
+    "scope": "DIRECT_REAL_API_HTTP; real nginx platform regression is separate",
+    "realModelCalls": 0,
+    "requestsWhileGenerateBlocked": [
+      {
+        "endpoint": "csrf",
+        "elapsedMs": 4,
+        "id": "1365416c-a7ca-4fee-b3a9-98aa44c117ec",
+        "status": 200
+      },
+      {
+        "endpoint": "application",
+        "elapsedMs": 7,
+        "id": "f871dfdb-ec38-434b-bea2-0d732398fadd",
+        "status": 200
+      },
+      {
+        "endpoint": "csrf",
+        "elapsedMs": 3,
+        "id": "bedbdbe3-c61e-42f3-b7bb-59a9daeaf2e1",
+        "status": 200
+      },
+      {
+        "endpoint": "application",
+        "elapsedMs": 8,
+        "id": "6a777032-16c1-4e65-a668-cf2e684b3fff",
+        "status": 200
+      },
+      {
+        "endpoint": "csrf",
+        "elapsedMs": 3,
+        "id": "602bc138-d380-4f56-bd8e-e44ea0e985e6",
+        "status": 200
+      },
+      {
+        "endpoint": "application",
+        "elapsedMs": 8,
+        "id": "cdacb489-38a5-4801-82fb-070b77872410",
+        "status": 200
+      },
+      {
+        "endpoint": "csrf",
+        "elapsedMs": 3,
+        "id": "e1452547-b02b-47c6-b8d2-2acf11a5af7e",
+        "status": 200
+      },
+      {
+        "endpoint": "application",
+        "elapsedMs": 7,
+        "id": "870416d7-b44b-4d29-93f5-2af994737bcf",
+        "status": 200
+      },
+      {
+        "endpoint": "csrf",
+        "elapsedMs": 3,
+        "id": "28e6f17d-f2d1-4a29-a625-07ae1726cc67",
+        "status": 200
+      },
+      {
+        "endpoint": "application",
+        "elapsedMs": 7,
+        "id": "1036fb7b-1917-4637-b9bc-2bcf527a9c6c",
+        "status": 200
+      },
+      {
+        "endpoint": "csrf",
+        "elapsedMs": 3,
+        "id": "4b51d3eb-6c19-4b4e-bc3c-c635916625c5",
+        "status": 200
+      },
+      {
+        "endpoint": "application",
+        "elapsedMs": 6,
+        "id": "4a6fac38-5adc-475a-9534-71c29777aa2e",
+        "status": 200
+      },
+      {
+        "endpoint": "csrf",
+        "elapsedMs": 2,
+        "id": "d88c1dc8-88b2-441c-b5e9-333c33099ebc",
+        "status": 200
+      },
+      {
+        "endpoint": "application",
+        "elapsedMs": 7,
+        "id": "59271f93-fc54-4795-87d5-1bf9d2958eb3",
+        "status": 200
+      },
+      {
+        "endpoint": "csrf",
+        "elapsedMs": 3,
+        "id": "9cbd5a5d-6008-4376-a3a2-4345577e9095",
+        "status": 200
+      },
+      {
+        "endpoint": "application",
+        "elapsedMs": 7,
+        "id": "d4aec548-7a06-418f-8bee-0a08e6650955",
+        "status": 200
+      }
+    ]
+  },
+  "candidates": [
+    {
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 170,
+          "digest": "sha256:4c5bed2face90e8ce06f9aff9bc7c60792d737980b8fb426011559ef48163e87"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-csrf-concurrency/candidate-0",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+      "versionId": "2b513fe2-11d5-465f-a438-8cfe4ae4d3ca"
+    }
+  ],
+  "runners": [
+    {
+      "status": "VERIFIED",
+      "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+      "build": {
+        "id": "8833bd18-b657-4c48-bc77-459fa2cf0145",
+        "imageId": "sha256:93a15fea4f4e03476f5c5bdb140b72302c310d594e23acb58c5a1eee1ea5b497",
+        "containerName": "codeless-build-8833bd18-b657-4c48-bc77-459fa2cf0145",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 30 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-BmOy7POk.js  \u001b[39m\u001b[1m\u001b[2m83.42 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.08 kB\u001b[22m\n\u001b[32m✓ built in 1.10s\u001b[39m\n",
+          "bytes": 507,
+          "observedBytes": 507,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+          "bytes": 83713,
+          "files": [
+            {
+              "path": "assets/index-BmOy7POk.js",
+              "bytes": 83422,
+              "digest": "sha256:a9f85a10a51cbc549218837a8982a036a25c0ab77b1c27f0cd3c83cd5d17a189"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:fd3c7c6de8c6fe409ce803408537067150f4b45b1bcf8cc7e851c37b91ea2f1b"
+            }
+          ],
+          "directory": "PRIVATE_PATH_RETAINED_LOCALLY"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-08T07:19:47.597Z",
+        "completedAt": "2026-10-08T07:19:52.484Z"
+      },
+      "verification": {
+        "id": "9551dfd7-83f7-46da-8fef-47186f42ca37",
+        "buildId": "8833bd18-b657-4c48-bc77-459fa2cf0145",
+        "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+        "artifactDigest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-08T07:19:52.508Z",
+        "completedAt": "2026-10-08T07:19:53.530Z",
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "navigate",
+              "status": "PASSED"
+            },
+            {
+              "index": 1,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1"
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "screenshots/D10-A-csrf-concurrency-0.png",
+          "digest": "sha256:50ef5f8654547ed799076e340aa3ed28c32b3fbde6cc385e29b42786ac8b0462",
+          "bytes": 10310,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "PRIVATE_PATH_RETAINED_LOCALLY"
+      },
+      "executionId": "82883976-20c8-406e-b4f3-c8b40a96fcb7"
+    }
+  ],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "releasedTokens": 0,
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "chargedTokens": 9250,
+      "estimated": true,
+      "reservationTokens": 9250,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 0,
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "chargedTokens": 12604,
+      "estimated": true,
+      "reservationTokens": 12604,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 0,
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "chargedTokens": 13078,
+      "estimated": true,
+      "reservationTokens": 13078,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 0,
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "chargedTokens": 13682,
+      "estimated": true,
+      "reservationTokens": 13682,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "at": "2026-10-08T07:19:45.797502100Z",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "stage": "PLAN",
+      "sequence": 5,
+      "kind": "stage.finished",
+      "taskId": "13c46007-d329-422f-b8bb-1b430e46b773"
+    },
+    {
+      "at": "2026-10-08T07:19:47.129316400Z",
+      "payload": {
+        "next": "VERIFY"
+      },
+      "stage": "GENERATE",
+      "sequence": 21,
+      "kind": "stage.finished",
+      "taskId": "13c46007-d329-422f-b8bb-1b430e46b773"
+    },
+    {
+      "at": "2026-10-08T07:19:53.742246900Z",
+      "payload": {
+        "next": "READY"
+      },
+      "stage": "VERIFY",
+      "sequence": 24,
+      "kind": "stage.finished",
+      "taskId": "13c46007-d329-422f-b8bb-1b430e46b773"
+    },
+    {
+      "at": "2026-10-08T07:19:53.916226800Z",
+      "payload": {
+        "artifactDigest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+        "verificationId": "9551dfd7-83f7-46da-8fef-47186f42ca37",
+        "buildId": "8833bd18-b657-4c48-bc77-459fa2cf0145",
+        "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+        "versionId": "2b513fe2-11d5-465f-a438-8cfe4ae4d3ca"
+      },
+      "stage": "VERIFY",
+      "sequence": 25,
+      "kind": "completion",
+      "taskId": "13c46007-d329-422f-b8bb-1b430e46b773"
+    }
+  ]
+}

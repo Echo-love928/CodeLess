@@ -1,0 +1,36 @@
+diff --git a/tests/e2e/preview/gateway.acceptance.mjs b/tests/e2e/preview/gateway.acceptance.mjs
+--- a/tests/e2e/preview/gateway.acceptance.mjs
++++ b/tests/e2e/preview/gateway.acceptance.mjs
+@@ -32,7 +32,7 @@ async function fixture(run) {
+   const host = 'v' + version.replaceAll('-', '') + '.preview.codeless-preview.test'
+   const token = signed(handle, app, version, clock), cookie = '__Host-codeless-preview=' + token
+   gateway.register({ applicationId: app, versionId: version, handle, verification: passedFixture(handle) })
+-  try { await run({ gateway, handle, app, version, token, cookie, host, origin, built, advance: ms => { clock += ms } }) }
++  try { await run({ gateway, handle, app, version, token, cookie, host, origin, built, advance: ms => { clock += ms }, now: () => clock }) }
+   finally { await gateway.close(); await handle.close(); assert.equal(dirname(scratch), resolve(tmpdir())); await rm(scratch, { recursive: true, force: true }) }
+ }
+ 
+@@ -56,7 +56,7 @@ test('D09-B-T1/T4: bootstrap scopes a secure preview cookie; documents/resources
+   })
+ })
+ test('D09-B-T2: missing/expired/forged credentials and altered version/host/path/method are rejected', async () => {
+-  await fixture(async ({ origin, host, token, cookie, handle, app, advance }) => {
++  await fixture(async ({ origin, host, token, cookie, handle, app, advance, now }) => {
+     assert.equal((await get(origin, host)).status, 403)
+     assert.equal((await get(origin, host, '/', 'JSESSIONID=platform-session')).status, 403)
+     assert.equal((await get(origin, host, '/', cookie, {}, 'POST')).status, 403)
+@@ -67,12 +67,12 @@ test('D09-B-T2: missing/expired/forged credentials and altered version/host/path
+     const forgedVersion = Buffer.from(altered.join('.')).toString('base64url') + '.' + wire[1]
+     assert.equal((await get(origin, host, '/__preview/start?credential=' + forgedVersion)).status, 403)
+     assert.equal((await get(origin, 'v' + randomUUID().replaceAll('-', '') + '.preview.codeless-preview.test', '/', cookie)).status, 403)
+-    assert.equal((await get(origin, host, '/', '__Host-codeless-preview=' + signed(handle, randomUUID(), randomUUID()))).status, 403)
++    assert.equal((await get(origin, host, '/', '__Host-codeless-preview=' + signed(handle, randomUUID(), randomUUID(), now()))).status, 403)
+     for (const path of ['/%2e%2e/.env', '/..//secret', '/%2fpage.js', '/.env', '/unknown', 'http://169.254.169.254/']) {
+       assert.notEqual((await get(origin, host, path, cookie)).status, 200)
+     }
+     assert.equal((await get(origin, 'platform.codeless.test', '/', cookie, { 'X-Forwarded-Host': host })).status, 403)
+-    const wrongApp = signed(handle, randomUUID(), readCredential(token, signingKey(KEY_HEX)).version)
++    const wrongApp = signed(handle, randomUUID(), readCredential(token, signingKey(KEY_HEX)).version, now())
+     assert.equal((await get(origin, host, '/__preview/start?credential=' + wrongApp)).status, 404)
+     advance(120_000)
+     assert.equal((await get(origin, host, '/', cookie)).status, 403)

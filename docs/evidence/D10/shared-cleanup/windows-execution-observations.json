@@ -1,0 +1,9 @@
+{
+ "entry":"pnpm ci:gate / verify:static / Redocly lint",
+ "observation":"Contract lint printed validated, then Windows native assertion !(handle->flags & UV_HANDLE_CLOSING) at src/win/async.c:94; lifecycle command reported -1073740791.",
+ "redirectedFailureLog":".local-data/d10-b-shared-cleanup/ci-gate-release.log",
+ "comparison":{"command":"corepack pnpm verify:static","surface":"PTY","exitCode":0,"frontendTests":41,"sameSource":true,"dependencyUpgrade":false},
+ "conclusion":"UNKNOWN root cause. Output surface differs, but one comparison does not establish a libuv root cause. Original redirected ci-gate failure is retained and must not be converted to success.",
+ "scope":"Shared Windows execution environment; no A production, CI, lock or runtime-budget change applied.",
+ "apiProgressProbe":{"file":".local-data/d10-b-shared-cleanup/gate-api-threads.log","observation":"At sample JVM main was RUNNABLE in WindowsNativeDispatcher.FindFirstFile0 / AgentJournal.safeFile.toRealPath; later test logs advanced. This was progress sampling, not proof of a historical cleanup/TCP cause."}
+}

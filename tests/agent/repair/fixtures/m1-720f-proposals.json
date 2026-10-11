@@ -1,0 +1,611 @@
+{
+  "originTask": "720fdce9-dda0-42d4-b7f7-b96cc020462f",
+  "originCandidate": "3c349f55c5d860115cf50a76f82c1db70e7fe97b",
+  "source": "NORMALIZED_APPLICATION_PROPOSALS_AND_USAGE_FROM_PRIVATE_CAPTURE_NOT_FULL_REQUEST_EXPORT",
+  "protocolResponses": [
+    {
+      "stage": "PLAN",
+      "payload": {
+        "schemaVersion": 1,
+        "template": "VUE",
+        "dataMode": "STATIC",
+        "pages": [
+          {
+            "route": "/",
+            "file": "src/pages/HomePage.vue",
+            "title": "Ada Lovelace",
+            "purpose": "Static profile page showing name, short intro and two works (Analytical Engine, Note G)."
+          }
+        ],
+        "components": [
+          {
+            "name": "ProfileCard",
+            "file": "src/components/ProfileCard.vue",
+            "purpose": "Presentational card receiving typed props for name, bio and the list of two works."
+          }
+        ],
+        "files": [
+          {
+            "path": "src/pages/HomePage.vue",
+            "purpose": "Composes ProfileCard with static profile data and two work entries."
+          },
+          {
+            "path": "src/components/ProfileCard.vue",
+            "purpose": "Renders name, intro and works list from typed props."
+          }
+        ],
+        "acceptance": [
+          {
+            "id": "A1",
+            "route": "/",
+            "action": "Open / and read the profile card heading.",
+            "expected": "Name 'Ada Lovelace' is visible."
+          },
+          {
+            "id": "A2",
+            "route": "/",
+            "action": "Read the intro text under the name.",
+            "expected": "A short biography paragraph is visible."
+          },
+          {
+            "id": "A3",
+            "route": "/",
+            "action": "Inspect the works list in the profile card.",
+            "expected": "Exactly two works shown: 'Analytical Engine' and 'Note G'."
+          },
+          {
+            "id": "A4",
+            "route": "/",
+            "action": "Check the page for images or network requests.",
+            "expected": "No external images and no network requests occur."
+          }
+        ],
+        "capabilities": {
+          "backend": false,
+          "payments": false,
+          "externalServices": [],
+          "dependencies": []
+        }
+      },
+      "usage": {
+        "inputTokens": 1276,
+        "outputTokens": 329,
+        "totalTokens": 1605
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.create",
+        "arguments": {
+          "path": "src/components/ProfileCard.vue",
+          "content": "<script setup lang=\"ts\">\ninterface Work {\n  title: string;\n  description: string;\n}\n\nconst props = defineProps<{\n  name: string;\n  bio: string;\n  works: Work[];\n}>();\n</script>\n\n<template>\n  <section class=\"profile-card\">\n    <h1 data-testid=\"profile-name\">{{ props.name }}</h1>\n    <p data-testid=\"profile-bio\">{{ props.bio }}</p>\n    <h2 data-testid=\"works-heading\">Works</h2>\n    <ul class=\"works\">\n      <li v-for=\"(work, index) in props.works\" :key=\"work.title\" class=\"work-item\">\n        <h3 :data-testid=\"'work-title-' + index\">{{ work.title }}</h3>\n        <p :data-testid=\"'work-desc-' + index\">{{ work.description }}</p>\n      </li>\n    </ul>\n  </section>\n</template>\n\n<style scoped>\n.profile-card {\n  max-width: 640px;\n  margin: 0 auto;\n  padding: 24px;\n  font-family: system-ui, sans-serif;\n}\n\n.works {\n  list-style: none;\n  padding: 0;\n}\n\n.work-item {\n  border: 1px solid #ddd;\n  border-radius: 8px;\n  padding: 12px 16px;\n  margin-bottom: 12px;\n}\n</style>\n"
+        }
+      },
+      "usage": {
+        "inputTokens": 2463,
+        "outputTokens": 391,
+        "totalTokens": 2854
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/components/ProfileCard.vue"
+        }
+      },
+      "usage": {
+        "inputTokens": 2660,
+        "outputTokens": 23,
+        "totalTokens": 2683
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.create",
+        "arguments": {
+          "path": "src/pages/HomePage.vue",
+          "content": "<script setup lang=\"ts\">\nimport ProfileCard from '../components/ProfileCard.vue';\n\ninterface Work {\n  title: string;\n  description: string;\n}\n\nconst name = 'Ada Lovelace';\nconst bio = 'Augusta Ada King, Countess of Lovelace, was an English mathematician and writer, chiefly known for her work on Charles Babbage\\u2019s proposed mechanical general-purpose computer, the Analytical Engine.';\nconst works: Work[] = [\n  {\n    title: 'Analytical Engine',\n    description: 'Ada translated an article on the Analytical Engine and wrote extensive notes describing how the machine could be programmed beyond mere calculation.'\n  },\n  {\n    title: 'Note G',\n    description: 'Note G contains an algorithm for computing Bernoulli numbers, widely regarded as the first published computer program.'\n  }\n];\n</script>\n\n<template>\n  <main class=\"home-page\">\n    <ProfileCard :name=\"name\" :bio=\"bio\" :works=\"works\" />\n  </main>\n</template>\n\n<style scoped>\n.home-page {\n  min-height: 100vh;\n  background: #f7f7f9;\n  padding: 32px 16px;\n}\n</style>\n"
+        }
+      },
+      "usage": {
+        "inputTokens": 3259,
+        "outputTokens": 328,
+        "totalTokens": 3587
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/pages/HomePage.vue"
+        }
+      },
+      "usage": {
+        "inputTokens": 3532,
+        "outputTokens": 24,
+        "totalTokens": 3556
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "payload": {
+        "type": "done",
+        "actions": [
+          {
+            "type": "navigate",
+            "path": "/"
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "profile-name"
+            },
+            "value": "Ada Lovelace"
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "profile-bio"
+            },
+            "value": "Augusta Ada King, Countess of Lovelace, was an English mathematician and writer, chiefly known for her work on Charles Babbage’s proposed mechanical general-purpose computer, the Analytical Engine."
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "work-title-0"
+            },
+            "value": "Analytical Engine"
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "work-title-1"
+            },
+            "value": "Note G"
+          },
+          {
+            "type": "expectVisible",
+            "target": {
+              "testId": "works-heading"
+            }
+          }
+        ]
+      },
+      "usage": {
+        "inputTokens": 4154,
+        "outputTokens": 158,
+        "totalTokens": 4312
+      }
+    },
+    {
+      "stage": "REPAIR",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/pages/HomePage.vue"
+        }
+      },
+      "usage": {
+        "inputTokens": 2308,
+        "outputTokens": 24,
+        "totalTokens": 2332
+      }
+    },
+    {
+      "stage": "REPAIR",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/components/ProfileCard.vue"
+        }
+      },
+      "usage": {
+        "inputTokens": 2757,
+        "outputTokens": 23,
+        "totalTokens": 2780
+      }
+    },
+    {
+      "stage": "REPAIR",
+      "payload": {
+        "type": "tool",
+        "name": "files.update",
+        "arguments": {
+          "path": "src/pages/HomePage.vue",
+          "content": "<script setup lang=\"ts\">\nimport ProfileCard from '../components/ProfileCard.vue';\n\ninterface Work {\n  title: string;\n  description: string;\n}\n\nconst name = 'Ada Lovelace';\nconst bio = 'Augusta Ada King, Countess of Lovelace, was an English mathematician and writer, chiefly known for her work on Charles Babbage\\u2019s proposed mechanical general-purpose computer, the Analytical Engine.';\nconst works: Work[] = [\n  {\n    title: 'Analytical Engine',\n    description: 'Ada translated an article on the Analytical Engine and wrote extensive notes describing how the machine could be programmed beyond mere calculation.'\n  },\n  {\n    title: 'Note G',\n    description: 'Note G contains an algorithm for computing Bernoulli numbers, widely regarded as the first published computer program.'\n  }\n];\n</script>\n\n<template>\n  <main class=\"home-page\">\n    <ProfileCard :name=\"name\" :bio=\"bio\" :works=\"works\" />\n  </main>\n</template>\n\n<style scoped>\n.home-page {\n  min-height: 100vh;\n  background: #f7f7f9;\n  padding: 32px 16px;\n}\n</style>\n",
+          "expectedDigest": "sha256:fccdc6ce3aac1d6101c16df9efba84640964e391204d2369c0219faa044c64ef"
+        }
+      },
+      "usage": {
+        "inputTokens": 3260,
+        "outputTokens": 371,
+        "totalTokens": 3631
+      }
+    },
+    {
+      "stage": "REPAIR",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/pages/HomePage.vue"
+        }
+      },
+      "usage": {
+        "inputTokens": 2769,
+        "outputTokens": 24,
+        "totalTokens": 2793
+      }
+    },
+    {
+      "stage": "REPAIR",
+      "payload": {
+        "type": "tool",
+        "name": "files.read",
+        "arguments": {
+          "path": "src/components/ProfileCard.vue"
+        }
+      },
+      "usage": {
+        "inputTokens": 3080,
+        "outputTokens": 23,
+        "totalTokens": 3103
+      }
+    },
+    {
+      "stage": "REPAIR",
+      "rawReplyFile": "m1-720f-wrapped-done.reply.txt",
+      "replyDigest": "sha256:13f75160960d41e2bdd45c3ab9221cb4126ed072e320ef5e57885ed2d8ba28e6",
+      "usage": {
+        "inputTokens": 3442,
+        "outputTokens": 166,
+        "totalTokens": 3608
+      }
+    }
+  ],
+  "privateWireFiles": [
+    {
+      "file": "01-request.json",
+      "bytes": 5532,
+      "digest": "sha256:3a736d2a943a86482cc2b2fb7233010ad82471ce9ea8accc71cec5e6370b3f45",
+      "exported": false
+    },
+    {
+      "file": "01-result.json",
+      "bytes": 1903,
+      "digest": "sha256:f06d285db365ef4c50a8f15e60ed7e7467d0301db084328843afe9921ceafd38",
+      "exported": false
+    },
+    {
+      "file": "02-request.json",
+      "bytes": 9625,
+      "digest": "sha256:32a9f63c4f07b67a7eb6f10c4e126ef436cab24addc889311027750d855f9f91",
+      "exported": false
+    },
+    {
+      "file": "02-result.json",
+      "bytes": 1730,
+      "digest": "sha256:a07dc9755914765d0612e707f1dafc0348080ee19974bd44b7bd0582bcc5f58f",
+      "exported": false
+    },
+    {
+      "file": "03-request.json",
+      "bytes": 10137,
+      "digest": "sha256:3e233a6f674e3310de88b2eb08d3501f8c7944a0272883ab2a9adb364bba4314",
+      "exported": false
+    },
+    {
+      "file": "03-result.json",
+      "bytes": 581,
+      "digest": "sha256:d848517a131fe372307c6ef024d4f5709c5d1a9bd7e88bd0ec0cc99ec86444e7",
+      "exported": false
+    },
+    {
+      "file": "04-request.json",
+      "bytes": 11850,
+      "digest": "sha256:6540ef48ab6bfb4135751ce8ef606d02e8b69fe3ac4ae90aa770bc86b1ba6ef2",
+      "exported": false
+    },
+    {
+      "file": "04-result.json",
+      "bytes": 1726,
+      "digest": "sha256:c1a663743f87e310057ff6139fc4529945b085dbdbee41144533f23bcdeef91e",
+      "exported": false
+    },
+    {
+      "file": "05-request.json",
+      "bytes": 12504,
+      "digest": "sha256:b9f8ff9a3cd08cbb17e1021a56a631f9eea7eb33afaaa70a0121988e1a406aba",
+      "exported": false
+    },
+    {
+      "file": "05-result.json",
+      "bytes": 573,
+      "digest": "sha256:f6384289e932b1ea354c68c08973f24200d87fd69e93150ccd7c515737262d03",
+      "exported": false
+    },
+    {
+      "file": "06-request.json",
+      "bytes": 14361,
+      "digest": "sha256:0075b5164afaf29e438bb4b32c42b754f5483ebc2022f58564e510642dad363b",
+      "exported": false
+    },
+    {
+      "file": "06-result.json",
+      "bytes": 1184,
+      "digest": "sha256:1a09c4d7c81a81188e02b59f0c5c9f9685505fd5b9915e6fe930a8febd76e87f",
+      "exported": false
+    },
+    {
+      "file": "07-request.json",
+      "bytes": 7928,
+      "digest": "sha256:6bf41ba73510f5e576f3ffea82ee3048b4373517bdf8229a9f882c11c40ec775",
+      "exported": false
+    },
+    {
+      "file": "07-result.json",
+      "bytes": 568,
+      "digest": "sha256:a37ce99dc66fc26b0bea230d90759d65ba642c9a5f8ffecb59db0b167e67dee8",
+      "exported": false
+    },
+    {
+      "file": "08-request.json",
+      "bytes": 9422,
+      "digest": "sha256:01df9cc10fbded0475598fbdfa3aa967b6142ce502f7db393164c4ec5751feec",
+      "exported": false
+    },
+    {
+      "file": "08-result.json",
+      "bytes": 582,
+      "digest": "sha256:99794f87305c1fdf6881d0666c53650b0c0d0651f725e52bed21cd7415c121d4",
+      "exported": false
+    },
+    {
+      "file": "09-request.json",
+      "bytes": 10918,
+      "digest": "sha256:9313fac41f77bfb5ca6f30ce3260a686bb4dd213a3fcb815d39d2abec3023436",
+      "exported": false
+    },
+    {
+      "file": "09-result.json",
+      "bytes": 1822,
+      "digest": "sha256:be6a9d75fdc0b85bf57af1463427700a72a7e5dcf540e2813313f7f3df1d51b8",
+      "exported": false
+    },
+    {
+      "file": "10-request.json",
+      "bytes": 9047,
+      "digest": "sha256:dd78bd360653ab03818f44ddbfa29bd53f747a37c9fd47e777af508f98d1b490",
+      "exported": false
+    },
+    {
+      "file": "10-result.json",
+      "bytes": 574,
+      "digest": "sha256:1cd2b46a4f01679b9f32d5ec7f161775a34ef4762eb4ecb6bbd90acc7a5fd1f4",
+      "exported": false
+    },
+    {
+      "file": "11-request.json",
+      "bytes": 10164,
+      "digest": "sha256:958ec4aad9b71b700916e5225321de18e9aeafa0b382d6f1ee76395ad24127b7",
+      "exported": false
+    },
+    {
+      "file": "11-result.json",
+      "bytes": 582,
+      "digest": "sha256:2d7154418b7fb4e6f61e57c2024bdcf64a3cd3e37ab655c295246d4fbb56975b",
+      "exported": false
+    },
+    {
+      "file": "12-request.json",
+      "bytes": 11278,
+      "digest": "sha256:e3d315402aa457cfab28d90aa0e5399dcc93f94950874b4bd7f7548bd5c2d75a",
+      "exported": false
+    },
+    {
+      "file": "12-result.json",
+      "bytes": 1224,
+      "digest": "sha256:e0e500a66b2cbf4e92de8b4723fabe689b261df4dd03f40cc1c2f960d793a919",
+      "exported": false
+    }
+  ],
+  "outerRetries": 0,
+  "originalM1": "NOT_PASSED",
+  "originalRuntimeUsage": {
+    "modelRequests": 12,
+    "tools": 14,
+    "inputTokens": 34960,
+    "outputTokens": 1884,
+    "totalTokens": 36844,
+    "measurement": "MEASURED"
+  },
+  "offlineReplayIsModelQualityEvidence": false,
+  "originalDraft": {
+    "files": [
+      {
+        "path": "src/components/ProfileCard.vue",
+        "bytes": 969,
+        "digest": "sha256:e97d3f61fd30817a5a367cd20d868916483ed765ab7691139ea914a389e27dc3"
+      },
+      {
+        "path": "src/pages/HomePage.vue",
+        "bytes": 1031,
+        "digest": "sha256:fccdc6ce3aac1d6101c16df9efba84640964e391204d2369c0219faa044c64ef"
+      }
+    ],
+    "sourceDigest": "sha256:467d414ce4cbee994f9aaa06e63a753799bb4abf3fd9ce65153d16166d2e81b1",
+    "actions": [
+      {
+        "type": "navigate",
+        "path": "/"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "profile-name"
+        },
+        "value": "Ada Lovelace"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "profile-bio"
+        },
+        "value": "Augusta Ada King, Countess of Lovelace, was an English mathematician and writer, chiefly known for her work on Charles Babbage’s proposed mechanical general-purpose computer, the Analytical Engine."
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "work-title-0"
+        },
+        "value": "Analytical Engine"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "work-title-1"
+        },
+        "value": "Note G"
+      },
+      {
+        "type": "expectVisible",
+        "target": {
+          "testId": "works-heading"
+        }
+      }
+    ]
+  },
+  "observedRepairResults": [
+    {
+      "callId": "4b03d043-afc8-432e-8d76-7890312e25b3",
+      "status": "SUCCEEDED",
+      "errorCode": null,
+      "content": "<script setup lang=\"ts\">\nimport ProfileCard from '../components/M1MissingCard.vue';\n\ninterface Work {\n  title: string;\n  description: string;\n}\n\nconst name = 'Ada Lovelace';\nconst bio = 'Augusta Ada King, Countess of Lovelace, was an English mathematician and writer, chiefly known for her work on Charles Babbage\\u2019s proposed mechanical general-purpose computer, the Analytical Engine.';\nconst works: Work[] = [\n  {\n    title: 'Analytical Engine',\n    description: 'Ada translated an article on the Analytical Engine and wrote extensive notes describing how the machine could be programmed beyond mere calculation.'\n  },\n  {\n    title: 'Note G',\n    description: 'Note G contains an algorithm for computing Bernoulli numbers, widely regarded as the first published computer program.'\n  }\n];\n</script>\n\n<template>\n  <main class=\"home-page\">\n    <ProfileCard :name=\"name\" :bio=\"bio\" :works=\"works\" />\n  </main>\n</template>\n\n<style scoped>\n.home-page {\n  min-height: 100vh;\n  background: #f7f7f9;\n  padding: 32px 16px;\n}\n</style>\n",
+      "beforeDigest": "sha256:fccdc6ce3aac1d6101c16df9efba84640964e391204d2369c0219faa044c64ef",
+      "afterDigest": "sha256:fccdc6ce3aac1d6101c16df9efba84640964e391204d2369c0219faa044c64ef",
+      "source": {
+        "files": [
+          {
+            "path": "src/components/ProfileCard.vue",
+            "bytes": 969,
+            "digest": "sha256:e97d3f61fd30817a5a367cd20d868916483ed765ab7691139ea914a389e27dc3"
+          },
+          {
+            "path": "src/pages/HomePage.vue",
+            "bytes": 1031,
+            "digest": "sha256:fccdc6ce3aac1d6101c16df9efba84640964e391204d2369c0219faa044c64ef"
+          }
+        ],
+        "totalBytes": 2000,
+        "sourceDigest": "sha256:467d414ce4cbee994f9aaa06e63a753799bb4abf3fd9ce65153d16166d2e81b1"
+      }
+    },
+    {
+      "callId": "fd666b93-0d94-4e9c-911e-edcfdaebef41",
+      "status": "SUCCEEDED",
+      "errorCode": null,
+      "content": "<script setup lang=\"ts\">\ninterface Work {\n  title: string;\n  description: string;\n}\n\nconst props = defineProps<{\n  name: string;\n  bio: string;\n  works: Work[];\n}>();\n</script>\n\n<template>\n  <section class=\"profile-card\">\n    <h1 data-testid=\"profile-name\">{{ props.name }}</h1>\n    <p data-testid=\"profile-bio\">{{ props.bio }}</p>\n    <h2 data-testid=\"works-heading\">Works</h2>\n    <ul class=\"works\">\n      <li v-for=\"(work, index) in props.works\" :key=\"work.title\" class=\"work-item\">\n        <h3 :data-testid=\"'work-title-' + index\">{{ work.title }}</h3>\n        <p :data-testid=\"'work-desc-' + index\">{{ work.description }}</p>\n      </li>\n    </ul>\n  </section>\n</template>\n\n<style scoped>\n.profile-card {\n  max-width: 640px;\n  margin: 0 auto;\n  padding: 24px;\n  font-family: system-ui, sans-serif;\n}\n\n.works {\n  list-style: none;\n  padding: 0;\n}\n\n.work-item {\n  border: 1px solid #ddd;\n  border-radius: 8px;\n  padding: 12px 16px;\n  margin-bottom: 12px;\n}\n</style>\n",
+      "beforeDigest": "sha256:e97d3f61fd30817a5a367cd20d868916483ed765ab7691139ea914a389e27dc3",
+      "afterDigest": "sha256:e97d3f61fd30817a5a367cd20d868916483ed765ab7691139ea914a389e27dc3",
+      "source": {
+        "files": [
+          {
+            "path": "src/components/ProfileCard.vue",
+            "bytes": 969,
+            "digest": "sha256:e97d3f61fd30817a5a367cd20d868916483ed765ab7691139ea914a389e27dc3"
+          },
+          {
+            "path": "src/pages/HomePage.vue",
+            "bytes": 1031,
+            "digest": "sha256:fccdc6ce3aac1d6101c16df9efba84640964e391204d2369c0219faa044c64ef"
+          }
+        ],
+        "totalBytes": 2000,
+        "sourceDigest": "sha256:467d414ce4cbee994f9aaa06e63a753799bb4abf3fd9ce65153d16166d2e81b1"
+      }
+    },
+    {
+      "callId": "a6e358b7-7e8f-4b5b-b7b4-8025c925a06f",
+      "status": "SUCCEEDED",
+      "errorCode": null,
+      "content": null,
+      "beforeDigest": "sha256:fccdc6ce3aac1d6101c16df9efba84640964e391204d2369c0219faa044c64ef",
+      "afterDigest": "sha256:5c53d48e6fccfff10e9df009031c0fcf0de0d1ce35322fe6c0f5c3cd2dba689a",
+      "source": {
+        "files": [
+          {
+            "path": "src/components/ProfileCard.vue",
+            "bytes": 969,
+            "digest": "sha256:e97d3f61fd30817a5a367cd20d868916483ed765ab7691139ea914a389e27dc3"
+          },
+          {
+            "path": "src/pages/HomePage.vue",
+            "bytes": 1029,
+            "digest": "sha256:5c53d48e6fccfff10e9df009031c0fcf0de0d1ce35322fe6c0f5c3cd2dba689a"
+          }
+        ],
+        "totalBytes": 1998,
+        "sourceDigest": "sha256:86349eba83e84db33d162391c760118420550d141f74f4c60f2db8bf9c15d873"
+      }
+    },
+    {
+      "callId": "707ce4e1-4a00-4bde-8753-7b9ecd0e6909",
+      "status": "SUCCEEDED",
+      "errorCode": null,
+      "content": "<script setup lang=\"ts\">\nimport ProfileCard from '../components/ProfileCard.vue';\n\ninterface Work {\n  title: string;\n  description: string;\n}\n\nconst name = 'Ada Lovelace';\nconst bio = 'Augusta Ada King, Countess of Lovelace, was an English mathematician and writer, chiefly known for her work on Charles Babbage\\u2019s proposed mechanical general-purpose computer, the Analytical Engine.';\nconst works: Work[] = [\n  {\n    title: 'Analytical Engine',\n    description: 'Ada translated an article on the Analytical Engine and wrote extensive notes describing how the machine could be programmed beyond mere calculation.'\n  },\n  {\n    title: 'Note G',\n    description: 'Note G contains an algorithm for computing Bernoulli numbers, widely regarded as the first published computer program.'\n  }\n];\n</script>\n\n<template>\n  <main class=\"home-page\">\n    <ProfileCard :name=\"name\" :bio=\"bio\" :works=\"works\" />\n  </main>\n</template>\n\n<style scoped>\n.home-page {\n  min-height: 100vh;\n  background: #f7f7f9;\n  padding: 32px 16px;\n}\n</style>\n",
+      "beforeDigest": "sha256:5c53d48e6fccfff10e9df009031c0fcf0de0d1ce35322fe6c0f5c3cd2dba689a",
+      "afterDigest": "sha256:5c53d48e6fccfff10e9df009031c0fcf0de0d1ce35322fe6c0f5c3cd2dba689a",
+      "source": {
+        "files": [
+          {
+            "path": "src/components/ProfileCard.vue",
+            "bytes": 969,
+            "digest": "sha256:e97d3f61fd30817a5a367cd20d868916483ed765ab7691139ea914a389e27dc3"
+          },
+          {
+            "path": "src/pages/HomePage.vue",
+            "bytes": 1029,
+            "digest": "sha256:5c53d48e6fccfff10e9df009031c0fcf0de0d1ce35322fe6c0f5c3cd2dba689a"
+          }
+        ],
+        "totalBytes": 1998,
+        "sourceDigest": "sha256:86349eba83e84db33d162391c760118420550d141f74f4c60f2db8bf9c15d873"
+      }
+    },
+    {
+      "callId": "e48ff2ec-20f1-46d1-a57f-e525a0c7eb26",
+      "status": "SUCCEEDED",
+      "errorCode": null,
+      "content": "<script setup lang=\"ts\">\ninterface Work {\n  title: string;\n  description: string;\n}\n\nconst props = defineProps<{\n  name: string;\n  bio: string;\n  works: Work[];\n}>();\n</script>\n\n<template>\n  <section class=\"profile-card\">\n    <h1 data-testid=\"profile-name\">{{ props.name }}</h1>\n    <p data-testid=\"profile-bio\">{{ props.bio }}</p>\n    <h2 data-testid=\"works-heading\">Works</h2>\n    <ul class=\"works\">\n      <li v-for=\"(work, index) in props.works\" :key=\"work.title\" class=\"work-item\">\n        <h3 :data-testid=\"'work-title-' + index\">{{ work.title }}</h3>\n        <p :data-testid=\"'work-desc-' + index\">{{ work.description }}</p>\n      </li>\n    </ul>\n  </section>\n</template>\n\n<style scoped>\n.profile-card {\n  max-width: 640px;\n  margin: 0 auto;\n  padding: 24px;\n  font-family: system-ui, sans-serif;\n}\n\n.works {\n  list-style: none;\n  padding: 0;\n}\n\n.work-item {\n  border: 1px solid #ddd;\n  border-radius: 8px;\n  padding: 12px 16px;\n  margin-bottom: 12px;\n}\n</style>\n",
+      "beforeDigest": "sha256:e97d3f61fd30817a5a367cd20d868916483ed765ab7691139ea914a389e27dc3",
+      "afterDigest": "sha256:e97d3f61fd30817a5a367cd20d868916483ed765ab7691139ea914a389e27dc3",
+      "source": {
+        "files": [
+          {
+            "path": "src/components/ProfileCard.vue",
+            "bytes": 969,
+            "digest": "sha256:e97d3f61fd30817a5a367cd20d868916483ed765ab7691139ea914a389e27dc3"
+          },
+          {
+            "path": "src/pages/HomePage.vue",
+            "bytes": 1029,
+            "digest": "sha256:5c53d48e6fccfff10e9df009031c0fcf0de0d1ce35322fe6c0f5c3cd2dba689a"
+          }
+        ],
+        "totalBytes": 1998,
+        "sourceDigest": "sha256:86349eba83e84db33d162391c760118420550d141f74f4c60f2db8bf9c15d873"
+      }
+    }
+  ]
+}
