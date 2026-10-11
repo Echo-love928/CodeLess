@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -27,6 +28,9 @@ class FileToolsIntegrationTest extends PostgresTestBase {
     @Autowired TaskDiagnosticsService diagnostics;
     @Autowired FileToolRegistry registry;
     @TempDir(factory = WorkspaceTempFactory.class) Path root;
+    @AfterEach void closeOwnedWorkspaceBeforeJUnitCleanup() throws Exception {
+        OwnedWorkspaceCleanup.delete(root, Path.of("target", "file-tool-test-workspaces"));
+    }
     public static class WorkspaceTempFactory implements org.junit.jupiter.api.io.TempDirFactory {
         public Path createTempDirectory(org.junit.jupiter.api.extension.AnnotatedElementContext element,
                                         org.junit.jupiter.api.extension.ExtensionContext context) throws Exception {
