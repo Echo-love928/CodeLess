@@ -1,0 +1,201 @@
+{
+  "candidate": "aec394920f36b12a52ed7f61cf751602037afe90",
+  "sourceTask": "201b3882-30a8-4ac9-b0ac-cf3c024eabdf",
+  "newModelCalls": 0,
+  "sourceByteOrigin": "COMMITTED_REAL_PAID_TASK_IMMUTABLE_FILES",
+  "originalActions": [
+    {
+      "type": "navigate",
+      "path": "/"
+    },
+    {
+      "type": "expectText",
+      "target": {
+        "testId": "profile-name"
+      },
+      "value": "Ada Lovelace"
+    },
+    {
+      "type": "expectText",
+      "target": {
+        "testId": "profile-bio"
+      },
+      "value": "Ada Lovelace was an English mathematician and writer, chiefly known for her work on Charles Babbage's proposed mechanical general-purpose computer, the Analytical Engine."
+    },
+    {
+      "type": "expectVisible",
+      "target": {
+        "role": "heading",
+        "name": "Works"
+      }
+    },
+    {
+      "type": "expectText",
+      "target": {
+        "role": "heading",
+        "name": "Analytical Engine"
+      },
+      "value": "Analytical Engine"
+    },
+    {
+      "type": "expectText",
+      "target": {
+        "role": "heading",
+        "name": "Note G"
+      },
+      "value": "Note G"
+    }
+  ],
+  "results": [
+    {
+      "phase": "failed",
+      "status": "FAILED",
+      "sourceDigest": "sha256:21ae78c2f76800c86061131f4b4f60dee3319dea4d070dac391d792d3665295b",
+      "build": {
+        "id": "dafd37c7-bdcc-4669-a395-a91eadbf8a4f",
+        "imageId": "sha256:ffdd864be627b78fdcb5fc949ae5ee6262744f20d88e932e378b3450767c13db",
+        "containerName": "codeless-build-dafd37c7-bdcc-4669-a395-a91eadbf8a4f",
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 2,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\nsrc/pages/HomePage.vue(2,25): error TS2307: Cannot find module '../components/M1MissingCard.vue' or its corresponding type declarations.\n",
+          "bytes": 232,
+          "observedBytes": 232,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-11T10:55:53.257Z",
+        "completedAt": "2026-10-11T10:55:56.861Z"
+      },
+      "verification": null
+    },
+    {
+      "phase": "ready",
+      "status": "VERIFIED",
+      "sourceDigest": "sha256:6c88e4b4b9587cbd80445aef36b365da71fcb3988b0de6d6294fdb991bb44dcc",
+      "build": {
+        "id": "0ce35883-4700-48d0-85d8-f0c5bacd47d6",
+        "imageId": "sha256:ffdd864be627b78fdcb5fc949ae5ee6262744f20d88e932e378b3450767c13db",
+        "containerName": "codeless-build-0ce35883-4700-48d0-85d8-f0c5bacd47d6",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 33 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.36 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[35mindex-Dqb6HKTL.css  \u001b[39m\u001b[1m\u001b[2m 0.60 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.26 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-BBmVURyj.js   \u001b[39m\u001b[1m\u001b[2m85.33 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.91 kB\u001b[22m\n\u001b[32m✓ built in 953ms\u001b[39m\n",
+          "bytes": 628,
+          "observedBytes": 628,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:9541b07e34693c887dfb43ad8352756cfaa51b5da76f7d9246d698fd883492ef",
+          "bytes": 86292,
+          "files": [
+            {
+              "path": "assets/index-BBmVURyj.js",
+              "bytes": 85327,
+              "digest": "sha256:24b4b43333e6990960b3a962346acaf33894d2843f9df221fd016d0e4b111515"
+            },
+            {
+              "path": "assets/index-Dqb6HKTL.css",
+              "bytes": 602,
+              "digest": "sha256:ec3d4c50964dd4a9fe164377e5d096eebf6ac6c74fc5291b8d2ea8b2e6bee4fd"
+            },
+            {
+              "path": "index.html",
+              "bytes": 363,
+              "digest": "sha256:f0aa6e0dfbca4ffc12999dd2d22911d219d5a66d33fc4a08a5b1d26dfcb24924"
+            }
+          ],
+          "directory": "C:\\Users\\12058\\.codex\\worktrees\\d10-a-26-review\\CodeLess\\.local-data\\b-final-32-aec3949\\direct-artifacts\\0ce35883-4700-48d0-85d8-f0c5bacd47d6"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-11T10:55:56.935Z",
+        "completedAt": "2026-10-11T10:56:01.918Z"
+      },
+      "verification": {
+        "id": "9a636841-09a8-4eba-b5a4-04889aa9314e",
+        "buildId": "0ce35883-4700-48d0-85d8-f0c5bacd47d6",
+        "sourceDigest": "sha256:6c88e4b4b9587cbd80445aef36b365da71fcb3988b0de6d6294fdb991bb44dcc",
+        "artifactDigest": "sha256:9541b07e34693c887dfb43ad8352756cfaa51b5da76f7d9246d698fd883492ef",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-11T10:56:01.995Z",
+        "completedAt": "2026-10-11T10:56:03.304Z",
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "navigate",
+              "status": "PASSED"
+            },
+            {
+              "index": 1,
+              "type": "expectText",
+              "status": "PASSED"
+            },
+            {
+              "index": 2,
+              "type": "expectText",
+              "status": "PASSED"
+            },
+            {
+              "index": 3,
+              "type": "expectVisible",
+              "status": "PASSED"
+            },
+            {
+              "index": 4,
+              "type": "expectText",
+              "status": "PASSED"
+            },
+            {
+              "index": 5,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1"
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "PRIVATE_B_SCREENSHOT_HASH_MATCHES_AUTHOR_RUNNER_SCREENSHOT",
+          "digest": "sha256:d4ef79ab7c6393fd4633cd51c12a58e90c9fd9a61bc16e78a70d76a56f8689f0",
+          "bytes": 30445,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "C:\\Users\\12058\\.codex\\worktrees\\d10-a-26-review\\CodeLess\\.local-data\\b-final-32-aec3949\\direct-browser\\9a636841-09a8-4eba-b5a4-04889aa9314e\\result.json"
+      }
+    }
+  ]
+}

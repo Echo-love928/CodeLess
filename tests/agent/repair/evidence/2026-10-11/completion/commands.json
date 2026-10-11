@@ -1,0 +1,96 @@
+{
+  "commands": [
+    {
+      "command": "node tests/agent/prepare-runtime.mjs",
+      "exitCode": 0,
+      "log": "m1-3c-preflight.log",
+      "bytes": 2185,
+      "digest": "sha256:e7dbf65ee644675cf1ddca42c4ad692615925906f22a6ac38ae06bd21a90078e"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealRepairPreviewPlatformAcceptanceIT -DreuseForks=false -DforkCount=1 test",
+      "exitCode": 1,
+      "log": "m1-3c-real.log",
+      "bytes": 15405,
+      "digest": "sha256:0528ed51ed1eea72a517b2d9409045483243f80cfd667257bc45ed725b91861e"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RepairContextTest,RepairPolicyTest,DeepSeekModelProviderTest test (initial)",
+      "exitCode": 1,
+      "log": "completion-unit.log",
+      "bytes": 5210,
+      "digest": "sha256:b130931ed70fd26ebaf99ad74d713f1fb2d6de602c80cb27b2c79dd35bfe8d75"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RepairContextTest,RepairPolicyTest,DeepSeekModelProviderTest test",
+      "exitCode": 0,
+      "log": "completion-unit-final.log",
+      "bytes": 3801,
+      "digest": "sha256:7ea74b8bc95c7feec7b29527ee028ed60b23ce72d417342830d0991b5a48a666"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RepairLoopIntegrationTest#capturedWrappedDoneStopsAfterActualPatchWithoutUnwrappingOrRetry+capturedPatchAndSyntheticExactCompletionRebuildWithinOriginalBudget,ProtocolRepairPreviewIT -DreuseForks=false -DforkCount=1 test",
+      "exitCode": 0,
+      "log": "completion-loop-preview.log",
+      "bytes": 63201,
+      "digest": "sha256:f9b04762c75c58bf5c6a8797914dc9c102dad21db83018bfa9ca41fc97752d80"
+    },
+    {
+      "command": "corepack pnpm ci:gate (initial: stale shared GENERATE assertion)",
+      "exitCode": 1,
+      "log": "completion-ci-gate.log",
+      "bytes": 298281,
+      "digest": "sha256:5cc8544e4e457b070b35593b33524ed3fc0e1d8f7b0f1246dc4feda1dadc92d3"
+    },
+    {
+      "command": "corepack pnpm ci:gate (before final completion-only delta)",
+      "exitCode": 0,
+      "log": "completion-ci-gate-final.log",
+      "bytes": 164080,
+      "digest": "sha256:2a053d7527bfdb30f307526f767cdc3877e1ed4938cfb446f0473b173ea14ab9"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RepairContextTest test",
+      "exitCode": 0,
+      "log": "completion-full-content-unit.log",
+      "bytes": 3417,
+      "digest": "sha256:5458586f17d0909629203c48ef8f9a6638ad4ee36c8d23d94d1543ae9b7017d5"
+    },
+    {
+      "command": "corepack pnpm ci:gate (final source, Windows native-crash expectation failed)",
+      "exitCode": 1,
+      "log": "completion-release-gate.log",
+      "bytes": 169456,
+      "digest": "sha256:36f8767c4b37e20a5ca5febbeee0a5988c54be5ee67c2b6709d5325bf235f8ef"
+    },
+    {
+      "command": "node --test --test-name-pattern=locked Redocly default probe tests/infra/static-cli.test.mjs (independent diagnostic only)",
+      "exitCode": 0,
+      "log": "completion-cli-isolated.log",
+      "bytes": 219,
+      "digest": "sha256:6f481f5b085447d705a466e87d6f6d3ddff7cec673a468b989dec3d1aaaa1e55"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=ProtocolRepairPreviewIT -DreuseForks=false -DforkCount=1 test",
+      "exitCode": 0,
+      "log": "completion-preview-final.log",
+      "bytes": 57098,
+      "digest": "sha256:9c990ba663e189ce0ef79c380eb84f11872e37812d919716d236b4d0f0049e89"
+    }
+  ],
+  "developmentAgent": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "measurement": "UNKNOWN"
+  },
+  "realRuntimeModel": {
+    "inputTokens": 34960,
+    "outputTokens": 1884,
+    "totalTokens": 36844,
+    "modelRequests": 12,
+    "measurement": "MEASURED"
+  },
+  "M1": "NOT_PASSED",
+  "additionalPaidTasks": 0
+}

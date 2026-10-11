@@ -26,8 +26,9 @@ public class AgentConfiguration {
     }
     @Bean AgentEvidence agentEvidence(Environment env) {return new AgentEvidence(root(env));}
     @Bean TaskStageRunner agentLoop(AgentRunStore store,AgentModel model,PlanValidator validator,FileToolRegistry registry,
-                                   FileToolService files,BuildGateway gateway,AgentEvidence evidence) {
-        return new AgentLoop(store,model,validator,registry,files,gateway,evidence);
+                                   FileToolService files,BuildGateway gateway,AgentEvidence evidence,Environment env) {
+        return new AgentLoop(store,model,validator,registry,files,gateway,evidence,
+                env.getProperty("codeless.agent.repair.enabled",Boolean.class,true));
     }
     private static Path root(Environment env) {return Path.of(env.getRequiredProperty("codeless.agent.private-root")).toAbsolutePath().normalize();}
 }

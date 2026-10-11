@@ -9,6 +9,10 @@ public interface ModelProvider {
     String id();
     String model();
     Reply call(Prompt prompt, int maxOutputTokens, Duration timeout);
+    /** Pure serialization metadata only: no headers, prompt text, network call or extra model request. */
+    default java.util.Map<String,Object> requestMetadata(Prompt prompt,int maxOutputTokens) {
+        return java.util.Map.of("kind","UNAVAILABLE");
+    }
 
     record Reply(String content, Evidence evidence) {}
     record Evidence(String actualModel, String requestId, String responseId, Usage usage) {

@@ -131,14 +131,16 @@ test('fresh contexts isolate cookies and LocalStorage; controlled click/fill/rel
     await record('D08-B-actions-and-isolation', second, { fixture: true })
   } finally { await handle.close() }
 })
-test('whole-run watchdog kills a stalled browser process tree instead of reporting success', { timeout: 12000 }, async () => {
-  // The load event completes; a runaway timer stalls the content probe or screenshot afterwards.
-  const result = await fixtureVerify({ js: 'window.addEventListener("load",()=>setTimeout(()=>{while(true){}},0))' },
-    [], { runTimeoutMs: 3500, navigationTimeoutMs: 500 })
+test('whole-run watchdog kills a stalled browser process tree instead of reporting success', { timeout: 20000 }, async () => {
+  // Stall only when the fixed host content probe reads text, after navigation completes.
+  const result = await fixtureVerify({ js: 'Object.defineProperty(document.querySelector("h1").firstChild,"textContent",{get(){while(true){}}})' },
+    [], { runTimeoutMs: 10000, navigationTimeoutMs: 5000 })
   assert.equal(result.status, 'FAILED', JSON.stringify(result))
   assert.equal(result.timedOut, true, JSON.stringify(result))
   assert.equal(result.cleanup.processTreeTerminated, true, JSON.stringify(result))
   assert.match(result.failure, /_TIMEOUT$/)
+  assert.equal(result.phase, 'CONTENT', JSON.stringify(result))
+  assert.equal(result.failure, 'CONTENT_TIMEOUT', JSON.stringify(result))
   await record('D08-B-watchdog', result, { fixture: true })
 })
 

@@ -1,0 +1,56 @@
+{
+  "branch": "codex/d10-a-repair-context",
+  "baseline": "00d0343e13b0cc836a14813d569ac8b23380e02a",
+  "commands": [
+    {
+      "command": "corepack pnpm ci:gate",
+      "exitCode": 0,
+      "static": "SUCCESS",
+      "api": {
+        "status": "SUCCESS",
+        "tests": 142
+      },
+      "runner": {
+        "status": "SUCCESS",
+        "tests": 44
+      },
+      "e2e": {
+        "status": "SUCCESS",
+        "tests": 33
+      },
+      "log": "repair-context-ci-gate.log",
+      "sha256": "sha256:2ed0b583df862c867076976364647b7918a9ede962b6abfb5e48b4108ddfb48b"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RepairContextTest,RepairPolicyTest,RepairLoopIntegrationTest,RecordedRepairPreviewIT -DreuseForks=false -DforkCount=1 test",
+      "exitCode": 0,
+      "tests": 24,
+      "log": "repair-context-targeted-final.log",
+      "sha256": "sha256:13b04d3d29c267fdd67c5046ef31687e67d49fff5b34971224ce24f00d79ba8f"
+    }
+  ],
+  "currentTask": "cf18112f-4fdc-46bb-a4e7-6580df7a1979",
+  "currentRuntime": {
+    "models": 12,
+    "tools": 17,
+    "chargedTokens": 49630
+  },
+  "provider": "deterministic-mock",
+  "runtimeMeasurement": "REPLAY_AND_SYNTHETIC_FUTURE_NOT_PROVIDER_EVALUATION",
+  "newPaidCalls": 0,
+  "realModelM1": "NOT_PASSED",
+  "originalPaidTask": "45d37a80-c152-4672-9c0c-1fcf425fa014",
+  "originalPaidMeter": {
+    "models": 10,
+    "tools": 13,
+    "inputTokens": 30339,
+    "outputTokens": 1257,
+    "totalTokens": 31596
+  },
+  "developmentAgent": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "measurement": "UNKNOWN"
+  }
+}

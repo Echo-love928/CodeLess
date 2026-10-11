@@ -1,0 +1,475 @@
+{
+  "task": {
+    "id": "cbcb341b-e7dd-4852-a066-941c99ee4e7c",
+    "applicationId": "5825e241-07d3-4fe0-9741-ee87971c404b",
+    "prompt": "生成 Ada Lovelace 静态个人展示页",
+    "status": "READY",
+    "repairAttempts": 1,
+    "failureCode": null,
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-07T08:14:49.282876Z"
+  },
+  "budget": {
+    "models": 7,
+    "tools": 10,
+    "chargedTokens": 336
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "realBrowser": true,
+    "after": "<script setup lang=\"ts\">import ProfileCard from '../components/ProfileCard.vue';</script><template><main><ProfileCard/></main></template>",
+    "before": "<script setup lang=\"ts\">import { onMounted } from 'vue';import ProfileCard from '../components/ProfileCard.vue';onMounted(() => { window.setTimeout(() => { throw new Error('D10_A_BROWSER_PAGE_EXCEPTION'); }, 0); });</script><template><main><ProfileCard/></main></template>",
+    "realBuild": true,
+    "originalActionsPreserved": true
+  },
+  "candidates": [
+    {
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-browser-error/candidate-0",
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 272,
+          "digest": "sha256:6e785711747a16abda7eaf197d2d0fedd248243e02c846a18a6f5a2f7267c22b"
+        }
+      ],
+      "versionId": "a7650e67-bb59-4cba-8154-49111fdfe486",
+      "sourceDigest": "sha256:aa6ab5e73bd555c68bbc3239e5b96965b438f2946fd79d84b6bbb60aded49e07"
+    },
+    {
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-browser-error/candidate-1",
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 137,
+          "digest": "sha256:e6d3d42b532e6b59340492667cf58f2d22104037d059c8fc8ab295638edcb508"
+        }
+      ],
+      "versionId": "45558554-8b76-49fc-8f92-4645920524e0",
+      "sourceDigest": "sha256:6073f6c676790f70374e1736da73f224b0b781ec44847c5f15ff89fde683e3fa"
+    }
+  ],
+  "runners": [
+    {
+      "status": "FAILED",
+      "sourceDigest": "sha256:aa6ab5e73bd555c68bbc3239e5b96965b438f2946fd79d84b6bbb60aded49e07",
+      "build": {
+        "id": "b86546da-18fd-4d52-940b-5c063a1baa48",
+        "imageId": "sha256:0410e39cb1625e0fa17666e7a9aaf7698e4994abd2881558aae8142d94d9106d",
+        "containerName": "codeless-build-b86546da-18fd-4d52-940b-5c063a1baa48",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 30 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-_RrcKlU8.js  \u001b[39m\u001b[1m\u001b[2m83.45 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.09 kB\u001b[22m\n\u001b[32m✓ built in 1.14s\u001b[39m\n",
+          "bytes": 507,
+          "observedBytes": 507,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:8707964ffd8666f6e7bd6f03246871ada4486fd52ffdb4a03b997c3b228b3800",
+          "bytes": 83741,
+          "files": [
+            {
+              "path": "assets/index-_RrcKlU8.js",
+              "bytes": 83450,
+              "digest": "sha256:0734ef198d52423fe94c5dc380d8ff5ca4690ae11e9ab3386e64105b5594f11c"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:4d5a505920ab95a74ccaf561c726a1f4f744f95ac5b097b31a307eac5f8ce875"
+            }
+          ],
+          "directory": "PRIVATE_PATH_RETAINED_LOCALLY"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-07T08:14:33.711Z",
+        "completedAt": "2026-10-07T08:14:39.717Z"
+      },
+      "verification": {
+        "id": "2ee249b0-ce67-4454-9a7d-00ed02b89eda",
+        "buildId": "b86546da-18fd-4d52-940b-5c063a1baa48",
+        "sourceDigest": "sha256:aa6ab5e73bd555c68bbc3239e5b96965b438f2946fd79d84b6bbb60aded49e07",
+        "artifactDigest": "sha256:8707964ffd8666f6e7bd6f03246871ada4486fd52ffdb4a03b997c3b228b3800",
+        "status": "FAILED",
+        "failure": "PAGE_EXCEPTION",
+        "startedAt": "2026-10-07T08:14:39.742Z",
+        "completedAt": "2026-10-07T08:14:40.960Z",
+        "workerExitCode": 1,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [
+            "D10_A_BROWSER_PAGE_EXCEPTION",
+            "D10_A_BROWSER_PAGE_EXCEPTION"
+          ],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "navigate",
+              "status": "PASSED"
+            },
+            {
+              "index": 1,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1"
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "screenshots/D10-A-browser-error-0.png",
+          "digest": "sha256:448408c7bd100d0635f043ecf219a95c910c0966a7a0b4dd9c60e6001595111d",
+          "bytes": 8890,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "PRIVATE_PATH_RETAINED_LOCALLY"
+      },
+      "executionId": "5ff97ecc-04a7-4eb1-839c-3a7e2b01a0e3"
+    },
+    {
+      "status": "VERIFIED",
+      "sourceDigest": "sha256:6073f6c676790f70374e1736da73f224b0b781ec44847c5f15ff89fde683e3fa",
+      "build": {
+        "id": "ec88af60-1c77-4a9b-822d-b42233471a59",
+        "imageId": "sha256:0410e39cb1625e0fa17666e7a9aaf7698e4994abd2881558aae8142d94d9106d",
+        "containerName": "codeless-build-ec88af60-1c77-4a9b-822d-b42233471a59",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 30 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-BvbGrT7E.js  \u001b[39m\u001b[1m\u001b[2m83.36 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.04 kB\u001b[22m\n\u001b[32m✓ built in 1.11s\u001b[39m\n",
+          "bytes": 507,
+          "observedBytes": 507,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:9a0e4f82a38bcc7deb25679696e152445a46b971fced633dd1d252aed06f33c0",
+          "bytes": 83655,
+          "files": [
+            {
+              "path": "assets/index-BvbGrT7E.js",
+              "bytes": 83364,
+              "digest": "sha256:e6f27fb8c78404d3e5d607e9d7ed857811c163c535e29df64c32e85911f60ab6"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:e93e5fc0f2b6b14cb202453037d15177943da22049fa10202b619db73e589727"
+            }
+          ],
+          "directory": "PRIVATE_PATH_RETAINED_LOCALLY"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-07T08:14:42.855Z",
+        "completedAt": "2026-10-07T08:14:47.949Z"
+      },
+      "verification": {
+        "id": "d19de39b-934e-4a00-a4ce-a1f88271520c",
+        "buildId": "ec88af60-1c77-4a9b-822d-b42233471a59",
+        "sourceDigest": "sha256:6073f6c676790f70374e1736da73f224b0b781ec44847c5f15ff89fde683e3fa",
+        "artifactDigest": "sha256:9a0e4f82a38bcc7deb25679696e152445a46b971fced633dd1d252aed06f33c0",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-07T08:14:47.973Z",
+        "completedAt": "2026-10-07T08:14:49.007Z",
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "navigate",
+              "status": "PASSED"
+            },
+            {
+              "index": 1,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1"
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "screenshots/D10-A-browser-error-1.png",
+          "digest": "sha256:448408c7bd100d0635f043ecf219a95c910c0966a7a0b4dd9c60e6001595111d",
+          "bytes": 8890,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "PRIVATE_PATH_RETAINED_LOCALLY"
+      },
+      "executionId": "79c4479f-8657-45e1-a505-ea938565c8ed"
+    }
+  ],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 9202,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 9250
+    },
+    {
+      "stage": "GENERATE",
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 12139,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 12187
+    },
+    {
+      "stage": "GENERATE",
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 12613,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 12661
+    },
+    {
+      "stage": "GENERATE",
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 13217,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 13265
+    },
+    {
+      "stage": "REPAIR",
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 10521,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 10569
+    },
+    {
+      "stage": "REPAIR",
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 11465,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 11513
+    },
+    {
+      "stage": "REPAIR",
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 12138,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 12186
+    }
+  ],
+  "decisions": [
+    {
+      "kind": "stage.finished",
+      "sequence": 5,
+      "stage": "PLAN",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T08:14:32.197702400Z",
+      "taskId": "cbcb341b-e7dd-4852-a066-941c99ee4e7c"
+    },
+    {
+      "kind": "stage.finished",
+      "sequence": 21,
+      "stage": "GENERATE",
+      "payload": {
+        "next": "VERIFY"
+      },
+      "at": "2026-10-07T08:14:33.251421800Z",
+      "taskId": "cbcb341b-e7dd-4852-a066-941c99ee4e7c"
+    },
+    {
+      "kind": "repair.failure",
+      "sequence": 24,
+      "stage": "VERIFY",
+      "payload": {
+        "code": "AGENT_PAGE_EXCEPTION",
+        "category": "CODE",
+        "fingerprint": "sha256:c16dda60d242e8c2e1aa334e2d13445d1ca06f668d2bcd5f918b98e8c056c8b0",
+        "diagnostic": "{\"pageErrors\":[\"D10_A_BROWSER_PAGE_EXCEPTION\",\"D10_A_BROWSER_PAGE_EXCEPTION\"],\"consoleErrors\":[],\"blockedRequests\":[],\"failedRequests\":[],\"actions\":[{\"index\":0,\"type\":\"navigate\",\"status\":\"PASSED\"},{\"index\":1,\"type\":\"expectText\",\"status\":\"PASSED\"}],\"truncated\":false,\"freshContext\":{\"cookies\":0,\"pages\":1},\"visibleContent\":true,\"controlHost\":\"127.0.0.1\"}",
+        "sourceDigest": "sha256:aa6ab5e73bd555c68bbc3239e5b96965b438f2946fd79d84b6bbb60aded49e07",
+        "repairAttempts": 0,
+        "decision": "REPAIR"
+      },
+      "at": "2026-10-07T08:14:41.121850200Z",
+      "taskId": "cbcb341b-e7dd-4852-a066-941c99ee4e7c"
+    },
+    {
+      "kind": "stage.finished",
+      "sequence": 25,
+      "stage": "VERIFY",
+      "payload": {
+        "next": "REPAIR"
+      },
+      "at": "2026-10-07T08:14:41.151393800Z",
+      "taskId": "cbcb341b-e7dd-4852-a066-941c99ee4e7c"
+    },
+    {
+      "kind": "stage.finished",
+      "sequence": 40,
+      "stage": "REPAIR",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T08:14:42.138653400Z",
+      "taskId": "cbcb341b-e7dd-4852-a066-941c99ee4e7c"
+    },
+    {
+      "kind": "stage.finished",
+      "sequence": 43,
+      "stage": "GENERATE",
+      "payload": {
+        "next": "VERIFY"
+      },
+      "at": "2026-10-07T08:14:42.442227800Z",
+      "taskId": "cbcb341b-e7dd-4852-a066-941c99ee4e7c"
+    },
+    {
+      "kind": "stage.finished",
+      "sequence": 46,
+      "stage": "VERIFY",
+      "payload": {
+        "next": "READY"
+      },
+      "at": "2026-10-07T08:14:49.188486400Z",
+      "taskId": "cbcb341b-e7dd-4852-a066-941c99ee4e7c"
+    },
+    {
+      "kind": "completion",
+      "sequence": 47,
+      "stage": "VERIFY",
+      "payload": {
+        "verificationId": "d19de39b-934e-4a00-a4ce-a1f88271520c",
+        "artifactDigest": "sha256:9a0e4f82a38bcc7deb25679696e152445a46b971fced633dd1d252aed06f33c0",
+        "versionId": "45558554-8b76-49fc-8f92-4645920524e0",
+        "sourceDigest": "sha256:6073f6c676790f70374e1736da73f224b0b781ec44847c5f15ff89fde683e3fa",
+        "buildId": "ec88af60-1c77-4a9b-822d-b42233471a59"
+      },
+      "at": "2026-10-07T08:14:49.322421500Z",
+      "taskId": "cbcb341b-e7dd-4852-a066-941c99ee4e7c"
+    }
+  ]
+}

@@ -1,0 +1,569 @@
+{
+  "task": "D10-A",
+  "branch": "codex/d10-a-protocol-http",
+  "baseline": "7c3a502ce34db66c64b06d8dd21293e3b92ae05a",
+  "previousHead": "026af772d2ec8d9de2262f1c19e33b25d2c17271",
+  "peer": {
+    "url": "https://github.com/Echo-love928/CodeLess/pull/26#pullrequestreview-5467167782",
+    "state": "COMMENTED",
+    "approved": false,
+    "privatePackage": "B_REPORTED/UNAVAILABLE_ON_THIS_HOST"
+  },
+  "items": {
+    "protocol": {
+      "actualInvalidReply": {
+        "type": "json_object"
+      },
+      "originalTask": "57776370-dd0b-4ed7-9931-cf6ff55e9ec4",
+      "originalStatus": "FAILED",
+      "originalFailure": "AGENT_MODEL_PROTOCOL_INVALID",
+      "originalRepairAttempts": 0,
+      "cause": "Transport/application shape confusion is consistent with the reply; model internal cause UNKNOWN",
+      "policyBytes": {
+        "before": 416,
+        "after": 396
+      },
+      "parser": "STRICT tool/done UNCHANGED",
+      "automaticRetries": 0,
+      "originalActions": "UNCHANGED",
+      "limits": "3 repairs /12 models /20 tools /50000 runtime tokens /12 min /4096 output",
+      "paidEffectValidation": "PAUSED_BY_USER/NOT_PASSED"
+    },
+    "lifecycle": {
+      "before": "root exited0/7, grandchild alive; three new assertions failed",
+      "after": "17/17, root status preserved, suspended-start Windows job active processes checked and stopped even after root exit",
+      "unownedHandle": "TREE_OWNERSHIP_UNAVAILABLE; never claim all descendants terminated"
+    },
+    "sampling": {
+      "before": "foreign port45678 probed without witness; original exporter captured=true",
+      "after": "7/7; nonce/root/port/project binding only; foreign directories are not candidate authority"
+    },
+    "javaPrepare": {
+      "tests": 4,
+      "result": "normal0/nonzero7/timeout assertion/InterruptedException+interrupt flag preserved; owned root/child stopped and bounded wait",
+      "originalTimeoutSeconds": 300,
+      "cleanupWaitSeconds": 5,
+      "sharedInheritedOtherEntrypoints": "NOT_CHANGED; maintainer coordination pending"
+    },
+    "exporter": {
+      "tests": 9,
+      "before": "four HttpTimeoutException records still wrote success; actual exporter0 and negative test1",
+      "after": "conclusion derives observations; failed/unknown/non401/nonDIRECT/truncated cases covered; existing output immutable",
+      "nodeCombinedPassed": 27,
+      "truncatedResourceQuery": "remaining NULL, captured success downgrades collector to1"
+    }
+  },
+  "normal": {
+    "collectorExit": 0,
+    "mavenExit": 0,
+    "tests": 1,
+    "completeAcceptancePassed": true,
+    "samples": 3,
+    "matchedIds": 67,
+    "task": "c1c74740-5ba5-4228-847a-5a5227015398",
+    "budget": {
+      "models": 7,
+      "tools": 12,
+      "chargedTokens": 336
+    },
+    "modelQualityEvidence": false
+  },
+  "fault": {
+    "assertionHarnessExit": 0,
+    "parentExit": 1,
+    "mavenExit": null,
+    "completePlatformAcceptancePassed": false,
+    "jobRemainingProcesses": 0,
+    "composeDownExit": 0,
+    "ownedContainers": 0,
+    "ownedNetworks": 0,
+    "usage": null,
+    "usageSource": "UNKNOWN: interrupted task journal",
+    "modelQualityEvidence": false
+  },
+  "gates": {
+    "local": {
+      "state": "SUCCESS",
+      "exitCode": 0,
+      "stages": {
+        "static": {
+          "state": "SUCCESS",
+          "exitCode": 0
+        },
+        "api": {
+          "state": "SUCCESS",
+          "exitCode": 0,
+          "tests": 127,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "repairLoopPassed": true,
+          "preparationPassed": true
+        },
+        "runner": {
+          "state": "SUCCESS",
+          "exitCode": 0,
+          "tests": 40
+        },
+        "e2e": {
+          "state": "SUCCESS",
+          "exitCode": 0,
+          "assertionsPassed": 33
+        }
+      }
+    },
+    "candidateRemote": "PENDING_UNTIL_EXACT_HEAD_CHECKS"
+  },
+  "historicalRootCauses": "Windows cleanup/TCP/TLS/CSRF504/resident GET/remote fetch/exit137/Linux dpkg remain UNKNOWN; current success does not close them",
+  "sharedOwnership": "B/shared harness/runner/environment owners pending registration; no cross-scope source changes",
+  "realM1": "PAUSED_BY_USER/NOT_PASSED",
+  "newRealModelCalls": 0,
+  "developmentTokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "measurement": "UNKNOWN"
+  },
+  "commands": [
+    {
+      "command": "node --test --test-name-pattern='orphan|truncated-query' tests/agent/repair/collector-lifecycle.test.mjs (unfixed 026af77 helper)",
+      "exitCode": 1,
+      "log": ".local-data\\d10-a\\five-lifecycle-before.log",
+      "logDigest": "sha256:55ad980928525e4bf2088f7b73b0f3ac8d22aef3cea64a92b8ca2682ccc01627"
+    },
+    {
+      "command": "CODELESS_COLLECTOR_SAMPLING_SOURCE=private 026af77 snapshot; node --test --test-name-pattern=absent tests/agent/repair/collector-sampling.test.mjs",
+      "exitCode": 1,
+      "log": ".local-data\\d10-a\\five-sampling-before.log",
+      "logDigest": "sha256:c0ed261cfda6f108e3bbb1ef92a28e3047517dc89f4ba5bb1f609d35be5bafaa"
+    },
+    {
+      "command": "node --test --test-name-pattern=all-timeout tests/agent/repair/export-diagnostics.test.mjs (unfixed exporter)",
+      "exitCode": 1,
+      "log": ".local-data\\d10-a\\five-export-before.log",
+      "logDigest": "sha256:33df1cd7520f110d12e5aa63ba04bd811bbb10af4eb70ae6efad26eddc734df0"
+    },
+    {
+      "command": "node --test tests/agent/repair/collector-lifecycle.test.mjs",
+      "exitCode": 0,
+      "log": ".local-data\\d10-a\\five-lifecycle-final.log",
+      "logDigest": "sha256:72ec1ed08a5c7f412626fc18925d1f2674a4e9ff54e47f37c48726033948f08d"
+    },
+    {
+      "command": "node --test tests/agent/repair/collector-sampling.test.mjs",
+      "exitCode": 0,
+      "log": ".local-data\\d10-a\\five-sampling-final.log",
+      "logDigest": "sha256:f22f3ede3a29e5c3d24961d165c08e420fbaf747d2cbbf70e9bab8e57282889b"
+    },
+    {
+      "command": "node --test tests/agent/repair/export-diagnostics.test.mjs tests/agent/repair/collector-owner.test.mjs tests/agent/repair/preview-http-observe.test.mjs tests/agent/repair/preview-http-cleanup.test.mjs",
+      "exitCode": 0,
+      "log": ".local-data\\d10-a\\five-node-final.log",
+      "logDigest": "sha256:79b07830a653d9e4178111fba38259192abac5b14e1e3b6d92630ea37746549e"
+    },
+    {
+      "command": "mvnw.cmd -f services/api/pom.xml -Dtest=PreparationProcessTest test",
+      "exitCode": 0,
+      "log": ".local-data\\d10-a\\five-prepare-after.log",
+      "logDigest": "sha256:2f9427efc3ff603ce786070035c112c017b04a7db3239e101ee2c9a6c8fbe691"
+    },
+    {
+      "command": "pwsh -NoProfile -File tests/agent/repair/capture-platform-network.ps1 -LogDirectory .local-data/d10-a/five-real-normal (daemon unavailable)",
+      "exitCode": 1,
+      "log": ".local-data\\d10-a\\five-real-normal.log",
+      "logDigest": "sha256:ec17da895b79840f9661dd2af046490d889a17f58a5eeeac34025888ee4188c9"
+    },
+    {
+      "command": "docker desktop start --detach",
+      "exitCode": 0,
+      "log": ".local-data\\d10-a\\five-docker-start.log",
+      "logDigest": "sha256:5f83026ffb6adcef95ed27e8e68d43a0183d524611d0644977de86d6352ad3eb"
+    },
+    {
+      "command": "docker info --format {{.ServerVersion}}",
+      "exitCode": 0,
+      "log": ".local-data\\d10-a\\five-docker-ready.log",
+      "logDigest": "sha256:55ceab49f1815286a19ecaf662b7091a98e3cd1eda06e37bc61d50c51e0162ac"
+    },
+    {
+      "command": "pwsh -NoProfile -File tests/agent/repair/capture-platform-network.ps1 -LogDirectory .local-data/d10-a/five-real-normal-ready",
+      "exitCode": 0,
+      "log": ".local-data\\d10-a\\five-real-normal-ready.log",
+      "logDigest": "sha256:6fec22ad511a33a5318a990a392e1d41dd5633b60b80d4ea5404a319da63a609"
+    },
+    {
+      "command": "pwsh -NoProfile -File tests/agent/repair/fixtures/collector-real-interrupt.ps1 -LogDirectory .local-data/d10-a/five-real-interrupt",
+      "exitCode": 0,
+      "log": ".local-data\\d10-a\\five-real-interrupt.log",
+      "logDigest": "sha256:83ae398446c0d424c21da481a7e48b414a4ac1129c059419a41127e8e3e98a73"
+    },
+    {
+      "command": "corepack pnpm ci:gate",
+      "exitCode": 0,
+      "log": ".local-data\\d10-a\\five-ci-gate.log",
+      "logDigest": "sha256:3b0c5adfa6a12be5ab6317aa94e0d48bd179cda30bd8bcf59d45f56682edebad"
+    }
+  ],
+  "files": [
+    {
+      "path": "before-orphan-zero.json",
+      "bytes": 1120,
+      "digest": "sha256:b558f61893913e1846ba8b1e0b8c454e3222a420cb364a290d8281bebc4d91bd"
+    },
+    {
+      "path": "before-orphan-zero-pids.json",
+      "bytes": 48,
+      "digest": "sha256:5b8667909663c8df740fd9bd04197ec2381e1f89560723cf2d71ff40a6a7299a"
+    },
+    {
+      "path": "before-orphan-nonzero.json",
+      "bytes": 1123,
+      "digest": "sha256:0dc297c86aacc3b95328123d3ec1aca47bc2e99702313e362a6f6154af14ed55"
+    },
+    {
+      "path": "before-orphan-nonzero-pids.json",
+      "bytes": 48,
+      "digest": "sha256:4a069df7d4678e13076f512ab4d7111cbf701e6c2e41633f591da2aa0ec9573f"
+    },
+    {
+      "path": "before-truncated-query.json",
+      "bytes": 1129,
+      "digest": "sha256:6943e22194ffb620d75db20a7badcc039dd0523d7531e22be405f4a763c1f23c"
+    },
+    {
+      "path": "after-both-fail.json",
+      "bytes": 1184,
+      "digest": "sha256:47da0f161a5b35343e5416d3b1bdf72b47262006f9811ee3d5dfc8df010317a9"
+    },
+    {
+      "path": "after-cancel-error.json",
+      "bytes": 1207,
+      "digest": "sha256:a8fd42a932e728309f362e027be694b93cd1206c0ecc755e172072eb6b43c6ac"
+    },
+    {
+      "path": "after-child-nonzero.json",
+      "bytes": 1181,
+      "digest": "sha256:3368fca41e9e6ccb25d0fffa8b7569c52a434e7259254462fdef4fbe8112fcc1"
+    },
+    {
+      "path": "after-child-success.json",
+      "bytes": 1181,
+      "digest": "sha256:fe5c71e5c807cfdcb9a92e08f67ded9949f15a5924e1e4883a40c9df6b3d6dfa"
+    },
+    {
+      "path": "after-cleanup-nonzero.json",
+      "bytes": 1191,
+      "digest": "sha256:d23dc11428b1a925bd88872a0fef111da9f585a7ad09c5c205d6d62da91883c6"
+    },
+    {
+      "path": "after-cleanup-throws.json",
+      "bytes": 1186,
+      "digest": "sha256:04686e09f0bd76a6ed48356bd1e127061537eb63acb97f04d317df26957bc8d8"
+    },
+    {
+      "path": "after-invalid-owner.json",
+      "bytes": 931,
+      "digest": "sha256:c49a7dc2ac05d1d9e95645ac4e3091a0953ccd19b4e65b94b61cbcb02b88b99a"
+    },
+    {
+      "path": "after-lifecycle-write-error.json",
+      "bytes": 302,
+      "digest": "sha256:9c68b61b1fb9bf411f5a59353a9cef39db32750a0d35d4a30ed79b5818c38cd4"
+    },
+    {
+      "path": "after-missing-owner.json",
+      "bytes": 925,
+      "digest": "sha256:02d475040abc6cb1bb54136e80d79ccf082975386e008554110a448ade2a5cd0"
+    },
+    {
+      "path": "after-orphan-nonzero.json",
+      "bytes": 1181,
+      "digest": "sha256:66c7a165977e83f31d7aec2775b20009e0026793e1c1078d0f389a51b2994e3b"
+    },
+    {
+      "path": "after-orphan-nonzero-pids.json",
+      "bytes": 48,
+      "digest": "sha256:d2b4414f0731dd6ad219e0f68f064cabc1cb7a3e68c71db3deda0ebc60da1104"
+    },
+    {
+      "path": "after-orphan-zero.json",
+      "bytes": 1178,
+      "digest": "sha256:71921220c062f6708c0cce5b746bf5ef1567f4b9b3affbaae6e6a41c12779c61"
+    },
+    {
+      "path": "after-orphan-zero-pids.json",
+      "bytes": 48,
+      "digest": "sha256:267fb2799fff5e2278339d1211e41d762986313c0979df89219f49f029d3b394"
+    },
+    {
+      "path": "after-parent-error.json",
+      "bytes": 1206,
+      "digest": "sha256:5f77034b1e0ee988974d5a1e964dad8a5bf32a72abe77f689aeb2901a07e9f8b"
+    },
+    {
+      "path": "after-pipeline-stop.json",
+      "bytes": 1194,
+      "digest": "sha256:6805749b4e300b2835b86e5b085fff8b7dd01d17e4e507d77a1e9f4bcc024bba"
+    },
+    {
+      "path": "after-report-write-error.json",
+      "bytes": 1207,
+      "digest": "sha256:5a25e3acb53911103bdf1f31a04f762bf34c776b4d470120e7e31dadc37ef1ba"
+    },
+    {
+      "path": "after-start-gap.json",
+      "bytes": 946,
+      "digest": "sha256:072bd09b4052a14dc852dc110a923894c562bc31884517e92c29fcb85cbb2de5"
+    },
+    {
+      "path": "after-timeout.json",
+      "bytes": 1176,
+      "digest": "sha256:2952a541fc6bb279176a31daa51efe818c10de5376f32141fed7a4dfa1a1ce32"
+    },
+    {
+      "path": "after-truncated-query.json",
+      "bytes": 1191,
+      "digest": "sha256:d013a339b9f5ee98bec9490c78f6adbfd3e230499b9db117683303739eab6a45"
+    },
+    {
+      "path": "before-foreign-sampling.json",
+      "bytes": 2385,
+      "digest": "sha256:c5786d258bad9f4e45b41bca09a341b8664a6bdaf99d54227ea25ceecc9e52c0"
+    },
+    {
+      "path": "after-sampling-absent.json",
+      "bytes": 894,
+      "digest": "sha256:ecb3ea0e3be6d00c95f1389b716ea5ba48e032b543ba224e5f0c7b3177076ade"
+    },
+    {
+      "path": "after-sampling-foreign-project-result.json",
+      "bytes": 2832,
+      "digest": "sha256:c54e72d866afac407410fe6326c83398754650557e8ab9b1e21371e0cb28752d"
+    },
+    {
+      "path": "after-sampling-owned-with-foreign.json",
+      "bytes": 4252,
+      "digest": "sha256:da575b133f740be31d4723ab57da23bf164499b46980c72751293320e4f57430"
+    },
+    {
+      "path": "after-sampling-truncated-cleanup.json",
+      "bytes": 4257,
+      "digest": "sha256:178b598fb3393dd81350afce1d883cd60392fd346b2c1c7f6febfa3f32ae845a"
+    },
+    {
+      "path": "after-sampling-truncated-list.json",
+      "bytes": 2825,
+      "digest": "sha256:bcb821c5db3fd64606ebcd4571e1be85189b9cb7ed4865e99d84102be0dec06b"
+    },
+    {
+      "path": "after-sampling-wrong-id.json",
+      "bytes": 902,
+      "digest": "sha256:eca35a9feb18654a85f9281c4bf7fd0c2efea786246965ae0809c3601c29b110"
+    },
+    {
+      "path": "after-sampling-wrong-port.json",
+      "bytes": 1985,
+      "digest": "sha256:aa2668ab9159f50bbc2db85c55adc1adb364853b649cce3ba91262c7ae0ce671"
+    },
+    {
+      "path": "before-export-timeouts.json",
+      "bytes": 2824,
+      "digest": "sha256:fd11e2366137385af1922f956a9546fd9045944738f00b42e132a8db111e89af"
+    },
+    {
+      "path": "after-export-all-timeout.json",
+      "bytes": 3367,
+      "digest": "sha256:c6fb56ca952398e14187fc671fe6947b23938cf1bbd50deb59b88780a9ae60d6"
+    },
+    {
+      "path": "after-export-mixed.json",
+      "bytes": 3283,
+      "digest": "sha256:8b53eb13c5397642029ba8404d7c022fdf6125627ace10c0a90bae114e7133a3"
+    },
+    {
+      "path": "after-export-non-401.json",
+      "bytes": 3255,
+      "digest": "sha256:d6452449d9934248834e02a49f3ca67c6bc0fc811c7db93e7066d3fa0b5edc88"
+    },
+    {
+      "path": "after-export-tls-absent.json",
+      "bytes": 3208,
+      "digest": "sha256:ed01937ecbcca18b9a2a8ffd74638de3ffc7ba964a1dc5da9f1a9cad9080a7b3"
+    },
+    {
+      "path": "after-export-non-direct.json",
+      "bytes": 3230,
+      "digest": "sha256:cf290de2ddb4e8aeca76d44cc896e071decee8339749b900660160231bfecd80"
+    },
+    {
+      "path": "after-export-truncated.json",
+      "bytes": 3272,
+      "digest": "sha256:bceb00739fc558d0b0dd3a861108ea5342dcdba02b30794fb2aedef619caf15d"
+    },
+    {
+      "path": "after-export-process-failure.json",
+      "bytes": 3246,
+      "digest": "sha256:b2d21b4094271322f4a2d737af2600bdf7225b798caa56ac389eb3c30dfc6a24"
+    },
+    {
+      "path": "after-export-success.json",
+      "bytes": 3198,
+      "digest": "sha256:08ea981b85f44270aa99da3c1b125acdecac5c99d28c36064f14cc11118188c3"
+    },
+    {
+      "path": "after-export-immutable.json",
+      "bytes": 3198,
+      "digest": "sha256:08ea981b85f44270aa99da3c1b125acdecac5c99d28c36064f14cc11118188c3"
+    },
+    {
+      "path": "prepare-normal.json",
+      "bytes": 108,
+      "digest": "sha256:03422789f689923cb89c28b49333ec3227427c281db491b546646cefae145faf"
+    },
+    {
+      "path": "prepare-normal-pids.json",
+      "bytes": 30,
+      "digest": "sha256:c0f23b38d7f73db126b674fdbbb61471b8a9188ae07845733dd604a48caf7362"
+    },
+    {
+      "path": "prepare-nonzero.json",
+      "bytes": 108,
+      "digest": "sha256:7b20af9a3c803b7f0069c9405bf00308417937ceb02bbdb630ffffdf46d9172d"
+    },
+    {
+      "path": "prepare-nonzero-pids.json",
+      "bytes": 30,
+      "digest": "sha256:0a883328f78e1a09c997e80e15a780297e18620e41da3acb515aea5c783c9b33"
+    },
+    {
+      "path": "prepare-timeout.json",
+      "bytes": 119,
+      "digest": "sha256:815bdd0da20e05c06b4a53168b1b297b01f3823eb70112256ea5c163bf1a0758"
+    },
+    {
+      "path": "prepare-timeout-pids.json",
+      "bytes": 30,
+      "digest": "sha256:35d9588b575b632da389b91c2b6c23d0fdf0d33a5d371e4e4bc98463178bfd0c"
+    },
+    {
+      "path": "prepare-interrupt.json",
+      "bytes": 127,
+      "digest": "sha256:8568d2afc406414093764ac495a4bc4b28d8bd23e4dfd7468ba5fac98c9a2bb9"
+    },
+    {
+      "path": "prepare-interrupt-pids.json",
+      "bytes": 30,
+      "digest": "sha256:a466777407c21efc65c2d050698a495325deaa3910f6325990d346c916252d01"
+    },
+    {
+      "path": "normal-D10-A-application-http.json",
+      "bytes": 45115,
+      "digest": "sha256:d99b2885279dc2fcfa79f62b306f508254ffa78e0a912b8ea798c39fa834b471"
+    },
+    {
+      "path": "normal-acceptance.json",
+      "bytes": 1252,
+      "digest": "sha256:49853c56221316179cb60cc635937b32f9991ba756758f6d02b7f2c7f19bfcdd"
+    },
+    {
+      "path": "normal-ingress-api-timings.json",
+      "bytes": 26948,
+      "digest": "sha256:fda27eff48d0e0ade5de0175ff7eae6f2ed35f25d6deb25e106461d2cbd9ca66"
+    },
+    {
+      "path": "normal-api-lifecycle.log",
+      "bytes": 32744,
+      "digest": "sha256:45f65d81d5ea9337f83a9948ab7ec58f8f759ee67bab00de7786814eaed57294"
+    },
+    {
+      "path": "normal-platform-preview.png",
+      "bytes": 145989,
+      "digest": "sha256:78a8bfa35a7a8457de166c13b0c5c6834cabc09de9a81c5677ec399c4d0a1baa"
+    },
+    {
+      "path": "normal-lifecycle.json",
+      "bytes": 825,
+      "digest": "sha256:77e1c1cc8685e72924e5da9ca7014cd888a29ecf9abd32fb3a9a3dac616c8fc3"
+    },
+    {
+      "path": "normal-network.json",
+      "bytes": 7958,
+      "digest": "sha256:16fd465fab430da4e4f38327b1aa29917a9d65edc98471c0a3b7aceebde38201"
+    },
+    {
+      "path": "normal-owner.json",
+      "bytes": 407,
+      "digest": "sha256:8a16df911eb969f421f36af1030c956a3dccce8dec2205d81911515ad7738aef"
+    },
+    {
+      "path": "real-fault.json",
+      "bytes": 1416,
+      "digest": "sha256:17e277790a6655ad63ef70410e5a6fadab67538d941677c3b0c575ffe04a20d9"
+    },
+    {
+      "path": "fault-owner.json",
+      "bytes": 407,
+      "digest": "sha256:5da6d14feeb440a262909ce3d76b80865811282215a5c1f12a97af676d6d50ab"
+    },
+    {
+      "path": "daemon-failed-lifecycle.json",
+      "bytes": 586,
+      "digest": "sha256:f80beb2f36cba36fa8421b7c65023857ce4155e8a942f4a7480d79d2aae4c07f"
+    },
+    {
+      "path": "daemon-failed-network.json",
+      "bytes": 472,
+      "digest": "sha256:67362222a6a95df1260f5f26dc38fe5ab659860f3be6ae3baaa8f24e692c4abf"
+    },
+    {
+      "path": "D10-A-T1-T4.json",
+      "bytes": 21322,
+      "digest": "sha256:58b0fbabae9ddd81d3fc5034ebbc7dd04c88c72666397762243e07a63ada2fa9"
+    },
+    {
+      "path": "D10-A-T2-limit.json",
+      "bytes": 30399,
+      "digest": "sha256:262455741d7cd26223a38c15ea5f11b6060030dab2e27f4bf38a68b82455ab63"
+    },
+    {
+      "path": "D10-A-T2-no-progress.json",
+      "bytes": 15121,
+      "digest": "sha256:10838905417f32a0d0fb0b1191ef3019afd1eccc81de87f0513b9ffc59f20a7a"
+    },
+    {
+      "path": "D10-A-T3-cancel.json",
+      "bytes": 10651,
+      "digest": "sha256:04b627360f3993b82165797781a6c75ab9104375fbdeceda43fd33fde32e7a99"
+    },
+    {
+      "path": "D10-A-T3-timeout.json",
+      "bytes": 10677,
+      "digest": "sha256:6b76761d53422ea9fe0c1995e2a54e87d8d69d81ba62072ad0eb0cf5431d28a1"
+    },
+    {
+      "path": "D10-A-T3-budget-models.json",
+      "bytes": 5079,
+      "digest": "sha256:c4213226243e8ac8c95e25bb0bb890bee59c56dc9ea829885b6c294fcec45fe0"
+    },
+    {
+      "path": "D10-A-T3-budget-tools.json",
+      "bytes": 7607,
+      "digest": "sha256:f33bd416beb6f8b2ae984d9568cfb6ecdab3180393a14f62b1276361da658708"
+    },
+    {
+      "path": "D10-A-T3-budget-tokens.json",
+      "bytes": 3282,
+      "digest": "sha256:9ef2f0dcde2fe6b4370fedbccf644a6af12a9522d4eb343bee01f641d3042440"
+    },
+    {
+      "path": "D10-A-protocol-generate.json",
+      "bytes": 7392,
+      "digest": "sha256:52a5eb43fb6c4377e4ad5b66283bdd8ce8b5c265f982f534a8b2f3fed5d1fdc1"
+    },
+    {
+      "path": "D10-A-protocol-repair.json",
+      "bytes": 11594,
+      "digest": "sha256:5f3585fe6c1e3402f59395fc13ca19bd0aaccea1a4c3f74f1cf4dc729bf4abb2"
+    }
+  ]
+}

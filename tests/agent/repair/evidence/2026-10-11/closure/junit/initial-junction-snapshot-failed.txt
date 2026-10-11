@@ -1,0 +1,16 @@
+-------------------------------------------------------------------------------
+Test set: dev.codeless.api.tools.FileToolsIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 10, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 34.28 s <<< FAILURE! -- in dev.codeless.api.tools.FileToolsIntegrationTest
+dev.codeless.api.tools.FileToolsIntegrationTest.d08aT2TraversalAbsoluteProtectedFilesAndSymlinkDirectoriesAreRejected -- Time elapsed: 0.908 s <<< ERROR!
+java.nio.file.NoSuchFileException: F:\JAVA\CodeLess\CodeLess\.local-data\d10-a\repair-protocol\services\api\target\file-tool-test-workspaces\task-7478539286321494480\outside\HomePage.vue
+	at java.base/sun.nio.fs.WindowsException.translateToIOException(WindowsException.java:85)
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:103)
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:108)
+	at java.base/sun.nio.fs.WindowsFileSystemProvider.implDelete(WindowsFileSystemProvider.java:273)
+	at java.base/sun.nio.fs.AbstractFileSystemProvider.delete(AbstractFileSystemProvider.java:105)
+	at java.base/java.nio.file.Files.delete(Files.java:1153)
+	at dev.codeless.api.tools.OwnedWorkspaceCleanup.delete(OwnedWorkspaceCleanup.java:38)
+	at dev.codeless.api.tools.OwnedWorkspaceCleanup.delete(OwnedWorkspaceCleanup.java:16)
+	at dev.codeless.api.tools.FileToolsIntegrationTest.closeOwnedWorkspaceBeforeJUnitCleanup(FileToolsIntegrationTest.java:32)
+

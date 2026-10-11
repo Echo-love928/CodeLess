@@ -1,0 +1,91 @@
+{
+  "fixture": true,
+  "realModelCalls": 0,
+  "exitCode": 0,
+  "network": {
+    "command": "java tests/agent/repair/NetworkEnvironmentProbe.java",
+    "exitCode": 0,
+    "logDigest": "sha256:9e13eb36f453048cf9baeda7e32de2ec18592be8f07c8a8e06798eb2f8947258",
+    "outerProcess": {
+      "fixture": true,
+      "credentialsUsed": false
+    },
+    "observations": [
+      {
+        "kind": "environment",
+        "credentialsUsed": false,
+        "modelCalls": 0,
+        "selectedProxy": "[DIRECT]",
+        "defaultProxySelector": "explicit-fixture-selector"
+      },
+      {
+        "kind": "transport",
+        "route": "DEFAULT",
+        "requestedProtocol": "HTTP_1_1",
+        "peerChain": [],
+        "exceptionClasses": [
+          "java.net.http.HttpTimeoutException"
+        ]
+      },
+      {
+        "kind": "transport",
+        "route": "DEFAULT",
+        "requestedProtocol": "HTTP_2",
+        "peerChain": [],
+        "exceptionClasses": [
+          "java.net.http.HttpTimeoutException"
+        ]
+      },
+      {
+        "kind": "transport",
+        "route": "EXPLICIT_LOOPBACK_PROXY",
+        "requestedProtocol": "HTTP_1_1",
+        "peerChain": [],
+        "exceptionClasses": [
+          "java.net.http.HttpTimeoutException"
+        ]
+      },
+      {
+        "kind": "transport",
+        "route": "EXPLICIT_LOOPBACK_PROXY",
+        "requestedProtocol": "HTTP_2",
+        "peerChain": [],
+        "exceptionClasses": [
+          "java.net.http.HttpTimeoutException"
+        ]
+      }
+    ],
+    "childEnvironment": "env.ps1 selects locked Java 21 and removes HTTP_PROXY/HTTPS_PROXY/ALL_PROXY only in child shell; DEFAULT selector observed DIRECT. Explicit proxy probe uses 127.0.0.1:7897.",
+    "earlierA": {
+      "source": "tests/agent/repair/evidence/2026-10-07/followup.json",
+      "dns": [
+        "198.18.0.19"
+      ],
+      "http2Status": 401,
+      "http1ExceptionClasses": [
+        "ExecutionException",
+        "SSLHandshakeException",
+        "ValidatorException",
+        "SunCertPathBuilderException"
+      ],
+      "certificateChain": "NOT_CAPTURED",
+      "proxyConfiguration": "NOT_CAPTURED"
+    },
+    "earlierB": {
+      "source": "docs/handoffs/D10-M1.md (reported; original private log unavailable here)",
+      "dns": [
+        "120.232.219.129",
+        "120.240.157.195"
+      ],
+      "fourUnauthenticatedStatuses": [
+        401,
+        401,
+        401,
+        401
+      ],
+      "certificateChain": "api.deepseek.com -> TrustAsia -> DigiCert; hashes NOT_CAPTURED"
+    },
+    "historicalPaidNetworkFailureRootCause": "UNKNOWN",
+    "conclusion": "Current four connections validated default TLS and returned 401. DNS and presented certificate chain differ from recorded earlier observations; this does not establish the historical failure cause or model repair quality."
+  }
+}

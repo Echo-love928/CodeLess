@@ -1,0 +1,35 @@
+{
+  "scope": "Static gate Redocly optional network / locked Node Windows teardown",
+  "nativeStatus": 3221226505,
+  "nativeStatusHex": "0xC0000409",
+  "signedWindowsStatus": -1073740791,
+  "verified": {
+    "minimalForcedExitFailures": 5,
+    "minimalNaturalExitPasses": 5,
+    "redoclyInjectedFailureFileAndPipe": 6,
+    "redoclyOfflinePasses": 3,
+    "currentRegressions": 4,
+    "originalGateRegressionExit": 1
+  },
+  "mechanism": "Node delayed tasks may send to closing async handle after forced process exit; locked Redocly beforeExit calls process.exit after optional probe failure.",
+  "upstreamFix": "https://github.com/nodejs/node/pull/61999",
+  "lockedRuntimeSource": "https://github.com/nodejs/node/blob/v24.16.0/src/node_platform.cc",
+  "lockedRuntimeSourceDigest": "sha256:da453e71391a46a6a91ecaeb1f2e809d4ad2570004050974b642585cde4e4497",
+  "mitigation": "Only Redocly child receives REDOCLY_TELEMETRY=off / REDOCLY_SUPPRESS_UPDATE_NOTICE=true",
+  "limitations": [
+    "Historical exact native stack and remote response unavailable; no assertion of original 302 or TLS cause.",
+    "Node runtime not upgraded; underlying bug is not fixed globally.",
+    "M1 remains NOT_PASSED and all other historical unknowns retained."
+  ],
+  "dataHandling": {
+    "defaultExternalMatrix": "AUTO_REVIEW_REJECTED_NOT_EXECUTED",
+    "allExecutedNetworkProbes": "SYNTHETIC_LOOPBACK_ONLY",
+    "originalPayloadForwarded": false,
+    "newPaidCalls": 0
+  },
+  "developmentTokens": {
+    "input": "UNKNOWN",
+    "output": "UNKNOWN",
+    "total": "UNKNOWN"
+  }
+}

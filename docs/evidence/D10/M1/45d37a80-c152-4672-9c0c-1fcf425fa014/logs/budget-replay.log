@@ -1,0 +1,23 @@
+[PRIVATE_REPOSITORY]\.local-data\d10-m1\2026-10-10-real-4ebf0bb\BudgetReplay.java:12: ����: [deprecation] JsonNode�е�asText()�ѹ�ʱ
+  var plan=events.stream().filter(e->e.path("kind").asText().equals("plan")).findFirst().orElseThrow().path("payload");
+                                                   ^
+[PRIVATE_REPOSITORY]\.local-data\d10-m1\2026-10-10-real-4ebf0bb\BudgetReplay.java:13: ����: [deprecation] JsonNode�е�asText()�ѹ�ʱ
+  var draft=events.stream().filter(e->e.path("kind").asText().equals("draft")).findFirst().orElseThrow().path("payload");
+                                                    ^
+[PRIVATE_REPOSITORY]\.local-data\d10-m1\2026-10-10-real-4ebf0bb\BudgetReplay.java:14: ����: [deprecation] JsonNode�е�asText()�ѹ�ʱ
+  var failure=events.stream().filter(e->e.path("kind").asText().equals("repair.failure")).findFirst().orElseThrow().path("payload");
+                                                      ^
+[PRIVATE_REPOSITORY]\.local-data\d10-m1\2026-10-10-real-4ebf0bb\BudgetReplay.java:19: ����: [deprecation] JsonNode�е�asText()�ѹ�ʱ
+   if(!event.path("stage").asText().equals("REPAIR"))continue;
+                          ^
+[PRIVATE_REPOSITORY]\.local-data\d10-m1\2026-10-10-real-4ebf0bb\BudgetReplay.java:20: ����: [deprecation] JsonNode�е�asText()�ѹ�ʱ
+   if(event.path("kind").asText().equals("model.request")) {
+                        ^
+[PRIVATE_REPOSITORY]\.local-data\d10-m1\2026-10-10-real-4ebf0bb\BudgetReplay.java:27: ����: [deprecation] JsonNode�е�asText()�ѹ�ʱ
+   if(event.path("kind").asText().equals("tool.result"))observations.add(event.path("payload"));
+                        ^
+[PRIVATE_REPOSITORY]\.local-data\d10-m1\2026-10-10-real-4ebf0bb\BudgetReplay.java:39: ����: [deprecation] JsonNode�е�asText()�ѹ�ʱ
+  var input=new LinkedHashMap<String,Object>();input.put("phase","REPAIR");input.put("request",doc.path("task").path("prompt").asText());input.put("dataMode","STATIC");input.put("plan",plan);input.put("tools",new FileToolRegistry().definitions().path("tools"));input.put("observations",observations);input.put("failure",failure);input.put("originalActions",draft.path("actions"));input.put("sourceFiles",draft.path("files"));input.put("repairAttempt",1);return mapper.valueToTree(input);
+                                                                                                                              ^
+7 ������
+{"offlineOnly":true,"additionalModelRequests":0,"exactAcceptedReservationReplays":[{"reservedTokens":12332,"sequence":40,"exactMatch":true,"journalReservedTokens":12332,"inputUtf8Bytes":5962,"observations":0},{"reservedTokens":13962,"sequence":45,"exactMatch":true,"journalReservedTokens":13962,"inputUtf8Bytes":7592,"observations":1},{"reservedTokens":15458,"sequence":50,"exactMatch":true,"journalReservedTokens":15458,"inputUtf8Bytes":9088,"observations":2},{"reservedTokens":17089,"sequence":55,"exactMatch":true,"journalReservedTokens":17089,"inputUtf8Bytes":10719,"observations":3}],"meter":{"models":10,"tools":13,"chargedTokens":31596},"nextInputUtf8Bytes":12350,"policyUtf8Bytes":1762,"nextInputReservation":14624,"nextOutputReservation":4096,"nextTotalReservation":18720,"remainingChargedTokenBudget":18404,"wouldTotal":50316,"rejectedBeforeProvider":true}

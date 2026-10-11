@@ -1,0 +1,62 @@
+[
+  {
+    "command": "mvnw -DskipTests compile",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/compile.log",
+    "logDigest": "sha256:ce3f56f84c0d91ba07110001a5024ee507a8cace2b5a247baa1d94d7dd5abf81"
+  },
+  {
+    "command": "mvnw -Dtest=RepairPolicyTest,RepairLoopIntegrationTest test",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/repair-first.log",
+    "logDigest": "sha256:49b21a167b8383d93d6f48444cce530734ec5e8ef90f4d406a509c2b3d330336"
+  },
+  {
+    "command": "pnpm ci:gate",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/ci-gate.log",
+    "logDigest": "sha256:b0f7419a017b511b2d3c9eecffc6cda8fadc212e812786535630930b085dde9d"
+  },
+  {
+    "command": "pnpm verify:api (affected browser diagnostic regression)",
+    "exitCode": 1,
+    "log": ".local-data/d10-a/api-final.log",
+    "logDigest": "sha256:a1e8f15577e94a6798539be8b87881ae7860a6a27b77bd1a52037e517c6793fc"
+  },
+  {
+    "command": "mvnw -Dtest=FileToolsIntegrationTest#d08aT4MissingExistingDigestConflictAndUnknownShellNeverBecomeSuccessfulEvents test (diagnostic, not a gate replacement)",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/cleanup-diagnostic.log",
+    "logDigest": "sha256:e98b2d28f4823e8346fb69a3a21d7c86368426acda8d5cfbd647f85d2f9b67d5"
+  },
+  {
+    "command": "peer E2E before building dist (failed prerequisite, retained)",
+    "exitCode": 1,
+    "log": ".local-data/d10-a/peer-e2e.log",
+    "logDigest": "sha256:383c1107c62e73fb988a9bb76a1ea033822c632963738a88a06d360e734cad9e"
+  },
+  {
+    "command": "pnpm --filter @codeless/web exec playwright test --config playwright.config.ts --grep D10-B --workers=1",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/peer-e2e-final.log",
+    "logDigest": "sha256:14d6672c6ff5fe25bc91f34a4a508672f2fc73bef48811a67616b863b64b3cfb"
+  },
+  {
+    "command": "mvnw -Dtest=RealPreviewPlatformAcceptanceIT test",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/real-platform-first.log",
+    "logDigest": "sha256:fc91d8604c2beb84ba83430605b56b218d804a586364eaa4c76b2c840bc8fa1a"
+  },
+  {
+    "command": "mvnw -Dtest=RealRepairAcceptanceIT test",
+    "exitCode": 1,
+    "log": ".local-data/d10-a/real-repair.log",
+    "logDigest": "sha256:13d53e081379dbfc35ee7c12201f4633b630d4503ad04121ce43af34820aab07"
+  },
+  {
+    "command": "mvnw -Dtest=RealRepairAcceptanceIT test (independent fresh task; initial failure retained)",
+    "exitCode": 1,
+    "log": ".local-data/d10-a/real-repair-confirm.log",
+    "logDigest": "sha256:318b6cdb0dc10a8007e922f84329fdb75695add59ef3cfba28c7925dea1a0d96"
+  }
+]

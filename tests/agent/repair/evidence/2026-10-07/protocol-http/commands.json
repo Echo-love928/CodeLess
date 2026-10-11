@@ -1,0 +1,38 @@
+[
+  {
+    "command": "mvnw -Dtest=RepairLoopIntegrationTest,RepairPolicyTest,DeepSeekModelProviderTest test",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/protocol-tests.log",
+    "logDigest": "sha256:359fa1de8b25893fd413406b86f22c09765142bf720d8653207369643d1989c9"
+  },
+  {
+    "command": "mvnw -Dtest=CsrfDuringGenerationTest test",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/csrf-regression.log",
+    "logDigest": "sha256:6bdc57a841c64613a519c4e928031366ae422cc474e0d8b967c6527b9bf43d8c"
+  },
+  {
+    "command": "pnpm ci:gate (first run; prompt-size budget regression retained)",
+    "exitCode": 1,
+    "log": ".local-data/d10-a/protocol-http-ci-gate.log",
+    "logDigest": "sha256:554b2b3b5e12ab57cabe591f99fdb4b2645badf56554eb19697d7372bf6e0a57"
+  },
+  {
+    "command": "pnpm ci:gate (after compacting protocol instructions; same hard limits)",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/protocol-http-ci-gate-final.log",
+    "logDigest": "sha256:45897570b3b91b7b6b7c2e2f3a6f05299c66a136ac99ec5bf7b7c8a6f821a4f2"
+  },
+  {
+    "command": "mvnw -Dtest=FaultAtFreezePreviewAcceptanceIT -DreuseForks=false -DforkCount=1 test",
+    "exitCode": 1,
+    "log": ".local-data/d10-a/protocol-http-preview.log",
+    "logDigest": "sha256:33b52cb76a159c190bdf2acb185e26d92d8287c5233bc62af1ecb3deb48d990d"
+  },
+  {
+    "command": "java tests/agent/repair/NetworkEnvironmentProbe.java (no credentials, TLS validation enabled)",
+    "exitCode": 0,
+    "log": ".local-data/d10-a/network-current.log",
+    "logDigest": "sha256:b483c94772aaa68098aa25d8414e4d776dc76f3560c0ce1d4da4eb8c186e5bb0"
+  }
+]

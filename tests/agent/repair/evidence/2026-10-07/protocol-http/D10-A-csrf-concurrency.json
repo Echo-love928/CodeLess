@@ -1,0 +1,294 @@
+{
+  "task": {
+    "id": "9a0aba6e-3d47-4794-a479-ef3a4975fda4",
+    "applicationId": "2050943b-f75d-4d39-9853-a5199fdd5460",
+    "prompt": "生成 Ada Lovelace 静态个人展示页",
+    "status": "READY",
+    "repairAttempts": 0,
+    "failureCode": null,
+    "createdAt": "1899-12-31T15:00:00Z",
+    "updatedAt": "2026-10-07T13:07:04.01305Z"
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "requestsWhileGenerateBlocked": [
+      {
+        "id": "294a0cd7-4730-400d-a0de-b405b7d44cdf",
+        "elapsedMs": 3,
+        "status": 200
+      },
+      {
+        "id": "890b1d0e-ae79-49fd-99e2-b076a2b9cce6",
+        "elapsedMs": 2,
+        "status": 200
+      },
+      {
+        "id": "f4a9a819-22fb-4481-a0e7-9ebf7dbe971e",
+        "elapsedMs": 2,
+        "status": 200
+      },
+      {
+        "id": "d05f4d95-68c6-4276-a57a-5b22970ab61a",
+        "elapsedMs": 2,
+        "status": 200
+      },
+      {
+        "id": "82acdee7-c455-4ccd-9de1-4da62e85b6ed",
+        "elapsedMs": 1,
+        "status": 200
+      },
+      {
+        "id": "4d052a58-e374-4d0e-874a-86e8fecbab3c",
+        "elapsedMs": 2,
+        "status": 200
+      },
+      {
+        "id": "3e71c45e-875d-46dc-80ba-4c8ccd78c799",
+        "elapsedMs": 2,
+        "status": 200
+      },
+      {
+        "id": "96b8b726-5a77-4bb2-87cd-9abfea8384e4",
+        "elapsedMs": 2,
+        "status": 200
+      }
+    ],
+    "realModelCalls": 0,
+    "scope": "DIRECT_REAL_API_HTTP; real nginx platform regression is separate",
+    "historical504RootCause": "UNKNOWN"
+  },
+  "candidates": [
+    {
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 170,
+          "digest": "sha256:4c5bed2face90e8ce06f9aff9bc7c60792d737980b8fb426011559ef48163e87"
+        }
+      ],
+      "versionId": "8611df67-f21a-4d56-8996-219d4423b59d",
+      "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-csrf-concurrency/candidate-0"
+    }
+  ],
+  "runners": [
+    {
+      "status": "VERIFIED",
+      "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+      "build": {
+        "id": "bbbacf32-d610-4c82-862e-8d728bf820f6",
+        "imageId": "sha256:b5cbe9c541b609b20a142085f3d365e18d21119eafc216d3343f222666e9dbd8",
+        "containerName": "codeless-build-bbbacf32-d610-4c82-862e-8d728bf820f6",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 30 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-BmOy7POk.js  \u001b[39m\u001b[1m\u001b[2m83.42 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.08 kB\u001b[22m\n\u001b[32m✓ built in 1.05s\u001b[39m\n",
+          "bytes": 507,
+          "observedBytes": 507,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+          "bytes": 83713,
+          "files": [
+            {
+              "path": "assets/index-BmOy7POk.js",
+              "bytes": 83422,
+              "digest": "sha256:a9f85a10a51cbc549218837a8982a036a25c0ab77b1c27f0cd3c83cd5d17a189"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:fd3c7c6de8c6fe409ce803408537067150f4b45b1bcf8cc7e851c37b91ea2f1b"
+            }
+          ],
+          "directory": "PRIVATE_PATH_RETAINED_LOCALLY"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-07T13:06:57.996Z",
+        "completedAt": "2026-10-07T13:07:02.801Z"
+      },
+      "verification": {
+        "id": "fe98a83c-2b45-4262-bf67-e35cfd0f8095",
+        "buildId": "bbbacf32-d610-4c82-862e-8d728bf820f6",
+        "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+        "artifactDigest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-07T13:07:02.823Z",
+        "completedAt": "2026-10-07T13:07:03.800Z",
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "navigate",
+              "status": "PASSED"
+            },
+            {
+              "index": 1,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1"
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "screenshots/D10-A-csrf-concurrency-0.png",
+          "digest": "sha256:50ef5f8654547ed799076e340aa3ed28c32b3fbde6cc385e29b42786ac8b0462",
+          "bytes": 10310,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "PRIVATE_PATH_RETAINED_LOCALLY"
+      },
+      "executionId": "56952726-2742-4410-8022-11880b69ced1"
+    }
+  ],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "releasedTokens": 0,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      },
+      "reservationTokens": 9250,
+      "estimated": true,
+      "chargedTokens": 9250,
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT"
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 0,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      },
+      "reservationTokens": 12604,
+      "estimated": true,
+      "chargedTokens": 12604,
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT"
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 0,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      },
+      "reservationTokens": 13078,
+      "estimated": true,
+      "chargedTokens": 13078,
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT"
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 0,
+      "usage": {
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "raw": null
+      },
+      "reservationTokens": 13682,
+      "estimated": true,
+      "chargedTokens": 13682,
+      "meteringSource": "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT"
+    }
+  ],
+  "decisions": [
+    {
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T13:06:56.839116600Z",
+      "taskId": "9a0aba6e-3d47-4794-a479-ef3a4975fda4",
+      "kind": "stage.finished",
+      "sequence": 5,
+      "stage": "PLAN"
+    },
+    {
+      "payload": {
+        "next": "VERIFY"
+      },
+      "at": "2026-10-07T13:06:57.655185900Z",
+      "taskId": "9a0aba6e-3d47-4794-a479-ef3a4975fda4",
+      "kind": "stage.finished",
+      "sequence": 21,
+      "stage": "GENERATE"
+    },
+    {
+      "payload": {
+        "next": "READY"
+      },
+      "at": "2026-10-07T13:07:03.940622300Z",
+      "taskId": "9a0aba6e-3d47-4794-a479-ef3a4975fda4",
+      "kind": "stage.finished",
+      "sequence": 24,
+      "stage": "VERIFY"
+    },
+    {
+      "payload": {
+        "artifactDigest": "sha256:7607bbdea8b79a5d7f2ab45390c5909e9978ec23313f3d0e1da6ded3fda6efc1",
+        "versionId": "8611df67-f21a-4d56-8996-219d4423b59d",
+        "sourceDigest": "sha256:bebf61b1851bf1004e1ee98c94bfce18cb5b87ba5c446f492dae4c48993848f6",
+        "buildId": "bbbacf32-d610-4c82-862e-8d728bf820f6",
+        "verificationId": "fe98a83c-2b45-4262-bf67-e35cfd0f8095"
+      },
+      "at": "2026-10-07T13:07:04.036824800Z",
+      "taskId": "9a0aba6e-3d47-4794-a479-ef3a4975fda4",
+      "kind": "completion",
+      "sequence": 25,
+      "stage": "VERIFY"
+    }
+  ]
+}

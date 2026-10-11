@@ -1,0 +1,1 @@
+<script setup lang="ts">import { onMounted } from 'vue';import ProfileCard from '../components/ProfileCard.vue';onMounted(() => { window.setTimeout(() => { throw new Error('D10_A_BROWSER_PAGE_EXCEPTION'); }, 0); });</script><template><main><ProfileCard/></main></template>

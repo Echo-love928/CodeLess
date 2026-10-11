@@ -1,0 +1,148 @@
+{
+  "task": {
+    "id": "9fc315a5-c089-40d6-b23c-af0b446a816d",
+    "applicationId": "388ec05c-d84b-4706-966d-2204e1e89299",
+    "prompt": "生成 Ada Lovelace 静态个人展示页",
+    "status": "FAILED",
+    "repairAttempts": 0,
+    "failureCode": "AGENT_RUNNER_UNAVAILABLE",
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-07T13:07:23.102881Z"
+  },
+  "budget": {
+    "models": 4,
+    "tools": 5,
+    "chargedTokens": 192
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "repairModelCalls": 0,
+    "runnerFailureFixture": true
+  },
+  "candidates": [
+    {
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 137,
+          "digest": "sha256:2bb84476d299cb9aae768121e3b99f4e6554b4595e56f87b9d37cb3356234870"
+        }
+      ],
+      "versionId": "a4ddd89f-43a7-4a81-bdd9-6b4ec2a23809",
+      "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-infrastructure/candidate-0"
+    }
+  ],
+  "runners": [],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "releasedTokens": 9202,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 9250,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 12556,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 12604,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 13030,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 13078,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE"
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 13634,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "reservationTokens": 13682,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE"
+    }
+  ],
+  "decisions": [
+    {
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T13:07:22.231342900Z",
+      "taskId": "9fc315a5-c089-40d6-b23c-af0b446a816d",
+      "kind": "stage.finished",
+      "sequence": 5,
+      "stage": "PLAN"
+    },
+    {
+      "payload": {
+        "next": "VERIFY"
+      },
+      "at": "2026-10-07T13:07:22.999729200Z",
+      "taskId": "9fc315a5-c089-40d6-b23c-af0b446a816d",
+      "kind": "stage.finished",
+      "sequence": 21,
+      "stage": "GENERATE"
+    },
+    {
+      "payload": {
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+        "code": "AGENT_RUNNER_UNAVAILABLE",
+        "category": "INFRASTRUCTURE"
+      },
+      "at": "2026-10-07T13:07:23.095390Z",
+      "taskId": "9fc315a5-c089-40d6-b23c-af0b446a816d",
+      "kind": "failure",
+      "sequence": 23,
+      "stage": "VERIFY"
+    }
+  ]
+}
