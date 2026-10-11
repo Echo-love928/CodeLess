@@ -1,0 +1,105 @@
+{
+  "commands": [
+    {
+      "command": "node --test tests/infra/static-cli.test.mjs",
+      "exitCode": 0,
+      "privateLog": "closure-cli.log",
+      "bytes": 597,
+      "digest": "sha256:c4adf182e14b42ead31843d790d51561c0a7d6a91a3efc149458e483aadc6b77"
+    },
+    {
+      "command": "node tests/agent/prepare-runtime.mjs",
+      "exitCode": 0,
+      "privateLog": "closure-preflight.log",
+      "bytes": 2318,
+      "digest": "sha256:80e484fc5e2545f060f34be67b5af34d986bcc88f8f73d2e21a60ef7406c488b"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealRepairPreviewPlatformAcceptanceIT -DreuseForks=false -DforkCount=1 test",
+      "exitCode": 0,
+      "privateLog": "closure-m1-1-real.log",
+      "bytes": 13086,
+      "digest": "sha256:e253db4ef9b72f6f44a9f8ab3c30132bdcda7c5215f84ec61f6ebd5218286195"
+    },
+    {
+      "command": "node --test tests/agent/repair/*.test.mjs (all six actual files)",
+      "exitCode": 0,
+      "privateLog": "closure-diagnostics.log",
+      "bytes": 13172,
+      "digest": "sha256:9e5172eb4d8d437a9165b35c1226d15f02705e7d44386dfca8db220ac31d65d8"
+    },
+    {
+      "command": "corepack pnpm ci:gate (initial FileTools JUnit cleanup failed)",
+      "exitCode": 1,
+      "privateLog": "closure-ci-gate.log",
+      "bytes": 176219,
+      "digest": "sha256:31b9db8e2cadbffb51b1f8e5bd3fc79c3e5babf06b07836692ffc884512b0a5e"
+    },
+    {
+      "command": "Maven OwnedWorkspaceCleanupTest,FileToolsIntegrationTest (initial junction snapshot failure)",
+      "exitCode": 1,
+      "privateLog": "closure-workspace.log",
+      "bytes": 14898,
+      "digest": "sha256:a077694fda4b5eb024efceb6a7520e27b99dafa380417004ce1a8bdafc3463d4"
+    },
+    {
+      "command": "Maven OwnedWorkspaceCleanupTest,FileToolsIntegrationTest (explicit link guard)",
+      "exitCode": 0,
+      "privateLog": "closure-workspace-final.log",
+      "bytes": 12655,
+      "digest": "sha256:449577bbdfaabd9c1275c612aff3a0947c568d361d74a8fb57c48b92360ae2bd"
+    },
+    {
+      "command": "corepack pnpm ci:gate (API passed; gateway mixed-clock fixture failed)",
+      "exitCode": 1,
+      "privateLog": "closure-ci-gate-final.log",
+      "bytes": 168171,
+      "digest": "sha256:61fd55fdae7fd759544c3e09810638e32004cbd821866914e7a53c3db2d3c2d4"
+    },
+    {
+      "command": "node --test tests/agent/repair/gateway-clock.test.mjs",
+      "exitCode": 0,
+      "privateLog": "closure-gateway-clock.log",
+      "bytes": 239,
+      "digest": "sha256:3b721bb55ca5ebd1dac476519d461e6f2204e72a3a2ea04241d772371536c34f"
+    },
+    {
+      "command": "node --test private four-line gateway fixture proposal",
+      "exitCode": 0,
+      "privateLog": "closure-gateway-proposal.log",
+      "bytes": 585,
+      "digest": "sha256:96c784a326bb7123cdfc0ea8623985aa1c8e374ac1799c6611c480f27c55aaa0"
+    },
+    {
+      "command": "corepack pnpm verify:runner (authorized four-line fixture fix)",
+      "exitCode": 0,
+      "privateLog": "closure-runner-fixed.log",
+      "bytes": 16186,
+      "digest": "sha256:037877c1c52317df8ab5444312a2a031ea8e4bfe0c6e642ef4d5d663d916bde6"
+    },
+    {
+      "command": "corepack pnpm ci:gate (final actual source)",
+      "exitCode": 0,
+      "privateLog": "closure-release-gate.log",
+      "bytes": 170106,
+      "digest": "sha256:0348d7dfac89df7448492205ee8e0477056c740b4ff959f8664bf9cfe66b1f60"
+    }
+  ],
+  "platformRuntime": {
+    "inputTokens": 34322,
+    "outputTokens": 2729,
+    "totalTokens": 37051,
+    "measurement": "MEASURED",
+    "newTasks": 1,
+    "additionalTaskExecuted": false
+  },
+  "developmentAgent": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "measurement": "UNKNOWN"
+  },
+  "M1": "PASSED",
+  "newGate": "FINAL_EXECUTED",
+  "priorGateFailuresPreserved": 2
+}

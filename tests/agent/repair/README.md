@@ -214,3 +214,47 @@ rebuild and browser assertions are real. The platform test retains the earlier
 PR31 setup and its original same-task preview actions. Neither positive fixture
 proves the real provider now follows the completion protocol. Historical failures
 and their metering remain unchanged; the model's internal wrapper cause is UNKNOWN.
+
+## Real M1 closure on 2026-10-11
+
+The explicitly authorized paid evaluation passed on source candidate
+`14e3f32337477fbb5a51ec8e3acf35150d4e624b`, task
+`201b3882-30a8-4ac9-b0ac-cf3c024eabdf`: real PLAN/GENERATE, disclosed host-injected
+missing import, actual Docker TS2307 failure, real REPAIR writes and legal root
+done, a new immutable version, successful rebuild/Chromium, and authenticated
+same-task signed preview including restart/refresh, isolation and revocation.
+The original six actions are unchanged. Limits remain 3 rounds / 12 requests /
+20 tool slots / 50,000 charged tokens / 12 minutes. Actual usage: 12 requests,
+17 global tool budget slots, input34,322/output2,729/total37,051 measured tokens,
+one repair round, no outer retries. Only one of the newly authorized maximum two
+tasks was executed; no second paid task is needed.
+
+Reproduce only with a new explicit paid authorization, existing API-only provider
+credentials, frozen toolchain, Docker and the prepared runner/browser:
+
+```powershell
+$env:CODELESS_M1_REAL_APPROVED='1'
+$env:CODELESS_MODEL_PROVIDER='deepseek'
+services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RealRepairPreviewPlatformAcceptanceIT' '-DreuseForks=false' '-DforkCount=1' test
+```
+
+The test refuses absent authorization, captures the complete wire privately,
+checks authoritative SQL/actual runner artifacts and the original actions, and
+prints the exact owned evidence root. Its result was exit0, 1/1, no skips. Public
+verified source, compiler diagnostic, browser result, screenshot, usage, cleanup
+and private-wire digests are in `evidence/2026-10-11/closure/`. Complete requests,
+provider capture envelopes and private preview credentials are not exported.
+This proves one controlled missing-component evaluation, not a model success
+rate or a historical internal root cause. All prior budget, protocol, Windows,
+TCP/TLS/504/OOM failure records retain their original outcomes. The latest final
+stage gates and consolidated peer handoff are recorded in `docs/handoffs/D10-A.md`.
+
+The separate offline gateway-clock regression runs with
+`node --test tests/agent/repair/gateway-clock.test.mjs`: a future-issued credential
+returns 403, a valid credential for an unmapped app returns 404, and expiration
+returns 403 against the actual gateway. Its signing key and absent artifact
+mapping are explicit fixtures. The four-line patch under `maintainer-proposals/`
+was explicitly authorized and applied to the shared preview test; it binds both
+additional signatures to the gateway's injected clock without changing any
+production rule or assertion. Both prior failed full gates remain in the closure
+command evidence; the final gate result is recorded separately.
