@@ -183,3 +183,34 @@ corepack pnpm ci:gate
 The signed-preview success in this command is the original PR31 deterministic
 setup with synthetic patch/unknown done usage and unchanged eight actions. It
 does not execute the invalid 17cc suggestion or establish paid model quality.
+# Latest paid wrapped-done failure and offline regression (2026-10-11)
+
+The single authorized real task `720fdce9-dda0-42d4-b7f7-b96cc020462f` on
+`3c349f55c5d860115cf50a76f82c1db70e7fe97b` actually applied a digest-guarded repair,
+then reread two files and returned a wrapped completion. M1 remained NOT_PASSED:
+FAILED / AGENT_MODEL_PROTOCOL_INVALID, 12 requests / 14 tools / 36,844 measured
+tokens. The last 657-byte application reply is preserved in
+`fixtures/m1-720f-wrapped-done.reply.txt`, SHA-256
+`13f75160960d41e2bdd45c3ab9221cb4126ed072e320ef5e57885ed2d8ba28e6`.
+`m1-720f-proposals.json` contains normalized test proposals, recorded usage and
+actual tool observations; its 24-file private wire manifest exports no complete
+request or capture envelope. It does not represent a new provider evaluation.
+
+Reproduce without credentials, with the D01 environment and Docker:
+
+```powershell
+Remove-Item Env:CODELESS_MODEL_API_KEY,Env:CODELESS_MODEL_NAME,Env:CODELESS_M1_REAL_APPROVED -ErrorAction SilentlyContinue
+$env:CODELESS_MODEL_PROVIDER='deterministic-mock'
+services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RepairContextTest,RepairPolicyTest,DeepSeekModelProviderTest' test
+services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RepairLoopIntegrationTest#capturedWrappedDoneStopsAfterActualPatchWithoutUnwrappingOrRetry+capturedPatchAndSyntheticExactCompletionRebuildWithinOriginalBudget,ProtocolRepairPreviewIT' '-DreuseForks=false' '-DforkCount=1' test
+pnpm ci:gate
+```
+
+The negative case replays the complete invalid application reply and stops after
+the real patch without unwrapping it, accepting it, or issuing a thirteenth call.
+The positive case replays the first nine proposals and uses an explicitly synthetic
+legal completion with unknown usage charged conservatively; PostgreSQL, tools,
+rebuild and browser assertions are real. The platform test retains the earlier
+PR31 setup and its original same-task preview actions. Neither positive fixture
+proves the real provider now follows the completion protocol. Historical failures
+and their metering remain unchanged; the model's internal wrapper cause is UNKNOWN.

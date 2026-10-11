@@ -65,10 +65,11 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
             count.incrementAndGet();var input=json.readTree(prompt.getUserMessage().getText());inputs.add(input);
             String phase=input.path("phase").asText();String content;
             if(Set.of("GENERATE","REPAIR").contains(phase)) {
-                assertThat(prompt.getSystemMessage().getText()).startsWith("Application proposal protocol")
-                    .contains("REPAIR copies input.originalActions exactly into actions");
-                if(phase.equals("GENERATE"))assertThat(prompt.getSystemMessage().getText()).contains("never json_object","Invalid replies terminate");
-                else assertThat(prompt.getSystemMessage().getText()).contains("Each key occurs exactly once","The root type occurs once")
+                assertThat(prompt.getSystemMessage().getText()).startsWith("Application proposal protocol");
+                if(phase.equals("GENERATE"))assertThat(prompt.getSystemMessage().getText()).contains("never json_object","Invalid replies terminate",
+                    "REPAIR copies input.originalActions exactly into actions");
+                else assertThat(prompt.getSystemMessage().getText()).contains("Each key occurs exactly once","The root type occurs once",
+                    "input.completionProposal is the complete done example")
                     .doesNotContain("json_object","response_format","Invalid protocol reply");
                 assertThat(max).isEqualTo(RuntimeBudget.OUTPUT_TOKENS);
             }
@@ -103,21 +104,21 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                     return new Reply(content,new Evidence(model(),"explicit-synthetic-duplicate-key-fixture","explicit-synthetic-duplicate-key-fixture",new Usage(31,17,48,null)));
                 }
                 if(mode.equals("stuck") || mode.equals("cancel") || mode.equals("timeout") || mode.equals("weaken")) {
-                    var actions=input.path("originalActions").deepCopy();
+                    var actions=input.path("completionProposal").path("actions").deepCopy();
                     if(mode.equals("weaken")) ((tools.jackson.databind.node.ObjectNode)actions.get(1)).put("value","fake success");
                     content=json.writeValueAsString(Map.of("type","done","actions",actions));
                 } else if(mode.equals("limit")) {
                     String digest="";for(var entry:input.path("sourceFiles"))if(entry.path("path").asText().equals(PAGE))digest=entry.path("digest").asText();
                     content=observed==0?json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of(
                             "path",PAGE,"expectedDigest",digest,"content",BROKEN+"\n<!-- attempt "+input.path("repairAttempt").asInt()+" -->"))):
-                            json.writeValueAsString(Map.of("type","done","actions",input.path("originalActions")));
+                            json.writeValueAsString(Map.of("type","done","actions",input.path("completionProposal").path("actions")));
                 } else if(observed==0) content=json.writeValueAsString(Map.of("type","tool","name","files.read","arguments",Map.of("path",PAGE)));
                 else if(observed==1) {
                     JsonNode actual=input.path("observations").get(0);
                     assertThat(actual.path("content").asText()).isEqualTo(mode.equals("browser")?BROWSER_ERROR:BROKEN);
                     content=json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of(
                             "path",PAGE,"expectedDigest",actual.path("afterDigest").asText(),"content",FIXED)));
-                } else content=json.writeValueAsString(Map.of("type","done","actions",input.path("originalActions")));
+                } else content=json.writeValueAsString(Map.of("type","done","actions",input.path("completionProposal").path("actions")));
             }
             Usage usage=mode.equals("unknown")?Usage.unknown():new Usage(31,17,48,null);
             return new Reply(content,new Evidence(model(),"explicit-fixture-request","explicit-fixture-response",usage));
@@ -339,6 +340,65 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                         .param(seed.task()).query(Boolean.class).single()).isTrue();
                 report("D10-A-"+mode,seed,Map.of("measurement","SYNTHETIC_DUPLICATE_KEY_BOUNDARY","paidCalls",0,"outerRetries",0,"wireDigests",wire.digests));
             }
+        }
+    }
+    @Test void capturedWrappedDoneStopsAfterActualPatchWithoutUnwrappingOrRetry() throws Exception {
+        var seed=seed();var provider=new CapturedDoneRepairFixture(false,recordedFault(seed));
+        try(var wire=new RecordedRepairWireFixture(provider)) {
+            var task=run(seed,wire);var events=journal.read(seed.task());wire.assertHealthy();
+            assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_MODEL_PROTOCOL_INVALID");
+            assertThat(provider.count).isEqualTo(12);assertThat(RuntimeBudget.meter(events)).isEqualTo(new RuntimeBudget.Meter(12,14,36844));
+            assertThat(AgentJournal.latest(events,"model.response").path("type").asText()).isEqualTo("json_object");
+            assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.done")).count()).isZero();
+            assertThat(events.stream().filter(e->e.path("kind").asText().equals("draft")).count()).isEqualTo(1);
+            assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(1);
+            assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.read.repeat")).count()).isEqualTo(1);
+            assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
+            assertThat(Files.readString(Path.of("target/repair-integration/workspaces",seed.task().toString(),"source",PAGE))).contains("../components/ProfileCard.vue");
+            report("D10-A-wrapped-done720f-invalid",seed,Map.of("originTask",provider.recording.path("originTask").asText(),"completeReplyBytes",657,
+                "paidCalls",0,"outerRetries",0,"actualPatchExecuted",true,"modelQualityEvidence",false,"wireDigests",wire.digests));
+        }
+    }
+    @Test void lastRepairModelCallAfterPatchCannotConsumeAnotherFileTool() throws Exception {
+        var seed=seed();var captured=new CapturedDoneRepairFixture(false,recordedFault(seed));
+        ModelProvider provider=new ModelProvider() {
+            public String id(){return "deterministic-mock";}public String model(){return "synthetic-last-repair-tool-boundary-fixture";}
+            public Reply call(Prompt prompt,int max,Duration timeout) {
+                var reply=captured.call(prompt,max,timeout);if(captured.count<12)return reply;
+                var input=json.readTree(prompt.getUserMessage().getText());
+                assertThat(input.path("completionOnly").asBoolean()).isTrue();assertThat(input.path("tools")).isEmpty();
+                assertThat(input.path("budget").path("modelCallsRemaining").asInt()).isEqualTo(1);
+                return new Reply(json.writeValueAsString(Map.of("type","tool","name","files.read","arguments",Map.of("path",PAGE))),
+                    new Evidence(model(),"synthetic-last-tool","synthetic-last-tool",new Usage(31,17,48,json.valueToTree(Map.of("fixture",true,"measurement","SYNTHETIC_LAST_CALL_TOOL_BOUNDARY")))));
+            }
+        };
+        try(var wire=new RecordedRepairWireFixture(provider)) {
+            var task=run(seed,wire);var events=journal.read(seed.task());wire.assertHealthy();
+            assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_TOOL_NOT_ALLOWED");
+            assertThat(captured.count).isEqualTo(12);assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(14);
+            assertThat(events.stream().filter(e->e.path("stage").asText().equals("REPAIR")&&e.path("kind").asText().equals("tool.result")).count()).isEqualTo(5);
+            assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.done")).count()).isZero();
+            assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
+            report("D10-A-last-repair-tool-denied",seed,Map.of("originTask",captured.recording.path("originTask").asText(),"lastReplySynthetic",true,
+                "paidCalls",0,"outerRetries",0,"lastToolExecuted",false,"wireDigests",wire.digests));
+        }
+    }
+    @Test void capturedPatchAndSyntheticExactCompletionRebuildWithinOriginalBudget() throws Exception {
+        var seed=seed();var provider=new CapturedDoneRepairFixture(true,recordedFault(seed));
+        try(var wire=new RecordedRepairWireFixture(provider)) {
+            var task=run(seed,wire);var events=journal.read(seed.task());wire.assertHealthy();
+            assertThat(task.status()).isEqualTo(TaskStatus.READY);assertThat(provider.count).isEqualTo(10);
+            var meter=RuntimeBudget.meter(events);assertThat(meter.models()).isEqualTo(10);assertThat(meter.tools()).isEqualTo(15);assertThat(meter.chargedTokens()).isLessThanOrEqualTo(50000);
+            var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
+            var results=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
+            assertThat(drafts).hasSize(2);assertThat(drafts.getFirst().path("actions")).isEqualTo(drafts.getLast().path("actions"));
+            assertThat(drafts.getFirst().path("sourceDigest")).isNotEqualTo(drafts.getLast().path("sourceDigest"));
+            assertThat(results.getFirst().path("build").path("exitCode").asInt()).isEqualTo(2);
+            assertThat(results.getLast().path("build").path("exitCode").asInt()).isZero();assertThat(results.getLast().path("verification").path("status").asText()).isEqualTo("PASSED");
+            assertThat(AgentJournal.latest(events,"model.usage").path("estimated").asBoolean()).isTrue();
+            assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.read.repeat")).count()).isZero();
+            report("D10-A-captured720f-synthetic-done",seed,Map.of("originTask",provider.recording.path("originTask").asText(),"syntheticCompletion",true,
+                "paidCalls",0,"outerRetries",0,"realBuildAndBrowser",true,"modelQualityEvidence",false,"wireDigests",wire.digests));
         }
     }
     @Test void exact17ccDuplicateReplyIsRejectedBeforePatchAndKeepsCompleteMeasuredUsage() throws Exception {

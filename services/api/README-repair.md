@@ -14,6 +14,30 @@ GENERATE freezes the repaired bytes without another model call. A new immutable
 version is created for every candidate. Only a real successful rebuild/browser
 and independently checked artifacts/report/PNG allow READY and pointer replacement.
 
+The internal REPAIR model input now supplies `completionProposal` instead of the
+standalone `originalActions` field. It is the complete `{type:done,actions}` object
+containing the original frozen actions once. The model must still propose that
+exact object; the server independently compares its actions with the full original
+draft, rejects wrappers/duplicate keys, and never executes a nested proposal.
+After an actual source change, the final available model request is reserved for
+completion: `completionOnly:true` exposes no file tools, and a tool proposal is
+rejected before a tool reservation or execution. Omitting these unavailable tool
+schemas leaves room for full source content and conservative unknown completion
+usage; token reservation itself is unchanged. The model still must supply done,
+and only a new real build/browser result can succeed.
+This changes no public API or tool contract. Only model-facing plan prose is
+removed: routes, planned paths and capabilities are retained, while the complete
+validated plan remains authoritative for permissions and browser coverage.
+
+Read content is invalidated per file digest, not merely because another file has
+changed. A successful create/update projection can carry `committedContent` only
+when the submitted UTF-8 content digest matches both the actual reread afterDigest
+and current source manifest. It is labeled `COMMITTED_WRITE_DIGEST_MATCHED`, not
+reported as a new read; failed or mismatched writes stop. A genuine later read
+supersedes this text to avoid sending duplicate full file contents. Complete actual
+receipts remain in the journal. After a write, the progress hint asks for completion
+or a necessary patch; it does not encourage rereading already current source.
+
 | Observed condition | Decision / terminal failure |
 | --- | --- |
 | Confirmed compiler diagnostic with nonzero exit, no OOM/timeout and confirmed cleanup | Request REPAIR if limits permit. |

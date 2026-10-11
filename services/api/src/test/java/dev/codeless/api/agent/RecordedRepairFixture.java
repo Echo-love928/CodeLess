@@ -58,7 +58,7 @@ public final class RecordedRepairFixture implements ModelProvider {
         } else if(index==replayLimit+1) {
             assertThat(input.path("budget").path("modelCallsRemaining").asInt()).isEqualTo(12-index);
             assertThat(input.path("repairProgress").path("sourceChanged").asBoolean()).isTrue();
-            reply=json.valueToTree(Map.of("type","done","actions",input.path("originalActions")));usage=Usage.unknown();
+            reply=input.path("completionProposal");usage=Usage.unknown();
         } else throw new AssertionError("No outer retry or additional model calls permitted");
         return new Reply(reply.toString(),new Evidence(model(),"offline-fixture-"+index,"offline-fixture-"+index,usage));
     }

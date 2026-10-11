@@ -97,19 +97,21 @@ public final class AgentLoop implements TaskStageRunner {
         Set<String> planned=new TreeSet<>();plan.path("files").forEach(f -> planned.add(f.path("path").asText()));
         Set<String> names=new HashSet<>();registry.definitions().path("tools").forEach(t -> names.add(t.path("name").asText()));
         for(int i=0;i<RuntimeBudget.MODEL_CALLS;i++) {
+            var meter=repair?RuntimeBudget.meter(store.read(claim,stage)):null;
+            boolean completionOnly=repair&&Boolean.TRUE.equals(repairContext.progress().get("sourceChanged"))&&RuntimeBudget.MODEL_CALLS-meter.models()==1;
             var input=new LinkedHashMap<String,Object>();input.put("phase",stage.name());input.put("request",context.prompt());
-            input.put("dataMode",context.dataMode());input.put("plan",plan);input.put("tools",registry.definitions().path("tools"));
+            input.put("dataMode",context.dataMode());input.put("plan",repair?RepairContext.planProjection(plan):plan);input.put("tools",completionOnly?List.of():registry.definitions().path("tools"));
             input.put("observations",repair?repairContext.observations():observations);
-            if(repair) {input.put("failure",failure);input.put("originalActions",originalActions);input.put("sourceFiles",repairContext.sourceFiles());
+            if(repair) {input.put("failure",failure);input.put("completionProposal",Map.of("type","done","actions",originalActions));input.put("sourceFiles",repairContext.sourceFiles());
                 input.put("repairAttempt",context.repairAttempts());input.put("repairProgress",repairContext.progress());
-                var meter=RuntimeBudget.meter(store.read(claim,stage));
+                if(completionOnly)input.put("completionOnly",true);
                 input.put("budget",Map.of("modelCallsRemaining",RuntimeBudget.MODEL_CALLS-meter.models(),
                         "toolCallsRemaining",RuntimeBudget.TOOL_CALLS-meter.tools(),"tokensRemaining",RuntimeBudget.TOKENS-meter.chargedTokens()));}
             JsonNode reply=model.call(claim,stage,repair?repairPolicy:generationPolicy,json.valueToTree(input));
             if(reply.path("type").asText().equals("tool")) {
                 closed(reply,Set.of("type","name","arguments"));
                 String name=reply.path("name").asText();
-                if(!names.contains(name)) throw new AgentFailure("AGENT_TOOL_NOT_ALLOWED");
+                if(!names.contains(name)||completionOnly) throw new AgentFailure("AGENT_TOOL_NOT_ALLOWED");
                 JsonNode arguments=reply.path("arguments");
                 if(arguments.has("path") && !planned.contains(arguments.path("path").asText())) throw new AgentFailure("AGENT_UNPLANNED_FILE");
                 store.reserve(claim,stage,"tool.request",0);

@@ -54,7 +54,7 @@ class FaultAtFreezePreviewAcceptanceIT extends PreviewPlatformIntegrationTest {
                     assertThat(input.path("failure").path("diagnostic").asText()).contains("M1MissingCard.vue");int size=input.path("observations").size();String page="src/pages/HomePage.vue",content;
                     if(size==0)content=mapper.writeValueAsString(Map.of("type","tool","name","files.read","arguments",Map.of("path",page)));
                     else if(size==1){var actual=input.path("observations").get(0);content=mapper.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of("path",page,"content",actual.path("content").asText().replace("M1MissingCard.vue","ProfileCard.vue"),"expectedDigest",actual.path("afterDigest").asText())));}
-                    else content=mapper.writeValueAsString(Map.of("type","done","actions",input.path("originalActions")));
+                    else content=mapper.writeValueAsString(Map.of("type","done","actions",input.path("completionProposal").path("actions")));
                     return new Reply(content,new Evidence(model(),"explicit-fixture","explicit-fixture",new Usage(31,17,48,mapper.valueToTree(Map.of("measurement","SYNTHETIC_FIXTURE_COUNTERS")))));
                 }
             };

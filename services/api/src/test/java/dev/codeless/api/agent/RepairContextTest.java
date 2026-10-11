@@ -25,15 +25,22 @@ class RepairContextTest {
     }
     JsonNode input(JsonNode doc,List<JsonNode> observed,RepairContext context,RuntimeBudget.Meter meter) {
         var draft=latest(doc,"draft");var in=new LinkedHashMap<String,Object>();in.put("phase","REPAIR");in.put("request",doc.path("task").path("prompt").asText());in.put("dataMode","STATIC");
-        in.put("plan",latest(doc,"plan"));in.put("tools",new FileToolRegistry().definitions().path("tools"));in.put("observations",context==null?observed:context.observations());
-        in.put("failure",latest(doc,"repair.failure"));in.put("originalActions",draft.path("actions"));in.put("sourceFiles",context==null?draft.path("files"):context.sourceFiles());in.put("repairAttempt",1);
-        if(context!=null){in.put("repairProgress",context.progress());in.put("budget",Map.of("modelCallsRemaining",12-meter.models(),"toolCallsRemaining",20-meter.tools(),"tokensRemaining",50000-meter.chargedTokens()));}return json.valueToTree(in);
+        boolean completionOnly=context!=null&&Boolean.TRUE.equals(context.progress().get("sourceChanged"))&&12-meter.models()==1;
+        in.put("plan",context==null?latest(doc,"plan"):RepairContext.planProjection(latest(doc,"plan")));in.put("tools",completionOnly?List.of():new FileToolRegistry().definitions().path("tools"));in.put("observations",context==null?observed:context.observations());
+        in.put("failure",latest(doc,"repair.failure"));
+        if(context==null)in.put("originalActions",draft.path("actions")); // Exact historical request reproduction remains unchanged.
+        else in.put("completionProposal",Map.of("type","done","actions",draft.path("actions")));
+        in.put("sourceFiles",context==null?draft.path("files"):context.sourceFiles());in.put("repairAttempt",1);
+        if(context!=null){if(completionOnly)in.put("completionOnly",true);in.put("repairProgress",context.progress());in.put("budget",Map.of("modelCallsRemaining",12-meter.models(),"toolCallsRemaining",20-meter.tools(),"tokensRemaining",50000-meter.chargedTokens()));}return json.valueToTree(in);
     }
     int reservation(JsonNode doc,RepairContext context) throws Exception{return RuntimeBudget.inputReservation(policy(),input(doc,List.of(),context).toString())+RuntimeBudget.OUTPUT_TOKENS;}
     int reservation(JsonNode doc,RepairContext context,RuntimeBudget.Meter meter) throws Exception{return RuntimeBudget.inputReservation(policy(),input(doc,List.of(),context,meter).toString())+RuntimeBudget.OUTPUT_TOKENS;}
     RepairContext replay(JsonNode doc) throws Exception {var context=new RepairContext(latest(doc,"draft"));var ops=proposals();var actual=results(doc);assertThat(ops).hasSize(4);for(int i=0;i<4;i++)context.observe(ops.get(i).path("name").asText(),ops.get(i).path("arguments"),actual.get(i));return context;}
     JsonNode writeResult(JsonNode read) {
-        var actual=(tools.jackson.databind.node.ObjectNode)read.deepCopy();actual.putNull("content");actual.put("afterDigest","sha256:"+"a".repeat(64));
+        String content=read.path("content").asText().replace("M1MissingCard.vue","ProfileCard.vue");
+        var actual=(tools.jackson.databind.node.ObjectNode)read.deepCopy();actual.putNull("content");
+        try{actual.put("afterDigest","sha256:"+HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(content.getBytes(StandardCharsets.UTF_8))));}
+        catch(Exception failure){throw new IllegalStateException(failure);}
         var source=(tools.jackson.databind.node.ObjectNode)actual.path("source");source.put("sourceDigest","sha256:"+"b".repeat(64));
         for(var file:source.path("files"))if(file.path("path").asText().equals("src/pages/HomePage.vue"))((tools.jackson.databind.node.ObjectNode)file).put("digest",actual.path("afterDigest").asText());return actual;
     }
@@ -55,9 +62,12 @@ class RepairContextTest {
         // B's original last read input count plus a declared synthetic 1024-token patch output, NOT a new paid observation.
         var patchUsage=new Usage(4156,1024,5180,json.valueToTree(Map.of("fixture",true,"measurement","SYNTHETIC_FUTURE_SCENARIO")));
         var patchCharge=RuntimeBudget.charge(patchUsage,patchReservation-4096);assertThat(patchCharge.estimated()).isFalse();
-        context.observe("files.update",json.valueToTree(Map.of("path","src/pages/HomePage.vue")),writeResult(results(doc).getLast()));
+        String content=results(doc).getLast().path("content").asText().replace("M1MissingCard.vue","ProfileCard.vue");
+        context.observe("files.update",json.valueToTree(Map.of("path","src/pages/HomePage.vue","content",content)),writeResult(results(doc).getLast()));
         var afterPatch=new RuntimeBudget.Meter(11,14,31596+patchCharge.chargedTokens());
         int doneReservation=reservation(doc,context,afterPatch);var doneCharge=RuntimeBudget.charge(Usage.unknown(),doneReservation-4096);
+        var lastInput=input(doc,List.of(),context,afterPatch);assertThat(lastInput.path("completionOnly").asBoolean()).isTrue();assertThat(lastInput.path("tools")).isEmpty();
+        assertThat(context.observations().getLast().path("committedContent").asText()).isEqualTo(content);
         assertThat(doneCharge.estimated()).isTrue();assertThat(doneCharge.chargedTokens()).isEqualTo(doneReservation);
         var report=Map.of("originTask",doc.path("task").path("id").asText(),"offlineOnly",true,"paidCalls",0,"originalPaidMeter",new RuntimeBudget.Meter(10,13,31596),
                 "patchReservation",patchReservation,"patchChargeSynthetic",patchCharge,"doneReservation",doneReservation,"doneChargeEstimated",doneCharge,"projectedTotal",31596+patchCharge.chargedTokens()+doneCharge.chargedTokens(),"newInput",input(doc,List.of(),context,afterPatch));
@@ -79,6 +89,45 @@ class RepairContextTest {
         var changed=writeResult(result);context.observe("files.update",args,changed);assertThat(context.observations().getFirst().path("stale").asBoolean()).isTrue();assertThat(context.observations().getFirst().path("content").isNull()).isTrue();
         var fresh=(tools.jackson.databind.node.ObjectNode)changed.deepCopy();fresh.put("content","fresh actual text");fresh.put("beforeDigest",fresh.path("afterDigest").asText());context.observe("files.read",args,fresh);
         assertThat(context.observations().getFirst().path("content").asText()).isEqualTo("fresh actual text");assertThat(context.progress().get("repeatedReads")).isEqualTo(0);
+    }
+    @Test void actual720fPatchKeepsUnchangedDependencyAndDigestCheckedCommittedContent() throws Exception {
+        var captured=json.readTree(Files.readString(Path.of("../../tests/agent/repair/fixtures/m1-720f-proposals.json")));
+        var context=new RepairContext(captured.path("originalDraft"));var replies=captured.path("protocolResponses");var actual=captured.path("observedRepairResults");
+        for(int i=0;i<3;i++)context.observe(replies.get(6+i).path("payload").path("name").asText(),replies.get(6+i).path("payload").path("arguments"),actual.get(i));
+        var observed=context.observations();
+        assertThat(observed.get(0).path("stale").asBoolean()).isTrue();assertThat(observed.get(0).path("content").isNull()).isTrue();
+        assertThat(observed.get(1).path("stale").asBoolean()).isFalse();assertThat(observed.get(1).path("content")).isEqualTo(actual.get(1).path("content"));
+        assertThat(observed.get(2).path("content").isNull()).isTrue(); // The authentic write receipt remains a write, not a read.
+        assertThat(observed.get(2).path("committedContent")).isEqualTo(replies.get(8).path("payload").path("arguments").path("content"));
+        assertThat(context.progress().get("next")).isEqualTo("PROPOSE_COMPLETION_OR_NECESSARY_PATCH");
+        context.observe("files.read",replies.get(9).path("payload").path("arguments"),actual.get(3));
+        assertThat(context.observations().get(2).has("committedContent")).isFalse();
+        context.observe("files.read",replies.get(10).path("payload").path("arguments"),actual.get(4));
+        assertThat(context.progress().get("repeatedReads")).isEqualTo(1); // The unchanged dependency's previous read was retained.
+    }
+    @Test void proposedContentCannotBecomeCommittedEvidenceWithoutMatchingActualDigest() throws Exception {
+        var captured=json.readTree(Files.readString(Path.of("../../tests/agent/repair/fixtures/m1-720f-proposals.json")));
+        var context=new RepairContext(captured.path("originalDraft"));
+        var arguments=(tools.jackson.databind.node.ObjectNode)captured.path("protocolResponses").get(8).path("payload").path("arguments").deepCopy();
+        arguments.put("content","uncommitted model claim");
+        assertThatThrownBy(()->context.observe("files.update",arguments,captured.path("observedRepairResults").get(2)))
+            .isInstanceOf(AgentFailure.class).hasMessage("AGENT_CHECKPOINT_INVALID");
+        assertThat(context.observations()).isEmpty();
+        var failed=(tools.jackson.databind.node.ObjectNode)captured.path("observedRepairResults").get(2).deepCopy();failed.put("status","FAILED");
+        assertThatThrownBy(()->context.observe("files.update",captured.path("protocolResponses").get(8).path("payload").path("arguments"),failed))
+            .isInstanceOf(AgentFailure.class).hasMessage("AGENT_CHECKPOINT_INVALID");
+        assertThat(context.observations()).isEmpty();
+    }
+    @Test void repairPlanProjectionPreservesPathsRoutesAndCapabilitiesWithoutChangingFullPlan() throws Exception {
+        var original=latest(doc(),"plan");String full=original.toString();var compact=RepairContext.planProjection(original);
+        for(String field:List.of("schemaVersion","template","dataMode","capabilities"))assertThat(compact.path(field)).isEqualTo(original.path(field));
+        for(int i=0;i<original.path("pages").size();i++) {
+            assertThat(compact.path("pages").get(i).path("route")).isEqualTo(original.path("pages").get(i).path("route"));
+            assertThat(compact.path("pages").get(i).path("file")).isEqualTo(original.path("pages").get(i).path("file"));
+        }
+        for(int i=0;i<original.path("files").size();i++)assertThat(compact.path("files").get(i).path("path")).isEqualTo(original.path("files").get(i).path("path"));
+        assertThat(compact.toString().getBytes(StandardCharsets.UTF_8).length).isLessThan(full.getBytes(StandardCharsets.UTF_8).length-607);
+        assertThat(original.toString()).isEqualTo(full);assertThat(original.path("acceptance")).isNotEmpty();
     }
     @Test void differentPathsWithIdenticalBytesAreNotMergedAndLargeReadsAreNotTruncated() throws Exception {
         var doc=doc();var context=new RepairContext(latest(doc,"draft"));var huge=(tools.jackson.databind.node.ObjectNode)results(doc).getFirst().deepCopy();huge.put("content","x".repeat(131072));

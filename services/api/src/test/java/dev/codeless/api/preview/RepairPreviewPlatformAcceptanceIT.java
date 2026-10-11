@@ -69,7 +69,7 @@ class RepairPreviewPlatformAcceptanceIT extends PreviewPlatformIntegrationTest {
                             var actual=input.path("observations").get(0);assertThat(actual.path("content").asText()).isEqualTo(BROKEN);
                             content=json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of(
                                     "path",PAGE,"content",FIXED,"expectedDigest",actual.path("afterDigest").asText())));
-                        } else content=json.writeValueAsString(Map.of("type","done","actions",input.path("originalActions")));
+                        } else content=json.writeValueAsString(Map.of("type","done","actions",input.path("completionProposal").path("actions")));
                     }
                     return new Reply(content,new Evidence(model(),"explicit-same-task-fixture","explicit-same-task-fixture",
                             new Usage(31,17,48,json.valueToTree(Map.of("fixture",true,"measurement","SYNTHETIC_FIXTURE_COUNTERS")))));
