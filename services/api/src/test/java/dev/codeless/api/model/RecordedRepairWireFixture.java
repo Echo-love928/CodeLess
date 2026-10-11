@@ -34,6 +34,9 @@ public final class RecordedRepairWireFixture implements ModelProvider,AutoClosea
                 assertThat(body.path("thinking").path("type").asText()).isEqualTo("disabled");assertThat(body.has("tools")).isFalse();
                 var messages=body.path("messages");assertThat(messages).hasSize(2);
                 assertThat(messages.get(0).path("role").asText()).isEqualTo("system");assertThat(messages.get(1).path("role").asText()).isEqualTo("user");
+                if(json.readTree(messages.get(1).path("content").asText()).path("phase").asText().equals("REPAIR"))
+                    assertThat(messages.get(0).path("content").asText()).contains("Each key occurs exactly once","The root type occurs once")
+                        .doesNotContain("json_object","response_format","Invalid protocol reply");
                 var prompt=new Prompt(List.of(new SystemMessage(messages.get(0).path("content").asText()),new UserMessage(messages.get(1).path("content").asText())));
                 var reply=fixture.call(prompt,4096,Duration.ofSeconds(60));var usage=reply.evidence().usage();var billed=new LinkedHashMap<String,Object>();
                 if(usage.inputTokens()!=null)billed.put("prompt_tokens",usage.inputTokens());if(usage.outputTokens()!=null)billed.put("completion_tokens",usage.outputTokens());if(usage.totalTokens()!=null)billed.put("total_tokens",usage.totalTokens());

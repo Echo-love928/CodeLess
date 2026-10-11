@@ -142,3 +142,44 @@ task texts must be reviewed before any export. Capture failure before dispatch
 stops without a request, and result-write failure preserves measured usage.
 No paid approval guard, runtime limit, retry, transport or proposal parser is
 changed. This prevents another paid failure being archived without its input.
+
+### PR32 duplicate-field reply regression (2026-10-11)
+
+B's paid task `17cc6cb9-ee15-4919-bea9-95be983aebe4` returned a ninth reply with
+duplicate root `type` keys. It correctly failed with `MODEL_INVALID_RESPONSE`
+before `files.update`; real M1 remains NOT_PASSED and its single paid approval
+has been consumed. No paid request is made by these regressions.
+
+`fixtures/m1-17cc-duplicate-type.reply.txt` preserves all 2,575 reply bytes,
+including the duplicate keys. Its SHA-256 is
+`fc95b76a31290ead31dc73d7123a208f01572a11a74bc7eafdc5981339fceb7a`,
+matching B's actual private reply digest. The fixture was recovered from B's
+public frozen HomePage source and the operation envelope, rather than copied
+from the unavailable private capture. Provenance records the immutable B
+evidence commit `d273a999cf805915a5723f137769b6d706a179d4` and usage separately.
+
+`DuplicateTypeRepairFixture` uses the prior PR31's first eight recorded replies
+as setup, this exact final reply, and the nine recorded 17cc usage entries.
+It is **not** a replay of the private 17cc requests or first eight responses.
+Production serialization/loopback HTTP/AgentModel parsing reject the full reply,
+retain 9 fixture calls/11 tools/29,340 replay tokens, and perform no repair
+update/done/new candidate/READY. Synthetic cases additionally reject different
+and identical duplicate root values and duplicate argument paths.
+
+REPAIR policy now describes only the business tool/done root forms and unique
+keys. The provider's JSON response format remains unchanged. Removing the
+transport vocabulary from the prompt is an input correction; its causal effect
+on real model behavior remains unproven. The exact original request body is
+still private and has not been read in this A workspace.
+
+Run the focused regression with the pinned Java 21 environment, Docker ready,
+provider `deterministic-mock`, and no model key/name/M1 approval:
+
+```powershell
+services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RepairLoopIntegrationTest#exact17ccDuplicateReplyIsRejectedBeforePatchAndKeepsCompleteMeasuredUsage,ProtocolRepairPreviewIT' '-DreuseForks=false' '-DforkCount=1' test
+corepack pnpm ci:gate
+```
+
+The signed-preview success in this command is the original PR31 deterministic
+setup with synthetic patch/unknown done usage and unchanged eight actions. It
+does not execute the invalid 17cc suggestion or establish paid model quality.

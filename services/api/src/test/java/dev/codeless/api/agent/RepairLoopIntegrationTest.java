@@ -66,7 +66,10 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
             String phase=input.path("phase").asText();String content;
             if(Set.of("GENERATE","REPAIR").contains(phase)) {
                 assertThat(prompt.getSystemMessage().getText()).startsWith("Application proposal protocol")
-                    .contains("never json_object", "Invalid replies terminate", "REPAIR copies input.originalActions exactly into actions");
+                    .contains("REPAIR copies input.originalActions exactly into actions");
+                if(phase.equals("GENERATE"))assertThat(prompt.getSystemMessage().getText()).contains("never json_object","Invalid replies terminate");
+                else assertThat(prompt.getSystemMessage().getText()).contains("Each key occurs exactly once","The root type occurs once")
+                    .doesNotContain("json_object","response_format","Invalid protocol reply");
                 assertThat(max).isEqualTo(RuntimeBudget.OUTPUT_TOKENS);
             }
             if(!phase.equals("REPAIR")) {
@@ -91,6 +94,14 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                 if(mode.equals("cancel")) queue.cancel(seed.owner(),seed.task());
                 if(mode.equals("timeout")) jdbc.sql("UPDATE generation_tasks SET deadline_at=clock_timestamp()-interval '1 second',lease_expires_at=clock_timestamp()-interval '1 second' WHERE id=?").param(seed.task()).update();
                 int observed=input.path("observations").size();
+                if(mode.startsWith("duplicate-")&&observed==1) {
+                    var actual=input.path("observations").get(0);
+                    String valid=json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of(
+                            "path",PAGE,"expectedDigest",actual.path("afterDigest").asText(),"content",FIXED)));
+                    content=mode.equals("duplicate-path")?valid.replace("\"path\":\""+PAGE+"\"","\"path\":\""+PAGE+"\",\"path\":\""+PAGE+"\""):
+                            valid.replace("\"type\":\"tool\"","\"type\":\""+(mode.equals("duplicate-type")?"json_object":"tool")+"\",\"type\":\"tool\"");
+                    return new Reply(content,new Evidence(model(),"explicit-synthetic-duplicate-key-fixture","explicit-synthetic-duplicate-key-fixture",new Usage(31,17,48,null)));
+                }
                 if(mode.equals("stuck") || mode.equals("cancel") || mode.equals("timeout") || mode.equals("weaken")) {
                     var actions=input.path("originalActions").deepCopy();
                     if(mode.equals("weaken")) ((tools.jackson.databind.node.ObjectNode)actions.get(1)).put("value","fake success");
@@ -276,13 +287,16 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         return recordedProvider(seed,mode,RepairContextTest.RECORD);
     }
     private RecordedRepairFixture recordedProvider(Seed seed,String mode,Path directory) {
-        return new RecordedRepairFixture(mode,reply->{
+        return new RecordedRepairFixture(mode,recordedFault(seed),directory);
+    }
+    private java.util.function.Consumer<JsonNode> recordedFault(Seed seed) {
+        return reply->{
             var claim=jdbc.sql("SELECT lease_token FROM generation_tasks WHERE id=?").param(seed.task()).query(UUID.class).single();
             var lease=new TaskQueueService.Claim(seed.task(),claim,TaskStatus.GENERATE);
             store.reserve(lease,TaskStatus.GENERATE,"tool.request",0);var read=files.execute(seed.task(),claim,"files.read",json.writeValueAsString(Map.of("path",PAGE)));store.append(lease,TaskStatus.GENERATE,"tool.result",read);assertThat(read.status()).isEqualTo("SUCCEEDED");
             store.reserve(lease,TaskStatus.GENERATE,"tool.request",0);var write=files.execute(seed.task(),claim,"files.update",json.writeValueAsString(Map.of("path",PAGE,"content",read.content().replace("../components/ProfileCard.vue","../components/M1MissingCard.vue"),"expectedDigest",read.afterDigest())));
             store.append(lease,TaskStatus.GENERATE,"tool.result",write);assertThat(write.status()).isEqualTo("SUCCEEDED");
-        },directory);
+        };
     }
     @Test void completePaidProtocolErrorSurvivesRealWireParsingAndStopsWithoutRepairOrRetry() throws Exception {
         var seed=seed();Path directory=Path.of("../../docs/evidence/D10/M1/17f440cf-7970-46cc-b598-dd2d91a20ade");
@@ -304,6 +318,50 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
             assertThat(input.path("budget").path("tokensRemaining").asLong()).isEqualTo(25090);
             report("D10-A-protocol31-invalid",seed,Map.of("originTask","17f440cf-7970-46cc-b598-dd2d91a20ade",
                     "offlineWireRequests",wire.requests,"wireDigests",wire.digests,"paidCalls",0,"outerRetries",0,"historicalWireCaptured",false));
+        }
+    }
+    @Test void duplicateRootAndArgumentKeysStopBeforeProposedUpdatesThroughProductionWire() throws Exception {
+        // Synthetic boundary cases, separate from the exact 17cc6cb9 final reply test below.
+        for(String mode:List.of("duplicate-type","duplicate-same-type","duplicate-path")) {
+            var seed=seed();var provider=new Fixture(mode,seed);
+            try(var wire=new RecordedRepairWireFixture(provider)) {
+                var task=run(seed,wire);var events=journal.read(seed.task());
+                assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("MODEL_INVALID_RESPONSE");
+                assertThat(provider.count.get()).isEqualTo(6);assertThat(wire.requests).hasSize(6);wire.assertHealthy();
+                assertThat(RuntimeBudget.meter(events)).isEqualTo(new RuntimeBudget.Meter(6,6,288));
+                assertThat(events.stream().filter(e->e.path("stage").asText().equals("REPAIR")&&e.path("kind").asText().equals("tool.result")).count()).isEqualTo(1);
+                assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(1);
+                assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.done")).count()).isZero();
+                assertThat(AgentJournal.latest(events,"model.response").path("name").asText()).isEqualTo("files.read");
+                assertThat(AgentJournal.latest(events,"failure").path("category").asText()).isEqualTo("MODEL_INTERFACE");
+                assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
+                assertThat(jdbc.sql("SELECT input_tokens=31 AND output_tokens=17 AND error_code='MODEL_INVALID_RESPONSE' FROM model_calls WHERE task_id=? AND stage='REPAIR' ORDER BY created_at DESC LIMIT 1")
+                        .param(seed.task()).query(Boolean.class).single()).isTrue();
+                report("D10-A-"+mode,seed,Map.of("measurement","SYNTHETIC_DUPLICATE_KEY_BOUNDARY","paidCalls",0,"outerRetries",0,"wireDigests",wire.digests));
+            }
+        }
+    }
+    @Test void exact17ccDuplicateReplyIsRejectedBeforePatchAndKeepsCompleteMeasuredUsage() throws Exception {
+        var seed=seed();var provider=new DuplicateTypeRepairFixture(recordedFault(seed));
+        try(var wire=new RecordedRepairWireFixture(provider)) {
+            var task=run(seed,wire);var events=journal.read(seed.task());wire.assertHealthy();
+            assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("MODEL_INVALID_RESPONSE");
+            assertThat(provider.count).isEqualTo(9);assertThat(wire.requests).hasSize(9);
+            assertThat(RuntimeBudget.meter(events)).isEqualTo(new RuntimeBudget.Meter(9,11,29340));
+            assertThat(AgentJournal.latest(events,"model.response").path("name").asText()).isEqualTo("files.read");
+            assertThat(events.stream().filter(e->e.path("kind").asText().equals("model.response")).count()).isEqualTo(8);
+            assertThat(AgentJournal.latest(events,"model.usage").path("chargedTokens").asInt()).isEqualTo(4548);
+            assertThat(AgentJournal.latest(events,"model.usage").path("estimated").asBoolean()).isFalse();
+            assertThat(AgentJournal.latest(events,"failure").path("category").asText()).isEqualTo("MODEL_INTERFACE");
+            assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(1);
+            assertThat(events.stream().filter(e->e.path("kind").asText().equals("draft")).count()).isEqualTo(1);
+            assertThat(events.stream().filter(e->e.path("stage").asText().equals("REPAIR")&&e.path("kind").asText().equals("tool.result")).count()).isEqualTo(2);
+            assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.done")).count()).isZero();
+            assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
+            assertThat(jdbc.sql("SELECT input_tokens=3685 AND output_tokens=863 AND error_code='MODEL_INVALID_RESPONSE' FROM model_calls WHERE task_id=? ORDER BY created_at DESC LIMIT 1")
+                    .param(seed.task()).query(Boolean.class).single()).isTrue();
+            report("D10-A-duplicate17cc-invalid",seed,Map.of("provenance",provider.provenance,"wireDigests",wire.digests,"paidCalls",0,"outerRetries",0,
+                    "setupNotHistoricalRequestReplay",true,"completeLastReplyBytesVerified",true,"historicalRequestBodyRead",false));
         }
     }
 }
