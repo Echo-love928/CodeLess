@@ -1,0 +1,166 @@
+{
+  "mode": "truncated-cleanup",
+  "probePorts": [
+    12345
+  ],
+  "mavenExecuted": false,
+  "networkCaptured": true,
+  "calls": [
+    [
+      "ps",
+      "--filter",
+      "label=com.docker.compose.project=codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "--format",
+      "{{.ID}}|{{.Label \"com.docker.compose.project\"}}"
+    ],
+    [
+      "inspect",
+      "--format",
+      "{{range .Mounts}}{{if eq .Destination \"/etc/nginx/conf.d/default.conf\"}}{{.Source}}{{end}}{{end}}",
+      "abcdef123456"
+    ],
+    [
+      "exec",
+      "abcdef123456",
+      "cat",
+      "/etc/hosts"
+    ],
+    [
+      "exec",
+      "abcdef123456",
+      "cat",
+      "/proc/net/route"
+    ],
+    [
+      "exec",
+      "abcdef123456",
+      "nc",
+      "-z",
+      "-w",
+      "2",
+      "127.0.0.1",
+      "12345"
+    ],
+    [
+      "compose",
+      "--project-name",
+      "codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "--file",
+      "F:\\JAVA\\CodeLess\\CodeLess\\infra\\preview\\compose.yml",
+      "--env-file",
+      "F:\\JAVA\\CodeLess\\CodeLess\\services\\api\\target\\preview-platform-b43a1e41-7911-41f2-8f16-cb575f17bcbf\\evidence\\ingress\\compose.env",
+      "down",
+      "--remove-orphans"
+    ],
+    [
+      "ps",
+      "--all",
+      "--filter",
+      "label=com.docker.compose.project=codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "--format",
+      "{{.ID}}"
+    ],
+    [
+      "network",
+      "ls",
+      "--filter",
+      "label=com.docker.compose.project=codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "--format",
+      "{{.ID}}"
+    ]
+  ],
+  "lifecycle": {
+    "captureId": "ffd697c2-6d66-4fe9-845e-83dd6fab73e9",
+    "completed": true,
+    "collectorTimedOut": false,
+    "primaryExceptionType": null,
+    "primaryOutcome": "COMPLETED",
+    "childExitCode": 0,
+    "process": {
+      "started": true,
+      "stopRequested": false,
+      "terminated": true,
+      "nativeExitCode": 0,
+      "state": "EXITED",
+      "activeBefore": 0,
+      "remainingProcesses": 0
+    },
+    "resources": {
+      "state": "DOWN_COMPLETED",
+      "downAttempted": true,
+      "downExitCode": 0,
+      "containers": {
+        "remaining": null,
+        "queryExitCode": 0,
+        "state": "TRUNCATED"
+      },
+      "networks": {
+        "remaining": null,
+        "queryExitCode": 0,
+        "state": "TRUNCATED"
+      },
+      "project": "codeless-preview-test-11111111-1111-1111-1111-111111111111"
+    },
+    "cleanupFailed": true
+  },
+  "dockerStub": true,
+  "modelCalls": 0,
+  "realTcp": false,
+  "fixture": true,
+  "collectorExit": 1,
+  "samples": [
+    {
+      "at": "2026-10-09T08:37:12.111066Z",
+      "captureId": "ffd697c2-6d66-4fe9-845e-83dd6fab73e9",
+      "apiPort": 12345,
+      "root": "preview-platform-b43a1e41-7911-41f2-8f16-cb575f17bcbf",
+      "hostTcp": {
+        "connections": [],
+        "exitCode": 0,
+        "ipv6ExitCode": 0,
+        "state": "OBSERVED",
+        "ipv6State": "OBSERVED",
+        "truncated": false
+      },
+      "project": "codeless-preview-test-11111111-1111-1111-1111-111111111111",
+      "containerLookup": {
+        "found": true,
+        "mountQueries": [
+          {
+            "observedRoot": "preview-platform-b43a1e41-7911-41f2-8f16-cb575f17bcbf",
+            "expectedRoot": "preview-platform-b43a1e41-7911-41f2-8f16-cb575f17bcbf",
+            "state": "OBSERVED",
+            "matched": true,
+            "exitCode": 0
+          }
+        ],
+        "state": "OBSERVED",
+        "candidateLimitExceeded": false,
+        "exitCode": 0
+      },
+      "hosts": {
+        "state": "OBSERVED",
+        "addresses": [
+          "127.0.0.1"
+        ],
+        "exitCode": 0
+      },
+      "ipv4Routes": {
+        "truncated": false,
+        "state": "OBSERVED",
+        "entries": [],
+        "exitCode": 0
+      },
+      "tcpProbes": [
+        {
+          "exitCode": 0,
+          "at": "2026-10-09T08:37:12.1556153Z",
+          "state": "OBSERVED",
+          "port": 12345,
+          "address": "127.0.0.1",
+          "connected": true
+        }
+      ]
+    }
+  ]
+}

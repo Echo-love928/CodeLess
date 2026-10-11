@@ -1,0 +1,51 @@
+[
+  {
+    "stem": "owner-preflight",
+    "command": "test-private owner-preflight",
+    "exitCode": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-c9604e8/owner-preflight.log",
+    "privateLogDigest": "sha256:e40f223a681f27d024287e623f318a5bc66c3c2db8674d9c7a17a084b4ec86ec"
+  },
+  {
+    "stem": "job-preflight",
+    "command": "test-private job-preflight",
+    "exitCode": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-c9604e8/job-preflight.log",
+    "privateLogDigest": "sha256:0f8564729e6c23a1f00555a7ff69e2bcd764070bb57f3014730f3162162c105e"
+  },
+  {
+    "stem": "prepare",
+    "command": "node tests/agent/prepare-runtime.mjs",
+    "exitCode": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-c9604e8/prepare.log",
+    "privateLogDigest": "sha256:8323213bd63698fccd5babb58b8d510c25dfbebd1b88560713952847dffcadf9"
+  },
+  {
+    "stem": "test-compile",
+    "command": "services/api/mvnw.cmd -f services/api/pom.xml -DskipTests test-compile",
+    "exitCode": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-c9604e8/test-compile.log",
+    "privateLogDigest": "sha256:2175410b5595f6456f3e6be5b3b45b22f10a2df84210c0cc304a16e2af285c83"
+  },
+  {
+    "stem": "m1-real",
+    "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RealRepairPreviewPlatformAcceptanceIT -DreuseForks=false -DforkCount=1 test",
+    "exitCode": 1,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-c9604e8/m1-real.log",
+    "privateLogDigest": "sha256:21f7a6ed530b1bce16c9bc58025610b2d365ba5ada7baa6b7613b15d573f782a"
+  },
+  {
+    "stem": "orchestration",
+    "command": "test-private orchestration",
+    "exitCode": 1,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-c9604e8/orchestration.log",
+    "privateLogDigest": "sha256:98c25ff353c53deb9502fe65b2cb92fb5e1465e858b45f507276720ead42f5ae"
+  },
+  {
+    "stem": "export",
+    "command": "node tests/e2e/generation/export-m1-evidence.mjs <actual task evidence>",
+    "exitCode": 0,
+    "privateLog": ".local-data/d10-m1/2026-10-10-real-c9604e8/export.log",
+    "privateLogDigest": "sha256:3f3c9d33bbfc133ede055d3ca378140551caec456f94197df3ec9eb8952f5c4d"
+  }
+]

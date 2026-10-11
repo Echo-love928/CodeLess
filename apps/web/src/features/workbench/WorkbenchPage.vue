@@ -20,6 +20,7 @@ const app = ref<Application | null>(null)
 const loading = ref(true)
 const error = ref('')
 const prompt = ref('')
+const previewVersionError = ref('')
 const device = ref<'desktop' | 'mobile'>('desktop')
 const { task, events, busy, cancelling, restoring, error: taskError, connection, connectionDetail,
   persistenceWarning, diagnostics, diagnosticsError, canStart, canCancel, start, cancel, restore, refresh, dispose } = useWorkbenchTask(cause => redirectOnUnauthorized(cause, router))
@@ -37,6 +38,7 @@ async function load() {
   loading.value = true
   error.value = ''
   app.value = null
+  previewVersionError.value = ''
   try {
     const result = await getApplication(requestedId)
     if (version === loadVersion) {
@@ -61,9 +63,17 @@ async function load() {
 async function refreshPreviewVersion() {
   const id = props.id, version = loadVersion, request = ++previewRequest
   const value = await getApplication(id)
-  if (version === loadVersion && request === previewRequest) app.value = value
+  if (version === loadVersion && request === previewRequest) { app.value = value; previewVersionError.value = '' }
 }
-watch(() => task.value?.status, status => { if (status === `READY`) void refreshPreviewVersion().catch(cause => redirectOnUnauthorized(cause, router)) })
+watch(() => task.value?.status, status => {
+  if (status !== 'READY') return
+  const version = loadVersion
+  void refreshPreviewVersion().catch(async cause => {
+    if (version !== loadVersion) return
+    if (!(await redirectOnUnauthorized(cause, router)) && version === loadVersion)
+      previewVersionError.value = '无法读取最新可用版本，请刷新预览重试。'
+  })
+})
 
 watch(() => [props.id, route.query.taskId], load, { immediate: true })
 onBeforeUnmount(() => { loadVersion += 1; dispose() })
@@ -78,14 +88,14 @@ onBeforeUnmount(() => { loadVersion += 1; dispose() })
       <aside class="workbench-side" aria-label="需求与任务">
         <div><h2>你的需求</h2><p>描述想生成的 Vue 页面，任务阶段和结果由服务端确认。</p><label for="workbench-prompt">需求描述</label><textarea id="workbench-prompt" v-model="prompt" :disabled="busy || restoring || (!!task && !canStart)" placeholder="例如：创建一个展示活动日程的页面" /><button class="button-primary" type="button" :disabled="!canStart || !validPrompt" @click="start(prompt)">{{ busy ? '正在提交…' : task?.status === 'FAILED' ? '重试生成' : '开始生成' }}</button></div>
         <div class="workbench-task"><h2>任务进度</h2>
-          <p v-if="restoring" role="status">正在恢复当前任务…</p><TaskStatus :task="task" />
+          <p v-if="task" class="task-request">本次任务需求：{{ task.prompt }}</p><p v-if="restoring" role="status">正在恢复当前任务…</p><TaskStatus :task="task" />
           <p v-if="connectionLabel" role="status">{{ connectionLabel }}<span v-if="connectionDetail">：{{ connectionDetail }}</span></p>
           <p v-if="taskError" role="alert">{{ taskError }}</p><p v-if="persistenceWarning" role="alert">{{ persistenceWarning }}</p>
           <div class="task-actions"><button v-if="task && !['READY', 'FAILED'].includes(task.status)" class="button-secondary" type="button" :disabled="!canCancel" @click="cancel">{{ cancelling ? '正在请求取消…' : '取消任务' }}</button><button v-if="task || taskError" class="button-secondary" type="button" :disabled="busy || cancelling || restoring" @click="refresh">刷新任务</button><router-link v-if="taskLink" :to="taskLink">任务恢复链接</router-link></div>
           <TaskProgress :events="events" :diagnostics="diagnostics" :diagnostics-error="diagnosticsError" />
         </div>
       </aside>
-      <section class="workbench-preview" aria-label="预览区"><div class="editor-toolbar"><span class="page-path"><UiIcon name="doc" :size="15" />预览 <span>/</span> 初始草稿版本：{{ app.baseVersionId }} <span>/</span> 当前可用版本：{{ app.latestReadyVersionId || '暂无' }}</span><div class="device-toggle" aria-label="预览设备"><button type="button" :aria-pressed="device === 'desktop'" @click="device = 'desktop'"><UiIcon name="monitor" :size="15" />桌面</button><button type="button" :aria-pressed="device === 'mobile'" @click="device = 'mobile'"><UiIcon name="phone" :size="15" />手机</button></div></div><div class="editor-canvas" :class="{ 'editor-canvas--mobile': device === 'mobile' }"><div class="canvas-address"><UiIcon name="lock" :size="12" />{{ app.name }} · 预览</div><PreviewPanel :application-id="app.id" :version-id="app.latestReadyVersionId" :build-failed="task?.status === `FAILED`" :refresh-version="refreshPreviewVersion" @unauthorized="router.replace(`/login`)" /></div></section>
+      <section class="workbench-preview" aria-label="预览区"><div class="editor-toolbar"><span class="page-path"><UiIcon name="doc" :size="15" />预览 <span>/</span> 初始草稿版本：{{ app.baseVersionId }} <span>/</span> 当前可用版本：{{ app.latestReadyVersionId || '暂无' }}</span><div class="device-toggle" aria-label="预览设备"><button type="button" :aria-pressed="device === 'desktop'" @click="device = 'desktop'"><UiIcon name="monitor" :size="15" />桌面</button><button type="button" :aria-pressed="device === 'mobile'" @click="device = 'mobile'"><UiIcon name="phone" :size="15" />手机</button></div></div><div class="editor-canvas" :class="{ 'editor-canvas--mobile': device === 'mobile' }"><p v-if="previewVersionError" role="alert">{{ previewVersionError }}</p><div class="canvas-address"><UiIcon name="lock" :size="12" />{{ app.name }} · 预览</div><PreviewPanel :application-id="app.id" :version-id="app.latestReadyVersionId" :build-failed="task?.status === `FAILED`" :refresh-version="refreshPreviewVersion" @unauthorized="router.replace(`/login`)" /></div></section>
     </div>
   </div>
 </template>

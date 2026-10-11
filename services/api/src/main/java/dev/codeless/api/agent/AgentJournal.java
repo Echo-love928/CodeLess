@@ -9,6 +9,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 /** Append-only private recovery record. A pending reservation is never replayed automatically. */
 public final class AgentJournal {
+    private static final int MAX_EVENTS=160; // 12 model attempts, 20 tools and all three repair checkpoints.
     private final Path root;
     private final JsonMapper json = JsonMapper.builder().build();
     public AgentJournal(Path root) { this.root = root.toAbsolutePath().normalize(); }
@@ -29,7 +30,7 @@ public final class AgentJournal {
                     events.add(event);
                 }
             }
-            if (events.size() > 100) throw new AgentFailure("AGENT_CHECKPOINT_INVALID");
+            if (events.size() > MAX_EVENTS) throw new AgentFailure("AGENT_CHECKPOINT_INVALID");
             return List.copyOf(events);
         } catch (AgentFailure failure) { throw failure; }
         catch (Exception failure) { throw new AgentFailure("AGENT_CHECKPOINT_UNAVAILABLE"); }
@@ -37,7 +38,7 @@ public final class AgentJournal {
 
     public synchronized void append(UUID task, String stage, String kind, Object payload) {
         var events = read(task);
-        if (events.size() >= 100) throw new AgentFailure("AGENT_CHECKPOINT_LIMIT");
+        if (events.size() >= MAX_EVENTS) throw new AgentFailure("AGENT_CHECKPOINT_LIMIT");
         try {
             var event = Map.of("sequence", events.size() + 1, "taskId", task.toString(), "stage", stage,
                     "kind", kind, "payload", payload, "at", java.time.Instant.now().toString());

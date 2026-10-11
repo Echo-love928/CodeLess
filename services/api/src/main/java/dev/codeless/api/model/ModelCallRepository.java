@@ -22,7 +22,7 @@ public class ModelCallRepository {
 
     @Transactional
     public Attempt startStage(UUID taskId, UUID leaseToken, String provider, String model, String stage) {
-        if (!java.util.List.of("PLAN", "GENERATE").contains(stage)) throw new ModelFailure("MODEL_INVALID_INPUT");
+        if (!java.util.List.of("PLAN", "GENERATE", "REPAIR").contains(stage)) throw new ModelFailure("MODEL_INVALID_INPUT");
         return reserve(taskId, leaseToken, provider, model, stage, true);
     }
 
@@ -47,11 +47,9 @@ public class ModelCallRepository {
                 """).param(taskId).query((rs, row) -> new long[]{rs.getLong("calls"), rs.getLong("pending"),
                         rs.getLong("unknown"), rs.getLong("tokens")}).single();
         if (counts[1] > 0) throw new ModelFailure("MODEL_CALL_IN_PROGRESS");
-        // Only the explicitly named offline mock may proceed with unknown usage, using the loop's
-        // persisted conservative reservations. Real providers always fail closed on unknown usage.
-        if (counts[2] > 0 && !(boundedLoop && provider.equals("deterministic-mock") &&
-                jdbc.sql("SELECT count(*) FROM model_calls WHERE task_id=? AND provider<>'deterministic-mock'")
-                    .param(taskId).query(Long.class).single() == 0)) throw new ModelFailure("MODEL_BUDGET_UNKNOWN");
+        // The trusted AgentModel path reserves UTF-8 input + framing + max output in its durable
+        // journal before startStage. Legacy PLAN has no such meter and must still fail closed.
+        if (counts[2] > 0 && !boundedLoop) throw new ModelFailure("MODEL_BUDGET_UNKNOWN");
         if (counts[0] >= 12 || counts[3] >= 50000) throw new ModelFailure("MODEL_BUDGET_EXCEEDED");
         UUID id = UUID.randomUUID();
         String created = jdbc.sql("""

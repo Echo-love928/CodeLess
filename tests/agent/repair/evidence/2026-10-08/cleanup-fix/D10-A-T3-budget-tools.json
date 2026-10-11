@@ -1,0 +1,84 @@
+{
+  "task": {
+    "id": "831f071f-ed11-495e-8825-200da1639413",
+    "applicationId": "8f133648-d8ed-4a3b-8b16-e7542e53e5d6",
+    "prompt": "生成 Ada Lovelace 静态个人展示页",
+    "status": "FAILED",
+    "repairAttempts": 0,
+    "failureCode": "AGENT_TOOL_BUDGET_EXCEEDED",
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-08T08:36:20.445723Z"
+  },
+  "budget": {
+    "models": 2,
+    "tools": 20,
+    "chargedTokens": 96
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "code": "AGENT_TOOL_BUDGET_EXCEEDED",
+    "meter": {
+      "models": 2,
+      "tools": 20,
+      "chargedTokens": 96
+    },
+    "budget": "tools"
+  },
+  "candidates": [],
+  "runners": [],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "reservationTokens": 9250,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "releasedTokens": 9202,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 48,
+      "estimated": false
+    },
+    {
+      "stage": "GENERATE",
+      "reservationTokens": 12604,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "releasedTokens": 12556,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 48,
+      "estimated": false
+    }
+  ],
+  "decisions": [
+    {
+      "taskId": "831f071f-ed11-495e-8825-200da1639413",
+      "at": "2026-10-08T08:36:18.829313900Z",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "stage": "PLAN",
+      "sequence": 5,
+      "kind": "stage.finished"
+    },
+    {
+      "taskId": "831f071f-ed11-495e-8825-200da1639413",
+      "at": "2026-10-08T08:36:20.434563700Z",
+      "payload": {
+        "code": "AGENT_TOOL_BUDGET_EXCEEDED",
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+        "category": "CONTROL"
+      },
+      "stage": "GENERATE",
+      "sequence": 29,
+      "kind": "failure"
+    }
+  ]
+}

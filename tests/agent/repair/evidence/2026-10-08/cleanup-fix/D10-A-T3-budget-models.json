@@ -1,0 +1,70 @@
+{
+  "task": {
+    "id": "ac2f691d-8ef9-45bb-b8fa-fa01953c790c",
+    "applicationId": "23c05543-2e87-4293-90a4-7b196057f517",
+    "prompt": "生成 Ada Lovelace 静态个人展示页",
+    "status": "FAILED",
+    "repairAttempts": 0,
+    "failureCode": "AGENT_MODEL_BUDGET_EXCEEDED",
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-08T08:36:18.2964Z"
+  },
+  "budget": {
+    "models": 12,
+    "tools": 0,
+    "chargedTokens": 59
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "code": "AGENT_MODEL_BUDGET_EXCEEDED",
+    "meter": {
+      "models": 12,
+      "tools": 0,
+      "chargedTokens": 59
+    },
+    "budget": "models"
+  },
+  "candidates": [],
+  "runners": [],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "reservationTokens": 9250,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      },
+      "releasedTokens": 9202,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 48,
+      "estimated": false
+    }
+  ],
+  "decisions": [
+    {
+      "taskId": "ac2f691d-8ef9-45bb-b8fa-fa01953c790c",
+      "at": "2026-10-08T08:36:17.627935400Z",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "stage": "PLAN",
+      "sequence": 5,
+      "kind": "stage.finished"
+    },
+    {
+      "taskId": "ac2f691d-8ef9-45bb-b8fa-fa01953c790c",
+      "at": "2026-10-08T08:36:18.283785Z",
+      "payload": {
+        "code": "AGENT_MODEL_BUDGET_EXCEEDED",
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+        "category": "CONTROL"
+      },
+      "stage": "GENERATE",
+      "sequence": 17,
+      "kind": "failure"
+    }
+  ]
+}

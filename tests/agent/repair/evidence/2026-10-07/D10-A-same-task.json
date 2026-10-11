@@ -1,0 +1,464 @@
+{
+  "task": {
+    "id": "92c556b9-5ea6-4d39-a7e6-7364354b7f33",
+    "applicationId": "91ca0138-80b8-4e9d-b036-9159b1ae8629",
+    "prompt": "生成静态个人展示页，使用两个 Vue 文件展示 Ada Lovelace 与作品列表",
+    "status": "READY",
+    "repairAttempts": 1,
+    "createdAt": "2026-10-07T08:22:02.549651Z",
+    "updatedAt": "2026-10-07T08:22:23.096389Z"
+  },
+  "budget": {
+    "models": 7,
+    "tools": 10,
+    "chargedTokens": 336
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "acceptance": {
+      "applicationId": "91ca0138-80b8-4e9d-b036-9159b1ae8629",
+      "taskId": "92c556b9-5ea6-4d39-a7e6-7364354b7f33",
+      "versionId": "adfb9246-d82a-45e5-b87b-5c82fda4ff30",
+      "buildId": "62bbb1e5-6b59-42fa-a5d8-462d3b074a1a",
+      "sourceDigest": "sha256:6073f6c676790f70374e1736da73f224b0b781ec44847c5f15ff89fde683e3fa",
+      "artifactDigest": "sha256:9a0e4f82a38bcc7deb25679696e152445a46b971fced633dd1d252aed06f33c0",
+      "sourceFiles": 2,
+      "deploymentIngress": "nginx:1.27.5-alpine",
+      "modelProvider": "deterministic-mock",
+      "modelQualityAccepted": false,
+      "modelQualityValidation": "NOT_MODEL_ACCEPTANCE",
+      "acceptanceScope": "deterministic-platform-integration",
+      "platformApiFixture": false,
+      "signingFixture": false,
+      "realDockerBuild": true,
+      "realBrowserVerification": true,
+      "residentRestartPassed": true,
+      "credentialErrorLogDenied": true,
+      "retentionRevocationPassed": true,
+      "publicInternalDenied": true,
+      "isolation": {
+        "errors": [
+          "SecurityError",
+          "SecurityError",
+          "SecurityError"
+        ],
+        "cookie": "",
+        "platform": null
+      },
+      "screenshot": {
+        "path": "screenshots/D10-A-same-task-platform.png",
+        "digest": "sha256:b4a9d36b8f63c69384962f57414e68fc76a18cd24e6d189131fdb1f619712dbb",
+        "bytes": 139505
+      }
+    },
+    "generationTasks": 1,
+    "realAuthenticatedUi": true,
+    "repairAttempts": 1,
+    "signingFixture": false,
+    "sameTask": true,
+    "platformApiFixture": false
+  },
+  "candidates": [
+    {
+      "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-same-task/candidate-0",
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 137,
+          "digest": "sha256:2bb84476d299cb9aae768121e3b99f4e6554b4595e56f87b9d37cb3356234870"
+        }
+      ],
+      "versionId": "d3b4d9e9-2cea-4c4e-8178-695df0344f9e"
+    },
+    {
+      "sourceDigest": "sha256:6073f6c676790f70374e1736da73f224b0b781ec44847c5f15ff89fde683e3fa",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "profile-name"
+          },
+          "value": "Ada Lovelace"
+        }
+      ],
+      "sourceDirectory": "source/D10-A-same-task/candidate-1",
+      "files": [
+        {
+          "path": "src/components/ProfileCard.vue",
+          "bytes": 122,
+          "digest": "sha256:702d046dacf6f337e07cb98120685746d9b1ad03c33c1e1f85b0944d404ae0aa"
+        },
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 137,
+          "digest": "sha256:e6d3d42b532e6b59340492667cf58f2d22104037d059c8fc8ab295638edcb508"
+        }
+      ],
+      "versionId": "adfb9246-d82a-45e5-b87b-5c82fda4ff30"
+    }
+  ],
+  "runners": [
+    {
+      "status": "FAILED",
+      "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+      "build": {
+        "id": "73962ac5-7259-4d6a-970b-9b69852773d3",
+        "imageId": "sha256:1c233a00fae6442e1e2095aec06c13bb21d572b2ade4574f84911a63503ca095",
+        "containerName": "codeless-build-73962ac5-7259-4d6a-970b-9b69852773d3",
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 2,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/MissingCard.vue' or its corresponding type declarations.\n",
+          "bytes": 230,
+          "observedBytes": 230,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-07T08:22:04.541Z",
+        "completedAt": "2026-10-07T08:22:08.838Z"
+      },
+      "verification": null,
+      "executionId": "b6acf0e8-9792-48f0-a8ee-a50d62fd1f8d"
+    },
+    {
+      "status": "VERIFIED",
+      "sourceDigest": "sha256:6073f6c676790f70374e1736da73f224b0b781ec44847c5f15ff89fde683e3fa",
+      "build": {
+        "id": "62bbb1e5-6b59-42fa-a5d8-462d3b074a1a",
+        "imageId": "sha256:1c233a00fae6442e1e2095aec06c13bb21d572b2ade4574f84911a63503ca095",
+        "containerName": "codeless-build-62bbb1e5-6b59-42fa-a5d8-462d3b074a1a",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 30 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-BvbGrT7E.js  \u001b[39m\u001b[1m\u001b[2m83.36 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.04 kB\u001b[22m\n\u001b[32m✓ built in 1.12s\u001b[39m\n",
+          "bytes": 507,
+          "observedBytes": 507,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:9a0e4f82a38bcc7deb25679696e152445a46b971fced633dd1d252aed06f33c0",
+          "bytes": 83655,
+          "files": [
+            {
+              "path": "assets/index-BvbGrT7E.js",
+              "bytes": 83364,
+              "digest": "sha256:e6f27fb8c78404d3e5d607e9d7ed857811c163c535e29df64c32e85911f60ab6"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:e93e5fc0f2b6b14cb202453037d15177943da22049fa10202b619db73e589727"
+            }
+          ],
+          "directory": "PRIVATE_PATH_RETAINED_LOCALLY"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-07T08:22:15.454Z",
+        "completedAt": "2026-10-07T08:22:21.432Z"
+      },
+      "verification": {
+        "id": "699229fa-1c71-4c97-b931-28ca8e422bc1",
+        "buildId": "62bbb1e5-6b59-42fa-a5d8-462d3b074a1a",
+        "sourceDigest": "sha256:6073f6c676790f70374e1736da73f224b0b781ec44847c5f15ff89fde683e3fa",
+        "artifactDigest": "sha256:9a0e4f82a38bcc7deb25679696e152445a46b971fced633dd1d252aed06f33c0",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-07T08:22:21.455Z",
+        "completedAt": "2026-10-07T08:22:22.488Z",
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "navigate",
+              "status": "PASSED"
+            },
+            {
+              "index": 1,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1"
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "screenshots/D10-A-same-task-1.png",
+          "digest": "sha256:448408c7bd100d0635f043ecf219a95c910c0966a7a0b4dd9c60e6001595111d",
+          "bytes": 8890,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "PRIVATE_PATH_RETAINED_LOCALLY"
+      },
+      "executionId": "abb9decf-6f75-4ca9-82ce-c89983a90828"
+    }
+  ],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS",
+          "fixture": true
+        }
+      },
+      "reservationTokens": 9303,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 9255
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS",
+          "fixture": true
+        }
+      },
+      "reservationTokens": 12234,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 12186
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS",
+          "fixture": true
+        }
+      },
+      "reservationTokens": 12708,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 12660
+    },
+    {
+      "stage": "GENERATE",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS",
+          "fixture": true
+        }
+      },
+      "reservationTokens": 13312,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 13264
+    },
+    {
+      "stage": "REPAIR",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS",
+          "fixture": true
+        }
+      },
+      "reservationTokens": 10399,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 10351
+    },
+    {
+      "stage": "REPAIR",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS",
+          "fixture": true
+        }
+      },
+      "reservationTokens": 11208,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 11160
+    },
+    {
+      "stage": "REPAIR",
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": {
+          "measurement": "SYNTHETIC_FIXTURE_COUNTERS",
+          "fixture": true
+        }
+      },
+      "reservationTokens": 11881,
+      "estimated": false,
+      "chargedTokens": 48,
+      "meteringSource": "PROVIDER_USAGE",
+      "releasedTokens": 11833
+    }
+  ],
+  "decisions": [
+    {
+      "taskId": "92c556b9-5ea6-4d39-a7e6-7364354b7f33",
+      "kind": "stage.finished",
+      "sequence": 5,
+      "stage": "PLAN",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T08:22:02.863887500Z"
+    },
+    {
+      "taskId": "92c556b9-5ea6-4d39-a7e6-7364354b7f33",
+      "kind": "stage.finished",
+      "sequence": 21,
+      "stage": "GENERATE",
+      "payload": {
+        "next": "VERIFY"
+      },
+      "at": "2026-10-07T08:22:04.150782300Z"
+    },
+    {
+      "taskId": "92c556b9-5ea6-4d39-a7e6-7364354b7f33",
+      "kind": "repair.failure",
+      "sequence": 24,
+      "stage": "VERIFY",
+      "payload": {
+        "code": "AGENT_BUILD_EXIT",
+        "category": "CODE",
+        "fingerprint": "sha256:8ba9982c7fcbe5e6d5221f8ac6b6b56e65eb55698bfaf2923731a178233a0bfb",
+        "diagnostic": "> @codeless/generated-vue@0.1.0 build\n\nsrc/pages/HomePage.vue(1,49): error TS2307: Cannot find module '../components/MissingCard.vue' or its corresponding type declarations.",
+        "sourceDigest": "sha256:73bcb54fb7493077b66e5e0957d4eb98b81f99722ea9413f528b489bbe00f2cf",
+        "repairAttempts": 0,
+        "decision": "REPAIR"
+      },
+      "at": "2026-10-07T08:22:09.215363900Z"
+    },
+    {
+      "taskId": "92c556b9-5ea6-4d39-a7e6-7364354b7f33",
+      "kind": "stage.finished",
+      "sequence": 25,
+      "stage": "VERIFY",
+      "payload": {
+        "next": "REPAIR"
+      },
+      "at": "2026-10-07T08:22:09.317939100Z"
+    },
+    {
+      "taskId": "92c556b9-5ea6-4d39-a7e6-7364354b7f33",
+      "kind": "stage.finished",
+      "sequence": 40,
+      "stage": "REPAIR",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "at": "2026-10-07T08:22:12.709035100Z"
+    },
+    {
+      "taskId": "92c556b9-5ea6-4d39-a7e6-7364354b7f33",
+      "kind": "stage.finished",
+      "sequence": 43,
+      "stage": "GENERATE",
+      "payload": {
+        "next": "VERIFY"
+      },
+      "at": "2026-10-07T08:22:14.094438Z"
+    },
+    {
+      "taskId": "92c556b9-5ea6-4d39-a7e6-7364354b7f33",
+      "kind": "stage.finished",
+      "sequence": 46,
+      "stage": "VERIFY",
+      "payload": {
+        "next": "READY"
+      },
+      "at": "2026-10-07T08:22:22.865024200Z"
+    },
+    {
+      "taskId": "92c556b9-5ea6-4d39-a7e6-7364354b7f33",
+      "kind": "completion",
+      "sequence": 47,
+      "stage": "VERIFY",
+      "payload": {
+        "sourceDigest": "sha256:6073f6c676790f70374e1736da73f224b0b781ec44847c5f15ff89fde683e3fa",
+        "buildId": "62bbb1e5-6b59-42fa-a5d8-462d3b074a1a",
+        "verificationId": "699229fa-1c71-4c97-b931-28ca8e422bc1",
+        "artifactDigest": "sha256:9a0e4f82a38bcc7deb25679696e152445a46b971fced633dd1d252aed06f33c0",
+        "versionId": "adfb9246-d82a-45e5-b87b-5c82fda4ff30"
+      },
+      "at": "2026-10-07T08:22:23.202155700Z"
+    }
+  ]
+}

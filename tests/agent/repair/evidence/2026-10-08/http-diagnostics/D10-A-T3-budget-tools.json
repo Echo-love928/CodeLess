@@ -1,0 +1,84 @@
+{
+  "task": {
+    "id": "d6551878-8e75-4c88-8b00-0ef934b1e861",
+    "applicationId": "5255331e-917d-4913-987d-f621c09bd6d1",
+    "prompt": "生成 Ada Lovelace 静态个人展示页",
+    "status": "FAILED",
+    "repairAttempts": 0,
+    "failureCode": "AGENT_TOOL_BUDGET_EXCEEDED",
+    "createdAt": "1999-12-31T15:00:00Z",
+    "updatedAt": "2026-10-08T07:20:20.399391Z"
+  },
+  "budget": {
+    "models": 2,
+    "tools": 20,
+    "chargedTokens": 96
+  },
+  "modelProvider": "deterministic-mock",
+  "modelQualityEvidence": false,
+  "extra": {
+    "budget": "tools",
+    "code": "AGENT_TOOL_BUDGET_EXCEEDED",
+    "meter": {
+      "models": 2,
+      "tools": 20,
+      "chargedTokens": 96
+    }
+  },
+  "candidates": [],
+  "runners": [],
+  "usage": [
+    {
+      "stage": "PLAN",
+      "releasedTokens": 9202,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 48,
+      "estimated": false,
+      "reservationTokens": 9250,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      }
+    },
+    {
+      "stage": "GENERATE",
+      "releasedTokens": 12556,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 48,
+      "estimated": false,
+      "reservationTokens": 12604,
+      "usage": {
+        "inputTokens": 31,
+        "outputTokens": 17,
+        "totalTokens": 48,
+        "raw": null
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "at": "2026-10-08T07:20:18.779951800Z",
+      "payload": {
+        "next": "GENERATE"
+      },
+      "stage": "PLAN",
+      "sequence": 5,
+      "kind": "stage.finished",
+      "taskId": "d6551878-8e75-4c88-8b00-0ef934b1e861"
+    },
+    {
+      "at": "2026-10-08T07:20:20.389546700Z",
+      "payload": {
+        "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+        "category": "CONTROL",
+        "code": "AGENT_TOOL_BUDGET_EXCEEDED"
+      },
+      "stage": "GENERATE",
+      "sequence": 29,
+      "kind": "failure",
+      "taskId": "d6551878-8e75-4c88-8b00-0ef934b1e861"
+    }
+  ]
+}

@@ -18,7 +18,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import static org.assertj.core.api.Assertions.*;
 
-@SpringBootTest(properties={"codeless.model.provider=deterministic-mock","codeless.agent.enabled=true","codeless.agent.repository-root=../..",
+@SpringBootTest(properties={"codeless.model.provider=deterministic-mock","codeless.agent.enabled=true","codeless.agent.repair.enabled=false","codeless.agent.repository-root=../..",
         "codeless.agent.private-root=target/agent-integration/runtime","CODELESS_FILE_WORKSPACE_ROOT=target/agent-integration/workspaces",
         "CODELESS_FILE_AUDIT_ROOT=target/agent-integration/file-audit","codeless.model.audit-root=target/agent-integration/models"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -58,7 +58,7 @@ class AgentLoopIntegrationTest extends PostgresTestBase {
         var claim=queue.claim().orElseThrow();assertThat(claim.taskId()).isEqualTo(seed.task());return claim;
     }
     private AgentLoop loop(ModelProvider provider,BuildGateway build) {
-        return new AgentLoop(store,new AgentModel(provider,calls,audit,store),validator,registry,files,build,evidence);
+        return new AgentLoop(store,new AgentModel(provider,calls,audit,store),validator,registry,files,build,evidence,false);
     }
     private void stage(TaskStageRunner loop,TaskQueueService.Claim claim,TaskStatus current,TaskStatus expected) {
         var result=loop.execute(claim,current);assertThat(result.next()).as(result.failureCode()).isEqualTo(expected);
@@ -317,17 +317,21 @@ class AgentLoopIntegrationTest extends PostgresTestBase {
         assertThat(jdbc.sql("SELECT output_tokens FROM model_calls WHERE task_id=? AND stage='GENERATE'").param(cancelSeed.task()).query(Integer.class).single()).isEqualTo(17);
         report("D09-A-feedback-and-cancellation",Map.of("actualResultFeedback",true,"receivedInputTokens",31,"receivedOutputTokens",17,"fixture",true));
     }
-    @Test @Order(8) void unknownRealUsageBlocksTheNextModelCallAndNeverTurnsIntoZero() throws Exception {
+    @Test @Order(8) void boundedLoopReservesUnknownUsageAndNeverTurnsItIntoZero() throws Exception {
         var seed=seed();var claim=claim(seed);var mock=new MockModelProvider();var count=new java.util.concurrent.atomic.AtomicInteger();
         var provider=new ModelProvider() {
             public String id(){return "transport-fixture";}public String model(){return "unknown-usage-fixture";}
             public Reply call(Prompt prompt,int max,Duration timeout) {count.incrementAndGet();return mock.call(prompt,max,timeout);}
         };
-        var loop=loop(provider,gateway);stage(loop,claim,TaskStatus.PLAN,TaskStatus.GENERATE);stage(loop,claim,TaskStatus.GENERATE,TaskStatus.FAILED);
-        assertThat(queue.find(seed.owner(),seed.task()).orElseThrow().failureCode()).isEqualTo("MODEL_BUDGET_UNKNOWN");
-        assertThat(count.get()).isEqualTo(1);
-        assertThat(jdbc.sql("SELECT input_tokens IS NULL AND output_tokens IS NULL FROM model_calls WHERE task_id=?")
-                .param(seed.task()).query(Boolean.class).single()).isTrue();
-        report("D09-A-unknown-usage",Map.of("providerCalls",1,"nextCall","MODEL_BUDGET_UNKNOWN","inputTokens","UNKNOWN","fixture",true));
+        var loop=loop(provider,gateway);stage(loop,claim,TaskStatus.PLAN,TaskStatus.GENERATE);stage(loop,claim,TaskStatus.GENERATE,TaskStatus.VERIFY);
+        assertThat(count.get()).isEqualTo(4);
+        assertThat(jdbc.sql("SELECT count(*) FROM model_calls WHERE task_id=? AND input_tokens IS NULL AND output_tokens IS NULL")
+                .param(seed.task()).query(Integer.class).single()).isEqualTo(4);
+        var events=journal.read(seed.task());assertThat(RuntimeBudget.meter(events).chargedTokens()).isBetween(1L,50000L);
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("model.usage")))
+                .allSatisfy(e->assertThat(e.path("payload").path("estimated").asBoolean()).isTrue());
+        queue.cancel(seed.owner(),seed.task());
+        report("D09-A-unknown-usage",Map.of("providerCalls",4,"chargedTokens",RuntimeBudget.meter(events).chargedTokens(),
+                "estimated",true,"inputTokens","UNKNOWN","fixture",true));
     }
 }
