@@ -1,5 +1,30 @@
 # D11-A 只读互审
 
+## 当前复审结论：acdc183
+
+2026-10-12（Asia/Shanghai）。A PR33精确`acdc183cf4a250df024f7109d53e5628efc79e54`，
+基线/main仍`413e5b8`。仅复查4f364a3之后的测试诊断、记录器及证据差异，生产API/存储代码未变。
+已提交[独立APPROVED review5486237790](https://github.com/Echo-love928/CodeLess/pull/33#pullrequestreview-5486237790)。
+本批准仅覆盖A该候选，不代表B获批或允许合并；PR33仍草稿，main未改。
+
+- **阻塞问题**：没有发现A当前代码/验收阻塞。旧B `/source`接口不一致关闭；A新定向14/14、
+  精确HEAD实际CI175/175及B8640035真实面板1/1证据补齐验收缺口。原本机EIO根因仍UNKNOWN，
+  旧失败未覆盖，另一机器成功不解释旧失败。公共OpenAPI及全历史来源映射仍是最终启用的维护者事项。
+- **建议**：区分作者提交前4f+dirty test记录与最终acdc CI；B更新依赖后核验新候选。
+  2026-10-12用户明确本轮只更新B，公共契约/迁移另交维护者，本轮不改这些公共文件。
+- **已核验内容**：VersionFixtureGate:11保留第一原因；VersionHttpIntegrationTest:48/58在HTTP前
+  明确NOT_EXECUTED前置失败，原T1–T4断言:92/144/157/180未弱化。record-command:47/57
+  记录原生exit/signal与日志hash，非零不转成功。审查工作树独立unit9/9、contracts3/3 native0；
+  A缺B专用IT的负向panel命令原生1/FAILED，无测试检查未关闭。源码/清单/报告及4张面板截图摘要已重算匹配。
+  六项精确HEAD检查success；下载原始CI日志确认API175/175、版本HTTP5/存储7/新守卫2实际执行，E2E33。
+
+复现：`node tests/versions/record-command.mjs unit`、`contracts`；负向`panel`在仅A仓库预期exit1。
+真实面板在包含B IT的checkout显式运行，不能用负向用例或默认CI代替。
+完整新证据见A `tests/versions/evidence/2026-10-12/commands.json`，
+[精确CI run38197827472](https://github.com/Echo-love928/CodeLess/actions/runs/38197827472)。
+
+## 历史初审：4f364a3
+
 审查日期：2026-10-12（Asia/Shanghai）。PR：https://github.com/Echo-love928/CodeLess/pull/33 。精确候选 `4f364a323813ac7cf479bd1162db26e718ca8741`，当前 main / base `413e5b8bc40e2ccf6b5c538a9f2b4fc0f02e9ccb`。
 
 结论：静态代码、契约和公开证据审查未发现新的 A 后端代码阻塞；本地独立 HTTP 验收失败，真实 A+B 面板联调仍有前置事项，本次不提交 APPROVED。没有修改业务代码、契约或测试，也没有评论、合并、发布或推送 main。报告及复测输出仅保存在审查工作树的忽略目录。
