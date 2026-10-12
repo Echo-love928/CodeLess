@@ -11,6 +11,6 @@ commands.json记录本轮真实命令和失败；公共截图是明确契约fixt
 - real-panel-failure.json：真实A+B联调在原生成前置Docker EIO失败，新增panel断言没有到达。自有command/nonce确认来源，清理全部完成。
 
 完整API/gate/显式IT原件及JUnit保留于本地忽略目录；API173项28failure/3error/0skip、aggregate exit1。
-公开日志仅规范化行尾空白和EOF，原件未修改；commands中的aggregate/real日志hash指向私有原件，公开日志hash按本文件后的最终命令记录计算。
+公开日志仅规范化行尾空白和EOF，原件未修改；commands中的aggregate/real日志hash指向私有原件，公开静态日志hash按UTF-8/LF规范化计算（sha256NormalizedLf），避免Git行尾转换改变校验输入。
 没有模型质量证据。显式mock联调4请求、usage未知、paid0；开发tokens UNKNOWN。
 剩余：真实UI联调EIO根因定位、全历史来源映射、公共OpenAPI维护者同步、另一人复审/批准。
