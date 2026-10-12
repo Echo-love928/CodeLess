@@ -15,6 +15,7 @@ import { fileURLToPath } from 'node:url'
 import { startPreviewRuntime } from '../../../services/runner/src/preview/main.mjs'
 import { readSnapshot,digest } from '../../../services/runner/src/artifacts/snapshot.mjs'
 import { tlsServer,closeServer } from './fixtures.mjs'
+import { platformFetch } from '../versions/http-call.mjs'
 
 // Real HTTP/SQL/auth/issuer/runner/gateway. Paid evaluation is explicit and validated against SQL by its Java harness.
 const root=resolve(fileURLToPath(new URL('../../../',import.meta.url)))
@@ -57,11 +58,7 @@ try {
   })
   page=await context.newPage();diagnostic.attach(page)
   await page.goto('/login');await page.getByLabel('邮箱').fill('demo@codeless.local');await page.getByLabel('密码').fill('demo-password-for-test-only');await page.getByRole('button',{name:'登录',exact:true}).click();await expect(page).toHaveURL(/\/apps$/)
-  const call=async(path,method='GET',body)=>page.evaluate(async({path,method,body})=>{
-    const csrf=await (await fetch('/api/v0/auth/csrf')).json()
-    const response=await fetch('/api/v0/'+path,{method,headers:{'Content-Type':'application/json','X-CSRF-Token':csrf.token},...(body?{body:JSON.stringify(body)}:{})})
-    return {status:response.status,body:await response.json()}
-  },{path,method,body})
+  const call=async(path,method='GET',body)=>page.evaluate(platformFetch,{path,method,body})
   const created=await call('applications','POST',{name:'真实鉴权预览联调',dataMode:'STATIC',template:'VUE'})
   assert.equal(created.status,201);const app=created.body.id
   await page.evaluate(()=>{localStorage.setItem('platform-secret','private-platform-value');sessionStorage.setItem('platform-secret','private-platform-session')})

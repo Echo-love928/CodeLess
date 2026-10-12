@@ -2,9 +2,46 @@ import { expect, test } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { ids, versions, malicious, manifest, installVersionsFixture, openWorkbench } from './fixture'
+import { platformFetch } from './http-call.mjs'
 
 const evidence = resolve(process.cwd(), '../../tests/e2e/versions/evidence/2026-10-12/fixture')
 test.beforeAll(async () => { await mkdir(evidence, { recursive: true }) })
+
+test('real browser call preserves JSON failures and safely reports HTML 502 without retry', async ({ page }) => {
+  await page.goto('/login')
+  const requests: string[] = []
+  let csrfFailure = false, malformed = false, jsonFailure = false
+  await page.route('**/api/v0/auth/csrf', async route => {
+    requests.push('csrf')
+    if (csrfFailure) await route.fulfill({ status: 502, contentType: 'text/html', body: '<html>PRIVATE_CSRF_BODY</html>' })
+    else await route.fulfill({ json: { token: 'PRIVATE_CSRF_TOKEN' } })
+  })
+  await page.route('**/api/v0/tasks/**', async route => {
+    requests.push('task')
+    if (malformed) await route.fulfill({ status: 200, contentType: 'application/json', body: 'PRIVATE_INVALID_JSON' })
+    else if (jsonFailure) await route.fulfill({ status: 409, json: { code: 'TASK_REJECTED' } })
+    else await route.fulfill({ status: 502, contentType: 'text/html; charset=utf-8', body: '<html>PRIVATE_TASK_BODY</html>', headers: { 'X-Private': 'PRIVATE_HEADER' } })
+  })
+  const input = { path: `tasks/${ids[0]}?secret=PRIVATE_QUERY`, method: 'GET' }
+  const failure = async () => { try { await page.evaluate(platformFetch, input); return 'UNEXPECTED_PASS' } catch (error) { return (error as Error).message } }
+  requests.length = 0
+  const taskError = await failure()
+  expect(taskError).toContain('PLATFORM_HTTP_NON_JSON')
+  expect(taskError).toContain('"phase":"request","route":"/api/v0/tasks/:id","method":"GET","status":502,"contentType":"html"')
+  expect(taskError).not.toContain('PRIVATE_'); expect(taskError).not.toContain(ids[0])
+  expect(requests).toEqual(['csrf', 'task'])
+  csrfFailure = true; requests.length = 0
+  const csrfError = await failure()
+  expect(csrfError).toContain('"phase":"csrf","route":"/api/v0/auth/csrf","method":"GET","status":502,"contentType":"html"')
+  expect(csrfError).not.toContain('PRIVATE_'); expect(requests).toEqual(['csrf'])
+  csrfFailure = false; malformed = true; requests.length = 0
+  const invalid = await failure()
+  expect(invalid).toContain('PLATFORM_HTTP_INVALID_JSON'); expect(invalid).not.toContain('PRIVATE_')
+  expect(requests).toEqual(['csrf', 'task'])
+  malformed = false; jsonFailure = true; requests.length = 0
+  expect(await page.evaluate(platformFetch, input)).toEqual({ status: 409, body: { code: 'TASK_REJECTED' } })
+  expect(requests).toEqual(['csrf', 'task'])
+})
 
 test('D11-B-T1: versionId selects matching source and rendered preview', async ({ page }) => {
   const state = await installVersionsFixture(page)
