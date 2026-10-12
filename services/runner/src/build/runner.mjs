@@ -3,10 +3,12 @@ import { createHash, randomUUID } from 'node:crypto'
 import { constants } from 'node:fs'
 import { chmod, lstat, mkdir, mkdtemp, open, readFile, readdir, realpath, rename, rm, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve, sep } from 'node:path'
+import { tmpdir } from 'node:os'
 import { pathToFileURL } from 'node:url'
 import { StringDecoder } from 'node:string_decoder'
 import { containerUser, validateSource } from '../template/build.mjs'
 import { IMAGE, policy } from '../../../../infra/runner/policy.mjs'
+import { readSnapshot } from '../artifacts/snapshot.mjs'
 
 // Always drain pipes, even after the in-memory log cap is reached.
 export function capture(limit) {
@@ -146,6 +148,39 @@ export function isolationArgs({ name, input, output, user, imageId, limits }) {
     '--mount', `type=bind,src=${output},dst=/output`, imageId]
 }
 
+// Host-only artifact promotion. EXDEV is the sole copy fallback; the bytes
+// copied are bounded, retained and compared with the confirmed build manifest.
+export async function promoteArtifacts(output, artifacts, id, summary, limits, move = rename) {
+  if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(id)) throw new Error('invalid artifact ID')
+  const destination = join(artifacts, id)
+  try {
+    await move(output, destination)
+    return destination
+  } catch (error) {
+    if (error.code !== 'EXDEV') throw error
+  }
+  const frozen = await readSnapshot(output, { files: limits.artifactFiles, bytes: limits.artifactBytes })
+  if (frozen.manifest.digest !== summary.digest || frozen.manifest.bytes !== summary.bytes) {
+    throw new Error('artifact changed before cross-volume promotion')
+  }
+  let pending = await mkdtemp(join(artifacts, '.build-'))
+  try {
+    for (const [path, bytes] of frozen.buffers) {
+      const target = join(pending, path)
+      await mkdir(dirname(target), { recursive: true })
+      await writeFile(target, bytes, { flag: 'wx' })
+    }
+    await move(pending, destination)
+    pending = null
+    return destination
+  } finally {
+    if (pending) {
+      if (dirname(pending) !== artifacts) throw new Error('artifact cleanup escaped owned root')
+      await rm(pending, { recursive: true, force: true })
+    }
+  }
+}
+
 // This factory belongs to the trusted host worker. Request data contains only a source directory.
 // Tests use a separately built trusted fault image; production defaults to the D05 image.
 export async function createBuildRunner({ workRoot, artifactRoot, imageId, limits: overrides } = {}) {
@@ -158,13 +193,17 @@ export async function createBuildRunner({ workRoot, artifactRoot, imageId, limit
   if (work === artifacts || artifacts.startsWith(work + sep) || work.startsWith(artifacts + sep)) {
     throw new Error('work and artifact roots must be separate')
   }
+  // Docker Desktop's Windows sharing layer can return EIO for non-root bind
+  // reads below deeply nested host directories. Only disposable build copies
+  // use the worker account's short temp root; persisted artifacts stay private.
+  const staging = process.platform === 'win32' ? await realpath(tmpdir()) : work
   const pinned = imageId ?? checked(await docker(['image', 'inspect', IMAGE, '--format', '{{.Id}}']), 'inspect trusted image')
   if (!/^sha256:[a-f0-9]{64}$/.test(pinned)) throw new Error('worker image must be an immutable local sha256 ID')
 
   return async function runBuild(source) {
     const id = randomUUID()
     const name = `codeless-build-${id}`
-    const scratch = await mkdtemp(join(work, 'build-'))
+    const scratch = await mkdtemp(join(staging, 'codeless-build-'))
     const input = join(scratch, 'input')
     const output = join(scratch, 'output')
     const result = { id, imageId: pinned, containerName: name, status: 'FAILED', failure: null,
@@ -209,8 +248,7 @@ export async function createBuildRunner({ workRoot, artifactRoot, imageId, limit
       try {
         if (!result.failure && result.exitCode === 0 && result.cleanup.containerRemoved && result.cleanup.errors.length === 0) {
           const summary = await summarizeArtifacts(output, limits)
-          const destination = join(artifacts, id)
-          await rename(output, destination)
+          const destination = await promoteArtifacts(output, artifacts, id, summary, limits)
           result.artifact = { ...summary, directory: destination }
         }
       } catch (error) {
@@ -218,7 +256,7 @@ export async function createBuildRunner({ workRoot, artifactRoot, imageId, limit
         result.diagnostic = error.message.slice(0, 2048)
       }
       try {
-        if (dirname(scratch) !== work) throw new Error('workspace cleanup escaped configured root')
+        if (dirname(scratch) !== staging) throw new Error('workspace cleanup escaped owned staging root')
         await rm(scratch, { recursive: true, force: true })
         result.cleanup.workspaceRemoved = true
       } catch (error) { result.cleanup.errors.push(error.message.slice(0, 2048)) }

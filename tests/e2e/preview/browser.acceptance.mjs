@@ -180,7 +180,7 @@ test('D09-B-T1/T3/T4: real Vue build and Chromium preview, platform isolation an
       return route.continue()
     })
     await page.getByRole('button', { name: '刷新预览', exact: true }).click()
-    await expect(page.getByRole('alert')).toContainText('预览凭据失效或产物不可用')
+    await expect(page.locator('.preview-panel').getByRole('alert')).toContainText('预览凭据失效或产物不可用')
     breakResource = false
     await page.getByRole('button', { name: '刷新预览', exact: true }).click()
     await expect(frame.locator('#app')).toContainText('展示')
@@ -204,7 +204,7 @@ test('D09-B-T1/T3/T4: real Vue build and Chromium preview, platform isolation an
     clock += 121_000
     await page.frames().find(item => item.url().includes(version2.replaceAll('-', '')))
       .evaluate(() => { location.href = '/tasks' })
-    await expect(page.getByRole('alert')).toContainText('预览凭据失效')
+    await expect(page.locator('.preview-panel').getByRole('alert')).toContainText('预览凭据失效')
     expect(platformProbeHits).toBe(0)
     clock = Date.now()
     await page.getByRole('button', { name: '刷新预览', exact: true }).click()

@@ -2,6 +2,8 @@
 
 Run on a trusted **non-root host worker** with Docker CLI access. Generated containers never receive a Docker socket, platform credentials or Docker client configuration. The private D02 health container is not a Docker control worker; do not add a socket mount to it.
 
+Windows Docker Desktop: disposable build input/output copies use a random `codeless-build-*` directory in the worker account's canonical TEMP root. This avoids the observed non-root EIO on deeply nested host bind paths; the configured artifact root, immutable bytes/hashes, user1000, read-only input and all isolation flags remain unchanged. TEMP must be a short, worker-owned directory; no model/task parameter controls it. If TEMP and artifact storage are on different volumes, only an EXDEV rename failure permits a bounded frozen copy: recheck the original manifest, write CREATE_NEW files into a private pending directory on the artifact volume, then atomically rename it to the UUID. Other move errors remain failures. Only exact owned job/pending directories are cleaned. Linux continues using the configured work root. The original deep-path failures remain evidence; no root-user fallback or build retry is used.
+
 Build the existing locked D05 image first:
 
 ```sh

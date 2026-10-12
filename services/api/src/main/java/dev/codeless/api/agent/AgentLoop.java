@@ -82,6 +82,9 @@ public final class AgentLoop implements TaskStageRunner {
             String code=failure instanceof ModelFailure m?m.code():
                     failure instanceof AgentFailure || failure instanceof FileToolFailure?failure.getMessage():"AGENT_INTERNAL_ERROR";
             if(code==null || !code.matches("[A-Z][A-Z0-9_]{1,100}")) code="AGENT_INTERNAL_ERROR";
+            if(stage==TaskStatus.VERIFY) {
+                try {store.abandonDraft(claim,code);} catch(RuntimeException unavailable) { /* Never pretend a failed storage commit succeeded. */ }
+            }
             try {store.append(claim,stage,"failure",Map.of("code",code,"category",repairs.category(code).name(),
                     "recovery","MANUAL_REVIEW_NO_AUTOMATIC_RETRY"));}
             catch(RuntimeException unavailable) { /* DB state still fails; prior forced checkpoints remain. */ }

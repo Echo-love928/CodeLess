@@ -9,11 +9,11 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 
 /** Test-owned teardown: release all enumeration handles before deleting any entry. */
-final class OwnedWorkspaceCleanup {
+public final class OwnedWorkspaceCleanup {
     @FunctionalInterface interface Walk { Stream<Path> open(Path root) throws IOException; }
     @FunctionalInterface interface Delete { void remove(Path path) throws IOException; }
 
-    static void delete(Path root, Path parent) throws IOException {
+    public static void delete(Path root, Path parent) throws IOException {
         delete(root, parent, p -> snapshot(p).stream(), Files::delete);
     }
 

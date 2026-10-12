@@ -1,0 +1,145 @@
+{
+  "scope": "Original Windows Docker29.8.0, fixed trusted probes; root user only diagnostic; production stays user1000",
+  "upstreamInternalMechanism": "UNKNOWN",
+  "probes": {
+    "environment-probe.json": [
+      {
+        "mode": "normal",
+        "nativeExit": 1,
+        "signal": null,
+        "error": null,
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 1,
+        "eio": true,
+        "log": "EIO: i/o error, scandir '/input'\n",
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "inputPathLength": 189,
+        "case": 1
+      },
+      {
+        "mode": "gateway-allowlist",
+        "nativeExit": 1,
+        "signal": null,
+        "error": null,
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 1,
+        "eio": true,
+        "log": "EIO: i/o error, scandir '/input'\n",
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "inputPathLength": 189,
+        "case": 2
+      }
+    ],
+    "mount-probe.json": [
+      {
+        "user": "1000:1000",
+        "length": 113,
+        "createExit": 0,
+        "nativeExit": 0,
+        "stdout": "{\"path\":\"/input\",\"uid\":0,\"gid\":0,\"mode\":16895,\"entries\":[\"src\"]}\n{\"path\":\"/input/src\",\"uid\":0,\"gid\":0,\"mode\":16895,\"entries\":[\"pages\"]}\n{\"path\":\"/input/src/pages\",\"uid\":0,\"gid\":0,\"mode\":16895,\"entries\":[\"HomePage.vue\"]}\n",
+        "stderr": "",
+        "case": 1
+      },
+      {
+        "user": "0:0",
+        "length": 113,
+        "createExit": 0,
+        "nativeExit": 0,
+        "stdout": "{\"path\":\"/input\",\"uid\":0,\"gid\":0,\"mode\":16895,\"entries\":[\"src\"]}\n{\"path\":\"/input/src\",\"uid\":0,\"gid\":0,\"mode\":16895,\"entries\":[\"pages\"]}\n{\"path\":\"/input/src/pages\",\"uid\":0,\"gid\":0,\"mode\":16895,\"entries\":[\"HomePage.vue\"]}\n",
+        "stderr": "",
+        "case": 2
+      },
+      {
+        "user": "1000:1000",
+        "length": 189,
+        "createExit": 0,
+        "nativeExit": 1,
+        "stdout": "{\"path\":\"/input\",\"error\":\"EIO\"}\n{\"path\":\"/input/src\",\"error\":\"EIO\"}\n{\"path\":\"/input/src/pages\",\"error\":\"EIO\"}\n",
+        "stderr": "",
+        "case": 3
+      },
+      {
+        "user": "0:0",
+        "length": 189,
+        "createExit": 0,
+        "nativeExit": 0,
+        "stdout": "{\"path\":\"/input\",\"uid\":0,\"gid\":0,\"mode\":16895,\"entries\":[\"src\"]}\n{\"path\":\"/input/src\",\"uid\":0,\"gid\":0,\"mode\":16895,\"entries\":[\"pages\"]}\n{\"path\":\"/input/src/pages\",\"uid\":0,\"gid\":0,\"mode\":16895,\"entries\":[\"HomePage.vue\"]}\n",
+        "stderr": "",
+        "case": 4
+      }
+    ],
+    "length-probe.json": [
+      {
+        "length": 119,
+        "exit": 0,
+        "stdout": "{\"entries\":[\"src\"],\"source\":\"<template><h1>probe</h1></template>\"}\n",
+        "stderr": "",
+        "case": 1
+      },
+      {
+        "length": 139,
+        "exit": 0,
+        "stdout": "{\"entries\":[\"src\"],\"source\":\"<template><h1>probe</h1></template>\"}\n",
+        "stderr": "",
+        "case": 2
+      },
+      {
+        "length": 159,
+        "exit": 0,
+        "stdout": "{\"entries\":[\"src\"],\"source\":\"<template><h1>probe</h1></template>\"}\n",
+        "stderr": "",
+        "case": 3
+      },
+      {
+        "length": 179,
+        "exit": 0,
+        "stdout": "{\"entries\":[\"src\"],\"source\":\"<template><h1>probe</h1></template>\"}\n",
+        "stderr": "",
+        "case": 4
+      },
+      {
+        "length": 188,
+        "exit": 0,
+        "stdout": "{\"entries\":[\"src\"],\"source\":\"<template><h1>probe</h1></template>\"}\n",
+        "stderr": "",
+        "case": 5
+      }
+    ],
+    "depth-probe.json": [
+      {
+        "length": 99,
+        "components": 13,
+        "exit": 0,
+        "stdout": "{\"entries\":[\"src\"],\"source\":\"<template><h1>probe</h1></template>\"}\n",
+        "stderr": "",
+        "case": 1
+      },
+      {
+        "length": 127,
+        "components": 21,
+        "exit": 1,
+        "stdout": "{\"error\":\"EIO\"}\n",
+        "stderr": "",
+        "case": 2
+      },
+      {
+        "length": 121,
+        "components": 22,
+        "exit": 1,
+        "stdout": "{\"error\":\"EIO\"}\n",
+        "stderr": "",
+        "case": 3
+      }
+    ]
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "task": "D11-A",
+  "recordedAt": "2026-10-11T21:14:28.163476+09:00",
+  "implementationHead": "6353cf03096c75ff0437c803aa41897711d2ce4f",
+  "baseline": "413e5b8bc40e2ccf6b5c538a9f2b4fc0f02e9ccb",
+  "environment": {
+    "modelProvider": "deterministic-mock",
+    "finalBrowser": "locked Playwright Chromium 1223",
+    "buildDatabaseBrowser": "real",
+    "rawLogs": "private ignored local workspace"
+  },
+  "commands": [
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=LocalVolumeSnapshotStoreTest' test",
+      "exitCode": 0,
+      "log": ".local-data/d11-a/evidence/unit.log",
+      "logDigest": "sha256:9335d712ea0a0fdb6ade7db455feaebf51d0cba76e9e605bbbd0d8abcf488176",
+      "junit": {
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=LocalVolumeSnapshotStoreTest,VersionHttpIntegrationTest' test",
+      "exitCode": 0,
+      "log": ".local-data/d11-a/evidence/acceptance-canonical-main.log",
+      "logDigest": "sha256:e7ea631592e4084eaf0a3daabe7477392b719ec529f7aeff08cdcb1d1b9e165c",
+      "junit": {
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=PlanModelIntegrationTest,OwnedWorkspaceCleanupTest,PreviewPlatformIntegrationTest' test",
+      "exitCode": 0,
+      "log": ".local-data/d11-a/evidence/preview-and-cleanup.log",
+      "logDigest": "sha256:609d063af86a847f3e26ca6e7f0bb324f734f3e1eb55d6f7c0d6200ac602d88b",
+      "junit": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "command": "node --test tests/versions/contracts.test.mjs",
+      "exitCode": 0,
+      "log": ".local-data/d11-a/evidence/contracts-final.log",
+      "logDigest": "sha256:e139723a6d48d1b4b4b11845348a8f8562872bb1680d917b7c7b6f22b6a637fd"
+    },
+    {
+      "command": "pnpm exec redocly lint .local-data/d11-a/openapi-combined.json",
+      "exitCode": 0,
+      "log": ".local-data/d11-a/evidence/openapi-combined-fixed.log",
+      "logDigest": "sha256:a8a7031c2a415e9e628d67666263fbbeb81d123342aaaa1bad0199ffab9fde61"
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 1,
+      "log": ".local-data/d11-a/evidence/ci-gate.log",
+      "logDigest": "sha256:95a51639308db1252ccd5ba394ba1ac5a608e88e170ec5c33975faee39099de4",
+      "junit": {
+        "tests": 173,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0
+      },
+      "stages": {
+        "verify:static": "passed",
+        "verify:api": "failed",
+        "verify:runner": "passed",
+        "verify:e2e": "failed"
+      },
+      "failureSummary": "One existing JUnit Windows DirectoryNotEmpty cleanup error; three system-Chrome E2E timeouts. Preserved logs/traces; no skipped assertions."
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": null,
+      "log": ".local-data/d11-a/evidence/ci-gate-final.log",
+      "logDigest": "sha256:53c2d1521bd35ca33a17a935a74b7d6276da5d02a729d011de5e1007ec96f9d3",
+      "result": "UNKNOWN_EXIT_CODE",
+      "reason": "Launching tool session became unavailable; wrapper/child processes ended without writing the exit file. Buffered log is incomplete. Do not infer process exit from test reports.",
+      "observedLocalJUnit": {
+        "tests": 173,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "observedBrowserReport": {
+        "status": "passed",
+        "failedTests": []
+      }
+    }
+  ],
+  "remoteImplementationChecks": {
+    "head": "6353cf03096c75ff0437c803aa41897711d2ce4f",
+    "checks": [
+      {
+        "name": "ci-gate",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/Echo-love928/CodeLess/actions/runs/38137820729/job/114466214228"
+      },
+      {
+        "name": "verify:e2e",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/Echo-love928/CodeLess/actions/runs/38137820729/job/114465222107"
+      },
+      {
+        "name": "verify:api",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/Echo-love928/CodeLess/actions/runs/38137820729/job/114465222090"
+      },
+      {
+        "name": "verify:runner",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/Echo-love928/CodeLess/actions/runs/38137820729/job/114465222055"
+      },
+      {
+        "name": "verify:static",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/Echo-love928/CodeLess/actions/runs/38137820729/job/114465222024"
+      },
+      {
+        "name": "infra-preflight",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/Echo-love928/CodeLess/actions/runs/38137820729/job/114465221929"
+      }
+    ],
+    "api": {
+      "command": "pnpm verify:api",
+      "exitCode": 0,
+      "result": "173 tests; failures/errors/skipped all zero",
+      "logDigest": "sha256:38914a921f760c6a568aa1b93d02a424f8c71bf722223ad8d64da2758aa2a5a4"
+    },
+    "e2e": {
+      "command": "pnpm verify:e2e",
+      "exitCode": 0,
+      "result": "33 passed",
+      "logDigest": "sha256:b24d930200224832797be6a3a39b162fd7fc0b431b67cb1a51c7c99c05341864"
+    },
+    "source": "GitHub completed successful steps and downloaded original job logs. These checks apply only to this exact head."
+  }
+}

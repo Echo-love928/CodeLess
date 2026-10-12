@@ -1,0 +1,398 @@
+{
+  "paths": {
+    "/api/v0/applications/{applicationId}/versions": {
+      "parameters": [
+        {
+          "name": "applicationId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listVersions",
+        "tags": [
+          "versions"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "VERIFIED",
+                "FAILED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owner-scoped read-only version response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./versions/response.schema.json#/$defs/list"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path or parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not owned or missing file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Snapshot unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Snapshot integrity failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          }
+        },
+        "summary": "List immutable application versions"
+      }
+    },
+    "/api/v0/versions/{versionId}/files": {
+      "parameters": [
+        {
+          "name": "versionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listVersionFiles",
+        "tags": [
+          "versions"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Owner-scoped read-only version response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./versions/response.schema.json#/$defs/files"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path or parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not owned or missing file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Snapshot unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Snapshot integrity failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          }
+        },
+        "summary": "List read-only version source files"
+      }
+    },
+    "/api/v0/versions/{versionId}/files/content": {
+      "parameters": [
+        {
+          "name": "versionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "readVersionFile",
+        "tags": [
+          "versions"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 240
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owner-scoped read-only version response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./versions/response.schema.json#/$defs/file"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path or parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not owned or missing file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Snapshot unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Snapshot integrity failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Read a source file from an immutable version"
+      }
+    },
+    "/api/v0/versions/{versionId}/snapshot": {
+      "parameters": [
+        {
+          "name": "versionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getVersionSnapshot",
+        "tags": [
+          "versions"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Owner-scoped read-only version response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./versions/response.schema.json#/$defs/snapshot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path or parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not owned or missing file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Snapshot unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Snapshot integrity failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Read version manifests and verification report"
+      }
+    }
+  }
+}

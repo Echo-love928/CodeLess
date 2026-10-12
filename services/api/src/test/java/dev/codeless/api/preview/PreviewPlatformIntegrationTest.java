@@ -88,6 +88,44 @@ class PreviewPlatformIntegrationTest {
         assertThat(report.path("platformApiFixture").asBoolean()).isFalse();assertThat(report.path("signingFixture").asBoolean()).isFalse();
         assertThat(report.path("modelProvider").asText()).isEqualTo("deterministic-mock");
         assertThat(report.path("modelQualityAccepted").asBoolean()).isFalse();
+        verifyVersionSourceMatchesPreview(report);
         }
+    }
+    /** D11: the actual authenticated iframe and owner source APIs must refer to the same immutable version. */
+    private void verifyVersionSourceMatchesPreview(tools.jackson.databind.JsonNode preview) throws Exception {
+        var client=java.net.http.HttpClient.newHttpClient();
+        String base="http://127.0.0.1:"+port+"/api/v0/";
+        var csrf=client.send(java.net.http.HttpRequest.newBuilder(java.net.URI.create(base+"auth/csrf")).GET().build(),
+                java.net.http.HttpResponse.BodyHandlers.ofString());
+        assertThat(csrf.statusCode()).isEqualTo(200);
+        String cookie=csrf.headers().firstValue("set-cookie").orElseThrow().split(";",2)[0];
+        var login=client.send(java.net.http.HttpRequest.newBuilder(java.net.URI.create(base+"auth/login"))
+                .header("Cookie",cookie).header("X-CSRF-Token",json.readTree(csrf.body()).path("token").asText())
+                .header("Content-Type","application/json").POST(java.net.http.HttpRequest.BodyPublishers.ofString(
+                    "{\"email\":\"demo@codeless.local\",\"password\":\"demo-password-for-test-only\"}")).build(),
+                java.net.http.HttpResponse.BodyHandlers.ofString());
+        assertThat(login.statusCode()).isEqualTo(200);cookie=login.headers().firstValue("set-cookie").orElseThrow().split(";",2)[0];
+        String version=preview.path("versionId").asText();
+        var response=client.send(java.net.http.HttpRequest.newBuilder(java.net.URI.create(base+"versions/"+version+"/snapshot"))
+                .header("Cookie",cookie).GET().build(),java.net.http.HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode()).isEqualTo(200);var snapshot=json.readTree(response.body());
+        assertThat(snapshot.path("versionId").asText()).isEqualTo(version);
+        assertThat(snapshot.path("sourceDigest")).isEqualTo(preview.path("sourceDigest"));
+        assertThat(snapshot.path("validation").path("artifactDigest")).isEqualTo(preview.path("artifactDigest"));
+        assertThat(snapshot.path("validation").path("report").path("buildId")).isEqualTo(preview.path("buildId"));
+        var reads=new ArrayList<tools.jackson.databind.JsonNode>();
+        for(var entry:snapshot.path("files")) {
+            var read=client.send(java.net.http.HttpRequest.newBuilder(java.net.URI.create(base+"versions/"+version+"/files/content?path="+entry.path("path").asText()))
+                    .header("Cookie",cookie).GET().build(),java.net.http.HttpResponse.BodyHandlers.ofString());
+            assertThat(read.statusCode()).isEqualTo(200);var source=json.readTree(read.body());
+            assertThat(source.path("versionId").asText()).isEqualTo(version);
+            assertThat(source.path("sourceDigest")).isEqualTo(preview.path("sourceDigest"));
+            assertThat(dev.codeless.api.versions.LocalVolumeSnapshotStore.hash(source.path("content").asText().getBytes(java.nio.charset.StandardCharsets.UTF_8)))
+                    .isEqualTo(entry.path("digest").asText());
+            reads.add(source);
+        }
+        Path evidence=Path.of(System.getenv().getOrDefault("CODELESS_VERSION_PREVIEW_EVIDENCE_DIR",ROOT.resolve("evidence").toString()));
+        Files.createDirectories(evidence);
+        Files.writeString(evidence.resolve("preview-source-consistency.json"),json.writeValueAsString(Map.of("preview",preview,"snapshot",snapshot,"sourceReads",reads)));
     }
 }
