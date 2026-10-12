@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.annotation.DirtiesContext;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -29,6 +30,7 @@ import tools.jackson.databind.json.JsonMapper;
         "codeless.agent.private-root=target/edit-integration/runtime", "codeless.versions.root=target/edit-integration/versions",
         "CODELESS_FILE_WORKSPACE_ROOT=target/edit-integration/workspaces", "CODELESS_FILE_AUDIT_ROOT=target/edit-integration/audit"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext(classMode=DirtiesContext.ClassMode.AFTER_CLASS)
 class EditLifecycleIntegrationTest extends PostgresTestBase {
     static final int TLS=freePort(),CONTROL=freePort();
     static int freePort() {try(var socket=new java.net.ServerSocket(0)){return socket.getLocalPort();}catch(Exception failure){throw new IllegalStateException(failure);}}
@@ -209,9 +211,30 @@ class EditLifecycleIntegrationTest extends PostgresTestBase {
                 Map.of("baseVersionId",current,"prompt","x","source",Map.of("type","CHAT"),"publish",true)))
             assertThat(post("applications/"+app+"/edits",malformed,null,login,true).statusCode()).isEqualTo(400);
         assertThat(edit(UUID.randomUUID(),"不存在的基版本",null).statusCode()).isEqualTo(409);
+        UUID shell=jdbc.sql("SELECT id FROM application_versions WHERE application_id=? AND number=1").param(app).query(UUID.class).single();
+        assertThat(json.readTree(edit(shell,"初始空壳不可修改",null).body()).path("code").asText()).isEqualTo("EDIT_BASE_UNAVAILABLE");
+        int taskCount=jdbc.sql("SELECT count(*) FROM generation_tasks WHERE application_id=?").param(app).query(Integer.class).single();
+        Path volume=Path.of("target/edit-integration/versions").toAbsolutePath().normalize();
+        Path present=volume.resolve(current.toString()),unavailable=volume.resolve(".unavailable-"+current);
+        assertThat(present.startsWith(volume)).isTrue();assertThat(unavailable.startsWith(volume)).isTrue();
+        Files.move(present,unavailable);
+        try {
+            var missing=edit(current,"缺失源码不能创建任务",null);assertThat(missing.statusCode()).isEqualTo(409);
+            assertThat(json.readTree(missing.body()).path("code").asText()).isEqualTo("SNAPSHOT_UNAVAILABLE");
+        } finally {Files.move(unavailable,present);}
+        String digest=jdbc.sql("SELECT source_digest FROM application_versions WHERE id=?").param(current).query(String.class).single();
+        Path content=snapshots.source(current,digest).directory().resolve("src/components/ProfileCard.vue");
+        byte[] saved=Files.readAllBytes(content);
+        try {
+            Files.writeString(content,"<template>tampered test-only bytes</template>");
+            var corrupt=edit(current,"损坏源码不能创建任务",null);assertThat(corrupt.statusCode()).isEqualTo(503);
+            assertThat(json.readTree(corrupt.body()).path("code").asText()).isEqualTo("SNAPSHOT_DIGEST_MISMATCH");
+        } finally {Files.write(content,saved);}
+        assertThat(jdbc.sql("SELECT count(*) FROM generation_tasks WHERE application_id=?").param(app).query(Integer.class).single()).isEqualTo(taskCount);
         UUID task=task(edit(current,"幂等请求","boundary-key"));
         assertThat(edit(current,"另一需求","boundary-key").statusCode()).isEqualTo(409);
         assertThat(edit(base,"幂等请求","boundary-key").statusCode()).isEqualTo(409);
+        assertThat(post("applications/"+app+"/edits",Map.of("baseVersionId",current,"prompt","幂等请求","source",Map.of("type","CHAT","messageId","different-message")),"boundary-key",login,true).statusCode()).isEqualTo(409);
         assertThat(post("tasks",Map.of("applicationId",app,"prompt","幂等请求"),"boundary-key",login,true).statusCode()).isEqualTo(409);
         assertThat(get("tasks/"+task+"/edit",other).statusCode()).isEqualTo(404);
         queue.cancel(owner,task);
@@ -219,7 +242,10 @@ class EditLifecycleIntegrationTest extends PostgresTestBase {
         UUID normal=queue.create(owner,app,"ordinary queued task","ordinary-key").id();
         assertThat(edit(current,"ordinary queued task","ordinary-key").statusCode()).isEqualTo(409);
         assertThat(edit(current,"不同键修改",null).statusCode()).isEqualTo(409);queue.cancel(owner,normal);
-        report("boundaries",Map.of("anonymous",401,"csrf",403,"otherOwner",404,"invalidInputs",400,"missingBase",409,"idempotencyCollision",409));
+        UUID forged=queue.create(owner,app,EditMetadata.encode(new EditMetadata.Link(current,new EditMetadata.Source("CHAT","forged"))),null).id();
+        assertThat(get("tasks/"+forged+"/edit",login).statusCode()).isEqualTo(404);queue.cancel(owner,forged);
+        report("boundaries",Map.of("anonymous",401,"csrf",403,"otherOwner",404,"invalidInputs",400,"missingBase",409,"idempotencyCollision",409,
+                "missingSnapshot",409,"corruptSnapshot",503,"noTaskFromSnapshotFailures",true,"promptCannotForgeEditMetadata",true));
     }
     @Test @Order(6) void realFailedEditBuildCannotReplaceUsableVersion() throws Exception {
         UUID task=task(edit(current,"展示人物修改",null));var claim=claim(task);

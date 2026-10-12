@@ -30,12 +30,12 @@ public class EditController {
             message=source.path("messageId").asText();
         }
         if(key!=null && !key.matches("[A-Za-z0-9._:-]{1,128}")) invalid();
-        return ResponseEntity.accepted().header("Cache-Control","no-store").body(edits.create(ownership.userId(request),
+        return ResponseEntity.accepted().header("Cache-Control","no-store").header("X-Content-Type-Options","nosniff").body(edits.create(ownership.userId(request),
                 uuid(applicationId),uuid(body.path("baseVersionId").asText()),prompt,new EditMetadata.Source("CHAT",message),key));
     }
     @GetMapping("/api/v0/tasks/{taskId}/edit")
     public ResponseEntity<EditTaskService.View> get(@PathVariable String taskId,HttpServletRequest request) {
-        return ResponseEntity.ok().header("Cache-Control","no-store").body(edits.get(ownership.userId(request),uuid(taskId)));
+        return ResponseEntity.ok().header("Cache-Control","no-store").header("X-Content-Type-Options","nosniff").body(edits.get(ownership.userId(request),uuid(taskId)));
     }
     private static UUID uuid(String text) {
         try { UUID id=UUID.fromString(text); if(!id.toString().equalsIgnoreCase(text)) invalid(); return id; }
@@ -46,6 +46,15 @@ public class EditController {
         return ResponseEntity.status(HttpStatus.CONFLICT).header("Cache-Control","no-store").body(
                 new dev.codeless.api.error.ApiError(failure.code(),"Edit base is stale; review the current version before resubmitting",
                         java.time.Instant.now(),request.getRequestURI(),UUID.randomUUID().toString(),failure.details()));
+    }
+    @ExceptionHandler(dev.codeless.api.versions.SnapshotFailure.class)
+    public ResponseEntity<dev.codeless.api.error.ApiError> snapshotFailure(dev.codeless.api.versions.SnapshotFailure failure,HttpServletRequest request) {
+        HttpStatus status=switch(failure.getMessage()) {
+            case "SNAPSHOT_UNAVAILABLE" -> HttpStatus.CONFLICT;
+            default -> HttpStatus.SERVICE_UNAVAILABLE;
+        };
+        return ResponseEntity.status(status).header("Cache-Control","no-store").body(new dev.codeless.api.error.ApiError(
+                failure.getMessage(),"Edit base snapshot cannot be read",java.time.Instant.now(),request.getRequestURI(),UUID.randomUUID().toString(),java.util.Map.of()));
     }
     private static void invalid() {throw new AuthFailure(HttpStatus.BAD_REQUEST,"INVALID_REQUEST");}
 }

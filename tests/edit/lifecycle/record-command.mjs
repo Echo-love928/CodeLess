@@ -23,7 +23,10 @@ if (Object.hasOwn(tests, mode)) {
   command = process.execPath; args = ['--test', 'tests/edit/lifecycle/contracts.test.mjs']
 } else if (mode === 'gate') {
   command = process.execPath; args = ['scripts/ci-gate.mjs']
-} else throw new Error('Mode must be acceptance, contracts or gate')
+} else if (mode === 'api') {
+  command = process.platform === 'win32' ? (process.env.ComSpec ?? 'cmd.exe') : 'corepack'
+  args = process.platform === 'win32' ? ['/d', '/c', 'corepack', 'pnpm', 'run', 'verify:api'] : ['pnpm', 'run', 'verify:api']
+} else throw new Error('Mode must be acceptance, contracts, api or gate')
 const env = { ...process.env, CODELESS_MODEL_PROVIDER: 'deterministic-mock' }
 for (const key of ['CODELESS_MODEL_API_KEY', 'CODELESS_MODEL_NAME', 'CODELESS_PLAYWRIGHT_CHANNEL']) delete env[key]
 const run = join(workspace, '.local-data/d12-a/runs', `${new Date().toISOString().replaceAll(':', '-')}-${mode}-${randomUUID()}`)
@@ -60,4 +63,3 @@ function finish(code, signal, error) {
 }
 child.once('error', error => finish(null, null, error))
 child.once('exit', (code, signal) => finish(code, signal))
-

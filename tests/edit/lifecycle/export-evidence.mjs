@@ -18,7 +18,7 @@ for(const name of (await readdir(privateRoot)).sort()) {
   runs.push({...meta,cwd:'.',run:relative(root,directory),command:meta.command.map(v=>v.replace(root,'.')),
     junit:matches.length?Object.fromEntries(['tests','failures','errors','skipped'].map((key,i)=>[key,Number(matches.at(-1)[i+1])])):null})
 }
-const latest=runs.findLast(run=>run.status==='PASSED'&&['acceptance','gate'].includes(run.mode))
+const latest=runs.findLast(run=>run.status==='PASSED'&&['acceptance','gate','api'].includes(run.mode))
 assert.ok(latest,'No successful real acceptance run exists')
 const evidence=join(root,latest.run,'edit')
 for(const name of ['D12-A-T1','D12-A-T2','D12-A-T3','D12-A-T4','boundaries','real-build-failure','commit-conflict','cancel-preview','runtime-usage']) {
