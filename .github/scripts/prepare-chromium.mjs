@@ -3,6 +3,11 @@ import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { resolve } from 'node:path'
 
+export const ubuntuSourceFiles = Object.freeze([
+  '/etc/apt/sources.list', '/etc/apt/sources.list.d/ubuntu.sources',
+  '/etc/apt/apt-mirrors.txt',
+])
+
 // GitHub's Ubuntu image may select the Azure mirror. Keep the Ubuntu archive,
 // suites, components and signature policy; only change the observed slow host.
 export function officialUbuntuSources(text) {
@@ -19,7 +24,7 @@ export function checkedCommand(command, args, options = {}, spawn = spawnSync) {
 
 async function prepare() {
   if (process.platform !== 'linux' || process.version !== 'v24.16.0') throw new Error('Locked Linux/Node CI environment required')
-  for (const path of ['/etc/apt/sources.list', '/etc/apt/sources.list.d/ubuntu.sources']) {
+  for (const path of ubuntuSourceFiles) {
     let original
     try { original = await readFile(path, 'utf8') }
     catch (error) { if (error.code === 'ENOENT') continue; throw error }
