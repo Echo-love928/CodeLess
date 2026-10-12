@@ -46,6 +46,9 @@ jobs:
           node-version: 24.16.0
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
+      - name: Prepare locked Chromium
+        timeout-minutes: 5
+        run: node .github/scripts/prepare-chromium.mjs
       - run: pnpm verify:runner
 
   infra:
@@ -71,9 +74,9 @@ jobs:
           node-version: 24.16.0
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
-      - name: Install Chromium
-        timeout-minutes: 3
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Prepare locked Chromium
+        timeout-minutes: 5
+        run: node .github/scripts/prepare-chromium.mjs
       - name: Run browser smoke
         run: pnpm verify:e2e
         env:

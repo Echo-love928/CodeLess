@@ -1,0 +1,43 @@
+{
+  "failedHead": "71c7a1f76bda5fa0781fcc2e281716d8dd0c72b8",
+  "failedRun": "https://github.com/Echo-love928/CodeLess/actions/runs/38234410970",
+  "originalChecks": {
+    "verify:static": "success",
+    "verify:api": "success",
+    "verify:runner": "failure",
+    "verify:e2e": "failure",
+    "infra-preflight": "success",
+    "ci-gate": "failure"
+  },
+  "runnerFailure": {
+    "job": "https://github.com/Echo-love928/CodeLess/actions/runs/38234410970/job/114761439945",
+    "test": "D12-B-T2",
+    "cause": "Locked chromium_headless_shell-1223 executable absent; runner job never provisioned Chromium",
+    "localOriginalLog": ".local-data/d12-b/ci-fix/runner-old.log"
+  },
+  "e2eFailure": {
+    "job": "https://github.com/Echo-love928/CodeLess/actions/runs/38234410970/job/114761439986",
+    "step": "Install Chromium",
+    "cause": "Ubuntu Azure archive font package downloads occupied the 3 minute provisioning budget; tests did not start",
+    "localOriginalLog": ".local-data/d12-b/ci-fix/e2e-old.log"
+  },
+  "api": { "tests": 176, "failures": 0, "errors": 0, "skipped": 0, "localOriginalLog": ".local-data/d12-b/ci-fix/api-old.log" },
+  "regression": {
+    "command": "node --test tests/infra/chromium-setup.test.mjs",
+    "exitCode": 0,
+    "passed": 2,
+    "skipped": 0
+  },
+  "localRunner": {
+    "command": "corepack pnpm verify:runner",
+    "exitCode": 0,
+    "passed": 58,
+    "skipped": 0,
+    "log": ".local-data/d12-b/ci-fix/runner-local.log",
+    "exitEvidence": ".local-data/d12-b/ci-fix/runner-local.exit"
+  },
+  "fix": "Provision locked Chromium in runner and E2E before tests; replace only slow Azure Ubuntu archive host with official archive; preserve signatures and test assertions; fail closed on any prerequisite failure",
+  "candidateVerification": "Read exact current PR HEAD and six checks; do not treat old-head success as proof",
+  "priorLocalGateFailure": "Preserved, not overwritten or reclassified",
+  "mainModified": false
+}
