@@ -17,13 +17,21 @@ test('additive OpenAPI paths preserve the existing detail and public error contr
   const shared=JSON.parse(await readFile(new URL('../../contracts/openapi.v0.json',import.meta.url)))
   assert.equal(Object.keys(patch.paths).length,4)
   assert.equal(patch.paths['/api/v0/versions/{versionId}'],undefined)
-  for(const route of Object.values(patch.paths)) {
+  for(const [path,route] of Object.entries(patch.paths)) {
+    assert.deepEqual(shared.paths[path],route,'Public OpenAPI must contain the reviewed additive route')
     assert.deepEqual(Object.keys(route).sort(),['get','parameters'])
     assert.deepEqual(route.get.security,[{sessionCookie:[]}])
     assert.equal(shared.components.securitySchemes.sessionCookie.name,'JSESSIONID')
     assert.match(route.get.responses['200'].content['application/json'].schema.$ref,/^\.\/versions\/response\.schema\.json#/)
     assert.equal(route.get.responses['401'].content['application/json'].schema.$ref,'./schemas/v0/error.schema.json')
   }
+})
+
+test('version source tasks are optional valid UUIDs, never inferred arbitrary identifiers',()=>{
+  const item={id,applicationId:id,number:1,sourceDigest:digest,status:'DRAFT',createdAt:'2026-10-12T00:00:00Z'}
+  const page=value=>({items:[value],page:0,size:20,total:1})
+  for(const value of [item,{...item,taskId:id},{...item,taskId:null}])assert.equal(validate('list')(page(value)),true)
+  for(const taskId of ['current-task',8,'../other'])assert.equal(validate('list')(page({...item,taskId})),false)
 })
 test('closed file response, text scripts, traversal and false status fixtures',()=>{
   const file={versionId:id,sourceDigest:digest,path:'src/pages/HomePage.vue',bytes:8,digest,content:'<script>alert(1)</script>'}

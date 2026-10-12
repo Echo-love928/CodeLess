@@ -69,8 +69,8 @@ public final class AgentRunStore {
             UUID version=UUID.randomUUID();
             var frozen=snapshots.freezeSource(version,snapshot.directory(),snapshot.source().sourceDigest(),
                     tools.jackson.databind.json.JsonMapper.builder().build().valueToTree(snapshot.source().files()));
-            jdbc.sql("INSERT INTO application_versions(id,application_id,number,source_digest,status) VALUES (?,?,?,?,'DRAFT')")
-                    .params(version,app,number,snapshot.source().sourceDigest()).update();
+            jdbc.sql("INSERT INTO application_versions(id,application_id,number,source_digest,status,source_task_id) VALUES (?,?,?,?,'DRAFT',?)")
+                    .params(version,app,number,snapshot.source().sourceDigest(),claim.taskId()).update();
             journal.append(claim.taskId(),"GENERATE","draft",Map.of("versionId",version,"sourceDigest",snapshot.source().sourceDigest(),
                     "sourceDirectory",snapshot.directory().toString(),"frozenSourceDirectory",frozen.directory().toString(),
                     "files",frozen.manifest().files(),"actions",actions));

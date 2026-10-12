@@ -117,6 +117,7 @@ class VersionHttpIntegrationTest extends PostgresTestBase {
         var taskView=queue.find(owner,task).orElseThrow();assertThat(taskView.status()).as(taskView.failureCode()).isEqualTo(TaskStatus.READY);
         fixtureStage="DRAFT_MUTATION";fixtureCode="UNKNOWN";
         var draft=AgentJournal.latest(journal.read(task),"draft");ready=UUID.fromString(draft.path("versionId").asText());
+        assertThat(json.readTree(get("versions/"+ready,cookie).body()).path("taskId").asText()).isEqualTo(task.toString());
         var old=get("versions/"+ready+"/files/content?path=src/pages/HomePage.vue",cookie);
         assertThat(old.statusCode()).isEqualTo(200);var oldBytes=json.readTree(old.body());
         var before=snapshots.outcome(ready,draft.path("sourceDigest").asText(),"VERIFIED");
@@ -125,6 +126,7 @@ class VersionHttpIntegrationTest extends PostgresTestBase {
         var created=tools.execute(newTask,claim.token(),"files.create",json.writeValueAsString(Map.of("path","src/pages/HomePage.vue","content","<template>new draft</template>")));
         assertThat(created.status()).isEqualTo("SUCCEEDED");
         var newDraft=store.draft(claim,tools.snapshot(newTask,claim.token()),json.createArrayNode());failed=UUID.fromString(newDraft.path("versionId").asText());
+        assertThat(json.readTree(get("versions/"+failed,cookie).body()).path("taskId").asText()).isEqualTo(newTask.toString());
         var manifest=snapshots.source(failed,newDraft.path("sourceDigest").asText()).manifest();
         var updated=tools.execute(newTask,claim.token(),"files.update",json.writeValueAsString(Map.of("path","src/pages/HomePage.vue","content","<template>later draft mutation</template>","expectedDigest",manifest.files().getFirst().digest())));
         assertThat(updated.status()).isEqualTo("SUCCEEDED");
@@ -171,6 +173,11 @@ class VersionHttpIntegrationTest extends PostgresTestBase {
         }
         var list=get("applications/"+app+"/versions",cookie);assertThat(list.statusCode()).isEqualTo(200);var page=json.readTree(list.body());
         assertThat(page.path("total").asInt()).isEqualTo(3);assertThat(page.path("latestReadyVersionId").asText()).isEqualTo(ready.toString());
+        for(var item:page.path("items")) {
+            if(item.path("id").asText().equals(shell.toString())) assertThat(item.has("taskId")).isFalse();
+            else assertThat(item.path("taskId").asText()).isEqualTo(jdbc.sql("SELECT source_task_id FROM application_versions WHERE id=?")
+                    .param(UUID.fromString(item.path("id").asText())).query(UUID.class).single().toString());
+        }
         for(String status:List.of("DRAFT","FAILED","VERIFIED")) {
             var filtered=json.readTree(get("applications/"+app+"/versions?status="+status,cookie).body());
             assertThat(filtered.path("total").asInt()).isEqualTo(1);assertThat(filtered.path("items").get(0).path("status").asText()).isEqualTo(status);

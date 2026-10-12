@@ -2,7 +2,9 @@
 
 2026-10-12：已同步 D11-A PR33 的已独立批准候选 `acdc183cf4a250df024f7109d53e5628efc79e54`。
 A 的原始提交通过merge保留在 B 独立分支；main 未改。历史建议 `/source` 已撤去。
-A复审工作树对B8640035的真实面板验收1/1通过；本机旧Docker EIO失败仍保留，根因UNKNOWN。
+A复审工作树对B8640035的真实面板验收1/1通过；本机旧Docker EIO失败仍保留。本次已复现并隔离为
+Windows Docker文件共享对深层宿主目录的非root读取EIO，采用浅层临时构建目录后真实面板1/1通过。
+上游内部机制未确认，不声称升级Docker或降低隔离解决问题。
 依赖同步后的本机复测与精确HEAD检查以本卡交接最新节为准，不用旧候选结果替代。
 
 ## 读取契约
@@ -21,9 +23,10 @@ A复审工作树对B8640035的真实面板验收1/1通过；本机旧Docker EIO�
 Web Crypto 需要安全上下文（生产HTTPS、本地localhost），既有部署符合该要求。
 401回登录；404表示文件缺失/不属当前用户；409表示暂无快照；空清单与未冻结壳版本区别处理。
 
-A列表没有来源taskId。当前工作台 diagnostics 的真实 build.versionId 与条目匹配时，
-可展示该 diagnostics 所属任务链接；其他历史版本显示“未提供来源任务”，不从当前task猜测。
-全量历史来源映射需要 A/契约维护者补正式字段；没有扩充公共 schema 或偷偷新增后端路径。
+列表和详情的可选taskId来自不可变持久化来源。V5迁移只回填唯一且同应用的历史构建任务；
+无构建、歧义、跨应用的历史关系保持未知。新草稿在创建事务内记录真实生成任务，包含后来失败的版本。
+面板仅使用服务端taskId；当前diagnostics不再是来源回退。无来源显示“未提供来源任务”。
+公共version schema与OpenAPI已同步，四条读取路径保持A已核验fragment的原契约。
 
 ## UI与安全边界
 
@@ -33,8 +36,8 @@ VersionWorkspace复用未修改的D09 PreviewPanel；只有VERIFIED+buildId切�
 AbortController+序号阻止旧应用/版本/刷新结果覆盖当前选择。
 Vue文本插值到pre/code，无v-html/eval/IDE。冻结错误摘要也按文本显示。
 
-必要跨范围接线：WorkbenchPage额外传当前任务及其真实build版本IDs；
-旧任务状态机和凭据安全不变。公共OpenAPI增量仍由维护者同步。
+旧任务状态机和凭据安全不变；WorkbenchPage原先传入的当前任务/diagnostics信息不参与历史来源判断。
+本次按用户授权在B分支完成公共契约、V5迁移与API来源字段接线，A分支及main未改。
 测试跨范围：既有platform.acceptance.mjs仅加显式opt-in D11 hook，位于全部原断言后，
 没有删除/弱化原检查；新增相关Java IT复用原自有进程、DB、TLS与清理harness。
 
@@ -50,8 +53,9 @@ API/auth/预览内容是明确fixture，不能证明持久化或模型效果。
 真实IT使用 `d11-version-panel-fixture`，模型提案是明确mock；session/PG/文件工具/
 冻结/真实Docker/Chromium/TLS/nginx/签名iframe不是fixture。验证两已通过版本切换、
 草稿缺快照409、失败保留最新预览和脚本文本。它不在默认Surefire发现中，必须显式运行；
-此前本机在原平台生成前置处EIO失败，新增D11断言尚未到达；A复审机器的1/1通过另有实测报告，
-不能把另一机器成功解释为原EIO根因修复。
+旧本机前置EIO失败和A另一机器的成功报告分别保留。本次在原机器完整通过，新增断言验证切换至
+第二任务后第一历史版本仍指向第一来源任务。跨盘产物晋升的EXDEV边界使用明确故障注入测试，
+不把它称为真实E盘联调。
 
 证据：`tests/e2e/versions/evidence/2026-10-12/`；原失败历史保留于2026-10-11目录。
 状态与下一步见 `docs/handoffs/D11-B.md` 最新节；草稿PR34保持未合并。

@@ -51,7 +51,8 @@ public class VersionController {
                 .param("app",applicationId).param("size",size).param("offset",(long)page*size);
         if(status!=null) {count.param("status",status);select.param("status",status);}
         var items=select.query((rs,n)->new VersionView(rs.getObject("id",UUID.class),rs.getObject("application_id",UUID.class),rs.getInt("number"),
-                rs.getString("source_digest"),rs.getString("status"),rs.getObject("build_id",UUID.class),rs.getObject("created_at",OffsetDateTime.class))).list();
+                rs.getString("source_digest"),rs.getString("status"),rs.getObject("build_id",UUID.class),rs.getObject("created_at",OffsetDateTime.class),
+                rs.getObject("source_task_id",UUID.class))).list();
         UUID latest=jdbc.sql("SELECT latest_ready_version_id FROM applications WHERE id=?").param(applicationId)
                 .query((rs,n)->Optional.ofNullable(rs.getObject(1,UUID.class))).single().orElse(null);
         return ok(new Page(items,page,size,count.query(Long.class).single(),latest));

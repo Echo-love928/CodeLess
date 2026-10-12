@@ -54,6 +54,10 @@ export async function checkVersionPanel({page,call,app,version,task,created,evid
   const latest=await call('applications/'+app);const second=latest.body.latestReadyVersionId
   assert.notEqual(second,version)
   const secondRead=await verify(second,'Hedy Lamarr')
+  // Current diagnostics only names the second task; the first link must come
+  // from persisted historical provenance returned by the owner-scoped list.
+  await expect(row(version).getByRole('link',{name:task,exact:true})).toHaveAttribute('href',new RegExp(task))
+  assert.equal((await call(`versions/${version}`)).body.taskId,task)
   await verify(version,'Ada Lovelace')
   await verify(second,'Hedy Lamarr')
   await page.screenshot({path:join(evidence,'T1-real-version-switch.png'),fullPage:true})

@@ -33,13 +33,17 @@ it('does not resurrect an earlier list after a task refresh', async () => {
   wrapper.unmount()
 })
 
-it('only links a current task when its returned build metadata names that exact version', async () => {
+it('only links persisted origin tasks and does not infer unknown origins from current diagnostics', async () => {
   const taskId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', id = '55555555-5555-4555-8555-555555555555'
   get.mockResolvedValue({ items: [{ id, applicationId: app1, number: 1, sourceDigest: 'sha256:' + 'a'.repeat(64), status: 'DRAFT', createdAt: '2026-10-12T00:00:00Z' }], page: 0, size: 20, total: 1 })
   const wrapper = mount(VersionWorkspace, { props: { applicationId: app1, taskId, taskVersionIds: [app2] }, global: { stubs: { PreviewPanel: true, SourcePanel: true, RouterLink: { template: '<a><slot /></a>' } } } })
   await flushPromises()
   expect(wrapper.text()).toContain('未提供来源任务')
   await wrapper.setProps({ taskVersionIds: [id] })
+  expect(wrapper.text()).toContain('未提供来源任务')
+  expect(wrapper.text()).not.toContain(taskId)
+  get.mockResolvedValue({ items: [{ id, applicationId: app1, number: 1, sourceDigest: 'sha256:' + 'a'.repeat(64), status: 'DRAFT', createdAt: '2026-10-12T00:00:00Z', taskId }], page: 0, size: 20, total: 1 })
+  await wrapper.setProps({ refreshKey: 'persisted-origin' }); await flushPromises()
   expect(wrapper.text()).toContain(taskId)
   wrapper.unmount()
 })

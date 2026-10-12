@@ -15,7 +15,7 @@ const total = ref(0)
 const loading = ref(false)
 const error = ref('')
 const labels = { DRAFT: '草稿 · 未验证', VERIFIED: '已通过验证', FAILED: '验证失败' }
-const sourceTask = (item: Version) => item.taskId ?? (props.taskVersionIds?.includes(item.id) ? props.taskId : undefined)
+const sourceTask = (item: Version) => item.taskId
 let generation = 0
 let abort: AbortController | undefined
 async function load(nextPage = page.value) {

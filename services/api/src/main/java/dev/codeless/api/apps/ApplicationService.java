@@ -33,7 +33,7 @@ public class ApplicationService {
     public record PageView(List<ApplicationView> items, int page, int size, long total) {}
 
     public record VersionView(UUID id, UUID applicationId, int number, String sourceDigest,
-                              String status, UUID buildId, OffsetDateTime createdAt) {}
+                              String status, UUID buildId, OffsetDateTime createdAt, UUID taskId) {}
 
     @Transactional
     public ApplicationView create(UUID ownerId, String name, String description, String dataMode) {
@@ -80,7 +80,7 @@ public class ApplicationService {
                 """).params(versionId, ownerId).query((rs, row) -> new VersionView(
                 uuid(rs, "id"), uuid(rs, "application_id"), rs.getInt("number"),
                 rs.getString("source_digest"), rs.getString("status"), uuid(rs, "build_id"),
-                rs.getObject("created_at", OffsetDateTime.class))).optional();
+                rs.getObject("created_at", OffsetDateTime.class),uuid(rs, "source_task_id"))).optional();
     }
 
     private static ApplicationView application(ResultSet rs, int row) throws SQLException {
