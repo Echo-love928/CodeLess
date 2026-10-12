@@ -59,6 +59,8 @@ public final class AgentEvidence {
             if(!source.matches("sha256:[a-f0-9]{64}") || !source.equals(result.path("sourceDigest").asText())
                     || !source.equals(manifest(Path.of(draft.path("sourceDirectory").asText()),draft.path("files"),true)))
                 throw new AgentFailure("AGENT_SOURCE_DIGEST_MISMATCH");
+            if(draft.has("frozenSourceDirectory") && !source.equals(manifest(Path.of(draft.path("frozenSourceDirectory").asText()),draft.path("files"),true)))
+                throw new AgentFailure("AGENT_SOURCE_DIGEST_MISMATCH");
             String status=result.path("status").asText();
             if(!List.of("VERIFIED","FAILED").contains(status)) throw new AgentFailure("AGENT_RUNNER_RESULT_INVALID");
             if(status.equals("FAILED")) return;

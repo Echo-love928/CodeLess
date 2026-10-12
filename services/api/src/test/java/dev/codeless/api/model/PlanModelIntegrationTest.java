@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,18 @@ class PlanModelIntegrationTest extends PostgresTestBase {
     @Autowired TaskQueueService queue;
     @Autowired JdbcClient jdbc;
     @Autowired PlanValidator validator;
-    @TempDir Path root;
+    @TempDir(factory = AuditTempFactory.class) Path root;
+    @AfterEach void closeOwnedAuditEnumerationBeforeJUnitCleanup() throws Exception {
+        dev.codeless.api.tools.OwnedWorkspaceCleanup.delete(root, Path.of("target", "plan-model-test-workspaces"));
+    }
+    public static class AuditTempFactory implements org.junit.jupiter.api.io.TempDirFactory {
+        public Path createTempDirectory(org.junit.jupiter.api.extension.AnnotatedElementContext element,
+                                        org.junit.jupiter.api.extension.ExtensionContext context) throws Exception {
+            Path parent = Path.of("target", "plan-model-test-workspaces").toAbsolutePath();
+            Files.createDirectories(parent);
+            return Files.createTempDirectory(parent, "task-");
+        }
+    }
     private final JsonMapper mapper = JsonMapper.builder().build();
 
     private TaskQueueService.Claim claim(String prompt) {

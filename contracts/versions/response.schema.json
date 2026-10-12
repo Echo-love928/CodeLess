@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeless.dev/contracts/versions/response.schema.json",
+  "$defs": {
+    "uuid": {"type":"string","format":"uuid"},
+    "digest": {"type":"string","pattern":"^sha256:[a-f0-9]{64}$"},
+    "entry": {
+      "type":"object","additionalProperties":false,"required":["path","bytes","digest"],
+      "properties":{"path":{"type":"string","minLength":1,"maxLength":240},"bytes":{"type":"integer","minimum":0,"maximum":33554432},"digest":{"$ref":"#/$defs/digest"}}
+    },
+    "manifest": {
+      "type":"object","additionalProperties":false,"required":["digest","files"],
+      "properties":{"digest":{"$ref":"#/$defs/digest"},"files":{"type":"array","maxItems":2000,"items":{"$ref":"#/$defs/entry"}}}
+    },
+    "report": {
+      "type":"object","additionalProperties":false,
+      "required":["status","sourceDigest","buildId","buildStatus","exitCode","verificationId","verificationStatus","artifactDigest","failureCode"],
+      "properties":{
+        "status":{"enum":["VERIFIED","FAILED"]},"sourceDigest":{"$ref":"#/$defs/digest"},
+        "buildId":{"anyOf":[{"$ref":"#/$defs/uuid"},{"type":"null"}]},
+        "buildStatus":{"enum":["QUEUED","RUNNING","SUCCEEDED","FAILED",null]},
+        "exitCode":{"type":["integer","null"],"minimum":0},
+        "verificationId":{"anyOf":[{"$ref":"#/$defs/uuid"},{"type":"null"}]},
+        "verificationStatus":{"enum":["PASSED","FAILED",null]},
+        "artifactDigest":{"anyOf":[{"$ref":"#/$defs/digest"},{"type":"null"}]},
+        "failureCode":{"type":["string","null"],"pattern":"^[A-Z][A-Z0-9_]{1,100}$"}
+      }
+    },
+    "outcome": {
+      "type":"object","additionalProperties":false,"required":["status","sourceDigest","reportDigest","report"],
+      "properties":{"status":{"enum":["VERIFIED","FAILED"]},"sourceDigest":{"$ref":"#/$defs/digest"},
+        "artifactDigest":{"anyOf":[{"$ref":"#/$defs/digest"},{"type":"null"}]},
+        "artifact":{"anyOf":[{"$ref":"#/$defs/manifest"},{"type":"null"}]},
+        "reportDigest":{"$ref":"#/$defs/digest"},"report":{"$ref":"#/$defs/report"}},
+      "allOf":[{"if":{"properties":{"status":{"const":"VERIFIED"}}},"then":{"required":["artifactDigest","artifact"],"properties":{"artifactDigest":{"$ref":"#/$defs/digest"},"artifact":{"$ref":"#/$defs/manifest"}}}}]
+    },
+    "list": {
+      "type":"object","additionalProperties":false,"required":["items","page","size","total"],
+      "properties":{"items":{"type":"array","maxItems":100,"items":{"$ref":"../schemas/v0/version.schema.json"}},
+        "page":{"type":"integer","minimum":0},"size":{"type":"integer","minimum":1,"maximum":100},"total":{"type":"integer","minimum":0},
+        "latestReadyVersionId":{"anyOf":[{"$ref":"#/$defs/uuid"},{"type":"null"}]}}
+    },
+    "files": {
+      "type":"object","additionalProperties":false,"required":["versionId","sourceDigest","files"],
+      "properties":{"versionId":{"$ref":"#/$defs/uuid"},"sourceDigest":{"$ref":"#/$defs/digest"},
+        "files":{"type":"array","maxItems":40,"items":{"$ref":"#/$defs/entry"}}}
+    },
+    "file": {
+      "type":"object","additionalProperties":false,"required":["versionId","sourceDigest","path","bytes","digest","content"],
+      "properties":{"versionId":{"$ref":"#/$defs/uuid"},"sourceDigest":{"$ref":"#/$defs/digest"},
+        "path":{"type":"string","pattern":"^src/((pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue|data/[A-Za-z][A-Za-z0-9_-]*\\.ts)$"},
+        "bytes":{"type":"integer","minimum":0,"maximum":131072},"digest":{"$ref":"#/$defs/digest"},"content":{"type":"string","maxLength":131072}}
+    },
+    "snapshot": {
+      "type":"object","additionalProperties":false,"required":["versionId","status","sourceDigest","files"],
+      "properties":{"versionId":{"$ref":"#/$defs/uuid"},"status":{"enum":["DRAFT","VERIFIED","FAILED"]},"sourceDigest":{"$ref":"#/$defs/digest"},
+        "files":{"type":"array","maxItems":40,"items":{"$ref":"#/$defs/entry"}},"validation":{"$ref":"#/$defs/outcome"}},
+      "allOf":[{"if":{"properties":{"status":{"enum":["VERIFIED","FAILED"]}}},"then":{"required":["validation"],"properties":{"validation":{"$ref":"#/$defs/outcome"}}}}]
+    }
+  }
+}

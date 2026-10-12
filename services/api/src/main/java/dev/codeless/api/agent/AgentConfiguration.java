@@ -14,8 +14,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 @ConditionalOnProperty(name="codeless.agent.enabled",havingValue="true")
 public class AgentConfiguration {
     @Bean AgentJournal agentJournal(Environment env) {return new AgentJournal(root(env).resolve("journal"));}
-    @Bean AgentRunStore agentRunStore(JdbcClient jdbc,PlatformTransactionManager manager,AgentJournal journal) {
-        return new AgentRunStore(jdbc,manager,journal);
+    @Bean AgentRunStore agentRunStore(JdbcClient jdbc,PlatformTransactionManager manager,AgentJournal journal,
+                                    dev.codeless.api.versions.SnapshotStore snapshots) {
+        return new AgentRunStore(jdbc,manager,journal,snapshots);
     }
     @Bean AgentModel agentModel(ModelProvider provider,ModelCallRepository records,ModelCallAudit audit,AgentRunStore store) {
         return new AgentModel(provider,records,audit,store);

@@ -1,0 +1,77 @@
+$ node scripts/run-static.mjs
+version check passed: Node 24.16.0, pnpm 12.6.0; Java/Spring/Maven locks consistent
+application: valid accepted; invalid rejected
+task: valid accepted; invalid rejected
+event: valid accepted; invalid rejected
+build: valid accepted; invalid rejected
+version: valid accepted; invalid rejected
+publication: valid accepted; invalid rejected
+task-diagnostics: valid accepted; invalid rejected
+preview-credential: valid accepted; invalid rejected
+OpenAPI surface and authentication boundary passed
+build: valid accepted; invalid rejected
+version: valid accepted; invalid rejected
+runner contract boundary passed
+application: valid accepted; invalid rejected
+task: valid accepted; invalid rejected
+event: valid accepted; invalid rejected
+build: valid accepted; invalid rejected
+version: valid accepted; invalid rejected
+publication: valid accepted; invalid rejected
+task-diagnostics: valid accepted; invalid rejected
+preview-credential: valid accepted; invalid rejected
+cross-resource READY/publication flow passed
+✔ scoped patch preserves authentication, path identity and every unrelated operation (3.4523ms)
+✔ wire cursor schema rejects UUIDs, padding, signs and int32 overflow; page limits are bounded (3.3905ms)
+✔ documented wire examples match the existing event schema and separate comments/errors from persisted IDs (8.7786ms)
+✔ pre-stream errors remain JSON and validate their actual codes with the shared error envelope (10.044ms)
+✔ shared task create contract preserves CSRF and bounds application-scoped idempotency keys (33.5188ms)
+✔ shared cancel contract has owner identity, CSRF and real terminal task response (0.7105ms)
+✔ structured diagnostics contract distinguishes absent, empty and actual metadata and rejects unsafe paths/false build success (16.5181ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 240.4642
+No configurations were provided -- using built in recommended configuration by default.
+
+validating contracts\openapi.v0.json...
+contracts\openapi.v0.json: validated in 68ms
+
+Woohoo! Your API description is valid. 🎉
+
+$ pnpm lint && pnpm test && pnpm build
+$ eslint src vite.config.ts vitest.config.ts playwright.config.ts playwright.real-auth.config.ts
+$ vitest run
+
+ RUN  v3.0.9 C:/Users/12058/Documents/ChatGPT/CodeLess/.local-data/worktrees/d11-b/apps/web
+
+ ✓ src/features/workbench/task-diagnostics.test.ts (2 tests) 4ms
+ ✓ src/features/versions/version-api.test.ts (3 tests) 12ms
+ ✓ src/features/preview/preview-api.test.ts (4 tests) 18ms
+ ✓ src/features/workbench/use-workbench-task.test.ts (10 tests) 21ms
+ ✓ src/features/source/source-api.test.ts (18 tests) 32ms
+ ✓ src/features/workbench/TaskStatus.test.ts (10 tests) 54ms
+ ✓ src/components/StatePanel.test.ts (3 tests) 67ms
+ ✓ src/features/preview/PreviewPanel.test.ts (6 tests) 90ms
+ ✓ src/lib/events/task-events.test.ts (6 tests) 189ms
+ ✓ src/features/versions/VersionWorkspace.test.ts (3 tests) 86ms
+
+ Test Files  10 passed (10)
+      Tests  65 passed (65)
+   Start at  09:32:20
+   Duration  3.10s (transform 1.84s, setup 0ms, collect 6.09s, tests 575ms, environment 14.17s, prepare 3.62s)
+
+$ vue-tsc --noEmit && vite build
+vite v6.2.3 building for production...
+transforming...
+✓ 1468 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.54 kB │ gzip:  0.36 kB
+dist/assets/index-BkSkbvtT.css   54.53 kB │ gzip: 10.31 kB
+dist/assets/index-Dq89_2L4.js   173.77 kB │ gzip: 64.98 kB
+✓ built in 3.45s

@@ -56,6 +56,17 @@ test('D07-B-T1: controlled Vue template produces stable artifact digest and real
   assert.deepEqual(await readdir(join(scratch, 'work')), [])
 })
 
+test('deep configured work roots build as non-root without exposing host credentials', { timeout: 120000 }, async () => {
+  const deepWork = join(scratch, ...Array.from({ length: 20 }, (_, i) => `d${i}`))
+  const run = await runner({ workRoot: deepWork }, false)
+  const result = await run(join(root, 'templates/vue/fixtures/showcase'))
+  assert.equal(result.status, 'SUCCEEDED', JSON.stringify(result))
+  assert.equal(result.exitCode, 0)
+  assert.match(result.artifact.digest, /^sha256:[a-f0-9]{64}$/)
+  clean(result)
+  assert.deepEqual(await readdir(deepWork), [])
+})
+
 test('D07-B-T2: infinite loop and child process time out and container is removed', { timeout: 30000 }, async () => {
   const result = await (await runner({ limits: { timeoutMs: 1500 } }))(fixture('timeout'))
   assert.equal(result.status, 'FAILED')

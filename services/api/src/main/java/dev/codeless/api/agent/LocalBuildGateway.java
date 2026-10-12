@@ -33,7 +33,7 @@ public final class LocalBuildGateway implements BuildGateway {
             Process running=child;
             stdout=executor.submit(() -> running.getInputStream().readNBytes(2*1024*1024+1));
             stderr=executor.submit(() -> { running.getErrorStream().transferTo(java.io.OutputStream.nullOutputStream());return true; });
-            child.getOutputStream().write(json.writeValueAsString(Map.of("sourceDirectory",draft.path("sourceDirectory").asText(),
+            child.getOutputStream().write(json.writeValueAsString(Map.of("sourceDirectory",draft.path("frozenSourceDirectory").asText(draft.path("sourceDirectory").asText()),
                     "sourceDigest",draft.path("sourceDigest").asText(),"actions",draft.path("actions"))).getBytes(StandardCharsets.UTF_8));
             child.getOutputStream().close();
             if(!child.waitFor(timeout,TimeUnit.MILLISECONDS)) {

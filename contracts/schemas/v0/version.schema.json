@@ -12,6 +12,7 @@
     "sourceDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
     "status": { "enum": ["DRAFT", "VERIFIED", "FAILED"] },
     "buildId": { "type": ["string", "null"], "format": "uuid" },
+    "taskId": { "type": ["string", "null"], "format": "uuid", "description": "Immutable generating task from the same application. Omitted/null for an initial shell or unprovable historical provenance." },
     "createdAt": { "type": "string", "format": "date-time" }
   },
   "allOf": [
