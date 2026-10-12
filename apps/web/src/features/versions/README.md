@@ -1,55 +1,55 @@
 # D11-B 版本面板与只读源码
 
-基线 main `413e5b8` 只有 `GET /api/v0/versions/{versionId}` 的 v0 详情和
-`POST /api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials`。
-2026-10-11 只读 `gh pr list --state open` 返回 `[]`，没有 D11-A 交接。
-以下两个接口是 **B 的待对接建议，不是已存在的公共契约或后端实现**。
-没有改公共 OpenAPI/schema、迁移、锁文件、CI 或后端。
+2026-10-12：适配 D11-A PR33 的精确提交 `4f364a323813ac7cf479bd1162db26e718ca8741`。
+A 的原始提交作为依赖合入 B 独立分支；main 未改。历史建议 `/source` 已撤去。
+真实 API/面板联调入口已建立，但本地首次生成遭 Docker EIO，仍不能宣称真实联调通过。
 
-## 待 A/契约维护者确认的最小读取契约
+## 读取契约
 
-- `GET /api/v0/applications/{applicationId}/versions?page=0&size=20`：
-  `{items, page, size, total}`，按版本号倒序稳定分页，size 固定 20。
-  item 沿用 v0 version schema（id/applicationId/number/sourceDigest/status/buildId/createdAt），
-  增加可空 UUID `taskId` 和可空字符串 `errorSummary`（最多 2000 字符）。
-  未提供来源/摘要显示“未提供”，不推测对应任务或错误。
-  VERIFIED 必须有 buildId；未知状态/错误应用/重复条目/损坏分页返回前端错误。
-- `GET /api/v0/versions/{versionId}/source`：
-  `{versionId, sourceDigest, files:[{path,content}]}`，只读取按 versionId 保存的不可变快照。
-  摘要必须与版本条目相同；不接受工作目录路径或任务目录作为读取入口。
-  files 最多 200，单文件最多 256,000 JS 字符，总内容最多 1,000,000 JS 字符，
-  path 最多 240 字符、相对 POSIX 路径，不能有 `.`/`..` 段或重复路径。
-  A 应依据已有 runner 快照限制收紧这些上限，并在响应前实施字节/权限边界。
-  浏览器只校验关联摘要，不重算 runner 的规范化快照哈希；真实哈希一致性由 A 验收。
+沿用 `contracts/versions/README.md` 和 `response.schema.json`：
 
-两个接口必须使用真实 session/应用所有权过滤、响应 no-store。
-401 返回登录；404 不区分不存在/无权限；没有快照不能虚构空源码。
-有快照但没有文件返回 `files:[]`。列表真实为空返回 `total:0,items:[]`。
-后端资源限制和源码快照的摘要/所有权仍由 D11-A 承担。
+- GET `/api/v0/applications/{applicationId}/versions?page=0&size=20`：原 v0 item、倒序分页。
+- GET `/api/v0/versions/{versionId}/files`：不可变清单 `{versionId,sourceDigest,files:[{path,bytes,digest}]}`。
+- GET `/api/v0/versions/{versionId}/files/content?path=...`：同版本单文件 `{versionId,sourceDigest,path,bytes,digest,content}`。
+- GET `/api/v0/versions/{versionId}/snapshot`：失败版本的冻结 report；错误码、构建状态/退出码、浏览器验证状态作为摘要。未知结果保持未知，读取失败明确提示。
 
-## UI 接线与边界
+源码按 A 限制最多40文件、128KiB/文件、512KiB总量，只接受受控 src/pages、components、data 路径。
+清单 SHA256 使用按 path 排序、精确键序 `{path,bytes,digest}` 的 UTF-8 JSON；
+每份源码再核对实际 UTF-8 bytes 和 SHA256。任何 versionId/sourceDigest/path/bytes/fileDigest
+错配都不显示整份快照；不截断冒充原文。限定顺序读取，最多512KiB，不引入IDE或执行源码。
+Web Crypto 需要安全上下文（生产HTTPS、本地localhost），既有部署符合该要求。
+401回登录；404表示文件缺失/不属当前用户；409表示暂无快照；空清单与未冻结壳版本区别处理。
 
-`VersionWorkspace.vue` 复用未修改的 D09 `PreviewPanel`；默认预览仍取应用的
-latestReadyVersionId，由已有凭据服务最终校验。用户只能为 VERIFIED + buildId
-条目切换预览。这个动作让源码和预览使用同一个 versionId；不会更新应用元数据。
-查看 DRAFT/FAILED 源码保留原预览，两块分别显示 ID。
-列表失败、空列表及分页均不会覆盖已有预览；源码请求失败立即清掉旧源码，避免错标版本。
-新任务 READY 的 latestReadyVersionId 变化会读取新版本；任务状态变更重读列表。
-所有请求只消费当前应用/选择的结果，旧请求 abort + 序号保护。
-源码只使用 Vue 文本插值到 pre/code，无 v-html、eval、在线 IDE 或源码下载执行。
+A列表没有来源taskId。当前工作台 diagnostics 的真实 build.versionId 与条目匹配时，
+可展示该 diagnostics 所属任务链接；其他历史版本显示“未提供来源任务”，不从当前task猜测。
+全量历史来源映射需要 A/契约维护者补正式字段；没有扩充公共 schema 或偷偷新增后端路径。
 
-工作台跨默认范围的唯一改动：将 PreviewPanel 挂载改为 VersionWorkspace，
-传入 task id/status 作为刷新标记；任务逻辑、预览安全设置和凭据实现只读。
-同日最后启用 PR 必须确认上述读取契约或调整这两个局部适配器，并完成真实联调。
-当前后端会诚实显示列表尚不可用，既有预览继续可用。
+## UI与安全边界
 
-## 验收入口
+VersionWorkspace复用未修改的D09 PreviewPanel；只有VERIFIED+buildId切换预览。
+默认取latestReadyVersionId；查看DRAFT/FAILED源码或列表错误、分页均保留可用iframe。
+选中源码与预览分别标版本ID；切换已验证版本时两者一致。加载清空旧源码，
+AbortController+序号阻止旧应用/版本/刷新结果覆盖当前选择。
+Vue文本插值到pre/code，无v-html/eval/IDE。冻结错误摘要也按文本显示。
 
-在锁定 Node24.16.0/pnpm12.6.0 与 Chromium 已安装的仓库根执行：
+必要跨范围接线：WorkbenchPage额外传当前任务及其真实build版本IDs；
+旧任务状态机和凭据安全不变。公共OpenAPI增量仍由维护者同步。
+测试跨范围：既有platform.acceptance.mjs仅加显式opt-in D11 hook，位于全部原断言后，
+没有删除/弱化原检查；新增相关Java IT复用原自有进程、DB、TLS与清理harness。
 
-    corepack pnpm --filter @codeless/web build
-    corepack pnpm --filter @codeless/web exec playwright test --config playwright.config.ts versions/flow.spec.ts
+## 验收
 
-API/auth/source/预览页面使用明确 fixture，平台生产 UI 和 Chromium 真实运行。
-截图 `tests/e2e/versions/evidence/2026-10-11/`。它们证明前端行为，
-不能证明真实后端持久快照、生成结果/模型效果或当日完整集成。
+    pnpm verify:static
+    pnpm --filter @codeless/web exec playwright test --config playwright.config.ts versions/flow.spec.ts
+    services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=D11VersionPanelAcceptanceIT' test
+    pnpm ci:gate
+
+专项8条 fixture使用A路径/清单/单文件/失败快照格式和真实哈希。生产UI/Chromium真实，
+API/auth/预览内容是明确fixture，不能证明持久化或模型效果。
+真实IT使用 `d11-version-panel-fixture`，模型提案是明确mock；session/PG/文件工具/
+冻结/真实Docker/Chromium/TLS/nginx/签名iframe不是fixture。验证两已通过版本切换、
+草稿缺快照409、失败保留最新预览和脚本文本。它不在默认Surefire发现中，必须显式运行；
+此次在原平台生成前置处EIO失败，新增D11断言尚未到达，不能标作1/1通过。
+
+证据：`tests/e2e/versions/evidence/2026-10-12/`；原失败历史保留于2026-10-11目录。
+状态与下一步见 `docs/handoffs/D11-B.md` 最新节；草稿PR34保持未合并。

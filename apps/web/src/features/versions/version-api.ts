@@ -1,4 +1,4 @@
-import { requestJson } from '../../api/http'
+import { ApiError, requestJson } from '../../api/http'
 import { uuid } from '../workbench/task-api'
 
 export interface Version {
@@ -28,7 +28,7 @@ function version(value: Version, applicationId: string): Version {
   return value
 }
 
-// Proposed D11 task-local read contract; see README.md. No workspace fallback.
+// D11-A version list contract; see contracts/versions/README.md. No workspace fallback.
 export async function listVersions(applicationId: string, page = 0, signal?: AbortSignal): Promise<VersionPage> {
   if (!uuid(applicationId)) throw new Error('应用入口无效。')
   const result = await requestJson<VersionPage>(`/api/v0/applications/${applicationId}/versions?page=${page}&size=20`, { signal, cache: 'no-store' })
@@ -40,5 +40,25 @@ export async function listVersions(applicationId: string, page = 0, signal?: Abo
   if (new Set(result.items.map(item => item.id)).size !== result.items.length ||
       new Set(result.items.map(item => item.number)).size !== result.items.length)
     throw new Error('版本列表含重复记录，请重新读取。')
+  for (const item of result.items.filter(item => item.status === 'FAILED')) {
+    try {
+      const snapshot = await requestJson<{ versionId: string; status: string; sourceDigest: string; validation: {
+        status: string; sourceDigest: string; report: { failureCode: string | null; buildStatus: string | null; exitCode: number | null; verificationStatus: string | null }
+      } }>(`/api/v0/versions/${item.id}/snapshot`, { signal, cache: 'no-store' })
+      const validation = snapshot?.validation, report = validation?.report
+      if (snapshot?.versionId !== item.id || snapshot.status !== 'FAILED' || snapshot.sourceDigest !== item.sourceDigest ||
+          validation?.status !== 'FAILED' || validation.sourceDigest !== item.sourceDigest || !report ||
+          (report.failureCode != null && (typeof report.failureCode !== 'string' || !/^[A-Z][A-Z0-9_]{1,100}$/.test(report.failureCode))) ||
+          ![null, 'QUEUED', 'RUNNING', 'SUCCEEDED', 'FAILED'].includes(report.buildStatus) ||
+          ![null, 'PASSED', 'FAILED'].includes(report.verificationStatus) ||
+          (report.exitCode !== null && (!Number.isSafeInteger(report.exitCode) || report.exitCode < 0)))
+        throw new Error('失败快照响应不匹配。')
+      item.errorSummary = [report.failureCode, `构建 ${report.buildStatus ?? '结果未知'}；退出码 ${report.exitCode ?? '未知'}`,
+        `浏览器验证 ${report.verificationStatus ?? '结果未知'}`].filter(Boolean).join('；')
+    } catch (cause) {
+      if (signal?.aborted || cause instanceof ApiError && cause.status === 401) throw cause
+      item.errorSummary = '无法读取该版本的冻结错误摘要，请刷新版本重试。'
+    }
+  }
   return result
 }

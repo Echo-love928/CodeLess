@@ -1,0 +1,78 @@
+{
+  "task": "D11-B",
+  "date": "2026-10-12",
+  "baseline": "413e5b8bc40e2ccf6b5c538a9f2b4fc0f02e9ccb",
+  "dependencyA": "4f364a323813ac7cf479bd1162db26e718ca8741",
+  "commands": [
+    {
+      "sha256": "a49aac74d54466b708ff37a084dafae382a54f500e9e26a7c4dff31972301962",
+      "e2e": {
+        "result": "PASSED",
+        "tests": 41,
+        "passed": 41
+      },
+      "runner": {
+        "result": "PASSED",
+        "tests": 44,
+        "passed": 44
+      },
+      "api": {
+        "result": "FAILED",
+        "failures": 28,
+        "tests": 173,
+        "errors": 3,
+        "skipped": 0
+      },
+      "log": ".local-data/d11-b/adapter-ci-gate.log",
+      "exitCode": 1,
+      "command": "corepack pnpm ci:gate",
+      "static": "failed-new-RouterLink-test-stub"
+    },
+    {
+      "reason": "after rendering test RouterLink slot; production code unchanged",
+      "tests": 65,
+      "log": "verify-static.log",
+      "exitCode": 0,
+      "command": "corepack pnpm verify:static",
+      "sha256": "c3d7893b0cfc4c97d1e119520221ef6c384b1c2b1c1de639ec7607ea941754df"
+    },
+    {
+      "tests": 3,
+      "exitCode": 0,
+      "log": "a-contracts.log",
+      "command": "node --test tests/versions/contracts.test.mjs"
+    },
+    {
+      "modelQualityEvidence": false,
+      "errors": 0,
+      "exitCode": 1,
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=D11VersionPanelAcceptanceIT' test",
+      "report": "real-panel-failure.json",
+      "failures": 1,
+      "realPanelAssertionsReached": false,
+      "skipped": 0,
+      "tests": 1
+    }
+  ],
+  "developerTokens": {
+    "output": null,
+    "total": null,
+    "source": "UNKNOWN",
+    "input": null
+  },
+  "runtime": {
+    "modelQualityEvidence": false,
+    "modelProvider": "deterministic-mock",
+    "model": "d11-version-panel-fixture",
+    "input": null,
+    "total": null,
+    "requests": 4,
+    "output": null,
+    "paidCalls": 0
+  },
+  "limitations": [
+    "real A+B panel acceptance blocked by Windows Docker EIO, root cause UNKNOWN",
+    "public OpenAPI integration belongs to maintainer",
+    "historical task mapping missing in A version list; only proven current-task diagnostic builds are linked"
+  ]
+}

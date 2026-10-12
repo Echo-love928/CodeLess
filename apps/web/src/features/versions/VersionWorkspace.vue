@@ -5,7 +5,7 @@ import PreviewPanel from '../preview/PreviewPanel.vue'
 import SourcePanel from '../source/SourcePanel.vue'
 import { listVersions, type Version } from './version-api'
 
-const props = defineProps<{ applicationId: string; versionId?: string | null; buildFailed?: boolean; refreshVersion?: () => Promise<void>; refreshKey?: string }>()
+const props = defineProps<{ applicationId: string; versionId?: string | null; buildFailed?: boolean; refreshVersion?: () => Promise<void>; refreshKey?: string; taskId?: string; taskVersionIds?: string[] }>()
 const emit = defineEmits<{ unauthorized: [] }>()
 const previewId = ref(props.versionId)
 const selected = ref<Version>()
@@ -15,6 +15,7 @@ const total = ref(0)
 const loading = ref(false)
 const error = ref('')
 const labels = { DRAFT: '草稿 · 未验证', VERIFIED: '已通过验证', FAILED: '验证失败' }
+const sourceTask = (item: Version) => item.taskId ?? (props.taskVersionIds?.includes(item.id) ? props.taskId : undefined)
 let generation = 0
 let abort: AbortController | undefined
 async function load(nextPage = page.value) {
@@ -64,7 +65,7 @@ onBeforeUnmount(() => { generation++; abort?.abort() })
           <li v-for="item in items" :key="item.id" :data-version-id="item.id">
             <div><strong>版本 {{ item.number }}</strong> <span>{{ labels[item.status] }}</span><span v-if="item.id === previewId"> · 当前预览</span></div>
             <time :datetime="item.createdAt">{{ new Date(item.createdAt).toLocaleString('zh-CN') }}</time>
-            <p>来源任务：<router-link v-if="item.taskId" :to="{ path: `/workbench/${applicationId}`, query: { taskId: item.taskId } }">{{ item.taskId }}</router-link><span v-else>未提供来源任务</span></p>
+            <p>来源任务：<router-link v-if="sourceTask(item)" :to="{ path: `/workbench/${applicationId}`, query: { taskId: sourceTask(item) } }">{{ sourceTask(item) }}</router-link><span v-else>未提供来源任务</span></p>
             <p v-if="item.status === 'FAILED'" class="version-error">错误摘要：{{ item.errorSummary || '服务端未提供错误摘要。' }}</p>
             <button type="button" class="button-secondary" :aria-pressed="selected?.id === item.id" @click="select(item)">{{ item.status === 'VERIFIED' ? '查看源码并预览' : '查看源码' }}</button>
             <span v-if="item.status !== 'VERIFIED'"> 此版本不可预览。</span>

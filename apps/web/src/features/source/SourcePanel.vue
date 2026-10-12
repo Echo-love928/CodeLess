@@ -26,9 +26,11 @@ async function load() {
     snapshot.value = value; path.value = value.files[0]?.path ?? ''
   } catch (cause) {
     if (current !== generation) return
-    error.value = cause instanceof ApiError && cause.status === 404
-      ? '该版本暂无可读取源码快照，或源码接口尚未接入。'
-      : cause instanceof Error ? cause.message : '源码读取失败，请重试。'
+    error.value = cause instanceof ApiError && cause.status === 409
+      ? '该版本暂无可读取源码快照。'
+      : cause instanceof ApiError && cause.status === 404
+        ? '源码文件不存在或你无权访问此版本。'
+        : cause instanceof Error ? cause.message : '源码读取失败，请重试。'
     if (cause instanceof ApiError && cause.status === 401) emit('unauthorized')
   } finally { if (current === generation) loading.value = false }
 }

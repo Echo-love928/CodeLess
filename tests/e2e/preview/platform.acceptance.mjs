@@ -140,6 +140,11 @@ try {
   await writeFile(join(evidence,'acceptance.json'),JSON.stringify({applicationId:app,taskId:task,versionId:version,buildId:binding.buildId,sourceDigest:binding.sourceDigest,artifactDigest:binding.artifactDigest,sourceFiles:draft.files.length,
     deploymentIngress:'nginx:1.27.5-alpine',modelProvider:modelMode,modelQualityAccepted:false,modelQualityValidation:paid?'PENDING_SQL_VALIDATION':'NOT_MODEL_ACCEPTANCE',acceptanceScope:paid?'single-static-Ada-showcase':replay?'recorded-real-source-with-fixture-provider':'deterministic-platform-integration',platformApiFixture:false,signingFixture:false,realDockerBuild:true,realBrowserVerification:true,residentRestartPassed:true,credentialErrorLogDenied:true,retentionRevocationPassed:true,publicInternalDenied:true,isolation,
     screenshot:{path:'authenticated-platform-preview.png',digest:digest(screenshot),bytes:screenshot.length}},null,2))
+  // Opt-in D11 checks reuse this real session/DB/registry after every original assertion.
+  if(process.env.CODELESS_VERSION_PANEL_ACCEPTANCE==='1') {
+    const {checkVersionPanel}=await import('../versions/platform-checks.mjs')
+    await checkVersionPanel({page,call,app,version,task,created:created.body,evidence})
+  }
   success=true
   console.log('Authenticated platform preview, restart and retention acceptance passed (model: '+modelMode+').')
 } catch(error) {primaryFailure=error;throw error} finally {

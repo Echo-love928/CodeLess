@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { ids, versions, malicious, installVersionsFixture, openWorkbench } from './fixture'
+import { ids, versions, malicious, manifest, installVersionsFixture, openWorkbench } from './fixture'
 
-const evidence = resolve(process.cwd(), '../../tests/e2e/versions/evidence/2026-10-11')
+const evidence = resolve(process.cwd(), '../../tests/e2e/versions/evidence/2026-10-12/fixture')
 test.beforeAll(async () => { await mkdir(evidence, { recursive: true }) })
 
 test('D11-B-T1: versionId selects matching source and rendered preview', async ({ page }) => {
@@ -16,7 +16,7 @@ test('D11-B-T1: versionId selects matching source and rendered preview', async (
   await expect(page.getByLabel('文件内容')).toContainText('版本 1 页面')
   await expect(page.locator('.preview-panel__controls')).toContainText(ids[0])
   expect(state.sourceIds.at(-1)).toBe(ids[0]); expect(state.credentialIds.at(-1)).toBe(ids[0])
-  await expect(page.getByRole('link', { name: versions[0].taskId! }).first()).toHaveAttribute('href', /\/workbench\/.*\?taskId=/)
+  await expect(page.locator(`[data-version-id="${ids[0]}"]`)).toContainText('未提供来源任务')
   await page.screenshot({ path: resolve(evidence, 'T1-version-switch.png'), fullPage: true })
 })
 
@@ -29,7 +29,7 @@ test('D11-B-T2: empty, list failure, source failure and retry are distinct', asy
   await page.getByRole('button', { name: '刷新版本', exact: true }).click()
   await expect(page.locator('.versions-panel [role="alert"]')).toBeVisible()
   await expect(page.getByText('暂无版本记录。完成生成后可在此查看。')).toHaveCount(0)
-  state.listStatus = 200; state.records = versions; state.sourceStatus = 404
+  state.listStatus = 200; state.records = versions; state.sourceStatus = 409
   await page.getByRole('button', { name: '刷新版本', exact: true }).click()
   await expect(page.locator('.source-panel [role="alert"]')).toContainText('暂无可读取源码快照')
   await page.screenshot({ path: resolve(evidence, 'T2-source-error.png'), fullPage: true })
@@ -51,13 +51,13 @@ test('D11-B-T3: draft and failed versions never replace available preview', asyn
     await expect(page.locator('.preview-panel__controls')).toContainText(ids[1])
   }
   expect(state.credentialIds).toEqual([ids[1]])
-  await expect(page.locator(`[data-version-id="${ids[3]}"]`)).toContainText('构建退出码 2：缺少组件')
+  await expect(page.locator(`[data-version-id="${ids[3]}"]`)).toContainText('构建 FAILED；退出码 2')
   await page.screenshot({ path: resolve(evidence, 'T3-failed-keeps-preview.png'), fullPage: true })
 })
 
 test('D11-B-T4: source script and HTML remain literal text', async ({ page }) => {
   await installVersionsFixture(page); await openWorkbench(page)
-  await page.getByLabel('当前文件', { exact: true }).selectOption('src/untrusted.txt')
+  await page.getByLabel('当前文件', { exact: true }).selectOption('src/pages/Untrusted.vue')
   await expect(page.getByLabel('文件内容')).toHaveText(malicious)
   expect(await page.evaluate(() => '__sourceExecuted' in window)).toBe(false)
   await expect(page.locator('.source-panel script, .source-panel img')).toHaveCount(0)
@@ -91,9 +91,9 @@ test('late source from prior selection cannot overwrite the new version', async 
   let started!: () => void
   const requested = new Promise<void>(resolve => { started = resolve })
   const delayed = new Promise<void>(resolve => { release = resolve })
-  await page.route(`**/api/v0/versions/${ids[1]}/source`, async route => {
+  await page.route(`**/api/v0/versions/${ids[1]}/files`, async route => {
     started(); await delayed
-    await route.fulfill({ json: { versionId: ids[1], sourceDigest: versions[1].sourceDigest, files: [{ path: 'old.txt', content: '迟到的旧源码' }] } }).catch(() => {})
+    await route.fulfill({ json: { versionId: ids[1], sourceDigest: versions[1].sourceDigest, files: manifest([{ path: 'src/pages/Old.vue', content: '迟到的旧源码' }]) } }).catch(() => {})
   })
   await openWorkbench(page); await requested
   await page.locator(`[data-version-id="${ids[0]}"]`).getByRole('button').click()
@@ -112,7 +112,7 @@ test('source 401 redirects to login and paginated versions keep selected preview
   await expect(page.locator('.versions-panel')).toContainText('第 2 页')
   await expect(page.locator('.preview-panel__controls')).toContainText(ids[1])
   await page.route('**/api/v0/auth/me', route => route.fulfill({ status: 401 }))
-  await page.route('**/api/v0/versions/*/source', route => route.fulfill({ status: 401 }))
+  await page.route('**/api/v0/versions/*/files', route => route.fulfill({ status: 401 }))
   await page.locator('[data-version-id]').getByRole('button').click()
   await expect(page).toHaveURL(/\/login/)
 })
