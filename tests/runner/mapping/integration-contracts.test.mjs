@@ -30,3 +30,20 @@ test('closed component identity and edit request reject path, instance, publish 
     { ...request, selection: { ...selection, instanceId: 'dom-1' } }, { ...request, selection: { ...selection, versionId: 'current' } },
     { ...request, selection: { ...selection, sourceDigest: digest + '\n' } }, { ...request, selection: { ...selection, componentId: 'profile-card\n' } }]) assert.equal(check('request')(invalid), false)
 })
+
+test('actual authenticated version snapshot declares the optional immutable sidecar digest', async () => {
+  const versions = new Ajv2020({ strict: true, allErrors: true }); addFormats(versions)
+  versions.addSchema(await read('../../../contracts/schemas/v0/version.schema.json'), 'https://codeless.dev/contracts/schemas/v0/version.schema.json')
+  const schema = await read('../../../contracts/versions/response.schema.json'); versions.addSchema(schema)
+  const validate = versions.getSchema(`${schema.$id}#/$defs/snapshot`)
+  const snapshot = await read('./evidence/2026-10-12/integration/snapshot-public.json')
+  assert.equal(snapshot.status, 'VERIFIED')
+  assert.match(snapshot.validation.report.componentMappingDigest, /^sha256:[a-f0-9]{64}$/)
+  assert.equal(validate(snapshot), true, JSON.stringify(validate.errors))
+  const legacy = structuredClone(snapshot); delete legacy.validation.report.componentMappingDigest
+  assert.equal(validate(legacy), true)
+  for (const invalid of [null, 'sha256:bad', snapshot.validation.report.componentMappingDigest + '\n']) {
+    const forged = structuredClone(snapshot); forged.validation.report.componentMappingDigest = invalid
+    assert.equal(validate(forged), false)
+  }
+})

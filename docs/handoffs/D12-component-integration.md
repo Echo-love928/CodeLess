@@ -102,3 +102,19 @@ integration-runner-oom-fix.log/.exit 和 integration-runner-oom-fixed.log/.exit�
 故障或CI未观测OOM根因已根治。
 
 同伴批准必须由独立审查者针对最终候选给出，作者不能替代；仍禁止合并/推main。
+
+### 最后公共响应兼容核对
+
+d3bff07361293c00ae7b2f4c14f3d2b5e21b8cfc的[run38246836006](https://github.com/Echo-love928/CodeLess/actions/runs/38246836006)
+实查六项全部completed/success；Linuxrunner66/66，实际cgroup OOM和子SIGKILL137反例通过。
+没有抹去267失败，且未重现其false标志，不能据此宣称精确根因已确认。
+
+最后逐一核对公共HTTP响应时发现：版本snapshot的validation.report新增componentMappingDigest，
+但原公共versions/response.schema.json是闭合结构，未登记该字段。这里由最终启用维护者B作最小
+兼容追加：可选的严格71字符SHA256，旧版本没有字段继续合法，不放宽additionalProperties。
+真实鉴权HTTP响应来自上面Windows完整gate的preview-source-consistency，保留snapshot-public.json。
+新增真实响应契约回归：原schema2/3、exit1，明确additionalProperty=componentMappingDigest；补后
+3/3、exit0，含旧响应缺字段兼容和null/坏摘要/换行拒绝。前后日志snapshot-contract-{before,after}.log/.exit。
+最新完整verify:static native exit0（原契约11/11、UI69/69、OpenAPI lint/生产构建），日志
+integration-static-final.log/.exit。公共snapshot契约新增这一字段是必要的接口差异，不改原API行为。
+本补充提交后精确候选Checks须重新读取，不能把d3成功沿用到新HEAD。
