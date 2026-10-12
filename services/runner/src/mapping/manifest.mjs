@@ -39,12 +39,15 @@ export function bindCatalog({ catalog, sourceManifest, versionId, sourceDigest }
     if (file.componentId) ids.set(file.componentId, (ids.get(file.componentId) ?? 0) + 1)
   }
   const components = [], disabled = []
+  // A spread/dynamic marker can impersonate ANY catalog ID, including a sibling's.
+  // Disabling only its declaring file does not prevent wrong-file selection.
+  const unsafeNamespace = catalog.files.some(file => ['UNSAFE_MARKER', 'UNSUPPORTED_ROOT'].includes(file.disabledReason))
   for (const source of sourceManifest.files) {
     if (!source.path.endsWith('.vue')) continue
     if (!sourcePath(source.path)) reject('INVALID_SOURCE_PATH')
     const file = catalog.files.find(file => file.sourceFile === source.path)
     if (!file || file.fileDigest !== source.digest) reject('CATALOG_SOURCE_MISMATCH')
-    const reason = ids.get(file.componentId) > 1 ? 'DUPLICATE_COMPONENT_ID' : file.disabledReason
+    const reason = ids.get(file.componentId) > 1 ? 'DUPLICATE_COMPONENT_ID' : file.disabledReason ?? (unsafeNamespace ? 'UNSAFE_MARKER' : null)
     if (reason) disabled.push({ sourceFile: source.path, componentId: file.componentId, reason })
     else components.push({ componentId: file.componentId, sourceFile: source.path, fileDigest: source.digest, scope: 'SOURCE_FILE' })
   }

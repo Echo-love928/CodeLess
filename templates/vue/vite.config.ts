@@ -40,9 +40,8 @@ function componentCatalog() {
                   ['if', 'else', 'else-if'].includes(prop.name)))
               const nestedMarker = (nodes: typeof root.children): boolean => nodes.some(node => node.type === 1 &&
                 (node.props.some(prop => (prop.type === 6 && prop.name === 'data-ai-component') ||
-                  (prop.type === 7 && prop.name === 'bind' && prop.arg?.type === 4 && prop.arg.content === 'data-ai-component')) || nestedMarker(node.children)))
-              if (unsafeBinding || nestedMarker(root.children)) disabledReason = 'UNSAFE_MARKER'
-              else if (attributes.length !== 1) disabledReason = attributes.length ? 'INVALID_COMPONENT_ID' : 'MISSING_COMPONENT_ID'
+                  (prop.type === 7 && prop.name === 'bind' && (!prop.arg || prop.arg.type !== 4 || !prop.arg.isStatic || prop.arg.content === 'data-ai-component'))) || nestedMarker(node.children)))
+              if (attributes.length !== 1) disabledReason = attributes.length ? 'INVALID_COMPONENT_ID' : 'MISSING_COMPONENT_ID'
               else {
                 const attribute = attributes[0]
                 componentId = attribute.type === 6 ? attribute.value?.content ?? null : null
@@ -50,6 +49,9 @@ function componentCatalog() {
                   componentId = null; disabledReason = 'INVALID_COMPONENT_ID'
                 }
               }
+              // Retain a valid declared ID even when disabled, so forged candidates
+              // receive UNSAFE_MARKER rather than being resolved to another file.
+              if (unsafeBinding || nestedMarker(root.children)) disabledReason = 'UNSAFE_MARKER'
             }
           }
           files.push({ sourceFile, fileDigest: 'sha256:' + createHash('sha256').update(bytes).digest('hex'), componentId, disabledReason })

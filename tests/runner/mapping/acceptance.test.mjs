@@ -125,11 +125,11 @@ test('missing, dynamic, nested, fragment and duplicate identifiers disable selec
   const result = await buildVersionMapping({ sourceDirectory: source, versionId: newVersionId, sourceDigest: snapshot.manifest.digest, runBuild })
   assert.equal(result.status, 'MAPPED', JSON.stringify(result))
   const actual = Object.fromEntries(result.manifest.disabled.map(file => [file.sourceFile.split('/').at(-1).slice(0, -4), file.reason]))
-  assert.deepEqual(actual, { CommentOnly: 'MISSING_COMPONENT_ID', DuplicateA: 'DUPLICATE_COMPONENT_ID', DuplicateB: 'DUPLICATE_COMPONENT_ID',
+  assert.deepEqual(actual, { CommentOnly: 'MISSING_COMPONENT_ID', DuplicateA: 'DUPLICATE_COMPONENT_ID', DuplicateB: 'DUPLICATE_COMPONENT_ID', HomePage: 'UNSAFE_MARKER', SharedCard: 'UNSAFE_MARKER', RepeatedRoot: 'UNSAFE_MARKER',
     Dynamic: 'UNSAFE_MARKER', Fragment: 'UNSUPPORTED_ROOT', Invalid: 'INVALID_COMPONENT_ID', Missing: 'MISSING_COMPONENT_ID',
     Nested: 'UNSAFE_MARKER', RootComponent: 'UNSUPPORTED_ROOT', Spread: 'UNSAFE_MARKER' })
   assert.equal(resolveSelection(result.manifest, { versionId: newVersionId, sourceDigest: snapshot.manifest.digest, componentId: 'duplicate-id' }).reason, 'DUPLICATE_COMPONENT_ID')
-  assert.equal(result.manifest.components.find(file => file.componentId === 'repeated-root').scope, 'SOURCE_FILE')
+  assert.equal(result.manifest.components.length, 0)
   assert.equal(resolveSelection(result.manifest, { versionId: newVersionId, sourceDigest: snapshot.manifest.digest, componentId: null }).reason, 'MISSING_COMPONENT_ID')
   await evidence('D12-B-disabled', { manifest: result.manifest, exitCode: result.build.exitCode })
 })
@@ -142,4 +142,47 @@ test('source mismatch and build failure never produce a selectable manifest', as
   const failure = { status: 'FAILED', exitCode: null, artifact: null, failure: 'RUNNER_UNAVAILABLE' }
   const result = await buildVersionMapping({ sourceDirectory: fixture, versionId, sourceDigest: mapped.manifest.sourceDigest, runBuild: async () => failure })
   assert.deepEqual(result, { status: 'BUILD_FAILED', build: failure, manifest: null })
+})
+
+test('R1: call-site spread and dynamic arguments cannot select another component source', { timeout: 120000 }, async () => {
+  const source = join(scratch, 'call-site-overrides')
+  await cp(fixture, source, { recursive: true })
+  await writeFile(join(source, 'src/pages/HomePage.vue'), `<script setup lang="ts">
+import SharedCard from '../components/SharedCard.vue'
+const marker = 'data-ai-component'
+</script>
+<template><main data-ai-component="home-page">
+<SharedCard label="spread" v-bind="{ 'data-ai-component': 'home-page' }" />
+<section><SharedCard label="dynamic" :[marker]="'shared-card'" /></section>
+<span v-bind="{ 'data-ai-component': 'shared-card' }">native spread</span>
+</main></template>`)
+  const snapshot = await readSnapshot(source, { source: true })
+  const result = await buildVersionMapping({ sourceDirectory: source, versionId: newVersionId, sourceDigest: snapshot.manifest.digest, runBuild })
+  assert.equal(result.status, 'MAPPED', JSON.stringify(result))
+  const artifacts = await readSnapshot(result.build.artifact.directory)
+  const server = createServer((req, res) => {
+    const path = new URL(req.url, 'http://127.0.0.1').pathname.slice(1) || 'index.html'
+    const bytes = artifacts.buffers.get(path)
+    if (!bytes) { res.writeHead(404).end(); return }
+    res.setHeader('Content-Type', path.endsWith('.js') ? 'text/javascript' : 'text/html'); res.end(bytes)
+  })
+  let browser
+  try {
+    await new Promise(done => server.listen(0, '127.0.0.1', done))
+    browser = await chromium.launch({ headless: true })
+    const page = await browser.newPage()
+    await page.goto(`http://127.0.0.1:${server.address().port}/`)
+    await page.locator('h2').first().waitFor()
+    const markers = await page.locator('h2').evaluateAll(nodes => nodes.map(node => node.closest('[data-ai-component]')?.getAttribute('data-ai-component')))
+    // Keep the real Vue fallthrough behavior visible; disabling metadata must not
+    // silently rewrite source or pretend the forged DOM is authenticated.
+    assert.deepEqual(markers, ['home-page', 'shared-card'])
+    const selections = markers.map(componentId => resolveSelection(result.manifest, { versionId: newVersionId, sourceDigest: snapshot.manifest.digest, componentId }))
+    await evidence('D12-B-R1', { markers, selections, manifest: result.manifest, exitCode: result.build.exitCode, browser: browser.version() })
+    assert(selections.every(value => !value.selectable && value.reason === 'UNSAFE_MARKER'))
+    assert.equal(result.manifest.components.length, 0)
+  } finally {
+    try { if (browser) await browser.close() }
+    finally { await new Promise(done => server.close(done)) }
+  }
 })

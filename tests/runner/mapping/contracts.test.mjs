@@ -37,3 +37,13 @@ test('catalog digest, missing files, aliases, duplicate ID and snapshot-only bin
   assert(!result.disabled.some(file => file.sourceFile === 'src/pages/HomePage.vue'))
   for (const value of ['src/components/CON.vue', 'src/components/COM1.vue', 'src/components/Card.vue:secret', '/src/components/Card.vue', 'src/components/Card.Vue']) assert.equal(sourcePath(value), false)
 })
+
+test('unsafe marker namespace disables even a different valid target ID', () => {
+  for (const disabledReason of ['UNSAFE_MARKER', 'UNSUPPORTED_ROOT']) {
+    const poisoned = { ...catalog, files: [...catalog.files, { ...catalog.files[0], sourceFile: 'src/pages/HomePage.vue', componentId: 'home-page', disabledReason }] }
+    const result = bindCatalog({ catalog: poisoned, sourceManifest, ...identity })
+    assert.deepEqual(result.components, [])
+    assert.deepEqual(result.disabled, [{ sourceFile: path, componentId: 'card', reason: 'UNSAFE_MARKER' }])
+    assert.equal(check(result), true)
+  }
+})
