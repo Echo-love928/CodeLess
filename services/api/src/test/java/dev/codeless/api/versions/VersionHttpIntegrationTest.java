@@ -13,6 +13,7 @@ import java.nio.file.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -41,6 +42,28 @@ class VersionHttpIntegrationTest extends PostgresTestBase {
     final HttpClient client=HttpClient.newHttpClient();
     static UUID owner,app,ready,failed,shell;
     static String cookie,otherCookie,csrf;
+    static VersionFixtureGate fixture = new VersionFixtureGate();
+    static String fixtureStage = "INITIALIZATION", fixtureCode = "UNKNOWN";
+    @RegisterExtension final TestWatcher prerequisite = new TestWatcher() {
+        @Override public void testFailed(ExtensionContext context, Throwable cause) {
+            if (context.getRequiredTestMethod().getAnnotation(Order.class).value() != 1) return;
+            fixture.failed(cause);
+            try {
+                report("D11-A-prerequisite",Map.of("status","FAILED","stage",fixtureStage,"failureCode",fixtureCode,
+                        "exceptionType",cause.getClass().getSimpleName(),"affectedCases",List.of("D11-A-T2","D11-A-T3","D11-A-T4","boundaries"),
+                        "dependentResult","NOT_EXECUTED_PRECONDITION_FAILED"));
+            } catch (Exception evidenceFailure) { cause.addSuppressed(evidenceFailure); }
+        }
+    };
+    @BeforeEach void requireRealFixture(TestInfo info) throws Exception {
+        if (info.getTestMethod().orElseThrow().getAnnotation(Order.class).value() == 1) return;
+        try { fixture.require(); }
+        catch (AssertionError unavailable) {
+            report(info.getTestMethod().orElseThrow().getName()+"-not-executed",Map.of(
+                    "status","NOT_EXECUTED_PRECONDITION_FAILED","stage",fixtureStage,"failureCode",fixtureCode));
+            throw unavailable;
+        }
+    }
     record Login(String cookie,String csrf) {}
     String base() {return "http://127.0.0.1:"+port+"/api/v0/";}
     HttpResponse<String> get(String route,String session) throws Exception {
@@ -74,11 +97,25 @@ class VersionHttpIntegrationTest extends PostgresTestBase {
         UUID task=queue.create(owner,app,"生成静态个人展示页，展示 Ada Lovelace 与作品",null).id();
         var originalClaim=queue.claim().orElseThrow();assertThat(originalClaim.taskId()).isEqualTo(task);
         for(TaskStatus stage:List.of(TaskStatus.PLAN,TaskStatus.GENERATE,TaskStatus.VERIFY)) {
+            fixtureStage=stage.name();
             var result=loop.execute(originalClaim,stage);
-            assertThat(result.next()).as(result.failureCode()).isNotEqualTo(TaskStatus.FAILED);
+            fixtureCode=Objects.requireNonNullElse(result.failureCode(),"UNKNOWN");
+            if (result.next()==TaskStatus.FAILED) {
+                var receipt=journal.read(task).stream().filter(e->"runner.result".equals(e.path("kind").asText()))
+                        .reduce((a,b)->b).map(e->e.path("payload")).orElse(json.createObjectNode());
+                report("D11-A-runner-prerequisite",Map.of("status","FAILED","stage",fixtureStage,"failureCode",fixtureCode,
+                        "build",receipt.path("build").isObject()?Map.of("status",receipt.path("build").path("status"),
+                                "exitCode",receipt.path("build").path("exitCode"),"failure",receipt.path("build").path("failure"),
+                                "inputScanEio",receipt.path("build").path("log").path("text").asText().contains("EIO: i/o error, scandir '/input'"),
+                                "logDigest",LocalVolumeSnapshotStore.hash(receipt.path("build").path("log").path("text").asText().getBytes(StandardCharsets.UTF_8))):json.nullNode(),
+                        "verification",receipt.path("verification").path("status"),"artifactPresent",receipt.path("build").path("artifact").isObject()));
+            }
+            assertThat(result.next()).as("Real fixture stage %s failed (%s); see D11-A-runner-prerequisite.json",stage,fixtureCode)
+                    .isNotEqualTo(TaskStatus.FAILED);
             loop.advance(queue,originalClaim,result,result.next()==TaskStatus.READY?EventType.STAGE_COMPLETED:EventType.STAGE_STARTED);
         }
         var taskView=queue.find(owner,task).orElseThrow();assertThat(taskView.status()).as(taskView.failureCode()).isEqualTo(TaskStatus.READY);
+        fixtureStage="DRAFT_MUTATION";fixtureCode="UNKNOWN";
         var draft=AgentJournal.latest(journal.read(task),"draft");ready=UUID.fromString(draft.path("versionId").asText());
         var old=get("versions/"+ready+"/files/content?path=src/pages/HomePage.vue",cookie);
         assertThat(old.statusCode()).isEqualTo(200);var oldBytes=json.readTree(old.body());
@@ -101,6 +138,8 @@ class VersionHttpIntegrationTest extends PostgresTestBase {
         assertThat(applications.find(owner,app).orElseThrow().latestReadyVersionId()).isEqualTo(ready);
         report("D11-A-T1",Map.of("taskId",task,"readyVersionId",ready,"newVersionId",failed,"sourceBeforeAfter",oldBytes,
                 "validation",before,"realBuildAndBrowser",true,"newFailureProvider","explicit-unavailable-worker-fixture"));
+        fixture.ready();
+        report("D11-A-prerequisite",Map.of("status","SUCCEEDED","realBuildAndBrowser",true,"readyVersionId",ready));
     }
     @Test @Order(2) void d11aT2FailedAndDraftVersionsCannotBecomePublicationSources() throws Exception {
         for(UUID id:List.of(failed,shell)) {
