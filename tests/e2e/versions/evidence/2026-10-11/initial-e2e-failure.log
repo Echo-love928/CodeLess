@@ -1,0 +1,102 @@
+[WebServer] (node:56500) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 8 tests using 1 worker
+
+(node:93500) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93500) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:9:5 › D11-B-T1: versionId selects matching source and rendered preview (5.6s)
+(node:89556) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:89556) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 2 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:23:5 › D11-B-T2: empty, list failure, source failure and retry are distinct (856ms)
+  x  3 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:41:5 › D11-B-T3: draft and failed versions never replace available preview (5.4s)
+(node:102320) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:102320) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 4 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:58:5 › D11-B-T4: source script and HTML remain literal text (673ms)
+  ok 5 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:67:5 › unknown status, missing verified build and wrong app metadata fail closed (522ms)
+  ok 6 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:81:5 › snapshot mismatch never displays the wrong source (391ms)
+  ok 7 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:88:5 › late source from prior selection cannot overwrite the new version (449ms)
+  ok 8 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:105:5 › source 401 redirects to login and paginated versions keep selected preview (609ms)
+
+
+  1) [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:9:5 › D11-B-T1: versionId selects matching source and rendered preview
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('iframe').contentFrame().getByRole('heading', { name: '版本 2 页面' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('iframe').contentFrame().getByRole('heading', { name: '版本 2 页面' })[22m
+
+
+      10 |   const state = await installVersionsFixture(page)
+      11 |   await openWorkbench(page)
+    > 12 |   await expect(page.frameLocator('iframe').getByRole('heading', { name: '版本 2 页面' })).toBeVisible()
+         |                                                                                       ^
+      13 |   await expect(page.getByLabel('文件内容')).toContainText('版本 2 页面')
+      14 |   await page.locator(`[data-version-id="${ids[0]}"]`).getByRole('button').click()
+      15 |   await expect(page.frameLocator('iframe').getByRole('heading', { name: '版本 1 页面' })).toBeVisible()
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\.local-data\worktrees\d11-b\tests\e2e\versions\flow.spec.ts:12:87
+
+    Error Context: test-results\versions-flow-D11-B-T1-ver-a52e1-source-and-rendered-preview-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\versions-flow-D11-B-T1-ver-a52e1-source-and-rendered-preview-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\versions-flow-D11-B-T1-ver-a52e1-source-and-rendered-preview-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:41:5 › D11-B-T3: draft and failed versions never replace available preview
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('iframe').contentFrame().getByRole('heading', { name: '版本 2 页面' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('iframe').contentFrame().getByRole('heading', { name: '版本 2 页面' })[22m
+
+
+      42 |   const state = await installVersionsFixture(page)
+      43 |   await openWorkbench(page)
+    > 44 |   await expect(page.frameLocator('iframe').getByRole('heading', { name: '版本 2 页面' })).toBeVisible()
+         |                                                                                       ^
+      45 |   for (const index of [2, 3]) {
+      46 |     const row = page.locator(`[data-version-id="${ids[index]}"]`)
+      47 |     await expect(row).toContainText('此版本不可预览')
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\.local-data\worktrees\d11-b\tests\e2e\versions\flow.spec.ts:44:87
+
+    Error Context: test-results\versions-flow-D11-B-T3-dra-d3b49-r-replace-available-preview-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\versions-flow-D11-B-T3-dra-d3b49-r-replace-available-preview-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\versions-flow-D11-B-T3-dra-d3b49-r-replace-available-preview-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:9:5 › D11-B-T1: versionId selects matching source and rendered preview
+    [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:41:5 › D11-B-T3: draft and failed versions never replace available preview
+  6 passed (19.2s)
+Error: ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL
+
+  × "pnpm recursive exec" failed in C:
+  │ \Users\12058\Documents\ChatGPT\CodeLess\.local-data\worktrees\d11-
+  │ b\apps\web

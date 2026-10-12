@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-11",
+  "timezone": "Asia/Shanghai",
+  "task": "D11-B",
+  "baseline": "413e5b8bc40e2ccf6b5c538a9f2b4fc0f02e9ccb",
+  "platformApiFixture": true,
+  "sourceApiFixture": true,
+  "previewPageFixture": true,
+  "realModelEvaluation": false,
+  "overall": "BLOCKED_D11_A_CONTRACT_AND_LOCAL_API_FAILURE",
+  "commands": [
+    {
+      "command": "corepack pnpm install --frozen-lockfile",
+      "exitCode": 0,
+      "result": "locked dependencies installed; lockfile unchanged"
+    },
+    {
+      "command": "pnpm verify:static",
+      "exitCode": 1,
+      "result": "initial child script used default pnpm11/Node24.19; environment failure",
+      "log": ".local-data/d11-b/verify-static.log"
+    },
+    {
+      "command": "pnpm verify:static (task-local shim PATH)",
+      "exitCode": 0,
+      "result": "lint/typecheck/build; original web tests41/41, before added tests",
+      "log": ".local-data/d11-b/verify-static-locked.log"
+    },
+    {
+      "command": "pnpm --filter @codeless/web exec playwright test --config playwright.config.ts versions/flow.spec.ts",
+      "exitCode": 1,
+      "result": "6 passed,2 failed; fixture HTML lacked UTF8 charset",
+      "log": "initial-e2e-failure.log"
+    },
+    {
+      "command": "same versions Playwright command after fixture charset fix",
+      "exitCode": 0,
+      "result": "8/8; API/auth/source/page explicit fixture",
+      "log": "versions-e2e-success.log"
+    },
+    {
+      "command": "pnpm ci:gate",
+      "exitCode": 1,
+      "result": "static0(53 web tests),api1(161 tests,25 failures,1 error,0 skipped),runner0(44/44),e2e1(40/41)",
+      "log": ".local-data/d11-b/ci-gate.log",
+      "sha256": "e16c0cc11145f4e382e09c02a225c1b01141ba5b92b68f975cd86a2f121e50ae"
+    },
+    {
+      "command": "pnpm verify:e2e after scoping two preview alert assertions",
+      "exitCode": 0,
+      "result": "41/41,0 skipped; all existing real Docker/build/browser suites run",
+      "log": "e2e-final.log"
+    },
+    {
+      "command": "gh pr list --repo Echo-love928/CodeLess --state open --json number,title,headRefName,url",
+      "exitCode": 0,
+      "result": "[]; D11-A review unavailable"
+    },
+    {
+      "command": "Docker read-only directory enumeration of original and task-worktree showcase fixtures",
+      "exitCode": 0,
+      "result": "both directories readable; insufficient evidence to explain API EIO"
+    },
+    {
+      "command": "pnpm verify:static after RouterLink test stub",
+      "exitCode": 0,
+      "result": "53/53,contracts/lint/typecheck/build passed",
+      "log": "static-final.log"
+    }
+  ],
+  "developerTokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "source": "UNKNOWN"
+  },
+  "runtimeModelUsage": {
+    "d11Requests": 0,
+    "d11Tokens": 0,
+    "stageProvider": "explicit mock; not real model evaluation"
+  }
+}

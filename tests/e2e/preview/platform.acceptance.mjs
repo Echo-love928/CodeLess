@@ -15,6 +15,7 @@ import { fileURLToPath } from 'node:url'
 import { startPreviewRuntime } from '../../../services/runner/src/preview/main.mjs'
 import { readSnapshot,digest } from '../../../services/runner/src/artifacts/snapshot.mjs'
 import { tlsServer,closeServer } from './fixtures.mjs'
+import { platformFetch } from '../versions/http-call.mjs'
 
 // Real HTTP/SQL/auth/issuer/runner/gateway. Paid evaluation is explicit and validated against SQL by its Java harness.
 const root=resolve(fileURLToPath(new URL('../../../',import.meta.url)))
@@ -57,11 +58,7 @@ try {
   })
   page=await context.newPage();diagnostic.attach(page)
   await page.goto('/login');await page.getByLabel('邮箱').fill('demo@codeless.local');await page.getByLabel('密码').fill('demo-password-for-test-only');await page.getByRole('button',{name:'登录',exact:true}).click();await expect(page).toHaveURL(/\/apps$/)
-  const call=async(path,method='GET',body)=>page.evaluate(async({path,method,body})=>{
-    const csrf=await (await fetch('/api/v0/auth/csrf')).json()
-    const response=await fetch('/api/v0/'+path,{method,headers:{'Content-Type':'application/json','X-CSRF-Token':csrf.token},...(body?{body:JSON.stringify(body)}:{})})
-    return {status:response.status,body:await response.json()}
-  },{path,method,body})
+  const call=async(path,method='GET',body)=>page.evaluate(platformFetch,{path,method,body})
   const created=await call('applications','POST',{name:'真实鉴权预览联调',dataMode:'STATIC',template:'VUE'})
   assert.equal(created.status,201);const app=created.body.id
   await page.evaluate(()=>{localStorage.setItem('platform-secret','private-platform-value');sessionStorage.setItem('platform-secret','private-platform-session')})
@@ -140,6 +137,11 @@ try {
   await writeFile(join(evidence,'acceptance.json'),JSON.stringify({applicationId:app,taskId:task,versionId:version,buildId:binding.buildId,sourceDigest:binding.sourceDigest,artifactDigest:binding.artifactDigest,sourceFiles:draft.files.length,
     deploymentIngress:'nginx:1.27.5-alpine',modelProvider:modelMode,modelQualityAccepted:false,modelQualityValidation:paid?'PENDING_SQL_VALIDATION':'NOT_MODEL_ACCEPTANCE',acceptanceScope:paid?'single-static-Ada-showcase':replay?'recorded-real-source-with-fixture-provider':'deterministic-platform-integration',platformApiFixture:false,signingFixture:false,realDockerBuild:true,realBrowserVerification:true,residentRestartPassed:true,credentialErrorLogDenied:true,retentionRevocationPassed:true,publicInternalDenied:true,isolation,
     screenshot:{path:'authenticated-platform-preview.png',digest:digest(screenshot),bytes:screenshot.length}},null,2))
+  // Opt-in D11 checks reuse this real session/DB/registry after every original assertion.
+  if(process.env.CODELESS_VERSION_PANEL_ACCEPTANCE==='1') {
+    const {checkVersionPanel}=await import('../versions/platform-checks.mjs')
+    await checkVersionPanel({page,call,app,version,task,created:created.body,evidence})
+  }
   success=true
   console.log('Authenticated platform preview, restart and retention acceptance passed (model: '+modelMode+').')
 } catch(error) {primaryFailure=error;throw error} finally {

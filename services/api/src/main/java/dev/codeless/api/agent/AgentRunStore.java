@@ -3,6 +3,7 @@ package dev.codeless.api.agent;
 import dev.codeless.api.tasks.TaskQueueService;
 import dev.codeless.api.data.PlatformModels.*;
 import dev.codeless.api.tools.FileToolService;
+import dev.codeless.api.versions.SnapshotStore;
 import java.time.OffsetDateTime;
 import java.util.*;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -16,8 +17,9 @@ public final class AgentRunStore {
     private final JdbcClient jdbc;
     private final TransactionTemplate tx;
     private final AgentJournal journal;
-    public AgentRunStore(JdbcClient jdbc, PlatformTransactionManager manager, AgentJournal journal) {
-        this.jdbc=jdbc; this.tx=new TransactionTemplate(manager); this.journal=journal;
+    private final SnapshotStore snapshots;
+    public AgentRunStore(JdbcClient jdbc, PlatformTransactionManager manager, AgentJournal journal, SnapshotStore snapshots) {
+        this.jdbc=jdbc; this.tx=new TransactionTemplate(manager); this.journal=journal; this.snapshots=snapshots;
     }
     private Context lock(TaskQueueService.Claim claim, TaskStatus stage) {
         jdbc.sql("SELECT id FROM generation_tasks WHERE id=? FOR UPDATE").param(claim.taskId())
@@ -65,10 +67,13 @@ public final class AgentRunStore {
             int number=jdbc.sql("SELECT coalesce(max(number),0)+1 FROM application_versions WHERE application_id=?")
                     .param(app).query(Integer.class).single();
             UUID version=UUID.randomUUID();
-            jdbc.sql("INSERT INTO application_versions(id,application_id,number,source_digest,status) VALUES (?,?,?,?,'DRAFT')")
-                    .params(version,app,number,snapshot.source().sourceDigest()).update();
+            var frozen=snapshots.freezeSource(version,snapshot.directory(),snapshot.source().sourceDigest(),
+                    tools.jackson.databind.json.JsonMapper.builder().build().valueToTree(snapshot.source().files()));
+            jdbc.sql("INSERT INTO application_versions(id,application_id,number,source_digest,status,source_task_id) VALUES (?,?,?,?,'DRAFT',?)")
+                    .params(version,app,number,snapshot.source().sourceDigest(),claim.taskId()).update();
             journal.append(claim.taskId(),"GENERATE","draft",Map.of("versionId",version,"sourceDigest",snapshot.source().sourceDigest(),
-                    "sourceDirectory",snapshot.directory().toString(),"files",snapshot.source().files(),"actions",actions));
+                    "sourceDirectory",snapshot.directory().toString(),"frozenSourceDirectory",frozen.directory().toString(),
+                    "files",frozen.manifest().files(),"actions",actions));
             lock(claim,TaskStatus.GENERATE);
             return AgentJournal.latest(journal.read(claim.taskId()),"draft");
         });
@@ -80,6 +85,7 @@ public final class AgentRunStore {
             JsonNode build=result.path("build"), verification=result.path("verification");
             UUID buildId=UUID.fromString(build.path("id").asText());
             String artifact=build.path("artifact").path("digest").asText();
+            snapshots.freezeOutcome(version,draft.path("sourceDigest").asText(),"VERIFIED",result,null);
             int changed=jdbc.sql("""
                     INSERT INTO builds(id,task_id,version_id,status,exit_code,artifact_digest,created_at,completed_at)
                     SELECT ?,t.id,v.id,'SUCCEEDED',0,?,CAST(? AS timestamptz),CAST(? AS timestamptz)
@@ -104,6 +110,7 @@ public final class AgentRunStore {
         tx.executeWithoutResult(s -> {
             lock(claim,TaskStatus.VERIFY);
             JsonNode build=result.path("build");
+            snapshots.freezeOutcome(UUID.fromString(draft.path("versionId").asText()),draft.path("sourceDigest").asText(),"FAILED",result,null);
             if (build.path("exitCode").isIntegralNumber() && build.path("exitCode").asInt()>0 && build.path("completedAt").isString()) {
                 jdbc.sql("INSERT INTO builds(id,task_id,version_id,status,exit_code,created_at,completed_at) VALUES (?,?,?,'FAILED',?,CAST(? AS timestamptz),CAST(? AS timestamptz))")
                     .params(UUID.fromString(build.path("id").asText()),claim.taskId(),UUID.fromString(draft.path("versionId").asText()),
@@ -111,6 +118,21 @@ public final class AgentRunStore {
             }
             jdbc.sql("UPDATE application_versions SET status='FAILED',row_version=row_version+1,updated_at=clock_timestamp() WHERE id=? AND status='DRAFT'")
                     .param(UUID.fromString(draft.path("versionId").asText())).update();
+        });
+    }
+    /** A rejected/unavailable VERIFY result cannot leave its candidate looking pending forever. */
+    public void abandonDraft(TaskQueueService.Claim claim, String code) {
+        tx.executeWithoutResult(s -> {
+            lock(claim,TaskStatus.VERIFY);
+            var draft=AgentJournal.latest(journal.read(claim.taskId()),"draft");
+            UUID version=UUID.fromString(draft.path("versionId").asText());
+            boolean pending=jdbc.sql("SELECT EXISTS(SELECT 1 FROM application_versions WHERE id=? AND status='DRAFT')")
+                    .param(version).query(Boolean.class).single();
+            if (!pending) return;
+            snapshots.freezeOutcome(version,draft.path("sourceDigest").asText(),"FAILED",
+                    tools.jackson.databind.json.JsonMapper.builder().build().createObjectNode(),code);
+            jdbc.sql("UPDATE application_versions SET status='FAILED',row_version=row_version+1,updated_at=clock_timestamp() WHERE id=? AND status='DRAFT'")
+                    .param(version).update();
         });
     }
 }
