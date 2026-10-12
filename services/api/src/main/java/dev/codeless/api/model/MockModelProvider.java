@@ -20,6 +20,18 @@ public final class MockModelProvider implements ModelProvider {
         var mapper = JsonMapper.builder().build();
         var request = mapper.readTree(prompt.getUserMessage().getText());
         if ("GENERATE".equals(request.path("phase").asText())) {
+            if(request.has("editContext")) {
+                String content;
+                if(request.path("observations").isEmpty()) {
+                    String digest=request.path("editContext").path("sourceFiles").valueStream()
+                            .filter(f -> f.path("path").asText().equals("src/components/ProfileCard.vue"))
+                            .findFirst().orElseThrow().path("digest").asText();
+                    content=mapper.writeValueAsString(java.util.Map.of("type","tool","name","files.update","arguments",java.util.Map.of(
+                            "path","src/components/ProfileCard.vue","expectedDigest",digest,"content",
+                            "<template><section><h1 data-testid=\"profile-name\">Hedy Lamarr</h1><p>静态个人资料与作品</p></section></template>")));
+                } else content="{\"type\":\"done\",\"actions\":[{\"type\":\"navigate\",\"path\":\"/\"},{\"type\":\"expectText\",\"target\":{\"testId\":\"profile-name\"},\"value\":\"Hedy Lamarr\"}]}";
+                return new Reply(content,new Evidence(model(),"mock-edit-v1","mock-edit-v1",Usage.unknown()));
+            }
             long observed = request.path("observations").size();
             String content;
             if (observed == 0) content = mapper.writeValueAsString(java.util.Map.of("type", "tool", "name", "files.create",

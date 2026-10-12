@@ -63,14 +63,24 @@ public class PlatformRepository {
 
     private Task insertTask(UUID id, UUID applicationId, String prompt, String idempotencyKey,
                             String queueState) {
+        return insertTask(id, applicationId, prompt, idempotencyKey, queueState, "Task accepted in PLAN");
+    }
+
+    @Transactional
+    public Task createQueuedTask(UUID id, UUID applicationId, String prompt, String key, String acceptanceMessage) {
+        return insertTask(id, applicationId, prompt, key, "QUEUED", acceptanceMessage);
+    }
+
+    private Task insertTask(UUID id, UUID applicationId, String prompt, String idempotencyKey,
+                            String queueState, String acceptanceMessage) {
         jdbc.sql("""
                 INSERT INTO generation_tasks(id, application_id, prompt, event_sequence,
                                              idempotency_key, queue_state, deadline_at)
                 VALUES (?, ?, ?, 1, ?, ?, now() + interval '12 minutes')
                 """).params(id, applicationId, prompt, idempotencyKey, queueState).update();
         jdbc.sql("INSERT INTO task_events(id, task_id, sequence, type, stage, message) "
-                + "VALUES (?, ?, 1, 'STAGE_STARTED', 'PLAN', 'Task accepted in PLAN')")
-                .params(UUID.randomUUID(), id).update();
+                + "VALUES (?, ?, 1, 'STAGE_STARTED', 'PLAN', ?)")
+                .params(UUID.randomUUID(), id, acceptanceMessage).update();
         return findTask(id).orElseThrow();
     }
 

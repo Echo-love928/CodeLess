@@ -34,6 +34,32 @@ public final class AgentRunStore {
                 .orElseThrow(() -> new AgentFailure("AGENT_LEASE_INVALID"));
     }
     public Context context(TaskQueueService.Claim claim, TaskStatus stage) { return tx.execute(s -> lock(claim,stage)); }
+    public Optional<JsonNode> editContext(TaskQueueService.Claim claim, TaskStatus stage) {
+        return tx.execute(s -> {
+            lock(claim,stage);
+            return dev.codeless.api.edit.EditMetadata.find(jdbc,claim.taskId()).map(link -> {
+                String digest=baseDigest(claim,link.baseVersionId());
+                var source=snapshots.source(link.baseVersionId(),digest);
+                var contents=source.manifest().files().stream().map(f -> Map.of("path",f.path(),"digest",f.digest(),
+                        "content",snapshots.readSource(link.baseVersionId(),digest,f.path()))).toList();
+                return (JsonNode) tools.jackson.databind.json.JsonMapper.builder().build().valueToTree(Map.of(
+                        "baseVersionId",link.baseVersionId(),"source",link.source(),"sourceFiles",contents));
+            });
+        });
+    }
+    public Optional<SnapshotStore.Source> editSource(TaskQueueService.Claim claim) {
+        return tx.execute(s -> {
+            lock(claim,TaskStatus.GENERATE);
+            return dev.codeless.api.edit.EditMetadata.find(jdbc,claim.taskId())
+                    .map(link -> snapshots.source(link.baseVersionId(),baseDigest(claim,link.baseVersionId())));
+        });
+    }
+    private String baseDigest(TaskQueueService.Claim claim, UUID base) {
+        return jdbc.sql("""
+                SELECT v.source_digest FROM application_versions v JOIN generation_tasks t ON t.application_id=v.application_id
+                WHERE t.id=? AND v.id=? AND v.status='VERIFIED'
+                """).params(claim.taskId(),base).query(String.class).optional().orElseThrow(() -> new AgentFailure("EDIT_BASE_UNAVAILABLE"));
+    }
     public List<JsonNode> read(TaskQueueService.Claim claim, TaskStatus stage) {
         return tx.execute(s -> { lock(claim,stage); return journal.read(claim.taskId()); });
     }
@@ -81,6 +107,12 @@ public final class AgentRunStore {
     public TaskQueueService.TaskView complete(TaskQueueService queue, TaskQueueService.Claim claim, JsonNode draft, JsonNode result) {
         return tx.execute(s -> {
             lock(claim,TaskStatus.VERIFY);
+            UUID app=jdbc.sql("SELECT application_id FROM generation_tasks WHERE id=?").param(claim.taskId()).query(UUID.class).single();
+            jdbc.sql("SELECT id FROM applications WHERE id=? FOR UPDATE").param(app).query(UUID.class).single();
+            dev.codeless.api.edit.EditMetadata.find(jdbc,claim.taskId()).ifPresent(link -> {
+                UUID latest=jdbc.sql("SELECT latest_ready_version_id FROM applications WHERE id=?").param(app).query(UUID.class).single();
+                if(!link.baseVersionId().equals(latest)) throw new AgentFailure("EDIT_VERSION_CONFLICT");
+            });
             UUID version=UUID.fromString(draft.path("versionId").asText());
             JsonNode build=result.path("build"), verification=result.path("verification");
             UUID buildId=UUID.fromString(build.path("id").asText());
