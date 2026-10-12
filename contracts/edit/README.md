@@ -1,6 +1,6 @@
 # D12-A conversation edit contract
 
-Additive API fragment: `openapi.patch.json`; no shared OpenAPI, lockfile, CI or migration changes. The final enabling PR's public-contract maintainer must integrate the fragment and run actual D12-B integration. D12-B implementation/contract/PR was unavailable at task start; the component reference below is a proposal, not a claim of agreement.
+Additive API fragment: `openapi.patch.json`; no shared OpenAPI, lockfile, CI or migration changes. The final enabling PR's public-contract maintainer must integrate the fragment and run actual D12-B integration. D12-B was unavailable at task start; the final projections below align with the reviewed PR #36 contract, while actual component enablement/integration remains pending.
 
 | Method/path | Behavior |
 | --- | --- |
@@ -26,9 +26,9 @@ Cancellation/expiry retains task requirements/source and prior usable versions. 
 
 Filesystem/SQL are not one atomic resource. Seed failure/crash may leave a partial private workspace. Nonempty workspace or stage re-entry fails closed with operator recovery; no blind reseed/overwrite. No automatic cleanup or new privileges. The private workspace/snapshot roots must remain platform-owned across instances, as required by D08/D11.
 
-## D12-B component integration proposal
+## D12-B component integration boundary
 
-Use exactly `{componentId,sourceFile,versionId}`; versionId must equal the edit's baseVersionId and the mapping's frozen version. `sourceFile` must be an existing restricted Vue file from that version's actual source manifest (path syntax alone is insufficient, including rejecting device names). `componentId` is a mapping identifier, not a DOM-instance ID. Repeated instances share the component source and the modification scope includes all instances. Old-version mappings, spoofed files/IDs and illegal paths must be rejected before creating any task. This API currently accepts CHAT only; COMPONENT is rejected 400 until B's validator and real integration are available. No AST-level or per-DOM-instance precision is promised.
+The shared identity projection is exactly `{componentId,sourceFile,versionId}`. Match B's lowercase kebab-case ID (1..64), lowercase canonical UUID and restricted Vue path/device checks. Client selection is exactly `{componentId,versionId,sourceDigest}` with **no sourceFile**: the server resolves sourceFile only from B's trusted immutable sidecar. `versionId` must equal the edit's baseVersionId and sidecar's frozen version. Source must exist in that version's D11 manifest, and sourceDigest/fileDigest must match; shape/schema alone does not authenticate a mapping. Resolution additionally returns scope=SOURCE_FILE, shared=true and a notice that all instances change. Old-version, forged or unavailable mapping must fail before creating a task. CHAT still rejects COMPONENT 400; sidecar persistence, resolver and preview selection bridge are reserved for the final enabling PR, after B's nested-marker override issue is fixed. No AST-level or per-DOM-instance precision is promised. Read-only findings and reproduction: `review-D12-B.md`.
 
 ## Reproduce
 

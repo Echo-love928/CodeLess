@@ -13,6 +13,7 @@ const part = relative(workspace, repo)
 if (part.startsWith('..') || isAbsolute(part)) throw new Error('Review repository must stay within the authorized workspace')
 const tests = {
   acceptance: 'EditLifecycleIntegrationTest',
+  'cleanup-diagnostic': 'OwnedWorkspaceCleanupTest,FileToolsIntegrationTest#workspaceRootAncestorLinkAndUnexpectedProtectedFilesFailClosed',
 }
 let command, args, cwd = repo
 if (Object.hasOwn(tests, mode)) {
@@ -26,7 +27,7 @@ if (Object.hasOwn(tests, mode)) {
 } else if (mode === 'api') {
   command = process.platform === 'win32' ? (process.env.ComSpec ?? 'cmd.exe') : 'corepack'
   args = process.platform === 'win32' ? ['/d', '/c', 'corepack', 'pnpm', 'run', 'verify:api'] : ['pnpm', 'run', 'verify:api']
-} else throw new Error('Mode must be acceptance, contracts, api or gate')
+} else throw new Error('Mode must be acceptance, cleanup-diagnostic, contracts, api or gate')
 const env = { ...process.env, CODELESS_MODEL_PROVIDER: 'deterministic-mock' }
 for (const key of ['CODELESS_MODEL_API_KEY', 'CODELESS_MODEL_NAME', 'CODELESS_PLAYWRIGHT_CHANNEL']) delete env[key]
 const run = join(workspace, '.local-data/d12-a/runs', `${new Date().toISOString().replaceAll(':', '-')}-${mode}-${randomUUID()}`)

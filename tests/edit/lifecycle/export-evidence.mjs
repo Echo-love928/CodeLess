@@ -15,10 +15,13 @@ for(const name of (await readdir(privateRoot)).sort()) {
   const log=await readFile(join(directory,'command.log'))
   if(meta.logDigest)assert.equal(hash(log),meta.logDigest)
   const matches=[...log.toString('utf8').matchAll(/Tests run: (\d+), Failures: (\d+), Errors: (\d+), Skipped: (\d+)/g)]
+  const lifecycle=log.toString('utf8').match(/Tests run: (\d+), Failures: (\d+), Errors: (\d+), Skipped: (\d+),[^\r\n]* -- in dev\.codeless\.api\.edit\.EditLifecycleIntegrationTest/)
   runs.push({...meta,cwd:'.',run:relative(root,directory),command:meta.command.map(v=>v.replace(root,'.')),
-    junit:matches.length?Object.fromEntries(['tests','failures','errors','skipped'].map((key,i)=>[key,Number(matches.at(-1)[i+1])])):null})
+    junit:matches.length?Object.fromEntries(['tests','failures','errors','skipped'].map((key,i)=>[key,Number(matches.at(-1)[i+1])])):null,
+    editLifecycle:lifecycle?Object.fromEntries(['tests','failures','errors','skipped'].map((key,i)=>[key,Number(lifecycle[i+1])])):null})
 }
-const latest=runs.findLast(run=>run.status==='PASSED'&&['acceptance','gate','api'].includes(run.mode))
+const latest=runs.findLast(run=>['PASSED','FAILED'].includes(run.status)&&['acceptance','gate','api'].includes(run.mode)
+  &&run.editLifecycle?.tests>=7&&run.editLifecycle.failures===0&&run.editLifecycle.errors===0&&run.editLifecycle.skipped===0)
 assert.ok(latest,'No successful real acceptance run exists')
 const evidence=join(root,latest.run,'edit')
 for(const name of ['D12-A-T1','D12-A-T2','D12-A-T3','D12-A-T4','boundaries','real-build-failure','commit-conflict','cancel-preview','runtime-usage']) {
@@ -42,6 +45,8 @@ for(const item of preview.versions) {
   assert.ok(found,'Screenshot with the reported immutable hash not found')
 }
 await writeFile(join(publicRoot,'commands.json'),JSON.stringify({runs,acceptanceSource:latest.run,
+  acceptanceSourceRunStatus:latest.status,acceptanceSourceRunExitCode:latest.exitCode,
+  acceptanceScope:'D12-A lifecycle only. A successful class inside a failed full suite never makes the full suite PASSED.',
   rawLogs:'Retained privately under each run/command.log; hashes/native exits above',
   stageStatusRule:'Only completed native exit 0 is PASSED. Missing completion is UNKNOWN.'},null,2)+'\n')
 console.log(JSON.stringify({exportedFrom:latest.run,runs:runs.length}))

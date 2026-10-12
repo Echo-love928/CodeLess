@@ -20,11 +20,16 @@ test('CHAT request is closed and refuses publication, component claims and malfo
     {...request,source:{type:'CHAT',sourceFile:'../secret'}},{...request,source:{type:'CHAT',messageId:null}}])
     assert.equal(check('request')(invalid),false)
 })
-test('proposed component reference uses version-scoped source files and has no DOM-instance field', () => {
-  const value={componentId:'profile_card',sourceFile:'src/components/ProfileCard.vue',versionId:id}
-  assert.equal(check('componentReferenceProposal')(value),true)
+test('B-aligned component projection and untrusted selection have no client path or DOM-instance authority', () => {
+  const value={componentId:'profile-card',sourceFile:'src/components/ProfileCard.vue',versionId:id}
+  assert.equal(check('componentReferenceProjection')(value),true)
   for(const invalid of [{...value,sourceFile:'../secret'},{...value,versionId:'current'},{...value,instanceId:'dom-1'},
-    {...value,sourceFile:'src/data/config.ts'},{...value,componentId:''}]) assert.equal(check('componentReferenceProposal')(invalid),false)
+    {...value,sourceFile:'src/data/config.ts'},{...value,componentId:''},{...value,componentId:'profile_card'},
+    {...value,sourceFile:'src/components/NUL.vue'}]) assert.equal(check('componentReferenceProjection')(invalid),false)
+  const selection={componentId:value.componentId,versionId:id,sourceDigest:'sha256:'+'a'.repeat(64)}
+  assert.equal(check('componentSelection')(selection),true)
+  for(const invalid of [{...selection,sourceFile:value.sourceFile},{...selection,instanceId:'dom-1'},
+    {...selection,componentId:'profile-card\n'},{...selection,sourceDigest:'sha256:bad'}]) assert.equal(check('componentSelection')(invalid),false)
 })
 test('additive routes require authenticated session, POST CSRF and normal errors',async () => {
   const patch=await load('../../../contracts/edit/openapi.patch.json')

@@ -26,13 +26,22 @@
         "source": {"$ref": "#/$defs/storedSource"}
       }
     },
-    "componentReferenceProposal": {
-      "description": "D12-B integration proposal only. Not accepted by the CHAT edit endpoint until mapping validation is integrated.",
+    "componentReferenceProjection": {
+      "description": "Identity projection of the D12-B trusted resolution result. Never client authorization; CHAT does not accept this object.",
       "type": "object", "additionalProperties": false, "required": ["componentId", "sourceFile", "versionId"],
       "properties": {
-        "componentId": {"type": "string", "pattern": "^[A-Za-z0-9:_-]{1,128}$"},
-        "sourceFile": {"type": "string", "maxLength": 240, "pattern": "^src/(?:pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue$"},
-        "versionId": {"type": "string", "format": "uuid"}
+        "componentId": {"type": "string", "maxLength": 64, "pattern": "^(?![\\s\\S]*\\s)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+        "sourceFile": {"type": "string", "maxLength": 240, "pattern": "^(?![\\s\\S]*\\s)src/(?:pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue$", "not": {"pattern": "/(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Nn][Ii][Nn]|[Cc][Oo][Nn][Oo][Uu][Tt]|[Cc][Oo][Mm][0-9]+|[Ll][Pp][Tt][0-9]+)\\.vue$"}},
+        "versionId": {"type": "string", "minLength": 36, "maxLength": 36, "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"}
+      }
+    },
+    "componentSelection": {
+      "description": "D12-B untrusted client selection shape for a future component endpoint. sourceFile comes only from trusted frozen mapping.",
+      "type": "object", "additionalProperties": false, "required": ["componentId", "versionId", "sourceDigest"],
+      "properties": {
+        "componentId": {"type": "string", "maxLength": 64, "pattern": "^(?![\\s\\S]*\\s)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+        "versionId": {"type": "string", "minLength": 36, "maxLength": 36, "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+        "sourceDigest": {"type": "string", "minLength": 71, "maxLength": 71, "pattern": "^sha256:[a-f0-9]{64}$"}
       }
     }
   }
