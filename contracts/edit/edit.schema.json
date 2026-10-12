@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeless.dev/contracts/edit/edit.schema.json",
+  "$defs": {
+    "chatSource": {
+      "type": "object", "additionalProperties": false, "required": ["type"],
+      "properties": {"type": {"const": "CHAT"}, "messageId": {"type": "string", "pattern": "^[A-Za-z0-9._:-]{1,128}$"}}
+    },
+    "storedSource": {
+      "type": "object", "additionalProperties": false, "required": ["type"],
+      "properties": {"type": {"const": "CHAT"}, "messageId": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9._:-]{1,128}$"}}
+    },
+    "request": {
+      "type": "object", "additionalProperties": false, "required": ["baseVersionId", "prompt", "source"],
+      "properties": {
+        "baseVersionId": {"type": "string", "format": "uuid"},
+        "prompt": {"type": "string", "minLength": 1, "maxLength": 8000, "pattern": "\\S"},
+        "source": {"$ref": "#/$defs/chatSource"}
+      }
+    },
+    "response": {
+      "type": "object", "additionalProperties": false, "required": ["task", "baseVersionId", "source"],
+      "properties": {
+        "task": {"$ref": "../schemas/v0/task.schema.json"},
+        "baseVersionId": {"type": "string", "format": "uuid"},
+        "source": {"$ref": "#/$defs/storedSource"}
+      }
+    },
+    "componentReferenceProposal": {
+      "description": "D12-B integration proposal only. Not accepted by the CHAT edit endpoint until mapping validation is integrated.",
+      "type": "object", "additionalProperties": false, "required": ["componentId", "sourceFile", "versionId"],
+      "properties": {
+        "componentId": {"type": "string", "pattern": "^[A-Za-z0-9:_-]{1,128}$"},
+        "sourceFile": {"type": "string", "maxLength": 240, "pattern": "^src/(?:pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue$"},
+        "versionId": {"type": "string", "format": "uuid"}
+      }
+    }
+  }
+}
