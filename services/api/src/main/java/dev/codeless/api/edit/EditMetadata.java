@@ -8,7 +8,10 @@ import tools.jackson.databind.json.JsonMapper;
 /** Server-authored, transactionally persisted first event. Never parse prompts or tool logs as metadata. */
 public final class EditMetadata {
     public static final String PREFIX = "Edit accepted v1 ";
-    public record Source(String type, String messageId) {}
+    @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+    public record Source(String type, String messageId,String componentId,UUID versionId,String sourceDigest,String sourceFile) {
+        public Source(String type,String messageId) {this(type,messageId,null,null,null,null);}
+    }
     public record Link(UUID baseVersionId, Source source) {}
     private static final JsonMapper JSON = JsonMapper.builder().build();
     private EditMetadata() {}

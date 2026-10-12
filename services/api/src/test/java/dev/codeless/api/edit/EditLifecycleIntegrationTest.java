@@ -281,7 +281,7 @@ class EditLifecycleIntegrationTest extends PostgresTestBase {
         jdbc.sql("UPDATE applications SET latest_ready_version_id=? WHERE id=?").params(current,app).update();
         report("commit-conflict",Map.of("taskId",task,"expectedBaseVersionId",current,"actualCurrentVersionId",base,"failureCode",view.failureCode(),"candidateStatus","FAILED"));
     }
-    @Test @Order(8) void recordRuntimeModelUsageSeparatelyWithoutInventedTokens() throws Exception {
+    @Test @Order(12) void recordRuntimeModelUsageSeparatelyWithoutInventedTokens() throws Exception {
         var calls=jdbc.sql("""
                 SELECT m.task_id,m.stage,m.provider,m.status,m.input_tokens,m.output_tokens FROM model_calls m
                 JOIN generation_tasks t ON t.id=m.task_id WHERE t.application_id=? ORDER BY m.created_at,m.id
@@ -293,5 +293,72 @@ class EditLifecycleIntegrationTest extends PostgresTestBase {
         assertThat(calls).isNotEmpty();assertThat(calls).allSatisfy(row -> assertThat(row.get("provider")).isEqualTo("deterministic-mock"));
         report("runtime-usage",Map.of("provider","deterministic-mock","requests",calls.size(),"paidModelRequests",0,
                 "inputTokens","UNKNOWN","outputTokens","UNKNOWN","totalTokens","UNKNOWN","usageSource","persisted model_calls","calls",calls));
+    }
+    @Test @Order(9) void componentSidecarApiScopesOwnershipVersionsAndNewDraftInRealChain() throws Exception {
+        String digest=jdbc.sql("SELECT source_digest FROM application_versions WHERE id=?").param(current).query(String.class).single();
+        var manifestResponse=get("versions/"+current+"/component-mapping",login);assertThat(manifestResponse.statusCode()).as(manifestResponse.body()).isEqualTo(200);
+        var manifest=json.readTree(manifestResponse.body());
+        assertThat(manifest.path("components").size()).isEqualTo(2);
+        assertThat(new LocalVolumeSnapshotStore(Path.of("target/edit-integration/versions")).componentMapping(current,digest)).isEqualTo(manifest);
+        var selection=Map.of("versionId",current,"sourceDigest",digest,"componentId","profile-card");
+        String route="versions/"+current+"/component-selection";
+        var resolved=post(route,selection,null,login,true);assertThat(resolved.statusCode()).as(resolved.body()).isEqualTo(200);
+        var selected=json.readTree(resolved.body());assertThat(selected.path("sourceFile").asText()).isEqualTo("src/components/ProfileCard.vue");
+        assertThat(selected.path("shared").asBoolean()).isTrue();assertThat(selected.path("scope").asText()).isEqualTo("SOURCE_FILE");
+        assertThat(get("versions/"+current+"/component-mapping",other).statusCode()).isEqualTo(404);
+        assertThat(post(route,selection,null,login,false).statusCode()).isEqualTo(403);
+        assertThat(post(route,selection,null,null,false).statusCode()).isEqualTo(401);
+        var forged=new LinkedHashMap<String,Object>(selection);forged.put("sourceFile","src/pages/HomePage.vue");
+        assertThat(post(route,forged,null,login,true).statusCode()).isEqualTo(400);
+        var stale=new LinkedHashMap<String,Object>(selection);stale.put("versionId",base);
+        assertThat(json.readTree(post(route,stale,null,login,true).body()).path("reason").asText()).isEqualTo("VERSION_MISMATCH");
+        var body=Map.of("baseVersionId",current,"prompt","修改共享资料介绍","selection",selection);
+        String edits="applications/"+app+"/component-edits";
+        assertThat(post(edits,body,null,other,true).statusCode()).isEqualTo(404);
+        var wrong=new LinkedHashMap<String,Object>(selection);wrong.put("sourceDigest","sha256:"+"0".repeat(64));
+        assertThat(post(edits,Map.of("baseVersionId",current,"prompt","bad digest","selection",wrong),null,login,true).statusCode()).isEqualTo(409);
+        UUID task=task(post(edits,body,"component-12",login,true));assertThat(task(post(edits,body,"component-12",login,true))).isEqualTo(task);
+        var claimed=claim(task);stage(claimed,TaskStatus.PLAN,TaskStatus.GENERATE);stage(claimed,TaskStatus.GENERATE,TaskStatus.VERIFY);
+        var candidate=draft(task);UUID next=UUID.fromString(candidate.path("versionId").asText());
+        assertThat(next).isNotEqualTo(current);
+        assertThat(snapshots.readSource(next,candidate.path("sourceDigest").asText(),"src/pages/HomePage.vue"))
+                .isEqualTo(snapshots.readSource(current,digest,"src/pages/HomePage.vue"));
+        stage(claimed,TaskStatus.VERIFY,TaskStatus.READY);
+        assertThat(snapshots.componentMapping(next,candidate.path("sourceDigest").asText()).path("versionId").asText()).isEqualTo(next.toString());
+        assertThat(post(edits,body,null,login,true).statusCode()).isEqualTo(409); // stale base never auto-rebased
+        assertThat(snapshots.componentMapping(current,digest)).isEqualTo(manifest);
+        assertThat(jdbc.sql("SELECT count(*) FROM publications WHERE application_id=?").param(app).query(Integer.class).single()).isZero();
+        report("component-api",Map.of("manifest",manifest,"selection",selected,"baseVersionId",current,"versionId",next,"taskId",task,
+                "realPostgresDockerChromium",true,"publications",0));current=next;
+    }
+    @Test @Order(10) void sidecarCorruptionCannotCreateAnEditTask() throws Exception {
+        String digest=jdbc.sql("SELECT source_digest FROM application_versions WHERE id=?").param(current).query(String.class).single();
+        Path sidecar=Path.of("target/edit-integration/versions").resolve(current.toString()).resolve("outcome/component-mapping.json");
+        byte[] saved=Files.readAllBytes(sidecar);
+        int before=jdbc.sql("SELECT count(*) FROM generation_tasks WHERE application_id=?").param(app).query(Integer.class).single();
+        try {
+            Files.writeString(sidecar,"{}");
+            assertThat(get("versions/"+current+"/component-mapping",login).statusCode()).isEqualTo(503);
+            var response=post("applications/"+app+"/component-edits",Map.of("baseVersionId",current,"prompt","must not create",
+                    "selection",Map.of("versionId",current,"sourceDigest",digest,"componentId","profile-card")),null,login,true);
+            assertThat(response.statusCode()).isEqualTo(503);
+            assertThat(json.readTree(response.body()).path("code").asText()).isEqualTo("MAPPING_TAMPERED");
+            assertThat(jdbc.sql("SELECT count(*) FROM generation_tasks WHERE application_id=?").param(app).query(Integer.class).single()).isEqualTo(before);
+        } finally {Files.write(sidecar,saved);}
+    }
+    @Test @Order(11) void modelCannotWidenSelectedComponentScope() throws Exception {
+        String digest=jdbc.sql("SELECT source_digest FROM application_versions WHERE id=?").param(current).query(String.class).single();
+        UUID task=task(post("applications/"+app+"/component-edits",Map.of("baseVersionId",current,"prompt","修改父页",
+                "selection",Map.of("versionId",current,"sourceDigest",digest,"componentId","home-page")),null,login,true));
+        var claimed=claim(task);stage(claimed,TaskStatus.PLAN,TaskStatus.GENERATE);
+        // The named deterministic mock proposes ProfileCard.vue. Only HomePage.vue
+        // was selected; the real coordinator must reject before tools mutate it.
+        var failed=stage(claimed,TaskStatus.GENERATE,TaskStatus.FAILED);
+        assertThat(failed.failureCode()).isEqualTo("COMPONENT_SCOPE_REJECTED");
+        assertThat(journal.read(task).stream().filter(e -> "tool.result".equals(e.path("kind").asText())).count()).isZero();
+        assertThat(apps.find(owner,app).orElseThrow().latestReadyVersionId()).isEqualTo(current);
+        assertThat(snapshots.componentMapping(current,digest).path("versionId").asText()).isEqualTo(current.toString());
+        report("component-scope",Map.of("taskId",task,"failureCode",failed.failureCode(),"selectedSourceFile","src/pages/HomePage.vue",
+                "proposedSourceFile","src/components/ProfileCard.vue","mutatingToolResults",0,"latestReadyVersionId",current));
     }
 }

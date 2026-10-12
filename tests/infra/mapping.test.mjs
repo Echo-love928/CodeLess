@@ -7,4 +7,5 @@ const image = spawnSync('docker', ['build', '--file', 'infra/build-image/Dockerf
 if (image.error) throw image.error
 if (image.status !== 0) throw new Error(`trusted mapping image build exited ${image.status ?? 'unknown'}`)
 await import('../runner/mapping/contracts.test.mjs')
+await import('../runner/mapping/integration-contracts.test.mjs')
 await import('../runner/mapping/acceptance.test.mjs')

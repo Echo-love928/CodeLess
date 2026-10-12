@@ -25,6 +25,15 @@ public class EditTaskService {
     public View create(UUID owner, UUID app, UUID base, String prompt, EditMetadata.Source source, String key) {
         jdbc.sql("SELECT id FROM applications WHERE id=? AND owner_id=? FOR UPDATE").params(app,owner)
                 .query(UUID.class).optional().orElseThrow(() -> new AuthFailure(HttpStatus.NOT_FOUND,"NOT_FOUND"));
+        if("COMPONENT".equals(source.type())) {
+            // Resolve before task creation under the same ownership/base lock. No client path is used.
+            String digest=jdbc.sql("SELECT source_digest FROM application_versions WHERE id=? AND application_id=? AND status='VERIFIED'")
+                    .params(base,app).query(String.class).optional().orElseThrow(() -> new AuthFailure(HttpStatus.CONFLICT,"EDIT_BASE_UNAVAILABLE"));
+            if(!base.equals(source.versionId())) throw new AuthFailure(HttpStatus.CONFLICT,"VERSION_MISMATCH");
+            var selected=dev.codeless.api.mapping.ComponentMapping.select(snapshots.componentMapping(base,digest),source.versionId(),source.sourceDigest(),source.componentId());
+            if(!selected.path("selectable").asBoolean()) throw new AuthFailure(HttpStatus.CONFLICT,selected.path("reason").asText());
+            source=new EditMetadata.Source("COMPONENT",null,source.componentId(),base,digest,selected.path("sourceFile").asText());
+        }
         var link=new EditMetadata.Link(base,source);
         if(key!=null) {
             var prior=jdbc.sql("SELECT id FROM generation_tasks WHERE application_id=? AND idempotency_key=?")
