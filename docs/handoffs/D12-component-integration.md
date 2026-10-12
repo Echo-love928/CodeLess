@@ -69,5 +69,36 @@ EMPTY_AT_FAILURE/ENTRIES_AT_FAILURE/ALREADY_ABSENT 等状态、相对路径和�
 
 ## 最终门禁 / PR / 同伴审查
 
-待运行最终完整门禁；待创建最终启用草稿PR并读取精确HEAD Checks。
+源码26777392e90c7ea7b75fdd48d6d03c9f18fc4535上Windows完整四阶段 native exit0：static
+契约11/11、UI69/69及生产构建；API188/188、0failure/error/skip；runner63/63；E2E42/42。
+原生记录 `.local-data/d12-b/runs/2026-10-12T11-37-32.969Z-gate-6ee8a6ac-d67a-4b70-af34-2ba66ba16f54`。
+Gate启动时只有保留的未跟踪.idea，运行时代码干净。生成的D10及旧版本fixture截图另存
+`.local-data/d12-b/generated-integration-evidence`后恢复原文件；不提交其他任务的截图更新。
+该轮A+B lifecycle为11/11，新增组件scope实际在调用工具前拒绝另一文件；SQL账单19次mock请求，
+token UNKNOWN、paid0；这仅为该类本轮，不冒充所有历史/整个API累计，见runtime-api-usage.json。
+
+最终启用[草稿PR37](https://github.com/Echo-love928/CodeLess/pull/37)，已附加本任务。
+267的[CI run38243979877](https://github.com/Echo-love928/CodeLess/actions/runs/38243979877)为static、API
+188/188、E2E42/42、infra success；runner62/63失败，汇总ci-gate失败。唯一失败为既有D07-B-T3：
+容器ExitCode137、OOMKilled=false、timedOut=false，分类BUILD_EXIT。所有D12映射/联调契约已通过。
+不能将本机通过替代该真实CI失败；原始job日志保留integration-runner-first-ci.log，API日志保留
+integration-api-ci.log。当前main两端仍f67a7d；PR36a348修复六项CI已success，已请求原审查者
+yuanqizuimeng重新审查，仍CHANGES_REQUESTED，不算批准。
+
+为当前门禁实际失败扩大最小范围到runner OOM证据及对应tests/runner/build/infra入口。Docker
+OOM和exit由独立事件处理（[官方源码](https://github.com/moby/moby/blob/master/daemon/monitor.go)）；
+这是时序缺口的依据，**尚不能证明267 CI确切根因就是该时序**。本机3次状态/事件对照均是真实
+OOMKilled=true、有同容器OOM事件，没有重现false；诊断记录oom-diagnostic.log/.exit，exit0。
+
+补充137且非timeout/inspect=false时，有界查询同一完整容器ID的Docker OOM事件历史；若观察
+到可信OOM事件，再inspect实际最终状态，须ExitCode一致且OOMKilled=true才判OOM。保留首次
+false及最终true；无事件仍BUILD_EXIT、事件查询失败记UNAVAILABLE，绝不将137直接判OOM，
+不重试构建、不改资源/断言/隔离。事件属性（含宿主路径）不进入报告。
+首轮反例错误地向namespace PID1自身发SIGKILL，其被Linux忽略，真实exit0/ARTIFACT_INVALID，
+runner65/66、exit1保留。改用真实子进程SIGKILL并由PID1传播137，随后完整runner66/66、exit0，
+包括原真实cgroup OOM、普通137反例、同容器事件/未知/截断/伪造事件回归。日志分别为
+integration-runner-oom-fix.log/.exit 和 integration-runner-oom-fixed.log/.exit。
+该修正后候选远端六项Checks须另行读取，不沿用267的任何成功/失败；不宣称历史原生Windows
+故障或CI未观测OOM根因已根治。
+
 同伴批准必须由独立审查者针对最终候选给出，作者不能替代；仍禁止合并/推main。

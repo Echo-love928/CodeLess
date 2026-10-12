@@ -88,6 +88,16 @@ test('D07-B-T3: real cgroup OOM is distinguished from timeout and compiler failu
   await evidence('D07-B-T3', result)
 })
 
+test('real child SIGKILL propagated as exit 137 without a Docker OOM event stays BUILD_EXIT', { timeout: 30000 }, async () => {
+  const result = await (await runner())(fixture('kill'))
+  assert.equal(result.failure, 'BUILD_EXIT', JSON.stringify(result))
+  assert.equal(result.oomKilled, false)
+  assert.equal(result.exitCode, 137)
+  assert.equal(result.timedOut, false)
+  assert.deepEqual(result.oomEvidence, { status: 'NO_OOM_EVENT', events: [] })
+  await evidence('D12-integration-SIGKILL', result)
+})
+
 test('D07-B-T4: actual network, secrets, socket, root and input writes denied', { timeout: 30000 }, async () => {
   const prior = process.env.CODELESS_MODEL_API_KEY
   process.env.CODELESS_MODEL_API_KEY = 'd07-host-secret-must-stay-on-host'

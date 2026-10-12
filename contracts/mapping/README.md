@@ -1,7 +1,8 @@
 # D12-B 组件标识与版本化源码映射
 
-这是受控 Vue 构建的内部协议。公共 HTTP/OpenAPI、API 存储和平台 UI 未扩展。
-协议、生成器及真实构建/浏览器验收由本卡交付；D12-A 并发修改任务与最终功能启用由对应维护者接线。
+这是受控 Vue 构建的内部协议。B 独立 PR36 交付协议与生成器；最终启用 PR37 在独立集成分支
+完成 sidecar/API/UI 和公共 OpenAPI 接线。当前集成行为、验收和剩余阻塞见
+`docs/handoffs/D12-component-integration.md`；以下 producer/resolver 信任边界保持不变。
 
 ## 稳定标识
 

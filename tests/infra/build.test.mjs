@@ -9,4 +9,5 @@ if (image.error) throw image.error
 if (image.status !== 0) throw new Error(`trusted Vue image build exited ${image.status ?? 'unknown'}`)
 
 await import('../runner/build/acceptance.test.mjs')
+await import('../runner/build/oom-evidence.test.mjs')
 await import('../runner/build/promotion.test.mjs')
