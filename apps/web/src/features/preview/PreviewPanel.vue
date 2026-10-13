@@ -1,23 +1,16 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { ApiError } from '../../api/http'
 import { getPreviewCredential, type PreviewCredential } from './preview-api'
-import ComponentEditor from '../mapping/ComponentEditor.vue'
-import type { Candidate } from '../mapping/component-api'
+import VisualEditSelector from '../visual-edit/VisualEditSelector.vue'
 
 const props = defineProps<{ applicationId: string; versionId?: string | null; buildFailed?: boolean; refreshVersion?: () => Promise<void> }>()
 const emit = defineEmits<{ unauthorized: [] }>()
 const frame = ref<HTMLIFrameElement>()
 const credential = ref<PreviewCredential | null>(null)
+const previewOrigin = computed(() => credential.value ? new URL(credential.value.url).origin : '')
 const state = ref<'empty' | 'loading' | 'ready' | 'expired' | 'error'>('empty')
 const error = ref('')
-const componentAvailable = ref(false)
-const selecting = ref(false)
-const candidate = ref<Candidate | null>(null)
-function selectionMode() {
-  candidate.value = null
-  if (credential.value) frame.value?.contentWindow?.postMessage({ type: 'codeless-component-mode', enabled: selecting.value }, new URL(credential.value.url).origin)
-}
 let generation = 0
 let abort: AbortController | undefined
 let expiry: ReturnType<typeof setTimeout> | undefined
@@ -27,7 +20,6 @@ function dispose() {
   generation++; abort?.abort()
   clearTimeout(expiry); clearTimeout(loadTimeout)
   credential.value = null
-  componentAvailable.value = false; selecting.value = false; candidate.value = null
 }
 async function load() {
   dispose()
@@ -63,13 +55,8 @@ async function load() {
 function message(event: MessageEvent) {
   if (!credential.value || event.source !== frame.value?.contentWindow ||
       event.origin !== new URL(credential.value.url).origin) return
-  if (event.data?.type === 'codeless-component' && selecting.value && state.value === 'ready') {
-    if (event.data.versionId === props.versionId && typeof event.data.sourceDigest === 'string' && (event.data.componentId === null || typeof event.data.componentId === 'string'))
-      candidate.value = { versionId: event.data.versionId, sourceDigest: event.data.sourceDigest, componentId: event.data.componentId }
-    return
-  }
   if (event.data?.type !== 'codeless-preview') return
-  if (event.data.state === 'loaded') { clearTimeout(loadTimeout); state.value = 'ready'; selectionMode() }
+  if (event.data.state === 'loaded') { clearTimeout(loadTimeout); state.value = 'ready' }
   if (event.data.state === 'unavailable') {
     clearTimeout(loadTimeout); credential.value = null; state.value = 'error'
     error.value = '预览凭据失效或产物不可用，请刷新预览。'
@@ -101,18 +88,17 @@ onBeforeUnmount(() => { dispose(); window.removeEventListener('message', message
     <p v-if="state === 'loading'" class="preview-panel__message" role="status">正在加载已验证版本…</p>
     <p v-if="state === 'expired'" class="preview-panel__message" role="status">预览访问已过期，请刷新预览。</p>
     <p v-if="state === 'error'" class="preview-panel__message" role="alert">{{ error }}</p>
-    <label v-if="state === 'ready'" class="component-mode"><input v-model="selecting" type="checkbox" :disabled="!componentAvailable" @change="selectionMode" />选择组件进行修改</label>
     <iframe v-if="credential" ref="frame" :key="credential.url" :src="credential.url" title="当前版本预览"
       sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"
       allow="camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'; clipboard-read 'none'; clipboard-write 'none'"
       :class="{ 'preview-panel__frame--loading': state === 'loading' }" />
-    <ComponentEditor v-if="state === 'ready'" :application-id="applicationId" :version-id="versionId" :candidate="candidate" @available="componentAvailable = $event" @unauthorized="emit('unauthorized')" />
+    <VisualEditSelector v-if="credential" :key="credential.url" :application-id="applicationId" :version-id="credential.versionId"
+      :origin="previewOrigin" :frame="frame" :active="state === 'ready'" @unauthorized="emit('unauthorized')" />
   </div>
 </template>
 
 <style scoped>
 .preview-panel { width: 100%; min-height: 430px; background: white; }
-.component-mode { display: block; padding: 10px 16px; font-size: 13px; }
 .preview-panel__controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #e1e5ec; color: #687384; font-size: 12px; overflow-wrap: anywhere; }
 .preview-panel__controls button { flex-shrink: 0; }
 .preview-panel__message { padding: 56px 20px; color: #687384; text-align: center; font-size: 14px; }
