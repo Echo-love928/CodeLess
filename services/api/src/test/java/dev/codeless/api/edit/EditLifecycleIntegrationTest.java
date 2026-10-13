@@ -5,6 +5,7 @@ import dev.codeless.api.agent.*;
 import dev.codeless.api.apps.ApplicationService;
 import dev.codeless.api.data.*;
 import dev.codeless.api.data.PlatformModels.*;
+import dev.codeless.api.model.*;
 import dev.codeless.api.tasks.*;
 import dev.codeless.api.tools.*;
 import dev.codeless.api.versions.*;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.annotation.DirtiesContext;
@@ -49,6 +51,12 @@ class EditLifecycleIntegrationTest extends PostgresTestBase {
     @Autowired AgentRunStore store;
     @Autowired FileToolService tools;
     @Autowired SnapshotStore snapshots;
+    @Autowired ModelCallRepository modelCalls;
+    @Autowired ModelCallAudit modelAudit;
+    @Autowired PlanValidator planValidator;
+    @Autowired FileToolRegistry fileRegistry;
+    @Autowired BuildGateway buildGateway;
+    @Autowired AgentEvidence agentEvidence;
     final JsonMapper json=JsonMapper.builder().build();
     final HttpClient http=HttpClient.newHttpClient();
     record Login(String cookie,String csrf) {}
@@ -281,7 +289,103 @@ class EditLifecycleIntegrationTest extends PostgresTestBase {
         jdbc.sql("UPDATE applications SET latest_ready_version_id=? WHERE id=?").params(current,app).update();
         report("commit-conflict",Map.of("taskId",task,"expectedBaseVersionId",current,"actualCurrentVersionId",base,"failureCode",view.failureCode(),"candidateStatus","FAILED"));
     }
-    @Test @Order(8) void recordRuntimeModelUsageSeparatelyWithoutInventedTokens() throws Exception {
+    // Explicit provider fixture only; leases, PostgreSQL, filesystem, build and browser remain real.
+    AgentLoop deletionLoop(String mode) {
+        ModelProvider provider=new ModelProvider() {
+            final MockModelProvider delegate=new MockModelProvider();
+            public String id(){return "deterministic-mock";}
+            public String model(){return "d12-delete-"+mode+"-fixture";}
+            public Reply call(Prompt prompt,int max,java.time.Duration timeout) {
+                var input=json.readTree(prompt.getUserMessage().getText());
+                Object reply;
+                if(!input.path("phase").asText().equals("GENERATE")) {
+                    var plan=(tools.jackson.databind.node.ObjectNode)json.readTree(delegate.call(prompt,max,timeout).content());
+                    if(!mode.equals("retained-in-plan")) {
+                        var finalFiles=json.createArrayNode();
+                        plan.path("files").forEach(f -> {if(!f.path("path").asText().equals("src/components/ProfileCard.vue"))finalFiles.add(f);});
+                        plan.set("files",finalFiles);
+                        plan.set("components",json.createArrayNode());
+                    }
+                    reply=plan;
+                } else {
+                    int observed=input.path("observations").size();
+                    var source=input.path("editContext").path("sourceFiles");
+                    if(observed==0 && !mode.equals("missing-delete")) {
+                        String path=switch(mode) {
+                            case "unplanned" -> "src/components/Outside.vue";
+                            case "traversal" -> "../host-secret";
+                            default -> "src/components/ProfileCard.vue";
+                        };
+                        String digest=source.valueStream().filter(f -> f.path("path").asText().equals("src/components/ProfileCard.vue"))
+                                .findFirst().orElseThrow().path("digest").asText();
+                        String name=mode.equals("create-excluded-base")?"files.create":mode.equals("valid")?"files.read":"files.delete";
+                        Object arguments=name.equals("files.create")?Map.of("path",path,"content","<template>forbidden</template>"):
+                                name.equals("files.read")?Map.of("path",path):Map.of("path",path,"expectedDigest",mode.equals("wrong-digest")?"sha256:"+"0".repeat(64):digest);
+                        reply=Map.of("type","tool","name",name,"arguments",arguments);
+                    } else if(mode.equals("valid") && observed==1) {
+                        reply=Map.of("type","tool","name","files.delete","arguments",Map.of("path","src/components/ProfileCard.vue",
+                                "expectedDigest",input.path("observations").get(0).path("afterDigest").asText()));
+                    } else if(observed==(mode.equals("valid")?2:mode.equals("missing-delete")?0:1)) {
+                        String digest=source.valueStream().filter(f -> f.path("path").asText().equals("src/pages/HomePage.vue"))
+                                .findFirst().orElseThrow().path("digest").asText();
+                        reply=Map.of("type","tool","name","files.update","arguments",Map.of("path","src/pages/HomePage.vue","expectedDigest",digest,
+                                "content","<template><main><h1 data-testid=\"profile-name\">Component removed</h1></main></template>"));
+                    } else reply=Map.of("type","done","actions",List.of(Map.of("type","navigate","path","/"),
+                            Map.of("type","expectText","target",Map.of("testId","profile-name"),"value","Component removed")));
+                }
+                // Synthetic fixture counters allow several operations within the original
+                // budget. These are explicitly not measured model tokens or quality evidence.
+                return new Reply(json.writeValueAsString(reply),new Evidence(model(),"explicit-delete-fixture","explicit-delete-fixture",new Usage(31,17,48,null)));
+            }
+        };
+        return new AgentLoop(store,new AgentModel(provider,modelCalls,modelAudit,store),planValidator,fileRegistry,tools,buildGateway,agentEvidence,false);
+    }
+    @Test @Order(8) void deletionCannotExpandPermissionsOrRelaxFinalSnapshotEquality() throws Exception {
+        var results=new ArrayList<Object>();
+        for(String mode:List.of("unplanned","traversal","create-excluded-base","wrong-digest","retained-in-plan","missing-delete")) {
+            UUID task=task(edit(current,"删除组件失败边界 "+mode,null));var claim=claim(task);var deleting=deletionLoop(mode);
+            var plan=deleting.execute(claim,TaskStatus.PLAN);assertThat(plan.next()).isEqualTo(TaskStatus.GENERATE);
+            deleting.advance(queue,claim,plan,EventType.STAGE_STARTED);
+            var generated=deleting.execute(claim,TaskStatus.GENERATE);
+            String code=switch(mode) {
+                case "wrong-digest" -> "FILE_DIGEST_CONFLICT";
+                case "retained-in-plan","missing-delete" -> "AGENT_PLAN_FILES_MISMATCH";
+                default -> "AGENT_UNPLANNED_FILE";
+            };
+            assertThat(generated.next()).as(mode).isEqualTo(TaskStatus.FAILED);assertThat(generated.failureCode()).as(mode).isEqualTo(code);
+            deleting.advance(queue,claim,generated,EventType.TASK_FAILED);
+            assertThat(journal.read(task)).noneMatch(e -> e.path("kind").asText().equals("draft"));
+            if(Set.of("unplanned","traversal","create-excluded-base").contains(mode))
+                assertThat(journal.read(task)).noneMatch(e -> e.path("kind").asText().equals("tool.result"));
+            assertThat(apps.find(owner,app).orElseThrow().latestReadyVersionId()).isEqualTo(current);
+            assertThat(get("versions/"+current+"/files/content?path=src/components/ProfileCard.vue",login).statusCode()).isEqualTo(200);
+            results.add(Map.of("mode",mode,"taskId",task,"failureCode",code,"noDraft",true));
+        }
+        report("delete-boundaries",results);
+    }
+    @Test @Order(9) void deletingExistingFileCreatesVerifiedNewVersionAndPreservesBase() throws Exception {
+        UUID previous=current;var before=json.readTree(get("versions/"+previous+"/snapshot",login).body());
+        var original=json.readTree(get("versions/"+previous+"/files/content?path=src/components/ProfileCard.vue",login).body());
+        UUID task=task(edit(previous,"删除 ProfileCard 及其引用",null));var claim=claim(task);var deleting=deletionLoop("valid");
+        for(TaskStatus stage:List.of(TaskStatus.PLAN,TaskStatus.GENERATE,TaskStatus.VERIFY)) {
+            var result=deleting.execute(claim,stage);
+            assertThat(result.next()).as("%s %s",stage,result.failureCode()).isEqualTo(switch(stage){case PLAN->TaskStatus.GENERATE;case GENERATE->TaskStatus.VERIFY;default->TaskStatus.READY;});
+            deleting.advance(queue,claim,result,result.next()==TaskStatus.READY?EventType.STAGE_COMPLETED:EventType.STAGE_STARTED);
+            if(stage==TaskStatus.GENERATE) {
+                assertThat(apps.find(owner,app).orElseThrow().latestReadyVersionId()).isEqualTo(previous);
+                assertThat(json.readTree(get("versions/"+draft(task).path("versionId").asText(),login).body()).path("status").asText()).isEqualTo("DRAFT");
+            }
+        }
+        current=UUID.fromString(draft(task).path("versionId").asText());assertThat(current).isNotEqualTo(previous);
+        assertThat(snapshots.source(current,draft(task).path("sourceDigest").asText()).manifest().files()).extracting(SnapshotStore.Entry::path).containsExactly("src/pages/HomePage.vue");
+        assertThat(get("versions/"+current+"/files/content?path=src/components/ProfileCard.vue",login).statusCode()).isEqualTo(404);
+        assertThat(json.readTree(get("versions/"+previous+"/snapshot",login).body())).isEqualTo(before);
+        assertThat(json.readTree(get("versions/"+previous+"/files/content?path=src/components/ProfileCard.vue",login).body())).isEqualTo(original);
+        assertThat(jdbc.sql("SELECT count(*) FROM publications WHERE application_id=?").param(app).query(Integer.class).single()).isZero();
+        report("delete-existing",Map.of("baseVersionId",previous,"versionId",current,"taskId",task,"baseUnchanged",true,
+                "realPostgresDockerChromium",true,"snapshot",json.readTree(get("versions/"+current+"/snapshot",login).body()),"publications",0));
+    }
+    @Test @Order(10) void recordRuntimeModelUsageSeparatelyWithoutInventedTokens() throws Exception {
         var calls=jdbc.sql("""
                 SELECT m.task_id,m.stage,m.provider,m.status,m.input_tokens,m.output_tokens FROM model_calls m
                 JOIN generation_tasks t ON t.id=m.task_id WHERE t.application_id=? ORDER BY m.created_at,m.id
@@ -292,6 +396,6 @@ class EditLifecycleIntegrationTest extends PostgresTestBase {
                 }).list();
         assertThat(calls).isNotEmpty();assertThat(calls).allSatisfy(row -> assertThat(row.get("provider")).isEqualTo("deterministic-mock"));
         report("runtime-usage",Map.of("provider","deterministic-mock","requests",calls.size(),"paidModelRequests",0,
-                "inputTokens","UNKNOWN","outputTokens","UNKNOWN","totalTokens","UNKNOWN","usageSource","persisted model_calls","calls",calls));
+                "inputTokens","UNKNOWN","outputTokens","UNKNOWN","totalTokens","UNKNOWN","usageSource","persisted model_calls; deletion fixture reports synthetic 31/17/48 counters, not measurements","calls",calls));
     }
 }

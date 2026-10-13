@@ -22,12 +22,20 @@ if (Object.hasOwn(tests, mode)) {
   args = process.platform === 'win32' ? ['/d', '/c', 'services\\api\\mvnw.cmd', ...maven] : maven
 } else if (mode === 'contracts') {
   command = process.execPath; args = ['--test', 'tests/edit/lifecycle/contracts.test.mjs']
+} else if (mode === 'review-contracts') {
+  command = process.execPath; args = ['--test', 'tests/runner/mapping/contracts.test.mjs', 'tests/runner/mapping/integration-contracts.test.mjs', 'tests/runner/build/oom-evidence.test.mjs']
+} else if (mode === 'review-web') {
+  command = process.execPath; cwd = join(repo, 'apps/web')
+  args = [join(workspace, 'apps/web/node_modules/vitest/vitest.mjs'), 'run', 'src/features/mapping/ComponentEditor.test.ts', 'src/features/mapping/component-api.test.ts', 'src/features/preview/PreviewPanel.test.ts']
+} else if (['review-marker-case', 'review-marker-spread'].includes(mode)) {
+  command = process.execPath; cwd = workspace
+  args = ['tests/edit/lifecycle/review-B-marker-case.mjs', mode === 'review-marker-case' ? 'uppercase' : 'spread-dynamic']
 } else if (mode === 'gate') {
   command = process.execPath; args = ['scripts/ci-gate.mjs']
 } else if (mode === 'api') {
   command = process.platform === 'win32' ? (process.env.ComSpec ?? 'cmd.exe') : 'corepack'
   args = process.platform === 'win32' ? ['/d', '/c', 'corepack', 'pnpm', 'run', 'verify:api'] : ['pnpm', 'run', 'verify:api']
-} else throw new Error('Mode must be acceptance, cleanup-diagnostic, contracts, api or gate')
+} else throw new Error('Unknown fixed acceptance/review command mode')
 const env = { ...process.env, CODELESS_MODEL_PROVIDER: 'deterministic-mock' }
 for (const key of ['CODELESS_MODEL_API_KEY', 'CODELESS_MODEL_NAME', 'CODELESS_PLAYWRIGHT_CHANNEL']) delete env[key]
 const run = join(workspace, '.local-data/d12-a/runs', `${new Date().toISOString().replaceAll(':', '-')}-${mode}-${randomUUID()}`)
@@ -37,8 +45,10 @@ env.CODELESS_VERSION_PREVIEW_EVIDENCE_DIR = join(run, 'preview')
 const head = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' })
 if (head.status !== 0) throw new Error('Cannot record the tested Git HEAD')
 const changes = spawnSync('git', ['status', '--porcelain', '--', 'services/api/src/test', 'tests/edit/lifecycle'], { cwd: repo, encoding: 'utf8' })
+const sourceChanges = spawnSync('git', ['status', '--porcelain', '--', 'services/api/src/main', 'contracts/edit'], { cwd: repo, encoding: 'utf8' })
 const metadata = { mode, head: head.stdout.trim(), repository: relative(workspace, repo) || '.',
   uncommittedTestChanges: changes.status === 0 ? changes.stdout.trim().split('\n').filter(Boolean) : null,
+  uncommittedSourceChanges: sourceChanges.status === 0 ? sourceChanges.stdout.trim().split('\n').filter(Boolean) : null,
   command: [command, ...args], cwd: relative(workspace, cwd) || '.', startedAt: new Date().toISOString(), status: 'RUNNING', exitCode: null,
   signal: null, modelProvider: 'deterministic-mock', browserChannel: 'locked bundled Chromium' }
 function save() {

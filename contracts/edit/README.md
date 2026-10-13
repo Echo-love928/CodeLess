@@ -24,6 +24,8 @@ PLAN receives bounded immutable source as untrusted data and proposes the full r
 
 Cancellation/expiry retains task requirements/source and prior usable versions. A cancelled candidate can remain DRAFT, but is not usable/publishable and cannot receive a late READY write. Failed builds finalize FAILED and do not move latestReadyVersionId. No automatic publication.
 
+The plan file list is the **final snapshot**, not the complete set of permitted intermediate operations. During ordinary CHAT GENERATE, read/update/delete paths may come from either that plan or the trusted digest-checked immutable base; create paths must belong to the final plan. Deleted base files must be omitted from both final files and component declarations, with imports/usages removed. Final snapshot equality remains exact: forgotten deletions and deletion of a still-planned file fail `AGENT_PLAN_FILES_MISMATCH`. Model requests/source comments cannot add paths; paths outside both sets fail `AGENT_UNPLANNED_FILE`, and all existing tool path/digest/lease checks still apply. The final component enabling PR must retain its stricter server-resolved COMPONENT mutation boundary when integrating this CHAT fix.
+
 Filesystem/SQL are not one atomic resource. Seed failure/crash may leave a partial private workspace. Nonempty workspace or stage re-entry fails closed with operator recovery; no blind reseed/overwrite. No automatic cleanup or new privileges. The private workspace/snapshot roots must remain platform-owned across instances, as required by D08/D11.
 
 ## D12-B component integration boundary

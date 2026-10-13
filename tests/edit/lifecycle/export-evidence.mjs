@@ -5,13 +5,16 @@ import {resolve,join,relative} from 'node:path'
 import {fileURLToPath} from 'node:url'
 import {createHash} from 'node:crypto'
 const root=fileURLToPath(new URL('../../../',import.meta.url))
-const publicRoot=join(root,'tests/edit/lifecycle/evidence/2026-10-12')
+const date=process.argv[2]??'2026-10-12'
+assert.match(date,/^\d{4}-\d{2}-\d{2}$/)
+const publicRoot=join(root,'tests/edit/lifecycle/evidence',date)
 const privateRoot=join(root,'.local-data/d12-a/runs')
 const hash=bytes=>'sha256:'+createHash('sha256').update(bytes).digest('hex')
 await mkdir(publicRoot,{recursive:true})
 const runs=[]
 for(const name of (await readdir(privateRoot)).sort()) {
   const directory=join(privateRoot,name),meta=JSON.parse(await readFile(join(directory,'run.json'),'utf8'))
+  if(!meta.startedAt.startsWith(date))continue
   const log=await readFile(join(directory,'command.log'))
   if(meta.logDigest)assert.equal(hash(log),meta.logDigest)
   const matches=[...log.toString('utf8').matchAll(/Tests run: (\d+), Failures: (\d+), Errors: (\d+), Skipped: (\d+)/g)]
@@ -29,6 +32,8 @@ for(const name of ['D12-A-T1','D12-A-T2','D12-A-T3','D12-A-T4','boundaries','rea
   try {await copyFile(source,join(publicRoot,name+'.json'))}
   catch(error) {if(name==='runtime-usage'&&latest.mode==='acceptance'&&latest.junit?.tests===7)continue;throw error}
 }
+if(date>='2026-10-13')for(const name of ['delete-existing','delete-boundaries'])
+  await copyFile(join(evidence,name+'.json'),join(publicRoot,name+'.json'))
 const preview=JSON.parse(await readFile(join(publicRoot,'cancel-preview.json'),'utf8'))
 for(const item of preview.versions) {
   let found=false
