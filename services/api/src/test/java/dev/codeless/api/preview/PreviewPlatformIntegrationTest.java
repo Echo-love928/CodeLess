@@ -56,7 +56,7 @@ class PreviewPlatformIntegrationTest {
             assertThat(owned.await(java.time.Duration.ofSeconds(300))).isTrue();assertThat(owned.exitValue()).isZero();
         }
     }
-    protected String acceptanceScript(){return "../../tests/agent/repair/preview-platform-http-diagnostics.acceptance.mjs";}
+    protected String acceptanceScript(){return "../../tests/runner/mapping/platform.acceptance.mjs";}
     @Test void realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures() throws Exception {
         var builder=new ProcessBuilder("node",acceptanceScript()).directory(Path.of(".").toFile());
         var env=builder.environment();

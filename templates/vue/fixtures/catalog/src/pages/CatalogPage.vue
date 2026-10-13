@@ -14,7 +14,7 @@ const filtered = computed(() => items.filter((item) =>
 </script>
 
 <template>
-  <main><header><p>探索目录</p><h1>寻找下一次灵感</h1></header>
+  <main data-ai-component="catalog-page"><header><p>探索目录</p><h1>寻找下一次灵感</h1></header>
     <input v-model="query" type="search" aria-label="搜索目录" placeholder="搜索名称或描述">
     <nav aria-label="分类"><button v-for="name in ['全部','阅读','体验','出行']" :key="name" :aria-pressed="category === name" @click="category = name">{{ name }}</button></nav>
     <section aria-label="结果"><article v-for="item in filtered" :key="item.name"><small>{{ item.category }}</small><h2>{{ item.name }}</h2><p>{{ item.detail }}</p></article><p v-if="!filtered.length">没有匹配的结果</p></section>

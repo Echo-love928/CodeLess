@@ -48,11 +48,13 @@ public class TaskQueueService {
             Optional<Task> prior = jdbc.sql("SELECT id FROM generation_tasks WHERE application_id = ? AND idempotency_key = ?")
                     .params(applicationId, key).query(UUID.class).optional().flatMap(repository::findTask);
             if (prior.isPresent()) {
-                if (!prior.get().prompt().equals(prompt))
+                if (!prior.get().prompt().equals(prompt) || dev.codeless.api.edit.EditMetadata.find(jdbc,prior.get().id()).isPresent())
                     throw new AuthFailure(HttpStatus.CONFLICT, "IDEMPOTENCY_CONFLICT");
                 return TaskView.from(prior.get());
             }
         }
+        if (dev.codeless.api.edit.EditMetadata.active(jdbc,applicationId))
+            throw new AuthFailure(HttpStatus.CONFLICT, "EDIT_TASK_ACTIVE");
         return TaskView.from(repository.createTask(UUID.randomUUID(), applicationId, prompt, key));
     }
 

@@ -14,3 +14,10 @@ static data, explicit mock data, or browser LocalStorage.
 validates generated files and builds with Docker `--network none`. The runner
 service does not receive a Docker socket: this command is for a trusted host
 build worker until the runner orchestration contract is wired up.
+
+D12 component roots use a stable `data-ai-component` attribute. The fixed Vite
+configuration emits `ai-component-catalog.json` during every production build.
+The trusted mapping worker binds that catalog to the immutable source digest and
+server-selected version UUID. See `contracts/mapping/README.md` for shared-instance
+scope, disabled reasons and the version-sidecar integration boundary. Generated
+browser code cannot use the Node APIs typed in the trusted `src/build-node.d.ts`.

@@ -61,7 +61,12 @@ export function createPreviewGateway({ signingKeyHex, previewOrigin, platformOri
       let bytes = request.method === 'HEAD' ? undefined : Buffer.from(await upstream.arrayBuffer())
       if (bytes && name === 'index.html') {
         // Install before module/resources: window.load also fires after failed resources.
-        const bridge = '<script>(()=>{let failed=false;const report=state=>parent.postMessage({type:"codeless-preview",state},' +
+          const componentBridge = 'let selecting=false;addEventListener("message",e=>{if(e.source===parent&&e.origin===' + JSON.stringify(platform.origin) +
+            '&&e.data?.type==="codeless-component-mode"&&typeof e.data.enabled==="boolean")selecting=e.data.enabled});' +
+            'addEventListener("click",e=>{if(!selecting)return;e.preventDefault();e.stopImmediatePropagation();const node=e.target instanceof Element?e.target.closest("[data-ai-component]"):null;' +
+            'parent.postMessage({type:"codeless-component",versionId:' + JSON.stringify(claims.version) + ',sourceDigest:' + JSON.stringify(claims.source) +
+            ',componentId:node?.getAttribute("data-ai-component")??null},' + JSON.stringify(platform.origin) + ')},true);'
+          const bridge = '<script>(()=>{' + componentBridge + 'let failed=false;const report=state=>parent.postMessage({type:"codeless-preview",state},' +
           JSON.stringify(platform.origin) + ');const fail=()=>{failed=true;report("unavailable")};' +
           'addEventListener("error",fail,true);addEventListener("unhandledrejection",fail);' +
           'addEventListener("load",()=>report(failed?"unavailable":"loaded"))})()</script>'

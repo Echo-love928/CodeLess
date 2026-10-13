@@ -65,6 +65,7 @@ class LocalVolumeSnapshotStoreTest {
         var outcome=store.freezeOutcome(id,input.digest(),"VERIFIED",result,null);
         Files.writeString(artifact.resolve("index.html"),"changed runner output");
         assertThat(new LocalVolumeSnapshotStore(temporary.resolve("volume")).outcome(id,input.digest(),"VERIFIED")).isEqualTo(outcome);
+        assertThatThrownBy(()->store.componentMapping(id,input.digest())).hasMessage("MAPPING_UNAVAILABLE");
         Files.writeString(temporary.resolve("volume").resolve(id.toString()).resolve("outcome/report.json"),"{}");
         assertThatThrownBy(()->store.outcome(id,input.digest(),"VERIFIED")).hasMessage("SNAPSHOT_DIGEST_MISMATCH");
     }

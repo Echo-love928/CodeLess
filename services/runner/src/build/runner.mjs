@@ -9,6 +9,7 @@ import { StringDecoder } from 'node:string_decoder'
 import { containerUser, validateSource } from '../template/build.mjs'
 import { IMAGE, policy } from '../../../../infra/runner/policy.mjs'
 import { readSnapshot } from '../artifacts/snapshot.mjs'
+import { oomEventEvidence } from './oom-evidence.mjs'
 
 // Always drain pipes, even after the in-memory log cap is reached.
 export function capture(limit) {
@@ -218,7 +219,7 @@ export async function createBuildRunner({ workRoot, artifactRoot, imageId, limit
       await chmod(output, 0o777)
       const args = isolationArgs({ name, input, output, user, imageId: pinned, limits })
       mayExist = true
-      checked(await docker(args), 'create build container')
+      const containerId = checked(await docker(args), 'create build container')
       created = true
       const execution = await docker(['start', '--attach', name], limits.timeoutMs, limits.logBytes)
       result.log = execution.log
@@ -232,7 +233,25 @@ export async function createBuildRunner({ workRoot, artifactRoot, imageId, limit
       }
       result.exitCode = state.ExitCode
       result.oomKilled = state.OOMKilled
-      result.failure = result.timedOut ? 'TIMEOUT' : state.OOMKilled ? 'OOM' : state.ExitCode !== 0 ? 'BUILD_EXIT' :
+      if (!result.timedOut && state.ExitCode === 137 && state.OOMKilled === false) {
+        // Exit and OOM notifications are separate daemon events. Query bounded
+        // history before removing our container; never rerun the build or infer
+        // OOM from SIGKILL. Exact daemon container ID prevents unrelated evidence.
+        const events = await docker(['events', '--filter', `container=${containerId}`, '--filter', 'event=oom',
+          '--since', '0', '--until', new Date(Date.now() + 1000).toISOString(), '--format', '{{json .}}'], 2500, 32768)
+        result.oomEvidence = events.code === 0 && !events.error && !events.timedOut && !events.log.truncated
+          ? oomEventEvidence(events.stdout, containerId) : { status: 'UNAVAILABLE', events: [] }
+        if (result.oomEvidence.status === 'OBSERVED') {
+          const confirmed = JSON.parse(checked(await docker(['inspect', name, '--format', '{{json .State}}']), 'confirm OOM build state'))
+          result.oomEvidence.initialOOMKilled = state.OOMKilled
+          result.oomEvidence.confirmedOOMKilled = confirmed.OOMKilled
+          if (confirmed.Running || confirmed.ExitCode !== state.ExitCode || confirmed.OOMKilled !== true)
+            throw new Error('Docker OOM event and final state disagree')
+          // Preserve the contract: oomKilled is still an actual final inspect value.
+          result.oomKilled = confirmed.OOMKilled
+        }
+      }
+      result.failure = result.timedOut ? 'TIMEOUT' : result.oomKilled ? 'OOM' : state.ExitCode !== 0 ? 'BUILD_EXIT' :
         execution.error || execution.code !== 0 ? 'RUNNER_ERROR' : null
     } catch (error) {
       result.failure = created ? 'RUNNER_ERROR' : 'INPUT_OR_RUNNER_ERROR'
