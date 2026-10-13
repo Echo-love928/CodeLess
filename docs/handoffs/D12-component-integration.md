@@ -118,3 +118,16 @@ d3bff07361293c00ae7b2f4c14f3d2b5e21b8cfc的[run38246836006](https://github.com/E
 最新完整verify:static native exit0（原契约11/11、UI69/69、OpenAPI lint/生产构建），日志
 integration-static-final.log/.exit。公共snapshot契约新增这一字段是必要的接口差异，不改原API行为。
 本补充提交后精确候选Checks须重新读取，不能把d3成功沿用到新HEAD。
+
+### 2026-10-13 A／B 复审修复与重新集成
+
+- 只读复审 PR #35 的 `1d737c0`，核对 `e727e929..1d737c0` 的删除补丁、公共契约及失败路径；在 A 原分支真实运行 lifecycle 10/10、contracts 4/4，均 native exit0。确认可信基版本文件可以删除，越界创建、错摘要、遗漏最终删除与路径穿越仍失败；A 的新版本与原版本隔离、过期冲突、并发阻止及取消可回退行为保留。已对该精确提交提交正式 APPROVE，未合并或修改 main。
+- PR #36 的原候选 `a348f42` 实际复现了 `DATA-AI-COMPONENT` 调用处覆盖标识：SharedCard 可错误映射到 HomePage 源码。新候选 `6a66fdd` 将标识属性及静态 `v-bind` 参数按不区分大小写的别名检测，根节点或嵌套调用处出现别名即禁用该版本组件选择。相同 fixture 修复前 acceptance 7/9、exit1；修复后 9/9、exit0，contracts 3/3、exit0，真实 Docker Vue 构建、runner 与 Chromium 均参与。前后结构化证据在 `tests/runner/mapping/evidence/2026-10-13/case-fix/`。PR #36 该提交的 CI run `38373960725` 六项均 success；此前 REQUEST_CHANGES 仍需审查者对新提交重新裁决。
+- 集成分支先合入 A 删除补丁，再合入 B 标识补丁，并保持 COMPONENT 的 `files.create`、`files.delete` 及跨源码 `files.update` 阻断。真实 API 验收 15/15、exit0，含三种 REPAIR 越界提案在工具执行前被拒、删除可信基版本文件生成新已验证草稿、大小写别名 sidecar 冻结后 API 两个组件均不可选择且修改请求 409，无新增任务。公开最小证据在 `tests/runner/mapping/evidence/2026-10-13/integration-case/`。REPAIR 的 VERIFY 失败由明确测试 fixture 注入；该单项只验证范围阻断，不声称真实失败构建修复成功。
+- 集成验收首次因 Docker Desktop 引擎未启动在初始化失败，记录 `.local-data/d12-a/runs/2026-10-13T09-07-46.235Z-acceptance-f69e0fce-3153-4425-8fc6-9ba4f029c570`。引擎恢复后的首轮 12/15：新 REPAIR fixture 用未知计数耗尽预算，后续两个删除用例被活动任务阻挡，失败记录 `.local-data/d12-a/runs/2026-10-13T09-13-04.834Z-acceptance-30dd6245-952c-4354-a78a-924286ea71ce`。仅将该 fixture 的模型计数标注为合成 31/17/48，不改生产预算与范围校验；重跑 `.local-data/d12-a/runs/2026-10-13T09-21-00.391Z-acceptance-4ce3123b-fb88-4880-b390-d88d3cbe72b5` 得 15/15、exit0、0skip。
+
+以上真实联调用的是 deterministic-mock 提案，PostgreSQL、构建、浏览器、预览和 API 为真实执行；付费外呼 0、实际模型 token UNKNOWN。最后一轮 lifecycle SQL 有 51 条模型请求记录，其中删除及组件边界 fixture 的 31/17/48 是合成计数，不能当作真实 token 用量。开发 agent 输入／输出／合计 UNKNOWN。Windows 历史 `DirectoryNotEmptyException` 和首次预览凭据失败的确切根因仍 UNKNOWN。
+
+本轮完整 Windows `gate` 记录 `.local-data/d12-a/runs/2026-10-13T09-29-36.759Z-gate-2d298f77-41d0-4fae-8263-02df00451454`，总体 **exit1**：static 契约及 UI69/69、生产构建通过；API 191/192（其中 lifecycle15/15），仅 `PreviewPlatformIntegrationTest` 失败；runner69/69、E2E42/42 通过。API 原失败为真实预览平台浏览器获取 `/api/v0/auth/csrf` 收到 HTML 502。保留的 ingress 诊断在 `09:59:35Z` 显示 IPv4 宿主上游连接等待约 60 秒超时，随后 IPv6 上游连接失败，最终 upstreamStatus `504, 502`；该次请求未得到应用正常 JSON 响应。原始 Java/Surefire/ingress 记录均保留，未把 E2E 或本机其他阶段成功当作完整门禁成功。
+
+相同真实预览单测单独复测 `PreviewPlatformIntegrationTest` 为 1/1、native exit0，记录 `.local-data/d12-b/integration-2026-10-13/preview-retry.log` 与 `.exit`。这支持本次失败为 Windows Docker 容器到宿主的间歇连接故障，不足以证明具体底层根因；历史 DirectoryNotEmpty 与凭据异常也继续标记 UNKNOWN。门禁生成的 D10 与旧版本 E2E 截图已备份于 `.local-data/d12-b/integration-2026-10-13/generated-gate-20261013/` 后恢复，不纳入本 PR。

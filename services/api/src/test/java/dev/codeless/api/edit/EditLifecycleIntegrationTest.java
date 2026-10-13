@@ -493,7 +493,9 @@ class EditLifecycleIntegrationTest extends PostgresTestBase {
                     }
                     reply=generated;
                 }
-                return new Reply(json.writeValueAsString(reply),new Evidence(model(),"component-boundary-fixture","component-boundary-fixture",Usage.unknown()));
+                // Explicit fixture counters keep repeated setup proposals within the
+                // runtime budget; these are not measured provider tokens.
+                return new Reply(json.writeValueAsString(reply),new Evidence(model(),"component-boundary-fixture","component-boundary-fixture",new Usage(31,17,48,null)));
             }
         };
         return new AgentLoop(store,new AgentModel(provider,modelCalls,modelAudit,store),planValidator,fileRegistry,tools,buildGateway,agentEvidence,true);
