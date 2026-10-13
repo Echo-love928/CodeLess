@@ -17,4 +17,5 @@ public interface SnapshotStore {
     Outcome freezeOutcome(UUID version, String digest, String status, JsonNode result, String failureCode);
     Outcome outcome(UUID version, String digest, String status);
     String readSource(UUID version, String digest, String path);
+    default JsonNode componentMapping(UUID version,String digest) {throw new SnapshotFailure("MAPPING_UNAVAILABLE");}
 }

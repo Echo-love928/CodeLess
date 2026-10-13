@@ -162,6 +162,26 @@ public class FileToolService {
     }
 
     /** Trusted coordinator export: unique copied source only, no audit files or configuration. */
+    public ControlledWorkspace.View seed(UUID taskId, UUID token, dev.codeless.api.versions.SnapshotStore.Source source) {
+        return transactions.execute(tx -> {
+            if (!lock(taskId,token).equals("GENERATE")) throw new FileToolFailure("FILE_LEASE_INVALID");
+            try {
+                if (!workspace.inspect(taskId).files().isEmpty()) throw new FileToolFailure("EDIT_WORKSPACE_NOT_EMPTY");
+                for (var entry:source.manifest().files()) {
+                    FileToolRegistry.validatePath(entry.path());
+                    byte[] bytes=ControlledWorkspace.read(source.directory().resolve(entry.path()));
+                    if(bytes.length!=entry.bytes() || !ControlledWorkspace.hash(bytes).equals(entry.digest()))
+                        throw new FileToolFailure("FILE_SOURCE_CHANGED");
+                    workspace.write(taskId,workspace.target(taskId,entry.path()),bytes,false);
+                }
+                var actual=workspace.inspect(taskId);
+                if(!actual.sourceDigest().equals(source.manifest().digest())) throw new FileToolFailure("FILE_SOURCE_CHANGED");
+                requireLease(taskId,token);
+                return actual;
+            } catch(IOException failure) {throw new FileToolFailure("FILE_IO_ERROR");}
+        });
+    }
+
     public Snapshot snapshot(UUID taskId, UUID originalLeaseToken) {
         if (taskId == null || originalLeaseToken == null) throw new FileToolFailure("FILE_CONTEXT_INVALID");
         return transactions.execute(tx -> {

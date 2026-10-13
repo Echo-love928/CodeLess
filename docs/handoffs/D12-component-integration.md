@@ -1,0 +1,133 @@
+# D12 最终启用集成（B 接手）
+
+2026-10-12，用户明确要求 B 修复审查阻塞并解决 sidecar/API/UI、公共契约和 Windows 定位。
+独立分支 `codex/d12-component-integration`，基线 main=f67a7d1135448c102cf150816c0a1afb4ce26535。
+集成 B 修复 a348f42 和 A 候选 e727e929e1a2d5f8023207cc6bc83725261285a4，未改原 A/B 分支或 main。
+本 PR 为最终启用 PR，公共 OpenAPI 在该分支由 B 串行维护；无锁、依赖、迁移、CI变动。
+
+## 六步执行范围
+
+1. 实查同伴审查，补真实 R1 回归并独立修复 PR36。
+2. 从精确 A+B 候选建立最终启用分支，检查既有版本/任务/预览边界。
+3. 冻结 sidecar，与源码和产物匹配；接入所有权、基版本锁、组件选择和任务范围。
+4. 接入真实跨源预览点击、共享提示、冲突保留和公共 OpenAPI。
+5. 运行真实 SQL/Docker/浏览器联调和四阶段门禁；捕获 Windows 原生清理失败现场。
+6. 记录精确候选/真实证据，创建草稿 PR 供同伴重新审查；不自批、不合并、不推 main。
+
+## 行为与边界
+
+- 映射在 LocalVolumeSnapshotStore.freezeOutcome 内与验证结果同一待冻结目录写入；摘要加入
+  report，并由既有 reportDigest 保护。不向已冻结的 artifact 追加文件，不改变原 artifactDigest。
+  Java 宿主按 runner 相同规则从可信 catalog 和实际源码清单绑定；读取时检查源码、结果、完整
+  artifact、sidecar 哈希及重建映射一致性。重启可读取，旧版本缺 sidecar 返回 MAPPING_UNAVAILABLE；
+  不从当前模板/工作目录回填。
+- GET versions/{id}/component-mapping 和 POST component-selection 均检查所有权、VERIFIED
+  和冻结摘要。POST applications/{id}/component-edits 在 A 的同一应用锁内再次解析路径，复用
+  幂等、并发、过期基版本、取消和 READY 原子提交约束。客户端不提交 sourceFile。
+- COMPONENT 元数据中的 sourceFile 是服务端解析结果；首次事件持久化仍为 A 的机制，事件
+  长度受限，非模型/提示授权。GENERATE/REPAIR 只能 files.update 选中文件；create/delete/另一
+  文件更新在调用文件工具前失败。PLAN仍列完整结果文件集合，不承诺 AST 或某个 DOM 实例。
+- 预览 gateway 在服务端注入版本/源码摘要绑定的点击桥；只接受平台 origin+parent 的模式设置。
+  平台只接受当前 credential origin+iframe source 的点击候选，并由 API 再解析。版本切换/异步
+  迟到结果不能恢复旧选择。UI 明示全部实例共享；冲突保留描述、不自动重基或重试。
+- CHAT原接口仍只接受CHAT。公共 GET task/edit 支持CHAT与COMPONENT结果的oneOf，组件
+  修改有独立闭合接口。公共OpenAPI只追加5个路由；保留旧内容格式和鉴权/CSRF/error边界。
+  `contracts/mapping/integrate-openapi.mjs` 幂等且拒绝覆盖不同的已存在 D12 路由。
+- deterministic-mock样例补稳定根标识，真实模型缺/非法标识仍按禁用协议处理，不宣称模型质量。
+  无自动发布、环境/命令/依赖参数或新秘密权限。
+
+## 已实测与失败历史
+
+- R1独立真实回归先失败6/7、修复后7/7；契约3/3。a348f42的PR36六项Checks实查success，
+  run38240377250。同伴原REQUEST_CHANGES未被作者改成批准。
+- A+B API 独立真实联调 native exit0、10/10，0skip，记录：
+  `.local-data/d12-a/runs/2026-10-12T11-17-41.954Z-acceptance-82953558-6965-4699-b5a3-d39515853d0c`。
+  包含sidecar重启、所有权/CSRF、错摘要/旧版本、客户端伪造路径、新草稿/旧源码保留、篡改503
+  且任务数不增加。之后补模型越界scope和Windows诊断用例，须在完整门禁实际执行。
+- UI首轮预览 exit1：组件POST实际500，UI提示服务不可用。代码检查发现 requestJson 不会
+  自动加入JSON Content-Type，组件client漏加；补齐后同一真实平台链 exit0、1/1（111.2s），
+  所有原预览断言保留。记录：`.local-data/d12-b/runs/2026-10-12T11-28-59.939Z-preview-53f13fee-7757-4f8f-a4f0-34257e945252`
+  与 `2026-10-12T11-32-27.172Z-preview-ee31c8cf-f635-48e9-a929-77b2c37c8968`。
+  前者不能称HTTP415实测；实际状态500，缺Content-Type为修复前后实验确认的原因。
+- UI69/69、vue-tsc/生产构建通过，记录 integration-web-fixed.log/.exit；首次误选本机全局
+  Node24.19/pnpm11.25导致engine失败，后按既有固定PATH使用Node24.16/pnpm12.6，未升级。
+  中间单测ApiError类型写错导致TS失败已修正；所有失败日志保留。
+- 公共OpenAPI已实测lint及原static通过；追加集成契约2/2通过。最终完整门禁与精确候选
+  Checks需在下节据实补齐，不能沿用上述较早工作树结果。
+
+## Windows定位
+
+历史 A DirectoryNotEmptyException 及 B 首次预览凭据校验失败不能用本轮成功抹去。
+清理器已保证目录枚举句柄关闭、所有权/链接保护、没有重试。本轮新增在原异常上附加即时
+EMPTY_AT_FAILURE/ENTRIES_AT_FAILURE/ALREADY_ABSENT 等状态、相对路径和剩余数量。
+确定性竞争写入回归证明 DirectoryNotEmpty 原异常及剩余1项保留，而非吞异常或重试删除。
+历史故障确切根因仍 UNKNOWN；本轮原生Windows完整门禁若再现，应使用该现场定位，不能
+将测试构造的竞争写入当历史根因。原凭据校验故障亦未在最新真实预览中再现，仍未归因。
+
+开发agent输入/输出/合计 UNKNOWN，无任务级实测接口。独立映射模型请求0。
+平台联调为deterministic-mock，token UNKNOWN、付费外呼0；SQL实测账单另列，不代表模型质量。
+
+## 最终门禁 / PR / 同伴审查
+
+源码26777392e90c7ea7b75fdd48d6d03c9f18fc4535上Windows完整四阶段 native exit0：static
+契约11/11、UI69/69及生产构建；API188/188、0failure/error/skip；runner63/63；E2E42/42。
+原生记录 `.local-data/d12-b/runs/2026-10-12T11-37-32.969Z-gate-6ee8a6ac-d67a-4b70-af34-2ba66ba16f54`。
+Gate启动时只有保留的未跟踪.idea，运行时代码干净。生成的D10及旧版本fixture截图另存
+`.local-data/d12-b/generated-integration-evidence`后恢复原文件；不提交其他任务的截图更新。
+该轮A+B lifecycle为11/11，新增组件scope实际在调用工具前拒绝另一文件；SQL账单19次mock请求，
+token UNKNOWN、paid0；这仅为该类本轮，不冒充所有历史/整个API累计，见runtime-api-usage.json。
+
+最终启用[草稿PR37](https://github.com/Echo-love928/CodeLess/pull/37)，已附加本任务。
+267的[CI run38243979877](https://github.com/Echo-love928/CodeLess/actions/runs/38243979877)为static、API
+188/188、E2E42/42、infra success；runner62/63失败，汇总ci-gate失败。唯一失败为既有D07-B-T3：
+容器ExitCode137、OOMKilled=false、timedOut=false，分类BUILD_EXIT。所有D12映射/联调契约已通过。
+不能将本机通过替代该真实CI失败；原始job日志保留integration-runner-first-ci.log，API日志保留
+integration-api-ci.log。当前main两端仍f67a7d；PR36a348修复六项CI已success，已请求原审查者
+yuanqizuimeng重新审查，仍CHANGES_REQUESTED，不算批准。
+
+为当前门禁实际失败扩大最小范围到runner OOM证据及对应tests/runner/build/infra入口。Docker
+OOM和exit由独立事件处理（[官方源码](https://github.com/moby/moby/blob/master/daemon/monitor.go)）；
+这是时序缺口的依据，**尚不能证明267 CI确切根因就是该时序**。本机3次状态/事件对照均是真实
+OOMKilled=true、有同容器OOM事件，没有重现false；诊断记录oom-diagnostic.log/.exit，exit0。
+
+补充137且非timeout/inspect=false时，有界查询同一完整容器ID的Docker OOM事件历史；若观察
+到可信OOM事件，再inspect实际最终状态，须ExitCode一致且OOMKilled=true才判OOM。保留首次
+false及最终true；无事件仍BUILD_EXIT、事件查询失败记UNAVAILABLE，绝不将137直接判OOM，
+不重试构建、不改资源/断言/隔离。事件属性（含宿主路径）不进入报告。
+首轮反例错误地向namespace PID1自身发SIGKILL，其被Linux忽略，真实exit0/ARTIFACT_INVALID，
+runner65/66、exit1保留。改用真实子进程SIGKILL并由PID1传播137，随后完整runner66/66、exit0，
+包括原真实cgroup OOM、普通137反例、同容器事件/未知/截断/伪造事件回归。日志分别为
+integration-runner-oom-fix.log/.exit 和 integration-runner-oom-fixed.log/.exit。
+该修正后候选远端六项Checks须另行读取，不沿用267的任何成功/失败；不宣称历史原生Windows
+故障或CI未观测OOM根因已根治。
+
+同伴批准必须由独立审查者针对最终候选给出，作者不能替代；仍禁止合并/推main。
+
+### 最后公共响应兼容核对
+
+d3bff07361293c00ae7b2f4c14f3d2b5e21b8cfc的[run38246836006](https://github.com/Echo-love928/CodeLess/actions/runs/38246836006)
+实查六项全部completed/success；Linuxrunner66/66，实际cgroup OOM和子SIGKILL137反例通过。
+没有抹去267失败，且未重现其false标志，不能据此宣称精确根因已确认。
+
+最后逐一核对公共HTTP响应时发现：版本snapshot的validation.report新增componentMappingDigest，
+但原公共versions/response.schema.json是闭合结构，未登记该字段。这里由最终启用维护者B作最小
+兼容追加：可选的严格71字符SHA256，旧版本没有字段继续合法，不放宽additionalProperties。
+真实鉴权HTTP响应来自上面Windows完整gate的preview-source-consistency，保留snapshot-public.json。
+新增真实响应契约回归：原schema2/3、exit1，明确additionalProperty=componentMappingDigest；补后
+3/3、exit0，含旧响应缺字段兼容和null/坏摘要/换行拒绝。前后日志snapshot-contract-{before,after}.log/.exit。
+最新完整verify:static native exit0（原契约11/11、UI69/69、OpenAPI lint/生产构建），日志
+integration-static-final.log/.exit。公共snapshot契约新增这一字段是必要的接口差异，不改原API行为。
+本补充提交后精确候选Checks须重新读取，不能把d3成功沿用到新HEAD。
+
+### 2026-10-13 A／B 复审修复与重新集成
+
+- 只读复审 PR #35 的 `1d737c0`，核对 `e727e929..1d737c0` 的删除补丁、公共契约及失败路径；在 A 原分支真实运行 lifecycle 10/10、contracts 4/4，均 native exit0。确认可信基版本文件可以删除，越界创建、错摘要、遗漏最终删除与路径穿越仍失败；A 的新版本与原版本隔离、过期冲突、并发阻止及取消可回退行为保留。已对该精确提交提交正式 APPROVE，未合并或修改 main。
+- PR #36 的原候选 `a348f42` 实际复现了 `DATA-AI-COMPONENT` 调用处覆盖标识：SharedCard 可错误映射到 HomePage 源码。新候选 `6a66fdd` 将标识属性及静态 `v-bind` 参数按不区分大小写的别名检测，根节点或嵌套调用处出现别名即禁用该版本组件选择。相同 fixture 修复前 acceptance 7/9、exit1；修复后 9/9、exit0，contracts 3/3、exit0，真实 Docker Vue 构建、runner 与 Chromium 均参与。前后结构化证据在 `tests/runner/mapping/evidence/2026-10-13/case-fix/`。PR #36 该提交的 CI run `38373960725` 六项均 success；此前 REQUEST_CHANGES 仍需审查者对新提交重新裁决。
+- 集成分支先合入 A 删除补丁，再合入 B 标识补丁，并保持 COMPONENT 的 `files.create`、`files.delete` 及跨源码 `files.update` 阻断。真实 API 验收 15/15、exit0，含三种 REPAIR 越界提案在工具执行前被拒、删除可信基版本文件生成新已验证草稿、大小写别名 sidecar 冻结后 API 两个组件均不可选择且修改请求 409，无新增任务。公开最小证据在 `tests/runner/mapping/evidence/2026-10-13/integration-case/`。REPAIR 的 VERIFY 失败由明确测试 fixture 注入；该单项只验证范围阻断，不声称真实失败构建修复成功。
+- 集成验收首次因 Docker Desktop 引擎未启动在初始化失败，记录 `.local-data/d12-a/runs/2026-10-13T09-07-46.235Z-acceptance-f69e0fce-3153-4425-8fc6-9ba4f029c570`。引擎恢复后的首轮 12/15：新 REPAIR fixture 用未知计数耗尽预算，后续两个删除用例被活动任务阻挡，失败记录 `.local-data/d12-a/runs/2026-10-13T09-13-04.834Z-acceptance-30dd6245-952c-4354-a78a-924286ea71ce`。仅将该 fixture 的模型计数标注为合成 31/17/48，不改生产预算与范围校验；重跑 `.local-data/d12-a/runs/2026-10-13T09-21-00.391Z-acceptance-4ce3123b-fb88-4880-b390-d88d3cbe72b5` 得 15/15、exit0、0skip。
+
+以上真实联调用的是 deterministic-mock 提案，PostgreSQL、构建、浏览器、预览和 API 为真实执行；付费外呼 0、实际模型 token UNKNOWN。最后一轮 lifecycle SQL 有 51 条模型请求记录，其中删除及组件边界 fixture 的 31/17/48 是合成计数，不能当作真实 token 用量。开发 agent 输入／输出／合计 UNKNOWN。Windows 历史 `DirectoryNotEmptyException` 和首次预览凭据失败的确切根因仍 UNKNOWN。
+
+本轮完整 Windows `gate` 记录 `.local-data/d12-a/runs/2026-10-13T09-29-36.759Z-gate-2d298f77-41d0-4fae-8263-02df00451454`，总体 **exit1**：static 契约及 UI69/69、生产构建通过；API 191/192（其中 lifecycle15/15），仅 `PreviewPlatformIntegrationTest` 失败；runner69/69、E2E42/42 通过。API 原失败为真实预览平台浏览器获取 `/api/v0/auth/csrf` 收到 HTML 502。保留的 ingress 诊断在 `09:59:35Z` 显示 IPv4 宿主上游连接等待约 60 秒超时，随后 IPv6 上游连接失败，最终 upstreamStatus `504, 502`；该次请求未得到应用正常 JSON 响应。原始 Java/Surefire/ingress 记录均保留，未把 E2E 或本机其他阶段成功当作完整门禁成功。
+
+相同真实预览单测单独复测 `PreviewPlatformIntegrationTest` 为 1/1、native exit0，记录 `.local-data/d12-b/integration-2026-10-13/preview-retry.log` 与 `.exit`。这支持本次失败为 Windows Docker 容器到宿主的间歇连接故障，不足以证明具体底层根因；历史 DirectoryNotEmpty 与凭据异常也继续标记 UNKNOWN。门禁生成的 D10 与旧版本 E2E 截图已备份于 `.local-data/d12-b/integration-2026-10-13/generated-gate-20261013/` 后恢复，不纳入本 PR。

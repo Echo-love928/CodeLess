@@ -6,7 +6,7 @@ const projects = [
 </script>
 
 <template>
-  <main class="showcase">
+  <main class="showcase" data-ai-component="home-page">
     <p class="eyebrow">个人展示 / 2026</p>
     <h1>林予安，设计与摄影</h1>
     <p class="intro">关注城市、人与日常生活之间的细节。</p>

@@ -22,7 +22,7 @@ function add() {
 </script>
 
 <template>
-  <main><h1>今日任务</h1><p>计划清楚，做起来更轻松。</p>
+  <main data-ai-component="tasks-page"><h1>今日任务</h1><p>计划清楚，做起来更轻松。</p>
     <form @submit.prevent="add"><input v-model="draft" aria-label="新任务" placeholder="添加一项任务"><button>添加</button></form>
     <ul><li v-for="task in tasks" :key="task.id"><label><input v-model="task.done" type="checkbox"><span :class="{ done: task.done }">{{ task.text }}</span></label></li></ul>
   </main>

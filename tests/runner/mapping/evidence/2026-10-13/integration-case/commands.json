@@ -1,0 +1,25 @@
+{
+  "source": "A 1d737c0 and B 6a66fdd integrated on codex/d12-component-integration; main f67a7d1 unchanged",
+  "provider": "deterministic-mock",
+  "runs": [
+    {
+      "command": "node tests/edit/lifecycle/record-command.mjs acceptance",
+      "exitCode": 0,
+      "tests": "15/15",
+      "privateRun": ".local-data/d12-a/runs/2026-10-13T09-21-00.391Z-acceptance-4ce3123b-fb88-4880-b390-d88d3cbe72b5"
+    },
+    {
+      "command": "node tests/edit/lifecycle/record-command.mjs gate",
+      "exitCode": 1,
+      "result": "static, runner 69/69 and E2E 42/42 passed; API 191/192 due to one Windows ingress CSRF HTML 502",
+      "privateRun": ".local-data/d12-a/runs/2026-10-13T09-29-36.759Z-gate-2d298f77-41d0-4fae-8263-02df00451454"
+    },
+    {
+      "command": "services/api/mvnw.cmd -f services/api/pom.xml -Dtest=PreviewPlatformIntegrationTest test",
+      "exitCode": 0,
+      "tests": "1/1",
+      "privateLog": ".local-data/d12-b/integration-2026-10-13/preview-retry.log"
+    }
+  ],
+  "limits": "REPAIR scope case injects a named VERIFY failure fixture; actual model tokens are UNKNOWN; no paid model calls"
+}

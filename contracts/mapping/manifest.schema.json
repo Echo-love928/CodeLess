@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeless:component-mapping:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "versionId", "sourceDigest", "components", "disabled"],
+  "properties": {
+    "protocol": { "const": "codeless-component-mapping/v1" },
+    "versionId": { "type": "string", "minLength": 36, "maxLength": 36, "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
+    "sourceDigest": { "$ref": "#/$defs/digest" },
+    "components": {
+      "type": "array", "maxItems": 40,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["componentId", "sourceFile", "fileDigest", "scope"],
+        "properties": {
+          "componentId": { "$ref": "#/$defs/componentId" },
+          "sourceFile": { "$ref": "#/$defs/sourceFile" },
+          "fileDigest": { "$ref": "#/$defs/digest" },
+          "scope": { "const": "SOURCE_FILE" }
+        }
+      }
+    },
+    "disabled": {
+      "type": "array", "maxItems": 40,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["sourceFile", "componentId", "reason"],
+        "properties": {
+          "sourceFile": { "$ref": "#/$defs/sourceFile" },
+          "componentId": { "anyOf": [{ "$ref": "#/$defs/componentId" }, { "type": "null" }] },
+          "reason": { "enum": ["UNSUPPORTED_TEMPLATE", "UNSUPPORTED_ROOT", "UNSAFE_MARKER", "MISSING_COMPONENT_ID", "INVALID_COMPONENT_ID", "DUPLICATE_COMPONENT_ID"] }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "digest": { "type": "string", "minLength": 71, "maxLength": 71, "pattern": "^sha256:[a-f0-9]{64}$" },
+    "componentId": { "type": "string", "maxLength": 64, "pattern": "^(?![\\s\\S]*\\s)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$" },
+    "sourceFile": {
+      "type": "string", "maxLength": 240,
+      "pattern": "^(?![\\s\\S]*\\s)src/(?:pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue$",
+      "not": { "pattern": "/(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Nn][Ii][Nn]|[Cc][Oo][Nn][Oo][Uu][Tt]|[Cc][Oo][Mm][0-9]+|[Ll][Pp][Tt][0-9]+)\\.vue$" }
+    }
+  }
+}

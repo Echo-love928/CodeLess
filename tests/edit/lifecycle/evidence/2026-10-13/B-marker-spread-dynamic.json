@@ -1,0 +1,61 @@
+{
+  "status": "PASSED",
+  "variant": "spread-dynamic",
+  "head": "72be44ca2805f05375430f54b30a7285f7c965de",
+  "imageId": "sha256:ec08b2cc7de61112d86b93ae12e2d7cc03610e62b8bff5937826e5af909c2283",
+  "fixtureChange": "<SharedCard label=\"丙\" v-bind=\"{ 'data-ai-component': 'home-page' }\" /><SharedCard label=\"dynamic\" :[marker]=\"'shared-card'\" />",
+  "expected": "A marker override on SharedCard must never resolve to HomePage source",
+  "actual": {
+    "markers": [
+      "shared-card",
+      "shared-card",
+      "home-page",
+      "shared-card"
+    ],
+    "selection": {
+      "selectable": false,
+      "reason": "UNSAFE_MARKER"
+    },
+    "selections": [
+      {
+        "selectable": false,
+        "reason": "UNSAFE_MARKER"
+      },
+      {
+        "selectable": false,
+        "reason": "UNSAFE_MARKER"
+      },
+      {
+        "selectable": false,
+        "reason": "UNSAFE_MARKER"
+      },
+      {
+        "selectable": false,
+        "reason": "UNSAFE_MARKER"
+      }
+    ],
+    "manifest": {
+      "protocol": "codeless-component-mapping/v1",
+      "versionId": "55555555-5555-4555-8555-555555555555",
+      "sourceDigest": "sha256:76207bd7fb4963a4d6368af7480940a41a4bca77a1cc6b3a7de323d8cb629715",
+      "components": [],
+      "disabled": [
+        {
+          "sourceFile": "src/components/SharedCard.vue",
+          "componentId": "shared-card",
+          "reason": "UNSAFE_MARKER"
+        },
+        {
+          "sourceFile": "src/pages/HomePage.vue",
+          "componentId": "home-page",
+          "reason": "UNSAFE_MARKER"
+        }
+      ]
+    }
+  },
+  "realDockerBuild": true,
+  "realChromium": true,
+  "browserVersion": "148.0.7778.96",
+  "modelRequests": 0,
+  "buildExitCode": 0
+}
