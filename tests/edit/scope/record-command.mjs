@@ -14,6 +14,7 @@ if (part.startsWith('..') || isAbsolute(part)) throw new Error('Review repositor
 const tests = {
   acceptance: 'LocalEditScopeIntegrationTest,LocalEditScopeTest',
   regression: 'EditLifecycleIntegrationTest',
+  integration: 'LocalEditScopeIntegrationTest,LocalEditScopeTest,PreviewPlatformIntegrationTest',
 }
 let command, args, cwd = repo
 if (Object.hasOwn(tests, mode)) {
@@ -37,6 +38,7 @@ mkdirSync(run, { recursive: true })
 env.CODELESS_SCOPE_EVIDENCE_DIR = join(run, 'scope')
 env.CODELESS_EDIT_EVIDENCE_DIR = join(run, 'edit')
 env.CODELESS_VERSION_PREVIEW_EVIDENCE_DIR = join(run, 'preview')
+env.CODELESS_PREVIEW_EVIDENCE_DIR = join(run, 'preview')
 const head = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' })
 if (head.status !== 0) throw new Error('Cannot record the tested Git HEAD')
 const changes = spawnSync('git', ['status', '--porcelain', '--', 'services/api/src/test', 'tests/edit/scope'], { cwd: repo, encoding: 'utf8' })
@@ -46,6 +48,12 @@ const metadata = { mode, head: head.stdout.trim(), repository: relative(workspac
   uncommittedSourceChanges: sourceChanges.status === 0 ? sourceChanges.stdout.trim().split('\n').filter(Boolean) : null,
   command: [command, ...args], cwd: relative(workspace, cwd) || '.', startedAt: new Date().toISOString(), status: 'RUNNING', exitCode: null,
   signal: null, modelProvider: 'deterministic-mock', browserChannel: 'locked bundled Chromium' }
+if (mode === 'integration') {
+  const peer = spawnSync('git', ['rev-parse', 'MERGE_HEAD'], { cwd: repo, encoding: 'utf8' })
+  const tree = spawnSync('git', ['write-tree'], { cwd: repo, encoding: 'utf8' })
+  if (peer.status !== 0 || tree.status !== 0) throw new Error('Integration requires an explicit non-conflicting candidate merge')
+  metadata.peerCommit = peer.stdout.trim(); metadata.testedIndexTree = tree.stdout.trim()
+}
 function save() {
   writeFileSync(join(run, 'run.json.pending'), JSON.stringify(metadata, null, 2) + '\n')
   renameSync(join(run, 'run.json.pending'), join(run, 'run.json'))

@@ -41,4 +41,6 @@ GENERATE/REPAIR 模型只见目标正文（基版本）、导入路径/digest/by
 REPAIR 当前目标摘要/观察结果另列，需读当前内容时只允许 files.read 目标文件。
 依赖摘要用有界静态 import 提示识别（含可能的注释），不做 AST 编辑或依赖图推断，绝不授予依赖读写权限。
 
-真实 D13-B nonce/跨窗口/UI 最终启用联调尚须其候选；本卡独立验收不代替同日集成。
+D13-B续审unit9/9、真实浏览器3/3；A/B私有组合真实联调12/12，见review-D13-B.md及evidence/2026-10-14。
+组合复现：record-command.mjs integration --repo .local-data/d13-a/integration-8352-038b，要求显式无冲突MERGE_HEAD，记录父候选和indexTree。
+它不修改任务分支；正式启用仍由维护者整合并对新HEAD重新检查批准。
