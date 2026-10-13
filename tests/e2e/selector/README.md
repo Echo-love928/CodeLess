@@ -7,6 +7,8 @@ node tests/e2e/selector/record-command.mjs static
 node tests/e2e/selector/record-command.mjs unit
 node tests/e2e/selector/record-command.mjs browser
 node tests/e2e/selector/record-command.mjs gate
+node tests/e2e/selector/record-command.mjs preview
+node tests/e2e/selector/export-evidence.mjs
 ```
 
 `browser` serves the current production platform build; run `static` first after source changes.
