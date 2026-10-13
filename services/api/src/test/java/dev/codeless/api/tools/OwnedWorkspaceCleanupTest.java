@@ -53,4 +53,19 @@ class OwnedWorkspaceCleanupTest {
         OwnedWorkspaceCleanup.delete(root,parent);
         assertThat(root).doesNotExist();assertThat(Files.readString(keep)).isEqualTo("outside owned root");
     }
+    @Test void realDirectoryNotEmptyCapturesRemainingStateAndKeepsOriginalFailureWithoutRetry() throws Exception {
+        Path root=Files.createTempDirectory(parent,"task-");
+        Path audit=Files.createDirectories(root.resolve("audit/call"));
+        Path before=Files.writeString(audit.resolve("before.json"),"{}");
+        var injected=new AtomicBoolean();
+        Throwable failure=catchThrowable(()->OwnedWorkspaceCleanup.delete(root,parent,Files::walk,p->{
+            Files.delete(p);
+            // Deterministic competing writer after the enumeration snapshot.
+            if(p.equals(before) && injected.compareAndSet(false,true)) Files.writeString(audit.resolve("late.json"),"{}");
+        }));
+        assertThat(failure).isInstanceOf(java.nio.file.DirectoryNotEmptyException.class);
+        assertThat(failure.getSuppressed()).hasSize(1);
+        assertThat(failure.getSuppressed()[0].getMessage()).contains("ENTRIES_AT_FAILURE","remaining=1","retries=0");
+        assertThat(audit.resolve("late.json")).exists();
+    }
 }

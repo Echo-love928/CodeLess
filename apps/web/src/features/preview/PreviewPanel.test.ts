@@ -3,6 +3,8 @@ import { flushPromises, mount } from '@vue/test-utils'
 import PreviewPanel from './PreviewPanel.vue'
 import { getPreviewCredential } from './preview-api'
 vi.mock('./preview-api', () => ({ getPreviewCredential: vi.fn() }))
+// This suite owns credential/frame lifecycle; editor races and requests have their own tests.
+vi.mock('../mapping/ComponentEditor.vue', () => ({ default: { template: '<div />' } }))
 const get = vi.mocked(getPreviewCredential)
 const app = '11111111-1111-4111-8111-111111111111', version = '55555555-5555-4555-8555-555555555555'
 const value = (id = version) => ({ applicationId: app, versionId: id,

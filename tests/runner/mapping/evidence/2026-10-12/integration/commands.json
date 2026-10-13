@@ -1,0 +1,136 @@
+{
+  "commands": [
+    {
+      "name": "gate",
+      "directory": ".local-data/d12-b/runs/2026-10-12T11-37-32.969Z-gate-6ee8a6ac-d67a-4b70-af34-2ba66ba16f54",
+      "headAtStart": "26777392e90c7ea7b75fdd48d6d03c9f18fc4535",
+      "startedAt": "2026-10-12T11:37:33.111Z",
+      "completedAt": "2026-10-12T11:54:46.640Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASSED",
+      "logDigest": "sha256:d5728477dcb1d5dab871d62203097c02a95de43e81ea3f1fcf221d2929b3c167",
+      "sourceNote": "Runtime source clean at 2677739, only unrelated untracked .idea; before later OOM evidence repair"
+    },
+    {
+      "name": "api-first",
+      "directory": ".local-data/d12-a/runs/2026-10-12T11-17-41.954Z-acceptance-82953558-6965-4699-b5a3-d39515853d0c",
+      "headAtStart": "87815a039df8645428428b990f62b5de73734596",
+      "startedAt": "2026-10-12T11:17:42.067Z",
+      "completedAt": "2026-10-12T11:22:13.193Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASSED",
+      "logDigest": "sha256:1b6b7c52e09cb26c157c31df44a229271109d2b36b804104e84432696e11721c",
+      "sourceNote": "Recorded development working tree; see handoff for subsequent changes"
+    },
+    {
+      "name": "ui-before",
+      "directory": ".local-data/d12-b/runs/2026-10-12T11-28-59.939Z-preview-53f13fee-7757-4f8f-a4f0-34257e945252",
+      "headAtStart": "87815a039df8645428428b990f62b5de73734596",
+      "startedAt": "2026-10-12T11:29:00.087Z",
+      "completedAt": "2026-10-12T11:30:00.578Z",
+      "exitCode": 1,
+      "signal": null,
+      "status": "FAILED",
+      "logDigest": "sha256:1bd88476ec5ad911bf226995967cecd0e64a74568b79388e5a2b5ac7e265b686",
+      "sourceNote": "Recorded development working tree; see handoff for subsequent changes"
+    },
+    {
+      "name": "ui-after",
+      "directory": ".local-data/d12-b/runs/2026-10-12T11-32-27.172Z-preview-ee31c8cf-f635-48e9-a929-77b2c37c8968",
+      "headAtStart": "87815a039df8645428428b990f62b5de73734596",
+      "startedAt": "2026-10-12T11:32:27.314Z",
+      "completedAt": "2026-10-12T11:34:54.394Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASSED",
+      "logDigest": "sha256:366594f61ce7290d6994470d83661059f7cc6ca979ba3878f112d8e9e2c3471d",
+      "sourceNote": "Recorded development working tree; see handoff for subsequent changes"
+    },
+    {
+      "name": "runner-before",
+      "exitCode": 1,
+      "logDigest": "sha256:1ec5321997cad33ed98b1cdf53107d0f9572e74343b0f425ded6609778e08fc3",
+      "log": ".local-data/d12-b/integration-runner-oom-fix.log"
+    },
+    {
+      "name": "runner-after",
+      "exitCode": 0,
+      "logDigest": "sha256:66379fe618f1a1e3bfd77d13766b90fe4b535117c0d39d7329269d643aabf185",
+      "log": ".local-data/d12-b/integration-runner-oom-fixed.log"
+    },
+    {
+      "name": "oom-diagnostic",
+      "exitCode": 0,
+      "logDigest": "sha256:6c872e6ce526eacd468f118ac4944cf71d40bf54462877276b43d250853d8323",
+      "log": ".local-data/d12-b/oom-diagnostic.log"
+    },
+    {
+      "name": "ui-unit-before",
+      "exitCode": 1,
+      "logDigest": "sha256:27e27ae34b58ff0010215087ff257ef9fcc77ea03f3ffb978114f0ac11531c1e",
+      "log": ".local-data/d12-b/integration-web-final.log"
+    },
+    {
+      "name": "ui-unit-after",
+      "exitCode": 0,
+      "logDigest": "sha256:2cd9b02559e25aa8bb19459a6aef52871f2b1622e22810c3420467502b8e7a2c",
+      "log": ".local-data/d12-b/integration-web-fixed.log"
+    }
+  ],
+  "gate": {
+    "staticContracts": 11,
+    "frontend": 69,
+    "api": 188,
+    "runner": 63,
+    "e2e": 42,
+    "exitCode": 0,
+    "skips": 0
+  },
+  "affectedRunnerAfterOomEvidenceRepair": {
+    "passed": 66,
+    "failed": 0,
+    "skipped": 0,
+    "exitCode": 0
+  },
+  "windowsHistoricalFaults": {
+    "directoryNotEmpty": "ROOT_CAUSE_UNKNOWN_NOT_REPRODUCED",
+    "previewCredential": "ROOT_CAUSE_UNKNOWN_NOT_REPRODUCED"
+  },
+  "ci2677739": {
+    "run": "https://github.com/Echo-love928/CodeLess/actions/runs/38243979877",
+    "apiPassed": 188,
+    "static": "SUCCESS",
+    "api": "SUCCESS",
+    "e2e": "SUCCESS",
+    "infra": "SUCCESS",
+    "runner": "FAILURE",
+    "gate": "FAILURE",
+    "failure": {
+      "case": "D07-B-T3",
+      "exitCode": 137,
+      "inspectedOomKilled": false,
+      "timedOut": false,
+      "classification": "BUILD_EXIT",
+      "preciseCause": "UNKNOWN"
+    }
+  },
+  "peer": {
+    "pr36": "CHANGES_REQUESTED",
+    "rereviewRequested": "yuanqizuimeng",
+    "authorApproval": false
+  },
+  "usage": {
+    "developmentInput": "UNKNOWN",
+    "developmentOutput": "UNKNOWN",
+    "developmentTotal": "UNKNOWN",
+    "apiLifecycleRequestsThisGate": 19,
+    "provider": "deterministic-mock",
+    "input": "UNKNOWN",
+    "output": "UNKNOWN",
+    "total": "UNKNOWN",
+    "paidRequests": 0,
+    "modelQualityAccepted": false
+  }
+}

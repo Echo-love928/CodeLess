@@ -23,6 +23,7 @@
         "verificationId":{"anyOf":[{"$ref":"#/$defs/uuid"},{"type":"null"}]},
         "verificationStatus":{"enum":["PASSED","FAILED",null]},
         "artifactDigest":{"anyOf":[{"$ref":"#/$defs/digest"},{"type":"null"}]},
+        "componentMappingDigest":{"type":"string","pattern":"^sha256:[a-f0-9]{64}$","minLength":71,"maxLength":71},
         "failureCode":{"type":["string","null"],"pattern":"^[A-Z][A-Z0-9_]{1,100}$"}
       }
     },

@@ -173,6 +173,13 @@ public final class LocalVolumeSnapshotStore implements SnapshotStore {
                     throw new SnapshotFailure("SNAPSHOT_REPORT_INVALID");
             }
             Map<String, Object> report = new LinkedHashMap<>();
+            if (artifact != null && artifact.files().stream().anyMatch(f -> f.path().equals("ai-component-catalog.json"))) {
+                var catalog=json.readTree(read(pending.resolve("artifact/ai-component-catalog.json"),32768));
+                var mapping=dev.codeless.api.mapping.ComponentMapping.bind(catalog,source(versionId,sourceDigest).manifest(),versionId);
+                byte[] mappingBytes=json.writeValueAsBytes(mapping);
+                write(pending.resolve("component-mapping.json"),mappingBytes);
+                report.put("componentMappingDigest",hash(mappingBytes));
+            }
             report.put("status", status); report.put("sourceDigest", sourceDigest);
             report.put("buildId", id(build.path("id"))); report.put("buildStatus", text(build, "status", Set.of("QUEUED", "RUNNING", "SUCCEEDED", "FAILED")));
             report.put("exitCode", build.path("exitCode").isIntegralNumber() ? build.path("exitCode").asInt() : null);
@@ -217,5 +224,20 @@ public final class LocalVolumeSnapshotStore implements SnapshotStore {
             return decode(bytes);
         } catch (SnapshotFailure failure) { throw failure; }
         catch (Exception failure) { throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE"); }
+    }
+    @Override public JsonNode componentMapping(UUID id,String digest) {
+        // Verify original immutable source/outcome/artifact before trusting this sidecar.
+        var outcome=outcome(id,digest,"VERIFIED");
+        if(!outcome.report().has("componentMappingDigest")) throw new SnapshotFailure("MAPPING_UNAVAILABLE");
+        try {
+            Path base=version(id).resolve("outcome");
+            byte[] bytes=read(base.resolve("component-mapping.json"),32768);
+            if(!hash(bytes).equals(outcome.report().path("componentMappingDigest").asText())) throw new SnapshotFailure("MAPPING_TAMPERED");
+            var saved=json.readTree(bytes);
+            var trusted=dev.codeless.api.mapping.ComponentMapping.bind(json.readTree(read(base.resolve("artifact/ai-component-catalog.json"),32768)),source(id,digest).manifest(),id);
+            if(!saved.equals(trusted)) throw new SnapshotFailure("MAPPING_TAMPERED");
+            return saved;
+        } catch(SnapshotFailure failure) {throw failure;}
+        catch(Exception failure) {throw new SnapshotFailure("MAPPING_UNAVAILABLE");}
     }
 }

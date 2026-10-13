@@ -36,7 +36,24 @@ public final class OwnedWorkspaceCleanup {
             if (!entry.toAbsolutePath().normalize().startsWith(owned))
                 throw new IOException("Workspace teardown entry escaped ownership");
         }
-        for (Path entry : entries) delete.remove(entry);
+        for (Path entry : entries) {
+            try {delete.remove(entry);}
+            catch(IOException failure) {
+                // Keep the original native failure. Capture the directory immediately,
+                // before JUnit or an operator changes it; never retry a failed delete.
+                String state="UNKNOWN";long remaining=-1;
+                try {
+                    if(Files.notExists(entry,LinkOption.NOFOLLOW_LINKS)) state="ALREADY_ABSENT";
+                    else if(Files.isDirectory(entry,LinkOption.NOFOLLOW_LINKS) && !Files.isSymbolicLink(entry)) {
+                        try(var children=Files.newDirectoryStream(entry)) {remaining=0;for(var ignored:children)remaining++;}
+                        state=remaining==0?"EMPTY_AT_FAILURE":"ENTRIES_AT_FAILURE";
+                    } else state="NON_DIRECTORY_AT_FAILURE";
+                } catch(IOException unavailable) {state="INSPECTION_FAILED";}
+                failure.addSuppressed(new IOException("Owned cleanup diagnostic: os="+System.getProperty("os.name")+
+                        "; relative="+owned.relativize(entry)+"; state="+state+"; remaining="+remaining+"; retries=0"));
+                throw failure;
+            }
+        }
         if (!Files.notExists(owned, LinkOption.NOFOLLOW_LINKS))
             throw new IOException("Workspace teardown absence was not confirmed");
     }

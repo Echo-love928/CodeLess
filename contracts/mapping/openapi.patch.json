@@ -1,0 +1,436 @@
+{
+  "paths": {
+    "/api/v0/versions/{versionId}/component-mapping": {
+      "parameters": [
+        {
+          "name": "versionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getComponentMapping",
+        "summary": "Read the immutable version component sidecar; missing legacy mappings fail closed",
+        "tags": [
+          "versions"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Frozen component mapping",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./mapping/manifest.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/versions/{versionId}/component-selection": {
+      "parameters": [
+        {
+          "name": "versionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "resolveComponentSelection",
+        "summary": "Resolve an untrusted ID to shared source scope",
+        "tags": [
+          "versions"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CsrfToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "versionId",
+                  "sourceDigest",
+                  "componentId"
+                ],
+                "properties": {
+                  "versionId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "minLength": 36,
+                    "maxLength": 36
+                  },
+                  "sourceDigest": {
+                    "type": "string",
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "minLength": 71,
+                    "maxLength": 71
+                  },
+                  "componentId": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+                    "minLength": 1,
+                    "maxLength": 64
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Selectable source or explicit disabled reason",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "selectable",
+                        "shared",
+                        "notice",
+                        "versionId",
+                        "sourceDigest",
+                        "componentId",
+                        "sourceFile",
+                        "fileDigest",
+                        "scope"
+                      ],
+                      "properties": {
+                        "versionId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "minLength": 36,
+                          "maxLength": 36
+                        },
+                        "sourceDigest": {
+                          "type": "string",
+                          "pattern": "^sha256:[a-f0-9]{64}$",
+                          "minLength": 71,
+                          "maxLength": 71
+                        },
+                        "componentId": {
+                          "type": "string",
+                          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+                          "minLength": 1,
+                          "maxLength": 64
+                        },
+                        "selectable": {
+                          "const": true
+                        },
+                        "shared": {
+                          "const": true
+                        },
+                        "notice": {
+                          "type": "string"
+                        },
+                        "sourceFile": {
+                          "type": "string",
+                          "pattern": "^src/(pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue$",
+                          "maxLength": 240
+                        },
+                        "fileDigest": {
+                          "type": "string",
+                          "pattern": "^sha256:[a-f0-9]{64}$",
+                          "minLength": 71,
+                          "maxLength": 71
+                        },
+                        "scope": {
+                          "const": "SOURCE_FILE"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "selectable",
+                        "reason"
+                      ],
+                      "properties": {
+                        "selectable": {
+                          "const": false
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/applications/{applicationId}/component-edits": {
+      "parameters": [
+        {
+          "name": "applicationId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "createComponentEdit",
+        "summary": "Create a new draft task with an owner/base lock and server-resolved component source",
+        "tags": [
+          "versions"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CsrfToken"
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./mapping/component-edit.schema.json#/$defs/request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Component modification queued; never publishes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./mapping/component-edit.schema.json#/$defs/response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; no task or version mutation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

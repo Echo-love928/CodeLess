@@ -12,6 +12,14 @@ if (mode === 'Timeout') {
 } else if (mode === 'Memory') {
   const held = []
   while (true) held.push(Buffer.alloc(8 * 1024 * 1024, 1))
+} else if (mode === 'Kill') {
+  // PID 1 ignores namespace-local fatal signals. Use a real child and propagate
+  // its SIGKILL; container exit 137 must not become an invented OOM.
+  const child = spawn('node', ['-e', "process.kill(process.pid, 'SIGKILL')"], { stdio: 'inherit' })
+  await new Promise((resolve, reject) => {
+    child.once('error', reject)
+    child.once('exit', (code, signal) => { assert.equal(code, null); assert.equal(signal, 'SIGKILL'); process.exitCode = 137; resolve() })
+  })
 } else if (mode === 'Logs') {
   process.stdout.write('x'.repeat(200000))
   process.stderr.write('y'.repeat(200000))

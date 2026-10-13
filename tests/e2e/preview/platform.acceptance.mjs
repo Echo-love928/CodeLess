@@ -142,6 +142,10 @@ try {
     const {checkVersionPanel}=await import('../versions/platform-checks.mjs')
     await checkVersionPanel({page,call,app,version,task,created:created.body,evidence})
   }
+  if(process.env.CODELESS_COMPONENT_SELECTION_ACCEPTANCE==='1') {
+    const {checkComponentPlatform}=await import('../../runner/mapping/platform-checks.mjs')
+    await checkComponentPlatform({page,call,app,version,evidence})
+  }
   success=true
   console.log('Authenticated platform preview, restart and retention acceptance passed (model: '+modelMode+').')
 } catch(error) {primaryFailure=error;throw error} finally {
