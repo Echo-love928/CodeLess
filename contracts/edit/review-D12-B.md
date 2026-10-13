@@ -34,3 +34,53 @@
 B原专项6/6、契约2/2、native exit0，无skip。复审首轮因复用A旧镜像无catalog而exit1/BUILD_CATALOG_UNAVAILABLE；按B既有README前置重建固定镜像exit0后专项通过，首轮环境错误完整保留，没有重试掩盖。检查全部B文件diff、类型声明、固定catalog产出与artifact/source哈希复核、manifest/disabled集合、测试失败路径及报告；无新依赖/锁升级、秘密、开放命令、自动发布或失败改READY。解析器仅识别根，不做AST编辑。A私有复现与复查记录见 `B-review-commands.json`。
 
 镜像tag复原时原imageId已不存在，按IDtag失败；随后从A根原固定Dockerfile/模板重建exit0，恢复A模板内容，imageId变化已记账。没有改任一分支模板或锁、没有删除B工作树/他人数据。修复后正式批准仍须另一人按最终HEAD、当前主分支和全必需checks复核。
+# 2026-10-13 精确候选复审（覆盖旧结论）
+
+PR36=a348f429e5b899f9229138c4d9f791867775363d；最终启用 PR37=72be44ca2805f05375430f54b30a7285f7c965de。
+只读 B checkout，main 未改。已提交 [PR36 REQUEST_CHANGES](https://github.com/Echo-love928/CodeLess/pull/36#pullrequestreview-5498246948)
+及 [PR37 REQUEST_CHANGES](https://github.com/Echo-love928/CodeLess/pull/37#pullrequestreview-5498247222)，未批准。
+
+## 阻塞问题
+
+- **[P2] 标识属性大小写别名仍能选错源码**：`templates/vue/vite.config.ts:37–43` 的比较区分大小写，
+  而 Vue fallthrough 到 HTML 后属性名不区分大小写。受控 fixture 第三个调用改为
+  `<SharedCard label="丙" DATA-AI-COMPONENT="home-page" />`，真实 Docker build exit0，Chromium
+  标识 shared-card/shared-card/home-page；第三个 SharedCard 被解析为 selectable=true、
+  sourceFile=src/pages/HomePage.vue。原生回归命令 `node tests/edit/lifecycle/review-B-marker-case.mjs`
+  **exit1**，断言拒绝此错误结果。脚本使用精确 PR37 生产类和独立可信 imageId，fixture 全在私有目录。
+  PR36/37 的 detector/runner manifest 字节相同，`git diff a348f429..72be44c -- templates/vue/vite.config.ts services/runner/src/mapping/manifest.mjs` 无差异。
+  [完整证据](../../tests/edit/lifecycle/evidence/2026-10-13/B-marker-case.json)。影响：用户操作共享组件可能修改父页。
+  复现前从仓库根执行（checkout已存在时只核对HEAD/干净源码，不重复创建）：
+  `git worktree add --detach .local-data/d12-a/review-b-72be44c 72be44ca2805f05375430f54b30a7285f7c965de`，
+  `docker build --file .local-data/d12-a/review-b-72be44c/infra/build-image/Dockerfile --tag codeless-d12-review:72be44c .local-data/d12-a/review-b-72be44c`。
+  加载既有固定env后运行上述node回归；脚本使用独立tag的不可变imageId，不改变日常d05 tag。
+- **PR37 必须整合 A 删除修复**：其 `AgentLoop.java:136,165–170` 仍是旧的最终计划/工具集合混用逻辑。
+  PR35 本轮修复允许可信基版本 read/update/delete，create 仅限最终计划，最终快照仍严格相等。
+  最终启用维护者整合时须保留 COMPONENT 的仅选中文件 update 边界，运行组件 scope 及删除生命周期。
+  本次没有代写 B 分支，也不以 A 分支修复声称 PR37 已解决删除问题。
+
+## 建议
+
+按 HTML 属性语义处理静态属性/静态 bind 参数的大小写别名，覆盖原生根重复别名及组件调用处覆盖。
+保留 unsafe namespace fail-closed。Windows 现场诊断保留原异常、剩余数量和 retries=0 是进展；
+历史根因仍 UNKNOWN。OOM 补证仅接受同完整容器 ID 的宿主 Docker 事件并再 inspect，不将137自动视为OOM。
+
+## 已核验内容
+
+检查了 sidecar/reportDigest/冻结版本/源码/产物绑定、重启读取、所有权与CSRF、客户端拒绝 sourceFile、
+应用锁内解析、GENERATE/REPAIR 组件范围、origin/iframe.source 点击桥、异步版本栅栏、共享范围提示、
+409保留描述、不自动发布、闭合公共OpenAPI及可选componentMappingDigest。没有新增生产秘密或削弱测试。
+原 spread/dynamic 参数检测与全命名空间禁用修复已建立回归，旧问题不能因新反例全部称未修复。
+
+实查两候选六项 CI 全 success：PR36 [run38240377250](https://github.com/Echo-love928/CodeLess/actions/runs/38240377250)，
+PR37 [run38247878707](https://github.com/Echo-love928/CodeLess/actions/runs/38247878707)。下载 PR37 原API/runner
+job日志核对188/188（0failure/error/skip）及67/67。本地受影响UI10/10，mapping/公共/OOM契约8/8，均exit0。
+独立镜像真实Docker/Chromium `review-B-marker-case.mjs spread-dynamic` exit0，全部选择UNSAFE_MARKER；
+对应证据B-marker-spread-dynamic.json。大小写版本同命令不加参数exit1，两者均记录原生log/hash。
+本机不重复B完整API/预览：按用户“作者修复后只重查变更和受影响范围”核验当前精确CI原job中的
+组件lifecycle11/11及真实PreviewPlatformIntegrationTest1/1，再自行执行受影响源码反例和UI/契约。
+初次用pnpm在依赖junction工作树启动UI测试被pnpm12的state路径保护拒绝exit1，私有log/exit保留；
+改为固定Node运行原锁定Vitest CLI（同依赖/同B配置）实际10/10，未改pnpm版本或保护。
+CI与已有测试成功不能覆盖本次大小写反例。测试及剩余真实联调记录见 D12-A 本轮交接。
+
+---
