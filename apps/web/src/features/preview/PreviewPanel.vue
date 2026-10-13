@@ -88,12 +88,14 @@ onBeforeUnmount(() => { dispose(); window.removeEventListener('message', message
     <p v-if="state === 'loading'" class="preview-panel__message" role="status">正在加载已验证版本…</p>
     <p v-if="state === 'expired'" class="preview-panel__message" role="status">预览访问已过期，请刷新预览。</p>
     <p v-if="state === 'error'" class="preview-panel__message" role="alert">{{ error }}</p>
-    <iframe v-if="credential" ref="frame" :key="credential.url" :src="credential.url" title="当前版本预览"
-      sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"
-      allow="camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'; clipboard-read 'none'; clipboard-write 'none'"
-      :class="{ 'preview-panel__frame--loading': state === 'loading' }" />
-    <VisualEditSelector v-if="credential" :key="credential.url" :application-id="applicationId" :version-id="credential.versionId"
-      :origin="previewOrigin" :frame="frame" :active="state === 'ready'" @unauthorized="emit('unauthorized')" />
+    <div v-if="credential" class="preview-panel__workspace" :class="{ 'preview-panel__workspace--ready': state === 'ready' }">
+      <iframe ref="frame" :key="credential.url" :src="credential.url" title="当前版本预览"
+        sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"
+        allow="camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'; clipboard-read 'none'; clipboard-write 'none'"
+        :class="{ 'preview-panel__frame--loading': state === 'loading' }" />
+      <VisualEditSelector :key="credential.url" :application-id="applicationId" :version-id="credential.versionId"
+        :origin="previewOrigin" :frame="frame" :active="state === 'ready'" @unauthorized="emit('unauthorized')" />
+    </div>
   </div>
 </template>
 
@@ -105,4 +107,10 @@ onBeforeUnmount(() => { dispose(); window.removeEventListener('message', message
 .preview-panel__warning { margin: 0; padding: 12px 16px; color: #8b4d18; background: #fff5e8; font-size: 13px; }
 iframe { display: block; width: 100%; height: 560px; border: 0; }
 .preview-panel__frame--loading { height: 1px; visibility: hidden; }
+.preview-panel__workspace--ready { display: grid; grid-template-columns: minmax(0, 1fr) 280px; }
+.preview-panel__workspace :deep(.visual-selector) { border-left: 1px solid #e1e5ec; max-height: 560px; overflow: auto; }
+@media (max-width: 1050px) {
+  .preview-panel__workspace--ready { display: block; }
+  .preview-panel__workspace :deep(.visual-selector) { border-left: 0; border-top: 1px solid #e1e5ec; max-height: none; }
+}
 </style>
