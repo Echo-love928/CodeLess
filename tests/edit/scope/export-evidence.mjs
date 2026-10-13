@@ -23,8 +23,9 @@ const runs = readdirSync(root).sort().map(name => {
   }
   const lines = log.toString('utf8').split(/\r?\n/)
   const excerpts = lines.filter(line => /\[ci-gate\]|Tests run:|Test Files |Tests  |tests [0-9]+|pass [0-9]+|fail [0-9]+|passed \(|BUILD SUCCESS|BUILD FAILURE|Failed to execute goal/.test(line))
-  writeFileSync(join(out, name + '.summary.log'), excerpts.join('\n') + '\n')
+  writeFileSync(join(out, name + '.summary.log'), JSON.stringify({ mode: run.mode, status: run.status, nativeExit: run.exitCode, signal: run.signal,
+    completionVerified: run.completionVerified ?? null }) + '\n' + excerpts.join('\n') + '\n')
   return { ...run, rawLog: join(dir, 'command.log'), summary: name + '.summary.log', evidenceFiles }
 })
 writeFileSync(join(out, 'commands.json'), JSON.stringify(runs, null, 2) + '\n')
-console.log(JSON.stringify({ runs: runs.length, nativeExits: runs.map(r => ({ mode: r.mode, exit: r.exitCode })), out }))
+console.log(JSON.stringify({ runs: runs.length, nativeExits: runs.map(r => ({ mode: r.mode, status: r.status, exit: r.exitCode })), out }))

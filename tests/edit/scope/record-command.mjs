@@ -29,10 +29,11 @@ if (Object.hasOwn(tests, mode)) {
 const env = { ...process.env, CODELESS_MODEL_PROVIDER: 'deterministic-mock' }
 for (const key of ['CODELESS_MODEL_API_KEY', 'CODELESS_MODEL_NAME', 'CODELESS_PLAYWRIGHT_CHANNEL']) delete env[key]
 const run = join(workspace, '.local-data/d13-a/runs', `${new Date().toISOString().replaceAll(':', '-')}-${mode}-${randomUUID()}`)
-mkdirSync(run, { recursive: true })
+mkdirSync(join(workspace, '.local-data/d13-a'), { recursive: true })
 const lock = join(workspace, '.local-data/d13-a', createHash('sha256').update(repo).digest('hex') + '.command.lock')
 const lockFd = openSync(lock, 'wx') // Never run two Maven/gate commands against the same target directory.
 writeFileSync(lockFd, JSON.stringify({ pid: process.pid, run }))
+mkdirSync(run, { recursive: true })
 env.CODELESS_SCOPE_EVIDENCE_DIR = join(run, 'scope')
 env.CODELESS_EDIT_EVIDENCE_DIR = join(run, 'edit')
 env.CODELESS_VERSION_PREVIEW_EVIDENCE_DIR = join(run, 'preview')
