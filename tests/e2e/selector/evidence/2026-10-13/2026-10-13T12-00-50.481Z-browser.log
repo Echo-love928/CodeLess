@@ -1,0 +1,55 @@
+[2m[WebServer] [22m(node:159452) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:169244) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:169244) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:29:5 › D13-B-T1/T3: hover nested component, select/cancel, Esc and restored navigation (998ms)
+  x  2 [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:55:5 › D13-B-T4: repeated instances share one source file and show whole-component scope (30.1s)
+(node:173596) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:173596) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 3 [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:73:5 › D13-B-T2: both endpoints reject forged source/origin, nonce/version/schema and old-session replay (1.1s)
+
+
+  1) [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:55:5 › D13-B-T4: repeated instances share one source file and show whole-component scope 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.scrollIntoViewIfNeeded: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - attempting scroll into view action[22m
+    [2m    - waiting for element to be stable[22m
+
+
+      67 |   await expect(page.getByRole('region', { name: '预览组件选择' })).toContainText('所有共享实例')
+      68 |   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
+    > 69 |   await frame.getByText('共享链接二').scrollIntoViewIfNeeded()
+         |                                  ^
+      70 |   await expect(frame.getByText('共享链接二')).toBeVisible()
+      71 |   await page.locator('.preview-panel').screenshot({ path: info.outputPath('T4-shared-mobile.png') })
+      72 | })
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\tests\e2e\selector\flow.spec.ts:69:34
+
+    Error Context: test-results\selector-flow-D13-B-T4-rep-9a9d0--show-whole-component-scope-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\selector-flow-D13-B-T4-rep-9a9d0--show-whole-component-scope-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\selector-flow-D13-B-T4-rep-9a9d0--show-whole-component-scope-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:55:5 › D13-B-T4: repeated instances share one source file and show whole-component scope 
+  2 passed (35.7s)
+Error: ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL
+
+  × "pnpm recursive exec" failed in C:
+  │ \Users\12058\Documents\ChatGPT\CodeLess\apps\web
+

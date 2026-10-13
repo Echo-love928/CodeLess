@@ -8,6 +8,8 @@ const commands = {
   unit: ['--filter', '@codeless/web', 'exec', 'vitest', 'run', 'src/features/visual-edit/selector-session.test.ts', 'src/features/preview/PreviewPanel.test.ts'],
   browser: ['--filter', '@codeless/web', 'exec', 'playwright', 'test', '--config', 'playwright.config.ts', 'selector/flow.spec.ts', '--workers=1'],
   static: ['verify:static'], api: ['verify:api'], runner: ['verify:runner'], e2e: ['verify:e2e'], gate: ['ci:gate'],
+  preview: [],
+  authProbe: ['--filter', '@codeless/web', 'exec', 'playwright', 'test', '--config', 'playwright.config.ts', 'auth/flow.spec.ts', '--grep', 'submitting login locks', '--workers=1'],
 }
 if (!Object.hasOwn(commands, mode)) throw new Error('Unknown recording mode')
 const directory = resolve('.local-data/d13-b', new Date().toISOString().replaceAll(':', '-') + '-' + mode)
@@ -22,9 +24,12 @@ if (process.platform === 'win32') {
 delete env.CODELESS_MODEL_API_KEY; delete env.CODELESS_PLAYWRIGHT_CHANNEL
 const head = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' })
 const status = spawnSync('git', ['status', '--porcelain'], { encoding: 'utf8' })
-const command = process.platform === 'win32' ? process.env.ComSpec : 'corepack'
-const args = [...(process.platform === 'win32' ? ['/d', '/c', 'corepack'] : []), 'pnpm', ...commands[mode]]
-const metadata = { mode, command: ['corepack', 'pnpm', ...commands[mode]], head: head.stdout.trim(), changes: status.stdout.trim(),
+const windows = process.platform === 'win32'
+const invocation = mode === 'preview' ? [windows ? 'services\\api\\mvnw.cmd' : './services/api/mvnw', '-f', 'services/api/pom.xml', '-Dtest=PreviewPlatformIntegrationTest', 'test']
+  : ['corepack', 'pnpm', ...commands[mode]]
+const command = windows ? process.env.ComSpec : invocation[0]
+const args = windows ? ['/d', '/c', ...invocation] : invocation.slice(1)
+const metadata = { mode, command: invocation, head: head.stdout.trim(), changes: status.stdout.trim(),
   startedAt: new Date().toISOString(), status: 'RUNNING', exitCode: null, signal: null }
 const save = () => writeFileSync(join(directory, 'run.json'), JSON.stringify(metadata, null, 2) + '\n')
 save(); console.log(JSON.stringify({ directory, status: 'RUNNING' }))

@@ -1,0 +1,115 @@
+[2m[WebServer] [22m(node:135680) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:159100) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:159100) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:29:5 › D13-B-T1/T3: hover nested component, select/cancel, Esc and restored navigation (30.1s)
+(node:165716) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:165716) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  2 [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:55:5 › D13-B-T4: repeated instances share one source file and show whole-component scope (30.1s)
+(node:160828) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:160828) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  3 [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:64:5 › D13-B-T2: both endpoints reject forged source/origin, nonce/version/schema and old-session replay (30.1s)
+
+
+  1) [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:29:5 › D13-B-T1/T3: hover nested component, select/cancel, Esc and restored navigation 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('iframe').contentFrame().getByText('嵌套链接一')[22m
+
+
+      29 | test('D13-B-T1/T3: hover nested component, select/cancel, Esc and restored navigation', async ({ page }, info) => {
+      30 |   const { requests, frame } = await fixture(page)
+    > 31 |   await frame.getByText('嵌套链接一').click()
+         |                                  ^
+      32 |   await expect.poll(() => frame.locator('body').evaluate(() => location.hash)).toBe('#destination')
+      33 |   await page.getByLabel('选择组件进行修改').check()
+      34 |   await frame.getByText('嵌套链接一').hover()
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\tests\e2e\selector\flow.spec.ts:31:34
+
+    Error Context: test-results\selector-flow-D13-B-T1-T3--af5fa-Esc-and-restored-navigation-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\selector-flow-D13-B-T1-T3--af5fa-Esc-and-restored-navigation-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\selector-flow-D13-B-T1-T3--af5fa-Esc-and-restored-navigation-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:55:5 › D13-B-T4: repeated instances share one source file and show whole-component scope 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('iframe').contentFrame().getByText('共享链接二')[22m
+
+
+      56 |   const { frame } = await fixture(page)
+      57 |   await page.getByLabel('选择组件进行修改').check()
+    > 58 |   await frame.getByText('共享链接二').click()
+         |                                  ^
+      59 |   await expect(page.getByRole('region', { name: '预览组件选择' })).toContainText('第 2 / 3 个可见实例')
+      60 |   await expect(page.getByRole('region', { name: '预览组件选择' })).toContainText('所有共享实例，包括其他页面')
+      61 |   await expect(page.getByRole('region', { name: '组件修改' })).toContainText(component.sourceFile)
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\tests\e2e\selector\flow.spec.ts:58:34
+
+    Error Context: test-results\selector-flow-D13-B-T4-rep-9a9d0--show-whole-component-scope-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\selector-flow-D13-B-T4-rep-9a9d0--show-whole-component-scope-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\selector-flow-D13-B-T4-rep-9a9d0--show-whole-component-scope-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:64:5 › D13-B-T2: both endpoints reject forged source/origin, nonce/version/schema and old-session replay 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('iframe').contentFrame().getByText('共享链接二')[22m
+
+
+      77 |   }, { selection, rejected, origin })
+      78 |   // Flush the event loop with a genuine valid selection, proving negative messages caused no API request.
+    > 79 |   await frame.getByText('共享链接二').click()
+         |                                  ^
+      80 |   await expect(page.getByLabel('组件修改描述')).toBeVisible()
+      81 |   expect(requests).toHaveLength(1)
+      82 |   await page.getByLabel('选择组件进行修改').uncheck()
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\tests\e2e\selector\flow.spec.ts:79:34
+
+    Error Context: test-results\selector-flow-D13-B-T2-bot-5b258-hema-and-old-session-replay-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\selector-flow-D13-B-T2-bot-5b258-hema-and-old-session-replay-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\selector-flow-D13-B-T2-bot-5b258-hema-and-old-session-replay-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:29:5 › D13-B-T1/T3: hover nested component, select/cancel, Esc and restored navigation 
+    [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:55:5 › D13-B-T4: repeated instances share one source file and show whole-component scope 
+    [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:64:5 › D13-B-T2: both endpoints reject forged source/origin, nonce/version/schema and old-session replay 
+Error: ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL
+
+  × "pnpm recursive exec" failed in C:
+  │ \Users\12058\Documents\ChatGPT\CodeLess\apps\web
+

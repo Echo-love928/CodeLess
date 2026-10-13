@@ -66,7 +66,10 @@ test('D13-B-T4: repeated instances share one source file and show whole-componen
   await page.setViewportSize({ width: 375, height: 900 })
   await expect(page.getByRole('region', { name: '预览组件选择' })).toContainText('所有共享实例')
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
-  await page.screenshot({ path: info.outputPath('T4-shared-mobile.png'), fullPage: true })
+  // Scroll the parent first: offscreen cross-origin frames may pause animation frames.
+  await page.locator('iframe[title="当前版本预览"]').scrollIntoViewIfNeeded()
+  await expect(frame.getByText('共享链接二')).toBeVisible()
+  await page.locator('.preview-panel').screenshot({ path: info.outputPath('T4-shared-mobile.png') })
 })
 test('D13-B-T2: both endpoints reject forged source/origin, nonce/version/schema and old-session replay', async ({ page }, info) => {
   const { requests, frame } = await fixture(page)
@@ -82,6 +85,15 @@ test('D13-B-T2: both endpoints reject forged source/origin, nonce/version/schema
     for (const attempt of rejected) window.dispatchEvent(new MessageEvent('message', { origin: attempt.origin ?? origin,
       source: attempt.wrongSource ? window : document.querySelector('iframe')!.contentWindow, data: { ...selection, ...attempt.patch } }))
   }, { selection, rejected, origin })
+  // A native same-origin message from a second preview has the wrong WindowProxy.
+  await page.evaluate(() => {
+    const sibling = document.createElement('iframe'); sibling.id = 'forged-preview'
+    sibling.src = document.querySelector<HTMLIFrameElement>('iframe[title="当前版本预览"]')!.src
+    document.body.append(sibling)
+  })
+  await page.frameLocator('#forged-preview').getByText('共享三').evaluate((_node, selection) => parent.postMessage(selection, 'http://127.0.0.1:4173'), selection)
+  await page.evaluate(selection => postMessage(selection, location.origin), selection)
+  await page.locator('#forged-preview').evaluate(node => node.remove())
   // Flush the event loop with a genuine valid selection, proving negative messages caused no API request.
   await frame.getByText('共享链接二').click()
   await expect(page.getByLabel('组件修改描述')).toBeVisible()
