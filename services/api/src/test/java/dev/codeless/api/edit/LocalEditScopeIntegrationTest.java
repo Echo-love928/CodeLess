@@ -190,6 +190,7 @@ class LocalEditScopeIntegrationTest extends PostgresTestBase {
         assertThat(snapshots.readSource(next,updated.digest(),TARGET)).contains("Hedy Lamarr","<style scoped>");
         for(var input:inputs) {
             assertThat(input.path("editContext").path("sourceFiles").size()).isEqualTo(1);
+            assertThat(input.path("verificationRoutes")).isEqualTo(json.valueToTree(List.of("/")));
             assertThat(input.toString()).doesNotContain("UNRELATED_SOURCE_SENTINEL",OTHER,"CodeLess Showcase");assertThat(input.has("plan")).isFalse();
         }
         run(executor,c,TaskStatus.VERIFY,TaskStatus.READY);

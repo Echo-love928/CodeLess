@@ -126,7 +126,10 @@ public final class AgentLoop implements TaskStageRunner {
             boolean completionOnly=repair&&Boolean.TRUE.equals(repairContext.progress().get("sourceChanged"))&&RuntimeBudget.MODEL_CALLS-meter.models()==1;
             var input=new LinkedHashMap<String,Object>();input.put("phase",stage.name());input.put("request",context.prompt());
             input.put("dataMode",context.dataMode());
-            if(local.isPresent()) input.put("scope",local.get().path("allowedWriteFiles"));
+            if(local.isPresent()) {
+                input.put("scope",local.get().path("allowedWriteFiles"));
+                input.put("verificationRoutes",plan.path("pages").valueStream().map(page -> page.path("route").asText()).toList());
+            }
             else input.put("plan",repair?RepairContext.planProjection(plan):plan);
             input.put("tools",completionOnly?List.of():registry.definitions().path("tools"));
             input.put("observations",repair?repairContext.observations():observations);
