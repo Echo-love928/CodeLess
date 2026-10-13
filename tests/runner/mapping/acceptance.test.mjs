@@ -186,3 +186,78 @@ const marker = 'data-ai-component'
     finally { await new Promise(done => server.close(done)) }
   }
 })
+
+async function inspectCaseAliases(result, sourceDigest) {
+  const artifacts = await readSnapshot(result.build.artifact.directory)
+  const server = createServer((req, res) => {
+    const path = new URL(req.url, 'http://127.0.0.1').pathname.slice(1) || 'index.html'
+    const bytes = artifacts.buffers.get(path)
+    if (!bytes) { res.writeHead(404).end(); return }
+    res.setHeader('Content-Type', path.endsWith('.js') ? 'text/javascript' : path.endsWith('.css') ? 'text/css' : 'text/html')
+    res.end(bytes)
+  })
+  let browser
+  try {
+    await new Promise(done => server.listen(0, '127.0.0.1', done))
+    browser = await chromium.launch({ headless: true })
+    const page = await browser.newPage()
+    await page.goto(`http://127.0.0.1:${server.address().port}/`)
+    await page.locator('h2').first().waitFor()
+    const markers = await page.locator('h2').evaluateAll(nodes => nodes.map(node => node.closest('[data-ai-component]')?.getAttribute('data-ai-component')))
+    const selections = markers.map(componentId => resolveSelection(result.manifest, { versionId: newVersionId, sourceDigest, componentId }))
+    return { markers, selections, manifest: result.manifest, exitCode: result.build.exitCode, imageId: result.build.imageId, browser: browser.version(), realDocker: true, realChromium: true, modelRequests: 0 }
+  } finally {
+    try { await browser?.close() }
+    finally { await new Promise(done => server.close(done)) }
+  }
+}
+
+test('R2: call-site HTML marker case aliases cannot select the parent source', { timeout: 120000 }, async () => {
+  const source = join(scratch, 'case-call-sites')
+  await cp(fixture, source, { recursive: true })
+  const page = join(source, 'src/pages/HomePage.vue')
+  const content = await readFile(page, 'utf8')
+  assert(content.includes('<SharedCard label="丙" />'))
+  await writeFile(page, content.replace('<SharedCard label="丙" />', `<SharedCard label="uppercase" DATA-AI-COMPONENT="home-page" />
+<SharedCard label="mixed" Data-Ai-Component="home-page" />
+<SharedCard label="bind-uppercase" :DATA-AI-COMPONENT="'home-page'" />
+<SharedCard label="bind-mixed" :Data-Ai-Component="'home-page'" />`))
+  const snapshot = await readSnapshot(source, { source: true })
+  const result = await buildVersionMapping({ sourceDirectory: source, versionId: newVersionId, sourceDigest: snapshot.manifest.digest, runBuild })
+  assert.equal(result.status, 'MAPPED', JSON.stringify(result))
+  const actual = await inspectCaseAliases(result, snapshot.manifest.digest)
+  await evidence('D12-B-R2-call-sites', actual)
+  // Preserve the actual fallthrough/HTML behavior; a forged marker is not rewritten.
+  assert.equal(actual.markers.length, 6)
+  assert.equal(actual.markers[2], 'home-page')
+  assert(actual.selections.every(value => !value.selectable && value.reason === 'UNSAFE_MARKER'))
+  assert.equal(result.manifest.components.length, 0)
+})
+
+test('R2: root case aliases, duplicate aliases and static bind arguments disable the namespace', { timeout: 120000 }, async () => {
+  const source = join(scratch, 'case-roots')
+  await cp(fixture, source, { recursive: true })
+  const variants = {
+    RootUpper: '<main DATA-AI-COMPONENT="upper-root"><h2>upper root</h2></main>',
+    RootMixed: '<main Data-Ai-Component="mixed-root"><h2>mixed root</h2></main>',
+    RootDuplicate: '<main data-ai-component="duplicate-root" DATA-AI-COMPONENT="home-page"><h2>duplicate root</h2></main>',
+    RootBind: '<main data-ai-component="bind-root" :DATA-AI-COMPONENT="\'home-page\'"><h2>bind root</h2></main>',
+  }
+  const imports = [], calls = []
+  for (const [name, template] of Object.entries(variants)) {
+    await writeFile(join(source, 'src/components', name + '.vue'), '<template>' + template + '</template>')
+    imports.push(`import ${name} from '../components/${name}.vue'`)
+    calls.push(`<${name}/>`)
+  }
+  const page = join(source, 'src/pages/HomePage.vue')
+  await writeFile(page, (await readFile(page, 'utf8')).replace('</script>', imports.join('\n') + '\n</script>').replace('</main>', calls.join('\n') + '\n</main>'))
+  const snapshot = await readSnapshot(source, { source: true })
+  const result = await buildVersionMapping({ sourceDirectory: source, versionId: newVersionId, sourceDigest: snapshot.manifest.digest, runBuild })
+  assert.equal(result.status, 'MAPPED', JSON.stringify(result))
+  const actual = await inspectCaseAliases(result, snapshot.manifest.digest)
+  await evidence('D12-B-R2-roots', actual)
+  assert.equal(actual.markers.length, 7)
+  for (const name of Object.keys(variants)) assert.equal(result.manifest.disabled.find(file => file.sourceFile === `src/components/${name}.vue`)?.reason, 'UNSAFE_MARKER', name)
+  assert(actual.selections.every(value => !value.selectable && value.reason === 'UNSAFE_MARKER'))
+  assert.equal(result.manifest.components.length, 0)
+})

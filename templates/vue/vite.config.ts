@@ -7,6 +7,7 @@ import { resolve } from 'node:path'
 
 // Trusted build configuration, never part of the generated source allowlist.
 // The compiler AST is used only to recognize component roots, not to edit source.
+const markerName = (name: string) => name.toLowerCase() === 'data-ai-component'
 function componentCatalog() {
   return {
     name: 'codeless-component-catalog',
@@ -34,13 +35,17 @@ function componentCatalog() {
             if (roots.length !== 1 || root?.type !== 1 || root.tagType !== 0 || ['template', 'slot'].includes(root.tag)) {
               disabledReason = 'UNSUPPORTED_ROOT'
             } else {
-              const attributes = root.props.filter(prop => prop.type === 6 && prop.name === 'data-ai-component')
-              const unsafeBinding = root.props.some(prop => prop.type === 7 &&
-                ((prop.name === 'bind' && (!prop.arg || prop.arg.type !== 4 || !prop.arg.isStatic || prop.arg.content === 'data-ai-component')) ||
-                  ['if', 'else', 'else-if'].includes(prop.name)))
+              const attributes = root.props.filter(prop => prop.type === 6 && markerName(prop.name))
+              // Vue preserves source casing; native HTML attributes do not. Reject
+              // aliases rather than treating their fallthrough as a missing marker.
+              const unsafeBinding = root.props.some(prop =>
+                (prop.type === 6 && markerName(prop.name) && prop.name !== 'data-ai-component') ||
+                (prop.type === 7 &&
+                  ((prop.name === 'bind' && (!prop.arg || prop.arg.type !== 4 || !prop.arg.isStatic || markerName(prop.arg.content))) ||
+                    ['if', 'else', 'else-if'].includes(prop.name))))
               const nestedMarker = (nodes: typeof root.children): boolean => nodes.some(node => node.type === 1 &&
-                (node.props.some(prop => (prop.type === 6 && prop.name === 'data-ai-component') ||
-                  (prop.type === 7 && prop.name === 'bind' && (!prop.arg || prop.arg.type !== 4 || !prop.arg.isStatic || prop.arg.content === 'data-ai-component'))) || nestedMarker(node.children)))
+                (node.props.some(prop => (prop.type === 6 && markerName(prop.name)) ||
+                  (prop.type === 7 && prop.name === 'bind' && (!prop.arg || prop.arg.type !== 4 || !prop.arg.isStatic || markerName(prop.arg.content)))) || nestedMarker(node.children)))
               if (attributes.length !== 1) disabledReason = attributes.length ? 'INVALID_COMPONENT_ID' : 'MISSING_COMPONENT_ID'
               else {
                 const attribute = attributes[0]
