@@ -478,7 +478,7 @@ class EditLifecycleIntegrationTest extends PostgresTestBase {
                 if("REPAIR".equals(input.path("phase").asText())) {
                     String path=mode.equals("files.update")?"src/pages/HomePage.vue":"src/components/ProfileCard.vue";
                     String digest=input.path("sourceFiles").valueStream().filter(f -> f.path("path").asText().equals(path))
-                            .findFirst().orElseThrow().path("digest").asText();
+                            .findFirst().map(f -> f.path("digest").asText()).orElse("sha256:"+"0".repeat(64));
                     var arguments=new LinkedHashMap<String,Object>();arguments.put("path",path);
                     if(!mode.equals("files.create"))arguments.put("expectedDigest",digest);
                     if(!mode.equals("files.delete"))arguments.put("content","<template><main>scope fixture</main></template>");

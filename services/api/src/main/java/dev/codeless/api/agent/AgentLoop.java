@@ -4,6 +4,7 @@ import dev.codeless.api.data.PlatformModels.*;
 import dev.codeless.api.model.*;
 import dev.codeless.api.tasks.*;
 import dev.codeless.api.tools.*;
+import dev.codeless.api.edit.LocalEditScope;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import org.springframework.core.io.ClassPathResource;
@@ -20,7 +21,7 @@ public final class AgentLoop implements TaskStageRunner {
     private final BuildGateway runner;
     private final AgentEvidence evidence;
     private final JsonMapper json=JsonMapper.builder().build();
-    private final String planPolicy,generationPolicy,repairPolicy;
+    private final String planPolicy,generationPolicy,repairPolicy,localEditPolicy;
     private final RepairController repairs=new RepairController();
     private final boolean repairEnabled;
     public AgentLoop(AgentRunStore store,AgentModel model,PlanValidator plans,FileToolRegistry registry,
@@ -37,6 +38,7 @@ public final class AgentLoop implements TaskStageRunner {
             generationPolicy=proposalPolicy+new ClassPathResource("model/prompts/agent-generate-v1.txt").getContentAsString(StandardCharsets.UTF_8);
             // REPAIR owns a complete patch protocol; GENERATE's coordinator verdict hints are not repair instructions.
             repairPolicy=new ClassPathResource("model/prompts/repair/agent-repair-v1.txt").getContentAsString(StandardCharsets.UTF_8);
+            localEditPolicy=new ClassPathResource("model/prompts/edit/local-component-v1.txt").getContentAsString(StandardCharsets.UTF_8);
         } catch(Exception failure) {throw new AgentFailure("AGENT_CONFIGURATION");}
     }
     public StageResult execute(UUID taskId,TaskStatus stage) {throw new AgentFailure("AGENT_ORIGINAL_CLAIM_REQUIRED");}
@@ -57,7 +59,9 @@ public final class AgentLoop implements TaskStageRunner {
                     var input=new LinkedHashMap<String,Object>();
                     input.put("request",context.prompt());input.put("dataMode",context.dataMode());input.put("tools",List.of());
                     var edit=store.editContext(claim,stage);edit.ifPresent(value -> input.put("editContext",value));
-                    var candidate=model.call(claim,stage,planPolicy+(edit.isPresent()?EDIT_POLICY:""),json.valueToTree(input));
+                    // A local edit retains the trusted base structure; the model only proposes target-file changes.
+                    var candidate=edit.filter(LocalEditScope::component).isPresent()?store.componentPlan(claim):
+                            model.call(claim,stage,planPolicy+(edit.isPresent()?EDIT_POLICY:""),json.valueToTree(input));
                     var plan=plans.validate(candidate.toString(),context.dataMode());
                     store.append(claim,stage,"plan",plan);
                     yield new StageResult(TaskStatus.GENERATE,"Validated plan saved",null);
@@ -96,7 +100,10 @@ public final class AgentLoop implements TaskStageRunner {
             try {store.append(claim,stage,"failure",Map.of("code",code,"category",repairs.category(code).name(),
                     "recovery","MANUAL_REVIEW_NO_AUTOMATIC_RETRY"));}
             catch(RuntimeException unavailable) { /* DB state still fails; prior forced checkpoints remain. */ }
-            return new StageResult(TaskStatus.FAILED,"Generation stopped; recovery information retained",code);
+            String message=code.equals("COMPONENT_SCOPE_REJECTED")?"Local edit allows only reading/updating the selected source file; wider scope requires manual review":
+                    code.equals("COMPONENT_SCOPE_EXPANSION_REQUIRED")?"Model requested additional file scope; stopped for manual review":
+                    "Generation stopped; recovery information retained";
+            return new StageResult(TaskStatus.FAILED,message,code);
         }
     }
     private StageResult generate(TaskQueueService.Claim claim,AgentRunStore.Context context,JsonNode plan,JsonNode failure) {
@@ -107,7 +114,9 @@ public final class AgentLoop implements TaskStageRunner {
         RepairContext repairContext=repair?new RepairContext(previousDraft):null;
         Set<String> planned=new TreeSet<>();plan.path("files").forEach(f -> planned.add(f.path("path").asText()));
         Set<String> names=new HashSet<>();registry.definitions().path("tools").forEach(t -> names.add(t.path("name").asText()));
-        var edit=repair?Optional.<JsonNode>empty():store.editContext(claim,stage);
+        var currentEdit=store.editContext(claim,stage);
+        var local=currentEdit.filter(LocalEditScope::component);
+        var edit=repair?local:currentEdit;
         // The plan describes the final snapshot. Trusted immutable base files may also
         // be read, updated or deleted while producing it; model text grants no paths.
         Set<String> operable=new TreeSet<>(planned);
@@ -116,15 +125,28 @@ public final class AgentLoop implements TaskStageRunner {
             var meter=repair?RuntimeBudget.meter(store.read(claim,stage)):null;
             boolean completionOnly=repair&&Boolean.TRUE.equals(repairContext.progress().get("sourceChanged"))&&RuntimeBudget.MODEL_CALLS-meter.models()==1;
             var input=new LinkedHashMap<String,Object>();input.put("phase",stage.name());input.put("request",context.prompt());
-            input.put("dataMode",context.dataMode());input.put("plan",repair?RepairContext.planProjection(plan):plan);input.put("tools",completionOnly?List.of():registry.definitions().path("tools"));
+            input.put("dataMode",context.dataMode());
+            if(local.isPresent()) input.put("scope",local.get().path("allowedWriteFiles"));
+            else input.put("plan",repair?RepairContext.planProjection(plan):plan);
+            input.put("tools",completionOnly?List.of():registry.definitions().path("tools"));
             input.put("observations",repair?repairContext.observations():observations);
             edit.ifPresent(value -> input.put("editContext",value));
             if(repair) {input.put("failure",failure);input.put("completionProposal",Map.of("type","done","actions",originalActions));input.put("sourceFiles",repairContext.sourceFiles());
                 input.put("repairAttempt",context.repairAttempts());input.put("repairProgress",repairContext.progress());
                 if(completionOnly)input.put("completionOnly",true);
+                local.ifPresent(value -> input.put("sourceFiles",LocalEditScope.files(repairContext.sourceFiles(),LocalEditScope.target(value))));
                 input.put("budget",Map.of("modelCallsRemaining",RuntimeBudget.MODEL_CALLS-meter.models(),
                         "toolCallsRemaining",RuntimeBudget.TOOL_CALLS-meter.tools(),"tokensRemaining",RuntimeBudget.TOKENS-meter.chargedTokens()));}
-            JsonNode reply=model.call(claim,stage,repair?repairPolicy:generationPolicy+(edit.isPresent()?EDIT_POLICY:""),json.valueToTree(input));
+            JsonNode reply=model.call(claim,stage,(repair?repairPolicy:generationPolicy+(edit.isPresent()?EDIT_POLICY:""))+
+                    (local.isPresent()?"\n"+localEditPolicy:""),json.valueToTree(input));
+            if(local.isPresent() && "scopeExpansion".equals(reply.path("type").asText())) {
+                closed(reply,Set.of("type","reason"));
+                if(!reply.path("reason").isTextual() || reply.path("reason").asText().isBlank() || reply.path("reason").asText().length()>1000)
+                    throw new AgentFailure("AGENT_MODEL_PROTOCOL_INVALID");
+                store.append(claim,stage,"edit.scope.denied",Map.of("reason","MODEL_REQUESTED_SCOPE_EXPANSION","explanation",reply.path("reason"),
+                        "trust","UNTRUSTED_MODEL_DATA","allowedWriteFiles",local.get().path("allowedWriteFiles")));
+                throw new AgentFailure("COMPONENT_SCOPE_EXPANSION_REQUIRED");
+            }
             if(reply.path("type").asText().equals("tool")) {
                 closed(reply,Set.of("type","name","arguments"));
                 String name=reply.path("name").asText();
@@ -132,11 +154,13 @@ public final class AgentLoop implements TaskStageRunner {
                 JsonNode arguments=reply.path("arguments");
                 // A component edit authorizes the whole selected file, including REPAIR.
                 // Plan/model text cannot widen that immutable server-resolved scope.
-                var componentEdit=store.editContext(claim,stage);
-                if(componentEdit.isPresent() && "COMPONENT".equals(componentEdit.get().path("source").path("type").asText())
-                        && Set.of("files.create","files.update","files.delete").contains(name)
-                        && (!"files.update".equals(name) || !arguments.path("path").asText().equals(componentEdit.get().path("source").path("sourceFile").asText())))
-                    throw new AgentFailure("COMPONENT_SCOPE_REJECTED");
+                if(local.isPresent()) {
+                    String reason=LocalEditScope.denial(LocalEditScope.target(local.get()),name,arguments.path("path").asText());
+                    if(reason!=null) {
+                        store.append(claim,stage,"edit.scope.denied",Map.of("reason",reason,"tool",name,"allowedWriteFiles",local.get().path("allowedWriteFiles")));
+                        throw new AgentFailure("COMPONENT_SCOPE_REJECTED");
+                    }
+                }
                 Set<String> allowed=name.equals("files.create")?planned:operable;
                 if(arguments.has("path") && !allowed.contains(arguments.path("path").asText())) throw new AgentFailure("AGENT_UNPLANNED_FILE");
                 store.reserve(claim,stage,"tool.request",0);
@@ -144,11 +168,12 @@ public final class AgentLoop implements TaskStageRunner {
                 JsonNode observed=json.valueToTree(actual);
                 store.append(claim,stage,"tool.result",observed);
                 if(!actual.status().equals("SUCCEEDED")) throw new AgentFailure(actual.errorCode());
+                JsonNode projected=local.isPresent()?LocalEditScope.observation(observed,LocalEditScope.target(local.get())):observed;
                 if(repair) {
-                    boolean repeated=repairContext.observe(name,arguments,observed);
+                    boolean repeated=repairContext.observe(name,arguments,projected);
                     if(repeated)store.append(claim,stage,"repair.read.repeat",Map.of("tool",name,"path",arguments.path("path").asText(),
                             "callId",actual.callId(),"progress",repairContext.progress()));
-                } else observations.add(observed);
+                } else observations.add(projected);
             } else if(reply.path("type").asText().equals("done")) {
                 closed(reply,Set.of("type","actions"));
                 validateCoverage(plan,reply.path("actions"));
@@ -172,6 +197,7 @@ public final class AgentLoop implements TaskStageRunner {
         Set<String> planned=new TreeSet<>();plan.path("files").forEach(f -> planned.add(f.path("path").asText()));
         store.reserve(claim,TaskStatus.GENERATE,"tool.request",0);
         var snapshot=files.snapshot(claim.taskId(),claim.token());
+        store.checkComponentSnapshot(claim,json.valueToTree(snapshot.source().files()));
         if(!planned.equals(new TreeSet<>(snapshot.source().files().stream().map(ControlledWorkspace.SourceFile::path).toList())))
             throw new AgentFailure("AGENT_PLAN_FILES_MISMATCH");
         store.draft(claim,snapshot,actions);
