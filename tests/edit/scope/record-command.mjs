@@ -1,6 +1,6 @@
 // Developer-only fixed acceptance commands. No API/runtime shell capability is exposed.
 import { spawn, spawnSync } from 'node:child_process'
-import { openSync, closeSync, mkdirSync, writeFileSync, renameSync, readFileSync, realpathSync } from 'node:fs'
+import { openSync, closeSync, mkdirSync, writeFileSync, renameSync, readFileSync, realpathSync, unlinkSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { resolve, relative, isAbsolute, join } from 'node:path'
 import { randomUUID, createHash } from 'node:crypto'
@@ -30,6 +30,9 @@ const env = { ...process.env, CODELESS_MODEL_PROVIDER: 'deterministic-mock' }
 for (const key of ['CODELESS_MODEL_API_KEY', 'CODELESS_MODEL_NAME', 'CODELESS_PLAYWRIGHT_CHANNEL']) delete env[key]
 const run = join(workspace, '.local-data/d13-a/runs', `${new Date().toISOString().replaceAll(':', '-')}-${mode}-${randomUUID()}`)
 mkdirSync(run, { recursive: true })
+const lock = join(workspace, '.local-data/d13-a', createHash('sha256').update(repo).digest('hex') + '.command.lock')
+const lockFd = openSync(lock, 'wx') // Never run two Maven/gate commands against the same target directory.
+writeFileSync(lockFd, JSON.stringify({ pid: process.pid, run }))
 env.CODELESS_SCOPE_EVIDENCE_DIR = join(run, 'scope')
 env.CODELESS_EDIT_EVIDENCE_DIR = join(run, 'edit')
 env.CODELESS_VERSION_PREVIEW_EVIDENCE_DIR = join(run, 'preview')
@@ -56,12 +59,17 @@ function finish(code, signal, error) {
   if (completed) return
   completed = true; closeSync(fd)
   metadata.completedAt = new Date().toISOString(); metadata.exitCode = code; metadata.signal = signal
-  metadata.status = error ? 'LAUNCH_FAILED' : code === 0 && signal === null ? 'PASSED' : 'FAILED'
+  const log = readFileSync(join(run, 'command.log'))
+  const completedMarker = Object.hasOwn(tests, mode) || mode === 'api' ? log.includes('[INFO] BUILD SUCCESS') :
+    mode === 'gate' ? log.includes('[ci-gate] all stages passed') : true
+  metadata.completionVerified = completedMarker
+  metadata.status = error ? 'LAUNCH_FAILED' : code === 0 && signal === null ? completedMarker ? 'PASSED' : 'INCOMPLETE' : 'FAILED'
   if (error) metadata.launchError = error.code ?? 'UNKNOWN'
-  metadata.logDigest = 'sha256:' + createHash('sha256').update(readFileSync(join(run, 'command.log'))).digest('hex')
+  metadata.logDigest = 'sha256:' + createHash('sha256').update(log).digest('hex')
   save()
+  closeSync(lockFd); unlinkSync(lock)
   console.log(JSON.stringify({ status: metadata.status, exitCode: code, signal, run: relative(workspace, run) }))
-  process.exitCode = code === 0 && signal === null && !error ? 0 : Number.isInteger(code) && code !== 0 ? code : 1
+  process.exitCode = metadata.status === 'PASSED' ? 0 : Number.isInteger(code) && code !== 0 ? code : 1
 }
 child.once('error', error => finish(null, null, error))
 child.once('exit', (code, signal) => finish(code, signal))
