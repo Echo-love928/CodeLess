@@ -21,7 +21,7 @@ Git fetch PR41 失败（github.com:443 连接超时），未声称获得其 Git 
 
 ## 已核验内容
 
-- `VersionController.java:45` 的恢复入口闭合 expectedCurrentVersionId，规范 UUID、no-store/nosniff；
+- `VersionController.java:42` 的恢复入口闭合 expectedCurrentVersionId，规范 UUID、no-store/nosniff；
   身份/CSRF沿用公共安全链，测试确实覆盖 401/403/404、额外字段/简写 UUID 400。
 - `VersionRestoreService.java:23` 同一应用行锁下核对 owner、ACTIVE、VERIFIED、expected 指针及 QUEUED/RUNNING，
   核对 SUCCEEDED/exit0/build digest、冻结源码/产物/浏览器 PASSED；只更新应用指针，不更新历史版本或发布。
@@ -35,3 +35,12 @@ Git fetch PR41 失败（github.com:443 连接超时），未声称获得其 Git 
 复现：在 A 精确候选中 `node tests/edit/verification/record-command.mjs acceptance`；
 查看 `verified/D14-A-T1..T4.json`、`restore-boundaries.json`、`restore-concurrency.json`。
 本次通过 GitHub API逐字读取代码/原始 JSON，未把同伴报告当作自己的本地测试结果。
+
+## B 本地组合验证
+
+随后在独立 `.local-data/d14-ab-integration` 应用 A 精确候选的文本源码补丁，叠加 B 源码候选
+`a40af3f30cc35ba37f59f12f29bbec021d09dd6c`；8个改变的UI/单测文件逐字节相等。
+`node tests/e2e/visual-edit/record-command.mjs integration` **native exit0**，
+EditVerificationIntegrationTest 7/7 + PreviewPlatformIntegrationTest 1/1，0 failure/error/skip，BUILD SUCCESS。
+组合树中的每个改动/新增文件SHA256、A/B来源及命令在本卡 evidence 的 ab-integration/command.json。
+这次本地结果才是本人的真实组合验收；不替代B远端必需检查或同伴正式批准。
