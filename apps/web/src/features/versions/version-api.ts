@@ -29,6 +29,13 @@ function version(value: Version, applicationId: string): Version {
 }
 
 // D11-A version list contract; see contracts/versions/README.md. No workspace fallback.
+export async function getVersion(id: string, applicationId: string, signal?: AbortSignal): Promise<Version> {
+  if (!uuid(id) || !uuid(applicationId)) throw new Error('版本入口无效。')
+  const value = version(await requestJson<Version>(`/api/v0/versions/${id}`, { signal, cache: 'no-store' }), applicationId)
+  if (value.id !== id) throw new Error('版本响应与任务产物不匹配。')
+  return value
+}
+
 export async function listVersions(applicationId: string, page = 0, signal?: AbortSignal): Promise<VersionPage> {
   if (!uuid(applicationId)) throw new Error('应用入口无效。')
   const result = await requestJson<VersionPage>(`/api/v0/applications/${applicationId}/versions?page=${page}&size=20`, { signal, cache: 'no-store' })
