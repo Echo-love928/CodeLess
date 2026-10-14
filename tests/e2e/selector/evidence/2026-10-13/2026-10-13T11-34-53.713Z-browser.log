@@ -1,0 +1,51 @@
+[2m[WebServer] [22m(node:149064) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:146264) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:146264) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:29:5 › D13-B-T1/T3: hover nested component, select/cancel, Esc and restored navigation (1.2s)
+  ok 2 [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:55:5 › D13-B-T4: repeated instances share one source file and show whole-component scope (626ms)
+  x  3 [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:64:5 › D13-B-T2: both endpoints reject forged source/origin, nonce/version/schema and old-session replay (648ms)
+
+
+  1) [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:64:5 › D13-B-T2: both endpoints reject forged source/origin, nonce/version/schema and old-session replay 
+
+    Error: locator.evaluate: Error: strict mode violation: locator('iframe') resolved to 2 elements:
+        1) <iframe class="" title="当前版本预览" data-v-fb291831="" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin" src="https://v66666666666646668666666666666666.preview.codeless-preview.test/__preview/start?credential=fixture" allow="camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'; clipboard-read 'none'; clipboard-write 'none'"></iframe> aka locator('iframe[title="当前版本预览"]')
+        2) <iframe id="attacker" srcdoc="<p>sibling</p>"></iframe> aka locator('#attacker')
+
+    Call log:
+    [2m  - waiting for locator('iframe').contentFrame().locator('body')[22m
+
+
+      92 |     sibling.contentWindow!.eval(`parent.document.querySelector('iframe').contentWindow.postMessage(${JSON.stringify({ ...command, enabled: true })}, ${JSON.stringify(origin)})`)
+      93 |   }, { command, origin })
+    > 94 |   await frame.locator('body').evaluate(() => { location.hash = '' })
+         |                               ^
+      95 |   await frame.getByText('嵌套链接一').click()
+      96 |   await expect.poll(() => frame.locator('body').evaluate(() => location.hash)).toBe('#destination')
+      97 |   await page.locator('#attacker').evaluate(node => node.remove())
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\tests\e2e\selector\flow.spec.ts:94:31
+
+    Error Context: test-results\selector-flow-D13-B-T2-bot-5b258-hema-and-old-session-replay-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\selector-flow-D13-B-T2-bot-5b258-hema-and-old-session-replay-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\selector-flow-D13-B-T2-bot-5b258-hema-and-old-session-replay-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:64:5 › D13-B-T2: both endpoints reject forged source/origin, nonce/version/schema and old-session replay 
+  2 passed (6.7s)
+Error: ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL
+
+  × "pnpm recursive exec" failed in C:
+  │ \Users\12058\Documents\ChatGPT\CodeLess\apps\web
+
