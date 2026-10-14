@@ -184,7 +184,9 @@ export async function promoteArtifacts(output, artifacts, id, summary, limits, m
 
 // This factory belongs to the trusted host worker. Request data contains only a source directory.
 // Tests use a separately built trusted fault image; production defaults to the D05 image.
-export async function createBuildRunner({ workRoot, artifactRoot, imageId, limits: overrides } = {}) {
+export async function createBuildRunner({ workRoot, artifactRoot, imageId, limits: overrides, onContainerCreated } = {}) {
+  // Trusted host instrumentation only, never sourced from generated task data.
+  if (onContainerCreated !== undefined && typeof onContainerCreated !== 'function') throw new Error('invalid host container observer')
   const limits = policy(overrides)
   const user = containerUser()
   if (!workRoot || !artifactRoot) throw new Error('worker workRoot and artifactRoot are required')
@@ -221,6 +223,7 @@ export async function createBuildRunner({ workRoot, artifactRoot, imageId, limit
       mayExist = true
       const containerId = checked(await docker(args), 'create build container')
       created = true
+      onContainerCreated?.(containerId)
       const execution = await docker(['start', '--attach', name], limits.timeoutMs, limits.logBytes)
       result.log = execution.log
       result.timedOut = execution.timedOut

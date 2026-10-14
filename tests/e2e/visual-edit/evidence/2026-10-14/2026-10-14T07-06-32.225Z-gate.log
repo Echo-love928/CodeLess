@@ -1,0 +1,72 @@
+$ node scripts/ci-gate.mjs
+[ci-gate] verify:static
+$ node scripts/run-static.mjs
+ℹ tests 11
+ℹ pass 11
+ℹ fail 0
+ℹ skipped 0
+$ pnpm lint && pnpm test && pnpm build
+$ eslint src vite.config.ts vitest.config.ts playwright.config.ts playwright.real-auth.config.ts
+$ vitest run
+ Test Files  14 passed (14)
+      Tests  82 passed (82)
+   Duration  11.71s (transform 8.72s, setup 0ms, collect 33.78s, tests 1.42s, environment 103.11s, prepare 5.26s)
+$ vue-tsc --noEmit && vite build
+[ci-gate] verify:api
+$ node scripts/run-maven.mjs
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 276.2 s -- in dev.codeless.api.agent.AgentLoopIntegrationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 36.79 s -- in dev.codeless.api.agent.CsrfDuringGenerationTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.259 s -- in dev.codeless.api.agent.LocalBuildGatewayTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.862 s -- in dev.codeless.api.agent.PreparationProcessTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.170 s -- in dev.codeless.api.agent.RepairContextTest
+[INFO] Tests run: 21, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 465.7 s -- in dev.codeless.api.agent.RepairLoopIntegrationTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in dev.codeless.api.agent.RepairPolicyTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.031 s -- in dev.codeless.api.ApplicationSmokeTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.446 s -- in dev.codeless.api.apps.ApplicationHttpTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.776 s -- in dev.codeless.api.apps.ApplicationIntegrationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.120 s -- in dev.codeless.api.auth.AuthHttpTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.450 s -- in dev.codeless.api.auth.AuthIntegrationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in dev.codeless.api.auth.LoginAttemptsTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.318 s -- in dev.codeless.api.data.DataIntegrationTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.472 s -- in dev.codeless.api.data.TaskDiagnosticsTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.615 s -- in dev.codeless.api.data.VersionSourceMigrationTest
+[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 238.1 s -- in dev.codeless.api.edit.EditLifecycleIntegrationTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 242.1 s -- in dev.codeless.api.edit.LocalEditScopeIntegrationTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in dev.codeless.api.edit.LocalEditScopeTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.128 s -- in dev.codeless.api.error.GlobalExceptionHandlerTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.144 s -- in dev.codeless.api.model.DeepSeekModelProviderTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.687 s -- in dev.codeless.api.model.PlanAcceptanceCliTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.359 s -- in dev.codeless.api.model.PlanModelIntegrationTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.045 s -- in dev.codeless.api.model.PlanValidatorTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.175 s -- in dev.codeless.api.model.PrivateModelCaptureTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 26.67 s -- in dev.codeless.api.preview.PreviewAcceptanceProcessTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.081 s -- in dev.codeless.api.preview.PreviewHttpTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 68.95 s -- in dev.codeless.api.preview.PreviewPlatformIntegrationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.036 s -- in dev.codeless.api.preview.PreviewReadinessTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.117 s -- in dev.codeless.api.preview.PreviewRegistryHttpTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.070 s -- in dev.codeless.api.preview.RepairProviderMetadataTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in dev.codeless.api.system.HealthControllerTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.113 s -- in dev.codeless.api.tasks.TaskEventStreamsTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.388 s -- in dev.codeless.api.tasks.TaskHttpTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.416 s -- in dev.codeless.api.tasks.TaskQueueIntegrationTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.491 s -- in dev.codeless.api.tasks.TaskSseHttpTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in dev.codeless.api.tools.FileToolRegistryTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 18.91 s -- in dev.codeless.api.tools.FileToolsIntegrationTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.220 s -- in dev.codeless.api.tools.OwnedWorkspaceCleanupTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.382 s -- in dev.codeless.api.versions.LocalVolumeSnapshotStoreTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in dev.codeless.api.versions.VersionFixtureGateTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 39.70 s -- in dev.codeless.api.versions.VersionHttpIntegrationTest
+[INFO] Tests run: 203, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[ci-gate] verify:runner
+$ node scripts/validate-contracts.mjs runner && node --test tests/infra/*.test.mjs
+ℹ tests 69
+ℹ pass 69
+ℹ fail 0
+ℹ skipped 0
+[ci-gate] verify:e2e
+$ node scripts/validate-contracts.mjs flow && pnpm --filter @codeless/web smoke
+$ pnpm build && playwright test --config playwright.config.ts
+$ vue-tsc --noEmit && vite build
+  48 passed (1.3m)
+[ci-gate] all stages passed

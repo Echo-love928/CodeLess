@@ -10,8 +10,40 @@ if (mode === 'Timeout') {
   console.log('loop child started')
   while (true) { /* trusted infinite-loop fault */ }
 } else if (mode === 'Memory') {
-  const held = []
-  while (true) held.push(Buffer.alloc(8 * 1024 * 1024, 1))
+  // A sole PID 1 victim tears down its cgroup before an asynchronous runtime
+  // watcher necessarily reads memory.events. Keep a small guardian alive until
+  // the host test acknowledges Docker's actual OOMKilled=true on this container.
+  const oomKills = () => Number(readFileSync('/sys/fs/cgroup/memory.events', 'utf8').match(/^oom_kill (\d+)$/m)?.[1])
+  const memoryMax = Number(readFileSync('/sys/fs/cgroup/memory.max', 'utf8').trim())
+  const swapMax = Number(readFileSync('/sys/fs/cgroup/memory.swap.max', 'utf8').trim())
+  const oomKillBefore = oomKills()
+  assert.equal(oomKillBefore, 0)
+  let timer
+  const acknowledged = new Promise((resolve, reject) => {
+    process.once('SIGUSR2', resolve)
+    timer = setTimeout(() => reject(new Error('Host did not acknowledge Docker OOM evidence')), 10000)
+  })
+  const child = spawn('node', ['-e', `
+    require('node:fs').writeFileSync('/proc/self/oom_score_adj', '1000');
+    const held = []; while (true) held.push(Buffer.alloc(8 * 1024 * 1024, 1));
+  `], { stdio: 'inherit' })
+  const killed = new Promise((resolve, reject) => {
+    child.once('error', reject)
+    child.once('exit', (code, signal) => {
+      try {
+        assert.equal(code, null)
+        assert.equal(signal, 'SIGKILL')
+        const oomKillAfter = oomKills()
+        assert.ok(oomKillAfter > oomKillBefore, 'Child SIGKILL must have a real cgroup OOM kill')
+        console.log('MEMORY_CGROUP_OOM ' + JSON.stringify({ signal, memoryMax, swapMax, oomKillBefore, oomKillAfter }))
+        resolve()
+      } catch (error) { reject(error) }
+    })
+  })
+  try {
+    await Promise.all([killed, acknowledged])
+    process.exitCode = 137
+  } finally { clearTimeout(timer) }
 } else if (mode === 'Kill') {
   // PID 1 ignores namespace-local fatal signals. Use a real child and propagate
   // its SIGKILL; container exit 137 must not become an invented OOM.

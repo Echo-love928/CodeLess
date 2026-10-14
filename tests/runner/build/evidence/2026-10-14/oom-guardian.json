@@ -1,0 +1,107 @@
+{
+  "baseline": "418290e631be05f7e478ce4d5b61624c4c19360d",
+  "integrationTarget": "80aa8d014306ccf0ead010b2605fff7f5394fa77",
+  "environment": {
+    "cgroupDriver": "cgroupfs",
+    "cgroupVersion": 2,
+    "node": "24.16.0",
+    "docker": "29.8.0",
+    "pnpm": "12.6.0",
+    "containerd": "2.3.5"
+  },
+  "nativeRuns": [
+    {
+      "exitCode": 1,
+      "result": "Original baseline: TIMEOUT, not the CI missing-event symptom",
+      "logDigest": "sha256:b7b1d51de535a9d68b1d6a95de6e5f9b9ba4c07318ccd8dbd60efcb61d1c9e6b",
+      "name": "original"
+    },
+    {
+      "exitCode": 1,
+      "result": "Original PID1 fixture cannot retain its cgroup for daemon acknowledgement",
+      "logDigest": "sha256:d11d353eacc79b8ab1a335001fff5c0c3a058a8324d66a1f31e7c7fee6e2ab2c",
+      "name": "regression-before"
+    },
+    {
+      "exitCode": 0,
+      "result": "Guardian OOM plus ordinary SIGKILL: 2/2",
+      "logDigest": "sha256:4600c095bde82417ed82e67ca6e89bc4f3b982676b54e2bfee9977b45d4e05fc",
+      "name": "regression-after"
+    },
+    {
+      "exitCode": 0,
+      "result": "Complete runner gate: 70/70, zero failures/skips",
+      "logDigest": "sha256:68158a872b70208155fdcb6e24751a59b3e0b83543256194576e718370f13229",
+      "name": "runner"
+    }
+  ],
+  "actualOOM": {
+    "id": "539502f2-9545-4272-bde3-aa65b62ebf44",
+    "imageId": "sha256:73508cc5859caf7c5c4050a9e2877542adac2cb20bf1095e61097c4268de27d4",
+    "containerName": "codeless-build-539502f2-9545-4272-bde3-aa65b62ebf44",
+    "status": "FAILED",
+    "failure": "OOM",
+    "exitCode": 137,
+    "oomKilled": true,
+    "timedOut": false,
+    "log": {
+      "text": "MEMORY_CGROUP_OOM {\"signal\":\"SIGKILL\",\"memoryMax\":100663296,\"swapMax\":0,\"oomKillBefore\":0,\"oomKillAfter\":1}\n",
+      "bytes": 108,
+      "observedBytes": 108,
+      "truncated": false
+    },
+    "artifact": null,
+    "cleanup": {
+      "containerRemoved": true,
+      "workspaceRemoved": true,
+      "errors": []
+    },
+    "createdAt": "2026-10-14T10:28:47.158Z",
+    "completedAt": "2026-10-14T10:28:49.27Z"
+  },
+  "actualSIGKILL": {
+    "id": "e9957d8b-f570-4cd7-9c32-77a5a0d4e7eb",
+    "imageId": "sha256:73508cc5859caf7c5c4050a9e2877542adac2cb20bf1095e61097c4268de27d4",
+    "containerName": "codeless-build-e9957d8b-f570-4cd7-9c32-77a5a0d4e7eb",
+    "status": "FAILED",
+    "failure": "BUILD_EXIT",
+    "exitCode": 137,
+    "oomKilled": false,
+    "timedOut": false,
+    "log": {
+      "text": "",
+      "bytes": 0,
+      "observedBytes": 0,
+      "truncated": false
+    },
+    "artifact": null,
+    "cleanup": {
+      "containerRemoved": true,
+      "workspaceRemoved": true,
+      "errors": []
+    },
+    "createdAt": "2026-10-14T10:28:49.273Z",
+    "completedAt": "2026-10-14T10:28:51.826Z",
+    "oomEvidence": {
+      "status": "NO_OOM_EVENT",
+      "events": []
+    }
+  },
+  "sources": [
+    {
+      "normalization": "raw Windows checkout bytes",
+      "path": "services/runner/src/build/runner.mjs",
+      "checkoutDigest": "sha256:04d57147206a533d5002079ae27ee207f63006c58c613cecf6f387cdbcf377b3"
+    },
+    {
+      "normalization": "raw Windows checkout bytes",
+      "path": "tests/runner/build/acceptance.test.mjs",
+      "checkoutDigest": "sha256:27503a9a52210eeed21ecce0ddf94516ea46610593c7b890e23eb09955d88e29"
+    },
+    {
+      "normalization": "raw Windows checkout bytes",
+      "path": "tests/runner/build/fixtures/fault-entry.mjs",
+      "checkoutDigest": "sha256:bb9c4464cb9c735ce0c9b472c43910d75b7aa53bd743e2050c1c9f64d606d97f"
+    }
+  ]
+}
