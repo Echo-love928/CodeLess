@@ -1,7 +1,10 @@
 # D14-A verification and explicit restore
 
-Additive proposal for the public-contract maintainer. No shared contract, migration, CI, lockfile,
-frontend or runner changes. D13 component edit and D10 repair interfaces remain unchanged.
+The additive route is registered in `contracts/openapi.v0.json` on the D14-A candidate following the
+2026-10-14 user request to resolve B's review. D14-A owns this registration; B has no simultaneous
+shared-contract changes. No migration, CI, lockfile, frontend or runner changes. D13 component edit
+and D10 repair interfaces remain unchanged. `openapi.restore.patch.json` remains the reviewed fragment;
+`validate-contract.mjs` requires exact shared/fragment equality and validates the actual restore response.
 
 `POST /api/v0/applications/{applicationId}/versions/{versionId}/restore`
 
@@ -45,5 +48,7 @@ node tests/edit/verification/export-evidence.mjs
 
 Models are named deterministic fixtures; PostgreSQL/Docker/Vue/Chromium are real. Synthetic model
 counters and UNKNOWN provider usage are separately recorded, never real model-quality evidence.
-D14-B final enabling PR must register the public additive route and test its new UI against these
-semantics; A's API/preview proof does not certify unavailable D14-B UI/PR.
+D14-B PR #42 (59ed05b) supplies the visual edit UI and real A/B integration report; it does not call
+the restore write API. A owns public registration in PR #41. The final enabling PR must integrate the
+reviewed A/B candidates and verify the final head; independent or privately combined evidence does
+not by itself mean formal enablement or a merge. Historical failed commands remain failed.

@@ -43,13 +43,13 @@ env.CODELESS_PREVIEW_EVIDENCE_DIR = join(run, 'preview')
 const head = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' })
 if (head.status !== 0) throw new Error('Cannot record the tested Git HEAD')
 const changes = spawnSync('git', ['status', '--porcelain', '--', 'services/api/src/test', 'tests/edit/verification'], { cwd: repo, encoding: 'utf8' })
-const sourceChanges = spawnSync('git', ['status', '--porcelain', '--', 'services/api/src/main', 'services/api/pom.xml', 'prompts/runtime/edit'], { cwd: repo, encoding: 'utf8' })
+const sourceChanges = spawnSync('git', ['status', '--porcelain', '--', 'services/api/src/main', 'services/api/pom.xml', 'prompts/runtime/edit', 'contracts/openapi.v0.json'], { cwd: repo, encoding: 'utf8' })
 const metadata = { mode, head: head.stdout.trim(), repository: relative(workspace, repo) || '.',
   uncommittedTestChanges: changes.status === 0 ? changes.stdout.trim().split('\n').filter(Boolean) : null,
   uncommittedSourceChanges: sourceChanges.status === 0 ? sourceChanges.stdout.trim().split('\n').filter(Boolean) : null,
   command: [command, ...args], cwd: relative(workspace, cwd) || '.', startedAt: new Date().toISOString(), status: 'RUNNING', exitCode: null,
   signal: null, modelProvider: 'deterministic-mock', browserChannel: 'locked bundled Chromium' }
-const scopedPaths = ['services/api/src/main', 'services/api/src/test', 'tests/edit/verification']
+const scopedPaths = ['services/api/src/main', 'services/api/src/test', 'tests/edit/verification', 'contracts/openapi.v0.json']
 const modified = spawnSync('git', ['diff', '--name-only', '-z', 'HEAD', '--', ...scopedPaths], { cwd: repo, encoding: 'utf8' })
 const untracked = spawnSync('git', ['ls-files', '--others', '--exclude-standard', '-z', '--', ...scopedPaths], { cwd: repo, encoding: 'utf8' })
 if (modified.status !== 0 || untracked.status !== 0) throw new Error('Cannot record tested file hashes')
