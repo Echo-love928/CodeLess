@@ -8,7 +8,7 @@ import { getVersion, type Version } from '../versions/version-api'
 export interface AcceptedEdit { task: { id: string }; baseVersionId: string }
 export interface EditContext {
   locked: Readonly<Ref<boolean>>
-  posting: Ref<boolean>
+  begin: () => (() => void) | undefined
   accept: (value: AcceptedEdit, prompt: string, componentId: string) => void
 }
 export const editContext: InjectionKey<EditContext> = Symbol('visual-edit-flow')
@@ -27,6 +27,17 @@ export function useVisualEditFlow(applicationId: () => string, adopt: (version: 
   function report(cause: unknown) {
     error.value = cause instanceof Error ? cause.message : '无法读取修改结果，请刷新修改状态。'
     if (cause instanceof ApiError && cause.status === 401) unauthorized()
+  }
+  function begin() {
+    if (locked.value) return
+    const current = epoch
+    posting.value = true
+    let released = false
+    return () => {
+      if (released) return
+      released = true
+      if (current === epoch) posting.value = false
+    }
   }
   async function inspect(value: GenerationTask, current: number) {
     if (current !== epoch || value.id !== accepted.value?.task.id) return
@@ -85,7 +96,7 @@ export function useVisualEditFlow(applicationId: () => string, adopt: (version: 
     description.value = ''; component.value = ''; refreshing.value = false; cancelling.value = false
     posting.value = false
   }
-  return { locked, posting, accept, task, accepted, events, diagnostics, diagnosticsError, description, component, result,
+  return { locked, begin, accept, task, accepted, events, diagnostics, diagnosticsError, description, component, result,
     error, connection, refreshing, cancelling, refresh, cancel, reset }
 }
 

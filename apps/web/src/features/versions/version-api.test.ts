@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest'
-import { listVersions } from './version-api'
+import { getVersion, listVersions } from './version-api'
 
 const app = '11111111-1111-4111-8111-111111111111'
 const id = '55555555-5555-4555-8555-555555555555'
@@ -12,6 +12,10 @@ function responses(value: unknown, status = 200) {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(new Response(JSON.stringify(page))).mockResolvedValue(new Response(JSON.stringify(value), { status })))
 }
 afterEach(() => vi.unstubAllGlobals())
+it.each([{ id: app }, { applicationId: id }, { status: 'READY' }])('rejects mismatched exact version reads: %j', async patch => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ ...item, status: 'VERIFIED', buildId: app, ...patch }))))
+  await expect(getVersion(id, app)).rejects.toThrow()
+})
 it('shows the frozen failure code and unknown tool results without implying exit zero', async () => {
   responses(snapshot())
   const result = await listVersions(app)

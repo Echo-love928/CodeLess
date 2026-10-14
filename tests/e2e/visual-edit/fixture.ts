@@ -15,6 +15,9 @@ export async function visualFixture(page: Page) {
     payloads.set(id, { text, color, spacing, content, digest }); return digest
   }
   previous.records = [{ ...initial, status: 'VERIFIED', sourceDigest: put(initial.id, '原文案', 'rgb(0, 0, 0)', '8px') }]
+  let latestReadyVersionId = initial.id
+  await page.route(`**/api/v0/applications/${appId}`, route => route.fulfill({ json: { id: appId, name: 'D14 组件修改验收', template: 'VUE', dataMode: 'STATIC', status: 'ACTIVE',
+    baseVersionId: initial.id, latestReadyVersionId, createdAt: initial.createdAt, updatedAt: initial.createdAt } }))
   let counter = 0, outcome: 'READY' | 'FAILED' | 'FUTURE' = 'READY', selectionStatus = 200, editStatus = 202
   let current: { id: string; versionId: string; buildId: string; baseVersionId: string; prompt: string; status: string; updatedAt: string } | undefined
   const edits: Record<string, unknown>[] = [], selections: Record<string, unknown>[] = []
@@ -70,7 +73,7 @@ export async function visualFixture(page: Page) {
   })
   await page.route('https://*.preview.codeless-preview.test/**', route => {
     const id = [...payloads.keys()].find(id => new URL(route.request().url()).hostname.includes(id.replaceAll('-', '')))!, value = payloads.get(id)!
-    return route.fulfill({ contentType: 'text/html; charset=utf-8', body: `<!doctype html><meta charset="utf-8"><style>article{color:${value.color};padding:${value.spacing}}</style>
+    return route.fulfill({ contentType: 'text/html; charset=utf-8', body: `<!doctype html><meta charset="utf-8"><style>article{color:${value.color};padding:${value.spacing}}article a{color:inherit}</style>
       <script>${renderPreviewSelector({ platformOrigin: 'http://127.0.0.1:4173', versionId: id, sourceDigest: value.digest })}</script>
       ${[1, 2, 3].map(n => `<article data-ai-component="shared-card"><a href="#destination">${value.text} ${n}</a></article>`).join('')}<p id="destination">导航目标</p>
       <script>parent.postMessage({type:'codeless-preview',state:'loaded'},'http://127.0.0.1:4173')</script>` })
@@ -82,6 +85,7 @@ export async function visualFixture(page: Page) {
     async finish(state: typeof outcome, change: Partial<{ text: string; color: string; spacing: string }> = {}) {
       outcome = state; current!.status = state; current!.updatedAt = '2026-10-14T00:02:00Z'
       if (state === 'READY') {
+        latestReadyVersionId = current!.versionId
         const value = { ...payloads.get(current!.baseVersionId)!, ...change }
         const digest = put(current!.versionId, value.text, value.color, value.spacing)
         previous.records.unshift({ ...initial, id: current!.versionId, number: counter + 2, taskId: current!.id,

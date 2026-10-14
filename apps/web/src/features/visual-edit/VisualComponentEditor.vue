@@ -42,16 +42,17 @@ watch(() => [props.candidate, mapping.value] as const, async ([candidate, curren
 async function submit() {
   if (!flow || !selection.value?.selectable || !validPrompt.value || !confirmed.value || locked.value) return
   const current = generation, target = selection.value, text = prompt.value.trim()
+  const release = flow.begin()
+  if (!release) return
   const nextSignature = JSON.stringify([props.applicationId, target.versionId, target.sourceDigest, target.componentId, text])
   if (nextSignature !== signature) { key = crypto.randomUUID(); signature = nextSignature }
   submitting.value = true; error.value = ''
-  flow.posting.value = true
   try {
     const result = validateAccepted(await createComponentEdit(props.applicationId, target, text, key), target.versionId)
     if (current !== generation) return
     flow.accept(result, text, target.componentId!); emit('accepted')
   } catch (cause) { if (current === generation) report(cause) }
-  finally { flow.posting.value = false; if (current === generation) submitting.value = false }
+  finally { release(); if (current === generation) submitting.value = false }
 }
 onBeforeUnmount(() => { generation++; selectionGeneration++; abort?.abort(); selectionAbort?.abort() })
 </script>

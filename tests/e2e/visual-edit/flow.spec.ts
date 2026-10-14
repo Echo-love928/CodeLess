@@ -34,16 +34,23 @@ test('D14-B-T1/T3: text, color, spacing and shared edits use exact new mapping a
     await state.finish('READY', item.change)
     await expect(page.getByRole('region', { name: '组件修改任务', exact: true })).toContainText('当前预览已切换至新版本')
     await expect(page.locator('iframe')).toHaveAttribute('src', new RegExp(state.current.versionId.replaceAll('-', '')))
+    await expect(page.locator('.page-path')).toContainText(`当前可用版本：${state.current.versionId}`)
     await expect(page.getByLabel('组件修改描述')).toHaveCount(0)
     await expect(page.getByLabel('选择组件进行修改')).toBeEnabled()
     await expect(page.getByLabel('选择组件进行修改')).not.toBeChecked()
     if (item.change.text) await expect(frame(page).locator('article a').first()).toHaveText(item.change.text + ' 1')
-    if (item.change.color) await expect(frame(page).locator('article').first()).toHaveCSS('color', item.change.color)
+    if (item.change.color) await expect(frame(page).locator('article a').first()).toHaveCSS('color', item.change.color)
     if (item.change.spacing) await expect(frame(page).locator('article').first()).toHaveCSS('padding', item.change.spacing)
     if (index === 3) { await expect(frame(page).locator('article a').nth(2)).toHaveText('共享新文案 3'); await page.screenshot({ path: info.outputPath('four-edits.png'), fullPage: true }) }
     base = state.current.versionId
   }
   expect(state.selections.map(item => item.versionId)).toEqual([ids[1], ...state.edits.slice(1).map(item => item.baseVersionId)])
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.setViewportSize({ width: 375, height: 900 })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
+  await page.getByRole('region', { name: '组件修改任务', exact: true }).screenshot({ path: info.outputPath('mobile-edit-task.png') })
+  await page.setViewportSize({ width: 900, height: 375 })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
   await info.attach('four-scopes-and-versions', { body: JSON.stringify({ namedFixture: true, edits: state.edits, selections: state.selections }), contentType: 'application/json' })
 })
 test('D14-B-T2/T4: failed edit keeps old navigation, readable escaped logs and another edit', async ({ page }, info) => {

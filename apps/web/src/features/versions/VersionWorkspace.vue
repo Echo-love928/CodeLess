@@ -23,10 +23,17 @@ let generation = 0
 let abort: AbortController | undefined
 const flow = useVisualEditFlow(() => props.applicationId, version => {
   previewId.value = version.id; selected.value = version; void load(0)
+  const app = props.applicationId
+  // Refresh the surrounding application summary without substituting its latest pointer for this task's version.
+  if (props.refreshVersion) void props.refreshVersion().catch(cause => {
+    if (app !== props.applicationId || result.value?.id !== version.id) return
+    editError.value = '无法更新应用当前版本摘要；此任务的已验证新版本仍可预览。'
+    if (cause instanceof ApiError && cause.status === 401) emit('unauthorized')
+  })
 }, () => emit('unauthorized'))
 const { task: editTask, accepted, description, component, result, locked, error: editError, events, diagnostics,
   diagnosticsError, connection, refreshing, cancelling } = flow
-provide(editContext, { locked, posting: flow.posting, accept: flow.accept })
+provide(editContext, { locked, begin: flow.begin, accept: flow.accept })
 async function load(nextPage = page.value) {
   const current = ++generation
   abort?.abort(); abort = new AbortController()
@@ -92,7 +99,7 @@ onBeforeUnmount(() => { generation++; abort?.abort(); flow.reset() })
       <template v-else>
         <ul>
           <li v-for="item in items" :key="item.id" :data-version-id="item.id">
-            <div><strong>版本 {{ item.number }}</strong> <span>{{ labels[item.status] }}</span><span v-if="item.id === previewId"> · 当前预览</span></div>
+            <div><strong>版本 {{ item.number }}</strong> <span>{{ labels[item.status] }}</span><span v-if="item.id === previewId"> · 当前预览</span><span v-if="item.id === versionId"> · 当前可用</span></div>
             <time :datetime="item.createdAt">{{ new Date(item.createdAt).toLocaleString('zh-CN') }}</time>
             <p>来源任务：<router-link v-if="sourceTask(item)" :to="{ path: `/workbench/${applicationId}`, query: { taskId: sourceTask(item) } }">{{ sourceTask(item) }}</router-link><span v-else>未提供来源任务</span></p>
             <p v-if="item.status === 'FAILED'" class="version-error">错误摘要：{{ item.errorSummary || '服务端未提供错误摘要。' }}</p>

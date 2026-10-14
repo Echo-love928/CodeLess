@@ -23,6 +23,18 @@ function setup() {
   return { flow, adopt, stream }
 }
 afterEach(() => vi.resetAllMocks())
+it('a released old submission cannot unlock a new application submission', () => {
+  const flow = useVisualEditFlow(() => app, vi.fn(), vi.fn())
+  const oldRelease = flow.begin()!
+  expect(flow.locked.value).toBe(true); expect(flow.begin()).toBeUndefined()
+  flow.reset()
+  const newRelease = flow.begin()!
+  oldRelease(); expect(flow.locked.value).toBe(true)
+  newRelease(); expect(flow.locked.value).toBe(false)
+  const thirdRelease = flow.begin()!
+  newRelease(); expect(flow.locked.value).toBe(true)
+  thirdRelease(); flow.reset()
+})
 it('adopts only the exact immutable version bound to the READY task and successful build', async () => {
   const { flow, adopt, stream } = setup()
   stream.onTask(task('VERIFY')); await flushPromises()
