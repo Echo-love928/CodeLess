@@ -1,0 +1,180 @@
+{
+  "paths": {
+    "/api/v0/applications/{applicationId}/versions/{versionId}/restore": {
+      "parameters": [
+        {
+          "name": "applicationId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$"
+          }
+        },
+        {
+          "name": "versionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "restoreUsableVersion",
+        "summary": "Explicitly restore a verified immutable version as the current preview and edit base",
+        "tags": [
+          "versions"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedCurrentVersionId"
+                ],
+                "properties": {
+                  "expectedCurrentVersionId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current usable pointer restored; immutable versions and publications unchanged",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "const": "nosniff"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "applicationId",
+                    "previousVersionId",
+                    "latestReadyVersionId"
+                  ],
+                  "properties": {
+                    "applicationId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$"
+                    },
+                    "previousVersionId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$"
+                    },
+                    "latestReadyVersionId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Strict body or canonical UUID rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No authenticated session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "CSRF rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not owned, absent, or target belongs to another application",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Inactive application, unverified target, stale expected pointer, active task, or missing snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Corrupt or mismatched immutable source, report or artifact",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
