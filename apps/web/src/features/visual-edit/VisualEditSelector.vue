@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref, watch } from 'vue'
-import ComponentEditor from '../mapping/ComponentEditor.vue'
+import { inject, onBeforeUnmount, ref, watch } from 'vue'
+import ComponentEditor from './VisualComponentEditor.vue'
+import { editContext } from './edit-flow'
 import { createSelectorSession, type Selected } from './selector-session'
 
 const props = defineProps<{ applicationId: string; versionId: string; origin: string; frame?: HTMLIFrameElement; active: boolean }>()
 const emit = defineEmits<{ unauthorized: [] }>()
+const flow = inject(editContext, undefined)
 const available = ref(false), connected = ref(false), selecting = ref(false)
 const selected = ref<Selected | null>(null)
 let session: ReturnType<typeof createSelectorSession> | undefined
@@ -26,6 +28,7 @@ watch(() => [props.frame, props.versionId, props.origin], (_value, _old, cleanup
   cleanup(() => frame?.removeEventListener('load', connect))
 }, { immediate: true, flush: 'post' })
 watch(() => props.active, active => { if (!active) exit() })
+watch(() => flow?.locked.value, locked => { if (locked) exit() })
 window.addEventListener('message', message)
 window.addEventListener('keydown', key)
 onBeforeUnmount(() => { session?.close(); window.removeEventListener('message', message); window.removeEventListener('keydown', key) })
@@ -33,12 +36,12 @@ onBeforeUnmount(() => { session?.close(); window.removeEventListener('message', 
 
 <template>
   <section v-if="active" class="visual-selector" aria-label="预览组件选择">
-    <label><input v-model="selecting" type="checkbox" :disabled="!available || !connected" @change="mode" />选择组件进行修改</label>
+    <label><input v-model="selecting" type="checkbox" :disabled="!available || !connected || flow?.locked.value" @change="mode" />选择组件进行修改</label>
     <p v-if="selecting">悬停查看范围，点击选择组件。按 Esc 退出编辑。</p>
     <button v-if="selected" type="button" class="button-secondary" @click="session?.clear()">取消选择</button>
     <p v-if="selected?.instance" role="status">当前点击第 {{ selected.instance.index }} / {{ selected.instance.count }} 个已渲染实例。修改影响整个源码组件及所有共享实例，包括其他页面的实例。</p>
     <ComponentEditor :application-id="applicationId" :version-id="versionId" :candidate="selected?.candidate ?? null"
-      @available="available = $event" @unauthorized="emit('unauthorized')" />
+      @available="available = $event" @unauthorized="emit('unauthorized')" @accepted="exit" />
   </section>
 </template>
 

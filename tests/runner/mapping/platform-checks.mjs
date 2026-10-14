@@ -21,6 +21,7 @@ export async function checkComponentPlatform({ page, call, app, version, evidenc
   await expect(page.getByRole('region', { name: '组件修改' })).toContainText(selected.sourceFile)
   await expect(page.getByRole('region', { name: '组件修改' })).toContainText('所有实例')
   await page.getByLabel('组件修改描述').fill('将共享资料人物改为 Hedy Lamarr')
+  await page.getByLabel('我确认修改影响整个源码组件及所有共享实例').check()
   const accepted = page.waitForResponse(r => new URL(r.url()).pathname === `/api/v0/applications/${app}/component-edits` && r.request().method() === 'POST')
   await page.getByRole('button', { name: '创建组件修改', exact: true }).click()
   const response = await accepted

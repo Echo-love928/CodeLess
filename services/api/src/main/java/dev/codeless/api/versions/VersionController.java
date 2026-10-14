@@ -21,8 +21,10 @@ public class VersionController {
     private final ArtifactRepository artifacts;
     private final JdbcClient jdbc;
     private final SnapshotStore snapshots;
-    public VersionController(OwnershipGuard ownership, ArtifactRepository artifacts, JdbcClient jdbc, SnapshotStore snapshots) {
-        this.ownership=ownership; this.artifacts=artifacts; this.jdbc=jdbc; this.snapshots=snapshots;
+    private final VersionRestoreService restore;
+    public VersionController(OwnershipGuard ownership, ArtifactRepository artifacts, JdbcClient jdbc, SnapshotStore snapshots,
+                             VersionRestoreService restore) {
+        this.ownership=ownership; this.artifacts=artifacts; this.jdbc=jdbc; this.snapshots=snapshots; this.restore=restore;
     }
     public record Page(List<VersionView> items, int page, int size, long total, UUID latestReadyVersionId) {}
     public record FilesView(UUID versionId, String sourceDigest, List<SnapshotStore.Entry> files) {}
@@ -36,6 +38,22 @@ public class VersionController {
     private Version version(UUID id, HttpServletRequest request) {
         ownership.requireVersion(request,id);
         return artifacts.findVersion(id).orElseThrow(() -> new AuthFailure(HttpStatus.NOT_FOUND,"NOT_FOUND"));
+    }
+    @PostMapping("/applications/{applicationId}/versions/{versionId}/restore")
+    public ResponseEntity<VersionRestoreService.View> restore(@PathVariable String applicationId, @PathVariable String versionId,
+            @RequestBody tools.jackson.databind.JsonNode body, HttpServletRequest request) {
+        if(body==null || !body.isObject() || !Set.of("expectedCurrentVersionId").equals(body.propertyNames())
+                || !body.path("expectedCurrentVersionId").isTextual())
+            throw new AuthFailure(HttpStatus.BAD_REQUEST,"INVALID_REQUEST");
+        return ok(restore.restore(ownership.userId(request),uuid(applicationId),uuid(versionId),
+                uuid(body.path("expectedCurrentVersionId").asText())));
+    }
+    private static UUID uuid(String value) {
+        try {
+            var id=UUID.fromString(value);
+            if(!id.toString().equalsIgnoreCase(value)) throw new IllegalArgumentException();
+            return id;
+        } catch(IllegalArgumentException failure) {throw new AuthFailure(HttpStatus.BAD_REQUEST,"INVALID_REQUEST");}
     }
     @GetMapping("/applications/{applicationId}/versions")
     public ResponseEntity<Page> list(@PathVariable UUID applicationId,

@@ -1,0 +1,1 @@
+<template><section data-ai-component="profile-card"><h1 data-testid="profile-name">Hedy Lamarr</h1><p>静态个人资料与作品</p></section></template><style scoped>section { color: #3344aa; }</style>

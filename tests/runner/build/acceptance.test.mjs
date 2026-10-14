@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { after, before, test } from 'node:test'
+import { setTimeout as delay } from 'node:timers/promises'
 import { capture, createBuildRunner, isolationArgs, summarizeArtifacts } from '../../../services/runner/src/build/runner.mjs'
 import { policy } from '../../../infra/runner/policy.mjs'
 
@@ -79,7 +80,21 @@ test('D07-B-T2: infinite loop and child process time out and container is remove
 })
 
 test('D07-B-T3: real cgroup OOM is distinguished from timeout and compiler failure', { timeout: 30000 }, async () => {
-  const result = await (await runner({ limits: { memoryMiB: 96, timeoutMs: 15000 } }))(fixture('memory'))
+  // Keep the test cgroup alive until Docker has consumed its real OOM notification.
+  // Poll one exact daemon ID; do not rerun the build or infer OOM from exit 137.
+  let observation
+  const result = await (await runner({ limits: { memoryMiB: 96, timeoutMs: 15000 }, onContainerCreated(id) {
+    observation = observeLiveOOM(id).then(value => ({ value }), error => ({ error }))
+  } }))(fixture('memory'))
+  const observed = await observation
+  assert.equal(observed?.error, undefined, String(observed?.error))
+  assert.deepEqual(observed.value, { running: true, oomKilled: true })
+  const proof = JSON.parse(result.log.text.split('\n').find(line => line.startsWith('MEMORY_CGROUP_OOM '))?.slice('MEMORY_CGROUP_OOM '.length) ?? 'null')
+  assert.equal(proof?.signal, 'SIGKILL')
+  assert.equal(proof.memoryMax, 96 * 1024 * 1024)
+  assert.equal(proof.swapMax, 0)
+  assert.equal(proof.oomKillBefore, 0)
+  assert.equal(proof.oomKillAfter > proof.oomKillBefore, true)
   assert.equal(result.failure, 'OOM', JSON.stringify(result))
   assert.equal(result.oomKilled, true)
   assert.equal(result.exitCode, 137)
@@ -87,6 +102,24 @@ test('D07-B-T3: real cgroup OOM is distinguished from timeout and compiler failu
   assert.equal(result.artifact, null)
   await evidence('D07-B-T3', result)
 })
+
+async function observeLiveOOM(id) {
+  assert.match(id, /^[a-f0-9]{64}$/)
+  const deadline = Date.now() + 10000
+  while (Date.now() < deadline) {
+    const inspected = spawnSync('docker', ['inspect', id, '--format', '{{json .State}}'], { encoding: 'utf8', timeout: 2000, windowsHide: true })
+    assert.equal(inspected.status, 0, inspected.stderr)
+    const state = JSON.parse(inspected.stdout)
+    if (state.Running && state.OOMKilled === true) {
+      const acknowledged = spawnSync('docker', ['kill', '--signal', 'USR2', id], { encoding: 'utf8', timeout: 2000, windowsHide: true })
+      assert.equal(acknowledged.status, 0, acknowledged.stderr)
+      return { running: state.Running, oomKilled: state.OOMKilled }
+    }
+    assert.notEqual(state.Status, 'exited', 'OOM fixture exited before the daemon observed its live cgroup')
+    await delay(25)
+  }
+  throw new Error('Docker did not acknowledge the live cgroup OOM within 10 seconds')
+}
 
 test('real child SIGKILL propagated as exit 137 without a Docker OOM event stays BUILD_EXIT', { timeout: 30000 }, async () => {
   const result = await (await runner())(fixture('kill'))
@@ -167,9 +200,25 @@ test('invalid source and missing image keep unknown exit null and clean scratch'
   clean(missing)
 })
 
+test('a failed trusted container observer fails closed before execution and cleans its container', async () => {
+  let observedId
+  const result = await (await runner({ onContainerCreated(id) {
+    observedId = id
+    throw new Error('intentional host observer failure')
+  } }))(fixture('exit'))
+  assert.match(observedId, /^[a-f0-9]{64}$/)
+  assert.equal(result.failure, 'RUNNER_ERROR')
+  assert.equal(result.exitCode, null)
+  assert.equal(result.oomKilled, null)
+  assert.equal(result.artifact, null)
+  assert.match(result.diagnostic, /intentional host observer failure/)
+  clean(result)
+})
+
 test('worker policy refuses unpinned images, unknown limits and resource relaxation', async () => {
   for (const value of [{ memoryMiB: 513 }, { timeoutMs: 0 }, { shell: 1 }, { cpus: 1.5 }]) assert.throws(() => policy(value))
   await assert.rejects(runner({ imageId: 'untrusted:latest' }), /immutable/)
+  await assert.rejects(runner({ onContainerCreated: 'task-data' }), /invalid host container observer/)
   const args = isolationArgs({ name: 'codeless-policy', input: '/worker/input', output: '/worker/output', user: '1000:1000', imageId, limits: policy() })
   assert.equal(args.includes('--entrypoint'), false)
   assert.equal(args.includes('--env'), false)
