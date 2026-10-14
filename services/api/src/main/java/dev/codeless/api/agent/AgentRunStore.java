@@ -40,11 +40,36 @@ public final class AgentRunStore {
             return dev.codeless.api.edit.EditMetadata.find(jdbc,claim.taskId()).map(link -> {
                 String digest=baseDigest(claim,link.baseVersionId());
                 var source=snapshots.source(link.baseVersionId(),digest);
+                if("COMPONENT".equals(link.source().type())) {
+                    dev.codeless.api.edit.LocalEditScope.verify(link,source,snapshots.componentMapping(link.baseVersionId(),digest));
+                    return dev.codeless.api.edit.LocalEditScope.context(link,source,snapshots.readSource(link.baseVersionId(),digest,link.source().sourceFile()));
+                }
                 var contents=source.manifest().files().stream().map(f -> Map.of("path",f.path(),"digest",f.digest(),
                         "content",snapshots.readSource(link.baseVersionId(),digest,f.path()))).toList();
                 return (JsonNode) tools.jackson.databind.json.JsonMapper.builder().build().valueToTree(Map.of(
                         "baseVersionId",link.baseVersionId(),"source",link.source(),"sourceFiles",contents));
             });
+        });
+    }
+    /** Preserve the validated baseline structure locally; no unrelated plan/source goes to the model. */
+    public JsonNode componentPlan(TaskQueueService.Claim claim) {
+        return tx.execute(s -> {
+            lock(claim,TaskStatus.PLAN);
+            var link=dev.codeless.api.edit.EditMetadata.find(jdbc,claim.taskId()).orElseThrow();
+            UUID task=jdbc.sql("SELECT source_task_id FROM application_versions WHERE id=?").param(link.baseVersionId()).query(UUID.class).single();
+            var plan=AgentJournal.latest(journal.read(task),"plan").deepCopy();
+            var source=snapshots.source(link.baseVersionId(),baseDigest(claim,link.baseVersionId()));
+            var planned=new TreeSet<String>();plan.path("files").forEach(f -> planned.add(f.path("path").asText()));
+            if(!planned.equals(new TreeSet<>(source.manifest().files().stream().map(SnapshotStore.Entry::path).toList())))
+                throw new AgentFailure("COMPONENT_BASE_PLAN_MISMATCH");
+            return plan;
+        });
+    }
+    public void checkComponentSnapshot(TaskQueueService.Claim claim,JsonNode files) {
+        tx.executeWithoutResult(s -> {
+            lock(claim,TaskStatus.GENERATE);
+            dev.codeless.api.edit.EditMetadata.find(jdbc,claim.taskId()).filter(link -> "COMPONENT".equals(link.source().type())).ifPresent(link ->
+                    dev.codeless.api.edit.LocalEditScope.unchanged(snapshots.source(link.baseVersionId(),baseDigest(claim,link.baseVersionId())).manifest(),files,link.source().sourceFile()));
         });
     }
     public Optional<SnapshotStore.Source> editSource(TaskQueueService.Claim claim) {

@@ -1,0 +1,50 @@
+{
+  "gateResult": "Latest full E2E 44/45, exit1. Earlier complete ci:gate exit0. No failure overwritten.",
+  "failureLocation": "tests/e2e/auth/flow.spec.ts:101",
+  "rootCause": "UNKNOWN",
+  "observations": [
+    {
+      "type": "event",
+      "time": 8104.267,
+      "method": "pageClosed",
+      "status": null
+    },
+    {
+      "type": "before",
+      "time": 8385.174,
+      "method": "fulfill",
+      "status": 401
+    }
+  ],
+  "isolatedProbe": {
+    "mode": "authProbe",
+    "command": [
+      "corepack",
+      "pnpm",
+      "--filter",
+      "@codeless/web",
+      "exec",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.config.ts",
+      "auth/flow.spec.ts",
+      "--grep",
+      "submitting login locks",
+      "--workers=1"
+    ],
+    "head": "b5c6b7d5c237e717b8baf22cb20ffe1039db9596",
+    "changes": "M docs/evidence/D10/deterministic/cancelled.png\n M docs/evidence/D10/deterministic/failure.png\n M docs/evidence/D10/deterministic/recovered.png\n M docs/evidence/D10/deterministic/success.png\n M tests/e2e/selector/record-command.mjs\n M tests/e2e/versions/evidence/2026-10-12/fixture/T1-version-switch.png\n M tests/e2e/versions/evidence/2026-10-12/fixture/T2-source-error.png\n M tests/e2e/versions/evidence/2026-10-12/fixture/T3-failed-keeps-preview.png\n M tests/e2e/versions/evidence/2026-10-12/fixture/T4-script-as-text.png\n?? .idea/\n?? tests/e2e/selector/PR-DRAFT.md",
+    "startedAt": "2026-10-13T11:56:43.029Z",
+    "status": "PASSED",
+    "exitCode": 0,
+    "signal": null,
+    "completedAt": "2026-10-13T11:56:47.476Z",
+    "logDigest": "sha256:6f51459369ab58a203575a210352fa787cb3f892cfe966bd5bb4ad42dc3900bf",
+    "evidenceDirectory": ".local-data/d13-b/2026-10-13T11-56-42.852Z-authProbe",
+    "observedLogDigest": "sha256:6f51459369ab58a203575a210352fa787cb3f892cfe966bd5bb4ad42dc3900bf",
+    "portableLog": "2026-10-13T11-56-42.852Z-authProbe.log"
+  },
+  "qualification": "The isolated pass does not prove a fix or replace the failed full E2E. API preview and full E2E were concurrently running during this failed run; causality is unproven.",
+  "rawTrace": ".local-data/d13-b/login-diagnostic"
+}

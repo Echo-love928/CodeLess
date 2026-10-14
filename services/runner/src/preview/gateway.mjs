@@ -2,6 +2,7 @@ import { createServer } from 'node:http'
 import { browserTarget } from '../artifacts/service.mjs'
 import { artifactFile } from '../artifacts/routes.mjs'
 import { readCredential, signingKey, previewOrigins, versionHost, uuid } from './credentials.mjs'
+import { renderPreviewSelector } from '../../../../templates/vue/preview-bridge/selector.mjs'
 
 // Trusted coordinator API only: mappings cannot be registered through HTTP or model arguments.
 export function createPreviewGateway({ signingKeyHex, previewOrigin, platformOrigin, now = Date.now, isAvailable = () => true }) {
@@ -61,11 +62,7 @@ export function createPreviewGateway({ signingKeyHex, previewOrigin, platformOri
       let bytes = request.method === 'HEAD' ? undefined : Buffer.from(await upstream.arrayBuffer())
       if (bytes && name === 'index.html') {
         // Install before module/resources: window.load also fires after failed resources.
-          const componentBridge = 'let selecting=false;addEventListener("message",e=>{if(e.source===parent&&e.origin===' + JSON.stringify(platform.origin) +
-            '&&e.data?.type==="codeless-component-mode"&&typeof e.data.enabled==="boolean")selecting=e.data.enabled});' +
-            'addEventListener("click",e=>{if(!selecting)return;e.preventDefault();e.stopImmediatePropagation();const node=e.target instanceof Element?e.target.closest("[data-ai-component]"):null;' +
-            'parent.postMessage({type:"codeless-component",versionId:' + JSON.stringify(claims.version) + ',sourceDigest:' + JSON.stringify(claims.source) +
-            ',componentId:node?.getAttribute("data-ai-component")??null},' + JSON.stringify(platform.origin) + ')},true);'
+          const componentBridge = renderPreviewSelector({ platformOrigin: platform.origin, versionId: claims.version, sourceDigest: claims.source })
           const bridge = '<script>(()=>{' + componentBridge + 'let failed=false;const report=state=>parent.postMessage({type:"codeless-preview",state},' +
           JSON.stringify(platform.origin) + ');const fail=()=>{failed=true;report("unavailable")};' +
           'addEventListener("error",fail,true);addEventListener("unhandledrejection",fail);' +
