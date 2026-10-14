@@ -68,6 +68,12 @@ public class FileToolService {
         ControlledWorkspace.View view = null;
         try {
             if (error != null) throw new FileToolFailure(error);
+            // Defense in depth for every invocation, including REPAIR and direct internal callers.
+            String validatedPath=args.path("path").asText();
+            dev.codeless.api.edit.EditMetadata.find(jdbc,taskId).filter(link -> "COMPONENT".equals(link.source().type())).ifPresent(link -> {
+                if(dev.codeless.api.edit.LocalEditScope.denial(link.source().sourceFile(),name,validatedPath)!=null)
+                    throw new FileToolFailure("COMPONENT_SCOPE_REJECTED");
+            });
             view = workspace.inspect(taskId);
             if (!name.equals("files.list")) {
                 String requestedPath = args.get("path").asText();
