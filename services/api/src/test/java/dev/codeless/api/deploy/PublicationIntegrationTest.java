@@ -19,6 +19,10 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.*;
+import org.testcontainers.postgresql.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 import tools.jackson.databind.json.JsonMapper;
 
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT,properties={
@@ -30,7 +34,21 @@ import tools.jackson.databind.json.JsonMapper;
 @Import(PublicationIntegrationTest.HostingConfiguration.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PublicationIntegrationTest extends PostgresTestBase {
+@ActiveProfiles("test")
+@DirtiesContext(classMode=DirtiesContext.ClassMode.AFTER_CLASS)
+class PublicationIntegrationTest {
+    // Queue claims are global to a database. This suite must never claim another suite's retained task
+    // or retain another 10-connection pool against PostgresTestBase's shared database.
+    static final PostgreSQLContainer POSTGRES=new PostgreSQLContainer(DockerImageName.parse(
+            "postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94").asCompatibleSubstituteFor("postgres"))
+            .withDatabaseName("codeless_deploy_test").withUsername("codeless_test").withPassword("local-test-only");
+    static {POSTGRES.start();}
+    @DynamicPropertySource static void database(DynamicPropertyRegistry registry) {
+        registry.add("CODELESS_DATABASE_URL",()->"jdbc:postgresql://127.0.0.1:1/must_not_connect");
+        registry.add("spring.datasource.url",POSTGRES::getJdbcUrl);
+        registry.add("spring.datasource.username",POSTGRES::getUsername);
+        registry.add("spring.datasource.password",POSTGRES::getPassword);
+    }
     @TestConfiguration static class HostingConfiguration {
         @Bean @Primary FixtureHosting fixtureHosting() {return new FixtureHosting();}
     }
