@@ -25,7 +25,7 @@ public final class MockModelProvider implements ModelProvider {
                 if(request.path("observations").isEmpty()) {
                     String digest=request.path("editContext").path("sourceFiles").valueStream()
                             .filter(f -> f.path("path").asText().equals("src/components/ProfileCard.vue"))
-                            .findFirst().orElseThrow().path("digest").asText();
+                            .findFirst().map(f -> f.path("digest").asText()).orElse("sha256:"+"0".repeat(64));
                     content=mapper.writeValueAsString(java.util.Map.of("type","tool","name","files.update","arguments",java.util.Map.of(
                             "path","src/components/ProfileCard.vue","expectedDigest",digest,"content",
                             "<template><section data-ai-component=\"profile-card\"><h1 data-testid=\"profile-name\">Hedy Lamarr</h1><p>静态个人资料与作品</p></section></template>")));

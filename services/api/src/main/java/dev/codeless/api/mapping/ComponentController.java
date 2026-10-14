@@ -38,7 +38,8 @@ public class ComponentController {
         selection(body.path("selection"));String prompt=body.path("prompt").asText().strip();
         if(prompt.isEmpty() || prompt.codePointCount(0,prompt.length())>8000 || key!=null && !key.matches("[A-Za-z0-9._:-]{1,128}")) invalid();
         var select=body.path("selection");
-        return ResponseEntity.accepted().header("Cache-Control","no-store").body(edits.create(ownership.userId(request),uuid(applicationId),
+        return ResponseEntity.accepted().header("Cache-Control","no-store").header("X-CodeLess-Edit-Scope","SOURCE_FILE")
+                .header("X-CodeLess-Edit-Shared","true").header("X-CodeLess-Edit-Notice",LocalEditScope.NOTICE).body(edits.create(ownership.userId(request),uuid(applicationId),
                 uuid(body.path("baseVersionId").asText()),prompt,new EditMetadata.Source("COMPONENT",null,select.path("componentId").asText(),
                 uuid(select.path("versionId").asText()),select.path("sourceDigest").asText(),null),key));
     }

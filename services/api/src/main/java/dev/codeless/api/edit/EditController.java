@@ -35,7 +35,11 @@ public class EditController {
     }
     @GetMapping("/api/v0/tasks/{taskId}/edit")
     public ResponseEntity<EditTaskService.View> get(@PathVariable String taskId,HttpServletRequest request) {
-        return ResponseEntity.ok().header("Cache-Control","no-store").header("X-Content-Type-Options","nosniff").body(edits.get(ownership.userId(request),uuid(taskId)));
+        var view=edits.get(ownership.userId(request),uuid(taskId));
+        var response=ResponseEntity.ok().header("Cache-Control","no-store").header("X-Content-Type-Options","nosniff");
+        if("COMPONENT".equals(view.source().type())) response.header("X-CodeLess-Edit-Scope","SOURCE_FILE")
+                .header("X-CodeLess-Edit-Shared","true").header("X-CodeLess-Edit-Notice",LocalEditScope.NOTICE);
+        return response.body(view);
     }
     private static UUID uuid(String text) {
         try { UUID id=UUID.fromString(text); if(!id.toString().equalsIgnoreCase(text)) invalid(); return id; }
