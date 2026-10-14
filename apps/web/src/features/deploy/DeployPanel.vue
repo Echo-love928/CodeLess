@@ -1,0 +1,151 @@
+<script setup lang="ts">
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { ApiError } from '../../api/http'
+import { session } from '../auth/session'
+import { getVersion, type Version } from '../versions/version-api'
+import { createPublication, getPublication, loadPublicOrigin, type Publication } from './deploy-api'
+
+const props = defineProps<{ applicationId: string; versionId?: string | null }>()
+const emit = defineEmits<{ unauthorized: [] }>()
+const open = ref(false), loading = ref(false), posting = ref(false), refreshing = ref(false), recovering = ref(false)
+const version = ref<Version>(), confirmed = ref(false), error = ref(''), notice = ref('')
+const copyError = ref('')
+const current = ref<Publication>(), last = ref<Publication>(), uncertain = ref(false)
+const configured = ref(false)
+const locked = computed(() => posting.value || refreshing.value || recovering.value || uncertain.value || current.value?.status === 'REQUESTED')
+const canPublish = computed(() => configured.value && !loading.value && !locked.value && confirmed.value &&
+  version.value?.status === 'VERIFIED' && version.value.id === props.versionId && session.status === 'authenticated')
+let epoch = 0, versionRequest = 0
+const key = () => `codeless:publication:${session.user?.id}:${props.applicationId}`
+function save() {
+  try { sessionStorage.setItem(key(), JSON.stringify({ last: last.value?.id, pending: current.value?.status === 'REQUESTED' ? current.value.id : undefined, uncertain: uncertain.value })) }
+  catch { notice.value = '浏览器无法保存恢复记录，请保留发布编号。' }
+}
+function report(cause: unknown) {
+  error.value = cause instanceof Error ? cause.message : '发布服务暂时不可用。'
+  if (cause instanceof ApiError && cause.status === 401) emit('unauthorized')
+}
+function adopt(value: Publication) {
+  if (current.value?.id === value.id && current.value.status !== 'REQUESTED' && value.status !== current.value.status)
+    throw new Error('发布状态发生冲突，请联系维护者。')
+  current.value = value; uncertain.value = false
+  if (value.status === 'PUBLISHED') { last.value = value; notice.value = '发布成功，公开地址已通过访问检查。' }
+  if (value.status === 'FAILED') error.value = '发布失败。上次成功版本和地址仍然保留。请检查托管服务后重新确认发布。'
+  save()
+}
+async function loadVersion() {
+  const generation = epoch, request = ++versionRequest, id = props.versionId
+  version.value = undefined; confirmed.value = false; loading.value = true
+  try {
+    if (id) {
+      const value = await getVersion(id, props.applicationId)
+      if (epoch === generation && request === versionRequest) version.value = value
+    }
+  } catch (cause) { if (epoch === generation && request === versionRequest) report(cause) }
+  finally { if (epoch === generation && request === versionRequest) loading.value = false }
+}
+async function recover() {
+  if (recovering.value) return
+  const generation = epoch, applicationId = props.applicationId
+  recovering.value = true
+  try {
+    const stored = JSON.parse(sessionStorage.getItem(key()) ?? '{}')
+    uncertain.value = stored.uncertain === true
+    if (stored.last) {
+      const value = await getPublication(stored.last, applicationId)
+      if (generation !== epoch) return
+      if (value.status !== 'PUBLISHED') throw new Error('上次成功发布记录无法确认。')
+      last.value = value
+    }
+    if (stored.pending) {
+      const value = await getPublication(stored.pending, applicationId)
+      if (generation === epoch) adopt(value)
+    }
+    if (generation === epoch && uncertain.value) error.value = '上次提交结果未知，已暂停再次发布。请联系维护者核对发布记录。'
+  } catch (cause) { if (generation === epoch) { uncertain.value = true; report(cause) } }
+  finally { if (generation === epoch) recovering.value = false }
+}
+async function publish() {
+  if (!canPublish.value || !version.value) return
+  const generation = epoch, applicationId = props.applicationId, id = version.value.id
+  posting.value = true; uncertain.value = true; confirmed.value = false; error.value = ''; notice.value = ''; save()
+  try {
+    const value = await createPublication(applicationId, id)
+    if (generation === epoch) adopt(value)
+  } catch (cause) {
+    if (generation === epoch) {
+      // A definite rejection is retryable; a lost POST response must not automatically duplicate a deployment.
+      if (cause instanceof ApiError && [400, 401, 403, 409, 429].includes(cause.status ?? 0) ||
+        cause instanceof Error && cause.message.includes('尚未通过验证')) uncertain.value = false
+      report(cause); save()
+    }
+  } finally { if (generation === epoch) posting.value = false }
+}
+async function refresh() {
+  if (!current.value || refreshing.value) return
+  const generation = epoch, id = current.value.id, applicationId = props.applicationId, versionId = current.value.versionId
+  refreshing.value = true; error.value = ''
+  try {
+    const value = await getPublication(id, applicationId, versionId)
+    if (generation === epoch) adopt(value)
+  } catch (cause) { if (generation === epoch) report(cause) }
+  finally { if (generation === epoch) refreshing.value = false }
+}
+async function copy() {
+  if (!last.value?.url) return
+  const generation = epoch
+  copyError.value = ''
+  try { await navigator.clipboard.writeText(last.value.url); if (generation === epoch) notice.value = '公开地址已复制。' }
+  catch { if (generation === epoch) copyError.value = '复制失败，请选中下方地址手动复制。' }
+}
+watch(() => props.applicationId, () => {
+  epoch++; current.value = undefined; last.value = undefined; version.value = undefined
+  posting.value = false; refreshing.value = false; recovering.value = false; uncertain.value = false; error.value = ''; notice.value = ''; copyError.value = ''; open.value = false
+  configured.value = false
+  const generation = epoch
+  void loadPublicOrigin().then(() => {
+    if (generation !== epoch) return
+    configured.value = true; void recover()
+  }).catch(() => { if (generation === epoch) configured.value = false })
+}, { immediate: true })
+watch(() => props.versionId, () => { version.value = undefined; confirmed.value = false; if (open.value) void loadVersion() })
+watch(open, value => { if (value) void loadVersion() })
+onBeforeUnmount(() => { epoch++; versionRequest++ })
+</script>
+
+<template>
+  <div class="deploy-control">
+    <button type="button" class="button-primary" :aria-expanded="open" @click="open = !open">发布</button>
+    <section v-if="open" class="deploy-panel" aria-label="发布面板">
+      <div class="deploy-heading"><h2>发布应用</h2><button type="button" aria-label="关闭发布面板" @click="open = false">关闭</button></div>
+      <p>确认后，此版本会拥有独立的公开地址。</p>
+      <p v-if="!configured" role="alert">公开站点尚未配置，暂时无法发布。</p>
+      <p v-if="loading" role="status">正在核对待发布版本…</p>
+      <p v-else-if="version">待发布版本：v{{ version.number }} · {{ version.status === 'VERIFIED' ? '已验证' : '未通过验证' }}<code>{{ version.id }}</code><code>{{ version.sourceDigest }}</code></p>
+      <p v-else>暂无可发布的已验证版本。</p>
+      <label class="deploy-confirm"><input v-model="confirmed" type="checkbox" :disabled="!version || version.status !== 'VERIFIED' || locked">我确认公开发布上方版本</label>
+      <button type="button" class="button-primary" :disabled="!canPublish" @click="publish">{{ posting ? '正在提交发布…' : '确认发布' }}</button>
+      <p v-if="current">本次发布：{{ current.id }}<br>版本：{{ current.versionId }}<br>状态：{{ { REQUESTED: '已受理，正在部署与检查', PUBLISHED: '发布成功', FAILED: '发布失败' }[current.status] }}</p>
+      <button v-if="current" type="button" class="button-secondary" :disabled="refreshing" @click="refresh">刷新发布状态</button>
+      <button v-else-if="uncertain" type="button" class="button-secondary" :disabled="recovering" @click="recover">重新读取发布记录</button>
+      <p v-if="uncertain" role="status">提交结果未知，暂停再次发布；请核对服务端发布记录。</p>
+      <p v-if="error" role="alert">{{ error }}</p><p v-if="notice" role="status">{{ notice }}</p>
+      <p v-if="copyError" role="alert">{{ copyError }}</p>
+      <div v-if="last" class="deploy-success"><h3>上次成功发布</h3><p>版本：{{ last.versionId }}</p><a :href="last.url ?? undefined" target="_blank" rel="noopener noreferrer">{{ last.url }}</a><button type="button" class="button-secondary" @click="copy">复制公开地址</button></div>
+    </section>
+  </div>
+</template>
+
+<style scoped>
+.deploy-control { position: relative; }
+.deploy-panel { position: absolute; top: calc(100% + 12px); right: 0; z-index: 40; width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 100px); overflow-y: auto; padding: 24px; border: 1px solid var(--line); border-radius: 10px; background: white; color: var(--ink); box-shadow: 0 12px 40px #22293626; font-size: 14px; overflow-wrap: anywhere; }
+.deploy-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.deploy-heading h2 { margin: 0; font-size: 20px; }
+.deploy-panel p { margin: 16px 0; }
+.deploy-panel code { display: block; margin-top: 6px; font-size: 12px; }
+.deploy-panel button { min-height: 44px; }
+.deploy-panel a { display: block; text-decoration: underline; color: var(--blue); margin: 12px 0; }
+.deploy-confirm { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-bottom: 12px; }
+.deploy-success { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.deploy-success h3 { font-size: 16px; }
+</style>
