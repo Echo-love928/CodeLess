@@ -1,6 +1,6 @@
 # D14-B：组件选择、共享确认、修改状态与确切版本预览
 
-Base：main / 418290e；分支：codex/d14-b-visual-edit-flow。仅本地草稿，未创建远端B PR。
+Base：main / 418290e；分支：codex/d14-b-visual-edit-flow。已创建[远端草稿PR42](https://github.com/Echo-love928/CodeLess/pull/42)。
 
 原选择器创建任务后重载工作台，缺少共享影响确认和任务产物身份核对。本改动要求显式确认整份源码组件及所有实例的影响，在当前版本工作台观察修改任务、取消及可读日志。只有READY任务、SUCCEEDED/exit0构建与同来源VERIFIED版本一致时才切换预览/源码并重建映射会话；失败、取消、未知及错配均保留旧预览。应用摘要刷新不会将别的latest指针冒充本任务产物。
 
