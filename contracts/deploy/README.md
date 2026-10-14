@@ -39,6 +39,7 @@ SQL状态依次为 REQUESTED / PUBLISHED / FAILED，只有同version/hash的实�
 UUID目录、只增binding/编号event文件、force + atomic move；拒绝symlink/junction/hardlink/祖先别名。
 无需新迁移、依赖或根锁变动。生产默认每秒扫描最多10个REQUESTED，PG publication行锁+SKIP LOCKED
 使多个实例只能执行一次；所有实例**必须共享同一个私有卷**。测试profile禁止后台发布worker。
+发布验收使用独立的真实PostgreSQL，测试类结束关闭Spring上下文；不与既有回归共享全局任务队列或连接池。
 
 卷与PG没有跨资源事务。binding先落盘；SQL回滚后的完全相同、仅PREPARING孤儿允许复用，其他孤儿失败关闭。
 终态event在SQL commit后追加。进程崩溃于PUBLISHING/PROBING后，恢复标记FAILED/DEPLOYMENT_INTERRUPTED，

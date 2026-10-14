@@ -21,6 +21,8 @@ if (Object.hasOwn(tests, mode)) {
   const maven = ['-f', 'services/api/pom.xml', `-Dtest=${tests[mode]}`, 'test']
   command = process.platform === 'win32' ? (process.env.ComSpec ?? 'cmd.exe') : './services/api/mvnw'
   args = process.platform === 'win32' ? ['/d', '/c', 'services\\api\\mvnw.cmd', ...maven] : maven
+} else if (mode === 'contracts') {
+  command = process.execPath; args = ['tests/deploy/validate-contract.mjs']
 } else if (mode === 'gate') {
   command = process.execPath; args = ['scripts/ci-gate.mjs']
 } else if (['api', 'static', 'runner', 'e2e'].includes(mode)) {

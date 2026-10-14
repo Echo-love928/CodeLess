@@ -1,0 +1,23 @@
+{
+  "head": "768e749d1a50958ed74057be3d4f568e2d377435",
+  "job": "115872461985",
+  "logDigest": "sha256:df9399234b6ae25366fdc326d4be6d2596afd7fb64d2de765c7ba2870ad0fe43",
+  "apiStatus": "FAILURE",
+  "exitCode": 1,
+  "tests": 214,
+  "failures": 0,
+  "errors": 2,
+  "skipped": 0,
+  "cardStatus": "NOT_EXECUTED_PRECONDITION_FAILED",
+  "causes": [
+    "PublicationIntegrationTest claimed a retained task in the shared PostgreSQL queue",
+    "PreviewRegistryHttpTest could not start: too many clients already"
+  ],
+  "fixCommit": "d6dab94",
+  "fix": "Dedicated real PostgreSQL for publication suite; DirtiesContext AFTER_CLASS closes its pool",
+  "excerpts": [
+    "2026-10-14T13:18:30.9745499Z 2026-10-14T13:18:30.957Z ERROR 2384 --- [codeless-api] [           main] t.s.DeferredServletContainerInitializers : Error starting Tomcat context. Exception: org.springframework.beans.factory.UnsatisfiedDependencyException. Message: Error creating bean with name 'authFilter' defined in file [/home/runner/work/CodeLess/CodeLess/services/api/target/classes/dev/codeless/api/auth/AuthFilter.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'authAccountRepository' defined in file [/home/runner/work/CodeLess/CodeLess/services/api/target/classes/dev/codeless/api/auth/AuthAccountRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'jdbcClient' defined in class path resource [org/springframework/boot/jdbc/autoconfigure/JdbcClientAutoConfiguration.class]: Failed to initialize dependency 'flywayInitializer' of JdbcClient bean 'jdbcClient': Error creating bean with name 'flywayInitializer' defined in class path resource [org/springframework/boot/flyway/autoconfigure/FlywayAutoConfiguration$FlywayConfiguration.class]: Unable to obtain connection from database: FATAL: sorry, too many clients already",
+    "2026-10-14T13:18:30.9752184Z Message    : FATAL: sorry, too many clients already",
+    "2026-10-14T13:18:31.0394610Z Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'authFilter' defined in file [/home/runner/work/CodeLess/CodeLess/services/api/target/classes/dev/codeless/api/auth/AuthFilter.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'authAccountRepository' defined in file [/home/runner/work/CodeLess/CodeLess/services/api/target/classes/dev/codeless/api/auth/AuthAccountRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'jdbcClient' defined in class path resource [org/springframework/boot/jdbc/autoconfigure/JdbcClientAutoConfiguration.class]: Failed to initialize dependency 'flywayInitializer' of JdbcClient bean 'jdbcClient': Error creating bean with name 'flywayInitializer' defined in class path resource [org/springframework/boot/flyway/autoconfigure/FlywayAutoConfiguration$FlywayConfiguration.class]: Unable to obtain connection from database: FATAL: sorry, too many clients already"
+  ]
+}

@@ -16,7 +16,7 @@ test('strict request, key and owner-publication contract',async()=>{
   assert.equal(new RegExp(key.schema.pattern).test('../escape'),false)
   assert.equal(Object.keys(patch.paths).length,4)
 })
-test('real HTTP-derived deployment evidence matches schemas; hosting fixture is explicit',async()=>{
+test('actual deployment state and HTTP panel evidence match schemas; hosting fixture is explicit',async()=>{
   const deploy=ajv.compile(await read('contracts/deploy/deployment.schema.json')),list=ajv.compile(await read('contracts/deploy/list.schema.json'))
   const evidence='tests/deploy/evidence/2026-10-14/verified/'
   const t2=await read(evidence+'D15-A-T2.json'),t4=await read(evidence+'D15-A-T4.json')
