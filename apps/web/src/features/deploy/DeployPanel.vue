@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { ApiError } from '../../api/http'
 import { session } from '../auth/session'
 import { getVersion, type Version } from '../versions/version-api'
-import { createPublication, getPublication, loadPublicOrigin, type Publication } from './deploy-api'
+import { createPublication, getPublication, listPublications, verifiedArtifact, loadPublicOrigin, type Publication, type PublicationIntent } from './deploy-api'
 
 const props = defineProps<{ applicationId: string; versionId?: string | null }>()
 const emit = defineEmits<{ unauthorized: [] }>()
@@ -12,34 +12,36 @@ const version = ref<Version>(), confirmed = ref(false), error = ref(''), notice 
 const copyError = ref('')
 const current = ref<Publication>(), last = ref<Publication>(), uncertain = ref(false)
 const configured = ref(false)
+const artifactDigest = ref(''), intent = ref<PublicationIntent>()
 const locked = computed(() => posting.value || refreshing.value || recovering.value || uncertain.value || current.value?.status === 'REQUESTED')
 const canPublish = computed(() => configured.value && !loading.value && !locked.value && confirmed.value &&
-  version.value?.status === 'VERIFIED' && version.value.id === props.versionId && session.status === 'authenticated')
+  !!artifactDigest.value && version.value?.status === 'VERIFIED' && version.value.id === props.versionId && session.status === 'authenticated')
 let epoch = 0, versionRequest = 0
 const key = () => `codeless:publication:${session.user?.id}:${props.applicationId}`
 function save() {
-  try { sessionStorage.setItem(key(), JSON.stringify({ last: last.value?.id, pending: current.value?.status === 'REQUESTED' ? current.value.id : undefined, uncertain: uncertain.value })) }
+  try { sessionStorage.setItem(key(), JSON.stringify({ uncertain: uncertain.value, intent: uncertain.value ? intent.value : undefined })) }
   catch { notice.value = '浏览器无法保存恢复记录，请保留发布编号。' }
 }
 function report(cause: unknown) {
-  error.value = cause instanceof Error ? cause.message : '发布服务暂时不可用。'
+  error.value = cause instanceof ApiError && cause.status === 409 ? '版本或发布请求已变化，请重新读取版本与发布记录。' : cause instanceof Error ? cause.message : '发布服务暂时不可用。'
   if (cause instanceof ApiError && cause.status === 401) emit('unauthorized')
 }
 function adopt(value: Publication) {
   if (current.value?.id === value.id && current.value.status !== 'REQUESTED' && value.status !== current.value.status)
     throw new Error('发布状态发生冲突，请联系维护者。')
-  current.value = value; uncertain.value = false
+  current.value = value; uncertain.value = false; intent.value = undefined
   if (value.status === 'PUBLISHED') { last.value = value; notice.value = '发布成功，公开地址已通过访问检查。' }
   if (value.status === 'FAILED') error.value = '发布失败。上次成功版本和地址仍然保留。请检查托管服务后重新确认发布。'
   save()
 }
 async function loadVersion() {
   const generation = epoch, request = ++versionRequest, id = props.versionId
-  version.value = undefined; confirmed.value = false; loading.value = true
+  version.value = undefined; artifactDigest.value = ''; confirmed.value = false; loading.value = true
   try {
     if (id) {
       const value = await getVersion(id, props.applicationId)
-      if (epoch === generation && request === versionRequest) version.value = value
+      const artifact = value.status === 'VERIFIED' ? await verifiedArtifact(value) : ''
+      if (epoch === generation && request === versionRequest) { version.value = value; artifactDigest.value = artifact }
     }
   } catch (cause) { if (epoch === generation && request === versionRequest) report(cause) }
   finally { if (epoch === generation && request === versionRequest) loading.value = false }
@@ -49,29 +51,37 @@ async function recover() {
   const generation = epoch, applicationId = props.applicationId
   recovering.value = true
   try {
-    const stored = JSON.parse(sessionStorage.getItem(key()) ?? '{}')
-    uncertain.value = stored.uncertain === true
-    if (stored.last) {
-      const value = await getPublication(stored.last, applicationId)
-      if (generation !== epoch) return
-      if (value.status !== 'PUBLISHED') throw new Error('上次成功发布记录无法确认。')
-      last.value = value
-    }
-    if (stored.pending) {
-      const value = await getPublication(stored.pending, applicationId)
-      if (generation === epoch) adopt(value)
-    }
+    // Server discovery is authoritative even with empty/disabled/corrupt browser storage.
+    const page = await listPublications(applicationId)
+    if (generation !== epoch) return
+    last.value = page.latestSuccessful ?? undefined
+    current.value = page.items[0]
+    let stored: { uncertain?: boolean; intent?: PublicationIntent } = {}
+    try { stored = JSON.parse(sessionStorage.getItem(key()) ?? '{}') ?? {} }
+    catch { notice.value = '浏览器恢复记录不可用，已读取服务端发布记录。' }
+    uncertain.value = page.uncertain === true || stored.uncertain === true
+    intent.value = stored.intent?.applicationId === applicationId ? stored.intent : undefined
     if (generation === epoch && uncertain.value) error.value = '上次提交结果未知，已暂停再次发布。请联系维护者核对发布记录。'
   } catch (cause) { if (generation === epoch) { uncertain.value = true; report(cause) } }
   finally { if (generation === epoch) recovering.value = false }
 }
 async function publish() {
   if (!canPublish.value || !version.value) return
-  const generation = epoch, applicationId = props.applicationId, id = version.value.id
+  intent.value = { applicationId: props.applicationId, versionId: version.value.id, artifactDigest: artifactDigest.value, key: crypto.randomUUID() }
+  await submitIntent()
+}
+async function submitIntent() {
+  if (!intent.value || posting.value) return
+  const generation = epoch, binding = { ...intent.value }
   posting.value = true; uncertain.value = true; confirmed.value = false; error.value = ''; notice.value = ''; save()
   try {
-    const value = await createPublication(applicationId, id)
-    if (generation === epoch) adopt(value)
+    const value = await createPublication(binding)
+    if (generation !== epoch) return
+    adopt(value)
+    // An idempotent replay may return an old terminal publication. Reconcile
+    // the independent server pointer instead of leaving that old URL as latest.
+    const page = await listPublications(binding.applicationId)
+    if (generation === epoch) { last.value = page.latestSuccessful ?? last.value; uncertain.value = page.uncertain === true; save() }
   } catch (cause) {
     if (generation === epoch) {
       // A definite rejection is retryable; a lost POST response must not automatically duplicate a deployment.
@@ -88,6 +98,8 @@ async function refresh() {
   try {
     const value = await getPublication(id, applicationId, versionId)
     if (generation === epoch) adopt(value)
+    const page = await listPublications(applicationId)
+    if (generation === epoch) { last.value = page.latestSuccessful ?? undefined; uncertain.value = page.uncertain === true; save() }
   } catch (cause) { if (generation === epoch) report(cause) }
   finally { if (generation === epoch) refreshing.value = false }
 }
@@ -98,17 +110,17 @@ async function copy() {
   try { await navigator.clipboard.writeText(last.value.url); if (generation === epoch) notice.value = '公开地址已复制。' }
   catch { if (generation === epoch) copyError.value = '复制失败，请选中下方地址手动复制。' }
 }
-watch(() => props.applicationId, () => {
-  epoch++; current.value = undefined; last.value = undefined; version.value = undefined
+watch(() => [props.applicationId, session.user?.id], () => {
+  epoch++; current.value = undefined; last.value = undefined; version.value = undefined; artifactDigest.value = ''; intent.value = undefined
   posting.value = false; refreshing.value = false; recovering.value = false; uncertain.value = false; error.value = ''; notice.value = ''; copyError.value = ''; open.value = false
   configured.value = false
   const generation = epoch
   void loadPublicOrigin().then(() => {
     if (generation !== epoch) return
     configured.value = true; void recover()
-  }).catch(() => { if (generation === epoch) configured.value = false })
+  }).catch(cause => { if (generation === epoch) { configured.value = false; report(cause) } })
 }, { immediate: true })
-watch(() => props.versionId, () => { version.value = undefined; confirmed.value = false; if (open.value) void loadVersion() })
+watch(() => props.versionId, () => { version.value = undefined; artifactDigest.value = ''; confirmed.value = false; if (open.value) void loadVersion() })
 watch(open, value => { if (value) void loadVersion() })
 onBeforeUnmount(() => { epoch++; versionRequest++ })
 </script>
@@ -123,11 +135,14 @@ onBeforeUnmount(() => { epoch++; versionRequest++ })
       <p v-if="loading" role="status">正在核对待发布版本…</p>
       <p v-else-if="version">待发布版本：v{{ version.number }} · {{ version.status === 'VERIFIED' ? '已验证' : '未通过验证' }}<code>{{ version.id }}</code><code>{{ version.sourceDigest }}</code></p>
       <p v-else>暂无可发布的已验证版本。</p>
+      <p v-if="artifactDigest">构建产物：<code>{{ artifactDigest }}</code></p>
       <label class="deploy-confirm"><input v-model="confirmed" type="checkbox" :disabled="!version || version.status !== 'VERIFIED' || locked">我确认公开发布上方版本</label>
       <button type="button" class="button-primary" :disabled="!canPublish" @click="publish">{{ posting ? '正在提交发布…' : '确认发布' }}</button>
       <p v-if="current">本次发布：{{ current.id }}<br>版本：{{ current.versionId }}<br>状态：{{ { REQUESTED: '已受理，正在部署与检查', PUBLISHED: '发布成功', FAILED: '发布失败' }[current.status] }}</p>
       <button v-if="current" type="button" class="button-secondary" :disabled="refreshing" @click="refresh">刷新发布状态</button>
       <button v-else-if="uncertain" type="button" class="button-secondary" :disabled="recovering" @click="recover">重新读取发布记录</button>
+      <p v-if="uncertain && intent">本次待核对版本：<code>{{ intent.versionId }}</code><code>{{ intent.artifactDigest }}</code></p>
+      <button v-if="uncertain && intent" type="button" class="button-secondary" :disabled="posting || recovering" @click="submitIntent">重试本次提交</button>
       <p v-if="uncertain" role="status">提交结果未知，暂停再次发布；请核对服务端发布记录。</p>
       <p v-if="error" role="alert">{{ error }}</p><p v-if="notice" role="status">{{ notice }}</p>
       <p v-if="copyError" role="alert">{{ copyError }}</p>

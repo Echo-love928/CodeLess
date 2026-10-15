@@ -1,6 +1,5 @@
-import { chmod, mkdir, rename, rm, writeFile } from 'node:fs/promises'
-import { basename, dirname, join, resolve } from 'node:path'
-import { randomUUID } from 'node:crypto'
+import { createPublicationStore } from './store.mjs'
+import { dirname, join } from 'node:path'
 import { isDeepStrictEqual } from 'node:util'
 import { browserTarget } from '../artifacts/service.mjs'
 import { digest, readSnapshot } from '../artifacts/snapshot.mjs'
@@ -11,17 +10,13 @@ import { deploymentUrl, publicationSite, publicFile } from './policy.mjs'
 // Private API for the authenticated publication coordinator. Never exposed as an HTTP tool.
 // The coordinator supplies its committed immutable version and live worker-owned handle.
 export async function createPublisher({ hostingRoot, evidenceRoot, publicOrigin, platformOrigin, previewOrigin }) {
-  const root = await canonical(hostingRoot)
+  const store = await createPublicationStore(hostingRoot)
   const evidence = await canonical(evidenceRoot)
-  // Outside the ingress bind mount: Windows Docker file sharing can hold directory handles.
-  // A sibling on the same filesystem preserves atomic rename and cannot be served by a public host.
-  const pendingRoot = join(dirname(root), basename(root) + '-staging')
-  await mkdir(pendingRoot, { recursive: true, mode: 0o700 })
-  await canonical(pendingRoot)
   const { site } = publicationSite(publicOrigin, platformOrigin, previewOrigin)
   const pending = new Map()
   async function publish(job) {
-    await canonical(root); await canonical(pendingRoot)
+    const deadlineMs = job.deadline ? Date.parse(job.deadline) : Date.now() + 30000
+    if (!Number.isFinite(deadlineMs) || deadlineMs - Date.now() <= 3000 || deadlineMs - Date.now() > 30000) throw new Error('DEPLOYMENT_TIMEOUT')
     const { deploymentId, version, handle, verification } = job
     const target = browserTarget(handle) // Serialized/modeled handles cannot grant access.
     if (!uuid.test(deploymentId ?? '') || !version || !uuid.test(version.id ?? '') ||
@@ -46,7 +41,7 @@ export async function createPublisher({ hostingRoot, evidenceRoot, publicOrigin,
     const binding = { deploymentId, applicationId: version.applicationId, versionId: version.id,
       buildId: handle.buildId, sourceDigest: handle.sourceDigest, artifactDigest: handle.artifactDigest }
     const buffers = new Map(), files = []
-    const deadline = AbortSignal.timeout(30000)
+    const deadline = AbortSignal.timeout(Math.max(1, deadlineMs - Date.now() - 3000))
     let total = 0
     // Read the admitted immutable service, not mutable disk or a user-provided path/upstream.
     for (const name of target.paths.sort()) {
@@ -68,41 +63,14 @@ export async function createPublisher({ hostingRoot, evidenceRoot, publicOrigin,
     const publishedFiles = Object.freeze(files.filter(file => publicFile(file.path)).map(file => Object.freeze(file)))
     const receipt = Object.freeze({ ...binding, publishedDigest: digest(JSON.stringify(publishedFiles)), files: publishedFiles,
       url: deploymentUrl(deploymentId, site) })
-    const destination = join(root, deploymentId)
-    try {
-      await canonical(destination)
-      const existing = await readSnapshot(destination)
-      if (existing.buffers.get('__deployment.json')?.toString('utf8') !== JSON.stringify(receipt) ||
-        existing.manifest.files.length !== publishedFiles.length + 1 || publishedFiles.some(file =>
-          !existing.buffers.has(file.path) || digest(existing.buffers.get(file.path)) !== file.digest))
-        throw new Error('deployment ID already bound to different content')
-      return receipt
-    } catch (error) { if (error.code !== 'ENOENT') throw error }
-    const staging = join(pendingRoot, randomUUID())
-    await mkdir(staging, { mode: 0o700 })
-    try {
-      for (const [name, bytes] of buffers) {
-        const path = join(staging, name)
-        await mkdir(dirname(path), { recursive: true, mode: 0o755 })
-        await writeFile(path, bytes, { flag: 'wx', mode: 0o644 })
-      }
-      await writeFile(join(staging, '__deployment.json'), JSON.stringify(receipt), { flag: 'wx', mode: 0o600 })
-      await chmod(staging, 0o755)
-      await canonical(root); await canonical(pendingRoot)
-      // Public hostnames match UUID directories only; partially written staging is inaccessible.
-      await rename(staging, destination)
-      return receipt
-    } finally {
-      if (dirname(resolve(staging)) !== pendingRoot) throw new Error('cleanup escaped staging root')
-      await rm(staging, { recursive: true, force: true })
-    }
+    return store(receipt, buffers, deadlineMs - 3000)
   }
   return job => {
     const key = job?.deploymentId
     if (!uuid.test(key ?? '')) return Promise.reject(new Error('invalid deployment ID'))
     // Serialize same-ID calls, revalidate every binding; do not reuse another caller's result.
     const frozen = { deploymentId: key, version: structuredClone(job.version),
-      verification: structuredClone(job.verification), handle: job.handle }
+      verification: structuredClone(job.verification), handle: job.handle, deadline: job.deadline }
     const run = (pending.get(key) ?? Promise.resolve()).catch(() => {}).then(() => publish(frozen))
     pending.set(key, run)
     void run.finally(() => { if (pending.get(key) === run) pending.delete(key) }).catch(() => {})

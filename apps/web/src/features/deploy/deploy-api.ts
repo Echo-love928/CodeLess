@@ -1,6 +1,7 @@
-import { ApiError, requestJson } from '../../api/http'
+import { requestJson } from '../../api/http'
 import { session } from '../auth/session'
 import { uuid } from '../workbench/task-api'
+import { digest, type Version } from '../versions/version-api'
 
 export interface Publication {
   id: string; applicationId: string; versionId: string; requestedBy: string
@@ -44,18 +45,47 @@ function publication(value: Publication, applicationId: string, versionId?: stri
   }
   return value
 }
-export async function createPublication(applicationId: string, versionId: string): Promise<Publication> {
+export interface PublicationIntent { applicationId: string; versionId: string; artifactDigest: string; key: string }
+export async function verifiedArtifact(version: Version): Promise<string> {
+  const value = await requestJson<{ versionId: string; status: string; sourceDigest: string; validation: {
+    status: string; sourceDigest: string; artifactDigest: string; report: {
+      buildId: string; buildStatus: string; exitCode: number; verificationStatus: string; artifactDigest: string
+    }
+  } }>(`/api/v0/versions/${version.id}/snapshot`, { cache: 'no-store' })
+  const validation = value?.validation, report = validation?.report
+  if (version.status !== 'VERIFIED' || value.versionId !== version.id || value.status !== 'VERIFIED' ||
+    value.sourceDigest !== version.sourceDigest || validation?.status !== 'VERIFIED' ||
+    validation.sourceDigest !== version.sourceDigest || !digest(validation.artifactDigest) ||
+    report?.buildId !== version.buildId || report.buildStatus !== 'SUCCEEDED' || report.exitCode !== 0 ||
+    report.verificationStatus !== 'PASSED' || report.artifactDigest !== validation.artifactDigest)
+    throw new Error('无法确认此版本的冻结构建产物，请重新读取版本。')
+  return validation.artifactDigest
+}
+export async function createPublication(intent: PublicationIntent): Promise<Publication> {
+  const { applicationId, versionId, artifactDigest, key } = intent
   publicOrigin()
-  if (!uuid(applicationId) || !uuid(versionId) || session.status !== 'authenticated' || !session.csrfToken)
+  if (!uuid(applicationId) || !uuid(versionId) || !digest(artifactDigest) || !/^[A-Za-z0-9_-]{16,128}$/.test(key) || session.status !== 'authenticated' || !session.csrfToken)
     throw new Error('请登录后发布已验证版本。')
+  return publication(await requestJson<Publication>('/api/v0/publications', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': session.csrfToken, 'Idempotency-Key': key },
+    body: JSON.stringify({ applicationId, versionId, artifactDigest }) }), applicationId, versionId)
+}
+export async function listPublications(applicationId: string): Promise<{ items: Publication[]; latestSuccessful: Publication | null; uncertain?: boolean }> {
+  if (!uuid(applicationId)) throw new Error('发布记录入口无效。')
+  const page = await requestJson<{ items: Publication[]; latestSuccessful: Publication | null }>(`/api/v0/applications/${applicationId}/publications`, { cache: 'no-store' })
+  if (!page || !Array.isArray(page.items) || page.items.length > 100 || !Object.hasOwn(page, 'latestSuccessful'))
+    throw new Error('发布列表无法确认。')
+  if (page.latestSuccessful !== null && publication(page.latestSuccessful, applicationId).status !== 'PUBLISHED')
+    throw new Error('上次成功发布记录无法确认。')
   try {
-    return publication(await requestJson<Publication>('/api/v0/publications', { method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': session.csrfToken },
-      body: JSON.stringify({ applicationId, versionId }) }), applicationId, versionId)
-  } catch (cause) {
-    if (cause instanceof ApiError && cause.status === 409) throw new Error('该版本尚未通过验证，未发布。')
-    throw cause
+    page.items.forEach(item => publication(item, applicationId))
+    if (new Set(page.items.map(item => item.id)).size !== page.items.length) throw new Error('发布列表含重复记录。')
+  } catch {
+    // An unknown attempt blocks submission but cannot invalidate an independently
+    // checked latestSuccessful record returned by the owner-scoped server query.
+    return { items: [], latestSuccessful: page.latestSuccessful, uncertain: true }
   }
+  return page
 }
 export async function getPublication(id: string, applicationId: string, versionId?: string): Promise<Publication> {
   if (!uuid(id) || !uuid(applicationId)) throw new Error('发布记录入口无效。')

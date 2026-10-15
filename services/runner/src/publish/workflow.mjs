@@ -7,10 +7,11 @@ export async function createPublicationRunner(config) {
   const publish = await createPublisher(config)
   const probe = createPublicProbe(config)
   return async job => {
+    const deadline = Date.now() + 30000
     let receipt = null
     try {
-      receipt = await publish(job)
-      const observation = await probe(receipt)
+      receipt = await publish({ ...job, deadline: new Date(deadline).toISOString() })
+      const observation = await probe(receipt, deadline)
       if (observation.status !== 'PASSED' || observation.exitCode !== 0 || observation.cleanup !== true)
         return { deploymentId: job.deploymentId, versionId: job.version.id, status: 'FAILED',
           failure: observation.failure ?? 'PROBE_FAILED', receipt, probe: observation, url: null }

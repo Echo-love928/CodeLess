@@ -6,17 +6,18 @@ import { publicAddress, publicFile } from './probe-policy.mjs'
 const hash = bytes => 'sha256:' + createHash('sha256').update(bytes).digest('hex')
 // No browser, scripts, credentials, redirects, proxy or page-selected destinations.
 // lookup is pinned for EVERY connection, so a second DNS answer cannot redirect to an internal service.
-export async function inspectTarget({ url, address, files }, request = https.request) {
+export async function inspectTarget({ url, address, files, deadline = Date.now() + 25000 }, request = https.request) {
   const origin = new URL(url)
   const observations = []
   let total = 0
   async function get(path, expected, missing = false) {
+    if (Date.now() >= deadline) throw new Error('probe deadline exceeded')
     const observation = await new Promise((done, reject) => {
       const req = request({ protocol: origin.protocol, hostname: origin.hostname, port: origin.port || 443,
         path, method: 'GET', servername: origin.hostname, agent: false,
         lookup: (_host, options, callback) => options.all
           ? callback(null, [{ address, family: 4 }]) : callback(null, address, 4),
-        headers: { Accept: '*/*' }, timeout: 3000 }, response => {
+        headers: { Accept: '*/*' }, timeout: Math.max(1, Math.min(3000, deadline - Date.now())) }, response => {
         const chunks = []
         response.on('data', chunk => {
           total += chunk.length
@@ -63,7 +64,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const job = JSON.parse(input), url = new URL(job.url)
   if (url.protocol !== 'https:' || url.pathname !== '/' || url.search || url.hash || url.username || url.password ||
     !publicAddress(job.address)) throw new Error('public probe target rejected')
-  const deadline = setTimeout(() => process.exit(2), 30000)
+  if (!Number.isFinite(job.deadline) || job.deadline <= Date.now() || job.deadline > Date.now() + 30000) throw new Error('probe deadline rejected')
+  const deadline = setTimeout(() => process.exit(2), Math.max(1, job.deadline - Date.now()))
   const result = await inspectTarget(job)
   clearTimeout(deadline)
   process.stdout.write(JSON.stringify(result))

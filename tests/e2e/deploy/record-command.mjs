@@ -8,6 +8,7 @@ const commands = {
   unit: ['corepack', 'pnpm', '--filter', '@codeless/web', 'exec', 'vitest', 'run', 'src/features/deploy'],
   boundary: ['node', '--test', 'tests/e2e/deploy/publisher.test.mjs'],
   hosting: ['node', '--test', 'tests/e2e/deploy/hosting.acceptance.mjs'],
+  ab: ['node', 'tests/e2e/deploy/ab-integration.mjs'],
   browser: ['corepack', 'pnpm', '--filter', '@codeless/web', 'exec', 'playwright', 'test', '--config', 'playwright.config.ts', 'deploy/flow.spec.ts', '--workers=1'],
   static: ['corepack', 'pnpm', 'verify:static'], api: ['corepack', 'pnpm', 'verify:api'],
   'api-repro': [windows ? 'services\\api\\mvnw.cmd' : './services/api/mvnw', '-f', 'services/api/pom.xml', '-Dtest=PreviewPlatformIntegrationTest', 'test'],

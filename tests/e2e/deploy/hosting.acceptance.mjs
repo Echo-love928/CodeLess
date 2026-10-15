@@ -9,8 +9,9 @@ import { chromium } from '@playwright/test'
 import { createBuildVerifier } from '../../../services/runner/src/verify/workflow.mjs'
 import { openArtifactService } from '../../../services/runner/src/artifacts/service.mjs'
 import { createPublisher } from '../../../services/runner/src/publish/publisher.mjs'
+import { createFrozenGateway } from '../../../services/runner/src/publish/frozen-gateway.mjs'
 import { hostingConfig } from '../../../infra/hosting/render.mjs'
-import { digest } from '../../../services/runner/src/artifacts/snapshot.mjs'
+import { digest, readSnapshot } from '../../../services/runner/src/artifacts/snapshot.mjs'
 
 const repository = resolve('.'), evidence = resolve(process.env.CODELESS_DEPLOY_EVIDENCE_DIR ?? '.local-data/d15-b/hosting')
 const origins = { publicOrigin: 'https://sites.codeless-public.test:8443', platformOrigin: 'https://app.codeless.test', previewOrigin: 'https://preview.codeless-preview.test' }
@@ -23,13 +24,30 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
   await mkdir(evidence, { recursive: true })
   const artifactRoot = join(evidence, 'artifacts'), evidenceRoot = join(evidence, 'verification'), hostingRoot = join(evidence, 'sites')
   await mkdir(hostingRoot, { recursive: true })
+  // This suite also runs independently/in parallel in a clean CI job. Never rely on
+  // another runner test to prepare the pinned, repository-controlled build image.
+  const image = spawnSync('docker', ['build', '--file', 'infra/build-image/Dockerfile', '--tag', 'codeless-vue-build:d05', '.'],
+    { stdio: 'inherit', timeout: 180000, windowsHide: true })
+  assert.equal(image.error, undefined)
+  assert.equal(image.signal, null)
+  assert.equal(image.status, 0, 'controlled Vue image preparation failed')
   const run = await createBuildVerifier({ workRoot: join(evidence, 'work'), artifactRoot, evidenceRoot })
   const observed = await run(join(repository, 'templates/vue/fixtures/tasks'))
   assert.equal(observed.status, 'VERIFIED', JSON.stringify(observed))
   const handle = await openArtifactService({ artifactRoot, build: observed.build, sourceDigest: observed.sourceDigest })
   const version = { id: randomUUID(), applicationId: randomUUID(), status: 'VERIFIED', buildId: observed.build.id, sourceDigest: observed.sourceDigest }
   const publish = await createPublisher({ hostingRoot, evidenceRoot, ...origins })
-  const receipt = await publish({ deploymentId: randomUUID(), version, verification: observed.verification, handle })
+  // Retain D08 admission/evidence verification, then separately exercise A's frozen bytes
+  // after its live artifact service has gone away. Both paths use the same immutable writer.
+  await publish({ deploymentId: randomUUID(), version, verification: observed.verification, handle })
+  const snapshot = await readSnapshot(observed.build.artifact.directory)
+  const payload = { publicationId: randomUUID(), versionId: version.id, artifactDigest: snapshot.manifest.digest,
+    assets: snapshot.manifest.files.map(file => ({ path: file.path, digest: file.digest, bytes: snapshot.buffers.get(file.path).toString('base64') })) }
+  await handle.close()
+  const gateway = await createFrozenGateway({ hostingRoot, ...origins })
+  const deadline = () => new Date(Date.now() + 30000).toISOString()
+  await gateway.publish(payload, deadline())
+  const receipt = JSON.parse(await readFile(join(hostingRoot, payload.publicationId, '__deployment.json'), 'utf8'))
   const token = randomUUID(), network = 'codeless-d15-' + token, container = network + '-hosting', probeName = network + '-probe'
   const cert = join(evidence, 'server.pem'), key = join(evidence, 'server.key'), config = join(evidence, 'nginx.conf')
   let openssl = 'openssl'
@@ -112,7 +130,9 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
     await page.reload(); assert.match(await page.locator('#app').innerText(), /任务/)
     await page.screenshot({ path: join(evidence, 'public-tasks-refresh.png'), fullPage: true })
     await context.close()
-    const second = await publish({ deploymentId: randomUUID(), version, verification: observed.verification, handle })
+    const secondPayload = { ...payload, publicationId: randomUUID() }
+    await gateway.publish(secondPayload, deadline())
+    const second = JSON.parse(await readFile(join(hostingRoot, secondPayload.publicationId, '__deployment.json'), 'utf8'))
     const missing = second.files.find(file => file.path.endsWith('.js'))
     await unlink(join(hostingRoot, second.deploymentId, missing.path))
     const failure = spawnSync('docker', probeArgs, { encoding: 'utf8', input: JSON.stringify({ url: second.url, address, files: second.files }), timeout: 15000 })
@@ -123,10 +143,10 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
       buildExitCode: observed.build.exitCode, realBrowserVerification: observed.verification.status, version, receipt,
       httpEvidence, isolatedProbe: probe, failedProbe, productionPrivateTargetExitCode: production.status,
       immutablePreviousDigest: index.digest, sourceDigest: observed.sourceDigest }
+    result.frozenCoordinatorBridge = { liveHandleClosed: true, versionId: payload.versionId, artifactDigest: payload.artifactDigest }
     await writeFile(join(evidence, 'acceptance.json'), JSON.stringify(result, null, 2))
   } finally {
     if (browser) await browser.close()
-    await handle.close()
     if (hostingCreated) docker(['rm', '-f', container])
     if (networkCreated) docker(['network', 'rm', network])
   }
