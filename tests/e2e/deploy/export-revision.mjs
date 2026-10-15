@@ -10,6 +10,8 @@ const runs = []
 for (const entry of await readdir(source, { withFileTypes: true })) {
   if (!entry.isDirectory() || !entry.name.startsWith('2026-10-15T')) continue
   const value = JSON.parse(await readFile(join(source, entry.name, 'run.json'), 'utf8'))
+  try { value.termination = JSON.parse(await readFile(join(source, entry.name, 'termination.json'), 'utf8')) }
+  catch (error) { if (error.code !== 'ENOENT') throw error }
   runs.push({ ...value, directory: entry.name, privateLog: `.local-data/d15-b/${entry.name}/command.log` })
 }
 runs.sort((a, b) => a.startedAt.localeCompare(b.startedAt))
@@ -20,7 +22,7 @@ for (const mode of ['static', 'runner', 'e2e', 'api', 'ab']) {
   const log = await readFile(join(source, run.directory, 'command.log'), 'utf8')
   const summary = log.split(/\r?\n/).filter(line => /Tests run:|Tests  |Test Files|ℹ tests|ℹ pass|ℹ fail|ℹ skipped|[0-9]+ passed|[0-9]+ failed|BUILD SUCCESS|BUILD FAILURE|B-frozen|controlled Vue|No such image|Error:|ERROR /.test(line))
   await writeFile(join(output, mode + '-summary.json'), JSON.stringify({ command: run.command, status: run.status ?? 'RUNNING', exitCode: run.exitCode,
-    signal: run.signal, logDigest: run.logDigest, privateLog: run.privateLog, summary }, null, 2))
+    signal: run.signal, logDigest: run.logDigest, privateLog: run.privateLog, termination: run.termination ?? null, summary }, null, 2))
 }
 let hosting
 for (const run of runs.filter(run => ['e2e', 'hosting'].includes(run.mode)).reverse()) {
