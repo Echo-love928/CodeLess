@@ -50,6 +50,9 @@ export async function preflight(env = process.env) {
         if (response.statusCode >= 300 && response.statusCode < 400 || response.statusCode >= 500) {
           response.destroy(); reject(new Error('direct HTTPS endpoint unavailable')); return
         }
+        if (url.hostname === hostname && response.statusCode !== 404) {
+          response.destroy(); reject(new Error('unallocated publication host must return 404')); return
+        }
         if (url.pathname !== '/codeless-publication-config.json') { response.destroy(); done(response.statusCode); return }
         let body = '', bytes = 0
         response.on('data', chunk => { bytes += chunk.length; if (bytes > 1024) response.destroy(new Error('platform configuration exceeded')); else body += chunk })
