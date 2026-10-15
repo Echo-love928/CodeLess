@@ -182,3 +182,8 @@ Java -> private Node child -> immutable static directory. With no public DNS sup
 production probe must fail closed within A's deadline; SQL/list retain the earlier explicitly seeded
 A fixture success. This is real A/B failure-path integration, not a public successful deployment.
 The independent local TLS test proves serving/probing the same bytes with its explicit private CA.
+
+Linux fixture setup makes only its newly generated disposable self-signed key readable (0644)
+to the unchanged ingress UID101. Real operator TLS keys remain operator-managed ACLs; this
+fixture permission is not a production recommendation. Both stdout/stderr from hosting logs
+are retained when startup fails.

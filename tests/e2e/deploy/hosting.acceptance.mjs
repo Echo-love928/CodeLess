@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { execFileSync, spawnSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
-import { mkdir, readFile, writeFile, unlink } from 'node:fs/promises'
+import { chmod, mkdir, readFile, writeFile, unlink } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { request } from 'node:https'
 import { test } from 'node:test'
@@ -18,7 +18,7 @@ const origins = { publicOrigin: 'https://sites.codeless-public.test:8443', platf
 function docker(args, input) {
   const result = spawnSync('docker', args, { input, encoding: 'utf8', timeout: 60000, windowsHide: true })
   assert.equal(result.status, 0, JSON.stringify({ args: args.slice(0, 6), status: result.status, error: result.error?.message, stderr: result.stderr }))
-  return result.stdout.trim()
+  return (result.stdout + (args[0] === 'logs' ? result.stderr : '')).trim()
 }
 test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Nginx and isolated access probe', { timeout: 160000 }, async () => {
   await mkdir(evidence, { recursive: true })
@@ -55,6 +55,9 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
   execFileSync(openssl, ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', key, '-out', cert, '-days', '1',
     '-subj', '/CN=codeless-public-test', '-addext', 'subjectAltName=DNS:*.sites.codeless-public.test'],
   { stdio: 'ignore', windowsHide: true, env: { ...process.env, MSYS_NO_PATHCONV: '1' } })
+  // Disposable self-signed fixture only. OpenSSL uses 0600 on Linux; the fixed
+  // UID101 ingress must be able to read it. No production/operator key is changed.
+  await chmod(key, 0o644)
   await writeFile(config, await hostingConfig(origins))
   let browser, networkCreated = false, hostingCreated = false
   try {
@@ -69,8 +72,9 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
     docker(['network', 'connect', network, container])
     const inspect = JSON.parse(docker(['inspect', container]))[0]
     await writeFile(join(evidence, 'hosting-inspect.json'), JSON.stringify(inspect, null, 2))
-    await writeFile(join(evidence, 'hosting-log.txt'), docker(['logs', container]))
-    assert.equal(inspect.State.Running, true, JSON.stringify(inspect.State))
+    const hostingLog = docker(['logs', container])
+    await writeFile(join(evidence, 'hosting-log.txt'), hostingLog)
+    assert.equal(inspect.State.Running, true, JSON.stringify(inspect.State) + '\n' + hostingLog)
     docker(['exec', container, 'nginx', '-t'])
     const port = Number(inspect.NetworkSettings.Ports['8443/tcp'][0].HostPort), address = inspect.NetworkSettings.Networks[network].IPAddress
     const hostname = new URL(receipt.url).hostname

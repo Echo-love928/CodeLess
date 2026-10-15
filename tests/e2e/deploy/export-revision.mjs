@@ -44,7 +44,10 @@ async function scan(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const path = join(directory, entry.name).replaceAll('\\', '/')
     if (entry.isDirectory()) { if (entry.name !== 'evidence') await scan(path) }
-    else if (/\.(mjs|ts|vue|java|yml|template|md)$/.test(path)) files.push({ path, digest: digest(await readFile(path)) })
+    else if (/\.(mjs|ts|vue|java|yml|template|md)$/.test(path)) {
+      const bytes = await readFile(path)
+      files.push({ path, digest: digest(bytes), lfDigest: digest(Buffer.from(bytes.toString('utf8').replaceAll('\r\n', '\n'))) })
+    }
   }
 }
 for (const directory of ['services/runner/src/publish', 'apps/web/src/features/deploy', 'infra/hosting', 'tests/e2e/deploy']) await scan(directory)
