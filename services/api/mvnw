@@ -12,7 +12,10 @@ if [ ! -x "$MAVEN_HOME/bin/mvn" ]; then
   archive="$(mktemp "${TMPDIR:-/tmp}/codeless-maven.XXXXXX.zip")"
   trap 'rm -f "$archive"' EXIT INT TERM
   if command -v curl >/dev/null 2>&1; then
-    curl --fail --location --silent --show-error "$MAVEN_DIST" --output "$archive"
+    # Retry only transient download failures (including HTTP 429), never Maven tests.
+    curl --fail --location --silent --show-error \
+      --retry 3 --retry-delay 2 --retry-max-time 90 \
+      --connect-timeout 10 --max-time 30 "$MAVEN_DIST" --output "$archive"
   elif command -v wget >/dev/null 2>&1; then
     wget -q "$MAVEN_DIST" -O "$archive"
   else
