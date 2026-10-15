@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "publication",
+    "phase",
+    "sourceDigest",
+    "artifactDigest",
+    "reportDigest",
+    "history",
+    "failureCode",
+    "latestSuccessful"
+  ],
+  "properties": {
+    "publication": {
+      "title": "Publication",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "applicationId",
+        "versionId",
+        "requestedBy",
+        "status",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "applicationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "versionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "requestedBy": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "status": {
+          "enum": [
+            "REQUESTED",
+            "PUBLISHED",
+            "FAILED"
+          ]
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "publishedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "PUBLISHED"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "url": {
+                "type": "string"
+              },
+              "publishedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "url",
+              "publishedAt"
+            ]
+          }
+        }
+      ]
+    },
+    "phase": {
+      "enum": [
+        "PREPARING",
+        "PUBLISHING",
+        "PROBING",
+        "SUCCEEDED",
+        "FAILED",
+        "UNKNOWN"
+      ]
+    },
+    "sourceDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "artifactDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "reportDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "history": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "phase",
+          "at",
+          "failureCode"
+        ],
+        "properties": {
+          "phase": {
+            "enum": [
+              "PREPARING",
+              "PUBLISHING",
+              "PROBING",
+              "SUCCEEDED",
+              "FAILED"
+            ]
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "failureCode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Z][A-Z0-9_]{1,100}$"
+          }
+        }
+      }
+    },
+    "failureCode": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Z][A-Z0-9_]{1,100}$"
+    },
+    "latestSuccessful": {
+      "anyOf": [
+        {
+          "title": "Publication",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "applicationId",
+            "versionId",
+            "requestedBy",
+            "status",
+            "createdAt"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "applicationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "versionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "requestedBy": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "status": {
+              "enum": [
+                "REQUESTED",
+                "PUBLISHED",
+                "FAILED"
+              ]
+            },
+            "url": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uri",
+              "pattern": "^https://"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "publishedAt": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PUBLISHED"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "url": {
+                    "type": "string"
+                  },
+                  "publishedAt": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "url",
+                  "publishedAt"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

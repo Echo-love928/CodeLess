@@ -1,0 +1,177 @@
+$ node scripts/validate-contracts.mjs flow && pnpm --filter @codeless/web smoke "--workers=4"
+OpenAPI surface and authentication boundary passed
+application: valid accepted; invalid rejected
+task: valid accepted; invalid rejected
+event: valid accepted; invalid rejected
+build: valid accepted; invalid rejected
+version: valid accepted; invalid rejected
+publication: valid accepted; invalid rejected
+task-diagnostics: valid accepted; invalid rejected
+preview-credential: valid accepted; invalid rejected
+cross-resource READY/publication flow passed
+$ pnpm build && playwright test --config playwright.config.ts "--workers=4"
+$ vue-tsc --noEmit && vite build
+vite v6.2.3 building for production...
+transforming...
+✓ 1481 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.54 kB │ gzip:  0.36 kB
+dist/assets/index-CS9mwL8V.css   57.13 kB │ gzip: 10.82 kB
+dist/assets/index-BqAKbesD.js   199.30 kB │ gzip: 72.77 kB
+✓ built in 11.46s
+[2m[WebServer] [22m(node:210132) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 52 tests using 4 workers
+
+✔ D15-B-01: frozen bytes, deployment isolation, source/catalog exclusion and same-ID retry binding (592.8338ms)
+✔ D15-B-02/03: dedicated sites and SSRF targets fail closed (2.6065ms)
+(node:192552) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:204044) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:206112) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:206896) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:192552) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:206112) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:204044) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:206896) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  2 [chromium] › ..\..\tests\e2e\auth\flow.spec.ts:4:5 › D03-B-T1: failed login explains error and allows retry (auth contract mock) (1.1s)
+  ok  1 [chromium] › ..\..\tests\e2e\apps\flow.spec.ts:4:5 › D04-B-T1 contract fixture: authenticated create opens its own workbench (1.3s)
+[2m[WebServer] [22m21:27:24 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+[2m[WebServer] [22m21:27:24 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok  3 [chromium] › ..\..\tests\e2e\bootstrap\routes.spec.ts:4:5 › entry, application list and workbench navigate and refresh without script errors (1.7s)
+  ok  5 [chromium] › ..\..\tests\e2e\auth\flow.spec.ts:17:5 › D03-B-T2: refresh restores a session from the auth endpoint (auth contract mock) (1.1s)
+[2m[WebServer] [22m21:27:26 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok  6 [chromium] › ..\..\tests\e2e\apps\flow.spec.ts:17:5 › D04-B-T2 contract fixture: another user cannot open the application (1.7s)
+  ok  8 [chromium] › ..\..\tests\e2e\auth\flow.spec.ts:27:5 › D03-B-T3: anonymous workbench visit redirects to login and returns after login (1.2s)
+  ok  4 [chromium] › ..\..\tests\e2e\deploy\flow.spec.ts:26:5 › D15-B-T4: explicit confirmation, exact version and failed deployment retains recoverable successful address (3.5s)
+  ok  7 [chromium] › ..\..\tests\e2e\bootstrap\routes.spec.ts:25:5 › application search and API contract creation state stay honest (2.0s)
+  ok  9 [chromium] › ..\..\tests\e2e\apps\flow.spec.ts:30:5 › D04-B-T3 contract fixture: empty list and list failure stay distinct (1.9s)
+[2m[WebServer] [22m21:27:28 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 10 [chromium] › ..\..\tests\e2e\auth\flow.spec.ts:38:5 › logout invalidates the mocked session and protects workbench again (1.9s)
+  ok 12 [chromium] › ..\..\tests\e2e\bootstrap\routes.spec.ts:40:5 › workbench shows input, tasks and honest preview state (3.2s)
+  ok 11 [chromium] › ..\..\tests\e2e\deploy\flow.spec.ts:51:5 › published state shows address only after server success; keyboard/mobile panel remains usable (3.5s)
+  ok 13 [chromium] › ..\..\tests\e2e\apps\flow.spec.ts:46:5 › D04-B-T3 contract fixture: repeat submit sends one create request (2.6s)
+[2m[WebServer] [22m21:27:32 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 14 [chromium] › ..\..\tests\e2e\auth\flow.spec.ts:47:5 › application API contract fixture is scoped per user (3.9s)
+  ok 17 [chromium] › ..\..\tests\e2e\apps\flow.spec.ts:66:5 › D04-A name boundary: 120 emoji remain one character each in the create form (1.9s)
+  ok 18 [chromium] › ..\..\tests\e2e\auth\flow.spec.ts:68:5 › network failure does not admit anonymous users (806ms)
+  ok 15 [chromium] › ..\..\tests\e2e\bootstrap\routes.spec.ts:58:5 › mobile routes have no horizontal overflow and keep the inspector reachable (3.6s)
+[2m[WebServer] [22m21:27:33 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 19 [chromium] › ..\..\tests\e2e\apps\flow.spec.ts:75:5 › expired session on application list returns to login with its route (1.8s)
+  ok 20 [chromium] › ..\..\tests\e2e\auth\flow.spec.ts:75:5 › 403 and network errors keep login retryable (1.1s)
+  ok 16 [chromium] › ..\..\tests\e2e\deploy\flow.spec.ts:66:5 › unknown response cannot become success or automatically trigger another deployment (5.4s)
+  ok 22 [chromium] › ..\..\tests\e2e\apps\flow.spec.ts:88:5 › expired session on workbench detail returns to login with its route (1.0s)
+  ok 23 [chromium] › ..\..\tests\e2e\auth\flow.spec.ts:90:5 › submitting login locks the form until the request settles (1.0s)
+  ok 26 [chromium] › ..\..\tests\e2e\auth\flow.spec.ts:105:5 › a revoked session is rejected at the next protected navigation (1.2s)
+  ok 24 [chromium] › ..\..\tests\e2e\apps\flow.spec.ts:99:5 › expired session on create clears the form and returns to login (1.4s)
+  ok 25 [chromium] › ..\..\tests\e2e\events\flow.spec.ts:17:5 › D06-B-T1 fixture: offline reconnect backfills missing events once with exclusive cursor (3.4s)
+  ok 29 [chromium] › ..\..\tests\e2e\events\flow.spec.ts:34:5 › D06-B-T2 fixture: reload and close/reopen recover the current task with full history (2.6s)
+  ok 30 [chromium] › ..\..\tests\e2e\events\flow.spec.ts:56:5 › D06-B-T3 fixture: pending cancellation cannot claim cancelled or permit retry (5.5s)
+  ok 31 [chromium] › ..\..\tests\e2e\events\flow.spec.ts:89:5 › D06-B-T4 fixture: unknown events render inert diagnostics and do not crash the page (1.0s)
+  ok 32 [chromium] › ..\..\tests\e2e\events\flow.spec.ts:101:5 › fixture: task 401 expires the session; task 404 blocks creation without claiming success (1.6s)
+  ok 33 [chromium] › ..\..\tests\e2e\events\flow.spec.ts:113:5 › structured diagnostics fixture: files and persisted build result survive reload; corrupt details do not claim success (3.3s)
+  ok 21 [chromium] › ..\..\tests\e2e\deploy\hosting.spec.ts:5:5 › D15-B real static publication hosting and isolated probe (26.8s)
+  ok 35 [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:29:5 › D13-B-T1/T3: hover nested component, select/cancel, Esc and restored navigation (1.9s)
+[2m[WebServer] [22m21:28:03 [vite] http proxy error: /api/v0/versions/55555555-5555-4555-8555-555555555555/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 36 [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:55:5 › D13-B-T4: repeated instances share one source file and show whole-component scope (2.2s)
+[2m[WebServer] [22m21:28:07 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 37 [chromium] › ..\..\tests\e2e\selector\flow.spec.ts:74:5 › D13-B-T2: both endpoints reject forged source/origin, nonce/version/schema and old-session replay (2.3s)
+[2m[WebServer] [22m21:28:07 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+[2m[WebServer] [22m21:28:07 [vite] http proxy error: /api/v0/auth/me
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 27 [chromium] › ..\..\tests\e2e\generation\flow.spec.ts:44:5 › D10-B success fixture: missing component -> real failed build -> repair -> real verification -> preview (5.9s)
+  ok 38 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:10:5 › real browser call preserves JSON failures and safely reports HTML 502 without retry (733ms)
+[2m[WebServer] [22m21:28:09 [vite] http proxy error: /api/v0/versions/55555555-5555-4555-8555-555555555555/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+[2m[WebServer] [22m21:28:09 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+[2m[WebServer] [22m21:28:09 [vite] http proxy error: /api/v0/versions/55555555-5555-4555-8555-555555555555/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 40 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:46:5 › D11-B-T1: versionId selects matching source and rendered preview (1.7s)
+[2m[WebServer] [22m21:28:10 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 41 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:60:5 › D11-B-T2: empty, list failure, source failure and retry are distinct (1.7s)
+[2m[WebServer] [22m21:28:12 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 42 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:78:5 › D11-B-T3: draft and failed versions never replace available preview (1.8s)
+[2m[WebServer] [22m21:28:13 [vite] http proxy error: /api/v0/versions/55555555-5555-4555-8555-555555555555/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 39 [chromium] › ..\..\tests\e2e\generation\flow.spec.ts:65:5 › D10-B failure fixture: model done + real build exit 0 + actual wrong page -> FAILED, keep old preview (5.6s)
+[2m[WebServer] [22m21:28:14 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+[2m[WebServer] [22m21:28:14 [vite] http proxy error: /api/v0/versions/55555555-5555-4555-8555-555555555555/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 43 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:95:5 › D11-B-T4: source script and HTML remain literal text (1.5s)
+  ok 44 [chromium] › ..\..\tests\e2e\generation\flow.spec.ts:85:5 › D10-B cancellation fixture: pending -> authoritative CANCELLED -> explicit new task (2.0s)
+[2m[WebServer] [22m21:28:15 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 45 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:104:5 › unknown status, missing verified build and wrong app metadata fail closed (1.3s)
+[2m[WebServer] [22m21:28:17 [vite] http proxy error: /api/v0/versions/55555555-5555-4555-8555-555555555555/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+[2m[WebServer] [22m21:28:17 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 47 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:118:5 › snapshot mismatch never displays the wrong source (1.4s)
+[2m[WebServer] [22m21:28:18 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+[2m[WebServer] [22m21:28:19 [vite] http proxy error: /api/v0/versions/55555555-5555-4555-8555-555555555555/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 48 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:125:5 › late source from prior selection cannot overwrite the new version (1.2s)
+[2m[WebServer] [22m21:28:19 [vite] http proxy error: /api/v0/versions/55555555-5555-4555-8555-555555555555/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+[2m[WebServer] [22m21:28:20 [vite] http proxy error: /api/v0/versions/66666666-6666-4666-8666-666666666666/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 49 [chromium] › ..\..\tests\e2e\versions\flow.spec.ts:142:5 › source 401 redirects to login and paginated versions keep selected preview (1.5s)
+[2m[WebServer] [22m21:28:20 [vite] http proxy error: /api/v0/versions/55555555-5555-4555-8555-555555555555/component-mapping
+[2m[WebServer] [22mError: connect ECONNREFUSED 127.0.0.1:8080
+[2m[WebServer] [22m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+  ok 46 [chromium] › ..\..\tests\e2e\generation\flow.spec.ts:104:5 › D10-B recovery fixture: offline backfill -> reload -> close/reopen, no duplicate POST or events (5.2s)
+  ok 50 [chromium] › ..\..\tests\e2e\visual-edit\flow.spec.ts:11:5 › D14-B-T1/T3: text, color, spacing and shared edits use exact new mapping and explicit scope (6.9s)
+  ok 51 [chromium] › ..\..\tests\e2e\visual-edit\flow.spec.ts:56:5 › D14-B-T2/T4: failed edit keeps old navigation, readable escaped logs and another edit (2.7s)
+  ok 52 [chromium] › ..\..\tests\e2e\visual-edit\flow.spec.ts:83:5 › unknown state and conflicts retain old version and composition without auto retry (1.6s)
+  ok 28 [chromium] › ..\..\tests\e2e\preview\flow.spec.ts:6:5 › D09-B: real builds, isolated preview iframe and refresh (55.2s)
+  ok 34 [chromium] › ..\..\tests\e2e\runner\browser.spec.ts:6:5 › D08-B runner: build artifacts, controlled browser actions and isolation (1.3m)
+
+  52 passed (1.9m)
