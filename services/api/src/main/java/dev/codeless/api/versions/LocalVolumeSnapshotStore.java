@@ -225,6 +225,31 @@ public final class LocalVolumeSnapshotStore implements SnapshotStore {
         } catch (SnapshotFailure failure) { throw failure; }
         catch (Exception failure) { throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE"); }
     }
+    @Override public byte[] readArtifact(UUID id, String sourceDigest, String path) {
+        artifactPath(path);
+        var outcome=outcome(id,sourceDigest,"VERIFIED");
+        var entry=outcome.artifact().files().stream().filter(f->f.path().equals(path)).findFirst()
+                .orElseThrow(()->new SnapshotFailure("SNAPSHOT_FILE_NOT_FOUND"));
+        try {
+            byte[] bytes=read(version(id).resolve("outcome/artifact").resolve(path),32*1024*1024);
+            if(bytes.length!=entry.bytes() || !hash(bytes).equals(entry.digest())) throw new SnapshotFailure("SNAPSHOT_DIGEST_MISMATCH");
+            return bytes;
+        } catch(SnapshotFailure failure) {throw failure;}
+        catch(Exception failure) {throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE");}
+    }
+    @Override public Map<String,byte[]> artifactBytes(UUID id,String sourceDigest) {
+        // One manifest scan, then validate each exact file again while reading. Bounded to the existing 32 MiB quota.
+        var outcome=outcome(id,sourceDigest,"VERIFIED");var result=new LinkedHashMap<String,byte[]>();
+        try {
+            for(var entry:outcome.artifact().files()) {
+                byte[] bytes=read(version(id).resolve("outcome/artifact").resolve(entry.path()),32*1024*1024);
+                if(bytes.length!=entry.bytes() || !hash(bytes).equals(entry.digest())) throw new SnapshotFailure("SNAPSHOT_DIGEST_MISMATCH");
+                result.put(entry.path(),bytes);
+            }
+            return Collections.unmodifiableMap(result);
+        } catch(SnapshotFailure failure) {throw failure;}
+        catch(Exception failure) {throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE");}
+    }
     @Override public JsonNode componentMapping(UUID id,String digest) {
         // Verify original immutable source/outcome/artifact before trusting this sidecar.
         var outcome=outcome(id,digest,"VERIFIED");

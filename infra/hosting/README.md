@@ -1,6 +1,16 @@
 # D15-B static publication hosting
 
-This is the B-side worker/hosting/UI delivery. The reviewed A prerequisite is
+The integrated production adapter now lives at
+`services/api/src/main/java/dev/codeless/api/deploy/NodeDeploymentGateway.java` and is registered
+by `DeploymentConfiguration` when `CODELESS_PUBLICATION_ENABLED=true`. Missing or invalid enabled
+configuration fails startup; the default remains unavailable. The former B Java file is retained only
+as the reviewed standalone installation template, not the compiled production source.
+
+The A/B integration registers `contracts/deploy/openapi.patch.json` in the shared OpenAPI and includes
+deployment contract tests in the static gate. See `docs/handoffs/D15-integration.md` for exact candidates,
+combined verification and external resource status. This does not claim a public deployment.
+
+This originated as the B-side worker/hosting/UI delivery. The reviewed A prerequisite is
 [PR44](https://github.com/Echo-love928/CodeLess/pull/44), source `716abcd1ae5ad05fd75d780fc21734952326b98a`.
 No public DNS/certificate was supplied. **The publicly reachable, authenticated
 click-to-publish milestone is not achieved by the local TLS fixture.**
@@ -14,7 +24,7 @@ model tool is registered. A must first enforce session/CSRF/owner, VERIFIED immu
 PASSED retained report, database locking and idempotency. The adapter deliberately does not
 pretend that asset bytes alone can independently prove a build/browser run.
 
-In the final A/B integration checkout, install this Java source in
+The original standalone integration instructions were to install this Java source in
 `services/api/src/main/java/dev/codeless/api/deploy/NodeDeploymentGateway.java` and register:
 
 ```java
@@ -32,6 +42,17 @@ The integration test compiles the adapter with exact A production sources in a p
 composition and exercises the real session/PG/frozen-version chain; see reproduction below.
 The final enabling PR must install the bean and register A's `contracts/deploy/openapi.patch.json`
 in the shared OpenAPI under its maintainer's ownership.
+
+The current integration checkout has completed those two code steps. The remaining deployment
+sequence is: fill `infra/hosting/publication.env.example` in a protected operator environment;
+create the private hosting directory and provision wildcard DNS/TLS; run `node infra/hosting/prepare.mjs`;
+make the generated platform JSON available as `/codeless-publication-config.json` on the platform origin;
+grant ingress UID101 read access to its configuration/key; start the existing hosting compose service;
+then run `node infra/hosting/preflight.mjs`. This check returns native exit2 with missing settings or
+unavailable DNS/TLS, and never creates a publication or success record. A successful readiness check
+still requires an authenticated user's explicit publish click and successful real deployment probe.
+Only then enable the configured API gateway with `CODELESS_PUBLICATION_ENABLED=true` and the same
+environment, and complete public acceptance. Generated applications never receive this environment.
 
 Private wire input has fixed action `publish`/`probe`, the **same absolute A deadline**, and
 `Payload {publicationId, versionId, artifactDigest, assets:[{path,digest,bytes:<base64>}]}`.
