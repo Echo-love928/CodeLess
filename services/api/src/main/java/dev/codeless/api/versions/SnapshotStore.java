@@ -17,5 +17,8 @@ public interface SnapshotStore {
     Outcome freezeOutcome(UUID version, String digest, String status, JsonNode result, String failureCode);
     Outcome outcome(UUID version, String digest, String status);
     String readSource(UUID version, String digest, String path);
+    /** Trusted deployment adapter only; exact manifest member, checked immutable bytes, never a source path. */
+    default byte[] readArtifact(UUID version, String sourceDigest, String path) {throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE");}
+    default java.util.Map<String,byte[]> artifactBytes(UUID version,String sourceDigest) {throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE");}
     default JsonNode componentMapping(UUID version,String digest) {throw new SnapshotFailure("MAPPING_UNAVAILABLE");}
 }

@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "items",
+    "latestSuccessful"
+  ],
+  "properties": {
+    "items": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "title": "Publication",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "applicationId",
+          "versionId",
+          "requestedBy",
+          "status",
+          "createdAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "versionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "requestedBy": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "REQUESTED",
+              "PUBLISHED",
+              "FAILED"
+            ]
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri",
+            "pattern": "^https://"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "publishedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "PUBLISHED"
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "properties": {
+                "url": {
+                  "type": "string"
+                },
+                "publishedAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "url",
+                "publishedAt"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "latestSuccessful": {
+      "anyOf": [
+        {
+          "title": "Publication",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "applicationId",
+            "versionId",
+            "requestedBy",
+            "status",
+            "createdAt"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "applicationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "versionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "requestedBy": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "status": {
+              "enum": [
+                "REQUESTED",
+                "PUBLISHED",
+                "FAILED"
+              ]
+            },
+            "url": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uri",
+              "pattern": "^https://"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "publishedAt": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PUBLISHED"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "url": {
+                    "type": "string"
+                  },
+                  "publishedAt": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "url",
+                  "publishedAt"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}
