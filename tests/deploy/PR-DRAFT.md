@@ -10,7 +10,10 @@
 最终结果见docs/handoffs/D15-A.md与tests/deploy/evidence/2026-10-14/commands.json；后续证据/交接HEAD需读取自身checks，不继承旧HEAD检查。
 
 限制：托管/probe为明确fixture，默认生产适配器HOSTING_UNAVAILABLE，没有真实公开成功地址。
-D15-B PR45/a8a12bf已只读互审，独立unit8/boundary2/hosting1/browser3全通过；但其远端e2e缺镜像失败，POST仍缺artifactDigest/key，live handle与A冻结字节无桥接，冷会话最近成功未接新列表。
-具体位置和复现见tests/deploy/review-D15-B.md；不批准。最终启用PR须关闭这些缺口、登记contracts/deploy/openapi.patch.json并完成真实联调与公网验收。
+D15-B已复审到PR45/33b3b60：原四项B侧问题关闭，精确HEAD六项CI全SUCCESS，实际API210/210、E2E54/54。
+独立unit14/boundary4/hosting1/browser5/Maven下载回归5及build均退出0；A716abcd+B33b3b60真实失败路径组合7/7、退出0。
+初次本机Docker未运行的hosting退出1保留，启动daemon后另轮通过。已由不同作者的审查身份对B精确HEAD提交APPROVED，未合并。
+具体位置、命令和证据见tests/deploy/review-D15-B.md。最终启用PR仍须装配gateway bean、登记contracts/deploy/openapi.patch.json、
+运行完整组合门禁并完成公网成功发布验收；局部组合的缺DNS安全失败和本地TLS不代表公网成功。
 卷与PG不构成原子事务；共享私有卷和中断人工核对要求详见契约。未改迁移编号、锁文件、CI、前端或runner；未升级兼容版本。
 草稿待独立审查、精确HEAD必需检查成功与base同步；作者不自批、不合并。

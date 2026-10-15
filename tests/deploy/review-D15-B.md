@@ -1,6 +1,61 @@
 # D15-B 只读互审
 
-## 2026-10-14 收尾实际复审（当前结论）
+## 2026-10-15 修复复审（当前结论）
+
+候选为[PR45](https://github.com/Echo-love928/CodeLess/pull/45)的
+`33b3b603a46dc0554a3491b30da4e175c0e49168`，base仍572304e。
+只重查a8a12bf之后46个文件的差异、受影响实现/测试及精确HEAD检查；没有修改B源码。
+运行时代码b725745后，08c06ed的API因下载Maven HTTP429退出22、Java测试未启动，ci-gate正确失败。
+33b3b60增加有界下载重试；版本/官方地址/SHA512和Maven测试命令未变，没有重试失败测试。
+该候选六项checks均completed/success：[实际run38667734250](https://github.com/Echo-love928/CodeLess/actions/runs/38667734250)。
+
+### 阻塞问题
+
+- 原四项B侧问题已修复并按下列范围复核。最终启用仍须安装Java gateway bean、登记A的公共OpenAPI patch，
+  配置真实公网DNS/TLS/托管，并执行实际成功发布验收。这些没有在B草稿中虚称完成；本复审不批准公网启用或合并。
+- 完整A/B组合门禁尚未执行；局部临时组合只验证真实失败路径，不能代替最终集成PR的四类门禁。
+
+### 建议
+
+- 最终接线严格沿用共同30秒截止、固定私有stdin协议、环境白名单和独立站点，不暴露通用命令/路径/URL入口。
+- 将本复审核验的A716abcd与B33b3b60写入集成PR基线；base或候选变化后仅重审差异和受影响范围，重新取得需要的批准。
+
+### 已核验内容
+
+1. `hosting.acceptance.mjs:30–33,60`：独立准备受控D05镜像，只调整新生成一次性测试TLS key的Linux权限。
+   独立真实hosting通过；原live D08报告/PNG/handle校验仍保留，关闭handle后另走冻结字节网关。
+2. `deploy-api.ts:49–75`与`DeployPanel.vue:69–91`：核对真实snapshot/VERIFIED/source/build/PASSED/artifact绑定，
+   POST三字段及Idempotency-Key；网络响应丢失后不自动提交，用户显式重试复用原绑定/key。
+3. `publish/java/NodeDeploymentGateway.java:29–75`、`gateway-cli.mjs`、`frozen-gateway.mjs:13–72`：
+   Java实际接口经私有stdin传冻结字节，Node重算每文件和完整manifest摘要，排除源码，维持UUID不可变目录；
+   原live handle入口未弱化。发布/DNS/probe/清理使用A同一绝对截止，拒绝过期/过长截止及错误/未知结果。
+4. `DeployPanel.vue:50–66,98–103`与`deploy-api.ts:76–93`：冷会话读取owner-scoped列表，
+   独立验证latestSuccessful；FAILED/未知attempt保留旧成功，未知仍阻止新发布；旧幂等终态重放重查新成功指针。
+5. 独立worktree `.local-data/p15-b` / 33b3b60，unit14/14、boundary4/4、browser5/5、production build及
+   Maven下载回归5/5均native0。下载回归实际执行curl/HTTP/ZIP，覆盖429恢复/耗尽、404、checksum、Maven exit7不重试。
+6. 第一轮hosting native1：本机Docker daemon未运行，受控镜像准备失败，后续托管断言未执行。
+   启动已安装Docker Desktop并确认29.8.2后，新一轮hosting native0/1项，保留两轮日志与摘要。
+   实际HTTPS逐字节、`/tasks`刷新、缺JS/源码/map/目录404、private-target拒绝、第二部署缺JS失败及首部署摘要不变均通过。
+   实际新失败面板和任务页截图已视觉核验。publicMilestoneReached仍false。
+7. 远端最终API原日志210/210、0failure/error/skip、BUILD SUCCESS；E2E原日志54 passed。
+   原08c06ed失败日志SHA256 f909d37100ee9679980e4ac506516c063fda8ced28737cd31f66bab5c6a2322e已复核。
+   B新公开证据19项按Git blob逐项重算字节/digest均匹配；新证据属性固定换行。没有发现新增秘密、隔离削弱或断言删除。
+
+8. `node tests/e2e/deploy/record-command.mjs ab`独立native0，原A六项全部保留+真实bridge一项，7/7、0failure/error/skip。
+   精确A716abcd原生产代码与B33b3b60实际adapter编译，实际HTTP/session/PG/构建/Chromium/冻结卷字节经Java到Node不可变目录。
+   无公网DNS，生产probe正确失败；process实测1420ms，SQL旧成功整行及真实HTTP列表保持，失败url=null。
+   这关闭桥接实现缺失，不宣称公网成功或最终bean已启用。
+
+独立命令、精确CI URL/原日志SHA与本机托管/组合结果保存于
+`tests/deploy/evidence/2026-10-15/review-b-33b3b60/`。
+本轮组合1个任务4次deterministic-mock请求、5工具slots，保守charged48,650；实际token仍UNKNOWN/null，付费模型外呼0。
+独立于此前A四任务及B作者用量分账，不用保守charged冒充provider实测token。
+
+正式审查：已由GitHub身份yuanqizuimeng（不同于作者Echo-love928）对上述精确HEAD提交
+[APPROVED审查](https://github.com/Echo-love928/CodeLess/pull/45#pullrequestreview-5528259738)。
+认可B独立实现范围；PR仍draft、main仍572304e、没有合并/公网启用。原历史结论不删除，以下不再作为当前阻塞。
+
+## 2026-10-14 收尾实际复审（历史结论，已由上述复审更新）
 
 收尾发现[PR45](https://github.com/Echo-love928/CodeLess/pull/45)，精确候选
 `a8a12bfe32da95849a3ad78468f9b7b90d8d77fc` / base572304e，作者Echo-love928。
