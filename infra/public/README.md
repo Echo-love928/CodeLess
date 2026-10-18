@@ -15,6 +15,8 @@
 API、preview 和生成容器都没有 Docker socket 权限。只有受信 worker 操作 Docker；该权限具有宿主机管理能力，不能赋予生成代码。
 API 使用 `codeless.versions.shared-readers=true` 将已冻结的 source/outcome 设置为组只读，缺省配置仍是原有私有模式。
 公开发布文件显式设置为 0644、公开子目录 0755；staging 父目录 0700、私有 receipt 0600，不依赖 worker 的 umask。
+站点根目录为 worker 所有的 0755，仅 worker 可写；API/preview 的 systemd mount namespace 将整个 publication 目录设为只读。
+Java 网关仅要求该目录可读，写入经固定 worker IPC 执行。更新旧部署时须去掉站点树的组写权限，并执行 `check-publication-permissions.py` 检查实际账号与运行服务的 mount namespace。
 
 ## 在已装配服务器上检查
 
@@ -23,7 +25,7 @@ API 使用 `codeless.versions.shared-readers=true` 将已冻结的 source/outcom
 ```sh
 sudo systemctl is-active codeless-api codeless-worker codeless-preview codeless-backend-firewall codeless-reap.timer
 sudo docker compose --env-file /etc/codeless/compose.env -f /srv/codeless/repository/infra/public/compose.yml config --quiet
-sudo python3 /srv/codeless/repository/infra/public/check-final.py
+sudo python3 /srv/codeless/repository/infra/public/check-final.py --run-id <new-run-id> --commit-sha <deployed-commit>
 ```
 
 `check-final.py` 只读核对 SQL、角色、容器、冻结目录和公开资产，输出的证明不含凭据。
@@ -35,7 +37,7 @@ sudo python3 /srv/codeless/repository/infra/public/check-final.py
 - `run-acceptance.py` 是本次同服务器受保护操作员入口。它在匿名管道内完成登录，Chromium 由没有 Docker/IPC/共享私有卷权限的独立 evaluator 运行；凭据不离开服务器。
 - `acceptance.mjs` 通过真实平台 UI、真实 API、SQL、Docker、预览与公网探测完成发布。只有模型使用明确标识的 deterministic-mock，不使用路由拦截、签名 fixture、hosts 覆盖或关闭 TLS 校验。
 - 失败注入只对新尝试的资产去掉公开读取权限，保留 worker 自身读取，以保证实际到达 HTTPS probe；旧成功资产不修改。待数据库返回 FAILED 后还原权限并把该失败目录移出公开根。
-- 此操作员入口固定了本轮 evidence 目录与一个保留的真实 FAILED 版本应用 ID；checkpoint 可续查本轮。开始全新轮次时须创建新 evidence 目录并显式选择该轮真实失败版本，不能把旧结果当作新部署证明。
+- 操作员入口必须显式传入 `--run-id <new-run-id> --commit-sha <deployed-commit>`，并拒绝已存在的 run 目录。它在运行前后逐文件核对已安装源码清单和 JAR hash，将真实操作绑定到该部署提交；失败证据保留，不能恢复历史 checkpoint 冒充新部署证明。一个保留的真实 FAILED 版本用于再次验证失败版本拒绝发布。
 - `check-external.mjs` 在独立本机运行，只需要非敏感公开证明，不需要登录密码。正常 DNS/TLS 获取各资产并核对字节/hash，再用无登录 Chromium 验证首页、任务、目录和刷新。其 30 秒外网请求预算不修改正式 probe 的 30 秒共同 deadline。
 
 ```sh

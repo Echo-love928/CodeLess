@@ -18,9 +18,9 @@ import stat
 import subprocess
 import time
 import uuid
+import argparse
 
 BASE = Path('/srv/codeless')
-EVIDENCE = BASE / 'acceptance-private/run-20261018-02'
 SITES = BASE / 'publication/sites'
 
 
@@ -34,6 +34,33 @@ def sql_status(identifier):
 
 def main():
     os.umask(0o077)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--run-id', required=True)
+    parser.add_argument('--commit-sha', required=True)
+    options = parser.parse_args()
+    if not re.fullmatch(r'[a-z0-9-]{1,80}', options.run_id):
+        raise ValueError('Invalid acceptance run ID')
+    if not re.fullmatch(r'[a-f0-9]{40}', options.commit_sha):
+        raise ValueError('Invalid deployed commit SHA')
+    evidence = BASE / 'acceptance-private' / options.run_id
+    public_evidence = BASE / 'public-evidence' / options.run_id
+    # A new deployment requires new operations, not a historical checkpoint.
+    if evidence.exists() or public_evidence.exists():
+        raise ValueError('Acceptance run already exists; retain it and use a fresh run ID')
+    release = json.loads((BASE / 'deployed-release.json').read_text())
+    assert release['commit'] == options.commit_sha
+    def verify_release():
+        assert json.loads((BASE / 'deployed-release.json').read_text()) == release
+        assert hashlib.sha256((BASE / 'api.jar').read_bytes()).hexdigest() == release['jarSha256']
+        manifest_path = BASE / 'releases' / options.commit_sha / 'source-manifest.json'
+        assert hashlib.sha256(manifest_path.read_bytes()).hexdigest() == release['manifestSha256']
+        manifest = json.loads(manifest_path.read_text())
+        assert manifest['commit'] == options.commit_sha
+        for item in manifest['files']:
+            path = Path(item['path'])
+            assert not path.is_absolute() and '..' not in path.parts
+            assert hashlib.sha256((BASE / 'repository' / path).read_bytes()).hexdigest() == item['sha256']
+    verify_release()
     try:
         evaluator = pwd.getpwnam('codeless-evaluator')
     except KeyError:
@@ -41,7 +68,7 @@ def main():
         evaluator = pwd.getpwnam('codeless-evaluator')
     forbidden = {grp.getgrnam(name).gr_gid for name in ('docker', 'codeless-ipc', 'codeless-shared')}
     assert forbidden.isdisjoint(os.getgrouplist(evaluator.pw_name, evaluator.pw_gid))
-    for path in (BASE / 'acceptance-private', EVIDENCE, BASE / 'acceptance-private/home', BASE / 'acceptance-private/home/tmp', BASE / 'public-evidence'):
+    for path in (BASE / 'acceptance-private', evidence, BASE / 'acceptance-private/home', BASE / 'acceptance-private/home/tmp', BASE / 'public-evidence', public_evidence):
         path.mkdir(mode=0o700, parents=True, exist_ok=True)
         os.chown(path, evaluator.pw_uid, evaluator.pw_gid)
         path.chmod(0o700)
@@ -58,7 +85,7 @@ def main():
            'PLAYWRIGHT_BROWSERS_PATH': '/opt/codeless/browsers', 'LANG': 'C.UTF-8'}
     child = subprocess.Popen(['/usr/sbin/runuser', '-u', evaluator.pw_name, '--',
                               '/opt/codeless/tools/node-v24.16.0-linux-x64/bin/node',
-                              str(BASE / 'repository/infra/public/acceptance.mjs'), str(EVIDENCE), str(BASE / 'public-evidence/acceptance.json')],
+                              str(BASE / 'repository/infra/public/acceptance.mjs'), str(evidence), str(public_evidence / 'acceptance.json')],
                              stdin=subprocess.PIPE, env=env, start_new_session=True)
     child.stdin.write(json.dumps(request).encode())
     child.stdin.close()
@@ -73,18 +100,18 @@ def main():
             if time.monotonic() - started > 900:
                 os.killpg(child.pid, signal.SIGKILL)
                 raise TimeoutError('Public browser acceptance deadline')
-            plan_path = EVIDENCE / 'failure-plan.json'
+            plan_path = evidence / 'failure-plan.json'
             if not armed and plan_path.exists():
                 plan = json.loads(plan_path.read_text())
                 for key in ('versionId', 'oldPublicationId', 'applicationId'):
                     assert str(uuid.UUID(plan[key])) == plan[key]
-                checkpoint = json.loads((EVIDENCE / 'checkpoint.json').read_text())
+                checkpoint = json.loads((evidence / 'checkpoint.json').read_text())
                 assert plan['oldPublicationId'] == checkpoint['publication']['id']
                 assert plan['versionId'] == checkpoint['editedVersionId']
                 assert sql_status(plan['oldPublicationId']) == 'PUBLISHED'
                 baseline = {path.name for path in SITES.iterdir()}
-                (EVIDENCE / 'failure-armed.json').write_text(json.dumps({'armed': True}))
-                (EVIDENCE / 'failure-armed.json').chmod(0o644)
+                (evidence / 'failure-armed.json').write_text(json.dumps({'armed': True}))
+                (evidence / 'failure-armed.json').chmod(0o644)
                 armed = True
             if armed and not injected:
                 for directory in SITES.iterdir():
@@ -106,9 +133,9 @@ def main():
                     # deny only the public Nginx reader so the real HTTPS probe fails.
                     modified.chmod(0o640)
                     injected = True
-                    (EVIDENCE / 'failure-injected.json').write_text(json.dumps({'publicationId': directory.name,
+                    (evidence / 'failure-injected.json').write_text(json.dumps({'publicationId': directory.name,
                         'path': name, 'injection': 'new_attempt_public_reader_denied', 'oldSuccessModified': False}))
-                    (EVIDENCE / 'failure-injected.json').chmod(0o644)
+                    (evidence / 'failure-injected.json').chmod(0o644)
                     break
             time.sleep(0.01)
         code = child.wait()
@@ -131,12 +158,17 @@ def main():
                     (SITES / identifier).rename(archive / identifier)
     if code:
         raise SystemExit(code)
-    report = json.loads((EVIDENCE / 'acceptance.json').read_text())
+    report = json.loads((evidence / 'acceptance.json').read_text())
     assert report['status'] == 'PASSED'
-    injection = json.loads((EVIDENCE / 'failure-injected.json').read_text())
+    injection = json.loads((evidence / 'failure-injected.json').read_text())
     assert injection['publicationId'] == report['failedPublication']['id']
+    verify_release()
+    report.update({'deployedCommit': options.commit_sha, 'serverJarSha256': release['jarSha256'],
+                   'sourceArchiveSha256': release['archiveSha256'], 'freshRun': True})
+    for path in (evidence / 'acceptance.json', public_evidence / 'acceptance.json'):
+        path.write_text(json.dumps(report, indent=2))
     print(json.dumps({'serverBrowserAcceptance': 'PASSED', 'credentialsExported': False, 'browserHasDockerOrIpcAccess': False,
-                      'publicMilestoneReached': False, 'evidence': str(EVIDENCE)}))
+                      'publicMilestoneReached': False, 'evidence': str(evidence), 'publicEvidence': str(public_evidence)}))
 
 
 if __name__ == '__main__':

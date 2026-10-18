@@ -32,6 +32,15 @@ class PublicationGatewayConfigurationTest {
                 .withPropertyValues("codeless.deploy.hosting-enabled=true").run(context->assertThat(context).hasFailed());
     }
     @Test void completeOperatorSettingsInstallExactlyOneRealGateway() throws Exception {
+        // Production Linux gives the API a readable, non-writable hosting root.
+        // Exercise that boundary on POSIX, retaining the portable startup case.
+        var posix = Files.getFileStore(temporary).supportsFileAttributeView("posix");
+        var previous = posix ? Files.getPosixFilePermissions(temporary) : null;
+        if (posix) {
+            Files.setPosixFilePermissions(temporary, java.nio.file.attribute.PosixFilePermissions.fromString("r-xr-xr-x"));
+            assertThat(Files.isWritable(temporary)).isFalse();
+        }
+        try {
         var env=configured(temporary);
         new ApplicationContextRunner().withUserConfiguration(DeploymentConfiguration.class)
                 .withInitializer(context->context.getEnvironment().getPropertySources().addFirst(env.getPropertySources().get("mockProperties")))
@@ -39,6 +48,9 @@ class PublicationGatewayConfigurationTest {
                     assertThat(context).hasSingleBean(DeploymentGateway.class);
                     assertThat(context.getBean(DeploymentGateway.class)).isInstanceOf(NodeDeploymentGateway.class);
                 });
+        } finally {
+            if (posix) Files.setPosixFilePermissions(temporary, previous);
+        }
     }
     @Test void invalidPathsAndSharedSitesCannotEnableHosting() throws Exception {
         var env=configured(temporary).withProperty("codeless.deploy.node-executable","relative-node");

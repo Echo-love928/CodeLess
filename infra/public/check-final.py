@@ -9,6 +9,9 @@ import pwd
 import stat
 import subprocess
 import uuid
+import argparse
+import re
+from importlib.util import spec_from_file_location, module_from_spec
 
 BASE = Path('/srv/codeless')
 
@@ -23,7 +26,32 @@ def sql(query):
 
 def main():
     assert os.getuid() == 0
-    proof = json.loads((BASE / 'public-evidence/acceptance.json').read_text())
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--run-id', required=True)
+    parser.add_argument('--commit-sha', required=True)
+    options = parser.parse_args()
+    if not re.fullmatch(r'[a-z0-9-]{1,80}', options.run_id):
+        raise ValueError('Invalid acceptance run ID')
+    if not re.fullmatch(r'[a-f0-9]{40}', options.commit_sha):
+        raise ValueError('Invalid deployed commit SHA')
+    public_evidence = BASE / 'public-evidence' / options.run_id
+    spec = spec_from_file_location('publication_permissions', Path(__file__).with_name('check-publication-permissions.py'))
+    permissions = module_from_spec(spec)
+    spec.loader.exec_module(permissions)
+    permission_proof = permissions.check()
+    proof = json.loads((public_evidence / 'acceptance.json').read_text())
+    assert proof['deployedCommit'] == options.commit_sha and proof['freshRun'] is True
+    release = json.loads((BASE / 'deployed-release.json').read_text())
+    assert release['commit'] == options.commit_sha
+    assert release['jarSha256'] == proof['serverJarSha256'] == hashlib.sha256((BASE / 'api.jar').read_bytes()).hexdigest()
+    manifest_path = BASE / 'releases' / options.commit_sha / 'source-manifest.json'
+    assert hashlib.sha256(manifest_path.read_bytes()).hexdigest() == release['manifestSha256']
+    manifest = json.loads(manifest_path.read_text())
+    assert manifest['commit'] == options.commit_sha
+    for item in manifest['files']:
+        path = Path(item['path'])
+        assert not path.is_absolute() and '..' not in path.parts
+        assert hashlib.sha256((BASE / 'repository' / path).read_bytes()).hexdigest() == item['sha256']
     assert proof['status'] == 'PASSED' and all(proof['checks'].values())
     assert proof['successDeployment']['phase'] == 'SUCCEEDED'
     assert proof['failedDeployment']['failureCode'] == 'DEPLOYMENT_PROBE_FAILED'
@@ -94,8 +122,10 @@ def main():
               'privateSnapshotsAndReceiptModesVerified': True, 'failedAttemptNotPublic': True, 'noOwnedContainersLeft': True,
               'serverJarSha256': hashlib.sha256((BASE / 'api.jar').read_bytes()).hexdigest(),
               'sourceHashes': hashes, 'publicationId': good, 'failedPublicationId': failed,
+              'publicationPermissions': permission_proof, 'deployedCommit': options.commit_sha,
+              'sourceFilesVerified': len(manifest['files']),
               'publicMilestoneReached': False}
-    (BASE / 'public-evidence/server-final.json').write_text(json.dumps(result, indent=2))
+    (public_evidence / 'server-final.json').write_text(json.dumps(result, indent=2))
     print(json.dumps(result))
 
 

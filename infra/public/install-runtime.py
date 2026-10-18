@@ -78,7 +78,9 @@ def main():
     for name in ('work', 'artifacts', 'evidence', 'receipts'):
         directory(BASE / 'private/agent' / name, worker.pw_uid, shared, 0o2770)
     directory(BASE / 'publication', 0, 0, 0o755)
-    directory(BASE / 'publication/sites', worker.pw_uid, shared, 0o2775)
+    # The IPC worker is the sole writer. API/preview may inspect the root but
+    # must not rename, replace or remove immutable published directories.
+    directory(BASE / 'publication/sites', worker.pw_uid, ipc, 0o755)
     directory(BASE / 'publication/sites-staging', worker.pw_uid, ipc, 0o700)
     for name in ('web', 'ingress'):
         directory(BASE / name, 0, 0, 0o755)

@@ -20,7 +20,7 @@ public final class NodeDeploymentGateway implements DeploymentGateway {
                                  String publicOrigin, String platformOrigin, String previewOrigin) {
         if(!node.isAbsolute() || !entry.isAbsolute() || !hostingRoot.isAbsolute()
                 || !Files.isRegularFile(node) || !Files.isExecutable(node) || !Files.isRegularFile(entry)
-                || !Files.isDirectory(hostingRoot) || !Files.isWritable(hostingRoot))
+                || !Files.isDirectory(hostingRoot) || !Files.isReadable(hostingRoot))
             throw new IllegalArgumentException("PUBLICATION_PATH_CONFIG_INVALID");
         var sites=List.of(site(publicOrigin),site(platformOrigin),site(previewOrigin));
         if(new HashSet<>(sites).size()!=3) throw new IllegalArgumentException("PUBLICATION_ORIGINS_MUST_BE_SEPARATE");
