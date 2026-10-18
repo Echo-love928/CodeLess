@@ -14,7 +14,12 @@ import { hostingConfig } from '../../../infra/hosting/render.mjs'
 import { digest, readSnapshot } from '../../../services/runner/src/artifacts/snapshot.mjs'
 
 const repository = resolve('.'), evidence = resolve(process.env.CODELESS_DEPLOY_EVIDENCE_DIR ?? '.local-data/d15-b/hosting')
-const origins = { publicOrigin: 'https://sites.codeless-public.test:8443', platformOrigin: 'https://app.codeless.test', previewOrigin: 'https://preview.codeless-preview.test' }
+// Only changes local fixture names. DNS is pinned to the private fixture network;
+// the production probe must still reject it. Never treat this as public acceptance.
+const fixtureSuffix = process.env.CODELESS_HOSTING_FIXTURE_SUFFIX ?? 'test'
+assert.ok(['test', 'cn', 'top'].includes(fixtureSuffix), 'unsupported local fixture suffix')
+const fixtureHost = `sites.codeless-public.${fixtureSuffix}`
+const origins = { publicOrigin: `https://${fixtureHost}:8443`, platformOrigin: `https://app.codeless.${fixtureSuffix}`, previewOrigin: `https://preview.codeless-preview.${fixtureSuffix}` }
 function docker(args, input) {
   const result = spawnSync('docker', args, { input, encoding: 'utf8', timeout: 60000, windowsHide: true })
   assert.equal(result.status, 0, JSON.stringify({ args: args.slice(0, 6), status: result.status, error: result.error?.message, stderr: result.stderr }))
@@ -36,14 +41,20 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
   assert.equal(observed.status, 'VERIFIED', JSON.stringify(observed))
   const handle = await openArtifactService({ artifactRoot, build: observed.build, sourceDigest: observed.sourceDigest })
   const version = { id: randomUUID(), applicationId: randomUUID(), status: 'VERIFIED', buildId: observed.build.id, sourceDigest: observed.sourceDigest }
-  const publish = await createPublisher({ hostingRoot, evidenceRoot, ...origins })
   // Retain D08 admission/evidence verification, then separately exercise A's frozen bytes
   // after its live artifact service has gone away. Both paths use the same immutable writer.
-  await publish({ deploymentId: randomUUID(), version, verification: observed.verification, handle })
-  const snapshot = await readSnapshot(observed.build.artifact.directory)
+  let snapshot
+  try {
+    const publish = await createPublisher({ hostingRoot, evidenceRoot, ...origins })
+    await publish({ deploymentId: randomUUID(), version, verification: observed.verification, handle })
+    snapshot = await readSnapshot(observed.build.artifact.directory)
+  } finally {
+    // A failed live-handle admission must not keep the local HTTP service alive
+    // and prevent the test runner from reporting its original failure.
+    await handle.close()
+  }
   const payload = { publicationId: randomUUID(), versionId: version.id, artifactDigest: snapshot.manifest.digest,
     assets: snapshot.manifest.files.map(file => ({ path: file.path, digest: file.digest, bytes: snapshot.buffers.get(file.path).toString('base64') })) }
-  await handle.close()
   const gateway = await createFrozenGateway({ hostingRoot, ...origins })
   const deadline = () => new Date(Date.now() + 30000).toISOString()
   await gateway.publish(payload, deadline())
@@ -53,7 +64,7 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
   let openssl = 'openssl'
   if (process.platform === 'win32') openssl = resolve(dirname(execFileSync('where.exe', ['git'], { encoding: 'utf8' }).trim().split(/\r?\n/)[0]), '../usr/bin/openssl.exe')
   execFileSync(openssl, ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', key, '-out', cert, '-days', '1',
-    '-subj', '/CN=codeless-public-test', '-addext', 'subjectAltName=DNS:*.sites.codeless-public.test'],
+    '-subj', '/CN=codeless-public-test', '-addext', `subjectAltName=DNS:*.${fixtureHost}`],
   { stdio: 'ignore', windowsHide: true, env: { ...process.env, MSYS_NO_PATHCONV: '1' } })
   // Disposable self-signed fixture only. OpenSSL uses 0600 on Linux; the fixed
   // UID101 ingress must be able to read it. No production/operator key is changed.
@@ -111,7 +122,7 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
     assert.equal(malformed.status, 400)
     assert.equal(malformed.body.toString().includes('src/pages'), false)
     httpEvidence.push({ path: malformed.path, status: malformed.status, parseRejected: true })
-    assert.equal((await get('/', 'd' + '0'.repeat(32) + '.sites.codeless-public.test')).status, 404)
+    assert.equal((await get('/', 'd' + '0'.repeat(32) + '.' + fixtureHost)).status, 404)
     assert.equal((await get('/', hostname, 'POST')).status, 405)
     const probeArgs = ['run', '--rm', '-i', '--name', probeName, '--network', network, '--read-only', '--user', '10001:10001',
       '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--pids-limit', '32', '--memory', '128m', '--cpus', '0.5',
@@ -124,9 +135,9 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
     const production = spawnSync('docker', [...probeArgs.slice(0, -1), '/probe/probe-worker.mjs'], {
       encoding: 'utf8', input: JSON.stringify({ url: receipt.url, address, files: receipt.files }), timeout: 15000 })
     assert.notEqual(production.status, 0); assert.match(production.stderr, /public probe target rejected/)
-    browser = await chromium.launch({ headless: true, args: [`--host-resolver-rules=MAP *.sites.codeless-public.test 127.0.0.1`, '--no-proxy-server'] })
+    browser = await chromium.launch({ headless: true, args: [`--host-resolver-rules=MAP *.${fixtureHost} 127.0.0.1`, '--no-proxy-server'] })
     const context = await browser.newContext({ ignoreHTTPSErrors: true, // Explicit self-signed local fixture only.
-      proxy: { server: 'http://127.0.0.1:9', bypass: '*.sites.codeless-public.test,127.0.0.1' },
+      proxy: { server: 'http://127.0.0.1:9', bypass: `*.${fixtureHost},127.0.0.1` },
       serviceWorkers: 'block', acceptDownloads: false })
     const page = await context.newPage()
     await page.goto(`https://${hostname}:${port}/tasks`)
@@ -143,7 +154,7 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
     assert.equal(failure.status, 1)
     const failedProbe = JSON.parse(failure.stdout); assert.equal(failedProbe.status, 'FAILED')
     assert.equal(digest((await get('/')).body), index.digest, 'failed second deployment must not mutate first')
-    const result = { localTlsFixture: true, publicMilestoneReached: false, realBuild: observed.build.status,
+    const result = { localTlsFixture: true, fixtureSuffix, publicMilestoneReached: false, realBuild: observed.build.status,
       buildExitCode: observed.build.exitCode, realBrowserVerification: observed.verification.status, version, receipt,
       httpEvidence, isolatedProbe: probe, failedProbe, productionPrivateTargetExitCode: production.status,
       immutablePreviousDigest: index.digest, sourceDigest: observed.sourceDigest }

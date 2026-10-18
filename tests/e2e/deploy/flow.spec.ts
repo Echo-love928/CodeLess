@@ -3,8 +3,8 @@ import { installVersionsFixture, openWorkbench, ids, appId, versions } from '../
 
 const artifactDigest = 'sha256:' + 'b'.repeat(64)
 const publicationIds = ['aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb']
-async function fixture(page: Page) {
-  await page.route('**/codeless-publication-config.json', route => route.fulfill({ json: { publicOrigin: 'https://sites.codeless-public.test' } }))
+async function fixture(page: Page, publicOrigin = 'https://sites.codeless-public.test') {
+  await page.route('**/codeless-publication-config.json', route => route.fulfill({ json: { publicOrigin } }))
   await installVersionsFixture(page)
   for (const version of versions) await page.route(`**/api/v0/versions/${version.id}`, route => route.fulfill({ json: version }))
   for (const version of versions.filter(item => item.status === 'VERIFIED')) await page.route(`**/api/v0/versions/${version.id}/snapshot`, route => route.fulfill({ json: { versionId: version.id, status: version.status, sourceDigest: version.sourceDigest, validation: { status: version.status, sourceDigest: version.sourceDigest, artifactDigest, report: { buildId: version.buildId, buildStatus: 'SUCCEEDED', exitCode: 0, verificationStatus: 'PASSED', artifactDigest } } } }))
@@ -12,7 +12,7 @@ async function fixture(page: Page) {
   const keys: string[] = []
   const submitted: { applicationId: string; versionId: string; artifactDigest: string }[] = []
   const publication = (id: string, state: string, versionId = ids[1]) => ({ id, applicationId: appId, versionId, requestedBy: 'user-1', status: state,
-    createdAt: '2026-10-14T00:00:00Z', ...(state === 'PUBLISHED' ? { url: `https://d${id.replaceAll('-', '')}.sites.codeless-public.test/`, publishedAt: '2026-10-14T00:01:00Z' } : {}) })
+    createdAt: '2026-10-14T00:00:00Z', ...(state === 'PUBLISHED' ? { url: `https://d${id.replaceAll('-', '')}.${new URL(publicOrigin).host}/`, publishedAt: '2026-10-14T00:01:00Z' } : {}) })
   await page.route('**/api/v0/publications', async route => {
     expect(route.request().method()).toBe('POST')
     expect(route.request().headers()['x-csrf-token']).toBe('test-csrf-token')
@@ -71,6 +71,29 @@ test('published state shows address only after server success; keyboard/mobile p
   expect(await panel.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
   await page.screenshot({ path: info.outputPath('mobile-published.png'), fullPage: true })
 })
+
+for (const suffix of ['cn', 'top']) {
+  // Explicit intercepted API fixtures test the real browser UI, not public DNS/TLS acceptance.
+  test(`${suffix} publication config preserves confirmation, cold-session recovery and failure retention`, async ({ page }) => {
+    const state = await fixture(page, `https://sites.codeless-public.${suffix}`)
+    state.prior()
+    await page.reload()
+    await page.getByRole('button', { name: '发布', exact: true }).click()
+    const panel = page.getByRole('region', { name: '发布面板' })
+    const previous = `https://d${publicationIds[0].replaceAll('-', '')}.sites.codeless-public.${suffix}/`
+    await expect(panel.getByRole('link')).toHaveAttribute('href', previous)
+    await expect(panel.getByRole('button', { name: '确认发布', exact: true })).toBeDisabled()
+    expect(state.posts()).toBe(0)
+    await page.getByLabel('我确认公开发布上方版本').check()
+    await panel.getByRole('button', { name: '确认发布', exact: true }).click()
+    await expect(panel).toContainText('已受理')
+    state.status('FAILED')
+    await panel.getByRole('button', { name: '刷新发布状态' }).click()
+    await expect(panel.getByRole('link')).toHaveAttribute('href', previous)
+    await expect(panel.getByRole('alert')).toContainText('上次成功版本和地址仍然保留')
+    expect(state.posts()).toBe(1)
+  })
+}
 test('unknown response cannot become success or automatically trigger another deployment', async ({ page }) => {
   const state = await fixture(page); state.malformed()
   await page.getByRole('button', { name: '发布', exact: true }).click()

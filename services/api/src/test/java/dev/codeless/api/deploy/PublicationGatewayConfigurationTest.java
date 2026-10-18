@@ -48,4 +48,25 @@ class PublicationGatewayConfigurationTest {
         var invalidPort=configured(temporary).withProperty("codeless.deploy.public-origin","https://sites.codeless-public.test:0");
         assertThatThrownBy(()->new DeploymentConfiguration().deploymentGateway(invalidPort)).hasMessage("PUBLICATION_ORIGIN_CONFIG_INVALID");
     }
+    @Test void cnTopAndMixedSitesEnableOnlyWithIndependentDedicatedRoots() throws Exception {
+        for (String suffix : List.of("cn", "top")) {
+            var env = configured(temporary)
+                    .withProperty("codeless.deploy.platform-origin", "https://app.codeless-platform." + suffix)
+                    .withProperty("codeless.deploy.preview-origin", "https://preview.codeless-preview." + suffix)
+                    .withProperty("codeless.deploy.public-origin", "https://sites.codeless-public." + suffix);
+            assertThat(new DeploymentConfiguration().deploymentGateway(env)).isInstanceOf(NodeDeploymentGateway.class);
+            for (String invalid : List.of("https://sites.codeless-platform." + suffix, "https://sites.codeless-preview." + suffix)) {
+                env.withProperty("codeless.deploy.public-origin", invalid);
+                assertThatThrownBy(() -> new DeploymentConfiguration().deploymentGateway(env)).hasMessage("PUBLICATION_ORIGINS_MUST_BE_SEPARATE");
+            }
+            for (String invalid : List.of("https://sites.tenant.com.cn", "https://sites.tenant.bj.cn", "https://sites.tenant.wadl.top")) {
+                env.withProperty("codeless.deploy.public-origin", invalid);
+                assertThatThrownBy(() -> new DeploymentConfiguration().deploymentGateway(env)).hasMessage("PUBLICATION_ORIGIN_CONFIG_INVALID");
+            }
+        }
+        var mixed = configured(temporary).withProperty("codeless.deploy.platform-origin", "https://app.codeless-platform.com")
+                .withProperty("codeless.deploy.preview-origin", "https://preview.codeless-preview.cn")
+                .withProperty("codeless.deploy.public-origin", "https://sites.codeless-public.top");
+        assertThat(new DeploymentConfiguration().deploymentGateway(mixed)).isInstanceOf(NodeDeploymentGateway.class);
+    }
 }

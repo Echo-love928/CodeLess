@@ -66,3 +66,19 @@ it('requires a matching verified snapshot build/artifact binding before confirma
     await expect(verifiedArtifact(version)).rejects.toThrow()
   }
 })
+
+it.each(['cn', 'top'])('accepts bound %s publication URLs and rejects same-site or multi-label sites', async suffix => {
+  vi.stubGlobal('location', new URL(`https://app.codeless-platform.${suffix}`))
+  vi.stubEnv('VITE_CODELESS_PREVIEW_ORIGIN', `https://preview.codeless-preview.${suffix}`)
+  vi.stubEnv('VITE_PUBLICATION_ORIGIN', `https://sites.codeless-public.${suffix}`)
+  const success = { ...value, status: 'PUBLISHED', url: `https://d${id.replaceAll('-', '')}.sites.codeless-public.${suffix}/`, publishedAt: value.createdAt }
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(success))))
+  expect(await getPublication(id, app)).toEqual(success)
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ ...success, url: success.url.replace('d' + id.replaceAll('-', ''), 'd' + app.replaceAll('-', '')) }))))
+  await expect(getPublication(id, app)).rejects.toThrow('公开地址')
+  for (const invalid of [`https://sites.codeless-platform.${suffix}`, `https://sites.codeless-preview.${suffix}`,
+    'https://sites.tenant.com.cn', 'https://sites.tenant.bj.cn', 'https://sites.tenant.wadl.top']) {
+    vi.stubEnv('VITE_PUBLICATION_ORIGIN', invalid)
+    expect(() => publicOrigin()).toThrow()
+  }
+})

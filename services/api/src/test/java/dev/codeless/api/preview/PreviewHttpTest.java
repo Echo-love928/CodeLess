@@ -30,6 +30,7 @@ class PreviewHttpTest extends PostgresTestBase {
     @Value("${local.server.port}") int port;
     @Autowired JdbcClient jdbc;
     @Autowired ObjectMapper mapper;
+    @Autowired org.springframework.core.env.Environment environment;
     @MockitoBean PreviewReadiness readiness; // Explicit control-plane fixture; full integration uses the real runtime.
     @BeforeEach void registeredFixture() {when(readiness.ready(any(),any(),any(),any(),any())).thenReturn(true);}
     final HttpClient client = HttpClient.newHttpClient();
@@ -87,7 +88,8 @@ class PreviewHttpTest extends PostgresTestBase {
         assertThat(body.get("applicationId").asText()).isEqualTo(own.app().toString());
         assertThat(body.get("versionId").asText()).isEqualTo(own.version().toString());
         URI url = URI.create(body.get("url").asText());
-        assertThat(url.getHost()).isEqualTo("v" + own.version().toString().replace("-", "") + ".preview.codeless-preview.test");
+        assertThat(url.getHost()).isEqualTo("v" + own.version().toString().replace("-", "") + "." +
+                URI.create(environment.getRequiredProperty("CODELESS_PREVIEW_ORIGIN")).getHost());
         String token = url.getRawQuery().substring("credential=".length());
         String[] wire = token.split("\\.");
         String payload = new String(Base64.getUrlDecoder().decode(wire[0]), StandardCharsets.UTF_8);

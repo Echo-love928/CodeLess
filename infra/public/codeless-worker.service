@@ -1,0 +1,28 @@
+[Unit]
+Description=CodeLess fixed-operation trusted worker
+After=docker.service
+Requires=docker.service
+PartOf=docker.service
+[Service]
+Type=notify
+TimeoutStartSec=10
+User=codeless-worker
+Group=codeless-ipc
+SupplementaryGroups=docker codeless-shared
+UMask=0007
+RuntimeDirectory=codeless-worker
+RuntimeDirectoryMode=0750
+ExecStart=/usr/bin/python3 /opt/codeless/ops/worker.py
+Restart=on-failure
+RestartSec=2
+KillMode=control-group
+TimeoutStopSec=10
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadWritePaths=/srv/codeless/private/agent /srv/codeless/publication /srv/codeless/worker-home
+MemoryMax=1536M
+TasksMax=512
+[Install]
+WantedBy=multi-user.target

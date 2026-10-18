@@ -3,6 +3,7 @@ package dev.codeless.api.deploy;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.net.URI;
+import dev.codeless.api.network.SitePolicy;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
@@ -41,10 +42,7 @@ public final class NodeDeploymentGateway implements DeploymentGateway {
                     || uri.getPort()==0 || uri.getPort()>65535
                     || uri.getUserInfo()!=null || uri.getQuery()!=null || uri.getFragment()!=null
                     || !(uri.getPath().isEmpty() || uri.getPath().equals("/"))) throw new IllegalArgumentException();
-            var labels=host.split("\\.",-1);
-            if(labels.length<3 || Arrays.stream(labels).anyMatch(s->s.isEmpty())
-                    || !Set.of("test","com","net","org","dev","app").contains(labels[labels.length-1])) throw new IllegalArgumentException();
-            return labels[labels.length-2]+"."+labels[labels.length-1];
+            return SitePolicy.site(host);
         } catch(Exception invalid) {throw new IllegalArgumentException("PUBLICATION_ORIGIN_CONFIG_INVALID");}
     }
     private JsonNode call(String action,Payload payload,String url,Instant deadline) {

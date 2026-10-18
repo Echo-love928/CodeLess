@@ -154,6 +154,13 @@ class PublicationIntegrationTest {
     }
     @BeforeEach void reset() {hosting.mode="PASS";hosting.entered=null;hosting.release=null;hosting.actualGateway=null;}
     @Test @Order(1) void d15aT1RejectsDraftFailureUnauthorizedAndWrongArtifact() throws Exception {
+        var empty=get("applications/"+app+"/publications",login);
+        assertThat(empty.statusCode()).isEqualTo(200);
+        var discovery=json.readTree(empty.body());
+        assertThat(discovery.path("items").isArray()).isTrue();
+        assertThat(discovery.path("items").size()).isZero();
+        assertThat(discovery.has("latestSuccessful")).isTrue();
+        assertThat(discovery.get("latestSuccessful").isNull()).isTrue();
         var results=new LinkedHashMap<String,Integer>();
         for(UUID version:List.of(shell,failed)) {var r=post(body(version,digest),key(),login,true);assertThat(r.statusCode()).isEqualTo(409);results.put(version.equals(shell)?"DRAFT":"FAILED",r.statusCode());}
         for(var test:List.of(Map.entry("ANONYMOUS",401),Map.entry("OTHER_OWNER",404),Map.entry("CSRF",403),Map.entry("WRONG_DIGEST",409))) {

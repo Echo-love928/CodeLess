@@ -1,0 +1,71 @@
+name: codeless-public
+x-ingress: &ingress
+  image: nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
+  user: "101:${CODELESS_INGRESS_GID:?required}"
+  restart: unless-stopped
+  read_only: true
+  tmpfs:
+    - /var/cache/nginx:uid=101,gid=${CODELESS_INGRESS_GID},mode=0700
+    - /var/run:uid=101,gid=${CODELESS_INGRESS_GID},mode=0700
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  pids_limit: 64
+  mem_limit: 128m
+  cpus: 0.5
+  networks: [ingress]
+services:
+  edge:
+    <<: *ingress
+    entrypoint: [nginx, -g, "daemon off;", -c, /etc/nginx/edge.conf]
+    ports: ["0.0.0.0:443:8443"]
+    volumes:
+      - /srv/codeless/ingress/edge.conf:/etc/nginx/edge.conf:ro
+  platform:
+    <<: *ingress
+    extra_hosts: ["host.docker.internal:172.28.0.1"]
+    volumes:
+      - /srv/codeless/ingress/platform.conf:/etc/nginx/conf.d/default.conf:ro
+      - /srv/codeless/web:/usr/share/nginx/html:ro
+      - /etc/codeless/tls:/certs:ro
+  hosting:
+    <<: *ingress
+    volumes:
+      - /srv/codeless/ingress/hosting.conf:/etc/nginx/conf.d/default.conf:ro
+      - /srv/codeless/publication/sites:/sites:ro
+      - /etc/codeless/tls:/certs:ro
+  postgres:
+    image: postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: codeless
+      POSTGRES_USER: codeless
+      POSTGRES_PASSWORD: ${CODELESS_DATABASE_PASSWORD:?required}
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    networks:
+      database:
+        ipv4_address: 172.29.0.2
+    mem_limit: 256m
+    pids_limit: 128
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U codeless -d codeless"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+networks:
+  ingress:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: cl-public0
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+          gateway: 172.28.0.1
+  database:
+    internal: true
+    driver_opts:
+      com.docker.network.bridge.name: cl-database0
+    ipam:
+      config:
+        - subnet: 172.29.0.0/24
+volumes:
+  postgres-data:

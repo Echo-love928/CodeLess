@@ -34,6 +34,10 @@ export async function createPublicationStore(hostingRoot) {
         const path = join(staging, name)
         await mkdir(dirname(path), { recursive: true, mode: 0o755 })
         await writeFile(path, bytes, { flag: 'wx', mode: 0o644 })
+        // Explicit public modes must survive a private worker's restrictive umask.
+        // The staging parent and the private receipt remain owner-only.
+        if (dirname(path) !== staging) await chmod(dirname(path), 0o755)
+        await chmod(path, 0o644)
       }
       await writeFile(join(staging, '__deployment.json'), JSON.stringify(receipt), { flag: 'wx', mode: 0o600 })
       await chmod(staging, 0o755)

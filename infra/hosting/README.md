@@ -77,7 +77,12 @@ It now also passes one 30-second deadline through publication and probing.
 
 Configuration: existing real directories `hostingRoot`, `evidenceRoot`, HTTPS `publicOrigin`,
 `platformOrigin`, `previewOrigin`. Publication must use a third registrable site (supported fixed
-suffixes match D09). `hostingRoot` and its `<basename>-staging` sibling must reside on the same
+suffixes test/com/net/org/dev/app/cn/top; `.test` is local only). Java, Node and the web bundle read
+`services/api/src/main/resources/network/site-policy.json`. Newly supported `.cn` and `.top` require
+directly registered two-label roots. Multi-label suffixes such as `.com.cn` and known shared-provider
+roots are rejected by a pinned PSL-derived deny set; this is not unrestricted suffix support.
+See `docs/deployment/D15-domain-suffix-compatibility.md` for scope and maintenance.
+`hostingRoot` and its `<basename>-staging` sibling must reside on the same
 filesystem, be owned by the single trusted publisher and have readable public directories (0755).
 The sibling is private and must not be mounted into ingress. Generated workers never receive either
 root, ingress keys, platform keys or the Docker socket.

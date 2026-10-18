@@ -5,6 +5,7 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.security.MessageDigest;
 import java.util.*;
 import tools.jackson.core.StreamReadFeature;
@@ -14,8 +15,26 @@ import tools.jackson.databind.json.JsonMapper;
 /** Append-only version directories on a platform-owned persistent volume. DB remains the visibility gate. */
 public final class LocalVolumeSnapshotStore implements SnapshotStore {
     private final Path root;
+    private final boolean sharedReaders;
     private final JsonMapper json = JsonMapper.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION).build();
-    public LocalVolumeSnapshotStore(Path root) { this.root = root.toAbsolutePath().normalize(); }
+    public LocalVolumeSnapshotStore(Path root) { this(root, false); }
+    public LocalVolumeSnapshotStore(Path root, boolean sharedReaders) {
+        this.root = root.toAbsolutePath().normalize();
+        if (sharedReaders && !root.getFileSystem().supportedFileAttributeViews().contains("posix"))
+            throw new IllegalArgumentException("Shared snapshot readers require POSIX permissions");
+        this.sharedReaders = sharedReaders;
+    }
+    /** Operator opt-in for distinct trusted readers. Root stays private until every child is ready. */
+    private void sharedRead(Path directory) throws Exception {
+        if (!sharedReaders) return;
+        try (var paths = Files.walk(directory)) {
+            for (var path : paths.sorted(java.util.Comparator.reverseOrder()).toList()) {
+                boolean dir = Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS);
+                check(path, dir);
+                Files.setPosixFilePermissions(path, PosixFilePermissions.fromString(dir ? "rwxr-x---" : "rw-r-----"));
+            }
+        }
+    }
     public static String hash(byte[] bytes) {
         try { return "sha256:" + HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes)); }
         catch (Exception failure) { throw new IllegalStateException(failure); }
@@ -126,6 +145,7 @@ public final class LocalVolumeSnapshotStore implements SnapshotStore {
             digest(actual, expected, files, json);
             directory(pending); // Empty sources still have an immutable directory.
             write(version.resolve("source-manifest.json"), json.writeValueAsBytes(actual));
+            sharedRead(pending);
             Files.move(pending, target, StandardCopyOption.ATOMIC_MOVE);
             return source(id, expected);
         } catch (SnapshotFailure failure) { throw failure; }
@@ -190,6 +210,7 @@ public final class LocalVolumeSnapshotStore implements SnapshotStore {
             write(pending.resolve("report.json"), reportBytes);
             var outcome = new Outcome(status, sourceDigest, artifact == null ? null : artifact.digest(), artifact, hash(reportBytes), json.valueToTree(report));
             write(pending.resolve("manifest.json"), json.writeValueAsBytes(outcome));
+            sharedRead(pending);
             Files.move(pending, target, StandardCopyOption.ATOMIC_MOVE);
             return outcome(versionId, sourceDigest, status);
         } catch (SnapshotFailure failure) { throw failure; }

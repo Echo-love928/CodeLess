@@ -22,7 +22,10 @@ public class PublicationService {
                        OffsetDateTime createdAt,OffsetDateTime publishedAt) {}
     public record Deployment(View publication,String phase,String sourceDigest,String artifactDigest,String reportDigest,
                              List<DeploymentRecords.Event> history,String failureCode,View latestSuccessful) {}
-    public record Page(List<View> items,View latestSuccessful) {}
+    // Discovery must distinguish an authoritative empty result from a missing field.
+    public record Page(List<View> items,
+                       @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS)
+                       View latestSuccessful) {}
     private record Version(String status,String source,UUID build) {}
     private final JdbcClient jdbc;
     private final ArtifactRepository artifacts;

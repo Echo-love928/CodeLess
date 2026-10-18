@@ -2,6 +2,7 @@ import { requestJson } from '../../api/http'
 import { session } from '../auth/session'
 import { uuid } from '../workbench/task-api'
 import { digest, type Version } from '../versions/version-api'
+import { dedicatedHostname, siteKey } from './site-policy'
 
 export interface Publication {
   id: string; applicationId: string; versionId: string; requestedBy: string
@@ -11,13 +12,11 @@ export interface Publication {
 let runtimeOrigin = ''
 export function publicOrigin(): URL {
   const url = new URL(import.meta.env.VITE_PUBLICATION_ORIGIN || runtimeOrigin)
-  const labels = url.hostname.split('.')
   const preview = new URL(import.meta.env.VITE_CODELESS_PREVIEW_ORIGIN || 'https://preview.codeless-preview.test')
   if (url.protocol !== 'https:' || url.pathname !== '/' || url.search || url.hash || url.username || url.password ||
-    !/^[a-z0-9.-]+$/.test(url.hostname) || labels.length < 3 ||
-    !['test', 'com', 'net', 'org', 'dev', 'app'].includes(labels.at(-1) ?? '') ||
-    labels.slice(-2).join('.') === location.hostname.split('.').slice(-2).join('.') ||
-    labels.slice(-2).join('.') === preview.hostname.split('.').slice(-2).join('.'))
+    !dedicatedHostname(url.hostname) ||
+    siteKey(url.hostname) === siteKey(location.hostname) ||
+    siteKey(url.hostname) === siteKey(preview.hostname))
     throw new Error('公开站点配置不可用，请联系维护者。')
   return url
 }
