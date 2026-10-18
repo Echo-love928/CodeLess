@@ -70,7 +70,8 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
   // UID101 ingress must be able to read it. No production/operator key is changed.
   await chmod(key, 0o644)
   await writeFile(config, await hostingConfig(origins))
-  let browser, networkCreated = false, hostingCreated = false
+  let browser, networkCreated = false, hostingCreated = false, failed = false
+  const netlogPath = join(evidence, 'chromium-netlog.json'), networkTimeline = {}
   try {
     docker(['network', 'create', '--internal', network]); networkCreated = true
     docker(['run', '-d', '--name', container, '--network', 'bridge', '--read-only', '--user', '101:101', '--cap-drop', 'ALL',
@@ -135,12 +136,17 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
     const production = spawnSync('docker', [...probeArgs.slice(0, -1), '/probe/probe-worker.mjs'], {
       encoding: 'utf8', input: JSON.stringify({ url: receipt.url, address, files: receipt.files }), timeout: 15000 })
     assert.notEqual(production.status, 0); assert.match(production.stderr, /public probe target rejected/)
-    browser = await chromium.launch({ headless: true, args: [`--host-resolver-rules=MAP *.${fixtureHost} 127.0.0.1`, '--no-proxy-server'] })
+    networkTimeline.launchStartedAt = new Date().toISOString()
+    browser = await chromium.launch({ headless: true, args: [`--host-resolver-rules=MAP *.${fixtureHost} 127.0.0.1`, '--no-proxy-server',
+      `--log-net-log=${netlogPath}`] })
+    networkTimeline.browserReadyAt = new Date().toISOString()
     const context = await browser.newContext({ ignoreHTTPSErrors: true, // Explicit self-signed local fixture only.
       proxy: { server: 'http://127.0.0.1:9', bypass: `*.${fixtureHost},127.0.0.1` },
       serviceWorkers: 'block', acceptDownloads: false })
     const page = await context.newPage()
+    networkTimeline.navigationStartedAt = new Date().toISOString()
     await page.goto(`https://${hostname}:${port}/tasks`)
+    networkTimeline.navigationLoadedAt = new Date().toISOString()
     assert.match(await page.locator('#app').innerText(), /任务/)
     await page.reload(); assert.match(await page.locator('#app').innerText(), /任务/)
     await page.screenshot({ path: join(evidence, 'public-tasks-refresh.png'), fullPage: true })
@@ -160,8 +166,27 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
       immutablePreviousDigest: index.digest, sourceDigest: observed.sourceDigest }
     result.frozenCoordinatorBridge = { liveHandleClosed: true, versionId: payload.versionId, artifactDigest: payload.artifactDigest }
     await writeFile(join(evidence, 'acceptance.json'), JSON.stringify(result, null, 2))
+  } catch (error) {
+    failed = true
+    networkTimeline.failedAt = new Date().toISOString()
+    networkTimeline.error = String(error.message).slice(0, 512)
+    throw error
   } finally {
     if (browser) await browser.close()
+    if (failed) {
+      try {
+        // Closing Chromium flushes its default, credential-excluding NetLog. This
+        // fixture never logs in; retain evidence without retrying navigation.
+        const netlog = JSON.parse(await readFile(netlogPath, 'utf8'))
+        const names = Object.fromEntries(Object.entries(netlog.constants.logEventTypes).map(([name, id]) => [id, name]))
+        const relevant = netlog.events.filter(event => /NETWORK.*CHANGED|DNS_CONFIG_CHANGED|PROXY_CONFIG_CHANGED/.test(names[event.type]) || event.params?.net_error === -21)
+        const network = { timeline: networkTimeline, totalMatchingEvents: relevant.length, events: relevant.slice(-40).map(event => ({
+          elapsedMs: Number(event.time) - Number(netlog.events[0].time), type: names[event.type], source: event.source, params: event.params,
+        })) }
+        await writeFile(join(evidence, 'chromium-network-failure.json'), JSON.stringify(network, null, 2))
+        console.error('Local TLS fixture network failure: ' + JSON.stringify(network))
+      } catch (error) { console.error('Local TLS fixture network diagnostics unavailable: ' + error.message) }
+    }
     if (hostingCreated) docker(['rm', '-f', container])
     if (networkCreated) docker(['network', 'rm', network])
   }

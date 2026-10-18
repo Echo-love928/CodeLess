@@ -7,6 +7,8 @@ import os
 from pathlib import Path
 import socket
 import struct
+import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -15,6 +17,7 @@ worker = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(worker)
 
 
+@unittest.skipUnless(sys.platform == 'linux', 'Production worker requires Linux process ownership')
 class WorkerBoundaryTest(unittest.TestCase):
     def envelope(self, argv, payload):
         return {'argv': argv, 'input': base64.b64encode(json.dumps(payload).encode()).decode()}
@@ -78,6 +81,28 @@ class WorkerBoundaryTest(unittest.TestCase):
         finally:
             left.close()
             right.close()
+
+
+    def process_case(self, case):
+        repository = Path(__file__).parents[2]
+        fixture = repository / 'tests/infra/fixtures/public-worker-process.py'
+        result = subprocess.run([sys.executable, str(fixture), '--repository', str(repository),
+                                 '--case', case], capture_output=True, text=True, timeout=12)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        proof = json.loads(result.stdout)
+        self.assertEqual(proof['kind'], 'UNIT_FIXTURE_ONLY')
+        self.assertFalse(proof['publicMilestoneReached'])
+        self.assertTrue(proof['exactFixturePidsReaped'])
+        self.assertTrue(proof['sameUidSiblingAlive'])
+
+    def test_disconnect_reclaims_detached_sessions_holding_stdout(self):
+        self.process_case('disconnect')
+
+    def test_deadline_reclaims_detached_sessions_holding_stdout(self):
+        self.process_case('deadline')
+
+    def test_success_reaps_adopted_orphans_before_reporting_clean(self):
+        self.process_case('completed')
 
 
 if __name__ == '__main__':

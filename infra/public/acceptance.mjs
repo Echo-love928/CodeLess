@@ -5,6 +5,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { createHash, randomUUID } from 'node:crypto'
 import { chromium, expect } from '@playwright/test'
+import { assertConcurrentEditCheckpoint } from './acceptance-checkpoint.mjs'
 
 let input = ''
 for await (const part of process.stdin) input += part
@@ -189,8 +190,8 @@ try {
     checkpoint.editTask = edit.task
     checkpoint.publicationStatusWhenEditAccepted = (await api('GET', '/api/v0/publications/' + checkpoint.publication.id)).status
     await save()
-    assert.equal(checkpoint.publicationStatusWhenEditAccepted, 'REQUESTED', 'Edit must be accepted while publication remains pending')
   }
+  assertConcurrentEditCheckpoint(checkpoint)
   const publication = await terminalPublication(checkpoint.publication.id)
   checkpoint.publication = publication
   await save()

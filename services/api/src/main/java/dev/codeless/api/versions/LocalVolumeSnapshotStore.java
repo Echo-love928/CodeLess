@@ -214,7 +214,7 @@ public final class LocalVolumeSnapshotStore implements SnapshotStore {
             Files.move(pending, target, StandardCopyOption.ATOMIC_MOVE);
             return outcome(versionId, sourceDigest, status);
         } catch (SnapshotFailure failure) { throw failure; }
-        catch (Exception failure) { throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE"); }
+        catch (Exception failure) { throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE", failure); }
     }
     @Override public Outcome outcome(UUID id, String sourceDigest, String status) {
         try {
