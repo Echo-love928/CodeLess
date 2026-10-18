@@ -1,6 +1,47 @@
 # D15-B 只读互审
 
-## 2026-10-15 修复复审（当前结论）
+## 2026-10-18 集成PR46审查（当前结论）
+
+候选为[PR46](https://github.com/Echo-love928/CodeLess/pull/46)的
+`6d55d55b70d71bf8c8828e16154ad4314a5111de`，base仍572304e，A源4ea141a、B源33b3b60。
+审查8880b6f机械合并之外的接线、fcc8e2f、4079ac0和6d55d55；没有修改B源码。
+该候选六项checks均completed/success：[实际run39110256996](https://github.com/Echo-love928/CodeLess/actions/runs/39110256996)。
+已用非作者身份yuanqizuimeng对精确HEAD提交APPROVED：
+https://github.com/Echo-love928/CodeLess/pull/46#pullrequestreview-5563127639 。PR46仍draft，未合并。
+
+### 阻塞问题
+
+- 无阻塞问题。
+
+### 建议
+
+1. `infra/public/install-runtime.py:81`把`publication/sites`设为worker:codeless-shared、2775，API与preview主组均为
+   codeless-shared，可绕过受信worker直接改写已发布站点。根因是`NodeDeploymentGateway`构造要求`isWritable(hostingRoot)`；
+   建议改为只读挂载，校验改为可读，由worker独占写入。
+2. 公网证据对应6d55d55之前的运行包；宣布公网里程碑前应按最终哈希重新部署并重跑公网验收。
+3. `tests/deploy/validate-contract.mjs`在openapi.v0.json已登记后仍输出"pending registration"，提示过时。
+4. `docs/deployment/D15-public-domains-2026-10-17.md:14`含SSH登录用户名，建议移除。
+
+### 已核验内容
+
+1. `NodeDeploymentGateway.java`：子进程环境白名单，截止须3秒<剩余≤30秒，超时仅在进程存活时销毁后代并关闭流；
+   `DeploymentConfiguration`仅在hosting-enabled时装配，否则HOSTING_UNAVAILABLE；`CODELESS_PUBLICATION_ENABLED`默认false。
+2. `SitePolicy`与`site-policy.json`按PSL拒绝共享后缀；三个独立.top域名。`LocalVolumeSnapshotStore`在原子提升前设0750/0640。
+3. `infra/public/worker.py`：unix socket IPC以`SO_PEERCRED`限定API uid，仅三种固定操作；pidfd与subreaper回收，按标签清理容器。
+   `nginx.conf.template`只对`/`、`/tasks`、`/catalog`回退index.html。
+4. 独立worktree `F:/r46` / 6d55d55：infra定向20/20、契约与OpenAPI exit0、publisher+contracts7/7、web deploy17/17、
+   Linux worker在`python:3.12-slim --network none`只读挂载8/8、hosting1/1 exit0、verify:e2e 56/56 exit0。
+5. 首轮hosting exit1：本机`where git`先返回mingw64，fixture推导的openssl不存在，托管断言未执行；
+   PATH前置Git\cmd后另轮通过，未改代码，原失败保留在independent-commands.json。
+6. verify:api（Temurin21）232项8失败exit1：openssl 3项、PreviewAcceptanceProcessTest 5项root stopped。
+   base main工作树`F:/rmain`/572304e以相同信息复现；PATH修复后EditLifecycle15/15、EditVerification7/7、PreviewPlatform1/1，
+   PAP仍稳定5失败，supervisor记录WINDOWS_JOB complete=true remaining=0，判断为本机Windows时序，非PR46引入；远端CI api通过。
+7. 公网`d9f35ba…sites.codeless-publish.top`：`/`与`/tasks` 200，缺失JS、`/src/main.ts`、`/src/`、`/assets/`、
+   `/.git/config`、`/package.json`均404，`/tasks/42` 404符合固定路由设计；该运行包早于6d55d55（建议2）。
+8. 证据：`tests/deploy/evidence/2026-10-18/review-b-6d55d55/`，含命令/exit/日志sha256、精确checks、公网探测和批准URL。
+   私有完整日志在审查后已清理，仅保留摘要。
+
+## 2026-10-15 修复复审（历史结论）
 
 候选为[PR45](https://github.com/Echo-love928/CodeLess/pull/45)的
 `33b3b603a46dc0554a3491b30da4e175c0e49168`，base仍572304e。
