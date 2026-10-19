@@ -67,7 +67,8 @@ class EditVerificationIntegrationTest extends PostgresTestBase {
     record Login(String cookie,String csrf) {}
     UUID owner,app,base,current,failedVersion;String baseDigest,currentDigest;Login login,other;
     JsonNode baselineSource,baselineSnapshot;
-    Path evidenceRoot() {return Path.of(System.getenv().getOrDefault("CODELESS_EDIT_VERIFICATION_EVIDENCE_DIR","target/edit-verification/evidence"));}
+    final Path defaultEvidenceRoot=Path.of("target/edit-verification/evidence","run-"+UUID.randomUUID());
+    Path evidenceRoot() {String configured=System.getenv("CODELESS_EDIT_VERIFICATION_EVIDENCE_DIR");return configured==null?defaultEvidenceRoot:Path.of(configured);}
     void report(String name,Object value) throws Exception {Files.createDirectories(evidenceRoot());Files.writeString(evidenceRoot().resolve(name+".json"),json.writeValueAsString(value));}
     HttpResponse<String> request(String method,String route,Object body,Login auth,boolean csrf) throws Exception {
         var b=HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/api/v0/"+route));

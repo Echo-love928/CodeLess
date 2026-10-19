@@ -89,13 +89,20 @@ class VersionHttpIntegrationTest extends PostgresTestBase {
         Process process=new ProcessBuilder("node","../../tests/agent/prepare-runtime.mjs").inheritIO().start();
         assertThat(process.waitFor(300,java.util.concurrent.TimeUnit.SECONDS)).isTrue();assertThat(process.exitValue()).isZero();
     }
+    TaskQueueService.Claim claimFixture(UUID task) {
+        // The real queue is shared with other HTTP fixtures. Make only this
+        // fixture oldest, as AgentLoopIntegrationTest does, without consuming
+        // another test's queued task or relaxing the exact claimed-ID assertion.
+        jdbc.sql("UPDATE generation_tasks SET created_at='2000-01-01' WHERE id=?").param(task).update();
+        var claim=queue.claim().orElseThrow();assertThat(claim.taskId()).isEqualTo(task);return claim;
+    }
     @Test @Order(1) void d11aT1NewDraftMutationDoesNotChangeVerifiedSourceOrArtifact() throws Exception {
         var login=login("demo@codeless.local","demo-password-for-test-only");cookie=login.cookie();csrf=login.csrf();
         otherCookie=login("admin@codeless.local","admin-password-for-test-only").cookie();
         owner=jdbc.sql("SELECT id FROM platform_users WHERE email='demo@codeless.local'").query(UUID.class).single();
         var application=applications.create(owner,"Versions acceptance",null,"STATIC");app=application.id();shell=application.baseVersionId();
         UUID task=queue.create(owner,app,"生成静态个人展示页，展示 Ada Lovelace 与作品",null).id();
-        var originalClaim=queue.claim().orElseThrow();assertThat(originalClaim.taskId()).isEqualTo(task);
+        var originalClaim=claimFixture(task);
         for(TaskStatus stage:List.of(TaskStatus.PLAN,TaskStatus.GENERATE,TaskStatus.VERIFY)) {
             fixtureStage=stage.name();
             var result=loop.execute(originalClaim,stage);
@@ -121,7 +128,7 @@ class VersionHttpIntegrationTest extends PostgresTestBase {
         var old=get("versions/"+ready+"/files/content?path=src/pages/HomePage.vue",cookie);
         assertThat(old.statusCode()).isEqualTo(200);var oldBytes=json.readTree(old.body());
         var before=snapshots.outcome(ready,draft.path("sourceDigest").asText(),"VERIFIED");
-        UUID newTask=queue.create(owner,app,"生成一个新的 Vue 草稿",null).id();var claim=queue.claim().orElseThrow();assertThat(claim.taskId()).isEqualTo(newTask);
+        UUID newTask=queue.create(owner,app,"生成一个新的 Vue 草稿",null).id();var claim=claimFixture(newTask);
         queue.advance(claim,TaskStatus.GENERATE,EventType.STAGE_STARTED,"Test draft",null);
         var created=tools.execute(newTask,claim.token(),"files.create",json.writeValueAsString(Map.of("path","src/pages/HomePage.vue","content","<template>new draft</template>")));
         assertThat(created.status()).isEqualTo("SUCCEEDED");

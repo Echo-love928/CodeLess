@@ -50,6 +50,8 @@ jobs:
         timeout-minutes: 5
         run: node .github/scripts/prepare-chromium.mjs
       - run: pnpm verify:runner
+      - name: Verify Linux worker ownership and cancellation
+        run: python3 tests/infra/public-worker.test.py
 
   infra:
     name: infra-preflight
@@ -81,6 +83,17 @@ jobs:
         run: pnpm verify:e2e
         env:
           DEBUG: pw:browser,pw:worker
+      - name: Retain failed hosting fixture network evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hosting-network-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            .local-data/d15-b/hosting/chromium-netlog.json
+            .local-data/d15-b/hosting/chromium-network-failure.json
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
 
   ci-gate:
     name: ci-gate

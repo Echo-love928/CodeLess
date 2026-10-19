@@ -1,0 +1,240 @@
+[
+  {
+    "mode": "infra-targeted",
+    "command": [
+      "node",
+      "--test",
+      "tests/infra/{site-policy,publication-config,publication-permissions,public-deployment,public-acceptance-checkpoint,publish,maven-wrapper}.test.mjs"
+    ],
+    "worktree": "F:/r46 @ 6d55d55b70d71bf8c8828e16154ad4314a5111de",
+    "exitCode": 0,
+    "status": "PASSED",
+    "summary": [
+      "tests 20",
+      "pass 20",
+      "fail 0",
+      "skipped 0"
+    ]
+  },
+  {
+    "mode": "contracts",
+    "command": [
+      "node",
+      "tests/deploy/validate-contract.mjs",
+      "&&",
+      "node",
+      "scripts/validate-contracts.mjs",
+      "all"
+    ],
+    "worktree": "F:/r46 @ 6d55d55b70d71bf8c8828e16154ad4314a5111de",
+    "exitCode": 0,
+    "status": "PASSED",
+    "summary": [
+      "deploy schemas and combined OpenAPI passed",
+      "version/publication/task-diagnostics/preview-credential valid/invalid",
+      "cross-resource READY/publication flow passed"
+    ],
+    "note": "validate-contract.mjs still prints 'shared contract remains pending registration' although openapi.v0.json is registered (suggestion 3)"
+  },
+  {
+    "mode": "boundary",
+    "command": [
+      "node",
+      "--test",
+      "tests/e2e/deploy/publisher.test.mjs",
+      "tests/deploy/contracts.test.mjs"
+    ],
+    "worktree": "F:/r46 @ 6d55d55b70d71bf8c8828e16154ad4314a5111de",
+    "exitCode": 0,
+    "status": "PASSED",
+    "summary": [
+      "tests 7",
+      "pass 7",
+      "fail 0"
+    ]
+  },
+  {
+    "mode": "web-deploy-unit",
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "src/features/deploy"
+    ],
+    "worktree": "F:/r46 @ 6d55d55b70d71bf8c8828e16154ad4314a5111de (apps/web)",
+    "exitCode": 0,
+    "status": "PASSED",
+    "summary": [
+      "Test Files 3 passed",
+      "Tests 17 passed"
+    ]
+  },
+  {
+    "mode": "linux-worker",
+    "command": [
+      "docker",
+      "run",
+      "--rm",
+      "--network",
+      "none",
+      "python:3.12-slim",
+      "python3",
+      "tests/infra/public-worker.test.py",
+      "-v"
+    ],
+    "worktree": "F:/r46 @ 6d55d55b70d71bf8c8828e16154ad4314a5111de (infra and tests/infra mounted read-only)",
+    "exitCode": 0,
+    "status": "PASSED",
+    "summary": [
+      "Ran 8 tests",
+      "OK"
+    ]
+  },
+  {
+    "mode": "hosting-first",
+    "command": [
+      "node",
+      "--test",
+      "tests/e2e/deploy/hosting.acceptance.mjs"
+    ],
+    "worktree": "F:/r46 @ 6d55d55b70d71bf8c8828e16154ad4314a5111de",
+    "exitCode": 1,
+    "status": "FAILED",
+    "summary": [
+      "spawnSync C:\\Program Files\\Git\\mingw64\\usr\\bin\\openssl.exe ENOENT; hosting assertions not executed"
+    ],
+    "note": "Local environment: `where git` resolved mingw64\\bin\\git.exe first. Log overwritten by the next run; no digest retained."
+  },
+  {
+    "mode": "hosting",
+    "command": [
+      "node",
+      "--test",
+      "tests/e2e/deploy/hosting.acceptance.mjs"
+    ],
+    "worktree": "F:/r46 @ 6d55d55b70d71bf8c8828e16154ad4314a5111de (PATH prefixed with C:\\Program Files\\Git\\cmd)",
+    "exitCode": 0,
+    "status": "PASSED",
+    "summary": [
+      "D15-B-T1/T2/T3 real Docker/Vue/Chromium -> publication -> HTTPS Nginx and isolated probe",
+      "tests 1",
+      "pass 1"
+    ],
+    "privateLog": "F:/r46-logs/hosting.log",
+    "logDigest": "sha256:01c10c901b33b33d7b5cdd7df2047a780cc845c1f661a32ee92bc807adfaf234"
+  },
+  {
+    "mode": "e2e",
+    "command": [
+      "pnpm",
+      "verify:e2e"
+    ],
+    "worktree": "F:/r46 @ 6d55d55b70d71bf8c8828e16154ad4314a5111de (PATH prefixed with C:\\Program Files\\Git\\cmd)",
+    "exitCode": 0,
+    "status": "PASSED",
+    "summary": [
+      "56 passed"
+    ],
+    "privateLog": "F:/r46-logs/e2e.log",
+    "logDigest": "sha256:138d4ec93c1fad5ae65601813a94409bf956de03a6cd00699a81e40eacbde5b3"
+  },
+  {
+    "mode": "api-jdk26",
+    "command": [
+      "node",
+      "scripts/run-maven.mjs"
+    ],
+    "worktree": "F:/r46 @ 6d55d55b70d71bf8c8828e16154ad4314a5111de (JAVA_HOME=F:\\jdk\\jdk26)",
+    "exitCode": 1,
+    "status": "NOT_STARTED",
+    "summary": [
+      "enforcer RequireJavaVersion: 26 not in [21,22); no tests executed"
+    ],
+    "note": "Log overwritten by the next run; no digest retained."
+  },
+  {
+    "mode": "api",
+    "command": [
+      "node",
+      "scripts/run-maven.mjs"
+    ],
+    "worktree": "F:/r46 @ 6d55d55b70d71bf8c8828e16154ad4314a5111de (Temurin 21.0.12.1, Adoptium SHA-256 verified)",
+    "exitCode": 1,
+    "status": "FAILED",
+    "summary": [
+      "Tests run: 232, Failures: 8, Errors: 0, Skipped: 0",
+      "EditLifecycleIntegrationTest 1, EditVerificationIntegrationTest 1, PreviewPlatformIntegrationTest 1: Test TLS requires Git-bundled openssl",
+      "PreviewAcceptanceProcessTest 5: [root stopped]",
+      "PublicationIntegrationTest and DeploymentRecordsTest passed"
+    ],
+    "privateLog": "F:/r46-logs/api.log",
+    "logDigest": "sha256:eb92aad0ada9ba46b968d6b90f6cda7b0e7a57b4f64ecc856c30e13177aa8eba"
+  },
+  {
+    "mode": "base-control-1",
+    "command": [
+      "mvnw",
+      "-Dtest=PreviewAcceptanceProcessTest,PreviewPlatformIntegrationTest,EditLifecycleIntegrationTest,EditVerificationIntegrationTest",
+      "test"
+    ],
+    "worktree": "F:/rmain @ 572304e0cc21fbfe2e22cf7c286b4c3f29ad1013",
+    "exitCode": null,
+    "status": "INTERRUPTED",
+    "summary": [
+      "EditLifecycleIntegrationTest 1 failure, EditVerificationIntegrationTest 1 failure: same openssl message as PR",
+      "Preview classes not reached before interruption"
+    ],
+    "privateLog": "F:/r46-logs/main-control.log",
+    "logDigest": "sha256:65e3e3f23cfbf7bf0fe2f646cce6454440b6ffe80ca4e6e81b454ec9de396c67"
+  },
+  {
+    "mode": "base-control-2",
+    "command": [
+      "mvnw",
+      "-Dtest=PreviewAcceptanceProcessTest,PreviewPlatformIntegrationTest",
+      "test"
+    ],
+    "worktree": "F:/rmain @ 572304e0cc21fbfe2e22cf7c286b4c3f29ad1013",
+    "exitCode": 1,
+    "status": "FAILED",
+    "summary": [
+      "Tests run: 9, Failures: 6",
+      "same openssl and [root stopped] messages as PR"
+    ],
+    "privateLog": "F:/r46-logs/main-control2.log",
+    "logDigest": "sha256:d307d3f6ef5ec15d4724af7a1ce9f548991448cdcd17086f0212ff8b7036cb0b"
+  },
+  {
+    "mode": "api-rerun",
+    "command": [
+      "mvnw",
+      "-Dtest=PreviewAcceptanceProcessTest,PreviewPlatformIntegrationTest,EditLifecycleIntegrationTest,EditVerificationIntegrationTest",
+      "test"
+    ],
+    "worktree": "F:/r46 @ 6d55d55b70d71bf8c8828e16154ad4314a5111de (PATH prefixed with C:\\Program Files\\Git\\cmd)",
+    "exitCode": 1,
+    "status": "FAILED",
+    "summary": [
+      "EditLifecycle 15/15, EditVerification 7/7, PreviewPlatform 1/1 passed",
+      "PreviewAcceptanceProcessTest 8 run, 5 failures (root stopped)"
+    ],
+    "privateLog": "F:/r46-logs/api-rerun.log",
+    "logDigest": "sha256:eb80a6be47fa6ce85358fea65e62b4223dc00e9b7d5e326c35ec4bf016dc6474"
+  },
+  {
+    "mode": "process-test-alone",
+    "command": [
+      "mvnw",
+      "-Dtest=PreviewAcceptanceProcessTest",
+      "test"
+    ],
+    "worktree": "F:/r46 @ 6d55d55b70d71bf8c8828e16154ad4314a5111de (PATH prefixed with C:\\Program Files\\Git\\cmd)",
+    "exitCode": 1,
+    "status": "FAILED",
+    "summary": [
+      "Tests run: 8, Failures: 5 (stable; supervisor process-result WINDOWS_JOB complete=true remaining=0)"
+    ],
+    "privateLog": "F:/r46-logs/pap.log",
+    "logDigest": "sha256:0357e435c93a6e1160deebfef52b089207ece203749eb38069b0d62690f92341"
+  }
+]

@@ -1,0 +1,101 @@
+{
+  "failedHead": "08c06ed6d24c3f8875167f0ebce5b7ae6e4f3cbc",
+  "failedJob": "https://github.com/Echo-love928/CodeLess/actions/runs/38666109399/job/116198325643",
+  "rootCause": "Maven distribution curl HTTP 429; API tests never started; ci-gate correctly rejected verify:api.",
+  "failedLogDigest": "sha256:f909d37100ee9679980e4ac506516c063fda8ced28737cd31f66bab5c6a2322e",
+  "runs": [
+    {
+      "label": "before",
+      "command": [
+        "node",
+        "--test",
+        "tests/infra/maven-wrapper.test.mjs"
+      ],
+      "startedAt": "2026-10-15T01:46:46.465Z",
+      "completedAt": "2026-10-15T01:46:48.034Z",
+      "exitCode": 1,
+      "signal": null,
+      "logDigest": "sha256:ae95361d9496557a5ed2830023d375d673507d204813876b7c24f2356757c047",
+      "summary": [
+        "✖ Maven bootstrap recovers from HTTP 429 and reuses the verified distribution (265.8495ms)",
+        "✖ persistent Maven HTTP 429 exhausts four attempts and remains a failure (215.4743ms)",
+        "✔ Maven HTTP 404 fails immediately without installing or running Maven (235.6485ms)",
+        "✖ Maven download retries preserve checksum enforcement (229.1843ms)",
+        "✔ Maven execution failures propagate without redownloading or retrying tests (376.5662ms)",
+        "ℹ tests 5",
+        "ℹ suites 0",
+        "ℹ pass 2",
+        "ℹ fail 3",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 1487.3193",
+        "✖ failing tests:",
+        "✖ Maven bootstrap recovers from HTTP 429 and reuses the verified distribution (265.8495ms)",
+        "✖ persistent Maven HTTP 429 exhausts four attempts and remains a failure (215.4743ms)",
+        "✖ Maven download retries preserve checksum enforcement (229.1843ms)"
+      ]
+    },
+    {
+      "label": "after",
+      "command": [
+        "node",
+        "--test",
+        "tests/infra/maven-wrapper.test.mjs"
+      ],
+      "startedAt": "2026-10-15T01:46:48.035Z",
+      "completedAt": "2026-10-15T01:47:00.040Z",
+      "exitCode": 0,
+      "signal": null,
+      "logDigest": "sha256:17847527e28ebd0b82620b48d9943a1acfd1a3dfc3f303f11816333053f3fb92",
+      "summary": [
+        "✔ Maven bootstrap recovers from HTTP 429 and reuses the verified distribution (2481.2165ms)",
+        "✔ persistent Maven HTTP 429 exhausts four attempts and remains a failure (6286.0844ms)",
+        "✔ Maven HTTP 404 fails immediately without installing or running Maven (237.4079ms)",
+        "✔ Maven download retries preserve checksum enforcement (2331.0843ms)",
+        "✔ Maven execution failures propagate without redownloading or retrying tests (367.8754ms)",
+        "ℹ tests 5",
+        "ℹ suites 0",
+        "ℹ pass 5",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 11915.3085"
+      ]
+    }
+  ],
+  "runner": {
+    "mode": "runner",
+    "command": [
+      "corepack",
+      "pnpm",
+      "verify:runner"
+    ],
+    "startedAt": "2026-10-15T01:47:05.957Z",
+    "exitCode": 0,
+    "signal": null,
+    "head": "08c06ed6d24c3f8875167f0ebce5b7ae6e4f3cbc",
+    "changes": "M services/api/mvnw\n?? .idea/\n?? tests/infra/maven-wrapper.test.mjs",
+    "generatedHistoricalEvidence": [],
+    "completedAt": "2026-10-15T01:47:44.153Z",
+    "status": "PASSED",
+    "logDigest": "sha256:c0c750016594633308be82ff0a96a7879f24f5c2e2b669a0e330e9869b332d40",
+    "summary": [
+      "tests 79",
+      "pass 79",
+      "fail 0",
+      "skipped 0"
+    ]
+  },
+  "sources": [
+    {
+      "path": "services/api/mvnw",
+      "lfDigest": "sha256:f5ac9ca537b779daceb582b862c126f15c98a37df3ec905289974c87e928cc2b"
+    },
+    {
+      "path": "tests/infra/maven-wrapper.test.mjs",
+      "lfDigest": "sha256:d1112dbe3437216382c463f8c8d3c65ead315facb5f6f797e7c31fa6e1d3b5be"
+    }
+  ]
+}

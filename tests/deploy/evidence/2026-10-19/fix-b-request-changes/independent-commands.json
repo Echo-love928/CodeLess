@@ -1,0 +1,26 @@
+[
+  {
+    "mode": "red-without-fix",
+    "command": ["mvnw", "-Dtest=PublicationIntegrationTest", "test"],
+    "worktree": "A branch on 12c583d with new HTTP assertions; production fix stashed",
+    "exitCode": 1,
+    "status": "FAILED_AS_EXPECTED",
+    "summary": [
+      "Tests run: 6, Failures: 3",
+      "T1:189 list response has no latestSuccessful field",
+      "T2:131 deployment property names miss failureCode/latestSuccessful",
+      "T4:150 history event misses failureCode"
+    ],
+    "logDigest": "sha256:5986cb3e2d6877093b81cd27a50c733f4ca1714f5e6de3db78792e8bda8e3e90",
+    "note": "An earlier attempt errored before any test because Docker Desktop was not running; that log was overwritten by this run and has no digest."
+  },
+  {
+    "mode": "green-with-fix",
+    "command": ["mvnw", "-Dtest=PublicationIntegrationTest,DeploymentRecordsTest", "test"],
+    "worktree": "A branch on 12c583d with fix and HTTP assertions",
+    "exitCode": 0,
+    "status": "PASSED",
+    "summary": ["PublicationIntegrationTest 6/6", "DeploymentRecordsTest 3/3"],
+    "logDigest": "sha256:c348cccb6317fe0c84e1cea4c18b574da327cac853bf1ba78b5161d8babc0683"
+  }
+]

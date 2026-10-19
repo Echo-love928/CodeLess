@@ -1,0 +1,84 @@
+package dev.codeless.api.deploy;
+
+import static org.assertj.core.api.Assertions.*;
+import java.nio.file.*;
+import java.time.Instant;
+import java.util.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.mock.env.MockEnvironment;
+
+class PublicationGatewayConfigurationTest {
+    @TempDir Path temporary;
+    static MockEnvironment configured(Path root) throws Exception {
+        var process=new ProcessBuilder("node","-p","process.execPath").start();
+        String node=new String(process.getInputStream().readAllBytes()).trim();
+        assertThat(process.waitFor()).isZero();
+        return new MockEnvironment().withProperty("codeless.deploy.hosting-enabled","true")
+                .withProperty("codeless.deploy.node-executable",node)
+                .withProperty("codeless.deploy.gateway-entry",Path.of("../../services/runner/src/publish/gateway-cli.mjs").toAbsolutePath().normalize().toString())
+                .withProperty("codeless.deploy.hosting-root",root.toAbsolutePath().toString())
+                .withProperty("codeless.deploy.public-origin","https://sites.codeless-public.test")
+                .withProperty("codeless.deploy.platform-origin","https://app.codeless.test")
+                .withProperty("codeless.deploy.preview-origin","https://preview.codeless-preview.test");
+    }
+    @Test void defaultIsUnavailableAndEnabledWithoutSettingsFailsStartup() {
+        new ApplicationContextRunner().withUserConfiguration(DeploymentConfiguration.class).run(context->{
+            assertThat(context).hasSingleBean(DeploymentGateway.class);
+            assertThatThrownBy(()->context.getBean(DeploymentGateway.class).publish(null,Instant.now())).hasMessage("HOSTING_UNAVAILABLE");
+        });
+        new ApplicationContextRunner().withUserConfiguration(DeploymentConfiguration.class)
+                .withPropertyValues("codeless.deploy.hosting-enabled=true").run(context->assertThat(context).hasFailed());
+    }
+    @Test void completeOperatorSettingsInstallExactlyOneRealGateway() throws Exception {
+        // Production Linux gives the API a readable, non-writable hosting root.
+        // Exercise that boundary on POSIX, retaining the portable startup case.
+        var posix = Files.getFileStore(temporary).supportsFileAttributeView("posix");
+        var previous = posix ? Files.getPosixFilePermissions(temporary) : null;
+        if (posix) {
+            Files.setPosixFilePermissions(temporary, java.nio.file.attribute.PosixFilePermissions.fromString("r-xr-xr-x"));
+            assertThat(Files.isWritable(temporary)).isFalse();
+        }
+        try {
+        var env=configured(temporary);
+        new ApplicationContextRunner().withUserConfiguration(DeploymentConfiguration.class)
+                .withInitializer(context->context.getEnvironment().getPropertySources().addFirst(env.getPropertySources().get("mockProperties")))
+                .run(context->{
+                    assertThat(context).hasSingleBean(DeploymentGateway.class);
+                    assertThat(context.getBean(DeploymentGateway.class)).isInstanceOf(NodeDeploymentGateway.class);
+                });
+        } finally {
+            if (posix) Files.setPosixFilePermissions(temporary, previous);
+        }
+    }
+    @Test void invalidPathsAndSharedSitesCannotEnableHosting() throws Exception {
+        var env=configured(temporary).withProperty("codeless.deploy.node-executable","relative-node");
+        assertThatThrownBy(()->new DeploymentConfiguration().deploymentGateway(env)).hasMessage("PUBLICATION_PATH_CONFIG_INVALID");
+        var shared=configured(temporary).withProperty("codeless.deploy.public-origin","https://sites.codeless.test");
+        assertThatThrownBy(()->new DeploymentConfiguration().deploymentGateway(shared)).hasMessage("PUBLICATION_ORIGINS_MUST_BE_SEPARATE");
+        var invalidPort=configured(temporary).withProperty("codeless.deploy.public-origin","https://sites.codeless-public.test:0");
+        assertThatThrownBy(()->new DeploymentConfiguration().deploymentGateway(invalidPort)).hasMessage("PUBLICATION_ORIGIN_CONFIG_INVALID");
+    }
+    @Test void cnTopAndMixedSitesEnableOnlyWithIndependentDedicatedRoots() throws Exception {
+        for (String suffix : List.of("cn", "top")) {
+            var env = configured(temporary)
+                    .withProperty("codeless.deploy.platform-origin", "https://app.codeless-platform." + suffix)
+                    .withProperty("codeless.deploy.preview-origin", "https://preview.codeless-preview." + suffix)
+                    .withProperty("codeless.deploy.public-origin", "https://sites.codeless-public." + suffix);
+            assertThat(new DeploymentConfiguration().deploymentGateway(env)).isInstanceOf(NodeDeploymentGateway.class);
+            for (String invalid : List.of("https://sites.codeless-platform." + suffix, "https://sites.codeless-preview." + suffix)) {
+                env.withProperty("codeless.deploy.public-origin", invalid);
+                assertThatThrownBy(() -> new DeploymentConfiguration().deploymentGateway(env)).hasMessage("PUBLICATION_ORIGINS_MUST_BE_SEPARATE");
+            }
+            for (String invalid : List.of("https://sites.tenant.com.cn", "https://sites.tenant.bj.cn", "https://sites.tenant.wadl.top")) {
+                env.withProperty("codeless.deploy.public-origin", invalid);
+                assertThatThrownBy(() -> new DeploymentConfiguration().deploymentGateway(env)).hasMessage("PUBLICATION_ORIGIN_CONFIG_INVALID");
+            }
+        }
+        var mixed = configured(temporary).withProperty("codeless.deploy.platform-origin", "https://app.codeless-platform.com")
+                .withProperty("codeless.deploy.preview-origin", "https://preview.codeless-preview.cn")
+                .withProperty("codeless.deploy.public-origin", "https://sites.codeless-public.top");
+        assertThat(new DeploymentConfiguration().deploymentGateway(mixed)).isInstanceOf(NodeDeploymentGateway.class);
+    }
+}
