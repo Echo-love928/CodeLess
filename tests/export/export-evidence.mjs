@@ -39,4 +39,32 @@ for (const name of readdirSync(source).filter(n => /\.(json|zip|log)$/.test(n)).
 writeFileSync(join(target, 'commands.json'), JSON.stringify({ card: 'D16-A', canonicalAcceptanceRun: canonical.run,
   note: 'Every recorded run is listed, including failures; raw logs are private under .local-data/d16-a/runs/<run>/command.log.',
   copied, runs }, null, 2) + '\n')
-console.log(JSON.stringify({ exported: relative(repo, target), canonical: canonical.run, files: copied.length, runs: runs.length }))
+
+// Platform runtime model usage, kept apart from personal development tokens. Tasks are attributed to a recorded run by
+// their first journal event time; export-integration is this card's suite, every other root is an existing suite.
+const apiTarget = join(repo, 'services/api/target'), roots = []
+for (const name of existsSync(apiTarget) ? readdirSync(apiTarget) : [])
+  for (const sub of ['runtime/journal', 'private/journal']) if (existsSync(join(apiTarget, name, sub))) roots.push([name, join(apiTarget, name, sub)])
+const usage = runs.filter(r => r.completedAt && ['acceptance', 'regression', 'api', 'gate'].includes(r.mode)).map(run => {
+  const tasks = []
+  for (const [suite, root] of roots) for (const task of readdirSync(root)) {
+    const events = readdirSync(join(root, task)).sort().flatMap(f => [JSON.parse(readFileSync(join(root, task, f), 'utf8'))].flat())
+    const first = events[0]?.at
+    if (!first || first < run.startedAt || first > run.completedAt) continue
+    const requests = events.filter(e => e.kind === 'model.request'), used = events.filter(e => e.kind === 'model.usage')
+    if (!requests.length) continue
+    const sum = key => used.every(e => Number.isInteger(e.payload?.usage?.[key])) ? used.reduce((s, e) => s + e.payload.usage[key], 0) : null
+    tasks.push({ suite, task, modelRequests: requests.length, toolSlots: requests.reduce((s, e) => s + (e.payload?.slots ?? 0), 0),
+      chargedTokens: used.reduce((s, e) => s + (e.payload?.chargedTokens ?? 0), 0), meteringSources: [...new Set(used.map(e => e.payload?.meteringSource))],
+      inputTokens: sum('inputTokens'), outputTokens: sum('outputTokens'), totalTokens: sum('totalTokens') })
+  }
+  const total = key => tasks.reduce((s, t) => s + t[key], 0)
+  return { run: run.run, mode: run.mode, provider: run.modelProvider, tasks: tasks.length, thisCardTasks: tasks.filter(t => t.suite === 'export-integration').length,
+    modelRequests: total('modelRequests'), chargedTokens: total('chargedTokens'),
+    providerTokens: tasks.every(t => t.totalTokens !== null) ? total('totalTokens') : null, perTask: tasks }
+})
+writeFileSync(join(target, 'runtime-usage.json'), JSON.stringify({ card: 'D16-A', provider: 'deterministic-mock', paidModelCalls: 0,
+  note: 'chargedTokens are conservative reservations (UTF8 bytes + framing + max output), not provider-measured tokens; null means unknown, never 0.',
+  runs: usage }, null, 2) + '\n')
+console.log(JSON.stringify({ exported: relative(repo, target), canonical: canonical.run, files: copied.length, runs: runs.length,
+  usageRuns: usage.map(u => `${u.mode}:${u.modelRequests}`) }))

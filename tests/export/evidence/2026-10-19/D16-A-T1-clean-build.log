@@ -1,0 +1,49 @@
++ cp -R /export /tmp/app
++ cd /tmp/app
++ test ! -e node_modules
++ test ! -e dist
++ node --version
+v24.16.0
++ corepack pnpm@12.6.0 --version
+Downloading the pnpm 12.6.0 binary for linux-x64...
+12.6.0
++ corepack pnpm@12.6.0 install --frozen-lockfile --store-dir /tmp/pnpm-store
+? Verifying lockfile against supply-chain policies (103 entries)...
+Progress: resolved 53, reused 0, downloaded 1, added 0
+Progress: resolved 53, reused 0, downloaded 31, added 0
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: /tmp/pnpm-store/v11
+  Virtual store is at:             node_modules/.pnpm
+Progress: resolved 53, reused 0, downloaded 51, added 32
+✓ Lockfile passes supply-chain policies (103 entries in 5.1s)
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 53, reused 0, downloaded 53, added 32
+Packages: +53
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 53, reused 0, downloaded 53, added 53, done
+.../esbuild@0.25.12/node_modules/esbuild postinstall$ node install.js
+.../esbuild@0.25.12/node_modules/esbuild postinstall: Done
+
+dependencies:
++ vue 3.5.13
++ vue-router 4.5.0
+
+devDependencies:
++ @vitejs/plugin-vue 5.2.3
++ typescript 5.8.2
++ vite 6.2.3
++ vue-tsc 2.2.8
+
+Done in 8.2s using pnpm v12.6.0
++ corepack pnpm@12.6.0 run build
+$ vue-tsc --noEmit && vite build --configLoader runner
+[36mvite v6.2.3 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 30 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                 [39m[1m[2m 0.29 kB[22m[1m[22m[2m │ gzip:  0.24 kB[22m
+[2mdist/[22m[32mai-component-catalog.json  [39m[1m[2m 0.77 kB[22m[1m[22m[2m │ gzip:  0.38 kB[22m
+[2mdist/[22m[2massets/[22m[36mindex-DC4JO8RG.js   [39m[1m[2m83.57 kB[22m[1m[22m[2m │ gzip: 33.13 kB[22m
+[32m✓ built in 613ms[39m
++ cp -R dist /out/dist
