@@ -60,7 +60,11 @@ test('independent verifier re-checks the published evidence archive against the 
   assert.equal(t1.cleanBuild.status, 'PASSED'); assert.equal(t1.cleanBuild.exitCode, 0)
   assert.equal(t1.cleanBuild.archiveDigest, t4.archiveSha256)
   assert.equal(t1.artifactReproduction.artifactReproduced, true)
+  assert.equal(t1.artifactReproduction.reproduction, 'REPRODUCED')
   assert.equal(t1.artifactReproduction.distDigest, t4.manifest.artifactDigest)
+  // Build success and reproduction are separate: a wrong expected digest builds but exits 3, never 0.
+  assert.deepEqual(t1.mismatchedExpectation, { status: 'PASSED', reproduction: 'NOT_REPRODUCED' })
+  assert.equal(t1.mismatchedExpectationExit, 3)
 })
 
 test('independent verifier allowlist equals the Java implementation allowlist', async () => {

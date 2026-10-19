@@ -1,7 +1,7 @@
 // Copies the latest PASSED acceptance run's public reports into tests/export/evidence/<date>/ and writes commands.json
 // with every recorded run (failures and history included), native exit codes, log digests and JUnit counts.
 // Raw logs stay private under .local-data/d16-a/runs/. Usage: node tests/export/export-evidence.mjs 2026-10-19
-import { readdirSync, readFileSync, existsSync, mkdirSync, copyFileSync, writeFileSync } from 'node:fs'
+import { readdirSync, readFileSync, existsSync, mkdirSync, copyFileSync, writeFileSync, unlinkSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -31,6 +31,10 @@ const runs = readdirSync(runsRoot).sort().filter(n => existsSync(join(runsRoot, 
 const canonical = runs.filter(r => r.mode === 'acceptance' && r.status === 'PASSED').at(-1)
 if (!canonical) throw new Error('No PASSED acceptance run to export')
 mkdirSync(target, { recursive: true })
+// Replace only the previous canonical copies (e.g. an older run's export-<versionId>.zip); other evidence and the
+// run history in commands.json are kept. Earlier canonical files remain in Git history.
+const previous = existsSync(join(target, 'commands.json')) ? JSON.parse(readFileSync(join(target, 'commands.json'), 'utf8')).copied ?? [] : []
+for (const { file } of previous) if (/^[A-Za-z0-9._-]+$/.test(file) && existsSync(join(target, file))) unlinkSync(join(target, file))
 const source = join(runsRoot, canonical.run, 'export'), copied = []
 for (const name of readdirSync(source).filter(n => /\.(json|zip|log)$/.test(n)).sort()) {
   copyFileSync(join(source, name), join(target, name))
