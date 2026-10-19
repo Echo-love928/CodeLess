@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import BrandLogo from '../../components/BrandLogo.vue'
 import VersionWorkspace from '../versions/VersionWorkspace.vue'
+import DeployPanel from '../deploy/DeployPanel.vue'
 import UiIcon from '../../components/UiIcon.vue'
 import { ApiError } from '../../api/http'
 import { type Application, getApplication } from '../apps/application-api'
@@ -80,7 +81,7 @@ onBeforeUnmount(() => { loadVersion += 1; dispose() })
 
 <template>
   <div class="workbench">
-    <header class="workbench-header"><router-link to="/apps" class="workbench-back" aria-label="返回我的应用"><UiIcon name="back" /></router-link><router-link to="/apps" class="workbench-brand"><BrandLogo /></router-link><span class="workbench-header__divider" /><div class="workbench-header__name">{{ app?.name || '工作台' }} <small v-if="app">应用 {{ app.id }}</small></div><div class="workbench-header__actions"><button class="button-primary" type="button" disabled title="发布功能尚未接入">发布</button></div></header>
+    <header class="workbench-header"><router-link to="/apps" class="workbench-back" aria-label="返回我的应用"><UiIcon name="back" /></router-link><router-link to="/apps" class="workbench-brand"><BrandLogo /></router-link><span class="workbench-header__divider" /><div class="workbench-header__name">{{ app?.name || '工作台' }} <small v-if="app">应用 {{ app.id }}</small></div><div class="workbench-header__actions"><DeployPanel v-if="app" :application-id="app.id" :version-id="app.latestReadyVersionId" @unauthorized="router.replace(`/login`)" /></div></header>
     <main v-if="loading" class="workbench-message" role="status">正在加载应用…</main>
     <main v-else-if="error" class="workbench-message" role="alert"><h1>无法打开工作台</h1><p>{{ error }}</p><button class="button-secondary" type="button" @click="load">重试</button></main>
     <div v-else-if="app" class="workbench-content">

@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
+import { dedicatedHostname, siteKey } from './site-policy.mjs'
 
 export const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
 const digest = /^sha256:[a-f0-9]{64}$/
@@ -25,10 +26,9 @@ export function previewOrigins(previewOrigin, platformOrigin) {
   for (const origin of [preview, platform]) {
     if (origin.protocol !== 'https:' || origin.username || origin.password || origin.pathname !== '/' ||
         origin.search || origin.hash || !/^[a-z0-9.-]+$/.test(origin.hostname)) throw new Error('HTTPS origin required')
-    const labels = origin.hostname.split('.')
-    if (labels.length < 3 || !['test', 'com', 'net', 'org', 'dev', 'app'].includes(labels.at(-1))) throw new Error('dedicated supported site required')
+    if (!dedicatedHostname(origin.hostname)) throw new Error('dedicated supported site required')
   }
-  if (preview.hostname.split('.').slice(-2).join('.') === platform.hostname.split('.').slice(-2).join('.')) throw new Error('separate preview site required')
+  if (siteKey(preview.hostname) === siteKey(platform.hostname)) throw new Error('separate preview site required')
   return { preview, platform }
 }
 export const versionHost = (version, preview) => 'v' + version.replaceAll('-', '') + '.' + preview.host

@@ -1,6 +1,7 @@
 package dev.codeless.api.preview;
 
 import dev.codeless.api.auth.OwnershipGuard;
+import dev.codeless.api.network.SitePolicy;
 import dev.codeless.api.auth.AuthFailure;
 import dev.codeless.api.error.ApiError;
 import jakarta.servlet.http.HttpServletRequest;
@@ -82,14 +83,7 @@ public class PreviewController {
         return uri;
     }
     private static String site(URI uri) {
-        String[] labels = uri.getHost().toLowerCase(java.util.Locale.ROOT).split("\\.");
-        if (labels.length < 3) throw new IllegalArgumentException("Dedicated domain required");
-        // Deployment uses dedicated .test or separate two-label registrable domains.
-        // Multi-label public suffixes are deliberately unsupported, rather than guessed.
-        String suffix = labels[labels.length - 1];
-        if (!java.util.Set.of("test", "com", "net", "org", "dev", "app").contains(suffix))
-            throw new IllegalArgumentException("Unsupported site suffix");
-        return labels[labels.length - 2] + "." + suffix;
+        return SitePolicy.site(uri.getHost());
     }
     private ResponseEntity<ApiError> failure(HttpStatus status, String code, HttpServletRequest request) {
         return ResponseEntity.status(status).header("Cache-Control", "no-store")

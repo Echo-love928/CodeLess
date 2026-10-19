@@ -1,0 +1,24 @@
+[Unit]
+Description=CodeLess resident private preview registry
+After=codeless-api.service codeless-backend-firewall.service
+Wants=codeless-api.service
+Requires=codeless-backend-firewall.service
+[Service]
+User=codeless-preview
+Group=codeless-shared
+UMask=0077
+WorkingDirectory=/srv/codeless/repository
+EnvironmentFile=/etc/codeless/preview.env
+ExecStart=/opt/codeless/tools/node-v24.16.0-linux-x64/bin/node /srv/codeless/repository/services/runner/src/preview/main.mjs
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadOnlyPaths=/srv/codeless/publication
+InaccessiblePaths=/var/run/docker.sock /run/docker.sock /etc/codeless/tls /etc/letsencrypt /run/codeless-worker
+MemoryMax=384M
+TasksMax=256
+[Install]
+WantedBy=multi-user.target

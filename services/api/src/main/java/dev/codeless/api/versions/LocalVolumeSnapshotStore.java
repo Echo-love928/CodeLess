@@ -5,6 +5,7 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.security.MessageDigest;
 import java.util.*;
 import tools.jackson.core.StreamReadFeature;
@@ -14,8 +15,26 @@ import tools.jackson.databind.json.JsonMapper;
 /** Append-only version directories on a platform-owned persistent volume. DB remains the visibility gate. */
 public final class LocalVolumeSnapshotStore implements SnapshotStore {
     private final Path root;
+    private final boolean sharedReaders;
     private final JsonMapper json = JsonMapper.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION).build();
-    public LocalVolumeSnapshotStore(Path root) { this.root = root.toAbsolutePath().normalize(); }
+    public LocalVolumeSnapshotStore(Path root) { this(root, false); }
+    public LocalVolumeSnapshotStore(Path root, boolean sharedReaders) {
+        this.root = root.toAbsolutePath().normalize();
+        if (sharedReaders && !root.getFileSystem().supportedFileAttributeViews().contains("posix"))
+            throw new IllegalArgumentException("Shared snapshot readers require POSIX permissions");
+        this.sharedReaders = sharedReaders;
+    }
+    /** Operator opt-in for distinct trusted readers. Root stays private until every child is ready. */
+    private void sharedRead(Path directory) throws Exception {
+        if (!sharedReaders) return;
+        try (var paths = Files.walk(directory)) {
+            for (var path : paths.sorted(java.util.Comparator.reverseOrder()).toList()) {
+                boolean dir = Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS);
+                check(path, dir);
+                Files.setPosixFilePermissions(path, PosixFilePermissions.fromString(dir ? "rwxr-x---" : "rw-r-----"));
+            }
+        }
+    }
     public static String hash(byte[] bytes) {
         try { return "sha256:" + HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes)); }
         catch (Exception failure) { throw new IllegalStateException(failure); }
@@ -126,6 +145,7 @@ public final class LocalVolumeSnapshotStore implements SnapshotStore {
             digest(actual, expected, files, json);
             directory(pending); // Empty sources still have an immutable directory.
             write(version.resolve("source-manifest.json"), json.writeValueAsBytes(actual));
+            sharedRead(pending);
             Files.move(pending, target, StandardCopyOption.ATOMIC_MOVE);
             return source(id, expected);
         } catch (SnapshotFailure failure) { throw failure; }
@@ -190,10 +210,11 @@ public final class LocalVolumeSnapshotStore implements SnapshotStore {
             write(pending.resolve("report.json"), reportBytes);
             var outcome = new Outcome(status, sourceDigest, artifact == null ? null : artifact.digest(), artifact, hash(reportBytes), json.valueToTree(report));
             write(pending.resolve("manifest.json"), json.writeValueAsBytes(outcome));
+            sharedRead(pending);
             Files.move(pending, target, StandardCopyOption.ATOMIC_MOVE);
             return outcome(versionId, sourceDigest, status);
         } catch (SnapshotFailure failure) { throw failure; }
-        catch (Exception failure) { throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE"); }
+        catch (Exception failure) { throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE", failure); }
     }
     @Override public Outcome outcome(UUID id, String sourceDigest, String status) {
         try {
@@ -224,6 +245,31 @@ public final class LocalVolumeSnapshotStore implements SnapshotStore {
             return decode(bytes);
         } catch (SnapshotFailure failure) { throw failure; }
         catch (Exception failure) { throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE"); }
+    }
+    @Override public byte[] readArtifact(UUID id, String sourceDigest, String path) {
+        artifactPath(path);
+        var outcome=outcome(id,sourceDigest,"VERIFIED");
+        var entry=outcome.artifact().files().stream().filter(f->f.path().equals(path)).findFirst()
+                .orElseThrow(()->new SnapshotFailure("SNAPSHOT_FILE_NOT_FOUND"));
+        try {
+            byte[] bytes=read(version(id).resolve("outcome/artifact").resolve(path),32*1024*1024);
+            if(bytes.length!=entry.bytes() || !hash(bytes).equals(entry.digest())) throw new SnapshotFailure("SNAPSHOT_DIGEST_MISMATCH");
+            return bytes;
+        } catch(SnapshotFailure failure) {throw failure;}
+        catch(Exception failure) {throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE");}
+    }
+    @Override public Map<String,byte[]> artifactBytes(UUID id,String sourceDigest) {
+        // One manifest scan, then validate each exact file again while reading. Bounded to the existing 32 MiB quota.
+        var outcome=outcome(id,sourceDigest,"VERIFIED");var result=new LinkedHashMap<String,byte[]>();
+        try {
+            for(var entry:outcome.artifact().files()) {
+                byte[] bytes=read(version(id).resolve("outcome/artifact").resolve(entry.path()),32*1024*1024);
+                if(bytes.length!=entry.bytes() || !hash(bytes).equals(entry.digest())) throw new SnapshotFailure("SNAPSHOT_DIGEST_MISMATCH");
+                result.put(entry.path(),bytes);
+            }
+            return Collections.unmodifiableMap(result);
+        } catch(SnapshotFailure failure) {throw failure;}
+        catch(Exception failure) {throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE");}
     }
     @Override public JsonNode componentMapping(UUID id,String digest) {
         // Verify original immutable source/outcome/artifact before trusting this sidecar.
