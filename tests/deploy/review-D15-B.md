@@ -32,14 +32,15 @@ https://github.com/Echo-love928/CodeLess/pull/46#pullrequestreview-5563127639 �
 4. 独立worktree `F:/r46` / 6d55d55：infra定向20/20、契约与OpenAPI exit0、publisher+contracts7/7、web deploy17/17、
    Linux worker在`python:3.12-slim --network none`只读挂载8/8、hosting1/1 exit0、verify:e2e 56/56 exit0。
 5. 首轮hosting exit1：本机`where git`先返回mingw64，fixture推导的openssl不存在，托管断言未执行；
-   PATH前置Git\cmd后另轮通过，未改代码，原失败保留在independent-commands.json。
+   PATH前置Git\cmd后另轮通过，未改代码。该首轮及JDK26 enforcer失败（exit1，测试未启动）的原日志已被下一轮覆盖，
+   independent-commands.json只保留命令、退出码和摘要，没有日志sha256。
 6. verify:api（Temurin21）232项8失败exit1：openssl 3项、PreviewAcceptanceProcessTest 5项root stopped。
    base main工作树`F:/rmain`/572304e以相同信息复现；PATH修复后EditLifecycle15/15、EditVerification7/7、PreviewPlatform1/1，
    PAP仍稳定5失败，supervisor记录WINDOWS_JOB complete=true remaining=0，判断为本机Windows时序，非PR46引入；远端CI api通过。
 7. 公网`d9f35ba…sites.codeless-publish.top`：`/`与`/tasks` 200，缺失JS、`/src/main.ts`、`/src/`、`/assets/`、
    `/.git/config`、`/package.json`均404，`/tasks/42` 404符合固定路由设计；该运行包早于6d55d55（建议2）。
 8. 证据：`tests/deploy/evidence/2026-10-18/review-b-6d55d55/`，含命令/exit/日志sha256、精确checks、公网探测和批准URL。
-   私有完整日志在审查后已清理，仅保留摘要。
+   其余7份私有完整日志在记录sha256后已清理，仅保留摘要与hash；上述2轮历史失败无日志hash。
 
 ## 2026-10-15 修复复审（历史结论）
 

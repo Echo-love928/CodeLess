@@ -13,7 +13,9 @@ import tools.jackson.databind.json.JsonMapper;
 public final class DeploymentRecords {
     public record Binding(UUID id, UUID applicationId, UUID versionId, UUID ownerId, UUID buildId,
                           String sourceDigest, String artifactDigest, String reportDigest) {}
-    public record Event(String phase, Instant at, String failureCode) {}
+    public record Event(String phase, Instant at,
+                        @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS)
+                        String failureCode) {}
     private final Path root;
     private final JsonMapper json=JsonMapper.builder().build();
     public DeploymentRecords(Path root) {this.root=root.toAbsolutePath().normalize();}

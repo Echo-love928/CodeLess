@@ -124,6 +124,36 @@ class PublicationIntegrationTest {
         var r=post(body(ready,digest),key(),login,true);assertThat(r.statusCode()).as(r.body()).isEqualTo(202);
         assertThat(r.headers().firstValue("Cache-Control")).contains("no-store");return UUID.fromString(json.readTree(r.body()).path("id").asText());
     }
+    void assertDeploymentHttp(UUID id,String phase,UUID latestSuccessful) throws Exception {
+        var response=get("publications/"+id+"/deployment",login);
+        assertThat(response.statusCode()).as(response.body()).isEqualTo(200);
+        var value=json.readTree(response.body());
+        assertThat(value.propertyNames()).containsExactlyInAnyOrder("publication","phase","sourceDigest","artifactDigest",
+                "reportDigest","history","failureCode","latestSuccessful");
+        assertThat(value.path("publication").path("id").asText()).isEqualTo(id.toString());
+        assertThat(value.path("publication").path("status").asText()).isEqualTo(switch(phase) {
+            case "PREPARING" -> "REQUESTED";case "SUCCEEDED" -> "PUBLISHED";case "FAILED" -> "FAILED";
+            default -> throw new IllegalArgumentException("Unexpected HTTP test phase");
+        });
+        assertThat(value.path("phase").asText()).isEqualTo(phase);
+        assertThat(value.path("sourceDigest").asText()).isEqualTo(source);
+        assertThat(value.path("artifactDigest").asText()).isEqualTo(digest);
+        assertThat(value.path("reportDigest").asText()).matches("sha256:[a-f0-9]{64}");
+        if("FAILED".equals(phase)) assertThat(value.get("failureCode").asText()).matches("[A-Z][A-Z0-9_]{1,100}");
+        else assertThat(value.get("failureCode").isNull()).isTrue();
+        if(latestSuccessful==null) assertThat(value.get("latestSuccessful").isNull()).isTrue();
+        else assertThat(value.get("latestSuccessful").path("id").asText()).isEqualTo(latestSuccessful.toString());
+        var history=value.path("history");
+        assertThat(history.isArray()).isTrue();assertThat(history.size()).isBetween(1,4);
+        assertThat(history.get(history.size()-1).path("phase").asText()).isEqualTo(phase);
+        for(var event:history) {
+            assertThat(event.propertyNames()).containsExactlyInAnyOrder("phase","at","failureCode");
+            assertThat(event.path("at").asText()).satisfies(at->assertThatCode(()->Instant.parse(at)).doesNotThrowAnyException());
+            if("FAILED".equals(event.path("phase").asText()))
+                assertThat(event.get("failureCode")).isEqualTo(value.get("failureCode"));
+            else assertThat(event.get("failureCode").isNull()).isTrue();
+        }
+    }
     void report(String name,Object value) throws Exception {
         Path root=Path.of(System.getenv().getOrDefault("CODELESS_DEPLOY_EVIDENCE_DIR","target/deploy-integration/evidence"));
         Files.createDirectories(root);Files.writeString(root.resolve(name+".json"),json.writeValueAsString(value));
@@ -151,6 +181,13 @@ class PublicationIntegrationTest {
     }
     @BeforeEach void reset() {hosting.mode="PASS";hosting.entered=null;hosting.release=null;}
     @Test @Order(1) void d15aT1RejectsDraftFailureUnauthorizedAndWrongArtifact() throws Exception {
+        var empty=get("applications/"+app+"/publications",login);
+        assertThat(empty.statusCode()).isEqualTo(200);
+        var discovery=json.readTree(empty.body());
+        assertThat(discovery.path("items").isArray()).isTrue();
+        assertThat(discovery.path("items").size()).isZero();
+        assertThat(discovery.has("latestSuccessful")).isTrue();
+        assertThat(discovery.get("latestSuccessful").isNull()).isTrue();
         var results=new LinkedHashMap<String,Integer>();
         for(UUID version:List.of(shell,failed)) {var r=post(body(version,digest),key(),login,true);assertThat(r.statusCode()).isEqualTo(409);results.put(version.equals(shell)?"DRAFT":"FAILED",r.statusCode());}
         for(var test:List.of(Map.entry("ANONYMOUS",401),Map.entry("OTHER_OWNER",404),Map.entry("CSRF",403),Map.entry("WRONG_DIGEST",409))) {
@@ -162,6 +199,7 @@ class PublicationIntegrationTest {
     }
     @Test @Order(2) void d15aT2ConcurrentDraftEditingDoesNotChangePayload() throws Exception {
         UUID id=request();var before=snapshots.outcome(ready,source,"VERIFIED");
+        assertDeploymentHttp(id,"PREPARING",null);
         hosting.entered=new CountDownLatch(1);hosting.release=new CountDownLatch(1);
         try(var pool=Executors.newSingleThreadExecutor()) {
             var work=pool.submit(()->publications.process(id));
@@ -186,6 +224,7 @@ class PublicationIntegrationTest {
         var payload=hosting.payloads.get(id);assertThat(payload.versionId()).isEqualTo(ready);assertThat(payload.artifactDigest()).isEqualTo(digest);
         for(var asset:payload.assets()) assertThat(asset.bytes()).isEqualTo(snapshots.readArtifact(ready,source,asset.path()));
         var deployment=publications.deployment(owner,id);assertThat(deployment.phase()).isEqualTo("SUCCEEDED");successful=id;
+        assertDeploymentHttp(id,"SUCCEEDED",id);
         report("D15-A-T2",Map.of("deployment",deployment,"concurrentDraftChanged",true,"frozenPayloadUnchanged",true,"modelDeployTool","FAILED / FILE_TOOL_UNKNOWN","hostingProvider","explicit-fixture-not-public-hosting"));
     }
     @Test @Order(3) void d15aT3ConcurrentClicksAndReplayCreateOneLogicalPublication() throws Exception {
@@ -211,6 +250,7 @@ class PublicationIntegrationTest {
         for(String mode:List.of("FAIL","UNKNOWN","WRONG_VERSION","WRONG_DIGEST","UNAVAILABLE","PRIVATE_URL")) {
             hosting.mode=mode;UUID id=request();publications.process(id);publications.process(id);
             var d=publications.deployment(owner,id);assertThat(d.phase()).isEqualTo("FAILED");assertThat(d.publication().url()).isNull();
+            assertDeploymentHttp(id,"FAILED",successful);
             assertThat(d.latestSuccessful().id()).isEqualTo(successful);assertThat(d.latestSuccessful().url()).isEqualTo(previous.url());
             assertThat(artifacts.findPublication(successful).orElseThrow()).isEqualTo(previous);assertThat(hosting.publishes.get(id)).isEqualTo(1);
             failedCases.add(Map.of("fixtureMode",mode,"deployment",d));
