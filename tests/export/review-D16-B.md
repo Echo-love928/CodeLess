@@ -111,3 +111,6 @@ https://github.com/Echo-love928/CodeLess/pull/49#pullrequestreview-5572416771 �
 
 **无阻塞问题，可以批准（Approve）**，以 B 当前 HEAD `4765062` 为准。合并仍需：双方 PR 各自获得非作者批准、同步最新 main 后全部必需检查 success、
 无未解决讨论；最后启用 PR 负责共享 OpenAPI/静态门禁登记以及公开地址 + 封面 + 源码包的真实联调。
+
+已于 2026-10-19T14:53:26Z 以 yuanqizuimeng 身份在 PR #49 提交 APPROVED（commit `4765062`，正文为本「复审」节，相对链接换成 `6b98d80` 固定链接）：
+https://github.com/Echo-love928/CodeLess/pull/49#pullrequestreview-5573425353 。此前对 `4d99ea0` 的 CHANGES_REQUESTED 保留在 PR 历史中。
