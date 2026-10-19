@@ -1,0 +1,141 @@
+{
+  "card": "D16-A re-review of D16-B fix",
+  "pullRequest": "https://github.com/Echo-love928/CodeLess/pull/49",
+  "reviewedHead": "4765062761352ec88821cc50ddabe2682eb94ed8",
+  "previousHead": "4d99ea0ce2de2c767dfbdd16a8530a8e5e4877f9",
+  "method": "read-only detached worktree; locked node_modules via junctions (removed afterwards); no B file changed; interop test copied only into a temporary A worktree that was removed",
+  "environment": "Windows 11, Node 24.16.0, Temurin 21.0.12.1, Docker Desktop 29.8.2, bundled Playwright Chromium, model provider deterministic-mock",
+  "privateLogs": ".local-data/d16-a/review-b-4765062/",
+  "runs": [
+    {
+      "name": "unit",
+      "command": "apps/web: node node_modules/vitest/vitest.mjs run src/features/source src/features/deploy",
+      "exitCode": 0,
+      "result": "76/76",
+      "logSha256": "sha256:917b34a4b3cb15e5d0471060a329c8210eaf8a884c99068055345408365e7493"
+    },
+    {
+      "name": "lint",
+      "command": "apps/web: node node_modules/eslint/bin/eslint.js src vite.config.ts vitest.config.ts playwright.config.ts playwright.real-auth.config.ts",
+      "exitCode": 0,
+      "result": "0 problems",
+      "logSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "vitest-all",
+      "command": "apps/web: node node_modules/vitest/vitest.mjs run",
+      "exitCode": 0,
+      "result": "147/147",
+      "logSha256": "sha256:14c63fc673090ab708dcdfd596114d85693de4ae9bc8030d0b8ac2a8b2b533ce"
+    },
+    {
+      "name": "typecheck",
+      "command": "apps/web: node node_modules/vue-tsc/bin/vue-tsc.js --noEmit",
+      "exitCode": 0,
+      "result": "pass",
+      "logSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "build",
+      "command": "apps/web: node node_modules/vite/bin/vite.js build",
+      "exitCode": 0,
+      "result": "pass",
+      "logSha256": "sha256:cc3410063bc7643547d932187722fe797f1ef499b47287b75fbc715478a4dacf"
+    },
+    {
+      "name": "browser-share",
+      "command": "apps/web: node node_modules/@playwright/test/cli.js test --config playwright.config.ts share/flow.spec.ts share/screenshot.spec.ts",
+      "exitCode": 0,
+      "result": "3/3",
+      "logSha256": "sha256:928b7e32c1749cbe4ad7b6503cf0201d63c896dbee2d5b843c58250782293ed8"
+    },
+    {
+      "name": "screenshot",
+      "command": "node --test tests/e2e/share/screenshot.acceptance.mjs",
+      "exitCode": 1,
+      "result": "6/7: \"real stdio worker is forcibly bounded\" got cleanupConfirmed=false (unchanged code; Windows taskkill race)",
+      "logSha256": "sha256:1cb877850584ea02e84d3580cf6a609fca614a59561a872b0006881580ac7102"
+    },
+    {
+      "name": "queue",
+      "command": "node --test tests/e2e/share/queue.acceptance.mjs",
+      "exitCode": 0,
+      "result": "4/4",
+      "logSha256": "sha256:30b8768b640e0f043726a752f06bd264b1314eb1d41b19f942f4483e9692b1a4"
+    }
+  ],
+  "diagnosticReruns": [
+    {
+      "name": "screenshot-rerun-2",
+      "command": "node --test tests/e2e/share/screenshot.acceptance.mjs",
+      "purpose": "diagnosis only; the failing run above is kept",
+      "result": "7/7",
+      "logSha256": "sha256:6819c2722f6e55fbb30e5208258976fdac4382c9636994bcebcd73b15c22d8ae"
+    },
+    {
+      "name": "screenshot-rerun-3",
+      "command": "node --test tests/e2e/share/screenshot.acceptance.mjs",
+      "purpose": "diagnosis only; the failing run above is kept",
+      "result": "7/7",
+      "logSha256": "sha256:cdbd0dcbbaf0f9cb7b41342efdfcbea66f5a78297a1a2bde02528f631356f2d2"
+    },
+    {
+      "name": "screenshot-rerun-4",
+      "command": "node --test tests/e2e/share/screenshot.acceptance.mjs",
+      "purpose": "diagnosis only; the failing run above is kept",
+      "result": "7/7",
+      "logSha256": "sha256:e35a5aa4a25645dffdb1542412726ad73e28695c2644ce7405ece785f80a295f"
+    },
+    {
+      "name": "screenshot-rerun-5",
+      "command": "node --test tests/e2e/share/screenshot.acceptance.mjs",
+      "purpose": "diagnosis only; the failing run above is kept",
+      "result": "7/7",
+      "logSha256": "sha256:450f68aab8e7d07a2e2ed79dede714b2335a607cf641e8a430eebf53da32ba3e"
+    }
+  ],
+  "liveInterop": {
+    "name": "live-interop",
+    "aHead": "9dd67238ab96509625db18076d31c9c37a013526",
+    "bHead": "4765062761352ec88821cc50ddabe2682eb94ed8",
+    "command": "temporary detached A worktree @9dd6723 + B tests/e2e/share/fixtures/BSourceExportInteropTest.java copied (not committed): services\\api\\mvnw.cmd -f services/api/pom.xml -Dtest=BSourceExportInteropTest test",
+    "exitCode": 0,
+    "result": "Tests run: 6, Failures: 0, Errors: 0, Skipped: 0",
+    "logSha256": "sha256:80a5ee64364a93a12715790a30cfb40e85d6d479891835f41c776359746922dc",
+    "report": {
+      "status": "PASSED",
+      "transport": "REAL_A_HTTP_STREAM",
+      "adapter": "B production TypeScript bundled without mocks",
+      "versionId": "bfc3bfd8-c98b-4202-801e-5dfe437f6099",
+      "applicationId": "b93bcc33-bbbb-4a9c-8d12-52b08c423140",
+      "sourceDigest": "sha256:2239f682cdf36d1fccd9adb61fe0c64736730a0d33191ec3364b09316179b9e9",
+      "bytes": 21089,
+      "archiveDigest": "sha256:cc3b6a4217e825355ca56c308852baa839aa29e5d351a3b70c64fdfeffc148ae",
+      "filename": "codeless-bfc3bfd8-c98b-4202-801e-5dfe437f6099.zip",
+      "responseHeaders": {
+        "content-type": "application/zip",
+        "x-codeless-artifact-digest": "sha256:b8dbdd171ae24971d102cbde17a1a41a80c55d147d8b774800a6b9ceace57f87",
+        "x-codeless-content-digest": "sha256:4b21673e1db1033a89658f73778ea8396a9dbce0e25fdfd41913347fde5f8a6d",
+        "x-codeless-source-digest": "sha256:2239f682cdf36d1fccd9adb61fe0c64736730a0d33191ec3364b09316179b9e9",
+        "x-codeless-version-id": "bfc3bfd8-c98b-4202-801e-5dfe437f6099"
+      },
+      "contentLengthAbsent": true,
+      "matchesDirectOwnerExport": true,
+      "requests": [
+        {
+          "path": "/api/v0/versions/bfc3bfd8-c98b-4202-801e-5dfe437f6099/export",
+          "status": 200
+        },
+        {
+          "path": "/api/v0/versions/bfc3bfd8-c98b-4202-801e-5dfe437f6099/export",
+          "status": 404
+        },
+        {
+          "path": "/api/v0/versions/bfc3bfd8-c98b-4202-801e-5dfe437f6099/export",
+          "status": 401
+        }
+      ],
+      "localDraftFailedInvalidRejectedWithoutRequest": true
+    }
+  }
+}

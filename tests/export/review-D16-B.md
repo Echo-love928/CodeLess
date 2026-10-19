@@ -70,3 +70,44 @@
 
 已于 2026-10-19T13:40:58Z 以 yuanqizuimeng 身份在 PR #49 提交 CHANGES_REQUESTED（commit `4d99ea0`）：
 https://github.com/Echo-love928/CodeLess/pull/49#pullrequestreview-5572416771 。
+
+---
+
+## 复审：修复提交 `4765062`（2026-10-19，当前结论）
+
+范围：只复查 `4d99ea0..4765062` 的 1 个提交（30 个文件）及受影响范围。base 仍为 `main` `03c7905`，B 未改 D16-A 文件或 main。
+证据：[review-b-4765062/commands.json](evidence/2026-10-19/review-b-4765062/commands.json)、[pr49-checks.json](evidence/2026-10-19/review-b-4765062/pr49-checks.json)。
+
+### 阻塞问题
+
+无。原阻塞问题 1 已关闭：
+- `export-api.ts` 改为 `/api/v0/versions/{id}/export`，只校验 `Content-Type: application/zip`、`X-CodeLess-Version-Id`、`X-CodeLess-Source-Digest`，
+  不再要求 `Content-Length`、应用 ID 头或 ZIP 字节摘要；保留流式 16 MiB 上限（超限 cancel）与 `PK\x03\x04` 校验；文件名与 A 的 `Content-Disposition` 一致。
+- 单测改用 A 的真实 ZIP（SHA 固定）与真实头部，逐项覆盖头部缺失/错误、空/截断/非 ZIP、超限、流中断与全部错误码；删除的断言只针对已作废的自定义头部，不是削弱。
+- **A 独立实测真实联调**：在 A 最新 HEAD `9dd6723`（含 P2 修复）的临时 worktree 中放入 B 的开发用 `BSourceExportInteropTest`（未提交，用后删除），
+  `mvnw -Dtest=BSourceExportInteropTest test` 6/6、exit 0：B 未 mock 的生产适配器经真实会话 HTTP 流下载，字节与直接 owner 导出相同、无 `Content-Length`，
+  其他 owner 404、匿名 401，DRAFT/FAILED/非法 ID 不发请求；报告不含 cookie。
+
+### 建议（非阻塞）
+
+1. 截图验收 `real stdio worker is forcibly bounded and its process tree is reclaimed`（`tests/e2e/share/screenshot.acceptance.mjs:140-143`）在本机
+   5 次中失败 1 次：`cleanupConfirmed` 为 false。该测试与 `capture.mjs`/`worker.mjs` 本次未改；与 B 交接记录的 Windows taskkill 竞态一致（worker 越过
+   BROWSER_STARTING 后自行退出、taskkill 报 PID 不存在时按设计判为“未确认”）。生产行为是保守的（不重试），但 `share/screenshot.spec.ts` 在 verify:e2e 中运行它，
+   偶发失败会让门禁变红。建议让该用例在父级截止前不可能自行退出，或只在有 taskkill 128 与 browserClosed 证据时接受“已回收”，使结果确定。
+2. 按最旧 `completedAt` 淘汰可能移除长期未更新应用的“最近成功”部署封面（README 已说明会显示占位图）。可考虑优先淘汰已被同应用更新部署取代的封面。
+3. `BSourceExportInteropTest` 继承 A 的测试类并使用其包内字段（`port`、`login`、`other`、`ready`）；A 若重命名需同步该开发工具。
+
+### 已核验内容
+
+- 原建议 1–4 已处理：DRAFT/FAILED 按钮禁用并说明原因，`exportSource` 本地拒绝且不发请求，状态变化作废迟到下载；409/503 按 A 的错误码分别提示；
+  终态封面按最旧淘汰（只删队列根下的直接子目录，删除前核验成员，从不淘汰进行中或正在运行的任务，图片读取与淘汰串行）；
+  离线锁恢复 `recover-lock.mjs` 必须显式 `--workers-stopped`，PID 存活或无法确认、跨主机、锁内容/inode 变化时一律拒绝。建议 5：B 原始失败记录保留（交接 +37/−0）。
+- A 本机复测（B 精确 HEAD `4765062`）：前端 source/deploy 76/76、全部 147/147、lint/typecheck/生产构建通过、Playwright `share/*` 3/3、
+  队列验收 4/4；截图验收首轮 6/7（见建议 1），诊断性复跑 4 次均 7/7（不覆盖首轮失败）。
+- 范围：仍仅 `apps/web/src/features/{deploy,source}`、`services/runner/src/screenshot`、`tests/e2e/share`、`docs/handoffs/D16-B.md`；新增行无秘密、cookie 或用户目录。
+- 远端：`4765062` 六项检查全部 success（[run 39267143514](https://github.com/Echo-love928/CodeLess/actions/runs/39267143514)，含 verify:api、verify:e2e 与 ci-gate）。
+
+### 结论
+
+**无阻塞问题，可以批准（Approve）**，以 B 当前 HEAD `4765062` 为准。合并仍需：双方 PR 各自获得非作者批准、同步最新 main 后全部必需检查 success、
+无未解决讨论；最后启用 PR 负责共享 OpenAPI/静态门禁登记以及公开地址 + 封面 + 源码包的真实联调。
