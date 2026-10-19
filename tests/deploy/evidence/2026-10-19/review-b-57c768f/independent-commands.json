@@ -1,0 +1,43 @@
+[
+  {
+    "mode": "python-ast",
+    "command": ["python", "-I", "-c", "ast.parse(...)", "infra/public/*.py"],
+    "worktree": "F:/r46b @ 57c768fea4352376babd80ce14ff1ca1b91a54e5",
+    "exitCode": 0,
+    "status": "PASSED",
+    "summary": ["all infra/public Python files parsed"]
+  },
+  {
+    "mode": "infra-all",
+    "command": ["node", "--test", "tests/infra/*.test.mjs"],
+    "worktree": "F:/r46b @ 57c768fea4352376babd80ce14ff1ca1b91a54e5",
+    "exitCode": 1,
+    "status": "NOT_EVALUATED",
+    "summary": ["exploratory full glob; output was not captured and the cause was not investigated"],
+    "note": "Not used as evidence. The same targeted set as the 6d55d55 review was run next; CI infra-preflight passed."
+  },
+  {
+    "mode": "infra-targeted",
+    "command": ["node", "--test", "tests/infra/{site-policy,publication-config,publication-permissions,public-deployment,public-acceptance-checkpoint,publish,maven-wrapper}.test.mjs"],
+    "worktree": "F:/r46b @ 57c768fea4352376babd80ce14ff1ca1b91a54e5",
+    "exitCode": 0,
+    "status": "PASSED",
+    "summary": ["tests 20", "pass 20", "fail 0"]
+  },
+  {
+    "mode": "linux-worker",
+    "command": ["docker", "run", "--rm", "--network", "none", "python:3.12-slim", "python3", "tests/infra/public-worker.test.py"],
+    "worktree": "F:/r46b @ 57c768fea4352376babd80ce14ff1ca1b91a54e5 (infra and tests/infra mounted read-only)",
+    "exitCode": 0,
+    "status": "PASSED",
+    "summary": ["Ran 8 tests", "OK"]
+  },
+  {
+    "mode": "public-probe",
+    "command": ["curl", "-m", "60", "https://d9f35ba94b79e8fb89361da2498b8dbf5.sites.codeless-publish.top/"],
+    "worktree": "local machine",
+    "exitCode": 28,
+    "status": "NOT_VERIFIED",
+    "summary": ["DNS answered by local proxy fake-IP 198.18.0.183", "all attempts timed out; public site not independently re-checked in this review"]
+  }
+]

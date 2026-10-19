@@ -1,6 +1,43 @@
 # D15-B 只读互审
 
-## 2026-10-18 集成PR46审查（当前结论）
+## 2026-10-19 集成PR46增量复审（当前结论）
+
+候选为[PR46](https://github.com/Echo-love928/CodeLess/pull/46)的
+`57c768fea4352376babd80ce14ff1ca1b91a54e5`，base仍572304e。只审6d55d55之后1个提交、10个文件；没有修改B源码。
+该候选六项checks均completed/success：[实际run39138756072](https://github.com/Echo-love928/CodeLess/actions/runs/39138756072)。
+已用非作者身份yuanqizuimeng对精确HEAD提交APPROVED：
+https://github.com/Echo-love928/CodeLess/pull/46#pullrequestreview-5568804778 。PR46仍draft，未合并。
+
+### 阻塞问题
+
+- 无阻塞问题。
+
+### 建议
+
+1. 上轮建议3、4仍未处理：`validate-contract.mjs:19`仍输出"pending registration"；
+   `docs/deployment/D15-public-domains-2026-10-17.md:14`仍含SSH用户名和服务器IP。
+2. 发布核对只覆盖源码清单内文件，服务器repository中多出的文件无法发现，建议同时比对文件集合。
+3. 新一轮公网验收证据只在B本机`.local-data`和服务器上，建议提交不含凭据的公开摘要以便独立核对。
+4. 原验收脚本三次超时根因确认后补记交接。
+
+### 已核验内容
+
+1. 上轮建议1已关闭：`install-runtime.py`将`publication/sites`改为worker:ipc 0755；API去掉sites的`ReadWritePaths`，
+   API与preview均`ReadOnlyPaths=/srv/codeless/publication`。`NodeDeploymentGateway`改为要求可读；
+   生产`CODELESS_NODE_EXECUTABLE=worker-client.py`，写入经受信worker IPC，API只读不影响发布。
+2. 新POSIX回归将目录设为0555后验证网关bean可启动；CI日志确认在Linux非root执行：
+   PublicationGatewayConfigurationTest 4/4，API全量232/232、BUILD SUCCESS。
+3. `check-publication-permissions.py`同时检查宿主DAC与运行中API/preview MainPID的mount namespace，
+   创建/覆盖/unlink/rename均须拒绝，worker正向写删通过；只操作不可路由的点前缀canary，已有发布只读扫描。
+4. 上轮建议2已关闭：`run-acceptance.py`、`check-final.py`必须显式`--run-id`、`--commit-sha`，拒绝已存在run目录，
+   运行前后按源码清单逐文件核对SHA256与JAR hash，结果写入`deployedCommit`/`freshRun`。
+5. 独立worktree `F:/r46b` / 57c768f：infra定向20/20 exit0，Linux worker在`python:3.12-slim --network none`只读挂载8/8，
+   `infra/public/*.py` AST全部通过。另有一次全量`tests/infra/*.test.mjs`探索性运行exit1，输出未保存、未分析，不作为证据。
+   本轮命令输出未保存为文件，没有日志sha256。
+6. 未独立核验：本机DNS被代理接管（fake-IP 198.18.0.183），公网站点多次超时；B的新一轮服务器与外部观测验收结果依据B说明。
+7. 证据：`tests/deploy/evidence/2026-10-19/review-b-57c768f/`，含命令/exit、精确checks与CI日志摘录、批准URL。
+
+## 2026-10-18 集成PR46审查（历史结论）
 
 候选为[PR46](https://github.com/Echo-love928/CodeLess/pull/46)的
 `6d55d55b70d71bf8c8828e16154ad4314a5111de`，base仍572304e，A源4ea141a、B源33b3b60。
