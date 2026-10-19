@@ -67,3 +67,6 @@
 **暂不批准（Request changes）**。截图隔离、绑定与失败保留符合卡片四项中的前三项；下载按钮必须先与已存在的 D16-A 契约对齐，
 才能满足第四项并进入当天联调。作者修复后只复查 `export-api.ts`、`SourceDownload.vue`、对应测试与受影响范围，按仓库规则再决定是否批准；
 不自批 A 的 PR，不合并。
+
+已于 2026-10-19T13:40:58Z 以 yuanqizuimeng 身份在 PR #49 提交 CHANGES_REQUESTED（commit `4d99ea0`）：
+https://github.com/Echo-love928/CodeLess/pull/49#pullrequestreview-5572416771 。
