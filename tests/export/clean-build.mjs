@@ -3,6 +3,7 @@
 // npm cache or repository files are visible; the extracted project is mounted read-only and copied inside.
 // This is a developer/test tool that emulates a user's clean machine. It is not a platform runtime capability.
 // Usage: node tests/export/clean-build.mjs <zip> <new-work-dir> [--expect-artifact-digest D] [--crlf-template-diagnostic]
+// Exit: 0 built (and, with --expect-artifact-digest, reproduced); 3 built but not reproduced; 1 build failed.
 // --crlf-template-diagnostic is not an acceptance mode: inside the container copy it rewrites TEMPLATE/TEMPLATE_DEFAULT
 // files the way a Windows core.autocrlf checkout presents them, to explain an artifact built by a Windows-built image.
 import { spawnSync } from 'node:child_process'
@@ -77,11 +78,14 @@ const report = {
   distIndexHtml: built, distFiles: distManifest?.files.length ?? 0, distDigest: distManifest?.digest ?? null,
   expectedArtifactDigest: expectedArtifact ?? null,
   artifactReproduced: expectedArtifact ? distManifest?.digest === expectedArtifact : null,
+  // Build success and artifact reproduction are separate results; see the exit code below.
+  reproduction: !expectedArtifact ? 'NOT_REQUESTED' : distManifest?.digest === expectedArtifact ? 'REPRODUCED' : 'NOT_REPRODUCED',
   logDigest: sha(logBytes), log: relative(target, logFile)
 }
 writeFileSync(join(target, 'clean-build.json'), JSON.stringify(report, null, 2) + '\n')
-console.log(JSON.stringify({ status: report.status, exitCode: report.exitCode, distDigest: report.distDigest, artifactReproduced: report.artifactReproduced }))
-process.exitCode = report.status === 'PASSED' ? 0 : 1
+console.log(JSON.stringify({ status: report.status, exitCode: report.exitCode, distDigest: report.distDigest, reproduction: report.reproduction }))
+// 0: built (and reproduced when an expected digest was given); 3: built but the requested reproduction failed; 1: build failed.
+process.exitCode = report.status !== 'PASSED' ? 1 : report.reproduction === 'NOT_REPRODUCED' ? 3 : 0
 
 function walk(base, current = base, files = []) {
   for (const name of readdirSync(current).sort()) {

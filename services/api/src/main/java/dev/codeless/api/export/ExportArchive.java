@@ -18,7 +18,13 @@ final class ExportArchive {
     static final int MAX_ENTRIES = 64;
     static final int MAX_ENTRY_BYTES = 1024 * 1024;
     static final long MAX_TOTAL_BYTES = 4L * 1024 * 1024;
+    /**
+     * Backstop only: the input bounds above keep every valid archive far below it (pinned by a regression test with
+     * maximal incompressible input and the longest names), so it can never truncate a stream after the first byte.
+     */
     static final long MAX_ARCHIVE_BYTES = 8L * 1024 * 1024;
+    /** Member path bound equals the frozen-source path bound, so every stored path can be exported in full. */
+    static final int MAX_PATH_BYTES = 240, MAX_ROOT_BYTES = 64, MAX_NAME_BYTES = MAX_ROOT_BYTES + 1 + MAX_PATH_BYTES;
     static final int FILE_MODE = 0100644;
     private static final int VERSION = 20, MADE_BY_UNIX = (3 << 8) | VERSION, UTF8 = 0x0800, DEFLATED = 8;
 
@@ -29,7 +35,7 @@ final class ExportArchive {
      * hidden segments (.env, .npmrc, .git) and dependency folders even if a caller's allowlist regressed.
      */
     static void path(String path) {
-        if (path == null || path.isEmpty() || path.length() > 240 || !path.matches("[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*"))
+        if (path == null || path.isEmpty() || path.length() > MAX_PATH_BYTES || !path.matches("[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*"))
             throw new ExportFailure("EXPORT_PATH_REJECTED");
         for (String part : path.split("/", -1))
             if (part.startsWith(".") || part.endsWith(".") || part.equalsIgnoreCase("node_modules")
@@ -37,14 +43,19 @@ final class ExportArchive {
                 throw new ExportFailure("EXPORT_PATH_REJECTED");
     }
 
-    /** Validates the complete member set before the first byte is written, so failures never yield a partial ZIP. */
+    /**
+     * Validates the complete member set, including every full stored name, before the first byte is written,
+     * so failures never yield a partial ZIP. Names are ASCII by construction, so characters equal bytes.
+     */
     static void check(String root, List<Entry> entries) {
         path(root);
-        if (root.contains("/") || entries.isEmpty() || entries.size() > MAX_ENTRIES) throw new ExportFailure("EXPORT_LIMIT_EXCEEDED");
+        if (root.contains("/") || root.length() > MAX_ROOT_BYTES) throw new ExportFailure("EXPORT_PATH_REJECTED");
+        if (entries.isEmpty() || entries.size() > MAX_ENTRIES) throw new ExportFailure("EXPORT_LIMIT_EXCEEDED");
         var names = new HashSet<String>();
         long total = 0;
         for (var entry : entries) {
             path(entry.path());
+            if (root.length() + 1 + entry.path().length() > MAX_NAME_BYTES) throw new ExportFailure("EXPORT_PATH_REJECTED");
             if (!names.add(entry.path().toLowerCase(Locale.ROOT))) throw new ExportFailure("EXPORT_PATH_REJECTED");
             if (entry.bytes().length > MAX_ENTRY_BYTES) throw new ExportFailure("EXPORT_LIMIT_EXCEEDED");
             total += entry.bytes().length;
@@ -61,12 +72,14 @@ final class ExportArchive {
     /** Writes entries in the given order; returns archive bytes written. Each member is compressed just before it is sent. */
     static long write(OutputStream target, String root, List<Entry> entries, LocalDateTime modified) throws IOException {
         check(root, entries);
+        // Encode every stored name up front: nothing past this point validates input.
+        var encoded = entries.stream().map(e -> (root + "/" + e.path()).getBytes(StandardCharsets.US_ASCII)).toList();
         var out = new Counter(target);
         int time = dosTime(modified), date = dosDate(modified);
         var central = new ByteArrayOutputStream();
-        for (var entry : entries) {
-            byte[] name = (root + "/" + entry.path()).getBytes(StandardCharsets.US_ASCII);
-            if (name.length > 255) throw new ExportFailure("EXPORT_PATH_REJECTED");
+        for (int index = 0; index < entries.size(); index++) {
+            var entry = entries.get(index);
+            byte[] name = encoded.get(index);
             var crc = new CRC32(); crc.update(entry.bytes());
             byte[] data = deflate(entry.bytes());
             long offset = out.count;

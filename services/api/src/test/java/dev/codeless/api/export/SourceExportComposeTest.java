@@ -79,6 +79,26 @@ class SourceExportComposeTest {
         Files.write(target.resolve("compose.zip"), out.toByteArray());
     }
 
+    /** D16-B review P2: every path the frozen store accepts (≤240) is exported completely under the real root. */
+    @Test void longestStoredSourcePathsComposeAndStreamCompletely() throws Exception {
+        String reported = "src/pages/" + "A".repeat(210) + ".vue", longest = "src/components/" + "B".repeat(221) + ".vue";
+        assertThat(reported).hasSize(224);
+        assertThat(longest).hasSize(240);
+        var source = new TreeMap<String, byte[]>();
+        for (String path : List.of(reported, longest)) {
+            dev.codeless.api.versions.LocalVolumeSnapshotStore.sourcePath(path); // accepted by the frozen store
+            source.put(path, "<template><p>long</p></template>\n".getBytes(StandardCharsets.UTF_8));
+        }
+        var export = SourceExportService.compose(identity(source), source, new ExportTemplate(REPOSITORY).load());
+        var out = new ByteArrayOutputStream();
+        assertThat(ExportArchive.write(out, export.root(), export.entries(), export.modified())).isEqualTo(out.size());
+        var names = new ArrayList<String>();
+        try (var zip = new ZipInputStream(new ByteArrayInputStream(out.toByteArray()))) {
+            for (var e = zip.getNextEntry(); e != null; e = zip.getNextEntry()) { names.add(e.getName()); zip.readAllBytes(); }
+        }
+        assertThat(names).hasSize(export.entries().size()).contains(export.root() + "/" + reported, export.root() + "/" + longest);
+    }
+
     @Test void versionSourceCannotReplaceFixedFilesOrAddUnapprovedPaths() throws Exception {
         var fixed = new ExportTemplate(REPOSITORY).load();
         for (String path : List.of("src/main.ts", "src/router.ts", "package.json", ".env", "src/pages/.env", "src/pages/Home.ts",

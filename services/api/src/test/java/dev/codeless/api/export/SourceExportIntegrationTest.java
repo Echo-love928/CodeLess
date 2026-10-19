@@ -114,13 +114,14 @@ class SourceExportIntegrationTest {
         Files.write(evidence().resolve(name + ".json"), json.writerWithDefaultPrettyPrinter().writeValueAsBytes(value));
     }
     /** Fixed developer tool from tests/export; never reachable through the platform API. */
-    JsonNode node(String script, Path out, String... args) throws Exception {
+    JsonNode node(String script, Path out, String... args) throws Exception {return nodeExit(0, script, out, args);}
+    JsonNode nodeExit(int expectedExit, String script, Path out, String... args) throws Exception {
         var command = new ArrayList<>(List.of("node", REPOSITORY.resolve("tests/export/" + script).toString()));
         command.addAll(List.of(args));
         Path stdout = Files.createDirectories(WORK.resolve("logs")).resolve(script + "-" + UUID.randomUUID() + ".stdout");
         var process = new ProcessBuilder(command).redirectErrorStream(true).redirectOutput(stdout.toFile()).start();
         assertThat(process.waitFor(16, TimeUnit.MINUTES)).as(script + " finished").isTrue();
-        assertThat(process.exitValue()).as(script + " exit; see " + stdout).isZero();
+        assertThat(process.exitValue()).as(script + " exit; see " + stdout).isEqualTo(expectedExit);
         return json.readTree(Files.readAllBytes(out));
     }
     static void delete(Path path) throws Exception {
@@ -246,8 +247,14 @@ class SourceExportIntegrationTest {
         Files.write(zip, r.body());
         Path work = WORK.resolve("clean-build/" + UUID.randomUUID());
         Files.createDirectories(work.getParent());
-        var result = node("clean-build.mjs", work.resolve("clean-build.json"), zip.toString(), work.toString(), "--expect-artifact-digest", artifact);
+        // Reproducibility of the frozen artifact itself. The build image copies working-tree template bytes, so an image
+        // built from a Windows autocrlf checkout compiled CRLF template files; the frozen index.html is the direct witness.
+        boolean crlfImage = new String(snapshots.readArtifact(ready, source, "index.html"), StandardCharsets.UTF_8).contains("\r");
+        // The harness exits 0 only when the build passed and any requested reproduction matched (3 = built, not reproduced).
+        var result = crlfImage ? node("clean-build.mjs", work.resolve("clean-build.json"), zip.toString(), work.toString())
+                : node("clean-build.mjs", work.resolve("clean-build.json"), zip.toString(), work.toString(), "--expect-artifact-digest", artifact);
         assertThat(result.path("status").asText()).isEqualTo("PASSED");
+        assertThat(result.path("reproduction").asText()).isEqualTo(crlfImage ? "NOT_REQUESTED" : "REPRODUCED");
         assertThat(result.path("exitCode").asInt()).isZero();
         assertThat(result.path("distIndexHtml").asBoolean()).isTrue();
         assertThat(result.path("hostProjectUnchanged").asBoolean()).isTrue();
@@ -256,9 +263,6 @@ class SourceExportIntegrationTest {
         assertThat(result.path("versionId").asText()).isEqualTo(ready.toString());
         assertThat(result.path("pnpm").asText()).isEqualTo(new ExportTemplate(REPOSITORY).load().pnpm());
         Files.copy(work.resolve("clean-build.log"), evidence().resolve("D16-A-T1-clean-build.log"), StandardCopyOption.REPLACE_EXISTING);
-        // Reproducibility of the frozen artifact itself. The build image copies working-tree template bytes, so an image
-        // built from a Windows autocrlf checkout compiled CRLF template files; the frozen index.html is the direct witness.
-        boolean crlfImage = new String(snapshots.readArtifact(ready, source, "index.html"), StandardCharsets.UTF_8).contains("\r");
         JsonNode reproduction = result;
         if (!crlfImage) assertThat(result.path("artifactReproduced").asBoolean()).as("exported bytes rebuild the frozen artifact").isTrue();
         else {
@@ -266,12 +270,21 @@ class SourceExportIntegrationTest {
             reproduction = node("clean-build.mjs", diagnostic.resolve("clean-build.json"), zip.toString(), diagnostic.toString(),
                     "--expect-artifact-digest", artifact, "--crlf-template-diagnostic");
             assertThat(reproduction.path("templateLineEndings").asText()).isEqualTo("CRLF_DIAGNOSTIC_NOT_EXPORT_BYTES");
-            assertThat(reproduction.path("artifactReproduced").asBoolean())
-                    .as("only the template line-ending presentation differs from the Windows-built image").isTrue();
+            assertThat(reproduction.path("reproduction").asText())
+                    .as("only the template line-ending presentation differs from the Windows-built image").isEqualTo("REPRODUCED");
+            assertThat(reproduction.path("artifactReproduced").asBoolean()).isTrue();
         }
+        // A successful build with a non-matching expected digest is reported separately (exit 3), never as success.
+        Path mismatch = WORK.resolve("clean-build/" + UUID.randomUUID());
+        var notReproduced = nodeExit(3, "clean-build.mjs", mismatch.resolve("clean-build.json"), zip.toString(), mismatch.toString(),
+                "--expect-artifact-digest", "sha256:" + "0".repeat(64));
+        assertThat(notReproduced.path("status").asText()).isEqualTo("PASSED");
+        assertThat(notReproduced.path("reproduction").asText()).isEqualTo("NOT_REPRODUCED");
         report("D16-A-T1", Map.of("versionId", ready, "archive", zip.getFileName().toString(), "cleanBuild", result,
                 "frozenArtifactDigest", artifact, "buildImageTemplateLineEndings", crlfImage ? "CRLF" : "LF",
-                "artifactReproduction", reproduction, "modelProvider", "deterministic-mock"));
+                "artifactReproduction", reproduction, "mismatchedExpectationExit", 3,
+                "mismatchedExpectation", Map.of("status", notReproduced.path("status").asText(), "reproduction", notReproduced.path("reproduction").asText()),
+                "modelProvider", "deterministic-mock"));
     }
 
     @Test @Order(2) void d16aT2PackageExcludesSecretsLogsDependenciesAndOtherVersions() throws Exception {

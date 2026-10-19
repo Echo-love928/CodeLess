@@ -88,6 +88,55 @@ class ExportArchiveTest {
             assertThatThrownBy(() -> ExportArchive.check(root, sample())).as(root).isInstanceOf(ExportFailure.class);
     }
 
+    /**
+     * D16-B review P2: a member path the store accepts (≤240) must never pass the pre-check and then fail after
+     * earlier members were streamed. The longest valid paths below the service's real root are written completely.
+     */
+    @Test void longestValidPathsBelowTheServiceRootAreWrittenCompletely() throws Exception {
+        String root = "codeless-" + UUID.randomUUID();
+        String reported = "src/pages/" + "A".repeat(210) + ".vue", longest = "src/pages/" + "B".repeat(226) + ".vue";
+        assertThat(reported).hasSize(224);
+        assertThat(longest).hasSize(240);
+        var entries = List.of(new ExportArchive.Entry("README.md", "说明\n".getBytes(StandardCharsets.UTF_8)),
+                new ExportArchive.Entry(reported, "<template>a</template>\n".getBytes(StandardCharsets.UTF_8)),
+                new ExportArchive.Entry(longest, "<template>b</template>\n".getBytes(StandardCharsets.UTF_8)));
+        var out = new ByteArrayOutputStream();
+        assertThat(ExportArchive.write(out, root, entries, TIME)).isEqualTo(out.size());
+        var names = new ArrayList<String>();
+        try (var in = new ZipInputStream(new ByteArrayInputStream(out.toByteArray()))) {
+            for (var entry = in.getNextEntry(); entry != null; entry = in.getNextEntry()) { names.add(entry.getName()); in.readAllBytes(); }
+        }
+        assertThat(names).containsExactly(root + "/README.md", root + "/" + reported, root + "/" + longest);
+        assertThat(central(out.toByteArray())).extracting(Central::name).containsExactlyElementsOf(names);
+        assertThat(root.length() + 1 + longest.length()).isEqualTo(286).isLessThanOrEqualTo(ExportArchive.MAX_NAME_BYTES);
+    }
+
+    @Test void rootAndFullNameBoundsAreCheckedBeforeTheFirstByte() {
+        String longest = "src/pages/" + "B".repeat(226) + ".vue";
+        String maxRoot = "r".repeat(ExportArchive.MAX_ROOT_BYTES);
+        var ok = new ByteArrayOutputStream();
+        assertThatCode(() -> ExportArchive.write(ok, maxRoot, List.of(new ExportArchive.Entry(longest, new byte[1])), TIME)).doesNotThrowAnyException();
+        var out = new ByteArrayOutputStream();
+        var entries = List.of(new ExportArchive.Entry("README.md", new byte[1]), new ExportArchive.Entry(longest, new byte[1]));
+        assertThatThrownBy(() -> ExportArchive.write(out, maxRoot + "r", entries, TIME)).hasMessage("EXPORT_PATH_REJECTED");
+        assertThat(out.size()).as("no partial archive").isZero();
+    }
+
+    /** The output bound is a backstop that the input bounds make unreachable, so it can never truncate a stream. */
+    @Test void maximumAllowedInputStaysWithinTheArchiveBound() throws Exception {
+        var random = new Random(16);
+        var entries = new ArrayList<ExportArchive.Entry>();
+        for (int i = 0; i < ExportArchive.MAX_ENTRIES; i++) {
+            byte[] bytes = new byte[(int) (ExportArchive.MAX_TOTAL_BYTES / ExportArchive.MAX_ENTRIES)];
+            random.nextBytes(bytes);
+            entries.add(new ExportArchive.Entry("src/pages/" + "C".repeat(222) + "%04d".formatted(i) + ".vue", bytes));
+        }
+        var out = new ByteArrayOutputStream();
+        long written = ExportArchive.write(out, "r".repeat(ExportArchive.MAX_ROOT_BYTES), entries, TIME);
+        assertThat(written).isEqualTo(out.size()).isLessThan(ExportArchive.MAX_ARCHIVE_BYTES);
+        assertThat(central(out.toByteArray())).hasSize(ExportArchive.MAX_ENTRIES);
+    }
+
     @Test void sizeAndCountLimitsFailClosed() {
         var big = new byte[ExportArchive.MAX_ENTRY_BYTES + 1];
         assertThatThrownBy(() -> ExportArchive.check("r", List.of(new ExportArchive.Entry("a.txt", big)))).hasMessage("EXPORT_LIMIT_EXCEEDED");
