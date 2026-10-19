@@ -6,6 +6,26 @@ import { spawnSync } from 'node:child_process'
 const root = resolve('.local-data/d16-b'), output = resolve('tests/e2e/share/evidence/2026-10-19')
 await mkdir(output, { recursive: true })
 const hash = bytes => 'sha256:' + createHash('sha256').update(bytes).digest('hex')
+const rawReportPath = join(root, 'api-repair-failure.raw.txt')
+let rawReport
+try { rawReport = await readFile(rawReportPath) }
+catch (error) {
+  if (error.code !== 'ENOENT') throw error
+  const report = await readFile(join(output, 'api-repair-failure.txt'))
+  try {
+    const origin = JSON.parse(await readFile(join(output, 'api-repair-failure-origin.json'), 'utf8'))
+    if (hash(report) !== origin.normalizedDigest) throw new Error('normalized failure report changed')
+    // A checkout may not contain the private raw report. Preserve its original
+    // provenance instead of relabeling normalized bytes as an original capture.
+  } catch (originError) { if (originError.code !== 'ENOENT') throw originError; rawReport = report }
+}
+if (rawReport) {
+  await writeFile(rawReportPath, rawReport)
+  const normalizedReport = rawReport.toString('utf8').replaceAll('\r\n', '\n').split('\n').map(line => line.trimEnd()).join('\n').trimEnd() + '\n'
+  await writeFile(join(output, 'api-repair-failure.txt'), normalizedReport)
+  await writeFile(join(output, 'api-repair-failure-origin.json'), JSON.stringify({ rawPath: relative(resolve('.'), rawReportPath).replaceAll('\\', '/'),
+    rawDigest: hash(rawReport), normalizedDigest: hash(normalizedReport), normalized: 'CRLF to LF; trailing whitespace only' }, null, 2) + '\n')
+}
 const runs = []
 for (const name of (await readdir(root)).sort()) {
   if (!/^2026-.*-(?:unit|screenshot|browser|static|api|runner|e2e|gate)$/.test(name)) continue
@@ -24,12 +44,19 @@ for (const [name, exitCode, description] of [['screenshot-first.log', 1, '6/7; t
   firstChecks.push({ log: relative(resolve('.'), join(root, name)).replaceAll('\\', '/'), exitCode, description, digest: hash(bytes) })
 }
 await writeFile(join(output, 'initial-checks.json'), JSON.stringify(firstChecks, null, 2) + '\n')
-const screenshot = runs.findLast(run => run.mode === 'screenshot' && run.status === 'PASSED')
-if (screenshot) {
-  const directory = join(resolve(screenshot.log, '..'), 'screenshot')
+for (const run of runs.toReversed().filter(run => ['screenshot', 'e2e', 'gate'].includes(run.mode))) {
+  const directory = join(resolve(run.log, '..'), 'screenshot')
+  let result, png
+  try { result = JSON.parse(await readFile(join(directory, 'T1-result.json'), 'utf8')); png = await readFile(join(directory, 'T1-cover.png')) }
+  catch (error) { if (error.code === 'ENOENT') continue; throw error }
+  if (result.status !== 'SUCCEEDED' || hash(png) !== result.imageDigest || png.length !== result.imageBytes) continue
   for (const name of ['T1-cover.png', 'T1-result.json', 'T2-result.json']) await copyFile(join(directory, name), join(output, name))
+  await writeFile(join(output, 'artifact-origin.json'), JSON.stringify({ mode: run.mode, overallStatus: run.status,
+    startedAt: run.startedAt, startHead: run.head, commandLog: run.log, commandLogDigest: run.logDigest ?? null,
+    screenshotStatus: result.status, imageDigest: result.imageDigest }, null, 2) + '\n')
+  break
 }
-const paths = spawnSync('git', ['ls-files', '--modified', '--others', '--exclude-standard', '-z', '--',
+const paths = spawnSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z', '--',
   'services/runner/src/screenshot', 'apps/web/src/features/deploy', 'apps/web/src/features/source', 'tests/e2e/share'], { encoding: 'utf8' }).stdout.split('\0').filter(Boolean)
 const sources = {}
 for (const path of [...new Set(paths)].filter(path => !path.includes('/evidence/'))) {

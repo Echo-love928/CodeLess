@@ -31,7 +31,9 @@ async function fixture() {
   const root = await mkdtemp(join(evidence, 'queue-')), hostingRoot = join(root, 'sites'), queueRoot = join(root, 'covers')
   await mkdir(hostingRoot); await mkdir(queueRoot)
   const store = await createPublicationStore(hostingRoot); await store(receipt, buffers)
-  const config = { ...origins, queueRoot, hostingRoot, lookupDeployment: async () => structuredClone(publication), timeoutMs: 5000 }
+  // Exercise the production default deadline. Short timeout behavior is isolated
+  // explicitly in T2; a success-path fixture must not impose a different budget.
+  const config = { ...origins, queueRoot, hostingRoot, lookupDeployment: async () => structuredClone(publication) }
   return { root, config, resolveTarget: createTargetResolver(config, async () => [{ address: '8.8.8.8', family: 4 }]) }
 }
 // Explicit deterministic HTTPS transport fixture. Production TLS/DNS is NOT mocked into public success.

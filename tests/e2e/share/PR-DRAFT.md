@@ -19,6 +19,14 @@ Validation and exact command results: `docs/handoffs/D16-B.md` and
 `tests/e2e/share/evidence/2026-10-19/commands.json`. Real Chromium is used; HTTP/export
 fixtures are explicitly labeled. No fixture ZIP is claimed to pass clean build.
 
+Final local checks: static exit0 (131 frontend tests), runner exit0 (90 tests),
+full default-concurrency E2E exit0 (59/59). API exit1: 232 tests, one failure in
+`RepairLoopIntegrationTest.recordedUnchangedReadLoopStopsBeforeAnotherModelOrBuild`
+(expected AGENT_REPAIR_NO_PROGRESS, observed AGENT_INTERNAL_ERROR). The full local
+ci:gate remains FAILED; earlier E2E failures are retained. The successful screenshot
+fixture was corrected to use the unchanged 12-second production default instead
+of its accidental 5-second override; test/global timeouts and concurrency remain.
+
 Integration is blocked on D16-A's actual export contract and source ZIP producer,
 plus maintainer registration of the cover HTTP/coordinator adapter and shared
 OpenAPI. These are deliberately outside B's allowed production paths. The private

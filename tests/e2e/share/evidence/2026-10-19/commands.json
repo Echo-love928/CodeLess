@@ -121,8 +121,8 @@
       "ci:gate"
     ],
     "startedAt": "2026-10-19T12:14:10.205Z",
-    "status": "RUNNING",
-    "exitCode": null,
+    "status": "FAILED",
+    "exitCode": 1,
     "signal": null,
     "head": "03c790545041e0651ff47a819d7a1bbdd4b4be57",
     "changes": "M apps/web/src/features/deploy/DeployPanel.vue\n M apps/web/src/features/source/SourcePanel.vue\n?? .idea/\n?? apps/web/src/features/deploy/DeploymentCover.test.ts\n?? apps/web/src/features/deploy/DeploymentCover.vue\n?? apps/web/src/features/deploy/cover-api.test.ts\n?? apps/web/src/features/deploy/cover-api.ts\n?? apps/web/src/features/source/SourceDownload.test.ts\n?? apps/web/src/features/source/SourceDownload.vue\n?? apps/web/src/features/source/export-api.test.ts\n?? apps/web/src/features/source/export-api.ts\n?? docs/handoffs/D16-B.md\n?? services/runner/src/screenshot/\n?? tests/e2e/share/",
@@ -243,6 +243,18 @@
         "lfDigest": "sha256:aa3f99d7bb9c19cad0c3bbd618614c18d0396f5f8aef3cbb5f2b0d2fe544139b"
       }
     },
+    "generatedHistoricalEvidence": [
+      "docs/evidence/D10/deterministic/cancelled.png",
+      "docs/evidence/D10/deterministic/failure.png",
+      "docs/evidence/D10/deterministic/recovered.png",
+      "docs/evidence/D10/deterministic/success.png",
+      "tests/e2e/versions/evidence/2026-10-12/fixture/T1-version-switch.png",
+      "tests/e2e/versions/evidence/2026-10-12/fixture/T2-source-error.png",
+      "tests/e2e/versions/evidence/2026-10-12/fixture/T3-failed-keeps-preview.png",
+      "tests/e2e/versions/evidence/2026-10-12/fixture/T4-script-as-text.png"
+    ],
+    "completedAt": "2026-10-19T12:58:48.687Z",
+    "logDigest": "sha256:186a86042020e03817af6c74ece7829581323a1876a666b47f6b2b775d3081ba",
     "log": ".local-data/d16-b/2026-10-19T12-14-10.203Z-gate/command.log",
     "resultLines": [
       "[ci-gate] verify:static",
@@ -253,7 +265,78 @@
       "ℹ skipped 0",
       " Test Files  22 passed (22)",
       "      Tests  131 passed (131)",
-      "[ci-gate] verify:api"
+      "[ci-gate] verify:api",
+      "[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 239.7 s -- in dev.codeless.api.agent.AgentLoopIntegrationTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 35.15 s -- in dev.codeless.api.agent.CsrfDuringGenerationTest",
+      "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.398 s -- in dev.codeless.api.agent.LocalBuildGatewayTest",
+      "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.851 s -- in dev.codeless.api.agent.PreparationProcessTest",
+      "[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.130 s -- in dev.codeless.api.agent.RepairContextTest",
+      "[ERROR] Tests run: 21, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 675.0 s <<< FAILURE! -- in dev.codeless.api.agent.RepairLoopIntegrationTest",
+      "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in dev.codeless.api.agent.RepairPolicyTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.968 s -- in dev.codeless.api.ApplicationSmokeTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.180 s -- in dev.codeless.api.apps.ApplicationHttpTest",
+      "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.416 s -- in dev.codeless.api.apps.ApplicationIntegrationTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.115 s -- in dev.codeless.api.auth.AuthHttpTest",
+      "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.213 s -- in dev.codeless.api.auth.AuthIntegrationTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in dev.codeless.api.auth.LoginAttemptsTest",
+      "[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.358 s -- in dev.codeless.api.data.DataIntegrationTest",
+      "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.434 s -- in dev.codeless.api.data.TaskDiagnosticsTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.813 s -- in dev.codeless.api.data.VersionSourceMigrationTest",
+      "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.570 s -- in dev.codeless.api.deploy.DeploymentRecordsTest",
+      "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.043 s -- in dev.codeless.api.deploy.PublicationGatewayConfigurationTest",
+      "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 119.2 s -- in dev.codeless.api.deploy.PublicationIntegrationTest",
+      "[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 475.5 s -- in dev.codeless.api.edit.EditLifecycleIntegrationTest",
+      "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 230.4 s -- in dev.codeless.api.edit.EditVerificationIntegrationTest",
+      "[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 354.2 s -- in dev.codeless.api.edit.LocalEditScopeIntegrationTest",
+      "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in dev.codeless.api.edit.LocalEditScopeTest",
+      "[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.364 s -- in dev.codeless.api.error.GlobalExceptionHandlerTest",
+      "[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.368 s -- in dev.codeless.api.model.DeepSeekModelProviderTest",
+      "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.778 s -- in dev.codeless.api.model.PlanAcceptanceCliTest",
+      "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.782 s -- in dev.codeless.api.model.PlanModelIntegrationTest",
+      "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.149 s -- in dev.codeless.api.model.PlanValidatorTest",
+      "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.511 s -- in dev.codeless.api.model.PrivateModelCaptureTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 s -- in dev.codeless.api.network.SitePolicyTest",
+      "[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 23.27 s -- in dev.codeless.api.preview.PreviewAcceptanceProcessTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.29 s -- in dev.codeless.api.preview.PreviewCnHttpTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.814 s -- in dev.codeless.api.preview.PreviewHttpTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 137.1 s -- in dev.codeless.api.preview.PreviewPlatformIntegrationTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.099 s -- in dev.codeless.api.preview.PreviewReadinessTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.391 s -- in dev.codeless.api.preview.PreviewRegistryHttpTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.502 s -- in dev.codeless.api.preview.PreviewTopHttpTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in dev.codeless.api.preview.RepairProviderMetadataTest",
+      "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.048 s -- in dev.codeless.api.system.HealthControllerTest",
+      "[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.238 s -- in dev.codeless.api.tasks.TaskEventStreamsTest",
+      "[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.758 s -- in dev.codeless.api.tasks.TaskHttpTest",
+      "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.448 s -- in dev.codeless.api.tasks.TaskQueueIntegrationTest",
+      "[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.698 s -- in dev.codeless.api.tasks.TaskSseHttpTest",
+      "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.028 s -- in dev.codeless.api.tools.FileToolRegistryTest",
+      "[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 57.38 s -- in dev.codeless.api.tools.FileToolsIntegrationTest",
+      "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.395 s -- in dev.codeless.api.tools.OwnedWorkspaceCleanupTest",
+      "[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 23.50 s -- in dev.codeless.api.versions.LocalVolumeSnapshotStoreTest",
+      "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.389 s -- in dev.codeless.api.versions.SharedSnapshotPermissionsTest",
+      "[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in dev.codeless.api.versions.VersionFixtureGateTest",
+      "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 45.07 s -- in dev.codeless.api.versions.VersionHttpIntegrationTest",
+      "[ERROR] Tests run: 232, Failures: 1, Errors: 0, Skipped: 0",
+      "[INFO] BUILD FAILURE",
+      "[ci-gate] verify:runner",
+      "ℹ tests 90",
+      "ℹ pass 90",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0",
+      "[ci-gate] verify:e2e",
+      "    \u001b[34mℹ tests 8\u001b[39m",
+      "    \u001b[34mℹ pass 7\u001b[39m",
+      "    \u001b[34mℹ fail 1\u001b[39m",
+      "    \u001b[34mℹ cancelled 0\u001b[39m",
+      "    \u001b[34mℹ skipped 0\u001b[39m",
+      "    \u001b[34mℹ tests 7\u001b[39m",
+      "    \u001b[34mℹ pass 6\u001b[39m",
+      "    \u001b[34mℹ fail 1\u001b[39m",
+      "    \u001b[34mℹ cancelled 0\u001b[39m",
+      "    \u001b[34mℹ skipped 0\u001b[39m",
+      "  57 passed (1.6m)",
+      "[ci-gate] failed with exit code 1"
     ]
   },
   {
@@ -691,6 +774,377 @@
     "log": ".local-data/d16-b/2026-10-19T12-16-17.934Z-browser/command.log",
     "resultLines": [
       "  2 passed (4.7s)"
+    ]
+  },
+  {
+    "mode": "static",
+    "command": [
+      "corepack",
+      "pnpm",
+      "verify:static"
+    ],
+    "startedAt": "2026-10-19T12:20:04.533Z",
+    "status": "PASSED",
+    "exitCode": 0,
+    "signal": null,
+    "head": "3fbcccf0474042cba25b4121a42acabdc3523c71",
+    "changes": "M tests/e2e/share/export-evidence.mjs\n M tests/e2e/share/record-command.mjs\n?? .idea/",
+    "toolchain": {
+      "node": "v24.16.0",
+      "javaHome": null,
+      "pnpm": "12.6.0 (repository corepack pin)"
+    },
+    "sourceDigests": {
+      "apps/web/src/features/deploy/DeployPanel.test.ts": {
+        "bytes": 8373,
+        "digest": "sha256:186e4bdeff16590ec670c5e89405872327ad61114842bc8476ea8fb11fa42cfd",
+        "lfDigest": "sha256:a2c68d03e1eddbd333c12275d908f11312987810b5015e93a4ebafcc7b2df10e"
+      },
+      "apps/web/src/features/deploy/DeployPanel.vue": {
+        "bytes": 12433,
+        "digest": "sha256:f38b831443c568a779986f7da49bc319f08126d9c6429c3f0a83316bb5699b6b",
+        "lfDigest": "sha256:a78b0d55826033b31053344e589598e9d7767888a3b61b94136e7080079b1843"
+      },
+      "apps/web/src/features/deploy/DeploymentCover.test.ts": {
+        "bytes": 1992,
+        "digest": "sha256:562dd3ce256813ec9d040ca4316f7881bd09b19cf3ec4c65f7cb75cda03aaa73",
+        "lfDigest": "sha256:562dd3ce256813ec9d040ca4316f7881bd09b19cf3ec4c65f7cb75cda03aaa73"
+      },
+      "apps/web/src/features/deploy/DeploymentCover.vue": {
+        "bytes": 2591,
+        "digest": "sha256:d0ce4a814f491a0e2006ca690a0dd97b1a0ec117e38d241200efbc08c22d6f9d",
+        "lfDigest": "sha256:d0ce4a814f491a0e2006ca690a0dd97b1a0ec117e38d241200efbc08c22d6f9d"
+      },
+      "apps/web/src/features/deploy/cover-api.test.ts": {
+        "bytes": 1599,
+        "digest": "sha256:199281cd858cc58b378315f0bbb0469069fc485bdf3773fa18d036daa4c9b719",
+        "lfDigest": "sha256:199281cd858cc58b378315f0bbb0469069fc485bdf3773fa18d036daa4c9b719"
+      },
+      "apps/web/src/features/deploy/cover-api.ts": {
+        "bytes": 1875,
+        "digest": "sha256:13429b51b2f8a86244e2f8a6cb7f108183067fdf1ffcdb431940cdf0474a4551",
+        "lfDigest": "sha256:13429b51b2f8a86244e2f8a6cb7f108183067fdf1ffcdb431940cdf0474a4551"
+      },
+      "apps/web/src/features/deploy/deploy-api.test.ts": {
+        "bytes": 6883,
+        "digest": "sha256:346650a4d2c726fbdc1b29161e152a1ac398b2a5a1274379991e188cfe19714d",
+        "lfDigest": "sha256:d8457ff904b0deede7bfb18be32cfb3db0c919adf8f22d5ddd70536968a38d4b"
+      },
+      "apps/web/src/features/deploy/deploy-api.ts": {
+        "bytes": 6433,
+        "digest": "sha256:ba33bbc8dc7b79370cab01e86f9128768dd05e225db622a2b3d040d66017d5c4",
+        "lfDigest": "sha256:85ea3c1f71ca19fc34b5208565093b09f3d7645fa9df5fd14cfd9b5ca17ae176"
+      },
+      "apps/web/src/features/deploy/site-policy.test.ts": {
+        "bytes": 506,
+        "digest": "sha256:1911ac4f7226bbf923eec7155a8eaffbf543479598fb8f2279a3126760d102f9",
+        "lfDigest": "sha256:78929bf33b35138771d2225d8b138f40e000a343e5a44225494e76736da390eb"
+      },
+      "apps/web/src/features/deploy/site-policy.ts": {
+        "bytes": 852,
+        "digest": "sha256:4c7818cf4e22bc59f2f6daeaa814df065516899046393c4fd778c563e660921a",
+        "lfDigest": "sha256:10a939a06673a1359e96142212bac991bf8930f4d46fcbd50162b098b819303d"
+      },
+      "apps/web/src/features/source/SourceDownload.test.ts": {
+        "bytes": 1901,
+        "digest": "sha256:7fc790ff1f74a2fd21b667e7b5d99d07812d055e70a46b707c47bba450484852",
+        "lfDigest": "sha256:7fc790ff1f74a2fd21b667e7b5d99d07812d055e70a46b707c47bba450484852"
+      },
+      "apps/web/src/features/source/SourceDownload.vue": {
+        "bytes": 2508,
+        "digest": "sha256:87fe2829e0eac4bc7f7788674058e5c3b077130ef0a995e3eca1fbb662a2ea8c",
+        "lfDigest": "sha256:87fe2829e0eac4bc7f7788674058e5c3b077130ef0a995e3eca1fbb662a2ea8c"
+      },
+      "apps/web/src/features/source/SourcePanel.vue": {
+        "bytes": 3618,
+        "digest": "sha256:7d214c26155d2f8950c5d48d5492470b1a2d7202b11727ba275175533adffd7c",
+        "lfDigest": "sha256:aa3f99d7bb9c19cad0c3bbd618614c18d0396f5f8aef3cbb5f2b0d2fe544139b"
+      },
+      "apps/web/src/features/source/export-api.test.ts": {
+        "bytes": 2863,
+        "digest": "sha256:30629336d253d47ae2aab6c64d402b87b5c76983aa5ebe91553e9dc365797a8a",
+        "lfDigest": "sha256:30629336d253d47ae2aab6c64d402b87b5c76983aa5ebe91553e9dc365797a8a"
+      },
+      "apps/web/src/features/source/export-api.ts": {
+        "bytes": 3144,
+        "digest": "sha256:34fa407025d247ef889dac0d38340942125188a7412273caf601c9b344ec29ff",
+        "lfDigest": "sha256:34fa407025d247ef889dac0d38340942125188a7412273caf601c9b344ec29ff"
+      },
+      "apps/web/src/features/source/source-api.test.ts": {
+        "bytes": 4868,
+        "digest": "sha256:30df5de923a29484e4b8def13ef53549b88131846174d1e107ed545be05d4313",
+        "lfDigest": "sha256:3d4a1244a3a57c82cb23537ff265d175f756d2512cba64793f6dbc1fe6bb4fd2"
+      },
+      "apps/web/src/features/source/source-api.ts": {
+        "bytes": 3562,
+        "digest": "sha256:3bbe1463774e0d5989d6587e7fdb53bee2fbb3c6bf758872c6be67b536f6d778",
+        "lfDigest": "sha256:55b24ba0d6c199b9027338bafcb0709e7e457f05fb33947bf2cf97ca43f46d78"
+      },
+      "services/runner/src/screenshot/README.md": {
+        "bytes": 6671,
+        "digest": "sha256:96886e0373a4a47824d60c0b7eb1c5d2a9443c91fee6429d625241be9f703824",
+        "lfDigest": "sha256:96886e0373a4a47824d60c0b7eb1c5d2a9443c91fee6429d625241be9f703824"
+      },
+      "services/runner/src/screenshot/adapter.mjs": {
+        "bytes": 1063,
+        "digest": "sha256:6d63cc7d89cdee4de20cb50def8ba1962531cfbd8b60feb881509331d7d1f10b",
+        "lfDigest": "sha256:6d63cc7d89cdee4de20cb50def8ba1962531cfbd8b60feb881509331d7d1f10b"
+      },
+      "services/runner/src/screenshot/capture.mjs": {
+        "bytes": 4655,
+        "digest": "sha256:96a04416beae562ac918363001da637debd674a39be4c42e58147ad61fb7a5cf",
+        "lfDigest": "sha256:96a04416beae562ac918363001da637debd674a39be4c42e58147ad61fb7a5cf"
+      },
+      "services/runner/src/screenshot/network.mjs": {
+        "bytes": 3432,
+        "digest": "sha256:2f61845286b81684256b39ff5bee6e80085ca8f082bdb3d472cc8a5bb84aa923",
+        "lfDigest": "sha256:2f61845286b81684256b39ff5bee6e80085ca8f082bdb3d472cc8a5bb84aa923"
+      },
+      "services/runner/src/screenshot/queue.mjs": {
+        "bytes": 7922,
+        "digest": "sha256:e26f95f741620ed72c165c3e7e028d3da6c7d0b554461cd1d9e7ed6e6de0a326",
+        "lfDigest": "sha256:e26f95f741620ed72c165c3e7e028d3da6c7d0b554461cd1d9e7ed6e6de0a326"
+      },
+      "services/runner/src/screenshot/target.mjs": {
+        "bytes": 3171,
+        "digest": "sha256:af9ff6087ea5963f11ba15977c15cd8142261e03e0e90baa1dc32c1331c2d624",
+        "lfDigest": "sha256:af9ff6087ea5963f11ba15977c15cd8142261e03e0e90baa1dc32c1331c2d624"
+      },
+      "services/runner/src/screenshot/worker.mjs": {
+        "bytes": 5246,
+        "digest": "sha256:f018152a159a4f6792b59779ed87de1b4ca63e808c1cbd2f3c813e166745ab96",
+        "lfDigest": "sha256:f018152a159a4f6792b59779ed87de1b4ca63e808c1cbd2f3c813e166745ab96"
+      },
+      "tests/e2e/share/PR-DRAFT.md": {
+        "bytes": 1721,
+        "digest": "sha256:9400d1862ec8ad232b33faf8da505aaa46d822431bec8d2653caf12a361893ca",
+        "lfDigest": "sha256:9400d1862ec8ad232b33faf8da505aaa46d822431bec8d2653caf12a361893ca"
+      },
+      "tests/e2e/share/export-evidence.mjs": {
+        "bytes": 3026,
+        "digest": "sha256:8501fe94f0e2afc87f9c8319c0a264c72fe4d6a344f0983ba9c1073555758031",
+        "lfDigest": "sha256:8501fe94f0e2afc87f9c8319c0a264c72fe4d6a344f0983ba9c1073555758031"
+      },
+      "tests/e2e/share/flow.spec.ts": {
+        "bytes": 5063,
+        "digest": "sha256:d5fdbb5714fae8e591012d5348436b26bf7cbb50fd6d65f352ca229562311034",
+        "lfDigest": "sha256:d5fdbb5714fae8e591012d5348436b26bf7cbb50fd6d65f352ca229562311034"
+      },
+      "tests/e2e/share/record-command.mjs": {
+        "bytes": 4865,
+        "digest": "sha256:dc923db0e8004627ee8a68f2ee304d7aa1934c8812bd5b759ffeaef1e2b486d8",
+        "lfDigest": "sha256:dc923db0e8004627ee8a68f2ee304d7aa1934c8812bd5b759ffeaef1e2b486d8"
+      },
+      "tests/e2e/share/screenshot.acceptance.mjs": {
+        "bytes": 11337,
+        "digest": "sha256:a30801014bb78781eac6c0d46db648b3cfca1c66fd49db3761c90122478c5278",
+        "lfDigest": "sha256:a30801014bb78781eac6c0d46db648b3cfca1c66fd49db3761c90122478c5278"
+      },
+      "tests/e2e/share/screenshot.spec.ts": {
+        "bytes": 871,
+        "digest": "sha256:3baf97a1842268326dd4c694c9f51512009f24553b9bebea9899fe196bc96209",
+        "lfDigest": "sha256:3baf97a1842268326dd4c694c9f51512009f24553b9bebea9899fe196bc96209"
+      }
+    },
+    "generatedHistoricalEvidence": [],
+    "completedAt": "2026-10-19T12:20:22.678Z",
+    "logDigest": "sha256:9480eda5f5e803af7356560fcb2a3bf3330b429f1ab688b2b9471bc4b158b762",
+    "log": ".local-data/d16-b/2026-10-19T12-20-04.531Z-static/command.log",
+    "resultLines": [
+      "ℹ tests 14",
+      "ℹ pass 14",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0",
+      " Test Files  22 passed (22)",
+      "      Tests  131 passed (131)"
+    ]
+  },
+  {
+    "mode": "e2e",
+    "command": [
+      "corepack",
+      "pnpm",
+      "verify:e2e"
+    ],
+    "startedAt": "2026-10-19T12:59:51.290Z",
+    "status": "PASSED",
+    "exitCode": 0,
+    "signal": null,
+    "head": "3fbcccf0474042cba25b4121a42acabdc3523c71",
+    "changes": "M docs/handoffs/D16-B.md\n M services/runner/src/screenshot/README.md\n M tests/e2e/share/export-evidence.mjs\n M tests/e2e/share/record-command.mjs\n M tests/e2e/share/screenshot.acceptance.mjs\n?? .idea/\n?? tests/e2e/share/evidence/2026-10-19/README.md\n?? tests/e2e/share/evidence/2026-10-19/api-repair-failure.txt",
+    "toolchain": {
+      "node": "v24.16.0",
+      "javaHome": null,
+      "pnpm": "12.6.0 (repository corepack pin)"
+    },
+    "sourceDigests": {
+      "apps/web/src/features/deploy/DeployPanel.test.ts": {
+        "bytes": 8373,
+        "digest": "sha256:186e4bdeff16590ec670c5e89405872327ad61114842bc8476ea8fb11fa42cfd",
+        "lfDigest": "sha256:a2c68d03e1eddbd333c12275d908f11312987810b5015e93a4ebafcc7b2df10e"
+      },
+      "apps/web/src/features/deploy/DeployPanel.vue": {
+        "bytes": 12433,
+        "digest": "sha256:f38b831443c568a779986f7da49bc319f08126d9c6429c3f0a83316bb5699b6b",
+        "lfDigest": "sha256:a78b0d55826033b31053344e589598e9d7767888a3b61b94136e7080079b1843"
+      },
+      "apps/web/src/features/deploy/DeploymentCover.test.ts": {
+        "bytes": 1992,
+        "digest": "sha256:562dd3ce256813ec9d040ca4316f7881bd09b19cf3ec4c65f7cb75cda03aaa73",
+        "lfDigest": "sha256:562dd3ce256813ec9d040ca4316f7881bd09b19cf3ec4c65f7cb75cda03aaa73"
+      },
+      "apps/web/src/features/deploy/DeploymentCover.vue": {
+        "bytes": 2591,
+        "digest": "sha256:d0ce4a814f491a0e2006ca690a0dd97b1a0ec117e38d241200efbc08c22d6f9d",
+        "lfDigest": "sha256:d0ce4a814f491a0e2006ca690a0dd97b1a0ec117e38d241200efbc08c22d6f9d"
+      },
+      "apps/web/src/features/deploy/cover-api.test.ts": {
+        "bytes": 1599,
+        "digest": "sha256:199281cd858cc58b378315f0bbb0469069fc485bdf3773fa18d036daa4c9b719",
+        "lfDigest": "sha256:199281cd858cc58b378315f0bbb0469069fc485bdf3773fa18d036daa4c9b719"
+      },
+      "apps/web/src/features/deploy/cover-api.ts": {
+        "bytes": 1875,
+        "digest": "sha256:13429b51b2f8a86244e2f8a6cb7f108183067fdf1ffcdb431940cdf0474a4551",
+        "lfDigest": "sha256:13429b51b2f8a86244e2f8a6cb7f108183067fdf1ffcdb431940cdf0474a4551"
+      },
+      "apps/web/src/features/deploy/deploy-api.test.ts": {
+        "bytes": 6883,
+        "digest": "sha256:346650a4d2c726fbdc1b29161e152a1ac398b2a5a1274379991e188cfe19714d",
+        "lfDigest": "sha256:d8457ff904b0deede7bfb18be32cfb3db0c919adf8f22d5ddd70536968a38d4b"
+      },
+      "apps/web/src/features/deploy/deploy-api.ts": {
+        "bytes": 6433,
+        "digest": "sha256:ba33bbc8dc7b79370cab01e86f9128768dd05e225db622a2b3d040d66017d5c4",
+        "lfDigest": "sha256:85ea3c1f71ca19fc34b5208565093b09f3d7645fa9df5fd14cfd9b5ca17ae176"
+      },
+      "apps/web/src/features/deploy/site-policy.test.ts": {
+        "bytes": 506,
+        "digest": "sha256:1911ac4f7226bbf923eec7155a8eaffbf543479598fb8f2279a3126760d102f9",
+        "lfDigest": "sha256:78929bf33b35138771d2225d8b138f40e000a343e5a44225494e76736da390eb"
+      },
+      "apps/web/src/features/deploy/site-policy.ts": {
+        "bytes": 852,
+        "digest": "sha256:4c7818cf4e22bc59f2f6daeaa814df065516899046393c4fd778c563e660921a",
+        "lfDigest": "sha256:10a939a06673a1359e96142212bac991bf8930f4d46fcbd50162b098b819303d"
+      },
+      "apps/web/src/features/source/SourceDownload.test.ts": {
+        "bytes": 1901,
+        "digest": "sha256:7fc790ff1f74a2fd21b667e7b5d99d07812d055e70a46b707c47bba450484852",
+        "lfDigest": "sha256:7fc790ff1f74a2fd21b667e7b5d99d07812d055e70a46b707c47bba450484852"
+      },
+      "apps/web/src/features/source/SourceDownload.vue": {
+        "bytes": 2508,
+        "digest": "sha256:87fe2829e0eac4bc7f7788674058e5c3b077130ef0a995e3eca1fbb662a2ea8c",
+        "lfDigest": "sha256:87fe2829e0eac4bc7f7788674058e5c3b077130ef0a995e3eca1fbb662a2ea8c"
+      },
+      "apps/web/src/features/source/SourcePanel.vue": {
+        "bytes": 3618,
+        "digest": "sha256:7d214c26155d2f8950c5d48d5492470b1a2d7202b11727ba275175533adffd7c",
+        "lfDigest": "sha256:aa3f99d7bb9c19cad0c3bbd618614c18d0396f5f8aef3cbb5f2b0d2fe544139b"
+      },
+      "apps/web/src/features/source/export-api.test.ts": {
+        "bytes": 2863,
+        "digest": "sha256:30629336d253d47ae2aab6c64d402b87b5c76983aa5ebe91553e9dc365797a8a",
+        "lfDigest": "sha256:30629336d253d47ae2aab6c64d402b87b5c76983aa5ebe91553e9dc365797a8a"
+      },
+      "apps/web/src/features/source/export-api.ts": {
+        "bytes": 3144,
+        "digest": "sha256:34fa407025d247ef889dac0d38340942125188a7412273caf601c9b344ec29ff",
+        "lfDigest": "sha256:34fa407025d247ef889dac0d38340942125188a7412273caf601c9b344ec29ff"
+      },
+      "apps/web/src/features/source/source-api.test.ts": {
+        "bytes": 4868,
+        "digest": "sha256:30df5de923a29484e4b8def13ef53549b88131846174d1e107ed545be05d4313",
+        "lfDigest": "sha256:3d4a1244a3a57c82cb23537ff265d175f756d2512cba64793f6dbc1fe6bb4fd2"
+      },
+      "apps/web/src/features/source/source-api.ts": {
+        "bytes": 3562,
+        "digest": "sha256:3bbe1463774e0d5989d6587e7fdb53bee2fbb3c6bf758872c6be67b536f6d778",
+        "lfDigest": "sha256:55b24ba0d6c199b9027338bafcb0709e7e457f05fb33947bf2cf97ca43f46d78"
+      },
+      "services/runner/src/screenshot/README.md": {
+        "bytes": 6918,
+        "digest": "sha256:35639b68e9df8dad3a8907752290724087c403a02acd0ab85feae66a3c0b26d3",
+        "lfDigest": "sha256:35639b68e9df8dad3a8907752290724087c403a02acd0ab85feae66a3c0b26d3"
+      },
+      "services/runner/src/screenshot/adapter.mjs": {
+        "bytes": 1063,
+        "digest": "sha256:6d63cc7d89cdee4de20cb50def8ba1962531cfbd8b60feb881509331d7d1f10b",
+        "lfDigest": "sha256:6d63cc7d89cdee4de20cb50def8ba1962531cfbd8b60feb881509331d7d1f10b"
+      },
+      "services/runner/src/screenshot/capture.mjs": {
+        "bytes": 4655,
+        "digest": "sha256:96a04416beae562ac918363001da637debd674a39be4c42e58147ad61fb7a5cf",
+        "lfDigest": "sha256:96a04416beae562ac918363001da637debd674a39be4c42e58147ad61fb7a5cf"
+      },
+      "services/runner/src/screenshot/network.mjs": {
+        "bytes": 3432,
+        "digest": "sha256:2f61845286b81684256b39ff5bee6e80085ca8f082bdb3d472cc8a5bb84aa923",
+        "lfDigest": "sha256:2f61845286b81684256b39ff5bee6e80085ca8f082bdb3d472cc8a5bb84aa923"
+      },
+      "services/runner/src/screenshot/queue.mjs": {
+        "bytes": 7922,
+        "digest": "sha256:e26f95f741620ed72c165c3e7e028d3da6c7d0b554461cd1d9e7ed6e6de0a326",
+        "lfDigest": "sha256:e26f95f741620ed72c165c3e7e028d3da6c7d0b554461cd1d9e7ed6e6de0a326"
+      },
+      "services/runner/src/screenshot/target.mjs": {
+        "bytes": 3171,
+        "digest": "sha256:af9ff6087ea5963f11ba15977c15cd8142261e03e0e90baa1dc32c1331c2d624",
+        "lfDigest": "sha256:af9ff6087ea5963f11ba15977c15cd8142261e03e0e90baa1dc32c1331c2d624"
+      },
+      "services/runner/src/screenshot/worker.mjs": {
+        "bytes": 5246,
+        "digest": "sha256:f018152a159a4f6792b59779ed87de1b4ca63e808c1cbd2f3c813e166745ab96",
+        "lfDigest": "sha256:f018152a159a4f6792b59779ed87de1b4ca63e808c1cbd2f3c813e166745ab96"
+      },
+      "tests/e2e/share/PR-DRAFT.md": {
+        "bytes": 1721,
+        "digest": "sha256:9400d1862ec8ad232b33faf8da505aaa46d822431bec8d2653caf12a361893ca",
+        "lfDigest": "sha256:9400d1862ec8ad232b33faf8da505aaa46d822431bec8d2653caf12a361893ca"
+      },
+      "tests/e2e/share/export-evidence.mjs": {
+        "bytes": 3026,
+        "digest": "sha256:8501fe94f0e2afc87f9c8319c0a264c72fe4d6a344f0983ba9c1073555758031",
+        "lfDigest": "sha256:8501fe94f0e2afc87f9c8319c0a264c72fe4d6a344f0983ba9c1073555758031"
+      },
+      "tests/e2e/share/flow.spec.ts": {
+        "bytes": 5063,
+        "digest": "sha256:d5fdbb5714fae8e591012d5348436b26bf7cbb50fd6d65f352ca229562311034",
+        "lfDigest": "sha256:d5fdbb5714fae8e591012d5348436b26bf7cbb50fd6d65f352ca229562311034"
+      },
+      "tests/e2e/share/record-command.mjs": {
+        "bytes": 4865,
+        "digest": "sha256:dc923db0e8004627ee8a68f2ee304d7aa1934c8812bd5b759ffeaef1e2b486d8",
+        "lfDigest": "sha256:dc923db0e8004627ee8a68f2ee304d7aa1934c8812bd5b759ffeaef1e2b486d8"
+      },
+      "tests/e2e/share/screenshot.acceptance.mjs": {
+        "bytes": 11484,
+        "digest": "sha256:5fc98cae93e3eeafc0f1a17bf635224665d1db36d14f041e50ca7fa434aef9cb",
+        "lfDigest": "sha256:5fc98cae93e3eeafc0f1a17bf635224665d1db36d14f041e50ca7fa434aef9cb"
+      },
+      "tests/e2e/share/screenshot.spec.ts": {
+        "bytes": 871,
+        "digest": "sha256:3baf97a1842268326dd4c694c9f51512009f24553b9bebea9899fe196bc96209",
+        "lfDigest": "sha256:3baf97a1842268326dd4c694c9f51512009f24553b9bebea9899fe196bc96209"
+      }
+    },
+    "generatedHistoricalEvidence": [
+      "docs/evidence/D10/deterministic/cancelled.png",
+      "docs/evidence/D10/deterministic/failure.png",
+      "docs/evidence/D10/deterministic/recovered.png",
+      "docs/evidence/D10/deterministic/success.png",
+      "tests/e2e/versions/evidence/2026-10-12/fixture/T1-version-switch.png",
+      "tests/e2e/versions/evidence/2026-10-12/fixture/T2-source-error.png",
+      "tests/e2e/versions/evidence/2026-10-12/fixture/T3-failed-keeps-preview.png",
+      "tests/e2e/versions/evidence/2026-10-12/fixture/T4-script-as-text.png"
+    ],
+    "completedAt": "2026-10-19T13:01:07.497Z",
+    "logDigest": "sha256:fe8430813ddd5cf318e7d653a019f332bcfafb84dfa21b6832723b6042ec318e",
+    "log": ".local-data/d16-b/2026-10-19T12-59-51.288Z-e2e/command.log",
+    "resultLines": [
+      "  59 passed (1.1m)"
     ]
   }
 ]

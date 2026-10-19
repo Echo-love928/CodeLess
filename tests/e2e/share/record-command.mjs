@@ -25,7 +25,7 @@ const metadata = { mode, command: commands[mode], startedAt: new Date().toISOStr
   head: spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim(),
   changes: spawnSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).stdout.trim() }
 metadata.toolchain = { node: process.version, javaHome: env.JAVA_HOME ?? null, pnpm: '12.6.0 (repository corepack pin)' }
-const sourcePaths = spawnSync('git', ['ls-files', '--modified', '--others', '--exclude-standard', '-z', '--',
+const sourcePaths = spawnSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z', '--',
   'services/runner/src/screenshot', 'apps/web/src/features/deploy', 'apps/web/src/features/source', 'tests/e2e/share'],
   { encoding: 'utf8' }).stdout.split('\0').filter(Boolean)
 metadata.sourceDigests = Object.fromEntries([...new Set(sourcePaths)].filter(path => !path.includes('/evidence/')).map(path => {

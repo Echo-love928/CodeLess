@@ -102,6 +102,10 @@ browser ZIP fixture is explicitly only a transport fixture; it cannot prove this
 
 ## Reproduction
 
+Use the pinned Node/pnpm tools and installed Chromium; set `JAVA_HOME` to the
+existing Java 21 installation before running `gate`. The recorder prepends that
+installation's bin directory for the child processes without changing machine settings.
+
 ```text
 node tests/e2e/share/record-command.mjs screenshot
 node tests/e2e/share/record-command.mjs unit
