@@ -1,0 +1,11 @@
+[Unit]
+Description=Restrict CodeLess host backends to private ingress and loopback
+After=docker.service
+Requires=docker.service
+Before=codeless-api.service codeless-preview.service
+[Service]
+Type=oneshot
+ExecStart=/opt/codeless/ops/protect-backends.sh
+RemainAfterExit=yes
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,198 @@
+{
+  "paths": {
+    "/api/v0/publications": {
+      "post": {
+        "operationId": "createPublication",
+        "summary": "Publish a verified immutable version",
+        "description": "Explicit authenticated owner click; immutable VERIFIED version, artifactDigest and owner-scoped Idempotency-Key required. Same key/body replays the same publication; a changed binding returns 409.",
+        "tags": [
+          "publications"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CsrfToken"
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./deploy/request.schema.json"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Publication requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/publication.schema.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "description": "Version is not verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "503": {
+            "description": "Immutable snapshot or deployment ledger unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/publications/{publicationId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/PublicationId"
+        }
+      ],
+      "get": {
+        "operationId": "getPublication",
+        "summary": "Get publication state",
+        "tags": [
+          "publications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/publication.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v0/publications/{publicationId}/deployment": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/PublicationId"
+        }
+      ],
+      "get": {
+        "operationId": "getDeploymentRecord",
+        "summary": "Get locked deployment phases",
+        "tags": [
+          "publications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./deploy/deployment.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "503": {
+            "description": "Immutable snapshot or deployment ledger unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/applications/{applicationId}/publications": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ApplicationId"
+        }
+      ],
+      "get": {
+        "operationId": "listApplicationPublications",
+        "summary": "Get recent attempts and last successful publication",
+        "tags": [
+          "publications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./deploy/list.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "503": {
+            "description": "Immutable snapshot or deployment ledger unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./schemas/v0/error.schema.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

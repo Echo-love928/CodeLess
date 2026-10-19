@@ -81,6 +81,16 @@ class LocalVolumeSnapshotStoreTest {
             try(var contents=Files.list(outside)) {assertThat(contents.count()).isZero();}
         } finally {Files.delete(link);}
     }
+    @Test void unexpectedOutcomeFailureRetainsPrivateCauseAndPublicCode() throws Exception {
+        var volume=temporary.resolve("volume");var store=new LocalVolumeSnapshotStore(volume);var input=input();UUID id=UUID.randomUUID();
+        store.freezeSource(id,input.directory(),input.digest(),input.files());
+        var result=json.valueToTree(Map.of("status","VERIFIED","sourceDigest",input.digest(),
+                "build",Map.of("status","SUCCEEDED","exitCode",0,"artifact",Map.of("directory",temporary.resolve("missing-runner-artifact").toString())),
+                "verification",Map.of("status","PASSED","workerExitCode",0)));
+        assertThatThrownBy(()->store.freezeOutcome(id,input.digest(),"VERIFIED",result,null))
+                .isInstanceOf(SnapshotFailure.class).hasMessage("SNAPSHOT_UNAVAILABLE").hasCauseInstanceOf(NoSuchFileException.class);
+        assertThat(Files.exists(volume.resolve(id.toString()).resolve("outcome"))).isFalse();
+    }
     @Test void sourceLimitsAreRealUtf8Bytes() throws Exception {
         var input=input();Files.write(input.directory().resolve("src/pages/HomePage.vue"),new byte[131073]);
         var store=new LocalVolumeSnapshotStore(temporary.resolve("volume"));

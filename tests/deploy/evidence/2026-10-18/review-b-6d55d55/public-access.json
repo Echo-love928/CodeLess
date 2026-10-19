@@ -1,0 +1,18 @@
+{
+  "origin": "https://d9f35ba94b79e8fb89361da2498b8dbf5.sites.codeless-publish.top",
+  "checkedAt": "2026-10-18",
+  "method": "curl GET via local proxy; first attempts timed out at the proxy, per-path retries recorded",
+  "results": {
+    "/": "200 text/html",
+    "/tasks": "200 text/html",
+    "/tasks/42": "404 (fixed-route fallback limited to /, /tasks, /catalog by design)",
+    "/assets/missing-xyz.js": "404",
+    "/src/main.ts": "404",
+    "/src/": "404",
+    "/assets/": "404",
+    "/.git/config": "404",
+    "/package.json": "404"
+  },
+  "deployedHashMatchesHead": false,
+  "note": "Public runtime predates 6d55d55 per PR body; this proves the prior package only (suggestion 2)."
+}

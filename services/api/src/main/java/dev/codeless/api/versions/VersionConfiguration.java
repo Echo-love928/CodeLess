@@ -9,6 +9,7 @@ import org.springframework.core.env.Environment;
 public class VersionConfiguration {
     @Bean SnapshotStore snapshotStore(Environment env) {
         String agent = env.getProperty("codeless.agent.private-root", ".local-data/agent");
-        return new LocalVolumeSnapshotStore(Path.of(env.getProperty("codeless.versions.root", agent + "/versions")));
+        return new LocalVolumeSnapshotStore(Path.of(env.getProperty("codeless.versions.root", agent + "/versions")),
+                env.getProperty("codeless.versions.shared-readers", Boolean.class, false));
     }
 }

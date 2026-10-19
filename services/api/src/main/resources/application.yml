@@ -19,6 +19,14 @@ server:
         secure: ${CODELESS_COOKIE_SECURE:true}
         same-site: lax
 codeless:
+  deploy:
+    hosting-enabled: ${CODELESS_PUBLICATION_ENABLED:false}
+    node-executable: ${CODELESS_NODE_EXECUTABLE:}
+    gateway-entry: ${CODELESS_PUBLICATION_GATEWAY_ENTRY:}
+    hosting-root: ${CODELESS_HOSTING_ROOT:}
+    public-origin: ${CODELESS_PUBLICATION_ORIGIN:}
+    platform-origin: ${CODELESS_PLATFORM_ORIGIN:}
+    preview-origin: ${CODELESS_PREVIEW_ORIGIN:}
   model:
     provider: ${CODELESS_MODEL_PROVIDER:deterministic-mock}
     audit-root: ${CODELESS_MODEL_AUDIT_ROOT:.local-data/model-calls}

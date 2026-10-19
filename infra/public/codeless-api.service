@@ -1,0 +1,27 @@
+[Unit]
+Description=CodeLess private Java API
+After=codeless-worker.service codeless-backend-firewall.service
+Wants=codeless-worker.service
+Requires=codeless-backend-firewall.service
+[Service]
+User=codeless-api
+Group=codeless-shared
+SupplementaryGroups=codeless-ipc
+UMask=0007
+WorkingDirectory=/srv/codeless/repository
+EnvironmentFile=/etc/codeless/api.env
+ExecStart=/usr/bin/java -Xms128m -Xmx384m -jar /srv/codeless/api.jar
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadWritePaths=/srv/codeless/private
+ReadOnlyPaths=/srv/codeless/publication
+InaccessiblePaths=/var/run/docker.sock /run/docker.sock /etc/codeless/tls /etc/letsencrypt -/srv/codeless/postgres
+MemoryMax=896M
+TasksMax=512
+[Install]
+WantedBy=multi-user.target
