@@ -64,5 +64,3 @@ HTTP 下载、干净容器安装构建均为真实执行。没有真实付费模
 - 已知限制：D11 报告未冻结构建时模板摘要；导出使用当前受控模板（清单如实记录 `templateDigest`）。
 
 审查者：另一名成员；作者不自批。合并条件：最新 main 组合通过全部必需检查（ci-gate=success）、真实报告存在、无未解决阻塞讨论、同伴批准。
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
