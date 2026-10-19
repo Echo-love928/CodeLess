@@ -271,6 +271,20 @@ public final class LocalVolumeSnapshotStore implements SnapshotStore {
         } catch(SnapshotFailure failure) {throw failure;}
         catch(Exception failure) {throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE");}
     }
+    @Override public Map<String,byte[]> sourceBytes(UUID id,String digest) {
+        // The full scan rejects any unexpected member; each manifest file is then read again within the source quota.
+        var source=source(id,digest);var result=new LinkedHashMap<String,byte[]>();
+        try {
+            for(var entry:source.manifest().files()) {
+                byte[] bytes=read(source.directory().resolve(entry.path()),131072);
+                if(bytes.length!=entry.bytes() || !hash(bytes).equals(entry.digest())) throw new SnapshotFailure("SNAPSHOT_DIGEST_MISMATCH");
+                decode(bytes);
+                result.put(entry.path(),bytes);
+            }
+            return Collections.unmodifiableMap(result);
+        } catch(SnapshotFailure failure) {throw failure;}
+        catch(Exception failure) {throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE");}
+    }
     @Override public JsonNode componentMapping(UUID id,String digest) {
         // Verify original immutable source/outcome/artifact before trusting this sidecar.
         var outcome=outcome(id,digest,"VERIFIED");
