@@ -12,7 +12,7 @@ let generation = 0, abort: AbortController | undefined
 const urls = new Set<string>()
 function reset() { generation++; abort?.abort(); loading.value = false; error.value = ''; notice.value = ''; for (const url of urls) URL.revokeObjectURL(url); urls.clear() }
 async function download() {
-  if (loading.value || !props.version) return
+  if (loading.value || props.version?.status !== 'VERIFIED') return
   const current = ++generation, version = { ...props.version }
   loading.value = true; error.value = ''; notice.value = ''; abort = new AbortController()
   try {
@@ -29,13 +29,14 @@ async function download() {
     if (cause instanceof ApiError && cause.status === 401) emit('unauthorized')
   } finally { if (current === generation) loading.value = false }
 }
-watch(() => [props.version?.id, props.version?.sourceDigest, session.user?.id, session.status], reset)
+watch(() => [props.version?.id, props.version?.sourceDigest, props.version?.status, session.user?.id, session.status], reset)
 onBeforeUnmount(reset)
 </script>
 
 <template>
   <div class="source-download">
-    <button type="button" class="button-secondary" :disabled="!version || loading" @click="download">{{ loading ? '正在校验源码包…' : version ? `下载源码 · v${version.number}` : '下载源码' }}</button>
+    <button type="button" class="button-secondary" :disabled="version?.status !== 'VERIFIED' || loading" @click="download">{{ loading ? '正在校验源码包…' : version ? `下载源码 · v${version.number}` : '下载源码' }}</button>
+    <p v-if="version && version.status !== 'VERIFIED'" role="status">{{ version.status === 'DRAFT' ? '草稿版本尚未验证，暂不可下载源码。' : '验证失败的版本不可下载源码。' }}</p>
     <p v-if="version" class="download-binding">下载版本：{{ version.id }}<br>源码摘要：{{ version.sourceDigest }}</p>
     <p v-if="error" role="alert">{{ error }}</p><p v-if="notice" role="status">{{ notice }}</p>
   </div>

@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto'
 const mode = process.argv[2], windows = process.platform === 'win32'
 const commands = {
   unit: ['corepack', 'pnpm', '--filter', '@codeless/web', 'exec', 'vitest', 'run', 'src/features/source', 'src/features/deploy'],
-  screenshot: ['node', '--test', 'tests/e2e/share/screenshot.acceptance.mjs'],
+  screenshot: ['node', '--test', 'tests/e2e/share/screenshot.acceptance.mjs', 'tests/e2e/share/queue.acceptance.mjs'],
   browser: ['corepack', 'pnpm', '--filter', '@codeless/web', 'exec', 'playwright', 'test', '--config', 'playwright.config.ts', 'share/flow.spec.ts'],
   static: ['corepack', 'pnpm', 'verify:static'], api: ['corepack', 'pnpm', 'verify:api'],
   runner: ['corepack', 'pnpm', 'verify:runner'], e2e: ['corepack', 'pnpm', 'verify:e2e'], gate: ['corepack', 'pnpm', 'ci:gate'],

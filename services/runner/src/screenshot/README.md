@@ -35,12 +35,32 @@ a terminal FAILED job is not silently retried on a UI refresh. Each job has at
 most two attempts, a 12-second default deadline per attempt including DNS, and
 up to two seconds of owned-process cleanup. Cleanup uncertainty stops retries.
 Queue capacity is 100 retained deployment jobs (maximum ~600 MiB of PNGs).
-An operator must archive terminal jobs only while the queue is closed; there is
-no automatic deletion of publication history.
+When admission needs room, the oldest terminal SUCCEEDED/FAILED cover is removed
+from this private queue. Pending/running jobs are never evicted; 100 nonterminal
+jobs still return QUEUE_FULL. Image reads serialize with retention. The active
+job is excluded even while its success record is being saved. Legacy terminal
+records use their job.json modification time until a completion time is present.
+Eviction changes only cover retention: old covers become unavailable/placeholders;
+SQL publication history, PUBLISHED status and the public website stay intact.
+The coordinator should reconcile recent publications within this retention window,
+not continually re-enqueue evicted historical publications.
 
 The lifetime `owner.lock` prevents two processes owning a root. `close()` drains
-owned work before removing it. After a host crash, an operator must first prove
-the old owner/browser processes are gone before removing this specific stale lock.
+owned work before removing it. After a host crash, use the offline recovery tool:
+
+```text
+# Stop all coordinators and their browser trees before this offline operation.
+node services/runner/src/screenshot/recover-lock.mjs <private-queue-root> --workers-stopped
+```
+
+The tool checks the bounded, regular single-link lock, same hostname (when present),
+valid owner UUID/PID, native process liveness and unchanged lock identity before
+removal. It refuses live owners, permission/unknown results, malformed locks or
+foreign hosts. Legacy local locks without hostname are accepted only under the
+same offline maintenance requirement. PID reuse fails closed and requires operator
+investigation. This is a local private root, not a distributed/shared-host lock.
+No startup auto-recovery or browser-killing heuristic is used: a dead coordinator
+PID alone cannot prove its browser tree is gone, and concurrent recovery is unsafe.
 On reopening, RUNNING/RETRYING records become FAILED/CAPTURE_INTERRUPTED; no blind
 replay. Corrupt/unknown state or image hashes fail closed. Atomic JSON rename is
 used on the private volume; filesystem/SQL are not a distributed transaction.
@@ -79,26 +99,30 @@ Do not expose enqueue as an unauthenticated or model tool. UI refreshes only GET
 the metadata; a missing adapter, timeout or image failure displays a placeholder
 without discarding the successful share URL.
 
-## D16-A export proposal — requires agreement and real integration
+## D16-A export contract
 
-No export contract, implementation, or open D16-A PR was present at the initial
-2026-10-19 read. `export-api.ts` is a provisional independent adapter, not a claim
-that this HTTP route exists:
+The download adapter now follows PR #48's actual `contracts/export/README.md`
+(API implementation unchanged between A's feb820c and reviewed 684ef36):
 
-`GET /api/v0/versions/{id}/source-export`, authenticated/owner-scoped, no redirect,
-ZIP body <=16 MiB, `Content-Length`, `Content-Type: application/zip`,
-`X-Application-Id`, `X-Version-Id`, `X-Source-Digest`, `X-Archive-Digest` (SHA-256 of ZIP bytes).
-The UI checks every binding and byte digest, uses an ID-derived filename and a
-30-second timeout, and never falls back to the latest version. 401/403 and missing
-service remain errors. Selection/account changes abort and invalidate late downloads.
+`GET /api/v0/versions/{id}/export`, authenticated/owner-scoped, no redirect,
+`Content-Type: application/zip`, `X-CodeLess-Version-Id` and
+`X-CodeLess-Source-Digest` bound to the selected VERIFIED version.
+The streamed body is capped at 16 MiB and must begin with the ZIP local-header
+signature. Content-Length, application-ID and ZIP-byte-digest headers are not
+required. A's Content-Digest is a manifest-member digest, not a ZIP byte digest.
+The UI uses `codeless-{id}.zip`, a 30-second timeout and no latest-version fallback.
+DRAFT/FAILED are locally disabled. Error JSON codes map to fixed user messages;
+untrusted server text is not shown. Selection/status/account changes invalidate
+late responses. The regression fixture contains A's actual verified owner ZIP.
 
-A must still supply an exact immutable-version export with template/package/lock
-files, secret/dependency filtering and authorization. The enabling PR must reconcile
-these proposed headers/routes with A's **actual** contract and register shared
-OpenAPI, install the screenshot coordinator and owner HTTP bridge, then verify:
+The enabling PR must still register shared OpenAPI, install the screenshot
+coordinator and owner HTTP bridge, then verify:
 real public URL -> exact cover -> source ZIP -> version/source/artifact records,
 including clean unzip/install/build and illegal/cross-owner downloads. The current
-browser ZIP fixture is explicitly only a transport fixture; it cannot prove this.
+browser fixture is explicitly a UI transport fixture; it cannot prove the public
+hosting/cover integration. `tests/e2e/share/source-export-interop.mjs` separately
+checks the unmocked B adapter against an isolated live A HTTP test server; required
+test session/origin variables are documented in that developer-only harness.
 
 ## Reproduction
 

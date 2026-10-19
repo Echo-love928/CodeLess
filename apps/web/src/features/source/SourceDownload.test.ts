@@ -23,3 +23,22 @@ it('T4: switches the download version, suppresses stale responses and disables d
   expect(wrapper.text()).toContain('版本 v2')
   wrapper.unmount(); expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:fixture')
 })
+it.each(['DRAFT', 'FAILED'] as const)('disables %s downloads and explains why retry cannot help', async status => {
+  const wrapper = mount(SourceDownload, { props: { version: { ...version, status } } })
+  expect(wrapper.get('button').attributes('disabled')).toBeDefined()
+  expect(wrapper.text()).toContain(status === 'DRAFT' ? '尚未验证' : '验证失败')
+  await wrapper.get('button').trigger('click')
+  expect(exportSource).not.toHaveBeenCalled()
+  wrapper.unmount()
+})
+it('invalidates a pending download if the version loses VERIFIED status', async () => {
+  let resolve!: (value: SourceArchive) => void
+  vi.mocked(exportSource).mockReturnValueOnce(new Promise(done => { resolve = done }))
+  const wrapper = mount(SourceDownload, { props: { version } })
+  await wrapper.get('button').trigger('click')
+  await wrapper.setProps({ version: { ...version, status: 'FAILED' } })
+  resolve({ blob: new Blob(['fixture']), filename: 'old.zip' }); await flushPromises()
+  expect(URL.createObjectURL).not.toHaveBeenCalled()
+  expect(wrapper.get('button').attributes('disabled')).toBeDefined()
+  wrapper.unmount()
+})

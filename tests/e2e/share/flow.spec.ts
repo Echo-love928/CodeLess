@@ -1,5 +1,4 @@
 import { expect, test, type Page } from '@playwright/test'
-import { createHash } from 'node:crypto'
 import { readFile, mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { installVersionsFixture, openWorkbench, appId, ids, versions } from '../versions/fixture'
@@ -43,15 +42,14 @@ test('T4: actual browser download requests exactly the selected historical versi
   await fixture(page)
   const requests: string[] = []
   let mismatch = false
-  // Transport fixture only. D16-A must supply a real clean-buildable archive for integration.
+  // Explicit UI transport fixture; the adapter unit test separately uses A's real ZIP.
   const zip = Buffer.from([80, 75, 3, 4, 1, 2, 3, 4])
-  await page.route('**/api/v0/versions/*/source-export', route => {
+  await page.route('**/api/v0/versions/*/export', route => {
     const id = new URL(route.request().url()).pathname.split('/versions/')[1].split('/')[0]
     requests.push(id)
     const version = versions.find(value => value.id === id)!
-    return route.fulfill({ contentType: 'application/zip', body: zip, headers: { 'Content-Length': String(zip.length),
-      'X-Application-Id': appId, 'X-Version-Id': mismatch ? ids[1] : id, 'X-Source-Digest': version.sourceDigest,
-      'X-Archive-Digest': 'sha256:' + createHash('sha256').update(zip).digest('hex') } })
+    return route.fulfill({ contentType: 'application/zip', body: zip, headers: {
+      'X-CodeLess-Version-Id': mismatch ? ids[1] : id, 'X-CodeLess-Source-Digest': version.sourceDigest } })
   })
   await page.locator(`[data-version-id="${ids[0]}"]`).getByRole('button').click()
   const source = page.getByRole('region', { name: '只读源码' })
@@ -59,7 +57,7 @@ test('T4: actual browser download requests exactly the selected historical versi
   const pending = page.waitForEvent('download')
   await source.getByRole('button', { name: '下载源码 · v1' }).click()
   const download = await pending
-  expect(download.suggestedFilename()).toBe(`codeless-v1-${ids[0]}.zip`)
+  expect(download.suggestedFilename()).toBe(`codeless-${ids[0]}.zip`)
   expect(await readFile((await download.path())!)).toEqual(zip)
   expect(requests).toEqual([ids[0]])
   mismatch = true
@@ -67,4 +65,10 @@ test('T4: actual browser download requests exactly the selected historical versi
   await source.getByRole('button', { name: '下载源码 · v1' }).click()
   await expect(source.getByRole('alert')).toContainText('已停止下载')
   expect(downloads).toEqual([]); expect(requests).toEqual([ids[0], ids[0]])
+  for (const index of [2, 3]) {
+    await page.locator(`[data-version-id="${ids[index]}"]`).getByRole('button').click()
+    await expect(source.getByRole('button', { name: `下载源码 · v${index + 1}` })).toBeDisabled()
+    await expect(source).toContainText(index === 2 ? '尚未验证' : '验证失败的版本不可下载')
+  }
+  expect(requests).toEqual([ids[0], ids[0]])
 })
