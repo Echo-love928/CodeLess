@@ -6,7 +6,7 @@ import { ApiError } from '../../api/http'
 import { clearSession, session } from '../auth/session'
 import AdminTable from './AdminTable.vue'
 import AdminMetrics from './AdminMetrics.vue'
-import { cancelTask, cancellable, getMetrics, listRecords, query, resources, type AdminRecord, type Filters, type Metrics, type Resource } from './admin-api'
+import { CancellationRejected, cancelTask, cancellable, getMetrics, listRecords, query, resources, type AdminRecord, type Filters, type Metrics, type Resource } from './admin-api'
 
 const router = useRouter()
 const labels: Record<Resource, string> = { tasks: '任务', applications: '应用', deployments: '部署', users: '用户', 'model-calls': '模型调用', audit: '取消审计' }
@@ -35,6 +35,10 @@ function block(id: string) {
   blocked.value = [...new Set([...blocked.value, id])]
   // Persist before POST. If persistence fails, do not submit an unrecoverable intent.
   sessionStorage.setItem(storageKey(), JSON.stringify(blocked.value))
+}
+function unblock(id: string) {
+  blocked.value = blocked.value.filter(value => value !== id)
+  try { sessionStorage.setItem(storageKey(), JSON.stringify(blocked.value)) } catch { /* Keep the current view retryable if browser storage is unavailable. */ }
 }
 function purge() {
   epoch++; rows.value = []; metrics.value = null; total.value = 0; target.value = null
@@ -86,8 +90,10 @@ async function confirmCancel() {
   if (submitting.value || !target.value || !reason.value.trim() || !permitted.value) return
   const selected = { ...target.value }, currentIdentity = identity.value
   submitting.value = true; feedback.value = ''; feedbackError.value = false
+  let submitted = false
   try {
     block(selected.id)
+    submitted = true
     const result = await cancelTask(selected.id, reason.value)
     if (currentIdentity !== identity.value || !permitted.value) return
     const outcome = result.audit.outcome
@@ -95,9 +101,13 @@ async function confirmCancel() {
     rows.value = rows.value.map(row => row.id === selected.id ? result.task : row)
     feedback.value = `任务 ${selected.id}：${outcome === 'CANCELLED' ? '服务端确认已取消（FAILED / CANCELLED）' : outcome === 'ALREADY_TERMINAL' ? '任务已经终止，本次没有重复取消' : '取消审计结果未知或失败，勿重复提交，请核对审计'}。审计 ID：${result.audit.id}；结果：${outcome}。`
   } catch (error) {
-    if (currentIdentity !== identity.value || !permitted.value || await authorizationError(error)) return
+    if (currentIdentity !== identity.value || !permitted.value) return
+    const rejected = !submitted || error instanceof CancellationRejected || error instanceof ApiError && ['unauthorized', 'forbidden'].includes(error.kind)
+    if (rejected) unblock(selected.id)
+    if (await authorizationError(error)) return
     feedbackError.value = true
-    feedback.value = `任务 ${selected.id} 取消未获确认，结果未知，请核对后台审计，勿重复提交。${error instanceof Error ? error.message : '操作失败。'}`
+    feedback.value = rejected ? `任务 ${selected.id} 未取消。${error instanceof Error ? error.message : '提交失败。'}可核对后重试。`
+      : `任务 ${selected.id} 取消未获确认，结果未知，请核对后台审计，勿重复提交。${error instanceof Error ? error.message : '操作失败。'}`
   } finally {
     submitting.value = false; dialog.value?.close(); target.value = null
   }

@@ -9,11 +9,13 @@ afterEach(() => { clearSession(); vi.resetAllMocks() })
 it('propagates lost authorization from a lazy trend read so the parent clears all private records', async () => {
   session.status = 'authenticated'; session.user = { id: 'admin', role: 'ADMIN', email: 'admin@example.test', displayName: 'Admin' }
   vi.mocked(getGenerationTrend).mockRejectedValue(new ApiError('forbidden', 403))
-  const counts = { succeeded: 0, failed: 0, pending: 0, cancelled: 0, unknown: 0 }
+  const counts = { succeeded: 0, failed: 0, pending: 0, cancelled: 0 }
   const wrapper = mount(AdminMetrics, { props: { filters: { status: '', ownerId: '', from: '', to: '' },
     metrics: { generation: counts, deployment: counts, usage: { inputTokens: null, outputTokens: null, unknownCalls: 1 }, trend: [] } } })
   wrapper.get('details').element.open = true
   await wrapper.get('details').trigger('toggle'); await flushPromises()
   expect(wrapper.emitted('authorization-error')?.[0]?.[0]).toMatchObject({ kind: 'forbidden' })
+  expect(wrapper.text()).not.toContain('未知 0')
+  expect(wrapper.text()).toContain('INTERRUPTED 计为失败')
   wrapper.unmount()
 })

@@ -48,7 +48,9 @@ POST 使用同源 Cookie 和现有 CSRF token，无开放 shell 或批量操作�
 CANCELLED 还必须与任务 FAILED/CANCELLED、cancellable=false、审计 resultingStatus=FAILED 一致。
 只有匹配回执才显示成功并用服务端 task 更新原行。
 ALREADY_TERMINAL 显示“已经终止”，不声称再次取消；UNKNOWN/FAILED 等审计结果保持未知/错误。
-网络/协议/503 失败不改原行、不自动重试。
+网络中断、超时、无法核验的回执或来源不明的 5xx 不改原行、不自动重试，保留待核对锁定。
+400/404 和明确的 503 `ADMIN_AUDIT_UNAVAILABLE` 表示未取消，显示原因并解除该行锁定，允许手动重试。
+401/403 解除本次意图锁定并按权限错误清空数据、跳转页面。
 
 提交前持久保存当前账号与目标 ID 的浏览器重复点击保护，同标签页刷新后仍不能盲目重发。
 它不是跨标签页幂等或后台事务机制。需要维护者核对审计后处理未确认目标。

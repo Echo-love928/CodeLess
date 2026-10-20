@@ -12,6 +12,7 @@ const columns: Record<Resource, { key: keyof AdminRecord; label: string }[]> = {
 }
 function cell(row: AdminRecord, key: keyof AdminRecord) {
   const value = row[key]
+  if (key === 'failureCode' && row.status && row.status !== 'FAILED' && value === null) return '不适用'
   return value === null || value === undefined || value === '' ? '未知 / 未提供' : String(value)
 }
 </script>

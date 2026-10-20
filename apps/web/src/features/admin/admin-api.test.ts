@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { wireMetrics, wireCancel } from '../../../../../tests/e2e/admin/wire-fixture'
 import { session, clearSession } from '../auth/session'
-import { cancelTask, getMetrics, listRecords, successRate, checkAdmin, type Outcomes } from './admin-api'
+import { CancellationRejected, cancelTask, getMetrics, getGenerationTrend, listRecords, successRate, checkAdmin, statusLabel, type Outcomes } from './admin-api'
 
 const id = '11111111-1111-4111-8111-111111111111'
 const filters = { ownerId: '', status: '', from: '', to: '' }
-const counts: Outcomes = { succeeded: 0, failed: 0, pending: 0, cancelled: 0, unknown: 0 }
+const counts: Outcomes = { succeeded: 0, failed: 0, pending: 0, cancelled: 0 }
 const metrics = () => wireMetrics({ empty: true })
 const respond = (body: unknown, status = 200) => vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(body), { status })))
 beforeEach(() => { session.status = 'authenticated'; session.user = { id, role: 'ADMIN', displayName: 'Admin', email: 'admin@example.test' }; session.csrfToken = 'csrf' })
@@ -41,8 +41,8 @@ it('keeps unknown status and null usage, including genuine measured zero', async
   expect((await listRecords('model-calls', filters, 0, 20)).items[0]).toMatchObject({ status: 'NEW_STATUS', inputTokens: null, outputTokens: 0 })
   respond(metrics()); expect((await getMetrics(filters)).usage.inputTokens).toBeNull()
   expect(successRate(counts)).toBe('暂无已知终态')
-  expect(successRate({ ...counts, unknown: 4, pending: 3 })).toBe('暂无已知终态')
-  expect(successRate({ ...counts, succeeded: 1, failed: 3, unknown: 40, pending: 10 })).toBe('25.0%')
+  expect(successRate({ ...counts, pending: 3 })).toBe('暂无已知终态')
+  expect(successRate({ ...counts, succeeded: 1, failed: 3, pending: 10 })).toBe('25.0%')
 })
 it('keeps generation and deployment denominators separate and omits table status from metrics', async () => {
   const value = metrics(); value.generation = wireMetrics().generation; value.deployment = wireMetrics().deployment
@@ -50,6 +50,32 @@ it('keeps generation and deployment denominators separate and omits table status
   const result = await getMetrics({ ...filters, status: 'READY' })
   expect(successRate(result.generation)).toBe('75.0%'); expect(successRate(result.deployment)).toBe('25.0%')
   expect(String(vi.mocked(fetch).mock.calls[0]![0])).not.toContain('status=')
+})
+it.each([[57, 800, 0.0713], [113, 800, 0.1413], [3, 4, 0.75]])(
+  'accepts backend rounding for %i/%i in both generation and deployment', async (succeeded, denominator, rate) => {
+    const value = metrics()
+    value.generation = { ...value.generation, total: denominator, ready: succeeded, failed: denominator - succeeded, denominator, successRate: rate }
+    value.deployment = { ...value.deployment, total: denominator, published: succeeded, failed: denominator - succeeded, denominator, successRate: rate }
+    respond(value)
+    await expect(getMetrics(filters)).resolves.toMatchObject({ generation: { rate, denominator }, deployment: { rate, denominator } })
+  },
+)
+it('accepts backend rounding when loading a daily trend window', async () => {
+  const value = metrics()
+  const range = { from: '2026-10-19T00:00:00.000Z', to: '2026-10-20T00:00:00.000Z' }
+  value.window = { ...range, field: 'createdAt' }
+  value.generation = { ...value.generation, total: 800, ready: 57, failed: 743, denominator: 800, successRate: 0.0713 }
+  respond(value)
+  await expect(getGenerationTrend({ ...filters, ...range })).resolves.toEqual([
+    expect.objectContaining({ day: '2026-10-19', generation: expect.objectContaining({ rate: 0.0713 }) }),
+  ])
+})
+it.each(['generation', 'deployment'] as const)('still rejects an incorrect rounded rate in %s', async key => {
+  const value = metrics()
+  if (key === 'generation') value.generation = { ...value.generation, total: 800, ready: 57, failed: 743, denominator: 800, successRate: 0.0712 }
+  else value.deployment = { ...value.deployment, total: 800, published: 57, failed: 743, denominator: 800, successRate: 0.0712 }
+  respond(value)
+  await expect(getMetrics(filters)).rejects.toThrow('不符合约定')
 })
 it('rejects missing usage, false precise totals and inconsistent backend denominators', async () => {
   respond({ ...metrics(), tokens: { unknownCalls: 0 } }); await expect(getMetrics(filters)).rejects.toThrow('不符合约定')
@@ -84,4 +110,21 @@ it('matches the audit actor and target, and preserves a committed task with UNKN
   expect((await cancelTask(id, 'reason')).audit.outcome).toBe('UNKNOWN')
   const wrong = wireCancel(id, id, id); wrong.audit.resultingStatus = 'READY'; respond(wrong)
   await expect(cancelTask(id, 'reason')).rejects.toThrow('不符合约定')
+})
+it.each([[400, 'INVALID_REQUEST'], [404, 'NOT_FOUND'], [503, 'ADMIN_AUDIT_UNAVAILABLE']])(
+  'identifies a definite cancellation rejection (%i, %s)', async (status, code) => {
+    respond({ code }, status as number)
+    await expect(cancelTask(id, 'reason')).rejects.toBeInstanceOf(CancellationRejected)
+  },
+)
+it('does not treat a generic proxy 503, a network error or a malformed receipt as proof of no cancellation', async () => {
+  respond({ code: 'UNAVAILABLE' }, 503)
+  await expect(cancelTask(id, 'reason')).rejects.toMatchObject({ kind: 'server', status: 503 })
+  vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('connection lost')))
+  await expect(cancelTask(id, 'reason')).rejects.toMatchObject({ kind: 'network' })
+  respond({ task: {} })
+  await expect(cancelTask(id, 'reason')).rejects.toThrow('不符合约定')
+})
+it('labels a missing audit target without inventing an unknown outcome', () => {
+  expect(statusLabel('NOT_FOUND')).toBe('目标不存在 · NOT_FOUND')
 })
