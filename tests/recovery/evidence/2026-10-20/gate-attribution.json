@@ -1,0 +1,28 @@
+{
+  "gateRun": "2026-10-20T14-02-55.130Z-gate-25da0888-6036-47b5-823e-f2be12439f3b",
+  "gateHead": "0c79dd3",
+  "gateNativeExit": 1,
+  "stages": {
+    "verify:static": { "result": "passed", "detail": "contracts node tests 18/18; web vitest 25 files 183/183; lint/types/production build completed (no failing stage line)" },
+    "verify:api": { "result": "failed", "detail": "275 tests, 5 failures, 0 errors, 0 skipped; all 5 failures in dev.codeless.api.preview.PreviewAcceptanceProcessTest; D18-A recovery suites 7/7 passed inside the gate" },
+    "verify:runner": { "result": "passed", "detail": "runner contract boundary passed; node tests 90/90" },
+    "verify:e2e": { "result": "passed", "detail": "cross-resource READY/publication flow passed; Playwright 64 passed (59.3s), 0 failed" }
+  },
+  "attribution": {
+    "method": "Same test class on unmodified origin/main 436c04a in a temporary worktree, same machine, JDK, Docker and environment file",
+    "command": "services/api/mvnw -o -f <base>/services/api/pom.xml -Dtest=PreviewAcceptanceProcessTest test",
+    "baseNativeExit": 1,
+    "baseResult": "Tests run: 8, Failures: 5, Errors: 0, Skipped: 0",
+    "baseFailedTests": [
+      "stopSignalWriteFailureStillReclaimsAndRunsProjectCleanup",
+      "parentExceptionIsNotReplacedByCleanup",
+      "timeoutAssertionAlwaysStopsRootBranchAndLeaf",
+      "interruptionStopsTreeAndRetainsInterrupt",
+      "unavailableProcessReportStillRunsProjectCleanupAndPreservesParent"
+    ],
+    "gateFailedTests": "identical five names",
+    "privateLogSha256": "8d7e57c77f000fb2897fc398f03be5eb14e67390f958f661f9de52b549a706e5",
+    "conclusion": "Pre-existing on this Windows machine (also recorded by D15-A, D16-A and D17-A); not introduced by D18-A. The PR's own remote Linux checks decide; local ci:gate is not reported as success."
+  },
+  "screenshots": "verify:e2e rewrote 8 committed PNGs (docs/evidence/D10/deterministic/*, tests/e2e/versions/evidence/2026-10-12/fixture/*); restored to their tracked bytes, not part of this PR"
+}
