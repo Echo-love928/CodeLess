@@ -3,6 +3,7 @@ import LoginView from './views/LoginView.vue'
 import AppsView from './views/AppsView.vue'
 import WorkbenchView from './views/WorkbenchView.vue'
 import { restoreSession, session } from './features/auth/session'
+import { adminRoute } from './features/admin/routes'
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -10,6 +11,7 @@ export const router = createRouter({
     { path: '/', redirect: '/login' },
     { path: '/login', name: 'login', component: LoginView },
     { path: '/apps', name: 'apps', component: AppsView, meta: { requiresAuth: true } },
+    adminRoute,
     { path: '/workbench/:id', name: 'workbench', component: WorkbenchView, props: true, meta: { requiresAuth: true } },
     { path: '/:pathMatch(.*)*', redirect: '/apps' },
   ],
