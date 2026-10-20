@@ -1,0 +1,1170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeless.local/contracts/admin/admin.schema.json",
+  "title": "CodeLess v0 administrator API (D17-A)",
+  "description": "Response and request shapes for /api/v0/admin/*. Unknown values are explicit null, never 0. See README.md for metric definitions.",
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "nullableTimestamp": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "rate": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "taskStatus": {
+      "enum": [
+        "PLAN",
+        "GENERATE",
+        "VERIFY",
+        "REPAIR",
+        "READY",
+        "FAILED"
+      ]
+    },
+    "pageIndex": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "pageSize": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "User": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "email",
+        "displayName",
+        "status",
+        "role",
+        "applicationCount",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/uuid"
+        },
+        "email": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 320
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "status": {
+          "enum": [
+            "ACTIVE",
+            "DISABLED"
+          ]
+        },
+        "role": {
+          "description": "null when the user has no credentials row (cannot sign in).",
+          "enum": [
+            "USER",
+            "ADMIN",
+            null
+          ]
+        },
+        "applicationCount": {
+          "$ref": "#/$defs/count"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/timestamp"
+        }
+      }
+    },
+    "Application": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "ownerId",
+        "ownerEmail",
+        "name",
+        "status",
+        "dataMode",
+        "latestReadyVersionId",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/uuid"
+        },
+        "ownerId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "ownerEmail": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 320
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "status": {
+          "enum": [
+            "ACTIVE",
+            "ARCHIVED"
+          ]
+        },
+        "dataMode": {
+          "enum": [
+            "STATIC",
+            "MOCK",
+            "LOCAL_STORAGE"
+          ]
+        },
+        "latestReadyVersionId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/timestamp"
+        }
+      }
+    },
+    "Task": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Never contains the prompt. promptPreview is masked first, then cut to 40 code points (+ an ellipsis).",
+      "required": [
+        "id",
+        "applicationId",
+        "ownerId",
+        "kind",
+        "status",
+        "queueState",
+        "repairAttempts",
+        "failureCode",
+        "promptPreview",
+        "promptLength",
+        "cancellable",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/uuid"
+        },
+        "applicationId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "ownerId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "kind": {
+          "enum": [
+            "GENERATION",
+            "EDIT"
+          ]
+        },
+        "status": {
+          "$ref": "#/$defs/taskStatus"
+        },
+        "queueState": {
+          "enum": [
+            "QUEUED",
+            "RUNNING",
+            "FINISHED"
+          ]
+        },
+        "repairAttempts": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "failureCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z0-9_]{1,100}$"
+        },
+        "promptPreview": {
+          "type": "string",
+          "maxLength": 41
+        },
+        "promptLength": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8000
+        },
+        "cancellable": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "READY",
+                  "FAILED"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "cancellable": {
+                "const": false
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "cancellable": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "FAILED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "failureCode": {
+                "type": "string"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "failureCode": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "applicationId",
+        "versionId",
+        "requestedBy",
+        "status",
+        "url",
+        "createdAt",
+        "updatedAt",
+        "publishedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/uuid"
+        },
+        "applicationId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "versionId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "requestedBy": {
+          "$ref": "#/$defs/uuid"
+        },
+        "status": {
+          "description": "PostgreSQL publications.status (terminal truth); REQUESTED is in progress.",
+          "enum": [
+            "REQUESTED",
+            "PUBLISHED",
+            "FAILED"
+          ]
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^https://[^\\s]+$"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "publishedAt": {
+          "$ref": "#/$defs/nullableTimestamp"
+        }
+      },
+      "if": {
+        "properties": {
+          "status": {
+            "const": "PUBLISHED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ModelCall": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Provider-reported usage only. No prompt, response or request body is exposed.",
+      "required": [
+        "id",
+        "taskId",
+        "applicationId",
+        "stage",
+        "provider",
+        "model",
+        "status",
+        "usage",
+        "inputTokens",
+        "outputTokens",
+        "totalTokens",
+        "errorCode",
+        "createdAt",
+        "completedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/uuid"
+        },
+        "taskId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "applicationId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "stage": {
+          "enum": [
+            "PLAN",
+            "GENERATE",
+            "REPAIR"
+          ]
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "status": {
+          "enum": [
+            "REQUESTED",
+            "SUCCEEDED",
+            "FAILED"
+          ]
+        },
+        "usage": {
+          "enum": [
+            "KNOWN",
+            "UNKNOWN",
+            "PENDING"
+          ]
+        },
+        "inputTokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "outputTokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "totalTokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 100
+        },
+        "createdAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "completedAt": {
+          "$ref": "#/$defs/nullableTimestamp"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "usage": {
+                "const": "KNOWN"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inputTokens": {
+                "type": "integer"
+              },
+              "outputTokens": {
+                "type": "integer"
+              },
+              "totalTokens": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "usage": {
+                "const": "UNKNOWN"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "totalTokens": {
+                "type": "null"
+              },
+              "status": {
+                "enum": [
+                  "SUCCEEDED",
+                  "FAILED"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "usage": {
+                "const": "PENDING"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "REQUESTED"
+              },
+              "inputTokens": {
+                "type": "null"
+              },
+              "outputTokens": {
+                "type": "null"
+              },
+              "totalTokens": {
+                "type": "null"
+              },
+              "completedAt": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "AuditEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "action",
+        "actorId",
+        "targetType",
+        "targetId",
+        "reason",
+        "requestedAt",
+        "outcome",
+        "previousStatus",
+        "resultingStatus",
+        "completedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/uuid"
+        },
+        "action": {
+          "enum": [
+            "TASK_CANCEL"
+          ]
+        },
+        "actorId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "targetType": {
+          "enum": [
+            "TASK"
+          ]
+        },
+        "targetId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "reason": {
+          "description": "Administrator input (1..200 code points), stored after credential masking; masking may lengthen it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "requestedAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "outcome": {
+          "description": "UNKNOWN: no completion record (in flight or lost); the task row is authoritative.",
+          "enum": [
+            "CANCELLED",
+            "ALREADY_TERMINAL",
+            "NOT_FOUND",
+            "FAILED",
+            "UNKNOWN"
+          ]
+        },
+        "previousStatus": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/taskStatus"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resultingStatus": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/taskStatus"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "completedAt": {
+          "$ref": "#/$defs/nullableTimestamp"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "UNKNOWN"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "completedAt": {
+                "type": "null"
+              },
+              "previousStatus": {
+                "type": "null"
+              },
+              "resultingStatus": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "completedAt": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "CANCELLED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "previousStatus": {
+                "enum": [
+                  "PLAN",
+                  "GENERATE",
+                  "VERIFY",
+                  "REPAIR"
+                ]
+              },
+              "resultingStatus": {
+                "const": "FAILED"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "ALREADY_TERMINAL"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "previousStatus": {
+                "enum": [
+                  "READY",
+                  "FAILED"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "UserPage": {
+      "type": "object",
+      "$ref": "#/$defs/page",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/User"
+          }
+        }
+      }
+    },
+    "ApplicationPage": {
+      "type": "object",
+      "$ref": "#/$defs/page",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Application"
+          }
+        }
+      }
+    },
+    "TaskPage": {
+      "type": "object",
+      "$ref": "#/$defs/page",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Task"
+          }
+        }
+      }
+    },
+    "DeploymentPage": {
+      "type": "object",
+      "$ref": "#/$defs/page",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Deployment"
+          }
+        }
+      }
+    },
+    "ModelCallPage": {
+      "type": "object",
+      "$ref": "#/$defs/page",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ModelCall"
+          }
+        }
+      }
+    },
+    "AuditPage": {
+      "type": "object",
+      "$ref": "#/$defs/page",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AuditEntry"
+          }
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "page",
+        "size",
+        "totalItems",
+        "totalPages"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "maxItems": 100
+        },
+        "page": {
+          "$ref": "#/$defs/pageIndex"
+        },
+        "size": {
+          "$ref": "#/$defs/pageSize"
+        },
+        "totalItems": {
+          "$ref": "#/$defs/count"
+        },
+        "totalPages": {
+          "$ref": "#/$defs/count"
+        }
+      }
+    },
+    "Metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "window",
+        "generation",
+        "deployment",
+        "repairs",
+        "tokens",
+        "generatedAt"
+      ],
+      "properties": {
+        "window": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "from",
+            "to",
+            "field"
+          ],
+          "properties": {
+            "from": {
+              "$ref": "#/$defs/nullableTimestamp"
+            },
+            "to": {
+              "$ref": "#/$defs/nullableTimestamp"
+            },
+            "field": {
+              "const": "createdAt"
+            }
+          }
+        },
+        "generation": {
+          "type": "object",
+          "$ref": "#/$defs/outcomeFields",
+          "required": [
+            "byKind"
+          ],
+          "properties": {
+            "byKind": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "GENERATION",
+                "EDIT"
+              ],
+              "properties": {
+                "GENERATION": {
+                  "$ref": "#/$defs/Outcomes"
+                },
+                "EDIT": {
+                  "$ref": "#/$defs/Outcomes"
+                }
+              }
+            }
+          },
+          "unevaluatedProperties": false
+        },
+        "deployment": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Publications only. denominator = published + failed; REQUESTED is inProgress and excluded.",
+          "required": [
+            "total",
+            "published",
+            "failed",
+            "inProgress",
+            "denominator",
+            "successRate"
+          ],
+          "properties": {
+            "total": {
+              "$ref": "#/$defs/count"
+            },
+            "published": {
+              "$ref": "#/$defs/count"
+            },
+            "failed": {
+              "$ref": "#/$defs/count"
+            },
+            "inProgress": {
+              "$ref": "#/$defs/count"
+            },
+            "denominator": {
+              "$ref": "#/$defs/count"
+            },
+            "successRate": {
+              "$ref": "#/$defs/rate"
+            }
+          },
+          "if": {
+            "properties": {
+              "denominator": {
+                "const": 0
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "successRate": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "successRate": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "repairs": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "total = sum of repair rounds entered; denominator = all tasks in the window.",
+          "required": [
+            "total",
+            "tasksWithRepairs",
+            "readyAfterRepair",
+            "denominator",
+            "averagePerTask"
+          ],
+          "properties": {
+            "total": {
+              "$ref": "#/$defs/count"
+            },
+            "tasksWithRepairs": {
+              "$ref": "#/$defs/count"
+            },
+            "readyAfterRepair": {
+              "$ref": "#/$defs/count"
+            },
+            "denominator": {
+              "$ref": "#/$defs/count"
+            },
+            "averagePerTask": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 3
+            }
+          },
+          "if": {
+            "properties": {
+              "denominator": {
+                "const": 0
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "averagePerTask": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "averagePerTask": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "tokens": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Provider-reported tokens only. Exact totals exist only when every call in the window has known usage.",
+          "required": [
+            "calls",
+            "knownCalls",
+            "unknownCalls",
+            "pendingCalls",
+            "inputTokens",
+            "outputTokens",
+            "totalTokens",
+            "knownInputTokens",
+            "knownOutputTokens",
+            "knownTotalTokens",
+            "complete"
+          ],
+          "properties": {
+            "calls": {
+              "$ref": "#/$defs/count"
+            },
+            "knownCalls": {
+              "$ref": "#/$defs/count"
+            },
+            "unknownCalls": {
+              "$ref": "#/$defs/count"
+            },
+            "pendingCalls": {
+              "$ref": "#/$defs/count"
+            },
+            "inputTokens": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "outputTokens": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "totalTokens": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "knownInputTokens": {
+              "$ref": "#/$defs/count"
+            },
+            "knownOutputTokens": {
+              "$ref": "#/$defs/count"
+            },
+            "knownTotalTokens": {
+              "$ref": "#/$defs/count"
+            },
+            "complete": {
+              "type": "boolean"
+            }
+          },
+          "if": {
+            "properties": {
+              "complete": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inputTokens": {
+                "type": "integer"
+              },
+              "outputTokens": {
+                "type": "integer"
+              },
+              "totalTokens": {
+                "type": "integer"
+              },
+              "unknownCalls": {
+                "const": 0
+              },
+              "pendingCalls": {
+                "const": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "inputTokens": {
+                "type": "null"
+              },
+              "outputTokens": {
+                "type": "null"
+              },
+              "totalTokens": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        "generatedAt": {
+          "$ref": "#/$defs/timestamp"
+        }
+      }
+    },
+    "CancelRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "reason is trimmed; 1..200 code points; control and format characters are rejected (400).",
+      "required": [
+        "reason"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^[^\\u0000-\\u001F\\u007F]+$"
+        }
+      }
+    },
+    "CancelResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task",
+        "audit"
+      ],
+      "properties": {
+        "task": {
+          "$ref": "#/$defs/Task"
+        },
+        "audit": {
+          "type": "object",
+          "allOf": [
+            {
+              "$ref": "#/$defs/AuditEntry"
+            }
+          ],
+          "properties": {
+            "outcome": {
+              "enum": [
+                "CANCELLED",
+                "ALREADY_TERMINAL",
+                "UNKNOWN"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "outcomeFields": {
+      "type": "object",
+      "description": "denominator = ready + failed; cancelled and active are excluded and reported separately.",
+      "required": [
+        "total",
+        "ready",
+        "failed",
+        "cancelled",
+        "active",
+        "denominator",
+        "successRate"
+      ],
+      "properties": {
+        "total": {
+          "$ref": "#/$defs/count"
+        },
+        "ready": {
+          "$ref": "#/$defs/count"
+        },
+        "failed": {
+          "$ref": "#/$defs/count"
+        },
+        "cancelled": {
+          "$ref": "#/$defs/count"
+        },
+        "active": {
+          "$ref": "#/$defs/count"
+        },
+        "denominator": {
+          "$ref": "#/$defs/count"
+        },
+        "successRate": {
+          "$ref": "#/$defs/rate"
+        }
+      },
+      "if": {
+        "properties": {
+          "denominator": {
+            "const": 0
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "successRate": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "successRate": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "Outcomes": {
+      "type": "object",
+      "$ref": "#/$defs/outcomeFields",
+      "unevaluatedProperties": false
+    }
+  }
+}
