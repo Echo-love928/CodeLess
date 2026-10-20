@@ -14,7 +14,7 @@
    - 后端口径（`AdminQueries.ratio`）是 `Math.round(n * 10000.0 / d) / 10000.0`。浮点运算顺序不同：57/800 时后端（jshell 实测）为 `0.0713`，
      客户端算出 `0.0712`；113/800 为 `0.1413` 对 `0.1412`。分母 ≤1000 时有 21 组、≤5000 时有 222 组这样的不一致（最小分母 800）。
    - 影响：窗口内终态任务（或发布）达到这些组合时，`getMetrics` 必然抛出“管理接口响应不符合约定”，整个指标区显示“指标不可用”，展开趋势的对应日同样失败；数据本身是正确的。
-   - 复现：在 `8c6de8b` 的 `apps/web/src/features/admin/` 放入下述测试，`./node_modules/.bin/vitest run src/features/admin/review-d17a-rounding.test.ts`
+   - 复现：在 `8c6de8b` 的 `apps/web/src/features/admin/` 放入复现测试 [review-d17a-rounding.test.ts](https://github.com/Echo-love928/CodeLess/blob/ce40068/tests/admin/evidence/2026-10-20/review-b-8c6de8b/review-d17a-rounding.test.ts)，`./node_modules/.bin/vitest run src/features/admin/review-d17a-rounding.test.ts`
      → `1 failed | 1 passed`，exit 1（对照组 3/4=0.75 通过；57/800 被拒，错误为“管理接口响应不符合约定”）。测试要点：
      以与后端相同形状的 `/metrics` 响应（`generation.total=800, ready=57, failed=743, denominator=800, successRate=0.0713`）调用 `getMetrics`，期望 resolve。
    - 修复方向：与后端同顺序计算（`Math.round(succeeded * 10000 / denominator) / 10000`），或不做浮点相等：校验 `denominator`、`null ⇔ denominator=0`，
@@ -23,7 +23,7 @@
 2. **[合并前置] PR #52 携带的 D17-A 副本是 `50d0044`，包含你在 #51 发现的两项阻塞问题。**
    - `chore(admin): import verified D17-A candidate 50d0044` 引入的 `AdminRedaction.java`、`AdminIntegrationTest.java` 与 `50d0044` 完全相同，
      即仍会把 `Authorization: Bearer demoTok123` 脱敏成 `Authorization: [REDACTED] demoTok123`，测试仍可能移动已配置的审计目录。
-   - D17-A 已在 `codex/d17-a-admin-api` 修复（P1、P2 与建议用例，提交见 #51）。#52 需改为引入修复后的 D17-A HEAD，或待 #51 合并后 rebase；
+   - D17-A 已在 `codex/d17-a-admin-api` 修复（P1、P2 与建议用例，修复提交 `b67ee32`，见 #51）。#52 需改为引入修复后的 D17-A HEAD，或待 #51 合并后 rebase；
      否则无论先合哪一个，都会在这些文件上冲突，处理不当会把修复覆盖回去。`contracts/admin` 未变，你登记进 `openapi.v0.json` 的片段仍有效。
 
 ## 建议（非阻塞）
