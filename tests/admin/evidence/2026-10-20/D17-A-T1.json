@@ -1,0 +1,110 @@
+{
+  "pathVariants" : [ {
+    "status" : 403,
+    "path" : "/api/v0//admin/users"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/admin//users"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/admin/./users"
+  }, {
+    "status" : 404,
+    "path" : "/api/v0/tasks/../admin/users"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/admin/users/"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/admin/%75sers"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/%61dmin/users"
+  }, {
+    "status" : 404,
+    "path" : "/api/v0/ADMIN/users"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/admin;x=1/users"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/admin/users;x=1"
+  }, {
+    "exact403" : true,
+    "status" : 403,
+    "path" : "/api/v0/admin/session"
+  }, {
+    "exact403" : true,
+    "status" : 403,
+    "path" : "/api/v0/%61dmin/session"
+  }, {
+    "exact403" : true,
+    "status" : 403,
+    "path" : "/api/v0/admin;x=1/session"
+  }, {
+    "exact403" : true,
+    "status" : 403,
+    "path" : "/api/v0/%61dmin/users"
+  }, {
+    "exact403" : true,
+    "status" : 403,
+    "path" : "/api/v0/admin;x=1/users"
+  } ],
+  "case" : "D17-A-T1",
+  "auditEntriesForTask" : 0,
+  "taskAfterRejectedAttempts" : {
+    "status" : "GENERATE",
+    "queue_state" : "RUNNING",
+    "lease_token" : "dd618119-24a3-4a37-9006-165bd44d3b5b"
+  },
+  "matrix" : [ {
+    "method" : "GET",
+    "path" : "/api/v0/admin/users",
+    "anonymous" : 401,
+    "ordinaryUser" : 403,
+    "admin" : 200
+  }, {
+    "method" : "GET",
+    "path" : "/api/v0/admin/applications",
+    "anonymous" : 401,
+    "ordinaryUser" : 403,
+    "admin" : 200
+  }, {
+    "method" : "GET",
+    "path" : "/api/v0/admin/tasks",
+    "anonymous" : 401,
+    "ordinaryUser" : 403,
+    "admin" : 200
+  }, {
+    "method" : "GET",
+    "path" : "/api/v0/admin/deployments",
+    "anonymous" : 401,
+    "ordinaryUser" : 403,
+    "admin" : 200
+  }, {
+    "method" : "GET",
+    "path" : "/api/v0/admin/model-calls",
+    "anonymous" : 401,
+    "ordinaryUser" : 403,
+    "admin" : 200
+  }, {
+    "method" : "GET",
+    "path" : "/api/v0/admin/audit",
+    "anonymous" : 401,
+    "ordinaryUser" : 403,
+    "admin" : 200
+  }, {
+    "method" : "GET",
+    "path" : "/api/v0/admin/metrics",
+    "anonymous" : 401,
+    "ordinaryUser" : 403,
+    "admin" : 200
+  }, {
+    "method" : "POST",
+    "path" : "/api/v0/admin/tasks/{taskId}/cancel",
+    "anonymous" : 401,
+    "ordinaryUser" : 403,
+    "adminWithoutCsrf" : 403
+  } ],
+  "source" : "AdminIntegrationTest real HTTP + PostgreSQL"
+}
