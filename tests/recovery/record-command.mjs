@@ -98,8 +98,11 @@ function failedTests(dir) {
   const failed = []
   for (const name of existsSync(dir) ? readdirSync(dir).filter(n => n.endsWith('.xml')) : []) {
     const xml = readFileSync(join(dir, name), 'utf8')
-    for (const match of xml.matchAll(/<testcase\b[^>]*\bname="([^"]+)"[^>]*>([\s\S]*?)<\/testcase>/g))
-      if (/<(failure|error)\b/.test(match[2])) failed.push(match[1])
+    // Passing cases are self-closing; never let a lazy body match run into the next <testcase>.
+    for (const match of xml.matchAll(/<testcase\b([^>]*?)(?:\/>|>([\s\S]*?)<\/testcase>)/g)) {
+      const name = match[1].match(/\bname="([^"]+)"/)?.[1]
+      if (name && /<(failure|error)\b/.test(match[2] ?? '')) failed.push(name)
+    }
   }
   return failed
 }
