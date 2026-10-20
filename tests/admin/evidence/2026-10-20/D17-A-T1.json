@@ -1,4 +1,62 @@
 {
+  "pathVariants" : [ {
+    "status" : 403,
+    "path" : "/api/v0//admin/users"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/admin//users"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/admin/./users"
+  }, {
+    "status" : 404,
+    "path" : "/api/v0/tasks/../admin/users"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/admin/users/"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/admin/%75sers"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/%61dmin/users"
+  }, {
+    "status" : 404,
+    "path" : "/api/v0/ADMIN/users"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/admin;x=1/users"
+  }, {
+    "status" : 403,
+    "path" : "/api/v0/admin/users;x=1"
+  }, {
+    "exact403" : true,
+    "status" : 403,
+    "path" : "/api/v0/admin/session"
+  }, {
+    "exact403" : true,
+    "status" : 403,
+    "path" : "/api/v0/%61dmin/session"
+  }, {
+    "exact403" : true,
+    "status" : 403,
+    "path" : "/api/v0/admin;x=1/session"
+  }, {
+    "exact403" : true,
+    "status" : 403,
+    "path" : "/api/v0/%61dmin/users"
+  }, {
+    "exact403" : true,
+    "status" : 403,
+    "path" : "/api/v0/admin;x=1/users"
+  } ],
+  "case" : "D17-A-T1",
+  "auditEntriesForTask" : 0,
+  "taskAfterRejectedAttempts" : {
+    "status" : "GENERATE",
+    "queue_state" : "RUNNING",
+    "lease_token" : "dd618119-24a3-4a37-9006-165bd44d3b5b"
+  },
   "matrix" : [ {
     "method" : "GET",
     "path" : "/api/v0/admin/users",
@@ -47,64 +105,6 @@
     "anonymous" : 401,
     "ordinaryUser" : 403,
     "adminWithoutCsrf" : 403
-  } ],
-  "taskAfterRejectedAttempts" : {
-    "status" : "GENERATE",
-    "queue_state" : "RUNNING",
-    "lease_token" : "87647e05-3ea4-4b42-a0b8-8144a698a13d"
-  },
-  "auditEntriesForTask" : 0,
-  "case" : "D17-A-T1",
-  "pathVariants" : [ {
-    "status" : 403,
-    "path" : "/api/v0//admin/users"
-  }, {
-    "status" : 403,
-    "path" : "/api/v0/admin//users"
-  }, {
-    "status" : 403,
-    "path" : "/api/v0/admin/./users"
-  }, {
-    "status" : 404,
-    "path" : "/api/v0/tasks/../admin/users"
-  }, {
-    "status" : 403,
-    "path" : "/api/v0/admin/users/"
-  }, {
-    "status" : 403,
-    "path" : "/api/v0/admin/%75sers"
-  }, {
-    "status" : 403,
-    "path" : "/api/v0/%61dmin/users"
-  }, {
-    "status" : 404,
-    "path" : "/api/v0/ADMIN/users"
-  }, {
-    "status" : 403,
-    "path" : "/api/v0/admin;x=1/users"
-  }, {
-    "status" : 403,
-    "path" : "/api/v0/admin/users;x=1"
-  }, {
-    "path" : "/api/v0/admin/session",
-    "status" : 403,
-    "exact403" : true
-  }, {
-    "path" : "/api/v0/%61dmin/session",
-    "status" : 403,
-    "exact403" : true
-  }, {
-    "path" : "/api/v0/admin;x=1/session",
-    "status" : 403,
-    "exact403" : true
-  }, {
-    "path" : "/api/v0/%61dmin/users",
-    "status" : 403,
-    "exact403" : true
-  }, {
-    "path" : "/api/v0/admin;x=1/users",
-    "status" : 403,
-    "exact403" : true
   } ],
   "source" : "AdminIntegrationTest real HTTP + PostgreSQL"
 }

@@ -14,7 +14,7 @@ const junit = dir => {
   const total = { suites: 0, tests: 0, failures: 0, errors: 0, skipped: 0 }
   for (const name of readdirSync(dir).filter(n => n.endsWith('.xml'))) {
     const head = readFileSync(join(dir, name), 'utf8').match(/<testsuite\b[^>]*>/)?.[0] ?? ''
-    const num = key => Number(head.match(new RegExp(`\b${key}="(\d+)"`))?.[1] ?? 0)
+    const num = key => Number(head.match(new RegExp(String.raw`\b${key}="(\d+)"`))?.[1] ?? 0)
     total.suites++; for (const key of ['tests', 'failures', 'errors', 'skipped']) total[key] += num(key)
   }
   return total
