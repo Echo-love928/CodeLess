@@ -1,0 +1,50 @@
+# D18-B：错误恢复与可用性
+
+## 统一呈现规则
+
+任务终态只读取服务端 `GenerationTask.status/failureCode`。构建退出码、事件文本、模型声称完成、连接恢复均不替代 READY。错误或未知状态不得改成成功；缺失用量与构建结果不得记为零。
+
+所有失败保留任务 ID、原始错误码、修复轮数、诊断和已有可用版本。组件编辑复用相同 TaskStatus/TaskProgress；发布仍须用户确认已验证的不可变版本。
+
+| 类型 | 权威信号与说明 | 可用操作 |
+| --- | --- | --- |
+| 模型错误 | MODEL_NETWORK/TIMEOUT/AUTHENTICATION/RATE_LIMITED/UNAVAILABLE/HTTP_ERROR/INTERNAL_ERROR/INVALID_RESPONSE/RESPONSE_LIMIT/INVALID_USAGE/INTERRUPTED/AUDIT_UNAVAILABLE/CONFIGURATION，以及 AGENT_MODEL_PROTOCOL_INVALID。具体文案集中在 failure-description.ts。 | 查看诊断；凭据、配置、记录服务错误联系维护者；连接/限流错误可稍后显式创建新任务。 |
+| 构建与浏览器失败 | BUILD_FAILED、AGENT_BUILD_FAILED/BUILD_EXIT/ACTION_FAILED/RUNNER_TIMEOUT/RUNNER_INTERRUPTED；构建成功不等于页面验收成功。 | 查看真实退出码/文件变更，调整需求后重新生成；保留旧预览。 |
+| 预算与修复停止 | MODEL_BUDGET_EXCEEDED/UNKNOWN、AGENT_MODEL_BUDGET_EXCEEDED/TOOL_BUDGET_EXCEEDED、AGENT_REPAIR_NO_PROGRESS/LIMIT_EXCEEDED/ACCEPTANCE_CHANGED。 | 保留停止状态与用量未知语义；不自动继续原任务或扩大预算。 |
+| 服务重启/中断 | FAILED + INTERRUPTED。现有契约不能区分服务重启、租约过期、其他执行中断；文案列出可能性并要求核对诊断。 | 显式重新生成创建新任务；原任务不复活。真实重启/资源一致性等待 D18-A 联调。 |
+| 取消 | FAILED + CANCELLED；取消中与确认取消分开。 | 未确认前不得重新生成；确认后可创建新任务。 |
+| 发布失败 | 只有权威 FAILED 才称失败；重新打开面板也显示统一说明，保留独立 latestSuccessful 地址。 | 重新读取版本与发布记录、核对版本并再次勾选确认，新 key 创建新发布记录。 |
+| 提交结果未知 | 超时、网络丢失、协议不合法或无法确认的发布记录。 | 任务显示“核对本次提交”，复用原需求和 key；发布继续复用冻结 version/artifact/key 的显式核对流程。未知结果不能当作已失败后创建新请求。 |
+| 未知状态/失败码 | 保留原码；未知任务状态不能开始或取消，不能显示完成。 | 刷新已知 ID 的任务、保留恢复链接、联系维护者。 |
+
+## 提交、记录和有界等待
+
+- 已受理任务 FAILED 后，“重试生成”使用新的 Idempotency-Key，创建不同任务 ID；不修改旧任务。普通提交按钮、Ctrl/⌘+Enter 共用同步防重锁。
+- 未知提交保留原 key/prompt，并在当前标签页的 sessionStorage 按用户+应用保存；刷新后输入只读，先核对原提交。400/401/403/404/409/429 明确拒绝会解除本次意图，允许修正后提交。无明确拒绝的 5xx、协议错误、网络失败继续保留。
+- 当前任务 ID 与最近 20 个访问入口保存在 localStorage，按用户+应用隔离；入口只保存 UUID，打开后重新鉴权并读取服务端真值。此上限只影响浏览器快捷入口，不删除服务端旧任务、事件或版本。不是新增服务端任务列表 API。
+- 新任务受理后同步 URL taskId；从旧任务链接重试后刷新仍恢复新任务。原任务入口可重新打开。
+- 工作台应用、任务读取/创建/取消、诊断、版本读取与发布配置/记录/提交/快照请求采用 15 秒客户端截止，保留调用者 AbortSignal。每个 HTTP 请求独立计时；多个串行读取的总时间可以超过 15 秒。超时中止等待并释放 UI 锁，不能据此宣称服务端停止执行。不对 SSE 长连接设置该截止。
+- 无有效任务 ID 时不显示“刷新任务”。发布版本/配置读取失败可用“重新读取版本与发布记录”恢复，该按钮只有 GET，不隐式发布。
+- 浏览器存储禁用、损坏或主动清除时展示恢复警告；无法跨被关闭标签页恢复 sessionStorage 的未知提交。需保留链接/由维护者核对，不能承诺浏览器之外的持久幂等账本。跨标签页并发和完整服务端恢复属于已有服务端契约与 D18-A 范围。
+
+## 键盘与窄屏
+
+- 需求输入：Enter 换行，Ctrl/⌘+Enter 提交；输入法组合期间不提交。原生 form/button 保留 Tab、Enter/Space 行为。
+- 选择组件：Space 切换；平台或 iframe 内 Esc 退出后焦点回到选择框。发布面板 Esc 关闭后焦点回到“发布”。
+- 超过 240 字符的事件、工具和错误消息用原生 details/summary 折叠；摘要归一空白，展开保留全部原文、换行及字符数。按文本渲染，不执行日志里的 HTML。完整日志和事件列表均可键盘滚动。
+- 640px 以下工具栏换行，任务文本/ID 可折行，需求输入 16px；375×812 与 812×375 的任务和 iframe 实际可见，无页面横向溢出。
+
+## 可用性缺陷清单（只修现有体验，不增加产品范围）
+
+| ID / 优先级 | 复现与影响 | 状态 / 验证或接手 |
+| --- | --- | --- |
+| U18-01 / P1 | API 接受创建但响应丢失，刷新后重新提交可能丢失原幂等键。 | 已修；lost response browser + use-workbench-task 单测证明同 key、同 task，不能换需求偷建任务。 |
+| U18-02 / P1 | 任务/发布 HTTP 一直挂起时按钮永远 loading。 | 已修涉及请求的 15s 截止；真实浏览器挂起 POST 到期释放，feature-request 测试核验 abort/清计时器/调用者取消。 |
+| U18-03 / P2 | 旧 taskId 深链重试成功后刷新又回到旧任务，且缺少旧任务快捷入口。 | 已修；两个 ID/不同 key，刷新新任务再打开旧记录，服务端 fixture 的旧对象仍 FAILED。 |
+| U18-04 / P2 | 窄屏工具栏长 UUID 竞争空间，键盘退出选择后焦点留在 iframe。 | 已修；375px/横屏和双侧 Esc 的 Chromium 断言。 |
+| U18-05 / P2 | 发布版本读失败只有不可用确认按钮；重开已失败发布缺少恢复说明。 | 已修；只读恢复按钮、统一失败文案，单测确认不会产生 POST，既有部署浏览器七项回归。 |
+| U18-06 / P2 | 长日志挤占页面且滚动区域不易由键盘操作。 | 已修；原生折叠/可聚焦滚动，完整原文和恶意标签文本测试。 |
+| U18-07 / P2 | 管理页把 CSRF_INVALID 的 403 与角色拒绝使用相同提示。 | 待后续维护者处理；D17-B 已记录，范围是细分既有 403 文案，不改变授权/取消语义。当前 ApiError 丢弃响应 code，需与公共 HTTP 维护者协调。 |
+| U18-08 / P3 | TaskProgress 事件列表和错误摘要可能重复展示同一失败消息。 | 保留两种已有视角，长文本均可折叠；后续可合并重复呈现，不能丢弃原事件或失败诊断。 |
+
+P0/P1 本卡新增体验阻塞：专项验收无未修项。该结论不替代全仓门禁、D18-A 真实重启/资源回收验收或同伴批准。命令和精确结果见 docs/handoffs/D18-B.md 及 tests/e2e/recovery/evidence。

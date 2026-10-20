@@ -6,10 +6,12 @@ import { getVersion, type Version } from '../versions/version-api'
 import { createPublication, getPublication, listPublications, verifiedArtifact, loadPublicOrigin, type Publication, type PublicationIntent } from './deploy-api'
 import DeploymentCover from './DeploymentCover.vue'
 import SourceDownload from '../source/SourceDownload.vue'
+import { publicationFailureDescription, publicationUnknownDescription } from '../workbench/failure-description'
 
 const props = defineProps<{ applicationId: string; versionId?: string | null }>()
 const emit = defineEmits<{ unauthorized: [] }>()
 const open = ref(false), loading = ref(false), posting = ref(false), refreshing = ref(false), recovering = ref(false)
+const trigger = ref<HTMLButtonElement>()
 const version = ref<Version>(), confirmed = ref(false), error = ref(''), notice = ref('')
 const copyError = ref('')
 const current = ref<Publication>(), last = ref<Publication>(), uncertain = ref(false)
@@ -33,7 +35,7 @@ function adopt(value: Publication) {
     throw new Error('发布状态发生冲突，请联系维护者。')
   current.value = value; uncertain.value = false; intent.value = undefined
   if (value.status === 'PUBLISHED') { last.value = value; notice.value = '发布成功，公开地址已通过访问检查。' }
-  if (value.status === 'FAILED') error.value = '发布失败。上次成功版本和地址仍然保留。请检查托管服务后重新确认发布。'
+  if (value.status === 'FAILED') error.value = publicationFailureDescription
   save()
 }
 async function loadVersion() {
@@ -112,6 +114,20 @@ async function copy() {
   try { await navigator.clipboard.writeText(last.value.url); if (generation === epoch) notice.value = '公开地址已复制。' }
   catch { if (generation === epoch) copyError.value = '复制失败，请选中下方地址手动复制。' }
 }
+function close() { open.value = false; trigger.value?.focus() }
+async function reload() {
+  if (loading.value || posting.value || refreshing.value || recovering.value) return
+  const generation = epoch
+  loading.value = true; error.value = ''
+  try {
+    await loadPublicOrigin()
+    if (generation !== epoch) return
+    configured.value = true
+    await recover()
+    if (generation === epoch) await loadVersion()
+  } catch (cause) { if (generation === epoch) report(cause) }
+  finally { if (generation === epoch) loading.value = false }
+}
 watch(() => [props.applicationId, session.user?.id], () => {
   epoch++; current.value = undefined; last.value = undefined; version.value = undefined; artifactDigest.value = ''; intent.value = undefined
   posting.value = false; refreshing.value = false; recovering.value = false; uncertain.value = false; error.value = ''; notice.value = ''; copyError.value = ''; open.value = false
@@ -129,9 +145,9 @@ onBeforeUnmount(() => { epoch++; versionRequest++ })
 
 <template>
   <div class="deploy-control">
-    <button type="button" class="button-primary" :aria-expanded="open" @click="open = !open">发布</button>
-    <section v-if="open" class="deploy-panel" aria-label="发布面板">
-      <div class="deploy-heading"><h2>发布应用</h2><button type="button" aria-label="关闭发布面板" @click="open = false">关闭</button></div>
+    <button ref="trigger" type="button" class="button-primary" :aria-expanded="open" @click="open = !open">发布</button>
+    <section v-if="open" class="deploy-panel" aria-label="发布面板" @keydown.esc.stop.prevent="close">
+      <div class="deploy-heading"><h2>发布应用</h2><button type="button" aria-label="关闭发布面板" @click="close">关闭</button></div>
       <p>确认后，此版本会拥有独立的公开地址。</p>
       <p v-if="!configured" role="alert">公开站点尚未配置，暂时无法发布。</p>
       <p v-if="loading" role="status">正在核对待发布版本…</p>
@@ -143,11 +159,13 @@ onBeforeUnmount(() => { epoch++; versionRequest++ })
       <label class="deploy-confirm"><input v-model="confirmed" type="checkbox" :disabled="!version || version.status !== 'VERIFIED' || locked">我确认公开发布上方版本</label>
       <button type="button" class="button-primary" :disabled="!canPublish" @click="publish">{{ posting ? '正在提交发布…' : '确认发布' }}</button>
       <p v-if="current">本次发布：{{ current.id }}<br>版本：{{ current.versionId }}<br>状态：{{ { REQUESTED: '已受理，正在部署与检查', PUBLISHED: '发布成功', FAILED: '发布失败' }[current.status] }}</p>
+      <p v-if="current?.status === 'FAILED'" role="status">{{ publicationFailureDescription }}再次确认将创建新的发布记录。</p>
+      <button type="button" class="button-secondary" :disabled="loading || posting || refreshing || recovering" @click="reload">重新读取版本与发布记录</button>
       <button v-if="current" type="button" class="button-secondary" :disabled="refreshing" @click="refresh">刷新发布状态</button>
       <button v-else-if="uncertain" type="button" class="button-secondary" :disabled="recovering" @click="recover">重新读取发布记录</button>
       <p v-if="uncertain && intent">本次待核对版本：<code>{{ intent.versionId }}</code><code>{{ intent.artifactDigest }}</code></p>
       <button v-if="uncertain && intent" type="button" class="button-secondary" :disabled="posting || recovering" @click="submitIntent">重试本次提交</button>
-      <p v-if="uncertain" role="status">提交结果未知，暂停再次发布；请核对服务端发布记录。</p>
+      <p v-if="uncertain" role="status">{{ publicationUnknownDescription }}</p>
       <p v-if="error" role="alert">{{ error }}</p><p v-if="notice" role="status">{{ notice }}</p>
       <p v-if="copyError" role="alert">{{ copyError }}</p>
       <div v-if="last" class="deploy-success"><h3>上次成功发布</h3><p>分享版本：{{ last.versionId }}<br>部署编号：{{ last.id }}<br>发布时间：{{ last.publishedAt }}</p><DeploymentCover :key="last.id" :publication="last" @unauthorized="emit('unauthorized')" /><a :href="last.url ?? undefined" target="_blank" rel="noopener noreferrer">{{ last.url }}</a><button type="button" class="button-secondary" @click="copy">复制公开地址</button></div>

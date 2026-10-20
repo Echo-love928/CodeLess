@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { eventTypes, type TaskEvent } from '../../lib/events/task-events'
 import { stages } from './task-api'
 import type { TaskDiagnostics } from './task-diagnostics'
+import LogMessage from './LogMessage.vue'
 
 const props = defineProps<{ events: TaskEvent[]; diagnostics?: TaskDiagnostics | null; diagnosticsError?: string }>()
 const tools = computed(() => props.events.filter(event => event.type === 'TOOL_RESULT'))
@@ -15,11 +16,11 @@ const buildLabel = { QUEUED: '排队中', RUNNING: '构建中', SUCCEEDED: '构�
 <template>
   <section class="task-progress" aria-label="任务事件">
     <p v-if="!events.length">尚未收到任务事件。</p>
-    <ol v-else class="task-progress__list">
+    <ol v-else class="task-progress__list" tabindex="0" aria-label="任务事件日志，可滚动查看">
       <li v-for="event in events" :key="event.id" :data-sequence="event.sequence">
         <strong>#{{ event.sequence }} · {{ event.stage }}</strong>
         <span v-if="!known(event)">未知事件（{{ event.type }}），保留诊断信息。</span>
-        <p>{{ event.message }}</p><time :datetime="event.occurredAt">{{ event.occurredAt }}</time>
+        <LogMessage :message="event.message" /><time :datetime="event.occurredAt">{{ event.occurredAt }}</time>
       </li>
     </ol>
     <p v-if="diagnosticsError" role="alert">{{ diagnosticsError }}</p>
@@ -39,10 +40,10 @@ const buildLabel = { QUEUED: '排队中', RUNNING: '构建中', SUCCEEDED: '构�
       <p>构建 {{ build.id }} · 版本 {{ build.versionId }}<br>退出码：{{ build.exitCode ?? '尚无结果' }}<br>制品摘要：{{ build.artifactDigest ?? '尚无制品' }}<br>开始：{{ build.createdAt }}<br>完成：{{ build.completedAt ?? '尚未完成' }}</p>
     </article>
     <p v-if="!tools.length">尚未收到工具事件。</p>
-    <p v-for="event in tools" :key="event.id">{{ event.message }}（{{ event.stage }}）</p>
+    <LogMessage v-for="event in tools" :key="event.id" :message="`${event.message}（${event.stage}）`" />
     <h3>错误摘要</h3>
     <p v-if="!failures.length">尚未收到错误事件；任务最终结果以状态查询为准。</p>
-    <p v-for="event in failures" :key="event.id">{{ event.message }}</p>
+    <LogMessage v-for="event in failures" :key="event.id" :message="event.message" />
   </section>
 </template>
 
@@ -52,6 +53,7 @@ const buildLabel = { QUEUED: '排队中', RUNNING: '构建中', SUCCEEDED: '构�
 .task-progress p { line-height: 1.7; color: #6b7484; }
 .task-progress__list { padding-left: 20px; max-height: 340px; overflow: auto; }
 .task-progress__list li { margin: 14px 0; }
+.task-progress__list:focus-visible { outline: 2px solid var(--blue, #4166d2); outline-offset: 2px; }
 .task-progress__list strong, .task-progress__list span { display: block; }
 .task-progress time { color: #798294; font-size: 11px; }
 </style>

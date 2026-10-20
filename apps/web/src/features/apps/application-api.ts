@@ -1,4 +1,5 @@
-import { requestJson, ApiError } from '../../api/http'
+import { ApiError } from '../../api/http'
+import { requestFeatureJson as requestJson } from '../workbench/feature-request'
 import { session } from '../auth/session'
 
 // D01 application fields plus the D04-A additions in contracts/apps/README.md.
