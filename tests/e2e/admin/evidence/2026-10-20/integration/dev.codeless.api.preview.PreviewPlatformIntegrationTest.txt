@@ -1,0 +1,2723 @@
+-------------------------------------------------------------------------------
+Test set: dev.codeless.api.preview.PreviewPlatformIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 99.38 s <<< FAILURE! -- in dev.codeless.api.preview.PreviewPlatformIntegrationTest
+dev.codeless.api.preview.PreviewPlatformIntegrationTest.realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures -- Time elapsed: 89.39 s <<< FAILURE!
+org.opentest4j.AssertionFailedError:
+[node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.evaluate: Error: PLATFORM_HTTP_NON_JSON {"phase":"request","route":"/api/v0/applications/:id/versions/:id/preview-credentials","method":"POST","status":502,"contentType":"html"}
+    at read (eval at evaluate (:302:30), <anonymous>:11:20)
+    at platformFetch (eval at evaluate (:302:30), <anonymous>:18:45)
+    at async <anonymous>:328:30
+    at call (C:\Users\12058\Documents\ChatGPT\CodeLess\tests\e2e\preview\platform.acceptance.mjs:61:50)
+    at C:\Users\12058\Documents\ChatGPT\CodeLess\tests\e2e\preview\platform.acceptance.mjs:101:22
+
+Node.js v24.16.0
+
+platform-diagnostics.json: {
+  "success": false,
+  "modelMode": "deterministic-mock",
+  "platformApiFixture": false,
+  "signingFixture": false,
+  "registry": {
+    "healthy": true,
+    "mapped": 1,
+    "failures": 0,
+    "lastSync": 1792479482786
+  },
+  "ui": {
+    "iframePresent": true,
+    "messages": [
+      {
+        "state": "loaded",
+        "originMatches": true,
+        "sourceMatches": true
+      }
+    ],
+    "previewState": "ready"
+  },
+  "events": [
+    {
+      "kind": "navigation",
+      "site": "platform",
+      "path": "/document",
+      "queryPresent": false,
+      "elapsedMs": 7269
+    },
+    {
+      "kind": "navigation",
+      "site": "platform",
+      "path": "/document",
+      "queryPresent": false,
+      "elapsedMs": 7292
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/me",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7292
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/me",
+      "queryPresent": false,
+      "status": 401,
+      "elapsedMs": 7307
+    },
+    {
+      "kind": "console",
+      "type": "error",
+      "error": "REDACTED",
+      "elapsedMs": 7307
+    },
+    {
+      "kind": "navigation",
+      "site": "platform",
+      "path": "/document",
+      "queryPresent": false,
+      "elapsedMs": 7308
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7408
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7418
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/login",
+      "queryPresent": false,
+      "method": "POST",
+      "elapsedMs": 7421
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/login",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7482
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7482
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7488
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/me",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7489
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/me",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7496
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7497
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7503
+    },
+    {
+      "kind": "navigation",
+      "site": "platform",
+      "path": "/document",
+      "queryPresent": false,
+      "elapsedMs": 7503
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/applications",
+      "queryPresent": true,
+      "method": "GET",
+      "elapsedMs": 7513
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/applications",
+      "queryPresent": true,
+      "status": 200,
+      "elapsedMs": 7518
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7606
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7613
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/applications",
+      "queryPresent": false,
+      "method": "POST",
+      "elapsedMs": 7614
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/applications",
+      "queryPresent": false,
+      "status": 201,
+      "elapsedMs": 7626
+    },
+    {
+      "kind": "navigation",
+      "site": "platform",
+      "path": "/document",
+      "queryPresent": false,
+      "elapsedMs": 7629
+    },
+    {
+      "kind": "requestfailed",
+      "site": "platform-api",
+      "path": "/api/v0/auth/me",
+      "queryPresent": false,
+      "error": "net::ERR_ABORTED",
+      "elapsedMs": 7636
+    },
+    {
+      "kind": "navigation",
+      "site": "platform",
+      "path": "/document",
+      "queryPresent": false,
+      "elapsedMs": 7636
+    },
+    {
+      "kind": "navigation",
+      "site": "platform",
+      "path": "/document",
+      "queryPresent": false,
+      "elapsedMs": 7644
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/me",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7644
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/me",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7653
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7654
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7660
+    },
+    {
+      "kind": "navigation",
+      "site": "platform",
+      "path": "/document",
+      "queryPresent": false,
+      "elapsedMs": 7661
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/applications/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7664
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/applications/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7673
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "method": "GET",
+      "elapsedMs": 7678
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "status": 200,
+      "elapsedMs": 7711
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks",
+      "queryPresent": false,
+      "method": "POST",
+      "elapsedMs": 7758
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks",
+      "queryPresent": false,
+      "status": 202,
+      "elapsedMs": 7775
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7779
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7779
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "method": "GET",
+      "elapsedMs": 7779
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7788
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7791
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7794
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/events",
+      "queryPresent": true,
+      "method": "GET",
+      "elapsedMs": 7794
+    },
+    {
+      "kind": "requestfailed",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "error": "net::ERR_ABORTED",
+      "elapsedMs": 7794
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7800
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7801
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "status": 200,
+      "elapsedMs": 7805
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7816
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7819
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/events",
+      "queryPresent": true,
+      "status": 200,
+      "elapsedMs": 7844
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/events",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 7846
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/events",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 7903
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 8326
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 8334
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 8334
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 8349
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 8410
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 8423
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 8425
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "method": "GET",
+      "elapsedMs": 8425
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "status": 200,
+      "elapsedMs": 8441
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 8444
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 8854
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 8862
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 8862
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 8878
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 8924
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 8937
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 8938
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 8959
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 9393
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 9399
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 9400
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 9408
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 9920
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 9927
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 9927
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 9936
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 9943
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 9953
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 9953
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 9954
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 9964
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 9966
+    },
+    {
+      "kind": "requestfailed",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "error": "net::ERR_ABORTED",
+      "elapsedMs": 9966
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 9983
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 10451
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 10456
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 10456
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 10465
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 10969
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 10975
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 10976
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 10987
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 11500
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 11502
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 11510
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 11510
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 11511
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 11513
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "method": "GET",
+      "elapsedMs": 11513
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 11523
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 11526
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "status": 200,
+      "elapsedMs": 11532
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 12028
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 12035
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 12035
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 12044
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 12555
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 12561
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 12562
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 12573
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 13081
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 13087
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 13087
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 13099
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 13613
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 13619
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 13619
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 13627
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 14139
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 14144
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 14144
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 14152
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 14670
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 14676
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 14676
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 14685
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 15198
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 15203
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 15204
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 15213
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 15718
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 15725
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 15725
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 15733
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 16250
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 16258
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 16258
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 16271
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 16779
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 16786
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 16786
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 16797
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 17315
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 17323
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 17324
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 17337
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 17841
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 17847
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 17848
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 17856
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 18365
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 18372
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 18372
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 18379
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 18897
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 18903
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 18903
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 18911
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 19427
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 19432
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 19432
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 19440
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 19944
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 19950
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 19950
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 19958
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 20248
+    },
+    {
+      "kind": "requestfailed",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/events",
+      "queryPresent": false,
+      "error": "net::ERR_ABORTED",
+      "elapsedMs": 20249
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 20255
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 20257
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/applications/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 20257
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "method": "GET",
+      "elapsedMs": 20257
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/events",
+      "queryPresent": true,
+      "method": "GET",
+      "elapsedMs": 20257
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/applications/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 20268
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "method": "GET",
+      "elapsedMs": 20269
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/applications/:id/versions/:id/preview-credentials",
+      "queryPresent": false,
+      "method": "POST",
+      "elapsedMs": 20269
+    },
+    {
+      "kind": "requestfailed",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "error": "net::ERR_ABORTED",
+      "elapsedMs": 20269
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/events",
+      "queryPresent": true,
+      "status": 200,
+      "elapsedMs": 20277
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id/diagnostics",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 20285
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "status": 200,
+      "elapsedMs": 20286
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 20288
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 20418
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "method": "GET",
+      "elapsedMs": 20419
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 20473
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 20478
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 20478
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/tasks/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 20486
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "status": 200,
+      "elapsedMs": 20605
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "method": "GET",
+      "elapsedMs": 20606
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": true,
+      "status": 200,
+      "elapsedMs": 20778
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/applications/:id/versions/:id/preview-credentials",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 20923
+    },
+    {
+      "kind": "request",
+      "site": "preview",
+      "path": "/__preview/start",
+      "queryPresent": true,
+      "method": "GET",
+      "elapsedMs": 20925
+    },
+    {
+      "kind": "console",
+      "type": "warning",
+      "error": "REDACTED",
+      "elapsedMs": 20927
+    },
+    {
+      "kind": "response",
+      "site": "preview",
+      "path": "/__preview/start",
+      "queryPresent": true,
+      "status": 303,
+      "elapsedMs": 20939
+    },
+    {
+      "kind": "request",
+      "site": "preview",
+      "path": "/",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 20939
+    },
+    {
+      "kind": "response",
+      "site": "preview",
+      "path": "/",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 20958
+    },
+    {
+      "kind": "navigation",
+      "site": "preview",
+      "path": "/",
+      "queryPresent": false,
+      "elapsedMs": 20959
+    },
+    {
+      "kind": "request",
+      "site": "preview",
+      "path": "/resource",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 20961
+    },
+    {
+      "kind": "response",
+      "site": "preview",
+      "path": "/resource",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 20974
+    },
+    {
+      "kind": "navigation",
+      "site": "preview",
+      "path": "/",
+      "queryPresent": false,
+      "elapsedMs": 20983
+    },
+    {
+      "kind": "navigation",
+      "site": "preview",
+      "path": "/",
+      "queryPresent": false,
+      "elapsedMs": 20983
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 20986
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 21344
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 21349
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/applications/:id",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 21350
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/applications/:id",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 21358
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "method": "GET",
+      "elapsedMs": 21475
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/auth/csrf",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 21481
+    },
+    {
+      "kind": "request",
+      "site": "platform-api",
+      "path": "/api/v0/applications/:id/versions/:id/preview-credentials",
+      "queryPresent": false,
+      "method": "POST",
+      "elapsedMs": 21481
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/REDACTED",
+      "queryPresent": false,
+      "status": 200,
+      "elapsedMs": 21567
+    },
+    {
+      "kind": "response",
+      "site": "platform-api",
+      "path": "/api/v0/applications/:id/versions/:id/preview-credentials",
+      "queryPresent": false,
+      "status": 502,
+      "elapsedMs": 81541
+    },
+    {
+      "kind": "console",
+      "type": "error",
+      "error": "REDACTED",
+      "elapsedMs": 81541
+    }
+  ],
+  "truncated": false
+}
+ingress-api-timings.json: {
+  "captureExitCode": 0,
+  "instrumented": true,
+  "configDigest": "sha256:324c5b3821dac25c96bbe8f191e50a6ddab4b97cb3f100eff0c7c2513e560e3c",
+  "entries": [
+    {
+      "kind": "ingress.api",
+      "route": "auth",
+      "at": "2026-10-20T06:56:48+00:00",
+      "id": "e51d84f1-a198-496b-a47a-c92249302292",
+      "status": 401,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.006",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "401"
+    },
+    {
+      "kind": "ingress.error",
+      "route": "csrf",
+      "phase": "CONNECT",
+      "errorClass": "UNKNOWN",
+      "errno": null,
+      "timedOut": false,
+      "upstream": "[fdc4:f303:9324::254]:63497"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:48+00:00",
+      "id": "cd79e3a4-0cfd-43b9-bfa0-2fd43d6604fd",
+      "status": 200,
+      "upstream": "[fdc4:f303:9324::254]:63497, 192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "-, 0.002",
+      "headerSeconds": "-, 0.005",
+      "responseSeconds": "0.000, 0.005",
+      "upstreamStatus": "502, 200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:48+00:00",
+      "id": "a85c06ef-b0f9-43ca-ae04-c8f9251c5763",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.004",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.004",
+      "responseSeconds": "0.004",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "auth",
+      "at": "2026-10-20T06:56:48+00:00",
+      "id": "8cb619a3-a294-43df-9f7b-b5c9163972c1",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.005",
+      "responseSeconds": "0.005",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:48+00:00",
+      "id": "d75ebaf2-50b8-4883-bc0e-b20fb3f79012",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.005",
+      "responseSeconds": "0.005",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:49+00:00",
+      "id": "858444eb-3617-4263-8879-6e31e7e1caa4",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.004",
+      "responseSeconds": "0.004",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "auth",
+      "at": "2026-10-20T06:56:49+00:00",
+      "id": "6d712999-2314-40ee-93e2-c0e97303caf0",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.007",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.007",
+      "responseSeconds": "0.007",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.error",
+      "route": "csrf",
+      "phase": "CONNECT",
+      "errorClass": "UNKNOWN",
+      "errno": null,
+      "timedOut": false,
+      "upstream": "[fdc4:f303:9324::254]:63497"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:49+00:00",
+      "id": "acd95cf3-4f17-4822-87ae-ea5bb152d328",
+      "status": 200,
+      "upstream": "[fdc4:f303:9324::254]:63497, 192.168.65.254:63497",
+      "requestSeconds": "0.004",
+      "connectSeconds": "-, 0.001",
+      "headerSeconds": "-, 0.003",
+      "responseSeconds": "0.000, 0.003",
+      "upstreamStatus": "502, 200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "application",
+      "at": "2026-10-20T06:56:49+00:00",
+      "id": "27e9f300-8ec9-4d1f-bedb-737dc701e9ae",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.008",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.008",
+      "responseSeconds": "0.008",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:49+00:00",
+      "id": "840be828-4fa8-4f48-a702-26c72e32052f",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.011",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.010",
+      "responseSeconds": "0.010",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:49+00:00",
+      "id": "0c83b3a9-1efd-4e0f-91b0-314b27ada679",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.006",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.005",
+      "responseSeconds": "0.005",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.error",
+      "route": "task",
+      "phase": "CONNECT",
+      "errorClass": "UNKNOWN",
+      "errno": null,
+      "timedOut": false,
+      "upstream": "[fdc4:f303:9324::254]:63497"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:49+00:00",
+      "id": "64af83f8-92f7-40ab-914b-576aff73ee70",
+      "status": 200,
+      "upstream": "[fdc4:f303:9324::254]:63497, 192.168.65.254:63497",
+      "requestSeconds": "0.010",
+      "connectSeconds": "-, 0.002",
+      "headerSeconds": "-, 0.009",
+      "responseSeconds": "0.000, 0.009",
+      "upstreamStatus": "502, 200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:49+00:00",
+      "id": "f1c5585f-d4cc-4b83-b5ba-a1c2b7a8cf92",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.004",
+      "responseSeconds": "0.004",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:49+00:00",
+      "id": "6afd3cc0-4adb-45e5-9800-39c2c3d9d155",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.013",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.012",
+      "responseSeconds": "0.012",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:49+00:00",
+      "id": "239320a3-03a9-4699-a20c-768c94fed745",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.010",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.010",
+      "responseSeconds": "0.010",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:50+00:00",
+      "id": "6bb8331b-85a5-4533-a272-c95743fe2cae",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.005",
+      "responseSeconds": "0.005",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:50+00:00",
+      "id": "484bd1e8-632a-42d5-aebc-50315064eb18",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.012",
+      "connectSeconds": "0.003",
+      "headerSeconds": "0.013",
+      "responseSeconds": "0.013",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:50+00:00",
+      "id": "ca8fffeb-c263-4b24-a508-e56ff5b3642b",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.010",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.011",
+      "responseSeconds": "0.011",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:50+00:00",
+      "id": "4b538761-979a-43e8-a77e-206ff9892e41",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.004",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.004",
+      "responseSeconds": "0.004",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:50+00:00",
+      "id": "382127b8-539e-4a57-aeae-02f765f30235",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.006",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:51+00:00",
+      "id": "42eda846-1f9b-46d5-9ea2-6d29faf48a4f",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.004",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.004",
+      "responseSeconds": "0.004",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:51+00:00",
+      "id": "1c1c2043-f715-4d77-8768-63e8db70720c",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.007",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.007",
+      "responseSeconds": "0.007",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:51+00:00",
+      "id": "2e4fb3e6-40e7-4769-b989-9a671357a2fb",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.008",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.008",
+      "responseSeconds": "0.008",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:51+00:00",
+      "id": "7cf7e8e8-0029-4bd5-bd56-0d7523a9bb4e",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.008",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.008",
+      "responseSeconds": "0.008",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:51+00:00",
+      "id": "a5e65b29-3060-41ea-bb2c-5c239e625432",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.003",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.003",
+      "responseSeconds": "0.003",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:51+00:00",
+      "id": "4796a192-35f3-4625-b5a2-87c945262193",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.007",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:52+00:00",
+      "id": "d659e33e-890a-40b7-87ac-e8f944cd84d4",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.004",
+      "responseSeconds": "0.004",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:52+00:00",
+      "id": "2f05e9a0-ee28-47e7-b670-87dcd48d2666",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.009",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.009",
+      "responseSeconds": "0.009",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:53+00:00",
+      "id": "a1210b7e-b46f-41aa-b8bc-3618cc757e27",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.005",
+      "responseSeconds": "0.005",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:53+00:00",
+      "id": "5ffd9638-aff0-4a57-8dc2-6f79945cef28",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.009",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.009",
+      "responseSeconds": "0.009",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.error",
+      "route": "task",
+      "phase": "CONNECT",
+      "errorClass": "UNKNOWN",
+      "errno": null,
+      "timedOut": false,
+      "upstream": "[fdc4:f303:9324::254]:63497"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:53+00:00",
+      "id": "91e25a53-1387-475e-9171-8b8e02c8cfaf",
+      "status": 200,
+      "upstream": "[fdc4:f303:9324::254]:63497, 192.168.65.254:63497",
+      "requestSeconds": "0.010",
+      "connectSeconds": "-, 0.002",
+      "headerSeconds": "-, 0.009",
+      "responseSeconds": "0.000, 0.009",
+      "upstreamStatus": "502, 200"
+    },
+    {
+      "kind": "ingress.error",
+      "route": "csrf",
+      "phase": "CONNECT",
+      "errorClass": "UNKNOWN",
+      "errno": null,
+      "timedOut": false,
+      "upstream": "[fdc4:f303:9324::254]:63497"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:53+00:00",
+      "id": "025893bc-1c5f-42b0-9636-b88f878a1d0e",
+      "status": 200,
+      "upstream": "[fdc4:f303:9324::254]:63497, 192.168.65.254:63497",
+      "requestSeconds": "0.003",
+      "connectSeconds": "-, 0.002",
+      "headerSeconds": "-, 0.004",
+      "responseSeconds": "0.000, 0.004",
+      "upstreamStatus": "502, 200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:53+00:00",
+      "id": "9a92a2d8-faaf-461f-9f56-1c147d64698c",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.007",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:54+00:00",
+      "id": "f06b125c-2812-4ad3-9adf-df5d10374597",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.004",
+      "responseSeconds": "0.004",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:54+00:00",
+      "id": "8b15c653-6719-4fd3-9d51-a59e6956a82c",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.009",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.008",
+      "responseSeconds": "0.008",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:54+00:00",
+      "id": "e13de3d7-5024-4bc0-b4e8-6fb253b56cdd",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.004",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.004",
+      "responseSeconds": "0.004",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:54+00:00",
+      "id": "3ab8dffc-20df-4c72-a8bf-b6303e7e26db",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.009",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.008",
+      "responseSeconds": "0.008",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:55+00:00",
+      "id": "f6cdfad8-4964-4f5a-8bc1-25f44274bce4",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.003",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.003",
+      "responseSeconds": "0.003",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:55+00:00",
+      "id": "e5a23dd8-a520-49f0-9ad9-5f511c866fa1",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:55+00:00",
+      "id": "f6852364-6792-4b59-9c52-5d0fdf1021be",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.004",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.003",
+      "responseSeconds": "0.003",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:55+00:00",
+      "id": "3c5318b0-8a1b-4c24-934f-b461a121e476",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:56+00:00",
+      "id": "883100b0-59f7-4e3d-86c6-0c03c2eff465",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.003",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.003",
+      "responseSeconds": "0.003",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:56+00:00",
+      "id": "ad2046ea-3819-4799-b699-af8cbe239708",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.006",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:56+00:00",
+      "id": "ad279b8f-38f4-41a5-9db3-2e1ebeedf7f1",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.004",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.003",
+      "responseSeconds": "0.003",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:56+00:00",
+      "id": "168ea00b-4054-4e6d-81b0-3c1ff270e4ac",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.007",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:57+00:00",
+      "id": "56d1556e-61b0-48b4-a07d-550449aedd74",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.004",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.003",
+      "responseSeconds": "0.003",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:57+00:00",
+      "id": "05af34f3-2241-40e7-8018-993474e9d047",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.007",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:57+00:00",
+      "id": "9872d05d-5df9-4286-aadc-0cf2ab2b8c2e",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.005",
+      "responseSeconds": "0.005",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:57+00:00",
+      "id": "99c41413-3432-4855-a457-aa53905a04c9",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.010",
+      "connectSeconds": "0.003",
+      "headerSeconds": "0.011",
+      "responseSeconds": "0.011",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:58+00:00",
+      "id": "fb8b8e95-2df4-4371-9310-315295818393",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.004",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.004",
+      "responseSeconds": "0.004",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:58+00:00",
+      "id": "bda09da2-33ff-4919-a391-68f4decabab0",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.008",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.009",
+      "responseSeconds": "0.009",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:58+00:00",
+      "id": "01c608f3-c9de-4cb3-8be2-70c8aa6dd1b9",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.004",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.004",
+      "responseSeconds": "0.004",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:58+00:00",
+      "id": "3aa5bb6c-9b35-4570-831e-9a89e81429f8",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.010",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.010",
+      "responseSeconds": "0.010",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:59+00:00",
+      "id": "f3878475-485d-4887-8b7c-bbeefd0a89a5",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.004",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.003",
+      "responseSeconds": "0.003",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:59+00:00",
+      "id": "d558b605-ddbb-491f-81a8-084ed0dffe84",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.006",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:56:59+00:00",
+      "id": "91a7ed63-3302-4d5c-95ff-d66afc0939f8",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.003",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.003",
+      "responseSeconds": "0.003",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:56:59+00:00",
+      "id": "fd3133e6-0284-4721-b761-6e4db3d975b0",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.005",
+      "responseSeconds": "0.005",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:57:00+00:00",
+      "id": "2140a849-bd26-44c9-a8ea-95521651ffe6",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.003",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.004",
+      "responseSeconds": "0.004",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:57:00+00:00",
+      "id": "924a4122-a91c-47a0-b883-2e76969e3b48",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:57:00+00:00",
+      "id": "559ef118-7b24-4791-99d3-f27c66beca8b",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.003",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.003",
+      "responseSeconds": "0.003",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:57:00+00:00",
+      "id": "81d28712-15f5-4874-adaa-7cc4e77917a4",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:57:01+00:00",
+      "id": "bd8b00c5-38ec-4573-b2e6-b13a3d37e90b",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.003",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.003",
+      "responseSeconds": "0.003",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:57:01+00:00",
+      "id": "3ec0287e-be18-4911-a202-522ac7635ac4",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.006",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:57:01+00:00",
+      "id": "c8ed508d-6c4a-47af-af1e-70038ce0fe10",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.006",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "application",
+      "at": "2026-10-20T06:57:01+00:00",
+      "id": "75b3002f-7810-473a-9c0b-ba1b53106d04",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.008",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.009",
+      "responseSeconds": "0.009",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:57:01+00:00",
+      "id": "379ee15d-3230-4a5e-a6a0-f290f41b84e0",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.003",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.003",
+      "responseSeconds": "0.003",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-10-20T06:57:01+00:00",
+      "id": "2b657f75-a92a-4b63-9526-73942586d3e3",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.006",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:57:02+00:00",
+      "id": "e75b639f-4a1f-4af0-a55d-16a832b6c8bd",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.003",
+      "connectSeconds": "0.001",
+      "headerSeconds": "0.003",
+      "responseSeconds": "0.003",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "application",
+      "at": "2026-10-20T06:57:02+00:00",
+      "id": "0123102c-5dec-4fd0-821a-44acf2dd03de",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.006",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.006",
+      "responseSeconds": "0.006",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-10-20T06:57:02+00:00",
+      "id": "e2267cae-8e3f-435e-8e84-5b806601419c",
+      "status": 200,
+      "upstream": "192.168.65.254:63497",
+      "requestSeconds": "0.004",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.003",
+      "responseSeconds": "0.003",
+      "upstreamStatus": "200"
+    }
+  ],
+  "truncated": false
+}
+]
+expected: 0
+ but was: 1
+	at dev.codeless.api.preview.PreviewPlatformIntegrationTest.realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures(PreviewPlatformIntegrationTest.java:84)

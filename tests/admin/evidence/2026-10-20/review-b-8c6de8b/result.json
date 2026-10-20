@@ -1,0 +1,11 @@
+{
+  "case": "D17-A review of D17-B PR #52",
+  "head": "8c6de8b19ea8a9d8707456f5708137dafe4b2816",
+  "worktree": ".local-data/rb17 (temporary, node_modules junctions to the main checkout; removed after review)",
+  "backendRatio": { "source": "jshell: Math.round(n * 10000.0 / d) / 10000.0 (AdminQueries.ratio)", "57/800": 0.0713, "113/800": 0.1413 },
+  "clientRatio": { "source": "admin-api.ts bucket(): Math.round(s / d * 10000) / 10000", "57/800": 0.0712, "113/800": 0.1412 },
+  "mismatchingPairs": { "denominatorUpTo1000": 21, "denominatorUpTo5000": 222, "smallestDenominator": 800 },
+  "repro": { "command": "./node_modules/.bin/vitest run src/features/admin/review-d17a-rounding.test.ts", "exitCode": 1, "result": "1 failed | 1 passed", "failure": "getMetrics rejected the backend response for 57/800 with 管理接口响应不符合约定" },
+  "bAdminUnitTests": { "command": "./node_modules/.bin/vitest run src/features/admin/admin-api.test.ts src/features/admin/AdminPage.test.ts src/features/admin/AdminMetrics.test.ts", "exitCode": 0, "result": "3 files, 17 passed" },
+  "remoteChecks": "PR #52 @8c6de8b: ci-gate, verify:static, verify:api, verify:runner, verify:e2e, infra-preflight all success (GitHub API, 2026-10-20)"
+}

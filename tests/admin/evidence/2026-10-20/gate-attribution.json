@@ -1,0 +1,36 @@
+{
+  "case": "D17-A verify:api attribution",
+  "environment": "Windows 11 22621, Temurin 21.0.12.1, Maven 3.9.11 wrapper, Docker Desktop 29.8.2, PostgreSQL 17.6 Testcontainers, deterministic-mock",
+  "runs": [
+    {
+      "head": "2a485f7",
+      "status": "FAILED",
+      "junit": { "tests": 266, "failures": 5, "errors": 5, "skipped": 0 },
+      "errors": "VersionHttpIntegrationTest 5/5: context load failed, PSQLException 'FATAL: sorry, too many clients already'",
+      "cause": "Introduced by this PR: AdminIntegrationTest added one more distinct cached Spring test context (own Hikari pool) on the single shared Testcontainers PostgreSQL",
+      "fix": "6eddcf5 reuses the AuthHttpTest/ApplicationHttpTest context configuration"
+    },
+    {
+      "head": "6eddcf5",
+      "status": "FAILED",
+      "junit": { "tests": 266, "failures": 5, "errors": 0, "skipped": 0 },
+      "failures": [
+        "PreviewAcceptanceProcessTest.stopSignalWriteFailureStillReclaimsAndRunsProjectCleanup",
+        "PreviewAcceptanceProcessTest.parentExceptionIsNotReplacedByCleanup",
+        "PreviewAcceptanceProcessTest.timeoutAssertionAlwaysStopsRootBranchAndLeaf",
+        "PreviewAcceptanceProcessTest.interruptionStopsTreeAndRetainsInterrupt",
+        "PreviewAcceptanceProcessTest.unavailableProcessReportStillRunsProjectCleanupAndPreservesParent"
+      ]
+    }
+  ],
+  "baseline": {
+    "head": "e41c0e19c4b1ea1406bc900155ff9888425f10ad",
+    "how": "unmodified origin/main in a temporary detached worktree, same environment, ./mvnw -o -Dtest=PreviewAcceptanceProcessTest test (direct Maven, not via the recorder)",
+    "exitCode": 1,
+    "junit": { "tests": 8, "failures": 5, "errors": 0, "skipped": 0 },
+    "sameFailureNames": true,
+    "privateLog": ".local-data/d17-a/base-e41c0e1-PreviewAcceptanceProcessTest.log",
+    "logSha256": "65f75d7f4218c60b7e460580a616193352c5ffbe4163c22b5e2e1684f0e10525"
+  },
+  "conclusion": "Remaining local verify:api failures are pre-existing on base main in this Windows environment (also recorded by D15/D16); not introduced by D17-A. Local verify:api is still not green, so local ci-gate cannot be reported as passing; the PR's own remote checks decide."
+}

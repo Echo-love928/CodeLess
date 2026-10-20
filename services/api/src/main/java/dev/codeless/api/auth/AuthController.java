@@ -88,6 +88,10 @@ public class AuthController {
 
     @GetMapping("/admin/session")
     public UserResponse adminSession(HttpServletRequest request) {
-        return UserResponse.from((AuthAccountRepository.Account) request.getAttribute(AuthFilter.ACCOUNT));
+        AuthAccountRepository.Account account = (AuthAccountRepository.Account) request.getAttribute(AuthFilter.ACCOUNT);
+        // Do not rely on the filter's path match alone; the role is the contract of this endpoint.
+        if (account == null) throw new AuthFailure(HttpStatus.UNAUTHORIZED, "UNAUTHENTICATED");
+        if (!"ADMIN".equals(account.role())) throw new AuthFailure(HttpStatus.FORBIDDEN, "FORBIDDEN");
+        return UserResponse.from(account);
     }
 }

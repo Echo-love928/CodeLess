@@ -1,0 +1,61 @@
+[2m[WebServer] [22m(node:287508) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:291120) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:291120) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [chromium] › ..\..\tests\e2e\admin\flow.spec.ts:7:5 › D17-B-T1: ordinary user cannot enter; stale administrator is rejected by the server check (1.0s)
+  x  2 [chromium] › ..\..\tests\e2e\admin\flow.spec.ts:19:5 › D17-B-T2: empty and unknown metrics never become a zero success rate (886ms)
+(node:269828) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:269828) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 3 [chromium] › ..\..\tests\e2e\admin\flow.spec.ts:34:5 › D17-B-T3: server pagination, status and owner/time filters agree; all five resource tables work (1.4s)
+  ok 4 [chromium] › ..\..\tests\e2e\admin\flow.spec.ts:59:5 › D17-B-T4: cancel confirmation binds its target; failure preserves readable table and survives refresh (1.0s)
+  ok 5 [chromium] › ..\..\tests\e2e\admin\flow.spec.ts:76:5 › audited cancellation updates the row and permission loss clears data; responsive view has no page overflow (1.2s)
+
+
+  1) [chromium] › ..\..\tests\e2e\admin\flow.spec.ts:19:5 › D17-B-T2: empty and unknown metrics never become a zero success rate
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('cell', { name: '未知 / 未提供', exact: true })
+    Expected: visible
+    Error: strict mode violation: getByRole('cell', { name: '未知 / 未提供', exact: true }) resolved to 2 elements:
+        1) <td class="" data-v-c6fead3c="">未知 / 未提供</td> aka getByRole('cell', { name: '未知 / 未提供' }).first()
+        2) <td class="" data-v-c6fead3c="">未知 / 未提供</td> aka getByRole('cell', { name: '未知 / 未提供' }).nth(1)
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('cell', { name: '未知 / 未提供', exact: true })[22m
+
+
+      28 |   await page.getByRole('button', { name: '模型调用', exact: true }).click()
+      29 |   await expect(page.getByRole('cell', { name: '未知 · FUTURE_STATE', exact: true })).toBeVisible()
+    > 30 |   await expect(page.getByRole('cell', { name: '未知 / 未提供', exact: true })).toBeVisible()
+         |                                                                           ^
+      31 |   await expect(page.getByRole('cell', { name: '0', exact: true })).toBeVisible()
+      32 | })
+      33 |
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\tests\e2e\admin\flow.spec.ts:30:75
+
+    Error Context: test-results\admin-flow-D17-B-T2-empty--7ffec--become-a-zero-success-rate-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\admin-flow-D17-B-T2-empty--7ffec--become-a-zero-success-rate-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\admin-flow-D17-B-T2-empty--7ffec--become-a-zero-success-rate-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › ..\..\tests\e2e\admin\flow.spec.ts:19:5 › D17-B-T2: empty and unknown metrics never become a zero success rate
+  4 passed (10.3s)
+Error: ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL
+
+  × "pnpm recursive exec" failed in C:
+  │ \Users\12058\Documents\ChatGPT\CodeLess\apps\web
