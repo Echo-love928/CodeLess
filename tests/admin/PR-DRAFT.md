@@ -26,6 +26,9 @@
 | `pnpm verify:api` | `2a485f7` | 1 | VersionHttpIntegrationTest 5 error（`too many clients already`，本 PR 新增测试上下文导致，已在 `6eddcf5` 修复）+ PreviewAcceptanceProcessTest 5 failure（既有 Windows 本机问题） |
 | `pnpm verify:api` | `6eddcf5` | 1 | 266 项：0 error，5 failure 全部为 `PreviewAcceptanceProcessTest`；未改动的 base `e41c0e1` 同环境单独运行同样 8 项 5 failure、失败名相同（`gate-attribution.json`）。本机 ci-gate 因此未全绿，以 PR 远端检查为准 |
 
+D17-B 互审修复（`b67ee32`）：P1 `Authorization: Bearer …` 整值脱敏、P2 测试审计目录强制隔离、新增“完成记录丢失 → UNKNOWN”用例。
+`acceptance` 0（12/12）、`contracts` 0、`verify:api` 1（268 项，仅既有 5 项 `PreviewAcceptanceProcessTest`）。修复前红测与 canary 复现见交接。
+
 证据：`tests/admin/evidence/2026-10-20/`（T1–T4、04 的真实响应 JSON 与全部运行摘要 `commands.json`；原始日志与 JUnit 在私有 `.local-data/d17-a/runs/`，以摘要标识）。
 变异自检：去掉控制器 `requireAdmin` / 把取消计入生成分母 / 把部分用量当精确总量，T1、T3、T4 分别失败（`.local-data/d17-a/mutation-run.log`）。
 

@@ -54,13 +54,15 @@ class AdminIntegrationTest extends PostgresTestBase {
     @Autowired ObjectMapper mapper;
     @Autowired TaskQueueService queue;
     @Autowired AdminAuditLog auditLog;
+    @Autowired AdminQueries queries;
     private final HttpClient client = HttpClient.newHttpClient();
 
     record Browser(String cookie, String csrf) {}
     record Response(int status, String body, String cacheControl) {}
 
-    /** Only undoes an interrupted failure injection; never deletes a real ledger directory. */
-    @BeforeEach void restoreInterruptedAuditInjection() throws Exception {
+    /** Refuses to run against any ledger but the per-JVM test one; then undoes an interrupted failure injection. */
+    @BeforeEach void isolatedAuditLedger() throws Exception {
+        assertThat(auditLog.root()).as("admin tests must never write to or move a configured ledger").isEqualTo(ADMIN_AUDIT_ROOT);
         Path root = auditLog.root(), moved = root.resolveSibling(root.getFileName() + ".moved");
         if (Files.isRegularFile(root) && Files.isDirectory(moved)) {
             Files.delete(root);
@@ -370,7 +372,7 @@ class AdminIntegrationTest extends PostgresTestBase {
         UUID running = runningTask(app, "GENERATE");
         UUID lease = jdbc.queryForObject("SELECT lease_token FROM generation_tasks WHERE id = ?", UUID.class, running);
         String cancel = "/api/v0/admin/tasks/" + running + "/cancel";
-        Response first = send("POST", cancel, admin, "{\"reason\":\"Stuck build loop; leaked token=sk-live-abcdef1234567890\"}", true);
+        Response first = send("POST", cancel, admin, "{\"reason\":\"Stuck build loop; leaked token=sk-live-abcdef1234567890 Authorization: Bearer demoTok123\"}", true);
         assertThat(first.status()).isEqualTo(200);
         assertThat(first.cacheControl()).contains("no-store");
         JsonNode cancelled = mapper.readTree(first.body());
@@ -383,7 +385,7 @@ class AdminIntegrationTest extends PostgresTestBase {
         assertThat(cancelled.at("/audit/actorId").asText()).isEqualTo(adminId.toString());
         assertThat(cancelled.at("/audit/targetId").asText()).isEqualTo(running.toString());
         assertThat(cancelled.at("/audit/reason").asText()).contains("[REDACTED]").doesNotContain("sk-live", "abcdef1234567890");
-        assertThat(first.body()).doesNotContain("sk-live");
+        assertThat(first.body()).doesNotContain("sk-live", "demoTok123");
         assertThat(taskRow(running)).containsEntry("queue_state", "FINISHED").containsEntry("lease_token", null);
         assertThat(jdbc.queryForObject("SELECT message FROM task_events WHERE task_id = ? ORDER BY sequence DESC LIMIT 1",
                 String.class, running)).isEqualTo("Task cancelled by administrator");
@@ -472,10 +474,11 @@ class AdminIntegrationTest extends PostgresTestBase {
         String straddle = "x".repeat(35) + " sk-abcdefghijklmnopqrstuvwx";
         task(app, prompt, "READY", null, 0, "GENERATION", at);
         task(app, straddle, "PLAN", null, 0, "GENERATION", at.plusMinutes(1));
+        task(app, "Authorization: Bearer demoTok123", "PLAN", null, 0, "GENERATION", at.minusMinutes(1));
         JsonNode page = json(admin, "/api/v0/admin/tasks?applicationId=" + app);
         String body = mapper.writeValueAsString(page);
         for (String secret : List.of("sk-test", "1234567890abcdef", "hunter2", "BEGIN PRIVATE", "MIIEvQ", "abcdefghijklmnop",
-                "秘密口令", "must stay private", "sk-ab"))
+                "秘密口令", "must stay private", "sk-ab", "demoTok123"))
             assertThat(body).as(secret).doesNotContain(secret);
         for (JsonNode item : page.get("items")) {
             assertThat(item.has("prompt")).isFalse();
@@ -489,6 +492,32 @@ class AdminIntegrationTest extends PostgresTestBase {
         users.at("/items/0").propertyNames().forEach(fields::add);
         assertThat(fields).containsExactlyInAnyOrder("id", "email", "displayName", "status", "role", "applicationCount", "createdAt");
         evidence("D17-A-04.json", Map.of("case", "D17-A-04", "taskPage", page, "userFields", fields));
+    }
+
+    /** D17-B review suggestion: the task change commits, then the completion record is lost. */
+    @Test void d17a03CommittedCancelWhoseCompletionRecordIsLostStaysUnknown() throws Exception {
+        UUID app = app(id("demo@codeless.local"), "Lost completion", "ACTIVE", "MOCK", OffsetDateTime.now());
+        UUID running = runningTask(app, "REPAIR");
+        AdminAuditLog failing = new AdminAuditLog(ADMIN_AUDIT_ROOT.resolveSibling(ADMIN_AUDIT_ROOT.getFileName() + "-lost").toString()) {
+            @Override public synchronized Entry complete(Entry requested, String outcome, String previous, String resulting) {
+                throw new Unavailable(new java.io.IOException("injected completion failure"));
+            }
+        };
+        AdminTaskCancellation.Result result = new AdminTaskCancellation(queue, queries, failing)
+                .cancel(id("admin@codeless.local"), running, "Authorization: Bearer demoTok123");
+        assertThat(result.audit().outcome()).isEqualTo("UNKNOWN");
+        assertThat(result.audit().completedAt()).isNull();
+        assertThat(result.audit().reason()).isEqualTo("Authorization: [REDACTED]");
+        assertThat(result.task().status()).isEqualTo("FAILED");
+        assertThat(result.task().failureCode()).isEqualTo("CANCELLED");
+        assertThat(taskRow(running)).containsEntry("status", "FAILED").containsEntry("queue_state", "FINISHED")
+                .containsEntry("lease_token", null);
+        // Only the durable intent exists: the ledger reports UNKNOWN for this target, never success.
+        assertThat(failing.entries()).singleElement().satisfies(entry -> {
+            assertThat(entry.targetId()).isEqualTo(running);
+            assertThat(entry.outcome()).isEqualTo("UNKNOWN");
+            assertThat(entry.previousStatus()).isNull();
+        });
     }
 
     private void assertGeneration(JsonNode node, long total, long ready, long failed, long cancelled, long active,
