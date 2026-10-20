@@ -1,0 +1,54 @@
+{
+  "runnerCleanup" : {
+    "removed" : [ "work/<task>", "workspaces/<task>/source", "workspaces/<task>/.write-123.tmp" ],
+    "receipts" : 1,
+    "retained" : [ "workspaces/<task>/snapshots/<id>" ]
+  },
+  "queuedTask" : {
+    "taskFailedEvents" : 1,
+    "taskId" : "4b10a233-524d-457e-a787-c8e6bb11696f",
+    "concurrentOwnerCancels" : 16
+  },
+  "runningTask" : {
+    "concurrentCalls" : {
+      "ownerCancel" : 8,
+      "runnerCleanup" : 6,
+      "adminCancel" : 4,
+      "expiryRecovery" : 4
+    },
+    "taskFailedEvents" : 1,
+    "draftVersion" : {
+      "versionId" : "e8280831-091a-4391-8476-52752645022e",
+      "frozenReport" : {
+        "status" : "FAILED",
+        "sourceDigest" : "sha256:56441fc030405a16f39171a74bdb2370539e1d2853c9a3d4bb411539084796b5",
+        "buildId" : null,
+        "buildStatus" : null,
+        "exitCode" : null,
+        "verificationId" : null,
+        "verificationStatus" : null,
+        "artifactDigest" : null,
+        "failureCode" : "CANCELLED"
+      },
+      "status" : "FAILED"
+    },
+    "exceptions" : 0,
+    "staleRenewalRejected" : true,
+    "taskId" : "83d023cb-f760-42f0-8a30-cffe719dea59",
+    "staleWorkerWriteRejected" : true,
+    "row" : {
+      "status" : "FAILED",
+      "failure_code" : "CANCELLED",
+      "queue_state" : "FINISHED",
+      "lease_cleared" : true,
+      "event_sequence" : 2
+    },
+    "cleanupOutcomes" : [ "CLEANED", "ALREADY_CLEANED", "ALREADY_CLEANED", "ALREADY_CLEANED", "ALREADY_CLEANED", "ALREADY_CLEANED" ]
+  },
+  "case" : "repeated and concurrent cancellation never throws and converges once",
+  "readyTask" : {
+    "eventsUnchanged" : true,
+    "taskId" : "9d8ad259-b215-4b0a-b94c-200c05526d20",
+    "status" : "READY"
+  }
+}
