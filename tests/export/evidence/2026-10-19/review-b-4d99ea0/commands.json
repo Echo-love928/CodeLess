@@ -1,0 +1,123 @@
+{
+  "card": "D16-A peer review of D16-B",
+  "pullRequest": "https://github.com/Echo-love928/CodeLess/pull/49",
+  "head": "4d99ea0ce2de2c767dfbdd16a8530a8e5e4877f9",
+  "base": "03c790545041e0651ff47a819d7a1bbdd4b4be57",
+  "method": "read-only detached worktree; locked node_modules reused through junctions; no B file changed or committed; temporary reproduction test removed after the run (copy kept here)",
+  "environment": "Windows 11, Node 24.16.0, Temurin 21.0.12.1, Docker Desktop 29.8.2, bundled Playwright Chromium, model provider deterministic-mock",
+  "privateLogs": ".local-data/d16-a/review-b-4d99ea0/*.log and B-recorder run directories (hashes below)",
+  "recorderRuns": [
+    {
+      "run": "2026-10-19T13-25-16.899Z-unit",
+      "via": "B tests/e2e/share/record-command.mjs unit",
+      "status": "FAILED",
+      "exitCode": 1,
+      "signal": null,
+      "head": "4d99ea0ce2de2c767dfbdd16a8530a8e5e4877f9",
+      "startedAt": "2026-10-19T13:25:16.902Z",
+      "completedAt": "2026-10-19T13:25:17.410Z",
+      "logSha256": "sha256:6dac308e7e4663e6ac2e5f7edb94284d8fe4a0554fc1e17eda92ae41efab7314",
+      "testsExecuted": false,
+      "note": "not executed: pnpm 12 refused the review worktree junctioned node_modules (ERR_PNPM_UNSAFE_TASK_RUN_STATE_PATH); review-setup launch failure, not a B result"
+    },
+    {
+      "run": "2026-10-19T13-25-17.516Z-screenshot",
+      "via": "B tests/e2e/share/record-command.mjs screenshot",
+      "status": "PASSED",
+      "exitCode": 0,
+      "signal": null,
+      "head": "4d99ea0ce2de2c767dfbdd16a8530a8e5e4877f9",
+      "startedAt": "2026-10-19T13:25:17.518Z",
+      "completedAt": "2026-10-19T13:25:21.019Z",
+      "logSha256": "sha256:42770effe8cd9aa44ed1f2f7b8b0ebc58ff1f7b67fefe4293ace0a4fa0d7e2b4",
+      "testsExecuted": true,
+      "note": "7/7 pass"
+    },
+    {
+      "run": "2026-10-19T13-25-21.120Z-browser",
+      "via": "B tests/e2e/share/record-command.mjs browser",
+      "status": "FAILED",
+      "exitCode": 1,
+      "signal": null,
+      "head": "4d99ea0ce2de2c767dfbdd16a8530a8e5e4877f9",
+      "startedAt": "2026-10-19T13:25:21.124Z",
+      "completedAt": "2026-10-19T13:25:21.631Z",
+      "logSha256": "sha256:6dac308e7e4663e6ac2e5f7edb94284d8fe4a0554fc1e17eda92ae41efab7314",
+      "testsExecuted": false,
+      "note": "not executed: pnpm 12 refused the review worktree junctioned node_modules (ERR_PNPM_UNSAFE_TASK_RUN_STATE_PATH); review-setup launch failure, not a B result"
+    }
+  ],
+  "directRuns": [
+    {
+      "name": "unit",
+      "command": "node node_modules/vitest/vitest.mjs run src/features/source src/features/deploy",
+      "startedAt": "2026-10-19T13:26:40Z",
+      "completedAt": "2026-10-19T13:26:44Z",
+      "exitCode": 0,
+      "logSha256": "sha256:8e0f82d541dace90a880d1377f2da39f5f3a791e8b96f187120125ad0e776a96",
+      "result": "60/60"
+    },
+    {
+      "name": "lint",
+      "command": "node node_modules/eslint/bin/eslint.js src vite.config.ts vitest.config.ts playwright.config.ts playwright.real-auth.config.ts",
+      "startedAt": "2026-10-19T13:26:44Z",
+      "completedAt": "2026-10-19T13:26:47Z",
+      "exitCode": 0,
+      "logSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "0 problems"
+    },
+    {
+      "name": "vitest-all",
+      "command": "node node_modules/vitest/vitest.mjs run",
+      "startedAt": "2026-10-19T13:26:47Z",
+      "completedAt": "2026-10-19T13:26:54Z",
+      "exitCode": 0,
+      "logSha256": "sha256:47ffdead47d21e3bcc189b7ccc4b49dded9507af866651ee078d775190de5a6e",
+      "result": "131/131"
+    },
+    {
+      "name": "typecheck",
+      "command": "node node_modules/vue-tsc/bin/vue-tsc.js --noEmit",
+      "startedAt": "2026-10-19T13:26:54Z",
+      "completedAt": "2026-10-19T13:26:57Z",
+      "exitCode": 0,
+      "logSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "pass"
+    },
+    {
+      "name": "build",
+      "command": "node node_modules/vite/bin/vite.js build",
+      "startedAt": "2026-10-19T13:26:58Z",
+      "completedAt": "2026-10-19T13:27:01Z",
+      "exitCode": 0,
+      "logSha256": "sha256:b32f560ab3c509d0a3b8dadd69c831e8915f9f228b09fd30480acb5041e6718e",
+      "result": "pass"
+    },
+    {
+      "name": "browser-share",
+      "command": "node node_modules/@playwright/test/cli.js test --config playwright.config.ts share/flow.spec.ts share/screenshot.spec.ts",
+      "startedAt": "2026-10-19T13:27:02Z",
+      "completedAt": "2026-10-19T13:27:08Z",
+      "exitCode": 0,
+      "logSha256": "sha256:604d18c3ee472e0cf0171e72aeb4a164a1c00a2b444a58909919769a1a1925a2",
+      "result": "3/3 (share/flow.spec.ts 2 + share/screenshot.spec.ts 1)"
+    },
+    {
+      "name": "contract-repro",
+      "command": "node node_modules/vitest/vitest.mjs run src/review-d16a/a-contract.review.test.ts (temporary review file)",
+      "completedAt": "2026-10-19T13:27:50Z",
+      "exitCode": 0,
+      "logSha256": "sha256:fe54405d56fb118048b0d1f641146907184c5444a40864e53732a33e06015f3c",
+      "result": "3/3 expectations reproduce the mismatch"
+    },
+    {
+      "name": "repair-loop",
+      "command": "services\\api\\mvnw.cmd -f services/api/pom.xml -Dtest=RepairLoopIntegrationTest test",
+      "startedAt": "2026-10-19T13:28:24Z",
+      "completedAt": "2026-10-19T13:32:52Z",
+      "exitCode": 0,
+      "logSha256": "sha256:9dea47b21567e7faa9315e9c6d51ba086283a0dc88515eaeed75f9160f1bbd6e",
+      "result": "21/21, 0 failure/error/skip"
+    }
+  ]
+}

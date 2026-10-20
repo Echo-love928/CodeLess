@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { ApiError } from '../../api/http'
 import type { Version } from '../versions/version-api'
 import { getSource, type SourceSnapshot } from './source-api'
+import SourceDownload from './SourceDownload.vue'
 
 const props = defineProps<{ version?: Version }>()
 const emit = defineEmits<{ unauthorized: [] }>()
@@ -41,6 +42,7 @@ onBeforeUnmount(() => { generation++; abort?.abort() })
 <template>
   <section class="source-panel" aria-label="只读源码">
     <h2>只读源码 <small v-if="version">版本 {{ version.number }} · {{ version.id }}</small></h2>
+    <SourceDownload :version="version" @unauthorized="emit('unauthorized')" />
     <p v-if="!version" role="status">选择一个版本查看源码。</p>
     <p v-else-if="loading" role="status">正在读取版本源码…</p>
     <div v-else-if="error"><p role="alert">{{ error }}</p><button type="button" class="button-secondary" @click="load">重试读取源码</button></div>

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeless.local/contracts/export/manifest.schema.json",
+  "title": "CodeLess source export manifest v1 (codeless-export.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "applicationId", "versionId", "versionNumber", "status", "buildId", "sourceDigest", "artifactDigest",
+    "reportDigest", "templateDigest", "contentDigest", "toolchain", "files"],
+  "properties": {
+    "protocol": { "const": "codeless-source-export/v1" },
+    "applicationId": { "type": "string", "format": "uuid" },
+    "versionId": { "type": "string", "format": "uuid" },
+    "versionNumber": { "type": "integer", "minimum": 1 },
+    "status": { "const": "VERIFIED" },
+    "buildId": { "type": "string", "format": "uuid" },
+    "sourceDigest": { "$ref": "#/$defs/digest", "description": "Equals the version sourceDigest; canonical digest of VERSION_SOURCE files." },
+    "artifactDigest": { "$ref": "#/$defs/digest", "description": "Frozen VERIFIED build artifact; same value a publication binds." },
+    "reportDigest": { "$ref": "#/$defs/digest", "description": "Frozen verification report of the version." },
+    "templateDigest": { "$ref": "#/$defs/digest", "description": "Canonical digest of TEMPLATE files (fixed configuration and lockfile)." },
+    "contentDigest": { "$ref": "#/$defs/digest", "description": "Canonical digest of every listed file; the manifest itself is excluded." },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node", "pnpm"],
+      "properties": {
+        "node": { "type": "string", "pattern": "^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$" },
+        "pnpm": { "type": "string", "pattern": "^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$" }
+      }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 14,
+      "maxItems": 63,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "bytes", "digest", "origin"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "maxLength": 240,
+            "anyOf": [
+              { "enum": ["README.md", "index.html", "package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", "src/App.vue",
+                "src/build-node.d.ts", "src/main.ts", "src/router.ts", "tsconfig.json", "vite.config.ts"] },
+              { "pattern": "^src/(?:pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue$" },
+              { "pattern": "^src/data/[A-Za-z][A-Za-z0-9_-]*\\.ts$" }
+            ]
+          },
+          "bytes": { "type": "integer", "minimum": 0, "maximum": 1048576 },
+          "digest": { "$ref": "#/$defs/digest" },
+          "origin": { "enum": ["TEMPLATE", "TEMPLATE_DEFAULT", "VERSION_SOURCE", "README"] }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+  }
+}
