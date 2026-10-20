@@ -3,6 +3,7 @@
 - 对象：草稿 PR #53 `codex/d18-b-recovery`，候选 `1cf20cf02e94e385c05ef9b325fd1e6a58cafa79`（运行时代码最终候选 `2a0d284`），基线 `436c04a`。
 - 方式：隔离 worktree `.d18-b-review/`（detached，只读，未提交、未推送、未改 B 代码），`pnpm install --frozen-lockfile`，B 自带记录器 `tests/e2e/recovery/record-command.mjs`。
 - 重点：错误状态无死按钮或无限 loading；重试不会重复旧请求；键盘能完成提交和退出选择；窄屏可以查看任务与预览；范围、失败路径、秘密与测试强度。
+- 结论：已提交 [APPROVED review](https://github.com/Echo-love928/CodeLess/pull/53#pullrequestreview-5586470309)，只针对 `1cf20cf`，不豁免合并门禁；新提交需要重新审查。
 
 ## 阻塞问题
 
