@@ -1,0 +1,92 @@
+import { expect, test } from '@playwright/test'
+import { loginAsDemo } from '../auth/mock-auth'
+import { installAdminAuth as installMockAuth, installAdminFixture, loginAdmin, owner, taskId } from './fixture'
+
+test.use({ timezoneId: 'Asia/Shanghai' })
+
+test('D17-B-T1: ordinary user cannot enter; stale administrator is rejected by the server check', async ({ page }) => {
+  await installMockAuth(page)
+  const fixture = await installAdminFixture(page, { permission: 403 })
+  await loginAsDemo(page); await page.goto('/admin')
+  await expect(page).toHaveURL(/\/apps\?reason=admin-required$/)
+  expect(fixture.requests).toHaveLength(0)
+  await page.getByRole('button', { name: '退出', exact: true }).click()
+  await loginAdmin(page)
+  await expect(page).toHaveURL(/\/apps\?reason=admin-unavailable$/)
+  expect(fixture.requests.map(url => url.pathname)).toEqual(['/api/v0/admin/session'])
+})
+
+test('D17-B-T2: empty and unknown metrics never become a zero success rate', async ({ page }) => {
+  await installMockAuth(page); await installAdminFixture(page, { empty: true }); await loginAdmin(page)
+  await expect(page.getByText('暂无已知终态', { exact: true })).toHaveCount(2)
+  await expect(page.getByText('当前筛选下没有记录')).toBeVisible()
+  await expect(page.getByText('0.0%', { exact: true })).toHaveCount(0)
+  await page.unroute('**/api/v0/admin/**'); await installAdminFixture(page, { unknown: true }); await page.reload()
+  await expect(page.getByText('输入 未知 / 输出 未知 tokens')).toBeVisible()
+  await page.getByText('生成任务每日趋势（UTC）').click()
+  await expect(page.getByText('成功 0 / 失败 0 / 进行中 0 / 取消 0').first()).toBeVisible()
+  await expect(page.getByText('未知 0', { exact: false })).toHaveCount(0)
+  await page.getByRole('button', { name: '模型调用', exact: true }).click()
+  await expect(page.getByRole('cell', { name: '未知 · FUTURE_STATE', exact: true })).toBeVisible()
+  await expect(page.getByRole('cell', { name: '未知 / 未提供', exact: true })).toBeVisible()
+  await expect(page.getByRole('cell', { name: '0', exact: true })).toBeVisible()
+})
+
+test('D17-B-T3: server pagination, status and owner/time filters agree; all five resource tables work', async ({ page }) => {
+  await installMockAuth(page); const fixture = await installAdminFixture(page); await loginAdmin(page)
+  await expect(page.getByText('75.0%', { exact: true })).toBeVisible(); await expect(page.getByText('25.0%', { exact: true })).toBeVisible()
+  await expect(page.getByText('共 25 条 · 第 1 页')).toBeVisible()
+  await page.getByRole('button', { name: '下一页', exact: true }).click()
+  await expect(page.getByText('共 25 条 · 第 2 页')).toBeVisible()
+  await expect(page.getByRole('rowheader', { name: taskId(5), exact: true })).toBeVisible()
+  await expect(page.getByRole('rowheader', { name: taskId(25), exact: true })).toHaveCount(0)
+  await page.getByLabel('所有者 ID', { exact: true }).fill(owner)
+  await page.getByLabel('开始时间（本地，含）').fill('2026-10-20T00:00')
+  await page.getByLabel('结束时间（本地，不含）').fill('2026-10-21T00:00')
+  await page.getByLabel('记录状态').selectOption('FAILED')
+  await page.getByRole('button', { name: '应用筛选', exact: true }).click()
+  await expect(page.getByText('共 12 条 · 第 1 页')).toBeVisible()
+  await expect(page.getByRole('button', { name: '下一页', exact: true })).toBeDisabled()
+  const last = fixture.requests.filter(url => url.pathname.endsWith('/tasks')).at(-1)!
+  expect(Object.fromEntries(last.searchParams)).toMatchObject({ page: '0', size: '20', status: 'FAILED', ownerId: owner, from: '2026-10-19T16:00:00.000Z', to: '2026-10-20T16:00:00.000Z' })
+  for (const [tab, cell] of [['应用', '<img src=x onerror=alert(1)>'], ['部署', '成功 · PUBLISHED'], ['用户', 'fixture@example.test'], ['模型调用', 'deterministic-mock']]) {
+    await page.getByRole('button', { name: tab, exact: true }).click(); await expect(page.getByRole('cell', { name: cell, exact: true })).toBeVisible()
+  }
+  expect(fixture.requests.filter(url => url.pathname.endsWith('/metrics')).every(url => !url.searchParams.has('status'))).toBe(true)
+  expect(fixture.requests.filter(url => url.pathname.endsWith('/metrics')).every(url => !url.searchParams.has('ownerId'))).toBe(true)
+  await expect(page.locator('table img')).toHaveCount(0)
+})
+
+test('D17-B-T4: cancel confirmation binds its target; failure preserves readable table and survives refresh', async ({ page }) => {
+  await installMockAuth(page); const fixture = await installAdminFixture(page, { cancel: 'fail' }); await loginAdmin(page)
+  await page.getByRole('button', { name: `取消任务 ${taskId(25)}`, exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  await expect(dialog).toContainText(taskId(25)); await expect(dialog.getByRole('button', { name: '确认取消', exact: true })).toBeDisabled()
+  await dialog.getByLabel('取消理由').fill('试用管理员确认停止')
+  await dialog.getByRole('button', { name: '确认取消', exact: true }).click()
+  await expect(dialog).toHaveCount(0)
+  await expect(page.getByRole('alert')).toContainText(`任务 ${taskId(25)} 取消未获确认，结果未知`)
+  await expect(page.getByRole('rowheader', { name: taskId(25), exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: `取消任务 ${taskId(25)}`, exact: true })).toBeDisabled()
+  expect(fixture.mutations).toEqual([{ path: `/api/v0/admin/tasks/${taskId(25)}/cancel`, body: { reason: '试用管理员确认停止' }, csrf: 'test-csrf-token' }])
+  await page.reload()
+  await expect(page.getByRole('button', { name: `取消任务 ${taskId(25)}`, exact: true })).toBeDisabled()
+  expect(fixture.mutations).toHaveLength(1)
+})
+
+test('audited cancellation updates the row and permission loss clears data; responsive view has no page overflow', async ({ page }) => {
+  await installMockAuth(page); const fixture = await installAdminFixture(page); await loginAdmin(page)
+  await page.getByRole('button', { name: `取消任务 ${taskId(25)}`, exact: true }).click()
+  await page.getByRole('dialog').getByLabel('取消理由').fill('test cancellation')
+  await page.getByRole('button', { name: '确认取消', exact: true }).click()
+  await expect(page.getByRole('status')).toContainText('服务端确认已取消')
+  await expect(page.getByRole('cell', { name: '已取消 · FAILED / CANCELLED' })).toBeVisible()
+  await page.setViewportSize({ width: 375, height: 812 })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.screenshot({ path: 'test-results/admin-mobile.png', fullPage: true })
+  await page.setViewportSize({ width: 1440, height: 1000 })
+  await page.screenshot({ path: 'test-results/admin-desktop.png', fullPage: true })
+  fixture.revoke(); await page.getByText('生成任务每日趋势（UTC）', { exact: true }).click()
+  await expect(page).toHaveURL(/\/apps\?reason=admin-required$/)
+  await expect(page.getByRole('table')).toHaveCount(0)
+})
