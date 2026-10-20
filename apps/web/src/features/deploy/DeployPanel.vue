@@ -4,6 +4,8 @@ import { ApiError } from '../../api/http'
 import { session } from '../auth/session'
 import { getVersion, type Version } from '../versions/version-api'
 import { createPublication, getPublication, listPublications, verifiedArtifact, loadPublicOrigin, type Publication, type PublicationIntent } from './deploy-api'
+import DeploymentCover from './DeploymentCover.vue'
+import SourceDownload from '../source/SourceDownload.vue'
 
 const props = defineProps<{ applicationId: string; versionId?: string | null }>()
 const emit = defineEmits<{ unauthorized: [] }>()
@@ -136,6 +138,8 @@ onBeforeUnmount(() => { epoch++; versionRequest++ })
       <p v-else-if="version">待发布版本：v{{ version.number }} · {{ version.status === 'VERIFIED' ? '已验证' : '未通过验证' }}<code>{{ version.id }}</code><code>{{ version.sourceDigest }}</code></p>
       <p v-else>暂无可发布的已验证版本。</p>
       <p v-if="artifactDigest">构建产物：<code>{{ artifactDigest }}</code></p>
+      <SourceDownload :version="version" @unauthorized="emit('unauthorized')" />
+      <p v-if="version && last && version.id !== last.versionId">当前选定版本与分享版本不同。分享地址对应下方成功发布版本；源码下载对应上方选定版本。</p>
       <label class="deploy-confirm"><input v-model="confirmed" type="checkbox" :disabled="!version || version.status !== 'VERIFIED' || locked">我确认公开发布上方版本</label>
       <button type="button" class="button-primary" :disabled="!canPublish" @click="publish">{{ posting ? '正在提交发布…' : '确认发布' }}</button>
       <p v-if="current">本次发布：{{ current.id }}<br>版本：{{ current.versionId }}<br>状态：{{ { REQUESTED: '已受理，正在部署与检查', PUBLISHED: '发布成功', FAILED: '发布失败' }[current.status] }}</p>
@@ -146,7 +150,7 @@ onBeforeUnmount(() => { epoch++; versionRequest++ })
       <p v-if="uncertain" role="status">提交结果未知，暂停再次发布；请核对服务端发布记录。</p>
       <p v-if="error" role="alert">{{ error }}</p><p v-if="notice" role="status">{{ notice }}</p>
       <p v-if="copyError" role="alert">{{ copyError }}</p>
-      <div v-if="last" class="deploy-success"><h3>上次成功发布</h3><p>版本：{{ last.versionId }}</p><a :href="last.url ?? undefined" target="_blank" rel="noopener noreferrer">{{ last.url }}</a><button type="button" class="button-secondary" @click="copy">复制公开地址</button></div>
+      <div v-if="last" class="deploy-success"><h3>上次成功发布</h3><p>分享版本：{{ last.versionId }}<br>部署编号：{{ last.id }}<br>发布时间：{{ last.publishedAt }}</p><DeploymentCover :key="last.id" :publication="last" @unauthorized="emit('unauthorized')" /><a :href="last.url ?? undefined" target="_blank" rel="noopener noreferrer">{{ last.url }}</a><button type="button" class="button-secondary" @click="copy">复制公开地址</button></div>
     </section>
   </div>
 </template>
