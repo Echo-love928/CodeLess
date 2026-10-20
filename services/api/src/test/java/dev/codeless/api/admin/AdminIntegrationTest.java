@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,33 +32,40 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlParameterValue;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.util.FileSystemUtils;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 
-/** D17-A acceptance over real HTTP and PostgreSQL. Metric fixtures live in private historical windows. */
+/**
+ * D17-A acceptance over real HTTP and PostgreSQL. Metric fixtures live in private historical windows.
+ * Deliberately the same configuration as AuthHttpTest/ApplicationHttpTest: reusing that cached context keeps the
+ * shared PostgreSQL connection budget unchanged (one more context exhausted max_connections in the full suite).
+ */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
         "CODELESS_DEMO_PASSWORD=demo-password-for-test-only",
         "CODELESS_ADMIN_PASSWORD=admin-password-for-test-only",
-        "codeless.admin.audit-root=target/d17a-admin-audit"
+        "CODELESS_COOKIE_SECURE=true"
 })
 class AdminIntegrationTest extends PostgresTestBase {
-    static final Path AUDIT = Path.of("target/d17a-admin-audit").toAbsolutePath().normalize();
     static final String[] LISTS = {"users", "applications", "tasks", "deployments", "model-calls", "audit"};
     @Value("${local.server.port}") int port;
     @Autowired JdbcTemplate jdbc;
     @Autowired ObjectMapper mapper;
     @Autowired TaskQueueService queue;
+    @Autowired AdminAuditLog auditLog;
     private final HttpClient client = HttpClient.newHttpClient();
 
     record Browser(String cookie, String csrf) {}
     record Response(int status, String body, String cacheControl) {}
 
-    @BeforeAll static void freshAuditRoot() throws Exception {
-        FileSystemUtils.deleteRecursively(AUDIT);
-        FileSystemUtils.deleteRecursively(AUDIT.resolveSibling("d17a-admin-audit.moved"));
+    /** Only undoes an interrupted failure injection; never deletes a real ledger directory. */
+    @BeforeEach void restoreInterruptedAuditInjection() throws Exception {
+        Path root = auditLog.root(), moved = root.resolveSibling(root.getFileName() + ".moved");
+        if (Files.isRegularFile(root) && Files.isDirectory(moved)) {
+            Files.delete(root);
+            Files.move(moved, root);
+        }
     }
 
     @Test void d17aT1OrdinaryUsersHaveNoAdministrativeCapability() throws Exception {
@@ -418,17 +425,18 @@ class AdminIntegrationTest extends PostgresTestBase {
         assertThat(json(admin, "/api/v0/admin/audit").get("totalItems").asLong()).isEqualTo(before);
         assertThat(taskRow(other)).containsEntry("status", "VERIFY");
         // Audit unavailable: nothing is cancelled and the audit list fails closed instead of looking empty.
-        Path moved = AUDIT.resolveSibling("d17a-admin-audit.moved");
-        Files.move(AUDIT, moved);
-        Files.writeString(AUDIT, "not a directory");
+        Path root = auditLog.root(), moved = root.resolveSibling(root.getFileName() + ".moved");
+        assertThat(moved).doesNotExist();
+        Files.move(root, moved);
+        Files.writeString(root, "not a directory");
         Response unavailable;
         Response unavailableList;
         try {
             unavailable = send("POST", otherCancel, admin, "{\"reason\":\"audit offline\"}", true);
             unavailableList = send("GET", "/api/v0/admin/audit", admin, null, false);
         } finally {
-            Files.delete(AUDIT);
-            Files.move(moved, AUDIT);
+            Files.delete(root);
+            Files.move(moved, root);
         }
         assertThat(unavailable.status()).isEqualTo(503);
         assertThat(code(unavailable)).isEqualTo("ADMIN_AUDIT_UNAVAILABLE");

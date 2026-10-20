@@ -178,7 +178,7 @@ public class AdminController {
                     : Set.of(filters);
             params.forEach((name, values) -> {
                 if (!allowed.contains(name) || values.size() != 1 || values.getFirst() == null
-                        || values.getFirst().isEmpty() || values.getFirst().length() > 100) invalid();
+                        || values.getFirst().isEmpty() || values.getFirst().length() > 200) invalid();
             });
         }
 

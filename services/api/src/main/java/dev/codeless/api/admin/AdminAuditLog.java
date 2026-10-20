@@ -67,6 +67,10 @@ public class AdminAuditLog {
                 requested.targetId(), requested.reason(), requested.requestedAt().toString()), completed);
     }
 
+    Path root() {
+        return root;
+    }
+
     /** All entries, newest first. */
     public synchronized List<Entry> entries() {
         Map<UUID, Requested> requested = new HashMap<>();
