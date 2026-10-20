@@ -43,6 +43,7 @@ test('enum drift guard: every filter value in the fragment is accepted by the Ja
   const patch = await read('contracts/admin/openapi.patch.json')
   const java = (await readFile(url('services/api/src/main/java/dev/codeless/api/admin/AdminController.java'), 'utf8'))
     + (await readFile(url('services/api/src/main/java/dev/codeless/api/admin/AdminQueries.java'), 'utf8'))
+    + (await readFile(url('services/api/src/main/java/dev/codeless/api/admin/AdminTaskCancellation.java'), 'utf8'))
   for (const [path, item] of Object.entries(patch.paths)) for (const p of item.get?.parameters ?? []) {
     for (const value of p.schema.enum ?? []) assert.ok(java.includes(`"${value}"`), `${path} ${p.name}=${value} not in Java`)
     assert.ok(java.includes(`"${p.name}"`), `${path} parameter ${p.name} not parsed by the controller`)
