@@ -1,0 +1,61 @@
+{
+  "paths": {
+    "/api/v0/versions/{versionId}/export": {
+      "parameters": [
+        {
+          "name": "versionId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "get": {
+        "operationId": "exportVersionSource",
+        "tags": ["versions"],
+        "summary": "Download the source package of an owned VERIFIED immutable version",
+        "description": "Owner-only GET; ADMIN has no bypass. The ZIP contains one root folder codeless-{versionId}/ with the frozen business source, the controlled template's fixed configuration and lockfile, generated README.md and codeless-export.json (see ./export/manifest.schema.json). Every input is hash-checked before the first byte; failures are JSON errors, never a partial archive. Members are regular 0644 files; no .env, keys, logs, node_modules, dist or other versions. There is no path, file or version selector besides versionId.",
+        "security": [{ "sessionCookie": [] }],
+        "responses": {
+          "200": {
+            "description": "Deterministic ZIP stream; identical bytes for the same version and template",
+            "headers": {
+              "Content-Disposition": {
+                "description": "attachment; filename=\"codeless-{versionId}.zip\"",
+                "schema": { "type": "string", "pattern": "^attachment; filename=\"codeless-[0-9a-f-]{36}\\.zip\"$" }
+              },
+              "Cache-Control": { "schema": { "type": "string", "const": "no-store" } },
+              "X-Content-Type-Options": { "schema": { "type": "string", "const": "nosniff" } },
+              "X-CodeLess-Version-Id": { "schema": { "type": "string", "format": "uuid" } },
+              "X-CodeLess-Source-Digest": { "schema": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" } },
+              "X-CodeLess-Artifact-Digest": { "schema": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" } },
+              "X-CodeLess-Content-Digest": { "schema": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" } }
+            },
+            "content": {
+              "application/zip": { "schema": { "type": "string", "format": "binary" } }
+            }
+          },
+          "400": {
+            "description": "versionId is not a UUID",
+            "content": { "application/json": { "schema": { "$ref": "./schemas/v0/error.schema.json" } } }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": { "application/json": { "schema": { "$ref": "./schemas/v0/error.schema.json" } } }
+          },
+          "404": {
+            "description": "Version missing or owned by another user",
+            "content": { "application/json": { "schema": { "$ref": "./schemas/v0/error.schema.json" } } }
+          },
+          "409": {
+            "description": "EXPORT_VERSION_UNAVAILABLE (DRAFT, FAILED or no successful exit-0 build) or SNAPSHOT_UNAVAILABLE",
+            "content": { "application/json": { "schema": { "$ref": "./schemas/v0/error.schema.json" } } }
+          },
+          "503": {
+            "description": "Frozen snapshot, report or template integrity failure, or fixed export limit exceeded",
+            "content": { "application/json": { "schema": { "$ref": "./schemas/v0/error.schema.json" } } }
+          }
+        }
+      }
+    }
+  }
+}

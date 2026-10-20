@@ -20,5 +20,7 @@ public interface SnapshotStore {
     /** Trusted deployment adapter only; exact manifest member, checked immutable bytes, never a source path. */
     default byte[] readArtifact(UUID version, String sourceDigest, String path) {throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE");}
     default java.util.Map<String,byte[]> artifactBytes(UUID version,String sourceDigest) {throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE");}
+    /** Trusted source export only; exact frozen manifest members, each re-read and re-hashed. */
+    default java.util.Map<String,byte[]> sourceBytes(UUID version,String digest) {throw new SnapshotFailure("SNAPSHOT_UNAVAILABLE");}
     default JsonNode componentMapping(UUID version,String digest) {throw new SnapshotFailure("MAPPING_UNAVAILABLE");}
 }

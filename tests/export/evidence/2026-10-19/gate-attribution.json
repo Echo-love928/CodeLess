@@ -1,0 +1,50 @@
+{
+  "card": "D16-A",
+  "checkedAt": "2026-10-19T12:30:41.115Z",
+  "environment": "Windows 11, Temurin 21.0.12.1, PATH with C:/Program Files/Git/cmd first (Git-bundled openssl resolvable)",
+  "conclusion": "The 5 PreviewAcceptanceProcessTest failures in the local verify:api stage reproduce identically on unmodified base main; they are pre-existing Windows process-tree behaviour, not caused by D16-A. D15 records the same 5 local failures and remote Linux CI api success.",
+  "firstGateAttempt": {
+    "run": "2026-10-19T11-56-58.380Z-gate-ffe1e1a8-45f0-47b3-a643-6cfb56ff9127",
+    "status": "FAILED",
+    "exitCode": 1,
+    "cause": "stopped by the author after EditLifecycleIntegrationTest and EditVerificationIntegrationTest failed with \"Test TLS requires Git-bundled openssl\": from Git Bash, where git resolves mingw64/bin/git.exe so the fixture looked for mingw64/usr/bin/openssl.exe; environment-only, rerun with Git/cmd first in PATH"
+  },
+  "runs": [
+    {
+      "target": "detached worktree of origin/main 03c790545041e0651ff47a819d7a1bbdd4b4be57 (no D16-A change)",
+      "command": "servicesapimvnw.cmd -f services/api/pom.xml -Dtest=PreviewAcceptanceProcessTest test",
+      "exitCode": 1,
+      "tests": 8,
+      "failures": 5,
+      "errors": 0,
+      "skipped": 0,
+      "failingTests": [
+        "interruptionStopsTreeAndRetainsInterrupt",
+        "parentExceptionIsNotReplacedByCleanup",
+        "stopSignalWriteFailureStillReclaimsAndRunsProjectCleanup",
+        "timeoutAssertionAlwaysStopsRootBranchAndLeaf",
+        "unavailableProcessReportStillRunsProjectCleanupAndPreservesParent"
+      ],
+      "privateLog": ".local-data/d16-a/attribution/base-preview-acceptance.log",
+      "logDigest": "sha256:ab66323605b9a137eefa4a5a0a4412ba8da04b2004b77972c5468e151062a3cf"
+    },
+    {
+      "target": "codex/d16-a-source-export f08616b16781930e431e6e0e9c170f22dd861489",
+      "command": "servicesapimvnw.cmd -f services/api/pom.xml -Dtest=PreviewAcceptanceProcessTest test",
+      "exitCode": 1,
+      "tests": 8,
+      "failures": 5,
+      "errors": 0,
+      "skipped": 0,
+      "failingTests": [
+        "interruptionStopsTreeAndRetainsInterrupt",
+        "parentExceptionIsNotReplacedByCleanup",
+        "stopSignalWriteFailureStillReclaimsAndRunsProjectCleanup",
+        "timeoutAssertionAlwaysStopsRootBranchAndLeaf",
+        "unavailableProcessReportStillRunsProjectCleanupAndPreservesParent"
+      ],
+      "privateLog": ".local-data/d16-a/attribution/head-preview-acceptance.log",
+      "logDigest": "sha256:036c6ee2353b45945a5b03354a4160a7aeef6df29d716df746c501d369bd6269"
+    }
+  ]
+}
