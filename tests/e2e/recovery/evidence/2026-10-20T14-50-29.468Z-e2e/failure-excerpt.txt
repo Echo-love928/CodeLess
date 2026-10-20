@@ -1,0 +1,281 @@
+  1) [chromium] › ..\..\tests\e2e\deploy\hosting.spec.ts:5:5 › D15-B real static publication hosting and isolated probe 
+
+    Error: (node:41868) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    (node:39296) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    ERROR: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+    [31m✖ D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Nginx and isolated access probe [90m(884.9645ms)[39m[39m
+    [34mℹ tests 1[39m
+    [34mℹ suites 0[39m
+    [34mℹ pass 0[39m
+    [34mℹ fail 1[39m
+    [34mℹ cancelled 0[39m
+    [34mℹ skipped 0[39m
+    [34mℹ todo 0[39m
+    [34mℹ duration_ms 2005.8282[39m
+
+    [31m✖ failing tests:[39m
+
+    test at tests\e2e\deploy\hosting.acceptance.mjs:28:1
+    [31m✖ D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Nginx and isolated access probe [90m(884.9645ms)[39m[39m
+      AssertionError [ERR_ASSERTION]: controlled Vue image preparation failed
+      
+      1 !== 0
+      
+          at TestContext.<anonymous> [90m(file:///C:/Users/12058/Documents/ChatGPT/CodeLess/[39mtests/e2e/deploy/hosting.acceptance.mjs:38:10[90m)[39m
+      [90m    at async Test.run (node:internal/test_runner/test:1313:7)[39m
+      [90m    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)[39m {
+        generatedMessage: [33mfalse[39m,
+        code: [32m'ERR_ASSERTION'[39m,
+        actual: [33m1[39m,
+        expected: [33m0[39m,
+        operator: [32m'strictEqual'[39m,
+        diff: [32m'simple'[39m
+      }
+
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+        at test at tests\e2e\deploy\hosting.acceptance.mjs:28:1
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\tests\e2e\deploy\hosting.spec.ts:17:42
+
+    Error Context: test-results\deploy-hosting-D15-B-real--c5823--hosting-and-isolated-probe-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\deploy-hosting-D15-B-real--c5823--hosting-and-isolated-probe-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\deploy-hosting-D15-B-real--c5823--hosting-and-isolated-probe-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › ..\..\tests\e2e\generation\flow.spec.ts:44:5 › D10-B success fixture: missing component -> real failed build -> repair -> real verification -> preview 
+
+    Error: (node:45460) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    node:internal/modules/run_main:107
+        triggerUncaughtException(
+        ^
+
+    AssertionError [ERR_ASSERTION]: ERROR: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+    1 !== 0
+
+
+      24 |     child.on('error', reject); child.on('close', code => done({ code, log }))
+      25 |   })
+    > 26 |   expect(observed.code, observed.log).toBe(0)
+         |                                       ^
+      27 |   results = JSON.parse(await readFile(join(runtime, 'manifest.json'), 'utf8'))
+      28 |   assets = JSON.parse(await readFile(join(runtime, 'assets.json'), 'utf8'))
+      29 | })
+        at docker [90m(file:///C:/Users/12058/Documents/ChatGPT/CodeLess/[39mtests/e2e/generation/prepare-fixture.mjs:18:10[90m)[39m
+        at [90mfile:///C:/Users/12058/Documents/ChatGPT/CodeLess/[39mtests/e2e/generation/prepare-fixture.mjs:21:1 {
+      generatedMessage: [33mfalse[39m,
+      code: [32m'ERR_ASSERTION'[39m,
+      actual: [33m1[39m,
+      expected: [33m0[39m,
+      operator: [32m'strictEqual'[39m,
+      diff: [32m'simple'[39m
+    }
+
+    Node.js v24.16.0
+
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\tests\e2e\generation\flow.spec.ts:26:39
+
+    Error Context: test-results\generation-flow-D10-B-succ-ceeab-real-verification---preview-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\generation-flow-D10-B-succ-ceeab-real-verification---preview-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\generation-flow-D10-B-succ-ceeab-real-verification---preview-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › ..\..\tests\e2e\preview\flow.spec.ts:6:5 › D09-B: real builds, isolated preview iframe and refresh 
+
+    Error: (node:45700) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    (node:28860) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    [31m✖ D09-B-T1/T3/T4: real Vue build and Chromium preview, platform isolation and version refresh [90m(1355.8843ms)[39m[39m
+    [34mℹ tests 1[39m
+    [34mℹ suites 0[39m
+    [34mℹ pass 0[39m
+    [34mℹ fail 1[39m
+    [34mℹ cancelled 0[39m
+    [34mℹ skipped 0[39m
+    [34mℹ todo 0[39m
+    [34mℹ duration_ms 2469.5295[39m
+
+    [31m✖ failing tests:[39m
+
+    test at tests\e2e\preview\browser.acceptance.mjs:37:1
+    [31m✖ D09-B-T1/T3/T4: real Vue build and Chromium preview, platform isolation and version refresh [90m(1355.8843ms)[39m[39m
+      Error: ERROR: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+      
+      
+      [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+      
+      Expected: [32m0[39m
+      Received: [31m1[39m
+          at captureRawStack [90m(C:\Users\12058\Documents\ChatGPT\CodeLess\[39mnode_modules\[4m.pnpm[24m\playwright-core@1.60.0\node_modules\[4mplaywright-core[24m\lib\coreBundle.js:3130:17[90m)[39m
+          at callMatcherAsStep [90m(C:\Users\12058\Documents\ChatGPT\CodeLess\[39mnode_modules\[4m.pnpm[24m\playwright@1.60.0\node_modules\[4mplaywright[24m\lib\matchers\expect.js:12873:57[90m)[39m
+          at Object.toBe [90m(C:\Users\12058\Documents\ChatGPT\CodeLess\[39mnode_modules\[4m.pnpm[24m\playwright@1.60.0\node_modules\[4mplaywright[24m\lib\matchers\expect.js:12863:23[90m)[39m
+          at TestContext.<anonymous> [90m(C:\Users\12058\Documents\ChatGPT\CodeLess\[39mtests\e2e\preview\browser.acceptance.mjs:46:48[90m)[39m {
+        matcherResult: { actual: [33m1[39m, expected: [33m0[39m, message: [32m'\x1B[2mexpect(\x1B[22m\x1B[31mreceived\x1B[39m\x1B[2m).\x1B[22mtoBe\x1B[2m(\x1B[22m\x1B[32mexpected\x1B[39m\x1B[2m) // Object.is equality\x1B[22m\n\nExpected: \x1B[32m0\x1B[39m\nReceived: \x1B[31m1\x1B[39m'[39m, name: [32m'toBe'[39m, pass: [33mfalse[39m }
+      }
+
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+        at test at tests\e2e\preview\browser.acceptance.mjs:37:1
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\tests\e2e\preview\flow.spec.ts:18:38
+
+    Error Context: test-results\preview-flow-D09-B-real-bu-f4f60--preview-iframe-and-refresh-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\preview-flow-D09-B-real-bu-f4f60--preview-iframe-and-refresh-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\preview-flow-D09-B-real-bu-f4f60--preview-iframe-and-refresh-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › ..\..\tests\e2e\runner\browser.spec.ts:6:5 › D08-B runner: build artifacts, controlled browser actions and isolation 
+
+    Error: (node:48644) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    (node:21916) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    [31m✖ D08-B-T1/T4: real Vue files -> offline Docker build -> Chromium, screenshot and matching hashes [90m(2166.8924ms)[39m[39m
+    D08-B-T1-blank: {"id":"4e24bb7e-cd28-48e1-8ce1-6c65b2157004","buildId":"7549a273-6a7e-4346-a90e-ad987f33dfbc","sourceDigest":"sha256:4753ca0c5ff32649bfe1c5cb5e9aa35522b1cf18db752c7230411946e287e1ae","artifactDigest":"sha256:6d7e25ad14f8cbd1e07e9886bee798db61b422adda9e137dada945943f5c2cd7","status":"FAILED","failure":"BLANK_PAGE","startedAt":"2026-10-20T14:50:45.626Z","completedAt":"2026-10-20T14:50:49.257Z","workerExitCode":1,"timedOut":false,"phase":"SCREENSHOT","diagnostics":{"pageErrors":[],"consoleErrors":[],"blockedRequests":[],"failedRequests":[],"actions":[],"truncated":false,"freshContext":{"cookies":0,"pages":1},"visibleContent":false,"controlHost":"127.0.0.1"},"cleanup":{"browserClosed":true,"processTreeTerminated":null},"screenshot":{"path":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\4e24bb7e-cd28-48e1-8ce1-6c65b2157004\\page.png","digest":"sha256:3878570f4a62a0d65f57cf1754e0269e56ec797f4e36e26b44c172eb6e800401","bytes":4254,"width":1280,"height":720},"reportPath":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\4e24bb7e-cd28-48e1-8ce1-6c65b2157004\\result.json","fixture":true}
+    [31m✖ D08-B-T1: blank and uncaught JavaScript exception pages fail with real screenshots [90m(18112.7907ms)[39m[39m
+    D08-B-T2-open-timeout: {"id":"536ea9b6-742c-4677-aaca-1a1b30c8d20c","buildId":"eb8cfbed-95a1-4d9e-966d-530d7263048d","sourceDigest":"sha256:af938ede793763347cf6bd2e84c31bfc69d8166914d59752ee3fd05ff84b738b","artifactDigest":"sha256:76173df725c25f7ff028b3dbb82a21df66edcc0a99bdd9d421f9f64cc04aacbf","status":"FAILED","failure":"PAGE_OPEN_TIMEOUT","startedAt":"2026-10-20T14:51:03.798Z","completedAt":"2026-10-20T14:51:05.623Z","workerExitCode":1,"timedOut":false,"phase":"PAGE_OPEN","diagnostics":{"pageErrors":[],"consoleErrors":[],"blockedRequests":[],"failedRequests":[{"url":"http://127.0.0.1:49278/","reason":"net::ERR_ABORTED"}],"actions":[],"truncated":false,"freshContext":{"cookies":0,"pages":1},"visibleContent":null,"controlHost":"127.0.0.1"},"cleanup":{"browserClosed":true,"processTreeTerminated":null},"screenshot":null,"reportPath":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\536ea9b6-742c-4677-aaca-1a1b30c8d20c\\result.json","error":"page.goto: Timeout 500ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:49278/\", waiting until \"load\"\u001b[22m\n","fixture":true}
+    D08-B-T2-screenshot-timeout: {"id":"bf9d63b1-4361-450d-8ee6-77b5ac9695c9","buildId":"d323e3dd-255d-44d2-bc21-97ce2bc1044e","sourceDigest":"sha256:486a46459ea4cbda51c212320be06fab01198357e3bd1b1e9a510846982907a6","artifactDigest":"sha256:9a50b8893b8de896cfb04b2d5af60fc1b542564bc44708f4919c2bd21500b812","status":"FAILED","failure":"SCREENSHOT_TIMEOUT","startedAt":"2026-10-20T14:51:05.649Z","completedAt":"2026-10-20T14:51:07.019Z","workerExitCode":1,"timedOut":false,"phase":"SCREENSHOT","diagnostics":{"pageErrors":[],"consoleErrors":[],"blockedRequests":[],"failedRequests":[],"actions":[],"truncated":false,"freshContext":{"cookies":0,"pages":1},"visibleContent":true,"controlHost":"127.0.0.1"},"cleanup":{"browserClosed":true,"processTreeTerminated":null},"screenshot":null,"reportPath":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\bf9d63b1-4361-450d-8ee6-77b5ac9695c9\\result.json","error":"page.screenshot: Timeout 1ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m    - disabled all CSS animations\u001b[22m\n","fixture":true,"screenshotBudgetMs":1}
+    [32m✔ D08-B-T2: page-open and screenshot timeouts retain distinct failure phases [90m(3323.6703ms)[39m[39m
+    D08-B-T3-admin: {"id":"6d75bcad-d499-407e-b058-6d8f424021c6","buildId":"c44c42e7-b659-4f8e-b524-9f40889488c1","sourceDigest":"sha256:917aff5577352ce5572162fe4a7f48dcfeadf1494c0a37609da608479c304f6f","artifactDigest":"sha256:9d919b3ec4262b2709e60ea173d7d39c40653f1392e23008490927527b703cda","status":"FAILED","failure":"NETWORK_BLOCKED","startedAt":"2026-10-20T14:51:07.063Z","completedAt":"2026-10-20T14:51:08.645Z","workerExitCode":1,"timedOut":false,"phase":"SCREENSHOT","diagnostics":{"pageErrors":[],"consoleErrors":[],"blockedRequests":[{"url":"http://127.0.0.1:65322/admin","reason":"ORIGIN_PATH_METHOD_OR_NAVIGATION"},{"url":"chrome-error://chromewebdata/","reason":"NAVIGATION"}],"failedRequests":[{"url":"http://127.0.0.1:65322/admin","reason":"net::ERR_BLOCKED_BY_CLIENT"}],"actions":[{"index":0,"type":"click","status":"PASSED"}],"truncated":false,"freshContext":{"cookies":0,"pages":1},"visibleContent":false,"controlHost":"127.0.0.1"},"cleanup":{"browserClosed":true,"processTreeTerminated":null},"screenshot":{"path":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\6d75bcad-d499-407e-b058-6d8f424021c6\\page.png","digest":"sha256:3878570f4a62a0d65f57cf1754e0269e56ec797f4e36e26b44c172eb6e800401","bytes":4254,"width":1280,"height":720},"reportPath":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\6d75bcad-d499-407e-b058-6d8f424021c6\\result.json","fixture":true,"adminHits":0}
+    D08-B-T3-metadata: {"id":"9e2e7537-cb78-43e0-98e7-31a42b489d0f","buildId":"4ff4cba7-6bf5-4a92-87c7-9b6e0dcc62f8","sourceDigest":"sha256:55adc210bb6c4ebc8eaaede6655f651ad54bad123361d33f09f8ed3dcf4c654e","artifactDigest":"sha256:0114ca4215e07fd1dd60c0fe40ab4464cd4f2f6121c6c9a9a027bd73c1a2a335","status":"FAILED","failure":"NETWORK_BLOCKED","startedAt":"2026-10-20T14:51:08.682Z","completedAt":"2026-10-20T14:51:09.872Z","workerExitCode":1,"timedOut":false,"phase":"SCREENSHOT","diagnostics":{"pageErrors":[],"consoleErrors":["Connecting to 'http://169.254.169.254/latest/meta-data/' violates the following Content Security Policy directive: \"connect-src 'self'\". The action has been blocked.","Fetch API cannot load http://169.254.169.254/latest/meta-data/. Refused to connect because it violates the document's Content Security Policy.","Connecting to 'http://metadata.google.internal/computeMetadata/v1/' violates the following Content Security Policy directive: \"connect-src 'self'\". The action has been blocked.","Fetch API cannot load http://metadata.google.internal/computeMetadata/v1/. Refused to connect because it violates the document's Content Security Policy.","Connecting to 'http://100.100.100.200/latest/meta-data/' violates the following Content Security Policy directive: \"connect-src 'self'\". The action has been blocked.","Fetch API cannot load http://100.100.100.200/latest/meta-data/. Refused to connect because it violates the document's Content Security Policy."],"blockedRequests":[{"url":"Connecting to 'http://169.254.169.254/latest/meta-data/' violates the following Content Security Policy directive: \"connect-src 'self'\". The action has been blocked.","reason":"CSP"},{"url":"Fetch API cannot load http://169.254.169.254/latest/meta-data/. Refused to connect because it violates the document's Content Security Policy.","reason":"CSP"},{"url":"Connecting to 'http://metadata.google.internal/computeMetadata/v1/' violates the following Content Security Policy directive: \"connect-src 'self'\". The action has been blocked.","reason":"CSP"},{"url":"Fetch API cannot load http://metadata.google.internal/computeMetadata/v1/. Refused to connect because it violates the document's Content Security Policy.","reason":"CSP"},{"url":"Connecting to 'http://100.100.100.200/latest/meta-data/' violates the following Content Security Policy directive: \"connect-src 'self'\". The action has been blocked.","reason":"CSP"},{"url":"Fetch API cannot load http://100.100.100.200/latest/meta-data/. Refused to connect because it violates the document's Content Security Policy.","reason":"CSP"},{"url":"ws://127.0.0.1:1/admin","reason":"WEBSOCKET"}],"failedRequests":[],"actions":[],"truncated":false,"freshContext":{"cookies":0,"pages":1},"visibleContent":true,"controlHost":"127.0.0.1"},"cleanup":{"browserClosed":true,"processTreeTerminated":null},"screenshot":{"path":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\9e2e7537-cb78-43e0-98e7-31a42b489d0f\\page.png","digest":"sha256:f72a40b1f5cb4d16f82cd0489044737859ed95dcb0a35dc3f27bda6b4ba29689","bytes":6006,"width":1280,"height":720},"reportPath":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\9e2e7537-cb78-43e0-98e7-31a42b489d0f\\result.json","fixture":true,"adminHits":0}
+    [32m✔ D08-B-T3: internal admin navigation and cloud metadata fetch never reach their targets [90m(2855.9393ms)[39m[39m
+    D08-B-actions-and-isolation: {"id":"daee5943-3093-4354-a3f5-5b409129b5de","buildId":"79d6615d-6582-41ad-b1e5-5f7528c19f74","sourceDigest":"sha256:468120fe3f1e92fdd9c2261068cd8ba717de859cf1cf25ebb22e765e0d406073","artifactDigest":"sha256:fdf365a72be86529dcccaa8653f947287bfc1275b5cea784eb380e49e475d6b8","status":"PASSED","failure":null,"startedAt":"2026-10-20T14:51:11.451Z","completedAt":"2026-10-20T14:51:13.168Z","workerExitCode":0,"timedOut":false,"phase":"SCREENSHOT","diagnostics":{"pageErrors":[],"consoleErrors":[],"blockedRequests":[],"failedRequests":[],"actions":[{"index":0,"type":"expectText","status":"PASSED"}],"truncated":false,"freshContext":{"cookies":0,"pages":1},"visibleContent":true,"controlHost":"127.0.0.1"},"cleanup":{"browserClosed":true,"processTreeTerminated":null},"screenshot":{"path":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\daee5943-3093-4354-a3f5-5b409129b5de\\page.png","digest":"sha256:16b6210bfdf6361c46ac7996da15eb35a84c91f2ef0145e872da476c999336c9","bytes":6344,"width":1280,"height":720},"reportPath":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\daee5943-3093-4354-a3f5-5b409129b5de\\result.json","fixture":true}
+    [32m✔ fresh contexts isolate cookies and LocalStorage; controlled click/fill/reload really execute [90m(6518.0847ms)[39m[39m
+    D08-B-watchdog: {"id":"6a1c5b7f-c457-4b1c-b07e-1c9b3a04b9da","buildId":"33b24327-37f4-480f-bff4-02bb0e87fd4a","sourceDigest":"sha256:0e010c2adb1e1f88403d8440ce30b455387d64946881c773cff29f96db48c674","artifactDigest":"sha256:d76f68f8c631e61b866b8ac54748412fac357469041c9314b9b69125ac78736d","status":"FAILED","failure":"CONTENT_TIMEOUT","startedAt":"2026-10-20T14:51:16.440Z","completedAt":"2026-10-20T14:51:26.977Z","workerExitCode":1,"timedOut":true,"phase":"CONTENT","diagnostics":null,"cleanup":{"browserClosed":false,"processTreeTerminated":true},"screenshot":null,"reportPath":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\6a1c5b7f-c457-4b1c-b07e-1c9b3a04b9da\\result.json","fixture":true}
+    [32m✔ whole-run watchdog kills a stalled browser process tree instead of reporting success [90m(10585.865ms)[39m[39m
+    D08-B-final-content: {"id":"1883438b-7710-4c37-a2ea-e2ec64d9cef3","buildId":"6ab3bcdf-2a69-49e4-8915-a87b8950bf94","sourceDigest":"sha256:50895274ca7af92aa92b243528ee4e1e28b22a02a4917cff82b359792cd488fa","artifactDigest":"sha256:b3eea9998e11b2d0e3dbacfb5e35ef566685676077073c86ea772cfdb44aeb52","status":"FAILED","failure":"BLANK_PAGE","startedAt":"2026-10-20T14:51:27.031Z","completedAt":"2026-10-20T14:51:28.270Z","workerExitCode":1,"timedOut":false,"phase":"SCREENSHOT","diagnostics":{"pageErrors":[],"consoleErrors":[],"blockedRequests":[],"failedRequests":[],"actions":[{"index":0,"type":"click","status":"PASSED"}],"truncated":false,"freshContext":{"cookies":0,"pages":1},"visibleContent":false,"controlHost":"127.0.0.1"},"cleanup":{"browserClosed":true,"processTreeTerminated":null},"screenshot":{"path":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\1883438b-7710-4c37-a2ea-e2ec64d9cef3\\page.png","digest":"sha256:3878570f4a62a0d65f57cf1754e0269e56ec797f4e36e26b44c172eb6e800401","bytes":4254,"width":1280,"height":720},"reportPath":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\1883438b-7710-4c37-a2ea-e2ec64d9cef3\\result.json","fixture":true}
+    [32m✔ a controlled click that empties the Vue mount is rejected at the final visibility check [90m(1294.0796ms)[39m[39m
+    [31m✖ fixed Vue history routes navigate and reload with real task persistence and frozen document bytes [90m(426.0001ms)[39m[39m
+    [34mℹ tests 8[39m
+    [34mℹ suites 0[39m
+    [34mℹ pass 5[39m
+    [34mℹ fail 3[39m
+    [34mℹ cancelled 0[39m
+    [34mℹ skipped 0[39m
+    [34mℹ todo 0[39m
+    [34mℹ duration_ms 45652.8003[39m
+
+    [31m✖ failing tests:[39m
+
+    test at tests\runner\browser\acceptance.test.mjs:47:1
+    [31m✖ D08-B-T1/T4: real Vue files -> offline Docker build -> Chromium, screenshot and matching hashes [90m(2166.8924ms)[39m[39m
+      AssertionError [ERR_ASSERTION]: ERROR: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+      
+      
+      1 !== 0
+      
+          at TestContext.<anonymous> [90m(file:///C:/Users/12058/Documents/ChatGPT/CodeLess/[39mtests/runner/browser/acceptance.test.mjs:50:10[90m)[39m
+      [90m    at Test.runInAsyncScope (node:async_hooks:227:14)[39m
+      [90m    at Test.run (node:internal/test_runner/test:1306:25)[39m
+      [90m    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)[39m
+      [90m    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)[39m {
+        generatedMessage: [33mfalse[39m,
+        code: [32m'ERR_ASSERTION'[39m,
+        actual: [33m1[39m,
+        expected: [33m0[39m,
+        operator: [32m'strictEqual'[39m,
+        diff: [32m'simple'[39m
+      }
+
+    test at tests\runner\browser\acceptance.test.mjs:67:1
+    [31m✖ D08-B-T1: blank and uncaught JavaScript exception pages fail with real screenshots [90m(18112.7907ms)[39m[39m
+      AssertionError [ERR_ASSERTION]: {"id":"8043b18b-562a-47dd-8cbc-380e9ad9d9c9","buildId":"62b40eac-fe08-4d07-b2bd-6b4dc18ee6a0","sourceDigest":"sha256:bb66ffbd45b9f9472de131af280c1e5da6cf071e9c359b906a7fb14266cc09a4","artifactDigest":"sha256:2a50f5bda5b43fc8c6f7059b4b26182dbd0e10cf5ee2bfce0e19557c9a1aadb5","status":"FAILED","failure":"PAGE_OPEN_TIMEOUT","startedAt":"2026-10-20T14:50:49.325Z","completedAt":"2026-10-20T14:51:03.679Z","workerExitCode":1,"timedOut":false,"phase":"PAGE_OPEN","diagnostics":{"pageErrors":[],"consoleErrors":[],"blockedRequests":[],"failedRequests":[],"actions":[],"truncated":false,"freshContext":{"cookies":0,"pages":1},"visibleContent":null,"controlHost":"127.0.0.1"},"cleanup":{"browserClosed":true,"processTreeTerminated":null},"screenshot":null,"reportPath":"C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d08-browser-zxWGpW\\evidence\\8043b18b-562a-47dd-8cbc-380e9ad9d9c9\\result.json","error":"page.goto: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:64894/\", waiting until \"load\"\u001b[22m\n"}
+      [32mactual[39m [31mexpected[39m
+      
+      [39m'[39m[39mP[39m[39mA[39m[39mG[39m[39mE[39m[39m_[39m[32mO[39m[32mP[39m[39mE[39m[32mN[39m[32m_[39m[31mX[39m[31mC[39m[31mE[39m[31mP[39m[39mT[39m[39mI[39m[32mM[39m[32mE[39m[39mO[39m[32mU[39m[32mT[39m[31mN[39m[39m'[39m
+      
+          at TestContext.<anonymous> [90m(file:///C:/Users/12058/Documents/ChatGPT/CodeLess/[39mtests/runner/browser/acceptance.test.mjs:73:10[90m)[39m
+      [90m    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)[39m
+      [90m    at async Test.run (node:internal/test_runner/test:1313:7)[39m
+      [90m    at async Test.processPendingSubtests (node:internal/test_runner/test:897:7)[39m {
+        generatedMessage: [33mfalse[39m,
+        code: [32m'ERR_ASSERTION'[39m,
+        actual: [32m'PAGE_OPEN_TIMEOUT'[39m,
+        expected: [32m'PAGE_EXCEPTION'[39m,
+        operator: [32m'strictEqual'[39m,
+        diff: [32m'simple'[39m
+      }
+
+    test at tests\runner\browser\acceptance.test.mjs:157:1
+    [31m✖ fixed Vue history routes navigate and reload with real task persistence and frozen document bytes [90m(426.0001ms)[39m[39m
+      AssertionError [ERR_ASSERTION]: ERROR: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+      
+      
+      1 !== 0
+      
+          at TestContext.<anonymous> [90m(file:///C:/Users/12058/Documents/ChatGPT/CodeLess/[39mtests/runner/browser/acceptance.test.mjs:160:10[90m)[39m
+      [90m    at Test.runInAsyncScope (node:async_hooks:227:14)[39m
+      [90m    at Test.run (node:internal/test_runner/test:1306:25)[39m
+      [90m    at async Test.processPendingSubtests (node:internal/test_runner/test:897:7)[39m {
+        generatedMessage: [33mfalse[39m,
+        code: [32m'ERR_ASSERTION'[39m,
+        actual: [33m1[39m,
+        expected: [33m0[39m,
+        operator: [32m'strictEqual'[39m,
+        diff: [32m'simple'[39m
+      }
+
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+        at test at tests\runner\browser\acceptance.test.mjs:47:1
+        at test at tests\runner\browser\acceptance.test.mjs:67:1
+        at test at tests\runner\browser\acceptance.test.mjs:157:1
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\tests\e2e\runner\browser.spec.ts:18:42
+
+    Error Context: test-results\runner-browser-D08-B-runne-8befa-owser-actions-and-isolation-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\runner-browser-D08-B-runne-8befa-owser-actions-and-isolation-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\runner-browser-D08-B-runne-8befa-owser-actions-and-isolation-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [chromium] › ..\..\tests\e2e\deploy\hosting.spec.ts:5:5 › D15-B real static publication hosting and isolated probe 
+    [chromium] › ..\..\tests\e2e\generation\flow.spec.ts:44:5 › D10-B success fixture: missing component -> real failed build -> repair -> real verification -> preview 
+    [chromium] › ..\..\tests\e2e\preview\flow.spec.ts:6:5 › D09-B: real builds, isolated preview iframe and refresh 
+    [chromium] › ..\..\tests\e2e\runner\browser.spec.ts:6:5 › D08-B runner: build artifacts, controlled browser actions and isolation 
+  3 did not run
+  68 passed (52.0s)
+[ELIFECYCLE] Command failed with exit code 1.
+Error: ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL
+
+  × "pnpm recursive run" failed in C:
+  │ \Users\12058\Documents\ChatGPT\CodeLess\apps\web
+
+[ELIFECYCLE] Command failed with exit code 1.
