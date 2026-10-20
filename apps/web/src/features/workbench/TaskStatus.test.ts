@@ -43,6 +43,13 @@ it('keeps unknown states and codes explicit without assuming success', () => {
   expect(unknown.text()).not.toContain('生成完成')
 })
 
+it.each(['__proto__', 'constructor'])('does not mistake inherited property %s for a failure explanation', failureCode => {
+  const wrapper = mount(TaskStatus, { props: { task: { ...task, status: 'FAILED', failureCode } } })
+  expect(wrapper.text()).toContain(failureCode)
+  expect(wrapper.text()).toContain('联系维护者确认')
+  expect(wrapper.text()).not.toContain('生成完成')
+})
+
 it.each([
   ['AGENT_BUILD_EXIT', '源码未通过构建'],
   ['AGENT_REPAIR_NO_PROGRESS', '源码没有变化'],

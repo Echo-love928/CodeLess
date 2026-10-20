@@ -35,5 +35,5 @@ export const publicationFailureDescription = '发布失败。上次成功版本�
 export const publicationUnknownDescription = '提交结果未知，暂停再次发布；请核对服务端发布记录。'
 
 export function failureDescription(code?: string | null): string {
-  return code && reasons[code] || '服务端未提供可解释的失败原因。请保留任务 ID 和诊断信息，联系维护者确认。'
+  return code && Object.hasOwn(reasons, code) ? reasons[code]! : '服务端未提供可解释的失败原因。请保留任务 ID 和诊断信息，联系维护者确认。'
 }
