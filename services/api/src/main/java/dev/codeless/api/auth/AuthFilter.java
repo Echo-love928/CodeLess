@@ -16,12 +16,14 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.UrlPathHelper;
 
 @Component
 public class AuthFilter extends OncePerRequestFilter {
     public static final String USER_ID = "codeless.userId";
     public static final String CSRF = "codeless.csrf";
     public static final String ACCOUNT = "codeless.account";
+    private static final UrlPathHelper ROUTED = new UrlPathHelper();
     private final AuthAccountRepository accounts;
     private final ObjectMapper mapper;
 
@@ -63,7 +65,9 @@ public class AuthFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
             return;
         }
-        if (path.startsWith("/api/v0/admin/") && !"ADMIN".equals(account.role())) {
+        // Spring routes on the decoded path without ;params, so /api/v0/%61dmin/ must not skip the role check.
+        boolean admin = path.startsWith("/api/v0/admin/") || ROUTED.getPathWithinApplication(request).startsWith("/api/v0/admin/");
+        if (admin && !"ADMIN".equals(account.role())) {
             error(response, request, HttpStatus.FORBIDDEN, "FORBIDDEN");
             return;
         }

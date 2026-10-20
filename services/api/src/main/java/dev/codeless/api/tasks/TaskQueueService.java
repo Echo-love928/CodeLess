@@ -81,6 +81,25 @@ public class TaskQueueService {
         return find(ownerId, taskId).orElseThrow();
     }
 
+    public record AdminCancel(TaskStatus previous, TaskStatus current, boolean changed) {}
+
+    /**
+     * Administrator path for the same FAILED/CANCELLED transition as {@link #cancel}; the caller has already
+     * checked the ADMIN role and written the audit intent. Clearing the lease stops stale workers writing.
+     */
+    @Transactional
+    public Optional<AdminCancel> cancelAsAdministrator(UUID taskId) {
+        Optional<UUID> id = jdbc.sql("SELECT id FROM generation_tasks WHERE id = ? FOR UPDATE")
+                .param(taskId).query(UUID.class).optional();
+        if (id.isEmpty()) return Optional.empty();
+        Task task = repository.findTask(taskId).orElseThrow();
+        if (terminal(task.status())) return Optional.of(new AdminCancel(task.status(), task.status(), false));
+        progress.transition(taskId, TaskStatus.FAILED, EventType.TASK_FAILED,
+                "Task cancelled by administrator", "CANCELLED");
+        finish(taskId);
+        return Optional.of(new AdminCancel(task.status(), TaskStatus.FAILED, true));
+    }
+
     @Transactional
     public Optional<Claim> claim() {
         Optional<UUID> candidate = jdbc.sql("""

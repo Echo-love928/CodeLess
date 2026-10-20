@@ -1,0 +1,49 @@
+
+Running 5 tests using 1 worker
+
+(node:254920) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:254920) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 tests\e2e\admin\real.acceptance.ts:16:5 › real T1: ordinary browser and direct management reads/writes are denied (802ms)
+  x  2 tests\e2e\admin\real.acceptance.ts:23:5 › real T2/T3: metrics match SQL records, pagination and supported filters; all six resources render (30.1s)
+(node:281968) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:281968) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 3 tests\e2e\admin\real.acceptance.ts:50:5 › real T4: unavailable audit rejects cancellation and keeps the real table readable (1.1s)
+  ok 4 tests\e2e\admin\real.acceptance.ts:68:5 › real cancellation binds actor, target and redacted reason; duplicate cancel adds no task event (1.2s)
+  ok 5 tests\e2e\admin\real.acceptance.ts:93:5 › real empty window has null rates and no fake zero success (749ms)
+
+
+  1) tests\e2e\admin\real.acceptance.ts:23:5 › real T2/T3: metrics match SQL records, pagination and supported filters; all six resources render
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.selectOption: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByLabel('任务结果', { exact: true })[22m
+
+
+      33 |   await expect(page.getByText('共 25 条 · 第 2 页')).toBeVisible()
+      34 |   await expect(page.getByRole('rowheader', { name: task(5), exact: true })).toBeVisible()
+    > 35 |   await page.getByLabel('任务结果', { exact: true }).selectOption('FAILED')
+         |                                                  ^
+      36 |   await page.getByRole('button', { name: '应用筛选', exact: true }).click()
+      37 |   await expect(page.getByText('共 2 条 · 第 1 页')).toBeVisible()
+      38 |   await expect(page.getByRole('rowheader', { name: task(3), exact: true })).toHaveCount(0)
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\tests\e2e\admin\real.acceptance.ts:35:50
+
+    Error Context: .local-data\d17-b\integration\live\2026-10-20T06-44-46Z\browser\real.acceptance.ts-real-T2-82d48-rs-all-six-resources-render\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .local-data\d17-b\integration\live\2026-10-20T06-44-46Z\browser\real.acceptance.ts-real-T2-82d48-rs-all-six-resources-render\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace .local-data\d17-b\integration\live\2026-10-20T06-44-46Z\browser\real.acceptance.ts-real-T2-82d48-rs-all-six-resources-render\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests\e2e\admin\real.acceptance.ts:23:5 › real T2/T3: metrics match SQL records, pagination and supported filters; all six resources render
+  4 passed (35.9s)

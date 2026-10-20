@@ -1,0 +1,76 @@
+{
+  "task": "D17 A/B real management data and cancellation audit integration",
+  "implementationCommit": "16ce6d8b8f7ac8663f932640c07ef73210b1398b",
+  "upstreamD17A": "50d0044f78224319b3ef7eb8f4ea6454ba87af0a",
+  "mainUnchanged": "e41c0e19c4b1ea1406bc900155ff9888425f10ad",
+  "integration": "PASSED",
+  "httpMock": false,
+  "database": "dedicated PostgreSQL 17.6",
+  "runtimeModelCallsInAdminAcceptance": 0,
+  "checks": {
+    "adminApiAcceptance": {
+      "exitCode": 0,
+      "passed": 10
+    },
+    "static": {
+      "exitCode": 0,
+      "frontendTestsPassed": 164
+    },
+    "realBrowserSqlAudit": {
+      "exitCode": 0,
+      "passed": 5
+    },
+    "contractBrowser": {
+      "exitCode": 0,
+      "passed": 5
+    },
+    "runner": {
+      "exitCode": 0,
+      "passed": 90
+    },
+    "api": {
+      "exitCode": 1,
+      "tests": 266,
+      "passed": 265,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "e2e": {
+      "exitCode": 1,
+      "tests": 64,
+      "passed": 63,
+      "failures": 1
+    }
+  },
+  "mergeEligible": false,
+  "aggregateCiGateCommand": "NOT_RUN; all four stages were executed individually and API/E2E failed",
+  "remoteCiGate": {
+    "head": "8c6de8b19ea8a9d8707456f5708137dafe4b2816",
+    "conclusion": "SUCCESS",
+    "checks": 6,
+    "evidence": "../review-fix/remote-8c6de8b.json"
+  },
+  "unresolved": [
+    {
+      "test": "PreviewPlatformIntegrationTest.realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures",
+      "location": "services/api/src/test/java/dev/codeless/api/preview/PreviewPlatformIntegrationTest.java:84",
+      "observed": "preview-credentials POST returned 502 HTML / PLATFORM_HTTP_NON_JSON",
+      "cause": "UNATTRIBUTED"
+    },
+    {
+      "test": "real stdio worker is forcibly bounded and its process tree is reclaimed",
+      "location": "tests/e2e/share/screenshot.acceptance.mjs:142",
+      "observed": "cleanupConfirmed=false; expected true",
+      "cause": "UNATTRIBUTED"
+    }
+  ],
+  "supersededBy": "../review-fix/summary.json",
+  "historicalFailureContext": {
+    "platform": "Windows",
+    "cause": "UNATTRIBUTED",
+    "reviewedLinuxHead": "968de83fb7f8a74e75b7a20eae47251c0f975d80",
+    "reviewedLinuxChecks": "6/6 SUCCESS",
+    "note": "These failures belong to the earlier local Windows run. The reviewed candidate passed all Linux CI checks; this does not establish the root cause of the historical Windows failures."
+  }
+}

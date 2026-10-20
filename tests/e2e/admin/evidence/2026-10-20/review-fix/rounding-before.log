@@ -1,0 +1,133 @@
+
+ RUN  v3.0.9 C:/Users/12058/Documents/ChatGPT/CodeLess/apps/web
+
+ ❯ src/features/admin/admin-api.test.ts (17 tests | 5 failed) 30ms
+   ✓ denies ordinary and expired sessions before reading management data
+   ✓ checks server role and current account rather than accepting a cached ADMIN
+   ✓ passes filtering and zero-based pagination to the server without filtering a local page
+   ✓ refuses a mismatched page or corrupt usage instead of making it look empty
+   ✓ keeps unknown status and null usage, including genuine measured zero
+   ✓ keeps generation and deployment denominators separate and omits table status from metrics
+   × accepts backend rounding for 57/800 in both generation and deployment 6ms
+     → promise rejected "Error: 管理接口响应不符合约定，请联系维护者核对；未将异常数据计为成功。" instead of resolving
+   × accepts backend rounding for 113/800 in both generation and deployment 1ms
+     → promise rejected "Error: 管理接口响应不符合约定，请联系维护者核对；未将异常数据计为成功。" instead of resolving
+   ✓ accepts backend rounding for 3/4 in both generation and deployment
+   × accepts backend rounding when loading a daily trend window 1ms
+     → promise rejected "Error: 管理接口响应不符合约定，请联系维护者核对；未将异常数据计为成功。" instead of resolving
+   × still rejects an incorrect rounded rate in generation 3ms
+     → promise resolved "{ generation: { …(7) }, …(4) }" instead of rejecting
+   × still rejects an incorrect rounded rate in deployment 1ms
+     → promise resolved "{ generation: { …(7) }, …(4) }" instead of rejecting
+   ✓ rejects missing usage, false precise totals and inconsistent backend denominators
+   ✓ does not send invalid time/owner filters
+   ✓ submits one exact cancellation target with CSRF and requires an audit receipt
+   ✓ requires a CSRF token and reason, reports missing D17-A and preserves permission errors
+   ✓ matches the audit actor and target, and preserves a committed task with UNKNOWN audit completion
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/admin/admin-api.test.ts > accepts backend rounding for 57/800 in both generation and deployment
+ FAIL  src/features/admin/admin-api.test.ts > accepts backend rounding for 113/800 in both generation and deployment
+AssertionError: promise rejected "Error: 管理接口响应不符合约定，请联系维护者核对；未将异常数据计为成功。" instead of resolving
+ ❯ src/features/admin/admin-api.test.ts:60:37
+     58|     value.deployment = { ...value.deployment, total: denominator, publ…
+     59|     respond(value)
+     60|     await expect(getMetrics(filters)).resolves.toMatchObject({ generat…
+       |                                     ^
+     61|   },
+     62| )
+
+Caused by: Error: 管理接口响应不符合约定，请联系维护者核对；未将异常数据计为成功。
+ ❯ invalid src/features/admin/admin-api.ts:32:35
+ ❯ bucket src/features/admin/admin-api.ts:110:137
+ ❯ getMetrics src/features/admin/admin-api.ts:121:22
+ ❯ src/features/admin/admin-api.test.ts:60:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/features/admin/admin-api.test.ts > accepts backend rounding when loading a daily trend window
+AssertionError: promise rejected "Error: 管理接口响应不符合约定，请联系维护者核对；未将异常数据计为成功。" instead of resolving
+ ❯ src/features/admin/admin-api.test.ts:68:96
+     66|   value.generation = { ...value.generation, total: 800, ready: 57, fai…
+     67|   respond(value)
+     68|   await expect(getGenerationTrend({ ...filters, from: value.window.fro…
+       |                                                                                                ^
+     69|     expect.objectContaining({ day: '2026-10-19', generation: expect.ob…
+     70|   ])
+
+Caused by: Error: 管理接口响应不符合约定，请联系维护者核对；未将异常数据计为成功。
+ ❯ invalid src/features/admin/admin-api.ts:32:35
+ ❯ bucket src/features/admin/admin-api.ts:110:137
+ ❯ getMetrics src/features/admin/admin-api.ts:121:22
+ ❯ src/features/admin/admin-api.ts:144:74
+ ❯ src/features/admin/admin-api.test.ts:68:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/features/admin/admin-api.test.ts > still rejects an incorrect rounded rate in generation
+ FAIL  src/features/admin/admin-api.test.ts > still rejects an incorrect rounded rate in deployment
+AssertionError: promise resolved "{ generation: { …(7) }, …(4) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "deployment": {
++     "cancelled": 0,
++     "denominator": 0,
++     "failed": 0,
++     "pending": 0,
++     "rate": null,
++     "succeeded": 0,
++     "unknown": 0,
++   },
++   "generation": {
++     "cancelled": 0,
++     "denominator": 800,
++     "failed": 743,
++     "pending": 0,
++     "rate": 0.0712,
++     "succeeded": 57,
++     "unknown": 0,
++   },
++   "repairs": {
++     "averagePerTask": null,
++     "denominator": 0,
++     "readyAfterRepair": 0,
++     "tasksWithRepairs": 0,
++     "total": 0,
++   },
++   "trend": [],
++   "usage": {
++     "inputTokens": null,
++     "knownTotalTokens": 0,
++     "outputTokens": null,
++     "pendingCalls": 0,
++     "unknownCalls": 2,
++   },
+  }
+
+ ❯ src/features/admin/admin-api.test.ts:77:35
+     75|   else value.deployment = { ...value.deployment, total: 800, published…
+     76|   respond(value)
+     77|   await expect(getMetrics(filters)).rejects.toThrow('不符合约定')
+       |                                   ^
+     78| })
+     79| it('rejects missing usage, false precise totals and inconsistent backe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 12 passed (17)
+   Start at  17:15:36
+   Duration  2.02s (transform 89ms, setup 0ms, collect 350ms, tests 30ms, environment 1.02s, prepare 201ms)
+
+Error: ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL
+
+  × "pnpm recursive exec" failed in C:
+  │ \Users\12058\Documents\ChatGPT\CodeLess\apps\web
+

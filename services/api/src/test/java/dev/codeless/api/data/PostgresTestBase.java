@@ -1,5 +1,7 @@
 package dev.codeless.api.data;
 
+import java.nio.file.Path;
+import java.util.UUID;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -17,6 +19,13 @@ public abstract class PostgresTestBase {
             .withUsername("codeless_test")
             .withPassword("local-test-only");
 
+    /**
+     * Admin audit records of every test context go to a fresh per-JVM directory under target/. A dynamic property
+     * outranks CODELESS_ADMIN_AUDIT_ROOT and application config, and adding it here keeps context cache keys unchanged.
+     */
+    protected static final Path ADMIN_AUDIT_ROOT = Path.of("target", "test-admin-audit", UUID.randomUUID().toString())
+            .toAbsolutePath().normalize();
+
     static {
         POSTGRES.start();
     }
@@ -27,5 +36,6 @@ public abstract class PostgresTestBase {
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
+        registry.add("codeless.admin.audit-root", ADMIN_AUDIT_ROOT::toString);
     }
 }
