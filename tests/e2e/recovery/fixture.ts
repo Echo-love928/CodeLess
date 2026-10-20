@@ -3,7 +3,7 @@ import { installVersionsFixture, openWorkbench, appId } from '../versions/fixtur
 import type { GenerationTask } from '../../../apps/web/src/features/workbench/task-api'
 
 // D18 UI contract fixture: real platform build and Chromium, HTTP/task/model doubles.
-export async function recoveryFixture(page: Page, code = 'MODEL_NETWORK') {
+export async function recoveryFixture(page: Page, code = 'MODEL_NETWORK', initialStatus = 'FAILED') {
   await installVersionsFixture(page)
   const tasks = new Map<string, GenerationTask>(), keys = new Map<string, GenerationTask>()
   const posts: { key: string; prompt: string }[] = []
@@ -16,7 +16,7 @@ export async function recoveryFixture(page: Page, code = 'MODEL_NETWORK') {
     if (hang) return // Deliberately held request; production deadline must settle it.
     if (!keys.has(key)) {
       const id = `aaaaaaaa-aaaa-4aaa-8aaa-${String(keys.size + 1).padStart(12, '0')}`
-      const task = { id, applicationId: appId, prompt, status: 'FAILED', failureCode: code, repairAttempts: 0,
+      const task = { id, applicationId: appId, prompt, status: initialStatus, failureCode: initialStatus === 'FAILED' ? code : null, repairAttempts: 0,
         createdAt: '2026-10-20T00:00:00Z', updatedAt: '2026-10-20T00:00:01Z' }
       tasks.set(id, task); keys.set(key, task)
     }
@@ -33,11 +33,13 @@ export async function recoveryFixture(page: Page, code = 'MODEL_NETWORK') {
   })
   await page.route('**/api/v0/tasks/*/events?*', route => {
     const url = new URL(route.request().url()), taskId = url.pathname.split('/').at(-2)!
+    const status = tasks.get(taskId)?.status ?? 'FAILED'
     return route.fulfill({ json: url.searchParams.get('afterEventId') === '0' ? [{
       id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', taskId, sequence: 1,
-      type: 'TASK_FAILED', stage: 'FAILED', message, occurredAt: '2026-10-20T00:00:01Z',
+      type: status === 'FAILED' ? 'TASK_FAILED' : 'STAGE_STARTED', stage: status, message, occurredAt: '2026-10-20T00:00:01Z',
     }] : [] })
   })
+  await page.route('**/api/v0/tasks/*/events', route => route.fulfill({ status: 503, json: { code: 'EVENT_STREAM_CAPACITY' } }))
   await openWorkbench(page)
   return { tasks, posts, message, loseNextResponse: () => { loseResponse = true }, failReads: (value: boolean) => { rejectRead = value }, hang: () => { hang = true } }
 }

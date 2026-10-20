@@ -33,6 +33,7 @@ const reasons: Record<string, string> = {
 
 export const publicationFailureDescription = '发布失败。上次成功版本和地址仍然保留。请检查托管服务后重新确认发布。'
 export const publicationUnknownDescription = '提交结果未知，暂停再次发布；请核对服务端发布记录。'
+export const cancellationRecoveryDescription = '取消结果尚未确认。可以刷新任务，或对同一任务再次取消；重复取消是安全的。确认终态前请勿重新生成。'
 
 export function failureDescription(code?: string | null): string {
   return code && Object.hasOwn(reasons, code) ? reasons[code]! : '服务端未提供可解释的失败原因。请保留任务 ID 和诊断信息，联系维护者确认。'

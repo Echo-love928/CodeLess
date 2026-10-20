@@ -3,6 +3,23 @@ import { recoveryFixture } from './fixture'
 import { visualFixture } from '../visual-edit/fixture'
 import { ids } from '../versions/fixture'
 
+test('D18-B review: reconnect explains restart wait without inventing a terminal state', async ({ page }) => {
+  const state = await recoveryFixture(page, 'INTERRUPTED', 'GENERATE')
+  await page.getByLabel('需求描述').fill('等待服务恢复')
+  await page.getByRole('button', { name: '开始生成', exact: true }).click()
+  await expect(page.getByText('若服务刚刚重启', { exact: false })).toBeVisible()
+  await expect(page.locator('.workbench-task')).toContainText('约一分钟再刷新任务')
+  await expect(page.locator('.task-status')).toContainText('正在生成')
+  await expect(page.locator('.task-status')).not.toContainText('生成完成')
+  await expect(page.getByRole('button', { name: '开始生成', exact: true })).toBeDisabled()
+  const task = [...state.tasks.values()][0]
+  task.status = 'FAILED'; task.failureCode = 'INTERRUPTED'; task.updatedAt = '2026-10-20T00:01:02Z'
+  await page.getByRole('button', { name: '刷新任务', exact: true }).click()
+  await expect(page.locator('.task-status')).toContainText('INTERRUPTED')
+  await expect(page.getByText('若服务刚刚重启', { exact: false })).toHaveCount(0)
+  expect(state.posts).toHaveLength(1)
+})
+
 for (const [code, text] of [
   ['MODEL_NETWORK', '模型服务连接失败'], ['AGENT_BUILD_EXIT', '源码未通过构建'],
   ['AGENT_MODEL_BUDGET_EXCEEDED', '预算已耗尽'], ['INTERRUPTED', '服务重启'],

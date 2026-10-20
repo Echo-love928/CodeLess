@@ -12,6 +12,7 @@ import TaskStatus from './TaskStatus.vue'
 import TaskProgress from './TaskProgress.vue'
 import { session } from '../auth/session'
 import { useWorkbenchTask } from './use-workbench-task'
+import { running } from './task-api'
 
 const props = defineProps<{ id: string }>()
 const router = useRouter()
@@ -25,6 +26,7 @@ const device = ref<'desktop' | 'mobile'>('desktop')
 const { task, events, busy, cancelling, restoring, error: taskError, connection, connectionDetail,
   persistenceWarning, diagnostics, diagnosticsError, history, pendingPrompt, canStart, canCancel, canRefresh, start, cancel, restore, refresh, dispose } = useWorkbenchTask(cause => redirectOnUnauthorized(cause, router))
 const connectionLabel = computed(() => ({ connecting: '正在连接事件服务', connected: '事件已连接', reconnecting: '连接中断，正在恢复', complete: '任务事件已同步', blocked: '事件连接不可用' })[connection.value] ?? '')
+const showRecoveryNotice = computed(() => connection.value === 'reconnecting' && task.value && running(task.value))
 const validPrompt = computed(() => !!prompt.value.trim() && Array.from(prompt.value.trim()).length <= 8000)
 const taskLink = computed(() => task.value ? { path: route.path, query: { taskId: task.value.id } } : undefined)
 const previousTasks = computed(() => history.value.filter(id => id !== task.value?.id))
@@ -105,6 +107,7 @@ onBeforeUnmount(() => { loadVersion += 1; dispose() })
         <div class="workbench-task"><h2>任务进度</h2>
           <p v-if="task" class="task-request">本次任务需求：{{ task.prompt }}</p><p v-if="restoring" role="status">正在恢复当前任务…</p><TaskStatus :task="task" />
           <p v-if="connectionLabel" role="status">{{ connectionLabel }}<span v-if="connectionDetail">：{{ connectionDetail }}</span></p>
+          <p v-if="showRecoveryNotice" role="status">若服务刚刚重启，可等待约一分钟再刷新任务，确认最终状态；当前结果尚未确认。恢复时间取决于服务配置和可用性。</p>
           <p v-if="taskError" role="alert">{{ taskError }}</p><p v-if="persistenceWarning" role="alert">{{ persistenceWarning }}</p>
           <div class="task-actions"><button v-if="task && !['READY', 'FAILED'].includes(task.status)" class="button-secondary" type="button" :disabled="!canCancel" @click="cancel">{{ cancelling ? '正在请求取消…' : '取消任务' }}</button><button v-if="task || canRefresh" class="button-secondary" type="button" :disabled="!canRefresh" @click="refresh">刷新任务</button><router-link v-if="taskLink" :to="taskLink">任务恢复链接</router-link></div>
           <TaskProgress :events="events" :diagnostics="diagnostics" :diagnostics-error="diagnosticsError" />

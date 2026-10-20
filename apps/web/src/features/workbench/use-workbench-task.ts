@@ -3,6 +3,7 @@ import { ApiError } from '../../api/http'
 import { connectTaskEvents, type TaskEvent } from '../../lib/events/task-events'
 import { cancelTask, createTask, getTask, running, uuid, type GenerationTask } from './task-api'
 import { getTaskDiagnostics, type TaskDiagnostics } from './task-diagnostics'
+import { cancellationRecoveryDescription } from './failure-description'
 
 export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) {
   const task = ref<GenerationTask | null>(null)
@@ -169,7 +170,11 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
     try {
       const value = await cancelTask(id, appId)
       if (version === epoch) { updateTask(value); void loadDiagnostics(id, version) }
-    } catch (cause) { await report(cause, version) }
+    } catch (cause) {
+      await report(cause, version)
+      if (version === epoch && task.value?.id === id && running(task.value) && error.value && cause instanceof ApiError && ['network', 'server'].includes(cause.kind))
+        error.value += ` ${cancellationRecoveryDescription}`
+    }
     finally { if (version === epoch) cancelling.value = false }
   }
 

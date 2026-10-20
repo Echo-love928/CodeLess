@@ -33,6 +33,15 @@ describe('workbench action and lifecycle constraints', () => {
     await cancelling
     expect(state.task.value?.status).toBe('GENERATE')
     expect(state.error.value).toContain('网络连接失败')
+    expect(state.error.value).toContain('重复取消是安全的')
+    expect(state.canStart.value).toBe(false)
+    expect(state.canCancel.value).toBe(true)
+    expect(cancelTask).toHaveBeenCalledTimes(1)
+    vi.mocked(cancelTask).mockResolvedValueOnce({ ...running, status: 'FAILED', failureCode: 'CANCELLED' })
+    await state.cancel()
+    expect(cancelTask).toHaveBeenCalledTimes(2)
+    expect(createTask).toHaveBeenCalledTimes(1)
+    expect(state.task.value?.failureCode).toBe('CANCELLED')
     state.dispose()
   })
 
@@ -46,6 +55,24 @@ describe('workbench action and lifecycle constraints', () => {
     await state.start('Build a page')
     expect(createTask).toHaveBeenCalledTimes(2)
     expect(localStorage.getItem(`codeless:task:v1:owner:${running.applicationId}`)).toBe(running.id)
+    state.dispose()
+  })
+
+  it('a late cancellation network error cannot describe an authoritative terminal task as unknown', async () => {
+    const state = useWorkbenchTask(async () => false)
+    await state.restore(running.applicationId, 'owner')
+    vi.mocked(createTask).mockResolvedValueOnce(running)
+    await state.start('Build a page')
+    let reject!: (cause: Error) => void
+    vi.mocked(cancelTask).mockReturnValueOnce(new Promise((_resolve, fail) => { reject = fail }))
+    const result = state.cancel()
+    vi.mocked(connectTaskEvents).mock.calls[0][0].onTask({ ...running, status: 'FAILED', failureCode: 'CANCELLED' })
+    reject(new ApiError('network'))
+    await result
+    expect(state.task.value?.failureCode).toBe('CANCELLED')
+    expect(state.error.value).not.toContain('取消结果尚未确认')
+    expect(cancelTask).toHaveBeenCalledTimes(1)
+    expect(state.canCancel.value).toBe(false)
     state.dispose()
   })
 
