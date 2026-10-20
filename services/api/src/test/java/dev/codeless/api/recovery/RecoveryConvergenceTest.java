@@ -10,6 +10,7 @@ import dev.codeless.api.data.PostgresTestBase;
 import dev.codeless.api.tasks.TaskQueueService;
 import dev.codeless.api.tasks.TaskScheduler;
 import dev.codeless.api.tasks.TaskStageRunner;
+import dev.codeless.api.versions.SnapshotFailure;
 import dev.codeless.api.versions.SnapshotStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /** D18-A-01/02 with real PostgreSQL: lease heartbeat, restart/expiry and cancel convergence, idempotent cleanup. */
 class RecoveryConvergenceTest extends PostgresTestBase {
@@ -157,6 +159,108 @@ class RecoveryConvergenceTest extends PostgresTestBase {
                         "retained", List.of("workspaces/<task>/snapshots/<id>"), "receipts", 1),
                 "queuedTask", Map.of("taskId", queued, "concurrentOwnerCancels", 16, "taskFailedEvents", 1),
                 "readyTask", Map.of("taskId", ready, "status", "READY", "eventsUnchanged", true)));
+    }
+
+    /**
+     * D18-B review (P2): a report must describe the committed outcome. A cancellation whose transaction rolls back
+     * after converging the draft leaves no CANCELLED report behind, so the later lease expiry freezes INTERRUPTED.
+     */
+    @Test void rolledBackCancelLeavesNoReportAndExpiryFreezesTheCommittedCode() throws Exception {
+        var seed = RecoveryFixtures.seed(repository, "D18 rolled back cancel");
+        UUID task = RecoveryFixtures.queuedTask(repository, seed.app(), "Cancel, then lose the transaction");
+        var claim = queue.claim(Duration.ofSeconds(1)).orElseThrow(); // its process is gone: nothing renews the lease
+        assertThat(claim.taskId()).isEqualTo(task);
+        var draft = RecoveryFixtures.draft(jdbc, snapshots, temporary.resolve("src"), seed.app(), task, 1);
+        var before = taskRow(task);
+
+        var injected = "injected failure after the cancel statements";
+        assertThatThrownBy(() -> new TransactionTemplate(transactions).executeWithoutResult(status -> {
+            assertThat(queue.cancel(seed.owner(), task).failureCode()).isEqualTo("CANCELLED");
+            assertThat(versionStatus(draft.id())).isEqualTo("FAILED");
+            throw new IllegalStateException(injected);
+        })).hasMessage(injected);
+
+        assertThat(taskRow(task)).isEqualTo(before);
+        assertThat(failedEvents(task)).isZero();
+        assertThat(versionStatus(draft.id())).isEqualTo("DRAFT");
+        assertThatThrownBy(() -> snapshots.outcome(draft.id(), draft.sourceDigest(), "FAILED"))
+                .as("no report for a cancellation that never committed").isInstanceOf(SnapshotFailure.class);
+
+        Thread.sleep(1200);
+        assertThat(queue.recoverExpired()).contains(task);
+        assertThat(taskRow(task)).containsEntry("status", "FAILED").containsEntry("failure_code", "INTERRUPTED")
+                .containsEntry("queue_state", "FINISHED").containsEntry("lease_cleared", true);
+        assertThat(failedEvents(task)).isEqualTo(1);
+        assertThat(versionStatus(draft.id())).isEqualTo("FAILED");
+        var report = snapshots.outcome(draft.id(), draft.sourceDigest(), "FAILED").report();
+        assertThat(report.path("failureCode").asText()).isEqualTo("INTERRUPTED");
+        assertThat(queue.cancel(seed.owner(), task).failureCode()).as("terminal and immutable").isEqualTo("INTERRUPTED");
+        assertThat(snapshots.outcome(draft.id(), draft.sourceDigest(), "FAILED").report()).isEqualTo(report);
+        RecoveryFixtures.evidence("D18-A-01-rolled-back-cancel", Map.of(
+                "case", "cancel converges the draft, then its transaction rolls back; the lease later expires",
+                "afterRollback", Map.of("row", before, "taskFailedEvents", 0, "draftVersion", "DRAFT", "report", "NONE"),
+                "afterExpiry", Map.of("row", taskRow(task), "taskFailedEvents", 1, "draftVersion", "FAILED", "report", report),
+                "laterCancel", "INTERRUPTED, report unchanged"));
+    }
+
+    /** D18-B review suggestion: the first cancellation races a real lease-expiry recovery; exactly one wins. */
+    @Test void firstCancelRacingExpiryRecoveryConvergesOnceWithAMatchingReport() throws Exception {
+        var seed = RecoveryFixtures.seed(repository, "D18 cancel versus expiry");
+        var pool = Executors.newFixedThreadPool(2);
+        var winners = new LinkedHashMap<String, Integer>();
+        var rounds = new ArrayList<Map<String, Object>>();
+        try {
+            for (int round = 1; round <= 12; round++) {
+                UUID task = RecoveryFixtures.queuedTask(repository, seed.app(), "Race " + round);
+                var claim = queue.claim(Duration.ofMillis(200)).orElseThrow();
+                assertThat(claim.taskId()).isEqualTo(task);
+                var draft = RecoveryFixtures.draft(jdbc, snapshots, temporary.resolve("race-" + round), seed.app(), task, round);
+                Thread.sleep(300); // the lease has really expired; the worker never renewed it
+
+                var start = new CountDownLatch(1);
+                Future<String> cancelled = pool.submit(() -> { start.await(); return queue.cancel(seed.owner(), task).failureCode(); });
+                Future<Boolean> recovered = pool.submit(() -> { start.await(); return queue.recoverExpired().isPresent(); });
+                start.countDown();
+                String answered = cancelled.get(30, TimeUnit.SECONDS); // any exception fails the test here
+                boolean expired = recovered.get(30, TimeUnit.SECONDS);
+
+                var row = taskRow(task);
+                String code = (String) row.get("failure_code");
+                assertThat(code).isIn("CANCELLED", "INTERRUPTED");
+                assertThat(expired).isEqualTo("INTERRUPTED".equals(code));
+                assertThat(answered).as("the cancel response reports the committed winner").isEqualTo(code);
+                assertThat(row).containsEntry("status", "FAILED").containsEntry("queue_state", "FINISHED");
+                assertThat(failedEvents(task)).isEqualTo(1);
+                assertThat(versionStatus(draft.id())).isEqualTo("FAILED");
+                assertThat(snapshots.outcome(draft.id(), draft.sourceDigest(), "FAILED").report().path("failureCode").asText())
+                        .isEqualTo(code);
+                winners.merge(code, 1, Integer::sum);
+                rounds.add(Map.of("round", round, "failureCode", code, "taskFailedEvents", 1, "reportFailureCode", code));
+            }
+        } finally {
+            pool.shutdownNow();
+        }
+        RecoveryFixtures.evidence("D18-A-01-cancel-expiry-race", Map.of(
+                "case", "first owner cancel and lease-expiry recovery start together on an expired lease",
+                "rounds", rounds.size(), "winners", winners, "exceptions", 0, "perRound", rounds));
+    }
+
+    /** EXISTING only for an identical frozen reason; any other frozen report stays immutable and reads as CONFLICT. */
+    @Test void existingReportCountsOnlyWhenItCarriesTheSameFailureCode() throws Exception {
+        var seed = RecoveryFixtures.seed(repository, "D18 existing report");
+        UUID task = RecoveryFixtures.queuedTask(repository, seed.app(), "Report frozen elsewhere");
+        var draft = RecoveryFixtures.draft(jdbc, snapshots, temporary.resolve("src"), seed.app(), task, 1);
+        var convergence = new DraftConvergence(jdbc, snapshots);
+        assertThat(convergence.freeze(draft.id(), draft.sourceDigest(), "CANCELLED")).isEqualTo("FROZEN");
+        assertThat(convergence.freeze(draft.id(), draft.sourceDigest(), "CANCELLED")).isEqualTo("EXISTING");
+        assertThat(convergence.freeze(draft.id(), draft.sourceDigest(), "INTERRUPTED")).isEqualTo("CONFLICT");
+        assertThat(snapshots.outcome(draft.id(), draft.sourceDigest(), "FAILED").report().path("failureCode").asText())
+                .isEqualTo("CANCELLED");
+        // The real cancellation converges over the identical report (and leaves no QUEUED task for other suites).
+        assertThat(queue.cancel(seed.owner(), task).failureCode()).isEqualTo("CANCELLED");
+        assertThat(versionStatus(draft.id())).isEqualTo("FAILED");
+        assertThat(snapshots.outcome(draft.id(), draft.sourceDigest(), "FAILED").report().path("failureCode").asText())
+                .isEqualTo("CANCELLED");
     }
 
     @Test void heartbeatKeepsLiveLeaseAndCancelledWorkerIsReleasedOnlyAfterItStops() throws Exception {

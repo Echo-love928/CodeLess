@@ -17,6 +17,8 @@ DRAFT 随任务收敛为 FAILED；按任务 ID 幂等清理 runner 资源；保�
   - 本机完整 ci:gate native 1：static、runner 90/90、e2e 64/64 通过；verify:api 275 项中仅 `PreviewAcceptanceProcessTest` 5 项失败。
     在未修改的 main 436c04a 上同环境单独运行，同样 5 项失败（gate-attribution.json），属本机既有问题。以本 PR 远端检查为准，不写 success。
 - 失败路径：重复/并发取消、租约过期、进程强杀、托管调用中断、存储不可用（版本报告 UNAVAILABLE、读取失败关闭）、链接/junction、清理根重叠、保留期小于 1 小时被拒绝。
+- 审查修复（B 的 P2）：失败报告改为终态事务提交后冻结，失败码取已提交的值，回滚不留报告；`EXISTING` 只认失败码相同的报告。
+  新增回滚窗口、首次取消与过期回收竞争（12 轮）、既有报告失败码三项测试；反证 `mutation-report` 单独运行。
 - 模型来源：deterministic-mock；T1 的阶段执行器与托管适配器是记录调用的 fixture。数据库、子进程、文件卷均真实。没有真实模型调用，不声称模型或公网托管效果。
 - 数据与配置：无迁移。新增配置 `codeless.tasks.lease-ms`（默认 60000）、`codeless.recovery.retention-hours`（默认 24，最少 1）、`codeless.recovery.sweep-enabled|sweep-ms|sweep-initial-ms|root`；测试 profile 关闭清理。回退方式：回滚本 PR 即可，回执与报告文件可直接删除。
 - 剩余事项：Docker 构建容器不带任务标识，宿主中途断电时可能遗留容器（runner 维护者加标签后可扩展清理）；与 D18-B 的真实组合联调由最后启用 PR 承担。

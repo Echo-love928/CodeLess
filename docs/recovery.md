@@ -12,7 +12,7 @@ PostgreSQL 始终是状态权威；文件卷与数据库不是同一事务，任
 | 用户 / 管理员取消（含重复、并发） | `FAILED/CANCELLED`，只追加一条 `TASK_FAILED` | 任务行锁串行化；终态重复取消返回原资源、不抛异常、不加事件。旧 worker 的写入和续期因租约已清除被拒绝。 |
 | 取消或过期时 worker 仍在执行 | 不再启动下一阶段 | 心跳发现租约丢失后置位，调度器在阶段之间停止；正在进行的阶段不被中断（runner 在自身 finally 中删除 Docker 容器，强杀会遗留容器）。 |
 | 截止时间（12 分钟）到达 | `FAILED/INTERRUPTED` | D05 既有规则不变。 |
-| 任务以 FAILED 结束时存在 DRAFT 候选版本 | 版本同事务转为 `FAILED` | `DraftConvergence.failDrafts`：数据库状态为准；冻结一份失败报告（`failureCode` = 任务失败码），结果记为 `FROZEN` / `EXISTING` / `CONFLICT` / `UNAVAILABLE`。后两种情况读取快照会失败关闭（503），不会显示为可用。`latest_ready_version_id` 永不改变。 |
+| 任务以 FAILED 结束时存在 DRAFT 候选版本 | 版本同事务转为 `FAILED` | `DraftConvergence.failDrafts`：数据库状态为准。报告不可变，所以失败报告只在终态事务**提交后**冻结（`afterCommit`），`failureCode` 取已提交的任务失败码；事务回滚不留任何报告，之后的取消或过期回收按自己的失败码冻结（D18-B 审查）。结果：`FROZEN`；`EXISTING`（已有失败码相同的 FAILED 报告）；`CONFLICT`（已有其他报告，原样保留：失去租约的 worker 留下的 VERIFIED 报告读取时以 503 失败关闭，worker 自己的构建失败报告失败码为空、按其事实显示）；`UNAVAILABLE`（写入失败；提交后、冻结前崩溃同样没有报告，快照读取失败，界面显示无法读取错误摘要）。非 `FROZEN` 写 WARN 日志，都不会显示为可用。`latest_ready_version_id` 永不改变。 |
 | 发布中（PUBLISHING/PROBING）进程崩溃 | `FAILED/DEPLOYMENT_INTERRUPTED`，**不再调用托管** | D15 账本语义：重启后账本事件数不为 1 即判中断；上次成功发布、URL 与 `latestSuccessful` 保留。 |
 
 调度：`codeless.tasks.lease-ms`（默认 60000，范围 1000..600000）、`codeless.tasks.poll-ms`（默认 1000）。

@@ -29,7 +29,7 @@ for (const name of readdirSync(evidence).filter(n => n.endsWith('.json'))) copyF
 const summary = runs.map(({ name, meta }) => ({ run: name, mode: meta.mode, head: meta.head, status: meta.status, exitCode: meta.exitCode,
   signal: meta.signal, completionVerified: meta.completionVerified ?? null, startedAt: meta.startedAt, completedAt: meta.completedAt ?? null,
   uncommittedScopedFiles: meta.uncommittedScopedFiles, logDigest: meta.logDigest ?? null, modelProvider: meta.modelProvider,
-  ...(meta.mode === 'mutation' ? { mutations: meta.mutations, failedTests: meta.failedTests, restoredDigests: meta.restoredDigests } : {}),
+  ...(meta.mode.startsWith('mutation') ? { mutations: meta.mutations, failedTests: meta.failedTests, restoredDigests: meta.restoredDigests } : {}),
   junit: junit(join(root, name, 'junit')) }))
 writeFileSync(join(target, 'commands.json'), JSON.stringify({ canonicalAcceptanceRun: canonical.name, canonicalHead: canonical.meta.head,
   note: 'Raw logs and JUnit XML stay private under .local-data/d18-a/runs/; digests identify them.', runs: summary }, null, 2) + '\n')

@@ -1,9 +1,11 @@
 // Developer-only fixed D18-A acceptance commands. Records native exit/signal, HEAD, tested file digests, the raw log
 // and this run's JUnit XML under .local-data/d18-a/runs/. No API/runtime shell capability is exposed by this script.
 // Usage: node tests/recovery/record-command.mjs MODE
-//   acceptance | regression | mutation | static | api | runner | e2e | gate
+//   acceptance | regression | mutation | mutation-report | static | api | runner | e2e | gate
 // `mutation` temporarily breaks three safeguards (draft convergence, version references, lease heartbeat), runs the
 // acceptance tests, restores the exact original bytes and PASSES only if every expected test failed.
+// `mutation-report` does the same for the D18-B review fix (report frozen only after commit, EXISTING only for the same
+// failure code); it is a separate run because `mutation` disables convergence altogether and would mask both.
 import { spawn, spawnSync } from 'node:child_process'
 import { openSync, closeSync, mkdirSync, writeFileSync, renameSync, readFileSync, unlinkSync, readdirSync, copyFileSync, existsSync, realpathSync, rmSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -17,20 +19,36 @@ const acceptance = 'RecoveryConvergenceTest,StorageSweeperTest,ProcessRestartRec
 const tests = {
   acceptance,
   mutation: acceptance,
+  'mutation-report': acceptance,
   // Changed: TaskQueueService (lease/recovery/convergence), TaskScheduler, BuildGateway/LocalBuildGateway, AgentLoop.
   regression: 'TaskQueueIntegrationTest,TaskHttpTest,TaskSseHttpTest,TaskDiagnosticsTest,AdminIntegrationTest,DataIntegrationTest,'
     + 'FileToolsIntegrationTest,PlanModelIntegrationTest,LocalBuildGatewayTest,RepairLoopIntegrationTest,AgentLoopIntegrationTest',
 }
 const api = 'services/api/src/main/java/dev/codeless/api/'
-const mutations = [
-  [api + 'recovery/DraftConvergence.java', '        if (code.isEmpty()) return List.of();', '        if (true) return List.of(); // MUTATION'],
-  [api + 'recovery/StorageSweeper.java', '            if (versionReferenced(id)) {', '            if (false) { // MUTATION'],
-  [api + 'recovery/StorageSweeper.java', '() -> !versionReferenced(id));', '() -> true); // MUTATION'],
-  [api + 'tasks/TaskScheduler.java', '        long period = Math.max(100, lease.toMillis() / 3);', '        long period = 3_600_000; // MUTATION'],
-]
-const expectedMutationFailures = ['d18aT1ProcessKillAndRestartNeitherRepublishesNorReportsSuccess',
-  'd18aT2RepeatedAndConcurrentCancelsConvergeOnceAndNeverThrow', 'heartbeatKeepsLiveLeaseAndCancelledWorkerIsReleasedOnlyAfterItStops',
-  'abandonedLeaseConvergesToInterruptedWithinOneLeaseAndReleasesResources', 'd18aT4CleanupNeverDeletesPublishedPreviewOrUsableVersions']
+const mutationSets = {
+  mutation: {
+    mutations: [
+      [api + 'recovery/DraftConvergence.java', '        if (code.isEmpty()) return List.of();', '        if (true) return List.of(); // MUTATION'],
+      [api + 'recovery/StorageSweeper.java', '            if (versionReferenced(id)) {', '            if (false) { // MUTATION'],
+      [api + 'recovery/StorageSweeper.java', '() -> !versionReferenced(id));', '() -> true); // MUTATION'],
+      [api + 'tasks/TaskScheduler.java', '        long period = Math.max(100, lease.toMillis() / 3);', '        long period = 3_600_000; // MUTATION'],
+    ],
+    expected: ['d18aT1ProcessKillAndRestartNeitherRepublishesNorReportsSuccess',
+      'd18aT2RepeatedAndConcurrentCancelsConvergeOnceAndNeverThrow', 'heartbeatKeepsLiveLeaseAndCancelledWorkerIsReleasedOnlyAfterItStops',
+      'abandonedLeaseConvergesToInterruptedWithinOneLeaseAndReleasesResources', 'd18aT4CleanupNeverDeletesPublishedPreviewOrUsableVersions'],
+  },
+  'mutation-report': {
+    mutations: [
+      [api + 'recovery/DraftConvergence.java', '    private static void afterCommit(Runnable action) {',
+        '    private static void afterCommit(Runnable action) { if (true) { action.run(); return; } // MUTATION'],
+      [api + 'recovery/DraftConvergence.java', 'existing.isTextual() && existing.asText().equals(code) ? "EXISTING" : "CONFLICT"',
+        '"EXISTING" /* MUTATION */'],
+    ],
+    expected: ['rolledBackCancelLeavesNoReportAndExpiryFreezesTheCommittedCode', 'existingReportCountsOnlyWhenItCarriesTheSameFailureCode'],
+  },
+}
+const mutating = Object.hasOwn(mutationSets, mode)
+const { mutations, expected: expectedMutationFailures } = mutating ? mutationSets[mode] : { mutations: [], expected: [] }
 
 let command, args
 const windows = process.platform === 'win32'
@@ -70,7 +88,7 @@ function save() {
 }
 
 const originals = new Map()
-if (mode === 'mutation') {
+if (mutating) {
   if (metadata.uncommittedScopedFiles.length) throw new Error('mutation mode requires a clean committed tree')
   for (const [file, from, to] of mutations) {
     const path = join(repo, file)
@@ -118,7 +136,7 @@ function finish(code, signal, error) {
     mkdirSync(join(run, 'junit'), { recursive: true })
     for (const name of readdirSync(reports).filter(name => /\.(xml|txt)$/.test(name))) copyFileSync(join(reports, name), join(run, 'junit', name))
   }
-  if (mode === 'mutation') {
+  if (mutating) {
     // Negative control: the build must fail, and exactly through the expected tests.
     const failed = failedTests(join(run, 'junit'))
     metadata.failedTests = failed
