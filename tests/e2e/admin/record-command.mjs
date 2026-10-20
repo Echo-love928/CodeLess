@@ -7,13 +7,15 @@ const mode = process.argv[2], windows = process.platform === 'win32'
 const commands = {
   unit: ['corepack', 'pnpm', '--filter', '@codeless/web', 'exec', 'vitest', 'run', 'src/features/admin'],
   'auth-http': ['python', 'tests/e2e/admin/auth_http.py'],
+  live: ['python', 'tests/e2e/admin/live_harness.py'],
+  contracts: ['node', 'tests/admin/validate-contract.mjs'],
   browser: ['corepack', 'pnpm', '--filter', '@codeless/web', 'exec', 'playwright', 'test', '--config', 'playwright.config.ts', 'admin/flow.spec.ts'],
   static: ['corepack', 'pnpm', 'verify:static'], api: ['corepack', 'pnpm', 'verify:api'],
   runner: ['corepack', 'pnpm', 'verify:runner'], e2e: ['corepack', 'pnpm', 'verify:e2e'], gate: ['corepack', 'pnpm', 'ci:gate'],
 }
 commands.build = ['corepack', 'pnpm', '--filter', '@codeless/web', 'build']
 if (!Object.hasOwn(commands, mode)) throw new Error('Unknown mode')
-const directory = resolve('.local-data/d17-b', new Date().toISOString().replaceAll(':', '-') + '-' + mode)
+const directory = resolve(process.env.CODELESS_ADMIN_INTEGRATION === '1' ? '.local-data/d17-b/integration/runs' : '.local-data/d17-b', new Date().toISOString().replaceAll(':', '-') + '-' + mode)
 mkdirSync(directory, { recursive: true })
 const env = { ...process.env, CODELESS_MODEL_PROVIDER: 'deterministic-mock', TZ: 'Asia/Shanghai' }
 delete env.CODELESS_MODEL_API_KEY; delete env.CODELESS_MODEL_NAME; delete env.CODELESS_PLAYWRIGHT_CHANNEL; delete env.VITE_PUBLICATION_ORIGIN

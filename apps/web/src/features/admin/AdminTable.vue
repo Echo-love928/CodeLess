@@ -5,9 +5,10 @@ defineEmits<{ cancel: [row: AdminRecord] }>()
 const columns: Record<Resource, { key: keyof AdminRecord; label: string }[]> = {
   tasks: [{ key: 'applicationId', label: '应用 ID' }, { key: 'ownerId', label: '所有者 ID' }, { key: 'failureCode', label: '失败原因码' }],
   applications: [{ key: 'name', label: '应用名称' }, { key: 'ownerId', label: '所有者 ID' }],
-  deployments: [{ key: 'applicationId', label: '应用 ID' }, { key: 'versionId', label: '版本 ID' }, { key: 'ownerId', label: '所有者 ID' }],
+  deployments: [{ key: 'applicationId', label: '应用 ID' }, { key: 'versionId', label: '版本 ID' }, { key: 'requestedBy', label: '请求者 ID' }],
   users: [{ key: 'name', label: '显示名称' }, { key: 'email', label: '邮箱' }, { key: 'role', label: '角色' }],
-  'model-calls': [{ key: 'taskId', label: '任务 ID' }, { key: 'model', label: '模型' }, { key: 'inputTokens', label: '输入 tokens' }, { key: 'outputTokens', label: '输出 tokens' }],
+  'model-calls': [{ key: 'taskId', label: '任务 ID' }, { key: 'model', label: '模型' }, { key: 'usage', label: '用量状态' }, { key: 'inputTokens', label: '输入 tokens' }, { key: 'outputTokens', label: '输出 tokens' }],
+  audit: [{ key: 'actorId', label: '管理员 ID' }, { key: 'targetId', label: '任务 ID' }, { key: 'reason', label: '理由（已脱敏）' }],
 }
 function cell(row: AdminRecord, key: keyof AdminRecord) {
   const value = row[key]
@@ -18,13 +19,13 @@ function cell(row: AdminRecord, key: keyof AdminRecord) {
 <template>
   <div class="table-scroll" tabindex="0" aria-label="管理记录表格，可横向滚动" :aria-busy="busy">
     <table>
-      <caption class="sr-only">{{ { tasks: '任务', applications: '应用', deployments: '部署', users: '用户', 'model-calls': '模型调用' }[resource] }}记录；时间按浏览器时区显示</caption>
+      <caption class="sr-only">{{ { tasks: '任务', applications: '应用', deployments: '部署', users: '用户', 'model-calls': '模型调用', audit: '取消审计' }[resource] }}记录；时间按浏览器时区显示</caption>
       <thead><tr><th scope="col">记录 ID</th><th v-for="column in columns[resource]" :key="column.key" scope="col">{{ column.label }}</th><th v-if="resource !== 'users'" scope="col">状态</th><th scope="col">创建时间</th><th v-if="resource === 'tasks'" scope="col">管理操作</th></tr></thead>
       <tbody>
         <tr v-for="row in rows" :key="row.id">
           <th scope="row" class="identifier">{{ row.id }}</th>
           <td v-for="column in columns[resource]" :key="column.key" :class="{ identifier: column.key.endsWith('Id') }">{{ column.key === 'role' ? statusLabel(row.role) : cell(row, column.key) }}</td>
-          <td v-if="resource !== 'users'"><span class="status" :data-status="row.status">{{ statusLabel(row.status) }}</span></td>
+          <td v-if="resource !== 'users'"><span class="status" :data-status="row.failureCode === 'CANCELLED' ? 'CANCELLED' : row.status">{{ row.failureCode === 'CANCELLED' ? '已取消 · FAILED / CANCELLED' : statusLabel(row.status) }}</span></td>
           <td>{{ new Date(row.createdAt).toLocaleString() }}</td>
           <td v-if="resource === 'tasks'"><button v-if="cancellable(row)" class="button-secondary" type="button" :disabled="busy || blocked.includes(row.id)" :aria-label="`取消任务 ${row.id}`" @click="$emit('cancel', row)">{{ blocked.includes(row.id) ? '已提交 / 待核对' : '取消任务' }}</button><span v-else>—</span></td>
         </tr>

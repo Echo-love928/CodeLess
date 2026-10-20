@@ -35,8 +35,8 @@ test('OpenAPI fragment: 7 admin GETs + 1 audited CSRF cancel, session auth, no-s
   assert.equal(cancel.post.requestBody.content['application/json'].schema.$ref, './admin/admin.schema.json#/$defs/CancelRequest')
   assert.deepEqual(Object.keys(cancel.post.responses).sort(), ['200', '400', '401', '403', '404', '503'])
   assert.equal(patch.paths['/api/v0/admin/audit'].get.responses['503'].content['application/json'].schema.$ref, './schemas/v0/error.schema.json')
-  // Shared registration is the maintainer's; once registered it must equal this reviewed fragment.
-  for (const [path, item] of Object.entries(patch.paths)) if (api.paths[path]) assert.deepEqual(api.paths[path], item, path)
+  // D17 enabling integration: the reviewed fragment must now be registered, not optional.
+  for (const [path, item] of Object.entries(patch.paths)) assert.deepEqual(api.paths[path], item, path)
 })
 
 test('enum drift guard: every filter value in the fragment is accepted by the Java controller/queries', async () => {

@@ -57,7 +57,7 @@ def expect(browser, path, expected, body=None, token=None):
 
 try:
     report['head'] = command('git', 'rev-parse', 'HEAD')
-    classpath_report = root / 'services/api/target/surefire-reports/TEST-dev.codeless.api.agent.AgentLoopIntegrationTest.xml'
+    classpath_report = root / 'services/api/target/surefire-reports/TEST-dev.codeless.api.admin.AdminIntegrationTest.xml'
     properties = ET.parse(classpath_report).find('properties')
     classpath = next(p.attrib['value'] for p in properties if p.attrib['name'] == 'surefire.test.class.path')
     # Exclude test classes/resources, probes and configuration from the server.
@@ -108,7 +108,7 @@ try:
         csrf = expect(admin, '/auth/csrf', 200)['token']
         expect(admin, '/auth/login', 200, {'email': 'admin@codeless.local', 'password': 'fixture-admin-only-d17'}, csrf)
         assert expect(admin, '/admin/session', 200)['role'] == 'ADMIN'
-        expect(admin, '/admin/tasks', 404)  # Absence remains absence, not a fixture success.
+        assert expect(admin, '/admin/tasks', 200)['totalItems'] == 0
         report['status'] = 'PASSED'
 except BaseException as error:
     report.update(status='FAILED', error=repr(error))

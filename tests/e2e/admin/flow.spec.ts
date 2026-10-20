@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
-import { installMockAuth, loginAsDemo } from '../auth/mock-auth'
-import { installAdminFixture, loginAdmin, owner, taskId } from './fixture'
+import { loginAsDemo } from '../auth/mock-auth'
+import { installAdminAuth as installMockAuth, installAdminFixture, loginAdmin, owner, taskId } from './fixture'
 
 test.use({ timezoneId: 'Asia/Shanghai' })
 
@@ -24,7 +24,7 @@ test('D17-B-T2: empty and unknown metrics never become a zero success rate', asy
   await page.unroute('**/api/v0/admin/**'); await installAdminFixture(page, { unknown: true }); await page.reload()
   await expect(page.getByText('输入 未知 / 输出 未知 tokens')).toBeVisible()
   await page.getByText('生成任务每日趋势（UTC）').click()
-  await expect(page.getByText('成功 0 / 失败 0 / 进行中 0 / 取消 0 / 未知 2')).toBeVisible()
+  await expect(page.getByText('成功 0 / 失败 0 / 进行中 0 / 取消 0 / 未知 0').first()).toBeVisible()
   await page.getByRole('button', { name: '模型调用', exact: true }).click()
   await expect(page.getByRole('cell', { name: '未知 · FUTURE_STATE', exact: true })).toBeVisible()
   await expect(page.getByRole('cell', { name: '未知 / 未提供', exact: true })).toBeVisible()
@@ -52,7 +52,7 @@ test('D17-B-T3: server pagination, status and owner/time filters agree; all five
     await page.getByRole('button', { name: tab, exact: true }).click(); await expect(page.getByRole('cell', { name: cell, exact: true })).toBeVisible()
   }
   expect(fixture.requests.filter(url => url.pathname.endsWith('/metrics')).every(url => !url.searchParams.has('status'))).toBe(true)
-  expect(fixture.requests.filter(url => url.pathname.endsWith('/metrics')).at(-1)!.searchParams.get('ownerId')).toBe(owner)
+  expect(fixture.requests.filter(url => url.pathname.endsWith('/metrics')).every(url => !url.searchParams.has('ownerId'))).toBe(true)
   await expect(page.locator('table img')).toHaveCount(0)
 })
 
@@ -73,18 +73,19 @@ test('D17-B-T4: cancel confirmation binds its target; failure preserves readable
   expect(fixture.mutations).toHaveLength(1)
 })
 
-test('accepted cancellation stays pending and permission loss clears data; responsive view has no page overflow', async ({ page }) => {
+test('audited cancellation updates the row and permission loss clears data; responsive view has no page overflow', async ({ page }) => {
   await installMockAuth(page); const fixture = await installAdminFixture(page); await loginAdmin(page)
   await page.getByRole('button', { name: `取消任务 ${taskId(25)}`, exact: true }).click()
   await page.getByRole('dialog').getByLabel('取消理由').fill('test cancellation')
   await page.getByRole('button', { name: '确认取消', exact: true }).click()
-  await expect(page.getByRole('status')).toContainText('尚未确认取消完成')
+  await expect(page.getByRole('status')).toContainText('服务端确认已取消')
+  await expect(page.getByRole('cell', { name: '已取消 · FAILED / CANCELLED' })).toBeVisible()
   await page.setViewportSize({ width: 375, height: 812 })
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await page.screenshot({ path: 'test-results/admin-mobile.png', fullPage: true })
   await page.setViewportSize({ width: 1440, height: 1000 })
   await page.screenshot({ path: 'test-results/admin-desktop.png', fullPage: true })
-  fixture.revoke(); await page.getByRole('button', { name: '刷新数据', exact: true }).click()
+  fixture.revoke(); await page.getByText('生成任务每日趋势（UTC）', { exact: true }).click()
   await expect(page).toHaveURL(/\/apps\?reason=admin-required$/)
   await expect(page.getByRole('table')).toHaveCount(0)
 })

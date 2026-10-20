@@ -9,10 +9,10 @@ import AdminMetrics from './AdminMetrics.vue'
 import { cancelTask, cancellable, getMetrics, listRecords, query, resources, type AdminRecord, type Filters, type Metrics, type Resource } from './admin-api'
 
 const router = useRouter()
-const labels: Record<Resource, string> = { tasks: '任务', applications: '应用', deployments: '部署', users: '用户', 'model-calls': '模型调用' }
-const statuses: Record<Resource, string[]> = { tasks: ['PLAN', 'GENERATE', 'VERIFY', 'REPAIR', 'READY', 'FAILED', 'CANCELLED', 'UNKNOWN'],
-  applications: ['ACTIVE', 'ARCHIVED', 'UNKNOWN'], deployments: ['REQUESTED', 'PUBLISHED', 'FAILED', 'UNKNOWN'],
-  users: [], 'model-calls': ['REQUESTED', 'SUCCEEDED', 'FAILED', 'UNKNOWN'] }
+const labels: Record<Resource, string> = { tasks: '任务', applications: '应用', deployments: '部署', users: '用户', 'model-calls': '模型调用', audit: '取消审计' }
+const statuses: Record<Resource, string[]> = { tasks: ['PLAN', 'GENERATE', 'VERIFY', 'REPAIR', 'READY', 'FAILED'],
+  applications: ['ACTIVE', 'ARCHIVED'], deployments: ['REQUESTED', 'PUBLISHED', 'FAILED'],
+  users: ['ACTIVE', 'DISABLED'], 'model-calls': ['REQUESTED', 'SUCCEEDED', 'FAILED'], audit: ['CANCELLED', 'ALREADY_TERMINAL', 'NOT_FOUND', 'FAILED', 'UNKNOWN'] }
 const empty = (): Filters => ({ status: '', ownerId: '', from: '', to: '' })
 const resource = ref<Resource>('tasks'), draft = ref(empty()), applied = ref(empty())
 const page = ref(0), size = ref(20), total = ref(0), rows = ref<AdminRecord[]>([])
@@ -64,13 +64,18 @@ async function load() {
 }
 function apply() {
   filterError.value = ''
-  try { draft.value.ownerId = draft.value.ownerId.trim(); query(draft.value) }
+  try { draft.value.ownerId = draft.value.ownerId.trim(); query(draft.value, true, resource.value); query(draft.value, false) }
   catch (error) { filterError.value = error instanceof Error ? error.message : '筛选条件无效。'; return }
   applied.value = { ...draft.value }; page.value = 0; void load()
 }
 function switchResource(value: Resource) {
   if (resource.value === value || submitting.value) return
-  resource.value = value; draft.value.status = ''; applied.value.status = ''; page.value = 0; void load()
+  resource.value = value
+  for (const filters of [draft.value, applied.value]) {
+    filters.status = ''; filters.outcome = ''; filters.usage = ''; filters.q = ''; filters.targetId = ''
+    if (!['tasks', 'applications'].includes(value)) filters.ownerId = ''
+  }
+  page.value = 0; void load()
 }
 async function openCancel(row: AdminRecord) {
   if (!permitted.value || !cancellable(row) || blocked.value.includes(row.id) || submitting.value) return
@@ -85,7 +90,10 @@ async function confirmCancel() {
     block(selected.id)
     const result = await cancelTask(selected.id, reason.value)
     if (currentIdentity !== identity.value || !permitted.value) return
-    feedback.value = `任务 ${result.taskId}：${result.status === 'CANCELLED' ? '服务端确认已取消' : '取消请求已受理，尚未确认取消完成'}。审计 ID：${result.auditId}。请刷新记录核对状态。`
+    const outcome = result.audit.outcome
+    feedbackError.value = !['CANCELLED', 'ALREADY_TERMINAL'].includes(outcome)
+    rows.value = rows.value.map(row => row.id === selected.id ? result.task : row)
+    feedback.value = `任务 ${selected.id}：${outcome === 'CANCELLED' ? '服务端确认已取消（FAILED / CANCELLED）' : outcome === 'ALREADY_TERMINAL' ? '任务已经终止，本次没有重复取消' : '取消审计结果未知或失败，勿重复提交，请核对审计'}。审计 ID：${result.audit.id}；结果：${outcome}。`
   } catch (error) {
     if (currentIdentity !== identity.value || !permitted.value || await authorizationError(error)) return
     feedbackError.value = true
@@ -106,19 +114,24 @@ onUnmounted(() => { epoch++ })
       <div class="page-heading"><div><p class="eyebrow">OPERATIONS</p><h1>运行概览</h1><p>查看平台记录，核对结果，并管理仍在执行的任务。</p></div><button class="button-secondary" type="button" :disabled="loading || submitting" @click="load">{{ loading ? '正在刷新…' : '刷新数据' }}</button></div>
       <section class="filters" aria-label="管理筛选">
         <form @submit.prevent="apply">
-          <label>所有者 ID<input v-model="draft.ownerId" placeholder="全部所有者" :disabled="submitting" /></label>
+          <label v-if="['tasks', 'applications'].includes(resource)">所有者 ID<input v-model="draft.ownerId" placeholder="全部所有者" :disabled="submitting" /></label>
           <label>开始时间（本地，含）<input v-model="draft.from" type="datetime-local" :disabled="submitting" /></label>
           <label>结束时间（本地，不含）<input v-model="draft.to" type="datetime-local" :disabled="submitting" /></label>
-          <label>记录状态<select v-model="draft.status" :disabled="submitting || !statuses[resource].length"><option value="">全部状态</option><option v-for="status in statuses[resource]" :key="status" :value="status">{{ status }}</option></select></label>
+          <label>记录状态<select v-model="draft.status" aria-label="记录状态" :disabled="submitting || !statuses[resource].length"><option value="">全部状态</option><option v-for="status in statuses[resource]" :key="status" :value="status">{{ status }}</option></select></label>
+          <label v-if="resource === 'tasks'">任务结果<select v-model="draft.outcome" aria-label="任务结果" :disabled="submitting"><option value="">全部结果</option><option v-for="outcome in ['ACTIVE', 'READY', 'FAILED', 'CANCELLED']" :key="outcome">{{ outcome }}</option></select></label>
+          <label v-if="resource === 'model-calls'">用量状态<select v-model="draft.usage" aria-label="用量状态" :disabled="submitting"><option value="">全部用量</option><option v-for="usage in ['KNOWN', 'UNKNOWN', 'PENDING']" :key="usage">{{ usage }}</option></select></label>
+          <label v-if="resource === 'users'">邮箱或显示名<input v-model="draft.q" maxlength="100" :disabled="submitting" /></label>
+          <label v-if="resource === 'audit'">审计目标 ID<input v-model="draft.targetId" placeholder="全部任务" :disabled="submitting" /></label>
           <label>每页条数<select v-model="size" :disabled="submitting || loading" @change="page = 0; load()"><option :value="10">10</option><option :value="20">20</option><option :value="50">50</option></select></label>
           <button class="button-primary" :disabled="submitting" type="submit">应用筛选</button>
         </form>
         <p v-if="filterError" role="alert">{{ filterError }}</p>
-        <p class="active-filters">已应用：所有者 {{ applied.ownerId || '全部' }}；开始 {{ applied.from || '不限' }}；结束 {{ applied.to || '不限' }}；表格状态 {{ applied.status || '全部' }}。按创建时间降序，ID 降序。</p>
+        <p class="active-filters">已应用：所有者 {{ applied.ownerId || '全部' }}；开始 {{ applied.from || '不限' }}；结束 {{ applied.to || '不限' }}；表格状态 {{ applied.status || '全部' }}；任务结果 {{ applied.outcome || '全部' }}；用量 {{ applied.usage || '全部' }}；搜索 {{ applied.q || '不限' }}；审计目标 {{ applied.targetId || '全部' }}。按创建时间降序，ID 降序。</p>
+        <p class="active-filters">指标仅按时间窗口统计。时间筛选也适用于任务、部署、模型调用列表；用户、应用、审计列表不支持时间筛选。所有者筛选仅适用于任务和应用。</p>
       </section>
       <p v-if="loading" role="status">正在读取后台记录与指标…</p>
       <p v-if="metricsError" role="alert" class="error">指标不可用：{{ metricsError }}</p>
-      <AdminMetrics v-if="metrics" :metrics="metrics" />
+      <AdminMetrics v-if="metrics" :metrics="metrics" :filters="applied" @authorization-error="authorizationError" />
       <nav class="resource-nav" aria-label="管理资源"><button v-for="value in resources" :key="value" :aria-pressed="resource === value" :disabled="submitting" type="button" @click="switchResource(value)">{{ labels[value] }}</button></nav>
       <section :aria-label="`${labels[resource]}列表`">
         <div class="section-title"><h2>{{ labels[resource] }}记录</h2><span>{{ loadedAt ? `数据读取于 ${loadedAt}` : '尚无已确认快照' }}</span></div>
@@ -130,7 +143,7 @@ onUnmounted(() => { epoch++ })
       <p class="footnote">后台仅提供观测和必要管理。取消操作以服务端状态与审计为准；刷新前表格保留已读取状态。</p>
     </main>
     <dialog v-if="target" ref="dialog" aria-labelledby="cancel-title" @cancel.prevent="closeCancel">
-      <form @submit.prevent="confirmCancel"><h2 id="cancel-title">确认取消任务</h2><p>任务 ID：<strong>{{ target.id }}</strong></p><p>应用 ID：{{ target.applicationId || '未知' }}</p><p>读取时状态：{{ target.status }}。服务端会再次检查目标状态；已完成的任务不可取消。</p><label>取消理由<textarea v-model="reason" required maxlength="500" rows="3" :disabled="submitting" /></label><p>提交后不会自动重试。未获确认时，需要核对后台审计。</p><div class="dialog-actions"><button class="button-secondary" type="button" :disabled="submitting" @click="closeCancel">返回</button><button class="button-primary" type="submit" :disabled="submitting || !reason.trim()">{{ submitting ? '正在提交…' : '确认取消' }}</button></div></form>
+      <form @submit.prevent="confirmCancel"><h2 id="cancel-title">确认取消任务</h2><p>任务 ID：<strong>{{ target.id }}</strong></p><p>应用 ID：{{ target.applicationId || '未知' }}</p><p>读取时状态：{{ target.status }}。服务端会再次检查目标状态；已完成的任务不可取消。</p><label>取消理由（1–200 字）<textarea v-model="reason" required maxlength="200" rows="3" :disabled="submitting" /></label><p>提交后不会自动重试。未获确认时，需要核对后台审计。</p><div class="dialog-actions"><button class="button-secondary" type="button" :disabled="submitting" @click="closeCancel">返回</button><button class="button-primary" type="submit" :disabled="submitting || !reason.trim()">{{ submitting ? '正在提交…' : '确认取消' }}</button></div></form>
     </dialog>
   </div>
   <p v-else role="alert">需要管理员权限。</p>

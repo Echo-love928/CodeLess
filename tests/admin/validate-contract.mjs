@@ -5,15 +5,16 @@ import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 import { redoclyEnvironment } from '../../scripts/cli-environment.mjs'
+import assert from 'node:assert/strict'
 
 const repo = fileURLToPath(new URL('../../', import.meta.url)), target = join(repo, '.local-data/d17-a/combined-contracts')
 await rm(target, { recursive: true, force: true }); await mkdir(target, { recursive: true })
 await cp(join(repo, 'contracts'), target, { recursive: true })
 const doc = JSON.parse(await readFile(join(target, 'openapi.v0.json'), 'utf8'))
 const patch = JSON.parse(await readFile(join(target, 'admin/openapi.patch.json'), 'utf8'))
-for (const path of Object.keys(patch.paths)) if (doc.paths[path]) throw new Error(`shared OpenAPI already defines ${path}`)
+for (const path of Object.keys(patch.paths)) if (doc.paths[path]) assert.deepEqual(doc.paths[path], patch.paths[path], `registered ${path} drifted`)
 Object.assign(doc.paths, patch.paths)
-doc.tags = [...(doc.tags ?? []), ...patch.tags]
+doc.tags = [...(doc.tags ?? []), ...patch.tags.filter(tag => !doc.tags?.some(existing => existing.name === tag.name))]
 await writeFile(join(target, 'openapi.v0.json'), JSON.stringify(doc, null, 2) + '\n')
 const windows = process.platform === 'win32'
 for (const [command, args, env] of [
@@ -25,4 +26,4 @@ for (const [command, args, env] of [
   const result = spawnSync(command, args, { cwd: repo, env, stdio: 'inherit' })
   if (result.error || result.status !== 0) process.exit(result.status ?? 1)
 }
-console.log('D17-A admin schemas, evidence and private combined OpenAPI passed; shared registration pending')
+console.log('D17 admin schemas, evidence and registered OpenAPI passed')
