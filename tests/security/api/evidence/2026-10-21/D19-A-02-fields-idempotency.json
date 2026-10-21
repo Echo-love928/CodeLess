@@ -1,0 +1,154 @@
+{
+  "fieldLengths" : [ {
+    "case" : "application name 120 code points (astral)",
+    "status" : 201,
+    "code" : ""
+  }, {
+    "case" : "application name 121 code points",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "application name whitespace only",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "application description 1000",
+    "status" : 201,
+    "code" : ""
+  }, {
+    "case" : "application description 1001",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "application name with NUL",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "rename to 121 code points",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "task prompt 8000 code points",
+    "status" : 202,
+    "code" : ""
+  }, {
+    "case" : "task prompt 8001 code points",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "task prompt with NUL",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "edit prompt 8001 code points",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "edit messageId 129",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "component edit prompt 8001",
+    "status" : 400,
+    "code" : "INVALID_SELECTION"
+  }, {
+    "case" : "admin cancel reason 201 code points",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "JSON nested 2000 deep",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "login email 321 / password 1025",
+    "status" : [ 400, 400 ]
+  }, {
+    "case" : "text/plain body / Accept: image/png",
+    "status" : [ 415, 406 ]
+  }, {
+    "case" : "login body of 3 MiB",
+    "status" : 400,
+    "code" : "INVALID_REQUEST",
+    "elapsedMs" : 31
+  } ],
+  "case" : "D19-A-02 field lengths and idempotency keys",
+  "violations" : [ ],
+  "idempotencyKeys" : [ {
+    "case" : "task key first use",
+    "status" : 202,
+    "code" : ""
+  }, {
+    "case" : "task key replay, same body",
+    "status" : 202,
+    "code" : ""
+  }, {
+    "case" : "task key reused with another prompt",
+    "status" : 409,
+    "code" : "IDEMPOTENCY_CONFLICT"
+  }, {
+    "case" : "task key reused on the edit endpoint",
+    "status" : 409,
+    "code" : "IDEMPOTENCY_CONFLICT"
+  }, {
+    "case" : "attacker replays the key on the owner's app",
+    "status" : 404,
+    "randomAppStatus" : 404
+  }, {
+    "case" : "attacker uses the same key on an own app",
+    "status" : 202,
+    "distinctTask" : true
+  }, {
+    "case" : "8 concurrent requests with one key",
+    "distinctIds" : 1,
+    "rows" : 1
+  }, {
+    "case" : "task key 129 chars",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "task key has space",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "task key key*star",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "task key a,b",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "task key ../../etc",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "publication key replay",
+    "status" : 202,
+    "code" : ""
+  }, {
+    "case" : "publication key reused for another application",
+    "status" : 409,
+    "code" : "PUBLICATION_IDEMPOTENCY_CONFLICT"
+  }, {
+    "case" : "attacker publishes an own version with the owner's key",
+    "status" : 202,
+    "distinctPublication" : true
+  }, {
+    "case" : "publication key short-key-15chr",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "publication key 129 chars",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "publication key dots.not.allowed.here",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  }, {
+    "case" : "publication without key",
+    "status" : 400,
+    "code" : "INVALID_REQUEST"
+  } ],
+  "source" : "ApiSecurityMatrixTest real HTTP + PostgreSQL"
+}

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.UrlPathHelper;
 
@@ -36,12 +37,25 @@ public class AuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         String path = request.getRequestURI();
-        if (!path.startsWith("/api/v0/")) {
+        // Spring routes on the decoded path without ;params, and the production edge matches /api/v0/ on the normalized
+        // URI but forwards the raw target. Every decision below uses the routed path, and a non-canonical spelling never
+        // reaches a handler (D19-A: /api;x=1/v0/auth/logout and /%61pi/v0/... skipped this filter, CSRF included).
+        String routed = routed(request);
+        if (routed == null) {
+            error(response, request, HttpStatus.BAD_REQUEST, "INVALID_REQUEST");
+            return;
+        }
+        boolean canonical = path.equals(routed) && path.indexOf('%') < 0;
+        if (!path.startsWith("/api/v0/") && !routed.startsWith("/api/v0/")) {
+            if (!canonical && (scoped(path) || scoped(routed))) {
+                error(response, request, HttpStatus.BAD_REQUEST, "INVALID_REQUEST");
+                return;
+            }
             chain.doFilter(request, response);
             return;
         }
         HttpSession session = request.getSession(false);
-        boolean publicAuth = path.equals("/api/v0/auth/csrf") || path.equals("/api/v0/auth/login");
+        boolean publicAuth = routed.equals("/api/v0/auth/csrf") || routed.equals("/api/v0/auth/login");
         AuthAccountRepository.Account account = null;
         if (!publicAuth) {
             UUID id = session == null ? null : (UUID) session.getAttribute(USER_ID);
@@ -61,18 +75,32 @@ public class AuthFilter extends OncePerRequestFilter {
                 return;
             }
         }
+        // Spring routes on the decoded path without ;params, so /api/v0/%61dmin/ must not skip the role check.
+        boolean admin = path.startsWith("/api/v0/admin/") || routed.startsWith("/api/v0/admin/");
+        if (!publicAuth && admin && !"ADMIN".equals(account.role())) {
+            error(response, request, HttpStatus.FORBIDDEN, "FORBIDDEN");
+            return;
+        }
+        // Checked after identity, CSRF and role, so those failures keep their codes for every spelling.
+        if (!canonical) {
+            error(response, request, HttpStatus.BAD_REQUEST, "INVALID_REQUEST");
+            return;
+        }
         if (publicAuth) {
             chain.doFilter(request, response);
             return;
         }
-        // Spring routes on the decoded path without ;params, so /api/v0/%61dmin/ must not skip the role check.
-        boolean admin = path.startsWith("/api/v0/admin/") || ROUTED.getPathWithinApplication(request).startsWith("/api/v0/admin/");
-        if (admin && !"ADMIN".equals(account.role())) {
-            error(response, request, HttpStatus.FORBIDDEN, "FORBIDDEN");
-            return;
-        }
         request.setAttribute(ACCOUNT, account);
         chain.doFilter(request, response);
+    }
+
+    private static String routed(HttpServletRequest request) {
+        try { return StringUtils.cleanPath(ROUTED.getPathWithinApplication(request)); }
+        catch (IllegalArgumentException undecodable) { return null; }
+    }
+
+    private static boolean scoped(String path) {
+        return path.startsWith("/api/") || path.startsWith("/internal/");
     }
 
     private void error(HttpServletResponse response, HttpServletRequest request, HttpStatus status, String code)
@@ -84,6 +112,7 @@ public class AuthFilter extends OncePerRequestFilter {
         String message = switch (code) {
             case "UNAUTHENTICATED" -> "Authentication required";
             case "CSRF_INVALID" -> "CSRF token missing or invalid";
+            case "INVALID_REQUEST" -> "Request path is not canonical";
             default -> "Access denied";
         };
         mapper.writeValue(response.getWriter(), new ApiError(code, message, Instant.now(),

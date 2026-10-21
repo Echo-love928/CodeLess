@@ -3,6 +3,30 @@ import { basename, dirname, join, resolve } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { canonical } from '../preview/registry.mjs'
 import { digest, readSnapshot } from '../artifacts/snapshot.mjs'
+import { uuid } from '../preview/credentials.mjs'
+import { publicFile } from './probe-policy.mjs'
+
+function admittedInput(receipt, buffers) {
+  const reject = () => { throw new Error('publication input rejected') }
+  if (typeof receipt?.deploymentId !== 'string' || receipt.deploymentId.length !== 36 || !uuid.test(receipt.deploymentId) ||
+      !(buffers instanceof Map) || buffers.size < 2 || buffers.size > 2000) reject()
+  const names = new Set(), frozen = new Map()
+  let total = 0
+  for (const [name, bytes] of buffers) {
+    if (typeof name !== 'string' || name.length > 240 || /[^A-Za-z0-9_./-]/.test(name) || !publicFile(name) ||
+        /(?:^|\/)(?:CON|PRN|AUX|NUL|COM[0-9]+|LPT[0-9]+)(?:\.|$)/i.test(name) ||
+        names.has(name.toLowerCase()) || !Buffer.isBuffer(bytes)) reject()
+    names.add(name.toLowerCase()); total += bytes.length
+    if (total > 32 * 1024 * 1024) reject()
+    frozen.set(name, Buffer.from(bytes))
+  }
+  if (!frozen.has('index.html') || ![...frozen.keys()].some(name => name.endsWith('.js'))) reject()
+  const json = JSON.stringify(receipt)
+  if (Buffer.byteLength(json) > 1024 * 1024) reject()
+  // Freeze before the first await: callers cannot mutate accepted paths or bytes
+  // while canonical checks and asynchronous filesystem writes are in progress.
+  return { receipt: JSON.parse(json), buffers: frozen }
+}
 
 // Shared immutable writer; callers must first establish a trusted verified binding.
 export async function createPublicationStore(hostingRoot) {
@@ -10,7 +34,8 @@ export async function createPublicationStore(hostingRoot) {
   const pendingRoot = join(dirname(root), basename(root) + '-staging')
   await mkdir(pendingRoot, { recursive: true, mode: 0o700 })
   await canonical(pendingRoot)
-  return async (receipt, buffers, deadline = Infinity) => {
+  return async (inputReceipt, inputBuffers, deadline = Infinity) => {
+    const { receipt, buffers } = admittedInput(inputReceipt, inputBuffers)
     const deploymentId = receipt.deploymentId, publishedFiles = receipt.files
     const check = () => { if (Date.now() >= deadline) throw new Error('DEPLOYMENT_TIMEOUT') }
     check(); await canonical(root); await canonical(pendingRoot)

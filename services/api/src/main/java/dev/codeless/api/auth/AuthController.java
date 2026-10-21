@@ -60,12 +60,12 @@ public class AuthController {
             throw new AuthFailure(HttpStatus.BAD_REQUEST, "INVALID_REQUEST");
         }
         AuthAccountRepository.Account account = accounts.activeByEmail(email).orElse(null);
-        if (account == null ? attempts.blocked(email) : attempts.blockedKnown(account.id())) {
+        // The attempt is counted before the password check: checking first and counting after the slow hash
+        // let parallel guesses all pass the limit (D19-A: 17 of 24 concurrent guesses were evaluated).
+        if (!(account == null ? attempts.acquire(email) : attempts.acquireKnown(account.id()))) {
             throw new AuthFailure(HttpStatus.TOO_MANY_REQUESTS, "LOGIN_RATE_LIMITED");
         }
         if (account == null || !encoder.matches(password, account.hash())) {
-            if (account == null) attempts.failed(email);
-            else attempts.failedKnown(account.id());
             throw new AuthFailure(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS");
         }
         attempts.succeededKnown(account.id());

@@ -33,6 +33,21 @@ public class LoginAttempts {
         knownAccounts.compute(accountId, (ignored, prior) -> next(prior, clock.instant()));
     }
 
+    /**
+     * Counts this attempt as a failure before the password is checked, atomically with the limit check, so parallel
+     * guesses cannot all pass {@link #blockedKnown} while the slow hash comparison runs. False when already limited.
+     */
+    public boolean acquireKnown(UUID accountId) {
+        boolean[] acquired = {false};
+        knownAccounts.compute(accountId, (ignored, prior) -> {
+            Instant now = clock.instant();
+            if (limited(prior, now)) return prior;
+            acquired[0] = true;
+            return next(prior, now);
+        });
+        return acquired[0];
+    }
+
     public void succeededKnown(UUID accountId) {
         knownAccounts.remove(accountId);
     }
@@ -47,6 +62,13 @@ public class LoginAttempts {
         return attempt.failures() >= 5;
     }
 
+    /** {@link #acquireKnown} for identifiers without an account. */
+    public synchronized boolean acquire(String email) {
+        if (limited(unknownEmails.get(email), clock.instant())) return false;
+        failed(email);
+        return true;
+    }
+
     public synchronized void failed(String email) {
         Instant now = clock.instant();
         Attempt prior = unknownEmails.get(email);
@@ -58,6 +80,10 @@ public class LoginAttempts {
             }
         }
         unknownEmails.put(email, next(prior, now));
+    }
+
+    private static boolean limited(Attempt attempt, Instant now) {
+        return attempt != null && now.isBefore(attempt.until()) && attempt.failures() >= 5;
     }
 
     private static Attempt next(Attempt prior, Instant now) {

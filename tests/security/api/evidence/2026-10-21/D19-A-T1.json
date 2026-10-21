@@ -1,0 +1,364 @@
+{
+  "violations" : [ ],
+  "stateUnchangedByRejectedRequests" : true,
+  "ownerControls" : [ {
+    "route" : "GET /api/v0/applications/{applicationId}",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/versions/{versionId}",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/applications/{applicationId}/versions",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/versions/{versionId}/files",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/versions/{versionId}/files/content",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/versions/{versionId}/snapshot",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/versions/{versionId}/export",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/versions/{versionId}/component-mapping",
+    "ownerStatus" : 200
+  }, {
+    "route" : "POST /api/v0/versions/{versionId}/component-selection",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/tasks/{taskId}",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/tasks/{taskId}/events [application/json]",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/tasks/{taskId}/events [text/event-stream]",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/tasks/{taskId}/diagnostics",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/tasks/{taskId}/edit",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/publications/{publicationId}",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/publications/{publicationId}/deployment",
+    "ownerStatus" : 200
+  }, {
+    "route" : "GET /api/v0/applications/{applicationId}/publications",
+    "ownerStatus" : 200
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials",
+    "ownerStatus" : 200
+  }, {
+    "route" : "POST /api/v0/publications",
+    "ownerStatus" : 202
+  }, {
+    "route" : "PATCH /api/v0/applications/{applicationId}",
+    "ownerStatus" : 200
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/restore",
+    "ownerStatus" : 200
+  }, {
+    "route" : "POST /api/v0/tasks/{taskId}/cancel",
+    "ownerStatus" : 200
+  }, {
+    "route" : "POST /api/v0/tasks",
+    "ownerStatus" : 202
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/edits",
+    "ownerStatus" : 202
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/component-edits",
+    "ownerStatus" : 202
+  }, {
+    "route" : "GET /internal/preview/versions (loopback + registry key)",
+    "status" : 200
+  } ],
+  "roleScoped" : [ {
+    "route" : "GET /api/v0/admin/session",
+    "ordinaryUser" : 403,
+    "code" : "FORBIDDEN"
+  }, {
+    "route" : "GET /api/v0/admin/users",
+    "ordinaryUser" : 403,
+    "code" : "FORBIDDEN"
+  }, {
+    "route" : "GET /api/v0/admin/applications",
+    "ordinaryUser" : 403,
+    "code" : "FORBIDDEN"
+  }, {
+    "route" : "GET /api/v0/admin/tasks",
+    "ordinaryUser" : 403,
+    "code" : "FORBIDDEN"
+  }, {
+    "route" : "GET /api/v0/admin/deployments",
+    "ordinaryUser" : 403,
+    "code" : "FORBIDDEN"
+  }, {
+    "route" : "GET /api/v0/admin/model-calls",
+    "ordinaryUser" : 403,
+    "code" : "FORBIDDEN"
+  }, {
+    "route" : "GET /api/v0/admin/metrics",
+    "ordinaryUser" : 403,
+    "code" : "FORBIDDEN"
+  }, {
+    "route" : "GET /api/v0/admin/audit",
+    "ordinaryUser" : 403,
+    "code" : "FORBIDDEN"
+  }, {
+    "route" : "POST /api/v0/admin/tasks/{taskId}/cancel",
+    "ordinaryUser" : 403,
+    "code" : "FORBIDDEN"
+  }, {
+    "route" : "GET /internal/preview/versions",
+    "ordinaryUser" : 403,
+    "code" : ""
+  } ],
+  "case" : "D19-A-T1 cross-user access to every private resource",
+  "ownerRoutes" : [ {
+    "route" : "GET /api/v0/applications/{applicationId}",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/versions/{versionId}",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/applications/{applicationId}/versions",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/versions/{versionId}/files",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/versions/{versionId}/files/content",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/versions/{versionId}/snapshot",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/versions/{versionId}/export",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/versions/{versionId}/component-mapping",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "POST /api/v0/versions/{versionId}/component-selection",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/tasks/{taskId}",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/tasks/{taskId}/events [application/json]",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/tasks/{taskId}/events [text/event-stream]",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/tasks/{taskId}/diagnostics",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/tasks/{taskId}/edit",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/publications/{publicationId}",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/publications/{publicationId}/deployment",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "GET /api/v0/applications/{applicationId}/publications",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "POST /api/v0/publications",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "PATCH /api/v0/applications/{applicationId}",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/restore",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "POST /api/v0/tasks/{taskId}/cancel",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "POST /api/v0/tasks",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/edits",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/component-edits",
+    "foreignStatus" : 404,
+    "foreignCode" : "NOT_FOUND",
+    "randomIdStatus" : 404,
+    "randomIdCode" : "NOT_FOUND",
+    "identicalToRandomId" : true,
+    "privateValueLeaked" : false
+  } ],
+  "crossObject" : [ {
+    "request" : "POST /api/v0/applications/{id}/edits",
+    "foreignChildStatus" : 409,
+    "foreignChildCode" : "EDIT_BASE_UNAVAILABLE",
+    "randomChildStatus" : 409,
+    "identicalToRandomChild" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/component-edits",
+    "foreignChildStatus" : 409,
+    "foreignChildCode" : "EDIT_BASE_UNAVAILABLE",
+    "randomChildStatus" : 409,
+    "identicalToRandomChild" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/versions/{id}/restore",
+    "foreignChildStatus" : 404,
+    "foreignChildCode" : "NOT_FOUND",
+    "randomChildStatus" : 404,
+    "identicalToRandomChild" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/versions/{id}/preview-credentials",
+    "foreignChildStatus" : 404,
+    "foreignChildCode" : "NOT_FOUND",
+    "randomChildStatus" : 404,
+    "identicalToRandomChild" : true
+  }, {
+    "request" : "POST /api/v0/publications",
+    "foreignChildStatus" : 404,
+    "foreignChildCode" : "NOT_FOUND",
+    "randomChildStatus" : 404,
+    "identicalToRandomChild" : true
+  }, {
+    "request" : "POST /api/v0/versions/{id}/component-selection",
+    "foreignChildStatus" : 200,
+    "foreignChildCode" : "",
+    "randomChildStatus" : 200,
+    "identicalToRandomChild" : true
+  } ],
+  "source" : "ApiSecurityMatrixTest real HTTP + PostgreSQL"
+}
