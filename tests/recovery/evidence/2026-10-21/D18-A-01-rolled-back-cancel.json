@@ -1,0 +1,38 @@
+{
+  "afterExpiry" : {
+    "draftVersion" : "FAILED",
+    "report" : {
+      "status" : "FAILED",
+      "sourceDigest" : "sha256:56441fc030405a16f39171a74bdb2370539e1d2853c9a3d4bb411539084796b5",
+      "buildId" : null,
+      "buildStatus" : null,
+      "exitCode" : null,
+      "verificationId" : null,
+      "verificationStatus" : null,
+      "artifactDigest" : null,
+      "failureCode" : "INTERRUPTED"
+    },
+    "taskFailedEvents" : 1,
+    "row" : {
+      "status" : "FAILED",
+      "failure_code" : "INTERRUPTED",
+      "queue_state" : "FINISHED",
+      "lease_cleared" : true,
+      "event_sequence" : 2
+    }
+  },
+  "laterCancel" : "INTERRUPTED, report unchanged",
+  "afterRollback" : {
+    "draftVersion" : "DRAFT",
+    "report" : "NONE",
+    "taskFailedEvents" : 0,
+    "row" : {
+      "status" : "PLAN",
+      "failure_code" : null,
+      "queue_state" : "RUNNING",
+      "lease_cleared" : false,
+      "event_sequence" : 1
+    }
+  },
+  "case" : "cancel converges the draft, then its transaction rolls back; the lease later expires"
+}

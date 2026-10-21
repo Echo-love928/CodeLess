@@ -12,6 +12,7 @@ import TaskStatus from './TaskStatus.vue'
 import TaskProgress from './TaskProgress.vue'
 import { session } from '../auth/session'
 import { useWorkbenchTask } from './use-workbench-task'
+import { running } from './task-api'
 
 const props = defineProps<{ id: string }>()
 const router = useRouter()
@@ -23,10 +24,12 @@ const prompt = ref('')
 const previewVersionError = ref('')
 const device = ref<'desktop' | 'mobile'>('desktop')
 const { task, events, busy, cancelling, restoring, error: taskError, connection, connectionDetail,
-  persistenceWarning, diagnostics, diagnosticsError, canStart, canCancel, start, cancel, restore, refresh, dispose } = useWorkbenchTask(cause => redirectOnUnauthorized(cause, router))
+  persistenceWarning, diagnostics, diagnosticsError, history, pendingPrompt, canStart, canCancel, canRefresh, start, cancel, restore, refresh, dispose } = useWorkbenchTask(cause => redirectOnUnauthorized(cause, router))
 const connectionLabel = computed(() => ({ connecting: '正在连接事件服务', connected: '事件已连接', reconnecting: '连接中断，正在恢复', complete: '任务事件已同步', blocked: '事件连接不可用' })[connection.value] ?? '')
+const showRecoveryNotice = computed(() => connection.value === 'reconnecting' && task.value && running(task.value))
 const validPrompt = computed(() => !!prompt.value.trim() && Array.from(prompt.value.trim()).length <= 8000)
 const taskLink = computed(() => task.value ? { path: route.path, query: { taskId: task.value.id } } : undefined)
+const previousTasks = computed(() => history.value.filter(id => id !== task.value?.id))
 let loadVersion = 0
 let previewRequest = 0
 
@@ -45,7 +48,7 @@ async function load() {
       app.value = result
       const linkedId = typeof route.query.taskId === 'string' ? route.query.taskId : undefined
       await restore(requestedId, session.user?.id ?? '', linkedId)
-      if (version === loadVersion && task.value) prompt.value = task.value.prompt
+      if (version === loadVersion) prompt.value = pendingPrompt.value || task.value?.prompt || ''
     }
   } catch (cause) {
     if (version === loadVersion) {
@@ -75,7 +78,21 @@ watch(() => task.value?.status, status => {
   })
 })
 
-watch(() => [props.id, route.query.taskId], load, { immediate: true })
+async function submit() {
+  if (!canStart.value || !validPrompt.value) return
+  const version = loadVersion
+  await start(prompt.value)
+  if (version !== loadVersion) return
+  if (!pendingPrompt.value && task.value && task.value.prompt === prompt.value.trim())
+    await router.replace({ path: route.path, query: { taskId: task.value.id } })
+}
+function shortcut(event: KeyboardEvent) {
+  if (event.key === 'Enter' && (event.ctrlKey || event.metaKey) && !event.isComposing) {
+    event.preventDefault(); void submit()
+  }
+}
+watch(() => props.id, load, { immediate: true })
+watch(() => route.query.taskId, id => { if (id !== task.value?.id) void load() })
 onBeforeUnmount(() => { loadVersion += 1; dispose() })
 </script>
 
@@ -86,13 +103,15 @@ onBeforeUnmount(() => { loadVersion += 1; dispose() })
     <main v-else-if="error" class="workbench-message" role="alert"><h1>无法打开工作台</h1><p>{{ error }}</p><button class="button-secondary" type="button" @click="load">重试</button></main>
     <div v-else-if="app" class="workbench-content">
       <aside class="workbench-side" aria-label="需求与任务">
-        <div><h2>你的需求</h2><p>描述想生成的 Vue 页面，任务阶段和结果由服务端确认。</p><label for="workbench-prompt">需求描述</label><textarea id="workbench-prompt" v-model="prompt" :disabled="busy || restoring || (!!task && !canStart)" placeholder="例如：创建一个展示活动日程的页面" /><button class="button-primary" type="button" :disabled="!canStart || !validPrompt" @click="start(prompt)">{{ busy ? '正在提交…' : task?.status === 'FAILED' ? '重试生成' : '开始生成' }}</button></div>
+        <form @submit.prevent="submit"><h2>你的需求</h2><p>描述想生成的 Vue 页面，任务阶段和结果由服务端确认。</p><label for="workbench-prompt">需求描述</label><textarea id="workbench-prompt" v-model="prompt" aria-describedby="prompt-help" :readonly="!!pendingPrompt" :disabled="busy || restoring || (!!task && !canStart)" placeholder="例如：创建一个展示活动日程的页面" @keydown="shortcut" /><p id="prompt-help">Ctrl / ⌘ + Enter 提交；Enter 换行。{{ task?.status === 'FAILED' ? '重试生成将创建新任务，保留旧记录。' : '' }}</p><p v-if="pendingPrompt" role="status">上次提交结果未知；核对本次提交会复用原请求标识，不会另建任务。</p><button class="button-primary" type="submit" :disabled="!canStart || !validPrompt">{{ busy ? '正在提交…' : pendingPrompt ? '核对本次提交' : task?.status === 'FAILED' ? '重试生成' : '开始生成' }}</button></form>
         <div class="workbench-task"><h2>任务进度</h2>
           <p v-if="task" class="task-request">本次任务需求：{{ task.prompt }}</p><p v-if="restoring" role="status">正在恢复当前任务…</p><TaskStatus :task="task" />
           <p v-if="connectionLabel" role="status">{{ connectionLabel }}<span v-if="connectionDetail">：{{ connectionDetail }}</span></p>
+          <p v-if="showRecoveryNotice" role="status">若服务刚刚重启，可等待约一分钟再刷新任务，确认最终状态；当前结果尚未确认。恢复时间取决于服务配置和可用性。</p>
           <p v-if="taskError" role="alert">{{ taskError }}</p><p v-if="persistenceWarning" role="alert">{{ persistenceWarning }}</p>
-          <div class="task-actions"><button v-if="task && !['READY', 'FAILED'].includes(task.status)" class="button-secondary" type="button" :disabled="!canCancel" @click="cancel">{{ cancelling ? '正在请求取消…' : '取消任务' }}</button><button v-if="task || taskError" class="button-secondary" type="button" :disabled="busy || cancelling || restoring" @click="refresh">刷新任务</button><router-link v-if="taskLink" :to="taskLink">任务恢复链接</router-link></div>
+          <div class="task-actions"><button v-if="task && !['READY', 'FAILED'].includes(task.status)" class="button-secondary" type="button" :disabled="!canCancel" @click="cancel">{{ cancelling ? '正在请求取消…' : '取消任务' }}</button><button v-if="task || canRefresh" class="button-secondary" type="button" :disabled="!canRefresh" @click="refresh">刷新任务</button><router-link v-if="taskLink" :to="taskLink">任务恢复链接</router-link></div>
           <TaskProgress :events="events" :diagnostics="diagnostics" :diagnostics-error="diagnosticsError" />
+          <details v-if="previousTasks.length" class="task-history"><summary>之前的任务入口（本浏览器最近 20 条）</summary><ul><li v-for="id in previousTasks" :key="id"><router-link :to="{ path: route.path, query: { taskId: id } }">查看任务 {{ id }}</router-link></li></ul></details>
         </div>
       </aside>
       <section class="workbench-preview" aria-label="预览区"><div class="editor-toolbar"><span class="page-path"><UiIcon name="doc" :size="15" />预览 <span>/</span> 初始草稿版本：{{ app.baseVersionId }} <span>/</span> 当前可用版本：{{ app.latestReadyVersionId || '暂无' }}</span><div class="device-toggle" aria-label="预览设备"><button type="button" :aria-pressed="device === 'desktop'" @click="device = 'desktop'"><UiIcon name="monitor" :size="15" />桌面</button><button type="button" :aria-pressed="device === 'mobile'" @click="device = 'mobile'"><UiIcon name="phone" :size="15" />手机</button></div></div><div class="editor-canvas" :class="{ 'editor-canvas--mobile': device === 'mobile' }"><p v-if="previewVersionError" role="alert">{{ previewVersionError }}</p><div class="canvas-address"><UiIcon name="lock" :size="12" />{{ app.name }} · 预览</div><VersionWorkspace :task-id="task?.id" :task-version-ids="diagnostics?.builds.map(build => build.versionId)" :refresh-key="`${task?.id}:${task?.status}`" :application-id="app.id" :version-id="app.latestReadyVersionId" :build-failed="task?.status === `FAILED`" :refresh-version="refreshPreviewVersion" @unauthorized="router.replace(`/login`)" /></div></section>
@@ -112,12 +131,18 @@ onBeforeUnmount(() => { loadVersion += 1; dispose() })
 .workbench-side p { color: #6b7484; font-size: 12px; line-height: 1.7; }
 .workbench-side label { display: block; margin: 22px 0 9px; font-size: 12px; }
 .workbench-side textarea { width: 100%; min-height: 145px; padding: 12px; resize: vertical; border: 1px solid #dbe0e9; border-radius: 7px; font-size: 12px; line-height: 1.7; }
-.workbench-side > div > .button-primary { width: 100%; margin-top: 12px; }
+.workbench-side > form > .button-primary { width: 100%; margin-top: 12px; }
+.workbench-side { min-width: 0; overflow-wrap: anywhere; }
+.task-history summary { cursor: pointer; padding: 12px 0; }
+.task-history ul { padding-left: 18px; }
+.task-history li { margin: 12px 0; }
+.workbench :is(button, textarea, a, summary):focus-visible { outline: 2px solid var(--blue, #4166d2); outline-offset: 3px; }
+.workbench-side button { min-height: 44px; }
 .workbench-side button:disabled { opacity: .6; cursor: default; }
 .workbench-task { margin-top: 38px; padding-top: 24px; border-top: 1px solid #e1e5ec; }
 .task-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px 0; font-size: 12px; }
 .workbench-preview { min-width: 0; padding: 0 27px 30px; background: #f0f2f5; }
 .page-path { min-width: 0; overflow-wrap: anywhere; }
 @media (max-width: 900px) { .workbench-content { grid-template-columns: 1fr; } .workbench-side { border-right: 0; border-bottom: 1px solid #e1e5ec; } }
-@media (max-width: 640px) { .workbench-header__name small { display: none; } .workbench-preview { padding: 0 13px 20px; } .workbench-side { padding: 22px 18px; } }
+@media (max-width: 640px) { .workbench-header__name small { display: none; } .workbench-preview { padding: 0 13px 20px; } .workbench-side { padding: 22px 18px; } .editor-toolbar { flex-wrap: wrap; padding: 12px 0; } .page-path { flex-basis: 100%; } .workbench-side textarea { font-size: 16px; } }
 </style>

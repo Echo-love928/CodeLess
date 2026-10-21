@@ -1,4 +1,5 @@
-import { ApiError, requestJson } from '../../api/http'
+import { ApiError } from '../../api/http'
+import { requestFeatureJson as requestJson } from '../workbench/feature-request'
 import { uuid } from '../workbench/task-api'
 
 export interface Version {

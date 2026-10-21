@@ -1,4 +1,5 @@
-import { ApiError, requestJson } from '../../api/http'
+import { ApiError } from '../../api/http'
+import { requestFeatureJson as requestJson } from './feature-request'
 import { uuid } from './task-api'
 
 export interface FileChange { path: string; operation: 'ADDED' | 'MODIFIED' | 'DELETED'; beforeDigest: string | null; afterDigest: string | null }

@@ -17,14 +17,19 @@ public final class LocalBuildGateway implements BuildGateway {
         this.node=node;bridge=repository.toAbsolutePath().normalize().resolve("services/api/agent-runner.mjs");
         work=root.resolve("work");artifacts=root.resolve("artifacts");evidence=root.resolve("evidence");receipts=root.resolve("receipts");
     }
-    public JsonNode run(JsonNode draft, OffsetDateTime deadline) {
+    public JsonNode run(JsonNode draft, OffsetDateTime deadline) {return execute(work,draft,deadline);}
+    /** Runner scratch lives under work/&lt;taskId&gt;; recovery releases exactly that root by task ID. */
+    @Override public JsonNode run(UUID taskId, JsonNode draft, OffsetDateTime deadline) {
+        return execute(work.resolve(taskId.toString()),draft,deadline);
+    }
+    private JsonNode execute(Path scratch, JsonNode draft, OffsetDateTime deadline) {
         Process child=null;
         var executor=Executors.newVirtualThreadPerTaskExecutor();
         Future<byte[]> stdout=null;Future<Boolean> stderr=null;
         try {
             long timeout=Math.min(240000,Duration.between(Instant.now(),deadline.toInstant()).toMillis());
             if (timeout<=0) throw new AgentFailure("AGENT_RUNNER_TIMEOUT");
-            var builder=new ProcessBuilder(node,bridge.toString(),work.toString(),artifacts.toString(),evidence.toString(),receipts.toString());
+            var builder=new ProcessBuilder(node,bridge.toString(),scratch.toString(),artifacts.toString(),evidence.toString(),receipts.toString());
             var environment=builder.environment();
             var inherited=new HashMap<>(environment);environment.clear();
             for(String name:List.of("PATH","Path","SystemRoot","WINDIR","TEMP","TMP","TMPDIR","HOME","USERPROFILE","LOCALAPPDATA","PLAYWRIGHT_BROWSERS_PATH"))

@@ -3,6 +3,7 @@ import { ApiError } from '../../api/http'
 import { connectTaskEvents, type TaskEvent } from '../../lib/events/task-events'
 import { cancelTask, createTask, getTask, running, uuid, type GenerationTask } from './task-api'
 import { getTaskDiagnostics, type TaskDiagnostics } from './task-diagnostics'
+import { cancellationRecoveryDescription } from './failure-description'
 
 export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) {
   const task = ref<GenerationTask | null>(null)
@@ -16,6 +17,8 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
   const persistenceWarning = ref('')
   const diagnostics = ref<TaskDiagnostics | null>(null)
   const diagnosticsError = ref('')
+  const history = ref<string[]>([])
+  const pendingPrompt = ref('')
   let diagnosticsRequest = 0
   let diagnosticsAbort: AbortController | undefined
   let appId = ''
@@ -26,9 +29,19 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
   let pending: { prompt: string; key: string } | undefined
   let currentId: string | null = null
 
+  function clearIntent() {
+    pending = undefined; pendingPrompt.value = ''
+    try { sessionStorage.removeItem(`${storageKey}:intent`) }
+    catch { persistenceWarning.value = '浏览器恢复记录无法清理；请保留此任务链接并核对服务端记录。' }
+  }
+
   function remember(id: string) {
     currentId = id
-    try { localStorage.setItem(storageKey, id) }
+    history.value = [id, ...history.value.filter(value => value !== id)].slice(0, 20)
+    try {
+      localStorage.setItem(storageKey, id)
+      localStorage.setItem(`${storageKey}:history`, JSON.stringify(history.value))
+    }
     catch { persistenceWarning.value = '浏览器无法保存任务入口；关闭页面后需通过任务链接恢复。' }
   }
 
@@ -95,7 +108,19 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
     task.value = null; events.value = []; error.value = ''; busy.value = false; cancelling.value = false
     diagnostics.value = null; diagnosticsError.value = ''
     connection.value = ''; connectionDetail.value = ''; persistenceWarning.value = ''; pending = undefined
+    pendingPrompt.value = ''
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(`${storageKey}:intent`) ?? 'null')
+      if (saved && typeof saved.prompt === 'string' && saved.prompt.trim() && Array.from(saved.prompt).length <= 8000 && uuid(saved.key)) {
+        pending = { prompt: saved.prompt, key: saved.key }; pendingPrompt.value = saved.prompt
+      }
+    } catch { persistenceWarning.value = '浏览器提交恢复记录不可用；请先核对服务端任务记录，避免重复提交。' }
     currentId = null
+    history.value = []
+    try {
+      const stored: unknown = JSON.parse(localStorage.getItem(`${storageKey}:history`) ?? '[]')
+      if (Array.isArray(stored)) history.value = [...new Set(stored.filter(uuid))].slice(0, 20)
+    } catch { persistenceWarning.value = '浏览器任务入口记录不可用；可通过任务链接恢复，服务端记录未删除。' }
     try { currentId = linkedId ?? localStorage.getItem(storageKey) }
     catch { persistenceWarning.value = '浏览器无法读取任务入口；可通过任务链接恢复。'; currentId = linkedId ?? null }
     if (!currentId) { restoring.value = false; return }
@@ -115,18 +140,25 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
     if (busy.value || restoring.value || cancelling.value || task.value && task.value.status !== 'FAILED' && task.value.status !== 'READY') return
     const prompt = input.trim()
     if (!prompt || Array.from(prompt).length > 8000) { error.value = '需求描述需为 1–8000 个字符。'; return }
+    if (pending && pending.prompt !== prompt) { error.value = '上次提交结果未知，请先核对本次提交；确认前不能更换需求创建任务。'; return }
     const version = epoch
     busy.value = true; error.value = ''
     if (!pending || pending.prompt !== prompt) pending = { prompt, key: crypto.randomUUID() }
+    pendingPrompt.value = pending.prompt
+    try { sessionStorage.setItem(`${storageKey}:intent`, JSON.stringify(pending)) }
+    catch { persistenceWarning.value = '浏览器无法保存提交恢复记录；请保持当前页面并核对本次提交，避免重复创建任务。' }
     try {
       const value = await createTask(appId, prompt, pending.key)
       if (version !== epoch) return
-      pending = undefined
+      clearIntent()
       updateTask(value); events.value = []
       diagnostics.value = null; diagnosticsError.value = ''
       remember(value.id)
       attach(value.id, version)
-    } catch (cause) { await report(cause, version) }
+    } catch (cause) {
+      if (version === epoch && cause instanceof ApiError && [400, 401, 403, 404, 409, 429].includes(cause.status ?? 0)) clearIntent()
+      await report(cause, version)
+    }
     finally { if (version === epoch) busy.value = false }
   }
 
@@ -138,7 +170,11 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
     try {
       const value = await cancelTask(id, appId)
       if (version === epoch) { updateTask(value); void loadDiagnostics(id, version) }
-    } catch (cause) { await report(cause, version) }
+    } catch (cause) {
+      await report(cause, version)
+      if (version === epoch && task.value?.id === id && running(task.value) && error.value && cause instanceof ApiError && ['network', 'server'].includes(cause.kind))
+        error.value += ` ${cancellationRecoveryDescription}`
+    }
     finally { if (version === epoch) cancelling.value = false }
   }
 
@@ -158,6 +194,7 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
   const canStart = computed(() => !busy.value && !restoring.value && !cancelling.value &&
     (!task.value ? !currentId : ['READY', 'FAILED'].includes(task.value.status)))
   const canCancel = computed(() => !!task.value && running(task.value) && !busy.value && !restoring.value && !cancelling.value)
+  const canRefresh = computed(() => !!(task.value?.id || error.value && uuid(currentId)) && !busy.value && !restoring.value && !cancelling.value)
   return { task, events, busy, cancelling, restoring, error, connection, connectionDetail, persistenceWarning, diagnostics, diagnosticsError,
-    canStart, canCancel, start, cancel, restore, refresh, dispose }
+    history, pendingPrompt, canStart, canCancel, canRefresh, start, cancel, restore, refresh, dispose }
 }

@@ -19,6 +19,21 @@ beforeEach(() => {
   vi.mocked(getVersion).mockImplementation(async id => version(id))
 })
 afterEach(() => vi.resetAllMocks())
+
+it('D18-B restores failed publication guidance and recovers a failed version read without posting', async () => {
+  vi.mocked(listPublications).mockResolvedValue({ items: [publication('FAILED')], latestSuccessful: publication('PUBLISHED', id2) })
+  vi.mocked(getVersion).mockRejectedValueOnce(new Error('version unavailable'))
+  const wrapper = mount(DeployPanel, { props: { applicationId: app, versionId: id1 } })
+  await flushPromises(); await wrapper.get('button').trigger('click'); await flushPromises()
+  expect(wrapper.text()).toContain('上次成功版本和地址仍然保留')
+  expect(wrapper.text()).toContain('version unavailable')
+  await wrapper.findAll('button').find(button => button.text() === '重新读取版本与发布记录')!.trigger('click'); await flushPromises()
+  expect(wrapper.text()).toContain('待发布版本：v1')
+  expect(wrapper.text()).not.toContain('version unavailable')
+  expect(createPublication).not.toHaveBeenCalled()
+  expect(wrapper.findAll('button').find(button => button.text() === '确认发布')!.attributes('disabled')).toBeDefined()
+  wrapper.unmount()
+})
 async function panel() {
   const wrapper = mount(DeployPanel, { props: { applicationId: app, versionId: id1 } })
   await flushPromises(); await wrapper.get('button').trigger('click'); await flushPromises()

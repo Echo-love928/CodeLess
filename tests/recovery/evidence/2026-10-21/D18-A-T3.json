@@ -1,0 +1,52 @@
+{
+  "case" : "expired task resources are reclaimed; nothing referenced or inside retention is touched",
+  "keptDespiteOldFiles" : [ "active task work/ and workspace/", "task failed inside retention", "subtree touched inside retention" ],
+  "sweepAfterRetention" : {
+    "status" : "COMPLETE",
+    "startedAt" : "2026-10-20T15:50:45.635050400Z",
+    "cutoff" : "2026-10-20T14:50:45.635050400Z",
+    "removed" : {
+      "FAILED_TASK_WORKSPACE" : 1,
+      "ORPHAN_ARTIFACT" : 1,
+      "ORPHAN_VERSION" : 1,
+      "PENDING_ARTIFACT" : 1,
+      "RUNNER_SCRATCH" : 2
+    },
+    "kept" : {
+      "ACTIVE" : 2,
+      "RETENTION" : 2
+    },
+    "removedPaths" : [ "versions/6bffd0c7-8492-43ff-a358-bbbda0c6128f", "artifacts/.build-123", "artifacts/98c25eb4-6d8e-4cbc-91b0-2288f1743e93", "work/build/codeless-build-xyz", "work/source-abc", "workspaces/0a7a34a2-fcf3-46e8-9c86-d8539fb4317a" ],
+    "errors" : [ ]
+  },
+  "agedBy" : "2 hours (file mtimes and task updated_at)",
+  "expiredTask" : {
+    "taskId" : "0a7a34a2-fcf3-46e8-9c86-d8539fb4317a",
+    "failureCode" : "INTERRUPTED",
+    "releasedImmediatelyByTaskId" : [ "work/<task>", "workspaces/<task>/source" ]
+  },
+  "sweepInsideRetention" : {
+    "status" : "COMPLETE",
+    "startedAt" : "2026-10-20T15:50:45.523709800Z",
+    "cutoff" : "2026-10-20T14:50:45.523709800Z",
+    "removed" : { },
+    "kept" : {
+      "RETENTION" : 6
+    },
+    "removedPaths" : [ ],
+    "errors" : [ ]
+  },
+  "repeatSweep" : {
+    "status" : "COMPLETE",
+    "startedAt" : "2026-10-20T15:50:45.795556700Z",
+    "cutoff" : "2026-10-20T14:50:45.795556700Z",
+    "removed" : { },
+    "kept" : {
+      "ACTIVE" : 2,
+      "RETENTION" : 2
+    },
+    "removedPaths" : [ ],
+    "errors" : [ ]
+  },
+  "retentionHours" : 1
+}
