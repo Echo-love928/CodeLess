@@ -1,0 +1,66 @@
+{
+  "note": "Local Windows ci-gate attribution for D19-A. Remote CI on the PR head is authoritative; nothing here is written as success.",
+  "gates": [
+    {
+      "run": "2026-10-21T05-56-38.503Z-gate-ea156272-e1a4-4ecb-b1e5-71bd5f4dd9a7",
+      "head": "c290f28b7da0adf17c200e78585980b169bb277e",
+      "nativeExit": 1,
+      "uncommittedScopedFiles": 0,
+      "stages": {
+        "verify:static": "passed (contracts 18/18, web 26 test files)",
+        "verify:api": "FAILED 285 tests, 6 failures: PreviewAcceptanceProcessTest x5, PreviewPlatformIntegrationTest x1; ApiSecurityMatrixTest 7/7",
+        "verify:runner": "passed 90/90",
+        "verify:e2e": "passed 75/75"
+      }
+    },
+    {
+      "run": "2026-10-21T06-24-30.780Z-gate-c78c856f-e159-4f52-8d15-c368cf5f664b",
+      "head": "605b5c136c6fa9384a85abc121d21cf95c85b7ed",
+      "nativeExit": 1,
+      "uncommittedScopedFiles": 0,
+      "stages": {
+        "verify:static": "passed (contracts 18/18, web 26 test files)",
+        "verify:api": "FAILED 285 tests, 5 failures: PreviewAcceptanceProcessTest x5 only; PreviewPlatformIntegrationTest 1/1; ApiSecurityMatrixTest 7/7",
+        "verify:runner": "passed 90/90",
+        "verify:e2e": "passed 75/75"
+      }
+    }
+  ],
+  "attribution": [
+    {
+      "test": "PreviewAcceptanceProcessTest",
+      "failedCases": [
+        "stopSignalWriteFailureStillReclaimsAndRunsProjectCleanup",
+        "parentExceptionIsNotReplacedByCleanup",
+        "timeoutAssertionAlwaysStopsRootBranchAndLeaf",
+        "interruptionStopsTreeAndRetainsInterrupt",
+        "unavailableProcessReportStillRunsProjectCleanupAndPreservesParent"
+      ],
+      "baseRun": {
+        "commit": "3ec4b99fbc262aef20e72c23cfe34d0da0740ef9",
+        "worktree": "temporary detached worktree, removed afterwards",
+        "command": "mvnw -o -Dtest=PreviewAcceptanceProcessTest test",
+        "nativeExit": 1,
+        "tests": 8,
+        "failures": 5,
+        "sameNames": true,
+        "privateLogDigest": "sha256:3acd4a01f3778fb1926616ee0e1ee8f478ef52fd0275cd28e7afcf4255964209"
+      },
+      "conclusion": "pre-existing on this Windows machine (also recorded by D15-A..D18-A); D19-A does not touch preview acceptance code"
+    },
+    {
+      "test": "PreviewPlatformIntegrationTest",
+      "firstGate": "failed: requests 200 for 27 s, then one request reached the API filters only 60 s later; client 15 s aborts and a final 502; all paths canonical",
+      "isolatedRun": {
+        "head": "c290f28b7da0adf17c200e78585980b169bb277e",
+        "nativeExit": 0,
+        "tests": 1,
+        "failures": 0,
+        "privateLogDigest": "sha256:9e2d133f27ef5375fda529cf0b54294add8759f5cd0d761d9c938e3d3787e1d1"
+      },
+      "secondGate": "passed 1/1 inside the full suite at 605b5c1",
+      "conclusion": "load-dependent timing in the full local suite, not introduced by D19-A; ran 41st, before the new security class (49th) existed; not modified, skipped or retried"
+    }
+  ],
+  "screenshots": "verify:e2e rewrote 9 committed PNGs in each gate run; generated copies kept under .local-data/d19-a/gate*-generated-png/, committed bytes restored file by file"
+}

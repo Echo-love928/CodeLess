@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url'
 // The injected request is a private test dependency; stdio accepts no transport options.
 export async function capturePage(job, request) {
 const asset = createAssetReader(job, request), origin = new URL(job.url)
-let browserServer, proxy, blocked = false, failed = false
+let browserServer, proxy, deadlineTimer, deadlineExceeded = false, blocked = false, failed = false
 const result = { status: 'FAILED', failure: 'CAPTURE_FAILED', browserClosed: false, screenshot: null }
 const mime = { html: 'text/html; charset=utf-8', js: 'text/javascript; charset=utf-8', css: 'text/css; charset=utf-8', svg: 'image/svg+xml', png: 'image/png',
   jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', ico: 'image/x-icon', woff: 'font/woff', woff2: 'font/woff2' }
@@ -25,6 +25,13 @@ try {
       '--disable-features=WebTransport,Prerender2,SpeculationRulesPrefetch',
       '--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1'] })
   process.send?.({ browserPid: browserServer.process().pid })
+  // A generated busy loop can stall graceful browser shutdown as well as goto.
+  // Keep the deadline armed through cleanup; the parent process-tree deadline
+  // remains the outer fail-closed boundary if the browser kill itself fails.
+  deadlineTimer = setTimeout(() => {
+    deadlineExceeded = true
+    void browserServer.kill().catch(() => {})
+  }, Math.max(1, job.deadline - Date.now()))
   const browser = await chromium.connect(browserServer.wsEndpoint(), { timeout: 5000 })
   const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, serviceWorkers: 'block', acceptDownloads: false })
   await context.addInitScript(() => {
@@ -63,6 +70,8 @@ try {
 finally {
   try { if (browserServer) await browserServer.close(); result.browserClosed = true }
   catch { result.status = 'FAILED'; result.failure = 'CLEANUP_FAILED'; result.screenshot = null }
+  clearTimeout(deadlineTimer)
+  if (deadlineExceeded) { result.status = 'FAILED'; if (result.browserClosed) result.failure = 'CAPTURE_TIMEOUT'; result.screenshot = null }
   if (proxy) { proxy.closeAllConnections(); await new Promise(done => proxy.close(done)) }
 }
 return result

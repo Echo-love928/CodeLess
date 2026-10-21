@@ -4,15 +4,20 @@ import dev.codeless.api.auth.AuthFailure;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -45,6 +50,34 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException.class})
     public ResponseEntity<ApiError> malformed(Exception exception, HttpServletRequest request) {
         return response(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "Request is malformed", request, Map.of());
+    }
+
+    /** A missing required query parameter or header is the client's error, not a server failure. */
+    @ExceptionHandler(ServletRequestBindingException.class)
+    public ResponseEntity<ApiError> binding(ServletRequestBindingException exception, HttpServletRequest request) {
+        return response(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "Request is malformed", request, Map.of());
+    }
+
+    /** PostgreSQL text cannot hold NUL (SQLSTATE 22021): such input is rejected as invalid instead of a 500. */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> integrity(DataIntegrityViolationException exception, HttpServletRequest request,
+                                              HttpServletResponse response) {
+        for (Throwable cause = exception; cause != null; cause = cause.getCause())
+            if (cause instanceof SQLException sql && "22021".equals(sql.getSQLState()))
+                return response(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "Request is malformed", request, Map.of());
+        return unexpected(exception, request, response);
+    }
+
+    /** The catch-all below would turn these into 500s; they are the standard 415 and (bodiless) 406. */
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ApiError> mediaType(HttpMediaTypeNotSupportedException exception, HttpServletRequest request) {
+        return response(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "UNSUPPORTED_MEDIA_TYPE", "Content type is not supported",
+                request, Map.of());
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+    public ResponseEntity<Void> notAcceptable() {
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
