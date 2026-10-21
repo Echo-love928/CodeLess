@@ -61,11 +61,13 @@ child.once('close', async (exitCode, signal) => {
     await writeFile(path, original); restoredHistory.push(path)
   }
   const revisionAtEnd = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim()
+  const statusAtEnd = spawnSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).stdout
   const finalSources = await sourceSnapshot(), canonicalReasons = [...initialCanonicalReasons]
+  if (statusAtEnd.trim()) canonicalReasons.push('WORKTREE_DIRTY_AT_END')
   if (revisionAtEnd !== revision) canonicalReasons.push('HEAD_CHANGED_DURING_RUN')
   if (JSON.stringify(finalSources) !== JSON.stringify(sources)) canonicalReasons.push('SOURCE_CHANGED_DURING_RUN')
   const canonical = canonicalReasons.length === 0
-  const result = { mode, command, args, startedAt, completedAt: new Date().toISOString(), revision, revisionAtEnd, status, sources,
+  const result = { mode, command, args, startedAt, completedAt: new Date().toISOString(), revision, revisionAtEnd, status, statusAtEnd, sources,
     canonical, canonicalReasons, revisionRole: 'CHECKOUT_REFERENCE', codeIdentity: canonical ? 'COMMIT' : 'WORKTREE_SOURCE_SNAPSHOT',
     exitCode, signal, restoredHistory, logSha256: createHash('sha256').update(bytes).digest('hex'), modelProvider: 'deterministic-mock', realModelCalls: 0 }
   await writeFile(join(directory, 'run.json'), JSON.stringify(result, null, 2))
