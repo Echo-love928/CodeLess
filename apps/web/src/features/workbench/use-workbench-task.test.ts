@@ -11,7 +11,7 @@ vi.mock('../../lib/events/task-events', () => ({ connectTaskEvents: vi.fn(() => 
 vi.mock('./task-diagnostics', () => ({ getTaskDiagnostics: vi.fn() }))
 const running = { ...taskFixture, status: 'GENERATE', failureCode: null }
 beforeEach(() => {
-  vi.clearAllMocks(); localStorage.clear()
+  vi.clearAllMocks(); localStorage.clear(); sessionStorage.clear()
   vi.mocked(getTaskDiagnostics).mockImplementation(async taskId => ({ taskId, files: { available: false, revision: 0, changes: [] }, builds: [] }))
 })
 
@@ -33,6 +33,15 @@ describe('workbench action and lifecycle constraints', () => {
     await cancelling
     expect(state.task.value?.status).toBe('GENERATE')
     expect(state.error.value).toContain('网络连接失败')
+    expect(state.error.value).toContain('重复取消是安全的')
+    expect(state.canStart.value).toBe(false)
+    expect(state.canCancel.value).toBe(true)
+    expect(cancelTask).toHaveBeenCalledTimes(1)
+    vi.mocked(cancelTask).mockResolvedValueOnce({ ...running, status: 'FAILED', failureCode: 'CANCELLED' })
+    await state.cancel()
+    expect(cancelTask).toHaveBeenCalledTimes(2)
+    expect(createTask).toHaveBeenCalledTimes(1)
+    expect(state.task.value?.failureCode).toBe('CANCELLED')
     state.dispose()
   })
 
@@ -46,6 +55,24 @@ describe('workbench action and lifecycle constraints', () => {
     await state.start('Build a page')
     expect(createTask).toHaveBeenCalledTimes(2)
     expect(localStorage.getItem(`codeless:task:v1:owner:${running.applicationId}`)).toBe(running.id)
+    state.dispose()
+  })
+
+  it('a late cancellation network error cannot describe an authoritative terminal task as unknown', async () => {
+    const state = useWorkbenchTask(async () => false)
+    await state.restore(running.applicationId, 'owner')
+    vi.mocked(createTask).mockResolvedValueOnce(running)
+    await state.start('Build a page')
+    let reject!: (cause: Error) => void
+    vi.mocked(cancelTask).mockReturnValueOnce(new Promise((_resolve, fail) => { reject = fail }))
+    const result = state.cancel()
+    vi.mocked(connectTaskEvents).mock.calls[0][0].onTask({ ...running, status: 'FAILED', failureCode: 'CANCELLED' })
+    reject(new ApiError('network'))
+    await result
+    expect(state.task.value?.failureCode).toBe('CANCELLED')
+    expect(state.error.value).not.toContain('取消结果尚未确认')
+    expect(cancelTask).toHaveBeenCalledTimes(1)
+    expect(state.canCancel.value).toBe(false)
     state.dispose()
   })
 
@@ -144,6 +171,9 @@ describe('workbench action and lifecycle constraints', () => {
     expect(onError).not.toHaveBeenCalled()
     expect(localStorage.getItem(`codeless:task:v1:owner:${running.applicationId}`)).toBe(next.id)
     expect(current.taskId).toBe(next.id)
+    expect(new Set(vi.mocked(createTask).mock.calls.map(call => call[2])).size).toBe(2)
+    expect(state.history.value).toEqual([next.id, running.id])
+    expect(JSON.parse(localStorage.getItem(`codeless:task:v1:owner:${running.applicationId}:history`)!)).toEqual([next.id, running.id])
     state.dispose()
   })
 
@@ -170,4 +200,38 @@ describe('workbench action and lifecycle constraints', () => {
     expect(state.task.value?.status).toBe('PLAN')
     state.dispose()
   })
+})
+
+it('D18-B lost create response survives reload and cannot create a changed intent', async () => {
+  const first = useWorkbenchTask(async () => false)
+  await first.restore(running.applicationId, 'owner')
+  vi.mocked(createTask).mockRejectedValueOnce(new ApiError('network'))
+  await first.start('Build a page')
+  const key = vi.mocked(createTask).mock.calls[0][2]
+  expect(first.busy.value).toBe(false)
+  first.dispose()
+  const reopened = useWorkbenchTask(async () => false)
+  await reopened.restore(running.applicationId, 'owner')
+  expect(reopened.pendingPrompt.value).toBe('Build a page')
+  await reopened.start('A different page')
+  expect(createTask).toHaveBeenCalledTimes(1)
+  vi.mocked(createTask).mockResolvedValueOnce(running)
+  await reopened.start('Build a page')
+  expect(vi.mocked(createTask).mock.calls[1][2]).toBe(key)
+  expect(reopened.pendingPrompt.value).toBe('')
+  expect(sessionStorage.getItem(`codeless:task:v1:owner:${running.applicationId}:intent`)).toBeNull()
+  reopened.dispose()
+})
+
+it('D18-B definite rejection releases the pending intent, allowing corrected input', async () => {
+  const state = useWorkbenchTask(async () => false)
+  await state.restore(running.applicationId, 'owner')
+  vi.mocked(createTask).mockRejectedValueOnce(new ApiError('server', 400)).mockResolvedValueOnce(running)
+  await state.start('Rejected prompt')
+  expect(state.pendingPrompt.value).toBe('')
+  expect(state.busy.value).toBe(false)
+  await state.start('Corrected prompt')
+  expect(createTask).toHaveBeenCalledTimes(2)
+  expect(vi.mocked(createTask).mock.calls[0][2]).not.toBe(vi.mocked(createTask).mock.calls[1][2])
+  state.dispose()
 })

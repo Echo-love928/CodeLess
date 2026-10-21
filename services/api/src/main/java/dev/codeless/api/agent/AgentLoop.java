@@ -224,7 +224,7 @@ public final class AgentLoop implements TaskStageRunner {
     }
     private StageResult verify(TaskQueueService.Claim claim,AgentRunStore.Context context,JsonNode draft) {
         store.reserveVerification(claim);
-        JsonNode actual=runner.run(draft,context.deadline());
+        JsonNode actual=runner.run(claim.taskId(),draft,context.deadline());
         store.append(claim,TaskStatus.VERIFY,"runner.result",actual);
         evidence.validate(draft,actual);
         if(!actual.path("status").asText().equals("VERIFIED")) {

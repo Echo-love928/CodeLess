@@ -1,0 +1,419 @@
+{
+  "canonicalAcceptanceRun": "2026-10-20T15-49-32.129Z-acceptance-841a91ae-b0d0-4b97-a537-1b7edcbc65c5",
+  "canonicalHead": "d97f3d3e30b8b37132fa001ce9328590982b0827",
+  "note": "Raw logs and JUnit XML stay private under .local-data/d18-a/runs/; digests identify them.",
+  "runs": [
+    {
+      "run": "2026-10-20T13-53-30.349Z-acceptance-be1c6294-ba2a-400b-9165-f9d5957cd134",
+      "mode": "acceptance",
+      "head": "76f4cee806589c9568646ad9c6ec8a4e6867c334",
+      "status": "PASSED",
+      "exitCode": 0,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-20T13:53:30.586Z",
+      "completedAt": "2026-10-20T13:54:50.558Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:19b05dcb68d73adb9bd32fa892030407d6091ecd849d1ec0700befa59173e998",
+      "modelProvider": "deterministic-mock",
+      "junit": {
+        "suites": 3,
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-20T13-54-50.686Z-mutation-3993c460-2f9e-4aa0-be15-fe88d8bc3df0",
+      "mode": "mutation",
+      "head": "76f4cee806589c9568646ad9c6ec8a4e6867c334",
+      "status": "FAILED",
+      "exitCode": 1,
+      "signal": null,
+      "completionVerified": false,
+      "startedAt": "2026-10-20T13:54:50.920Z",
+      "completedAt": "2026-10-20T13:55:45.092Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:48c2437af4fcd3b63a18c485e771c0f19deafa9d7d81fa804d88129fada5c804",
+      "modelProvider": "deterministic-mock",
+      "mutations": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/DraftConvergence.java",
+          "from": "if (code.isEmpty()) return List.of();",
+          "to": "if (true) return List.of(); // MUTATION"
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/StorageSweeper.java",
+          "from": "if (versionReferenced(id)) {",
+          "to": "if (false) { // MUTATION"
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/StorageSweeper.java",
+          "from": "() -> !versionReferenced(id));",
+          "to": "() -> true); // MUTATION"
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/tasks/TaskScheduler.java",
+          "from": "long period = Math.max(100, lease.toMillis() / 3);",
+          "to": "long period = 3_600_000; // MUTATION"
+        }
+      ],
+      "failedTests": [
+        "d18aT1ProcessKillAndRestartNeitherRepublishesNorReportsSuccess",
+        "d18aT2RepeatedAndConcurrentCancelsConvergeOnceAndNeverThrow",
+        "heartbeatKeepsLiveLeaseAndCancelledWorkerIsReleasedOnlyAfterItStops",
+        "abandonedLeaseConvergesToInterruptedWithinOneLeaseAndReleasesResources",
+        "d18aT3ExpiredTaskResourcesAreReclaimedOnlyWhenUnreferencedAndPastRetention"
+      ],
+      "restoredDigests": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/DraftConvergence.java",
+          "digest": "sha256:07e5f126e2cedc2f15bcc14ce628caa101fc9978c003028fc87addb190702ba4",
+          "matchesHead": true
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/StorageSweeper.java",
+          "digest": "sha256:56e76e0401fbcb8772b83dde719b4d4172cc567211500e23184cf75bebe55d8b",
+          "matchesHead": true
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/tasks/TaskScheduler.java",
+          "digest": "sha256:fdbb7d120c2096a0fb115365d33abd26ac1db2069e2db17e0d81e57132c1354c",
+          "matchesHead": true
+        }
+      ],
+      "junit": {
+        "suites": 3,
+        "tests": 7,
+        "failures": 4,
+        "errors": 1,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-20T13-56-16.949Z-mutation-24b2f508-0ca1-4c29-9c69-47a8f28a0275",
+      "mode": "mutation",
+      "head": "0c79dd3e9f40449f93af0ad30070d4cbb1894581",
+      "status": "PASSED",
+      "exitCode": 1,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-20T13:56:17.178Z",
+      "completedAt": "2026-10-20T13:57:11.241Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:70a83586c1a35c7c52c178c06f48675e36c478047ef97b28146ca4d741a8c46c",
+      "modelProvider": "deterministic-mock",
+      "mutations": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/DraftConvergence.java",
+          "from": "if (code.isEmpty()) return List.of();",
+          "to": "if (true) return List.of(); // MUTATION"
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/StorageSweeper.java",
+          "from": "if (versionReferenced(id)) {",
+          "to": "if (false) { // MUTATION"
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/StorageSweeper.java",
+          "from": "() -> !versionReferenced(id));",
+          "to": "() -> true); // MUTATION"
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/tasks/TaskScheduler.java",
+          "from": "long period = Math.max(100, lease.toMillis() / 3);",
+          "to": "long period = 3_600_000; // MUTATION"
+        }
+      ],
+      "failedTests": [
+        "d18aT1ProcessKillAndRestartNeitherRepublishesNorReportsSuccess",
+        "d18aT2RepeatedAndConcurrentCancelsConvergeOnceAndNeverThrow",
+        "heartbeatKeepsLiveLeaseAndCancelledWorkerIsReleasedOnlyAfterItStops",
+        "abandonedLeaseConvergesToInterruptedWithinOneLeaseAndReleasesResources",
+        "d18aT4CleanupNeverDeletesPublishedPreviewOrUsableVersions"
+      ],
+      "restoredDigests": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/DraftConvergence.java",
+          "digest": "sha256:07e5f126e2cedc2f15bcc14ce628caa101fc9978c003028fc87addb190702ba4",
+          "matchesHead": true
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/StorageSweeper.java",
+          "digest": "sha256:56e76e0401fbcb8772b83dde719b4d4172cc567211500e23184cf75bebe55d8b",
+          "matchesHead": true
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/tasks/TaskScheduler.java",
+          "digest": "sha256:fdbb7d120c2096a0fb115365d33abd26ac1db2069e2db17e0d81e57132c1354c",
+          "matchesHead": true
+        }
+      ],
+      "junit": {
+        "suites": 3,
+        "tests": 7,
+        "failures": 4,
+        "errors": 1,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-20T13-57-20.274Z-regression-a7d306a9-b331-4caa-9b98-2acdf328e722",
+      "mode": "regression",
+      "head": "0c79dd3e9f40449f93af0ad30070d4cbb1894581",
+      "status": "PASSED",
+      "exitCode": 0,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-20T13:57:20.497Z",
+      "completedAt": "2026-10-20T14:02:45.914Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:a4ceeb039edf297db328e8a3378a8eeef3a269dbd0e1458f34fe002a022df79a",
+      "modelProvider": "deterministic-mock",
+      "junit": {
+        "suites": 11,
+        "tests": 90,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-20T14-02-55.130Z-gate-25da0888-6036-47b5-823e-f2be12439f3b",
+      "mode": "gate",
+      "head": "0c79dd3e9f40449f93af0ad30070d4cbb1894581",
+      "status": "FAILED",
+      "exitCode": 1,
+      "signal": null,
+      "completionVerified": false,
+      "startedAt": "2026-10-20T14:02:55.360Z",
+      "completedAt": "2026-10-20T14:20:29.237Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:ece79b39b977c01f1b41dd01d4384557c39daeaacfcee22b122ff10f91581b90",
+      "modelProvider": "deterministic-mock",
+      "junit": {
+        "suites": 61,
+        "tests": 275,
+        "failures": 5,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-20T15-38-49.309Z-acceptance-85479f48-d93a-43b4-a1c3-f00bc85c2c7f",
+      "mode": "acceptance",
+      "head": "017f1e97588c3853ceba9f70f2df9a95807835d5",
+      "status": "PASSED",
+      "exitCode": 0,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-20T15:38:49.649Z",
+      "completedAt": "2026-10-20T15:40:26.857Z",
+      "uncommittedScopedFiles": [
+        {
+          "path": "services/api/src/main/java/dev/codeless/api/recovery/DraftConvergence.java",
+          "digest": "sha256:c4d154fe8883584440d5fbed0ea51f29ae642f79bcfe2f65dfed2a668750a15c"
+        },
+        {
+          "path": "services/api/src/test/java/dev/codeless/api/recovery/RecoveryConvergenceTest.java",
+          "digest": "sha256:c219e76b733a0f63395cbff1d5f9ed46e415034745c154d800cc16735d05d9cf"
+        },
+        {
+          "path": "tests/recovery/export-evidence.mjs",
+          "digest": "sha256:2a846401acbb70ebec8cc232883237f7de3730a8ce399f5ea10f66d162f96fba"
+        },
+        {
+          "path": "tests/recovery/record-command.mjs",
+          "digest": "sha256:29322da5067720c0031bfda3d16231b720046af652df73cc45b24b32d0c8d793"
+        }
+      ],
+      "logDigest": "sha256:b998e3b9203d8793c6548b21835cffe66e424c771f9f339bca60d2ccaed011bf",
+      "modelProvider": "deterministic-mock",
+      "junit": {
+        "suites": 3,
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-20T15-40-26.984Z-regression-edba3e2d-7332-45a8-ad3c-ceae6a26d9cb",
+      "mode": "regression",
+      "head": "017f1e97588c3853ceba9f70f2df9a95807835d5",
+      "status": "PASSED",
+      "exitCode": 0,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-20T15:40:27.226Z",
+      "completedAt": "2026-10-20T15:46:43.745Z",
+      "uncommittedScopedFiles": [
+        {
+          "path": "services/api/src/main/java/dev/codeless/api/recovery/DraftConvergence.java",
+          "digest": "sha256:c4d154fe8883584440d5fbed0ea51f29ae642f79bcfe2f65dfed2a668750a15c"
+        },
+        {
+          "path": "services/api/src/test/java/dev/codeless/api/recovery/RecoveryConvergenceTest.java",
+          "digest": "sha256:c219e76b733a0f63395cbff1d5f9ed46e415034745c154d800cc16735d05d9cf"
+        },
+        {
+          "path": "tests/recovery/PR-DRAFT.md",
+          "digest": "sha256:9eefa7496b4149617b384080ba5698b8bbe6039a0c5ca456f7f4770b2ee30e96"
+        },
+        {
+          "path": "tests/recovery/export-evidence.mjs",
+          "digest": "sha256:2a846401acbb70ebec8cc232883237f7de3730a8ce399f5ea10f66d162f96fba"
+        },
+        {
+          "path": "tests/recovery/record-command.mjs",
+          "digest": "sha256:29322da5067720c0031bfda3d16231b720046af652df73cc45b24b32d0c8d793"
+        }
+      ],
+      "logDigest": "sha256:a76e7aa313867e7f12aabbc3bde37ec747b58c75d97a46abda3dd06402079796",
+      "modelProvider": "deterministic-mock",
+      "junit": {
+        "suites": 11,
+        "tests": 90,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-20T15-49-32.129Z-acceptance-841a91ae-b0d0-4b97-a537-1b7edcbc65c5",
+      "mode": "acceptance",
+      "head": "d97f3d3e30b8b37132fa001ce9328590982b0827",
+      "status": "PASSED",
+      "exitCode": 0,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-20T15:49:32.373Z",
+      "completedAt": "2026-10-20T15:50:55.557Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:9efbda95d3efba29de258754046525f9d492301d0b7f0ef4309a73e5b93362e7",
+      "modelProvider": "deterministic-mock",
+      "junit": {
+        "suites": 3,
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-20T15-50-55.688Z-mutation-1f5c936c-b65f-43c1-99c7-cdb408176d69",
+      "mode": "mutation",
+      "head": "d97f3d3e30b8b37132fa001ce9328590982b0827",
+      "status": "PASSED",
+      "exitCode": 1,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-20T15:50:55.949Z",
+      "completedAt": "2026-10-20T15:51:51.478Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:0e24d8902d7bab65ffd1cf08b9956551992bd97a4e14db4700ad48980892cf1d",
+      "modelProvider": "deterministic-mock",
+      "mutations": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/DraftConvergence.java",
+          "from": "if (code.isEmpty()) return List.of();",
+          "to": "if (true) return List.of(); // MUTATION"
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/StorageSweeper.java",
+          "from": "if (versionReferenced(id)) {",
+          "to": "if (false) { // MUTATION"
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/StorageSweeper.java",
+          "from": "() -> !versionReferenced(id));",
+          "to": "() -> true); // MUTATION"
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/tasks/TaskScheduler.java",
+          "from": "long period = Math.max(100, lease.toMillis() / 3);",
+          "to": "long period = 3_600_000; // MUTATION"
+        }
+      ],
+      "failedTests": [
+        "d18aT1ProcessKillAndRestartNeitherRepublishesNorReportsSuccess",
+        "d18aT2RepeatedAndConcurrentCancelsConvergeOnceAndNeverThrow",
+        "rolledBackCancelLeavesNoReportAndExpiryFreezesTheCommittedCode",
+        "heartbeatKeepsLiveLeaseAndCancelledWorkerIsReleasedOnlyAfterItStops",
+        "existingReportCountsOnlyWhenItCarriesTheSameFailureCode",
+        "abandonedLeaseConvergesToInterruptedWithinOneLeaseAndReleasesResources",
+        "firstCancelRacingExpiryRecoveryConvergesOnceWithAMatchingReport",
+        "d18aT4CleanupNeverDeletesPublishedPreviewOrUsableVersions"
+      ],
+      "restoredDigests": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/DraftConvergence.java",
+          "digest": "sha256:c4d154fe8883584440d5fbed0ea51f29ae642f79bcfe2f65dfed2a668750a15c",
+          "matchesHead": true
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/StorageSweeper.java",
+          "digest": "sha256:56e76e0401fbcb8772b83dde719b4d4172cc567211500e23184cf75bebe55d8b",
+          "matchesHead": true
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/tasks/TaskScheduler.java",
+          "digest": "sha256:fdbb7d120c2096a0fb115365d33abd26ac1db2069e2db17e0d81e57132c1354c",
+          "matchesHead": true
+        }
+      ],
+      "junit": {
+        "suites": 3,
+        "tests": 10,
+        "failures": 7,
+        "errors": 1,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-20T15-51-51.972Z-mutation-report-9e9406db-29bd-44a1-a20b-036ffb78a396",
+      "mode": "mutation-report",
+      "head": "d97f3d3e30b8b37132fa001ce9328590982b0827",
+      "status": "PASSED",
+      "exitCode": 1,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-20T15:51:52.214Z",
+      "completedAt": "2026-10-20T15:53:19.429Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:abfdfc51b952f7e3308d59c6c5222a1d45765e4bf333cb2cd29ccb7e03762209",
+      "modelProvider": "deterministic-mock",
+      "mutations": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/DraftConvergence.java",
+          "from": "private static void afterCommit(Runnable action) {",
+          "to": "private static void afterCommit(Runnable action) { if (true) { action.run(); return; } // MUTATION"
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/DraftConvergence.java",
+          "from": "existing.isTextual() && existing.asText().equals(code) ? \"EXISTING\" : \"CONFLICT\"",
+          "to": "\"EXISTING\" /* MUTATION */"
+        }
+      ],
+      "failedTests": [
+        "rolledBackCancelLeavesNoReportAndExpiryFreezesTheCommittedCode",
+        "existingReportCountsOnlyWhenItCarriesTheSameFailureCode"
+      ],
+      "restoredDigests": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/recovery/DraftConvergence.java",
+          "digest": "sha256:c4d154fe8883584440d5fbed0ea51f29ae642f79bcfe2f65dfed2a668750a15c",
+          "matchesHead": true
+        }
+      ],
+      "junit": {
+        "suites": 3,
+        "tests": 10,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  ]
+}

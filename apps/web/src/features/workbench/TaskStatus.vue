@@ -22,7 +22,7 @@ const content = computed(() => {
 <template>
   <section class="task-status" :class="`task-status--${content.kind}`" :role="content.kind === 'failed' ? 'alert' : 'status'" :aria-busy="content.kind === 'running'">
     <span class="task-status__dot" aria-hidden="true" />
-    <div><strong>{{ content.title }}</strong><p>{{ content.detail }}</p><small v-if="task">任务 {{ task.id }} · {{ task.status }}</small><small v-if="task">已执行修复：{{ task.repairAttempts }} / 3 轮</small><small v-if="task?.status === 'FAILED'">错误代码：{{ task.failureCode || '未知' }}</small></div>
+    <div><strong>{{ content.title }}</strong><p>{{ content.detail }}</p><p v-if="task?.status === 'FAILED'">重新提交会创建新任务，旧任务记录和已有可用版本保留。</p><small v-if="task">任务 {{ task.id }} · {{ task.status }}</small><small v-if="task">已执行修复：{{ task.repairAttempts }} / 3 轮</small><small v-if="task?.status === 'FAILED'">错误代码：{{ task.failureCode || '未知' }}</small></div>
   </section>
 </template>
 

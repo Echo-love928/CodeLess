@@ -43,12 +43,25 @@ it('keeps unknown states and codes explicit without assuming success', () => {
   expect(unknown.text()).not.toContain('生成完成')
 })
 
+it.each(['__proto__', 'constructor'])('does not mistake inherited property %s for a failure explanation', failureCode => {
+  const wrapper = mount(TaskStatus, { props: { task: { ...task, status: 'FAILED', failureCode } } })
+  expect(wrapper.text()).toContain(failureCode)
+  expect(wrapper.text()).toContain('联系维护者确认')
+  expect(wrapper.text()).not.toContain('生成完成')
+})
+
 it.each([
   ['AGENT_BUILD_EXIT', '源码未通过构建'],
   ['AGENT_REPAIR_NO_PROGRESS', '源码没有变化'],
   ['AGENT_REPAIR_LIMIT_EXCEEDED', '最多 3 轮修复'],
   ['AGENT_REPAIR_ACCEPTANCE_CHANGED', '改变了原有页面验收要求'],
   ['AGENT_MODEL_BUDGET_EXCEEDED', '模型请求或 token 预算已耗尽'],
+  ['INTERRUPTED', '服务重启'],
+  ['MODEL_AUTHENTICATION', '模型服务鉴权失败'],
+  ['MODEL_RATE_LIMITED', '模型服务请求受限'],
+  ['MODEL_INVALID_RESPONSE', '模型返回内容无法解析'],
+  ['MODEL_INVALID_USAGE', '未知用量不能视为零'],
+  ['AGENT_RUNNER_INTERRUPTED', '本次结果未被验证'],
 ])('explains actual backend failure %s without claiming success', (failureCode, explanation) => {
   const wrapper = mount(TaskStatus, { props: { task: { ...task, status: 'FAILED', repairAttempts: 3, failureCode } } })
   expect(wrapper.get('[role="alert"]').text()).toContain('生成失败')
