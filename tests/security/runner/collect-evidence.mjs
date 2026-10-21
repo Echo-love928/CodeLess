@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto'
 const root = resolve('.local-data/d19-b'), output = resolve('tests/security/runner/evidence/2026-10-21')
 await mkdir(output, { recursive: true })
 const commands = []
+let latestResults
 for (const entry of await readdir(root, { withFileTypes: true })) {
   if (!entry.isDirectory() || !/^2026-/.test(entry.name)) continue
   const directory = join(root, entry.name)
@@ -16,9 +17,10 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
   const log = await readFile(join(directory, 'command.log'), 'utf8')
   const summary = log.split(/\r?\n/).filter(line => /ci-gate|Tests run:|BUILD SUCCESS|BUILD FAILURE|ℹ |Test Files|Tests\s+\d+|passed|failed|cancelled|skipped|✖|^  AssertionError|^  apiRequestContext|^  'test timed|^  locator\.evaluate/.test(line)).join('\n')
   await writeFile(join(output, entry.name + '-summary.txt'), summary + '\n')
-  if (metadata.mode === 'security' && metadata.exitCode === 0) {
-    for (const name of await readdir(join(directory, 'results'))) await copyFile(join(directory, 'results', name), join(output, name))
-  }
+  if (['security', 'gate', 'runner'].includes(metadata.mode) && metadata.exitCode === 0 &&
+      (!latestResults || metadata.completedAt > latestResults.completedAt)) latestResults = { directory, completedAt: metadata.completedAt }
 }
+if (latestResults) for (const name of await readdir(join(latestResults.directory, 'results')))
+  await copyFile(join(latestResults.directory, 'results', name), join(output, name))
 await writeFile(join(output, 'commands.json'), JSON.stringify(commands, null, 2))
 console.log(JSON.stringify({ output, runs: commands.length }))

@@ -28,7 +28,7 @@ const revision = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).s
 const status = spawnSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).stdout
 const tracked = spawnSync('git', ['ls-files', 'services/runner', 'infra', 'tests/security/runner', 'tests/infra/security-runner.test.mjs', '--cached', '--others', '--exclude-standard'], { encoding: 'utf8' }).stdout.trim().split(/\r?\n/)
 const sources = {}
-for (const path of new Set(tracked.filter(Boolean))) sources[path] = createHash('sha256').update(await readFile(path)).digest('hex')
+for (const path of new Set(tracked.filter(path => path && !path.includes('/evidence/')))) sources[path] = createHash('sha256').update(await readFile(path)).digest('hex')
 const output = []
 const originals = new Map()
 if (['gate', 'e2e', 'api', 'runner'].includes(mode)) {
