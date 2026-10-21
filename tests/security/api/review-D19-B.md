@@ -48,7 +48,8 @@
 
 - 对象：PR #56 新 HEAD `787da942c451a239e5dcc2bcc2afe09f932bc965`（`a13077d` 测试修复、`787da94` 记录器），基线 `3ec4b99`，main 未变。旧批准只针对 `587f830`，不沿用。
 - 范围：只重查变更与受影响范围。`git diff --stat 587f830..787da94 -- services apps contracts scripts .github pnpm-lock.yaml package.json infra tests/infra` 为空；增量只在 `tests/security/runner/**` 与两份文档。
-- 结论：**无阻塞问题**。
+- 结论：**无阻塞问题**。经用户确认，已在 GitHub 提交 [APPROVED review](https://github.com/Echo-love928/CodeLess/pull/56#pullrequestreview-5599156594)（2026-10-21T11:47:04Z，commit `787da94`；API 读回状态、提交与本节提交时的全文 sha256 `667b18d8…` 一致）。
+  批准只针对该提交，不豁免合并门禁；B 的新提交需要重新审查。
 
 ### 逐条核对
 
