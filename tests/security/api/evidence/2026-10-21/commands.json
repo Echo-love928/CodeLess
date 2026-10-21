@@ -1,0 +1,400 @@
+{
+  "canonicalAcceptanceRun": "2026-10-21T06-20-10.844Z-acceptance-a44dd3c7-dd75-4e01-9aa5-042298a786a7",
+  "canonicalHead": "534c64d0958cbcfef07c754864912afd28e25922",
+  "note": "Raw logs and JUnit XML stay private under .local-data/d19-a/runs/; digests identify them.",
+  "runs": [
+    {
+      "run": "2026-10-21T05-51-17.918Z-acceptance-fc918003-5bf8-4662-8f5a-e62a7179aa1d",
+      "mode": "acceptance",
+      "head": "c290f28b7da0adf17c200e78585980b169bb277e",
+      "status": "PASSED",
+      "exitCode": 0,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-21T05:51:18.116Z",
+      "completedAt": "2026-10-21T05:51:46.404Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:87e7ab8b5984842725cd05f786e8f7482e742f233925dfc54e540cfc6914b2e7",
+      "modelProvider": "deterministic-mock",
+      "junit": {
+        "suites": 1,
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-21T05-51-46.558Z-mutation-filter-58ab2eab-ae2e-47ce-9a56-f0ccbf018f3f",
+      "mode": "mutation-filter",
+      "head": "c290f28b7da0adf17c200e78585980b169bb277e",
+      "status": "PASSED",
+      "exitCode": 1,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-21T05:51:46.738Z",
+      "completedAt": "2026-10-21T05:52:22.660Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:35d0f43ab241469c3ee51a08d598e9cd4fe5f2520111e65c194a3dc34818b6b5",
+      "modelProvider": "deterministic-mock",
+      "mutations": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/auth/AuthFilter.java",
+          "revertedTo": "3ec4b99fbc262aef20e72c23cfe34d0da0740ef9",
+          "digest": "sha256:c2bdceb4a89b5c17b2eccbc26800dc7a6ce418c677aab0291a28fd800f324fe5"
+        }
+      ],
+      "expectedFailures": [
+        "d19aT2WritesCannotBypassCsrf"
+      ],
+      "failedTests": [
+        "d19aT2WritesCannotBypassCsrf"
+      ],
+      "restoredDigests": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/auth/AuthFilter.java",
+          "digest": "sha256:42d23d83e491b4675c8444e88b30d9f0194e8f236116bd4d6989efa285d81d58",
+          "matchesHead": true
+        }
+      ],
+      "junit": {
+        "suites": 1,
+        "tests": 7,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-21T05-52-22.982Z-mutation-login-7b7ddefd-193f-459a-8332-0edb7ad794a3",
+      "mode": "mutation-login",
+      "head": "c290f28b7da0adf17c200e78585980b169bb277e",
+      "status": "PASSED",
+      "exitCode": 1,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-21T05:52:23.172Z",
+      "completedAt": "2026-10-21T05:52:53.285Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:66b4cd53b3f52e130d0e131025f7faf0828c6ef5d8684d7df930ab067e18f739",
+      "modelProvider": "deterministic-mock",
+      "mutations": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/auth/AuthController.java",
+          "revertedTo": "3ec4b99fbc262aef20e72c23cfe34d0da0740ef9",
+          "digest": "sha256:04fbc6d0a8d494f8eec0e30c1aebf9f088852ba8e368e723badc0baa5663db0e"
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/auth/LoginAttempts.java",
+          "revertedTo": "3ec4b99fbc262aef20e72c23cfe34d0da0740ef9",
+          "digest": "sha256:bfde89b516ea73c9a4589982c48ec8521a343b1b9ce9242dd88b5468b65b7e6c"
+        }
+      ],
+      "expectedFailures": [
+        "d19aLoginLimitHoldsForSpellingsAndConcurrentGuesses"
+      ],
+      "failedTests": [
+        "d19aLoginLimitHoldsForSpellingsAndConcurrentGuesses"
+      ],
+      "restoredDigests": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/auth/AuthController.java",
+          "digest": "sha256:da01434cd1f6a4ff453f3004774483fd03a9b1e7382ff57e86ffcbdf02cedacb",
+          "matchesHead": true
+        },
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/auth/LoginAttempts.java",
+          "digest": "sha256:608f276434d499678ba8e10b1ae0e2b7367b934e839244d514d39a5baace36a4",
+          "matchesHead": true
+        }
+      ],
+      "junit": {
+        "suites": 1,
+        "tests": 7,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-21T05-53-00.530Z-mutation-errors-f5ac3f73-1f8b-4a6d-9c40-4475432a0242",
+      "mode": "mutation-errors",
+      "head": "c290f28b7da0adf17c200e78585980b169bb277e",
+      "status": "PASSED",
+      "exitCode": 1,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-21T05:53:00.706Z",
+      "completedAt": "2026-10-21T05:53:35.288Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:ef22dc22455bffd58279d3095d7ecca443b988e6c97bc033b3429c1a82923657",
+      "modelProvider": "deterministic-mock",
+      "mutations": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/error/GlobalExceptionHandler.java",
+          "revertedTo": "3ec4b99fbc262aef20e72c23cfe34d0da0740ef9",
+          "digest": "sha256:2962e77dc473fe6efaf88262389745f8ae0858eafada1d9da32f588977a958b9"
+        }
+      ],
+      "expectedFailures": [
+        "d19aFieldLengthsAndIdempotencyKeysAreEnforced",
+        "d19aT4IllegalInputCreatesNoExecutableFileOrDeployment"
+      ],
+      "failedTests": [
+        "d19aFieldLengthsAndIdempotencyKeysAreEnforced",
+        "d19aT4IllegalInputCreatesNoExecutableFileOrDeployment"
+      ],
+      "restoredDigests": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/error/GlobalExceptionHandler.java",
+          "digest": "sha256:87fd878d52381e82b15fb85c2bac0c2fc77e7c66b5fadfd0f7c5043108157366",
+          "matchesHead": true
+        }
+      ],
+      "junit": {
+        "suites": 1,
+        "tests": 7,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-21T05-53-35.550Z-mutation-ownership-e4bb8da2-d620-4ca9-815e-287f423cc602",
+      "mode": "mutation-ownership",
+      "head": "c290f28b7da0adf17c200e78585980b169bb277e",
+      "status": "PASSED",
+      "exitCode": 1,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-21T05:53:35.724Z",
+      "completedAt": "2026-10-21T05:54:14.100Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:87e1a70d9e519ef618be1a7858e70b4cbf236d5b301bfc46812e50c3d6361330",
+      "modelProvider": "deterministic-mock",
+      "mutations": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/auth/OwnershipGuard.java",
+          "from": "WHERE v.id = ? AND a.owner_id = ?",
+          "to": "WHERE v.id = ? AND (a.owner_id = ? OR true) /* MUTATION */"
+        }
+      ],
+      "expectedFailures": [
+        "d19aT1EveryPrivateResourceRejectsAnotherUser"
+      ],
+      "failedTests": [
+        "d19aT1EveryPrivateResourceRejectsAnotherUser"
+      ],
+      "restoredDigests": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/auth/OwnershipGuard.java",
+          "digest": "sha256:ac4a58541b3604b6ade55726277c03695228a6dedbb64f02863b12026e95381f",
+          "matchesHead": true
+        }
+      ],
+      "junit": {
+        "suites": 1,
+        "tests": 7,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-21T05-54-14.413Z-mutation-logging-0e0905a5-c07d-4305-80f6-5231ee277c6a",
+      "mode": "mutation-logging",
+      "head": "c290f28b7da0adf17c200e78585980b169bb277e",
+      "status": "PASSED",
+      "exitCode": 1,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-21T05:54:14.593Z",
+      "completedAt": "2026-10-21T05:54:51.969Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:fb84db293dcdca742ddcc32d45717cbb74740a96a7140dffc8f56ce731480624",
+      "modelProvider": "deterministic-mock",
+      "mutations": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/auth/AuthController.java",
+          "from": "if (email.length() > 320 || password.length() > 1024) {",
+          "to": "org.slf4j.LoggerFactory.getLogger(AuthController.class).info(\"login {} {}\", email, password); // MUTATION\n        if (email.length() > 320 || password.length() > 1024) {"
+        }
+      ],
+      "expectedFailures": [
+        "d19aT3LogsCarryNoSecretOrPassword"
+      ],
+      "failedTests": [
+        "d19aT3LogsCarryNoSecretOrPassword"
+      ],
+      "restoredDigests": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/auth/AuthController.java",
+          "digest": "sha256:da01434cd1f6a4ff453f3004774483fd03a9b1e7382ff57e86ffcbdf02cedacb",
+          "matchesHead": true
+        }
+      ],
+      "junit": {
+        "suites": 1,
+        "tests": 7,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-21T05-54-52.234Z-mutation-inventory-2646ffc7-f96f-4632-adca-0c0a265d306e",
+      "mode": "mutation-inventory",
+      "head": "c290f28b7da0adf17c200e78585980b169bb277e",
+      "status": "PASSED",
+      "exitCode": 1,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-21T05:54:52.404Z",
+      "completedAt": "2026-10-21T05:55:26.493Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:70272ecc7d93faf5144993887bf3ec9fe32a45602a6c3215e3f25fb4c517021c",
+      "modelProvider": "deterministic-mock",
+      "mutations": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/auth/AuthController.java",
+          "from": "@GetMapping(\"/auth/me\")",
+          "to": "@GetMapping(\"/auth/whoami\") public String whoami() { return \"unclassified\"; } // MUTATION\n\n    @GetMapping(\"/auth/me\")"
+        }
+      ],
+      "expectedFailures": [
+        "everyRegisteredRouteIsClassifiedInTheSecurityMatrix"
+      ],
+      "failedTests": [
+        "everyRegisteredRouteIsClassifiedInTheSecurityMatrix"
+      ],
+      "restoredDigests": [
+        {
+          "file": "services/api/src/main/java/dev/codeless/api/auth/AuthController.java",
+          "digest": "sha256:da01434cd1f6a4ff453f3004774483fd03a9b1e7382ff57e86ffcbdf02cedacb",
+          "matchesHead": true
+        }
+      ],
+      "junit": {
+        "suites": 1,
+        "tests": 7,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-21T05-55-46.150Z-regression-9a7d57ac-ff90-4fff-bfc9-5aeafe056ccf",
+      "mode": "regression",
+      "head": "c290f28b7da0adf17c200e78585980b169bb277e",
+      "status": "PASSED",
+      "exitCode": 0,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-21T05:55:46.333Z",
+      "completedAt": "2026-10-21T05:56:33.609Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:8cfc13c4731572c1183c63fb1b006c67bbe6a72577f819e93272d6235b80e310",
+      "modelProvider": "deterministic-mock",
+      "junit": {
+        "suites": 15,
+        "tests": 39,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-21T05-56-38.503Z-gate-ea156272-e1a4-4ecb-b1e5-71bd5f4dd9a7",
+      "mode": "gate",
+      "head": "c290f28b7da0adf17c200e78585980b169bb277e",
+      "status": "FAILED",
+      "exitCode": 1,
+      "signal": null,
+      "completionVerified": false,
+      "startedAt": "2026-10-21T05:56:38.683Z",
+      "completedAt": "2026-10-21T06:14:11.285Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:cc5536bce2095d501e1cdff9592b3036b1002c6985bfe9a36bf5c8dca2a8c9b4",
+      "modelProvider": "deterministic-mock",
+      "junit": {
+        "suites": 62,
+        "tests": 285,
+        "failures": 6,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-21T06-19-28.609Z-acceptance-5bc94845-edcf-43fe-ac80-9aadb80ecfbd",
+      "mode": "acceptance",
+      "head": "534c64d0958cbcfef07c754864912afd28e25922",
+      "status": "PASSED",
+      "exitCode": 0,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-21T06:19:28.810Z",
+      "completedAt": "2026-10-21T06:19:55.962Z",
+      "uncommittedScopedFiles": [
+        {
+          "path": "tests/security/api/PR-DRAFT.md",
+          "digest": "sha256:d9317eac279ff8a54839f0841c83bce98ffb1db6d0f51851831bf765c8013da6"
+        },
+        {
+          "path": "tests/security/api/review-D19-B.md",
+          "digest": "sha256:5f08dbb8919b74b05b2294f818bf9425ef2030a740fc399daa33ef572a6a85b3"
+        }
+      ],
+      "logDigest": "sha256:8fa6e5763d3e2cfeafdd3c84e72b49ef6fc6af57a49f6a9ba0c234fd77a14ab1",
+      "modelProvider": "deterministic-mock",
+      "junit": {
+        "suites": 1,
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-21T06-20-10.844Z-acceptance-a44dd3c7-dd75-4e01-9aa5-042298a786a7",
+      "mode": "acceptance",
+      "head": "534c64d0958cbcfef07c754864912afd28e25922",
+      "status": "PASSED",
+      "exitCode": 0,
+      "signal": null,
+      "completionVerified": true,
+      "startedAt": "2026-10-21T06:20:11.024Z",
+      "completedAt": "2026-10-21T06:20:32.973Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:ee940b436b66f3ca4fb1822cf9604e4a6a84be5dfcc63136bdbd478f23e1332c",
+      "modelProvider": "deterministic-mock",
+      "junit": {
+        "suites": 1,
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "2026-10-21T06-24-30.780Z-gate-c78c856f-e159-4f52-8d15-c368cf5f664b",
+      "mode": "gate",
+      "head": "605b5c136c6fa9384a85abc121d21cf95c85b7ed",
+      "status": "FAILED",
+      "exitCode": 1,
+      "signal": null,
+      "completionVerified": false,
+      "startedAt": "2026-10-21T06:24:30.976Z",
+      "completedAt": "2026-10-21T06:40:47.111Z",
+      "uncommittedScopedFiles": [],
+      "logDigest": "sha256:411c5004ec75299604814fb6a3e78647583febb8bade783850e4a59247301c25",
+      "modelProvider": "deterministic-mock",
+      "junit": {
+        "suites": 62,
+        "tests": 285,
+        "failures": 5,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  ]
+}

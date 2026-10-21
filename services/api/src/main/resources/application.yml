@@ -14,6 +14,8 @@ server:
   servlet:
     session:
       timeout: 30m
+      # Never accept or emit ;jsessionid= in URLs, where a session id ends up in logs, history and Referer headers.
+      tracking-modes: cookie
       cookie:
         http-only: true
         secure: ${CODELESS_COOKIE_SECURE:true}
