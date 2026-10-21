@@ -43,3 +43,33 @@
 | 本机重跑 | worktree 内 `pnpm install --frozen-lockfile --prefer-offline`（exit 0）后 `node tests/security/runner/record-command.mjs security` | exit 1：10/11 通过，站点用例因本机系统代理失败（建议 5）。构建隔离、超时回收、地址/重定向、浏览器 canary、CPU 忙循环、截图对抗、writer 全部通过。 |
 | 站点断言 | 审查者副本 `.d19-b-review/.local-data/d19a-probe/site.proxy-bypass.test.mjs`：只给上下文加代理 bypass，其余逐字相同；B 的跟踪文件未改（`git diff --quiet`） | exit 0，1/1。预览与公开站点读取 parent/opener 均 `SecurityError`，自身 Cookie/存储为空；6 条伪造消息被拒、合法消息 1 条；6 个私有路径 404。 |
 | 远端检查 | 公开 API 读一次：PR #56 head `587f830` 的 run [39539955022](https://github.com/Echo-love928/CodeLess/actions/runs/39539955022) | infra-preflight、verify:static、verify:runner、verify:e2e、verify:api、ci-gate 六项 completed/success（03:50:11Z）。 |
+
+## 第二轮：增量复审 `587f830..787da94`
+
+- 对象：PR #56 新 HEAD `787da942c451a239e5dcc2bcc2afe09f932bc965`（`a13077d` 测试修复、`787da94` 记录器），基线 `3ec4b99`，main 未变。旧批准只针对 `587f830`，不沿用。
+- 范围：只重查变更与受影响范围。`git diff --stat 587f830..787da94 -- services apps contracts scripts .github pnpm-lock.yaml package.json infra tests/infra` 为空；增量只在 `tests/security/runner/**` 与两份文档。
+- 结论：**无阻塞问题**。
+
+### 逐条核对
+
+| 第一轮建议 | 增量 | 核验 |
+| --- | --- | --- |
+| 1 close 后重放不确定 | 父页监听器在 `session.receive(event)` 之后只计数来自预览、origin 与数据完全相同的那条重放；`waitForFunction(replayDeliveries === 1)` 证明已送达并经过 `receive`，再断言 `selections.length === 1`。 | 断言变强、没有放宽。本机复现 B 的故障对照：`close()` 失效且重放延迟 1 秒时，**旧**测试 exit 0（确认第一轮指出的假通过真实存在），**新**测试 exit 1（`delivered replay after close must not select`）。 |
+| 2 构建超时 2 秒 | 改为 5 秒，保留 TIMEOUT、137、无产物、`D19_CHILD_RUNNING`、容器/工作区删除、`docker ps` 为空与 `inspect` 退出 1 全部断言；生产限额不变。 | 本机 6.7 秒通过。 |
+| 3 回执与写入字节一致性 | 未改，B 登记为非阻塞待办。 | 维持第一轮判断：失败关闭，不构成外部利用。 |
+| 4 记录器 revision | 新增 `canonical`/`canonicalReasons`（开始或结束时工作区不干净、运行中 HEAD 或源码变化）与 `codeIdentity`。 | 本机运行记为 `canonical=true`、`codeIdentity=COMMIT`、revision `787da94`。 |
+| 5 站点测试依赖宿主代理 | 上下文显式 `proxy: { server: 'http://127.0.0.1:9', bypass: '*.test,127.0.0.1' }`，路由过滤保留。 | 本机仍开着系统代理：B 的记录器 `security` 11/11（第一轮为 10/11），站点用例不再需要审查者副本。故障对照：注入继承代理时旧测试 exit 1、新测试 exit 0。 |
+| 6 联调项 | 留给最后启用 PR。 | 不变。 |
+
+### 建议（非阻塞）
+
+1. `fixture-controls.mjs` 放在 `evidence/` 目录下，而记录器计算源码摘要时排除 `/evidence/`，所以这个会执行测试变体的脚本不在任何运行的源码快照里。可以移到 `tests/security/runner/` 下，或者把它加进快照。
+
+### 已核验内容
+
+| 项 | 方法 | 结果 |
+| --- | --- | --- |
+| 安全专项 | 审查 worktree 切到 `787da94` 后 `node tests/security/runner/record-command.mjs security` | exit 0，11/11，0 fail/cancel/skip，`canonical=true`。 |
+| 故障对照 | `node tests/security/runner/evidence/2026-10-21/review-followup/fixture-controls.mjs` | exit 0，4/4 与预期一致（旧/新 × 代理/重放）；运行后 worktree 仍干净。 |
+| 秘密 | 增量新增行扫描 `sk-…`、私钥头、AWS/GitHub/Slack 令牌模式 | 0 处。 |
+| 远端检查 | 公开 API 读一次：`787da94` 的 run [39560507335](https://github.com/Echo-love928/CodeLess/actions/runs/39560507335) | infra-preflight、verify:static、verify:runner、verify:e2e、verify:api、ci-gate 六项 completed/success（07:22:16Z）。 |
