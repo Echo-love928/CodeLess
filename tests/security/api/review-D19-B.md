@@ -3,6 +3,8 @@
 - 对象：草稿 [PR #56](https://github.com/Echo-love928/CodeLess/pull/56) `codex/d19-b-runner-security`，HEAD `587f830978d1bda7e3a6efadb75db038fdbcb296`（运行时代码与断言候选 `4ef96b8`），基线 `3ec4b99`。
 - 方式：隔离 worktree `.d19-b-review/`（detached，只读；未提交、未推送、未改 B 的文件）。读取 B 的交接、`docs/security-runner.md`、全部生产 diff 与 5 个安全测试、记录器和已提交证据；本机重跑见“已核验内容”。
 - 重点（任务卡）：拒绝私网/元数据/重定向绕过；容器超时后无残留工作进程；恶意站点无法读取平台凭据；全部安全 fixture 有确定性结果；范围、失败路径、秘密与测试强度。
+- 结论：经用户确认，已在 GitHub 提交正式 [APPROVED review](https://github.com/Echo-love928/CodeLess/pull/56#pullrequestreview-5595975803)（2026-10-21T06:54:53Z，commit `587f830`；API 读回状态、提交与本文件提交时的全文 sha256 `7b3387a0…` 一致）。
+  批准只针对该提交，不豁免合并门禁；B 的新提交需要重新审查。
 
 ## 阻塞问题
 
