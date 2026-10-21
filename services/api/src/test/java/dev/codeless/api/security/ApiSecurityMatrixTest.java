@@ -651,6 +651,26 @@ class ApiSecurityMatrixTest extends PostgresTestBase {
                 violations.add("source read " + path + " -> " + res.status());
             rows.add(row("input", "source read path " + path.replace("\u0000", "\\u0000"), "status", res.status(), "code", code(res)));
         }
+        // Client host and forwarding headers never shape the credential URL; it comes from configuration only.
+        Map<String, String> forged = new LinkedHashMap<>();
+        forged.put("Host", "evil.example");
+        forged.put("Cookie", victim.cookie());
+        forged.put("X-CSRF-Token", victim.csrf());
+        forged.put("X-Forwarded-Host", "evil.example");
+        forged.put("X-Forwarded-Proto", "http");
+        forged.put("X-Forwarded-Prefix", "/../../evil");
+        forged.put("Forwarded", "host=evil.example;proto=http");
+        forged.put("X-Original-URL", "/api/v0/admin/users");
+        forged.put("X-Rewrite-URL", "/api/v0/admin/users");
+        var credential = SecurityFixtures.raw(port, "POST", "/api/v0/applications/" + owned.app() + "/versions/" + owned.version()
+                + "/preview-credentials", forged, null);
+        String issued = credential.status() == 200 ? mapper.readTree(credential.body()).path("url").asText() : "";
+        if (issued.contains("credential=")) secret("issued preview credential", issued.substring(issued.indexOf("credential=") + "credential=".length()));
+        boolean configured = credential.status() == 200 && issued.startsWith("https://v" + owned.version().toString().replace("-", "")
+                + ".preview.codeless-preview.test/__preview/start?credential=") && !credential.body().contains("evil");
+        if (!configured) violations.add("forged host headers -> " + credential.status() + " url from configuration " + configured);
+        rows.add(row("input", "preview credential with forged Host, X-Forwarded-*, Forwarded, X-Original-URL", "status", credential.status(),
+                "urlFromConfigurationOnly", configured));
         Res noPath = call(victim, get("/api/v0/versions/" + owned.version() + "/files/content"));
         rows.add(row("input", "source read without path", "status", noPath.status(), "code", code(noPath)));
         if (noPath.status() / 100 != 4) violations.add("source read without path -> " + noPath.status());

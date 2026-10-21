@@ -120,7 +120,7 @@ final class SecurityFixtures {
             socket.setSoTimeout(30_000);
             byte[] payload = body == null ? new byte[0] : body.getBytes(UTF_8);
             StringBuilder head = new StringBuilder(method).append(' ').append(target).append(" HTTP/1.1\r\n")
-                    .append("Host: 127.0.0.1:").append(port).append("\r\nConnection: close\r\n");
+                    .append(headers.containsKey("Host") ? "" : "Host: 127.0.0.1:" + port + "\r\n").append("Connection: close\r\n");
             headers.forEach((name, value) -> head.append(name).append(": ").append(value).append("\r\n"));
             if (body != null) head.append("Content-Type: application/json\r\nContent-Length: ").append(payload.length).append("\r\n");
             head.append("\r\n");
