@@ -1,0 +1,63 @@
+{
+  "case" : "API process killed during a generation stage and a hosting call, then restarted twice",
+  "fixtures" : "explicit recording stage runner + hosting adapter; real PostgreSQL 17.6, real child JVM, production scheduler/worker",
+  "leaseMs" : 2000,
+  "killedPid" : 32656,
+  "heartbeatBeforeKill" : {
+    "status" : "PLAN",
+    "failure_code" : null,
+    "queue_state" : "RUNNING",
+    "lease_valid" : true
+  },
+  "immediatelyAfterKill" : {
+    "task" : {
+      "status" : "PLAN",
+      "failure_code" : null,
+      "queue_state" : "RUNNING",
+      "lease_valid" : true
+    },
+    "publication" : {
+      "status" : "REQUESTED",
+      "url" : null
+    }
+  },
+  "convergedAfterRestartMs" : 5225,
+  "afterFirstRestart" : {
+    "task" : {
+      "status" : "FAILED",
+      "failure_code" : "INTERRUPTED",
+      "queue_state" : "FINISHED",
+      "lease_valid" : false,
+      "task_failed_events" : 1,
+      "ready_events" : 0
+    },
+    "draftVersion" : "FAILED",
+    "publication" : {
+      "status" : "FAILED",
+      "url_present" : false
+    },
+    "phases" : [ "PREPARING", "PUBLISHING", "FAILED" ],
+    "failureCode" : "DEPLOYMENT_INTERRUPTED",
+    "prior" : {
+      "status" : "PUBLISHED",
+      "url" : "https://hosting.example.test/d18/7e7ba0b7-8744-8d88-9000-2dc8c5878cd6/"
+    },
+    "latestReady" : "3c5cfb28-c5bc-4a4b-a398-51b63cf94f47",
+    "publishedRows" : 1
+  },
+  "afterSecondRestartUnchanged" : true,
+  "hostingCalls" : [ "1 publish 5e05423b-1607-8957-b6d5-5f4f1d78ec48" ],
+  "stageCalls" : [ "1 ec8ae36c-3d1c-4fdb-8830-ee30c2946bfb PLAN" ],
+  "draftReport" : {
+    "status" : "FAILED",
+    "sourceDigest" : "sha256:8d0190badc822cf8ccbd5863a1ebabe1ba8f8741fa76999627d7fd3609b1bc5a",
+    "buildId" : null,
+    "buildStatus" : null,
+    "exitCode" : null,
+    "verificationId" : null,
+    "verificationStatus" : null,
+    "artifactDigest" : null,
+    "failureCode" : "INTERRUPTED"
+  },
+  "childProcesses" : [ "1 32656", "2 30472", "3 30644" ]
+}

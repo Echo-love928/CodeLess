@@ -1,0 +1,42 @@
+{
+  "protectedTreesByteIdentical" : [ "versions/<id> (except the stale .outcome-777 attempt)", "artifacts/<buildId>", "workspaces/<sourceTask>" ],
+  "report" : {
+    "status" : "PARTIAL",
+    "startedAt" : "2026-10-20T15:50:51.622027400Z",
+    "cutoff" : "2026-10-20T14:50:51.622027400Z",
+    "removed" : {
+      "FAILED_TASK_WORKSPACE" : 1,
+      "ORPHAN_ARTIFACT" : 1,
+      "ORPHAN_VERSION" : 1,
+      "PENDING_VERSION_ATTEMPT" : 1
+    },
+    "kept" : {
+      "PROTECTED" : 4,
+      "REFERENCED" : 9
+    },
+    "removedPaths" : [ "versions/10108382-9792-460a-8f2b-4df5557eb85e", "versions/6739343a-66ff-4d04-8260-bbeb690622fb/.outcome-777", "artifacts/7c6326aa-5021-44c4-98dc-1bb15e415ba2", "workspaces/c016f52f-7422-4443-a637-19b25b50be43" ],
+    "errors" : [ "CLEANUP_LINK_REJECTED:versions/d6b55799-162c-4cbe-8557-9489c05f7f80" ]
+  },
+  "faultInjection" : {
+    "result" : "CLEANUP_LINK_REJECTED, not followed",
+    "plantedLink" : "versions/<orphan>/evil -> versions/<published>"
+  },
+  "publicationsAndLatestPointerUnchanged" : true,
+  "protected" : {
+    "currentPreview" : "b066bcf7-62a8-4558-833b-d6f0fc5cd204",
+    "usableHistory" : "cd1e8b2f-9c6b-44f5-8097-b4abfc8c9e0d",
+    "published" : {
+      "versionId" : "6739343a-66ff-4d04-8260-bbeb690622fb",
+      "publicationId" : "8ede9cea-2bd3-4610-b3f6-401d5a327c48",
+      "status" : "PUBLISHED"
+    },
+    "failedVersionDiagnostics" : "3af81a75-b4ff-472b-88b9-ef5d3ee9de2e",
+    "publishing" : {
+      "versionId" : "e49952f5-4322-4723-a37f-5ab3051131b6",
+      "publicationId" : "bfb22fce-4421-4ec6-ae6a-59916b9b9b0c",
+      "status" : "REQUESTED"
+    }
+  },
+  "storeRehashAfterSweep" : "outcome + artifactBytes verified for all four VERIFIED versions",
+  "case" : "cleanup never deletes published, publishing, current-preview or usable versions"
+}

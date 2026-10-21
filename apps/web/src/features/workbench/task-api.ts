@@ -1,4 +1,5 @@
-import { ApiError, requestJson } from '../../api/http'
+import { ApiError } from '../../api/http'
+import { requestFeatureJson as requestJson } from './feature-request'
 import { session } from '../auth/session'
 
 export const stages = ['PLAN', 'GENERATE', 'VERIFY', 'REPAIR', 'READY', 'FAILED'] as const

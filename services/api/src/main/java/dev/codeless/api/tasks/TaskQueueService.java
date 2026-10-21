@@ -7,6 +7,8 @@ import dev.codeless.api.data.PlatformModels.Task;
 import dev.codeless.api.data.PlatformModels.TaskStatus;
 import dev.codeless.api.data.PlatformRepository;
 import dev.codeless.api.data.TaskProgressService;
+import dev.codeless.api.recovery.DraftConvergence;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -21,11 +23,14 @@ public class TaskQueueService {
     private final JdbcClient jdbc;
     private final PlatformRepository repository;
     private final TaskProgressService progress;
+    private final DraftConvergence drafts;
 
-    public TaskQueueService(JdbcClient jdbc, PlatformRepository repository, TaskProgressService progress) {
+    public TaskQueueService(JdbcClient jdbc, PlatformRepository repository, TaskProgressService progress,
+                            DraftConvergence drafts) {
         this.jdbc = jdbc;
         this.repository = repository;
         this.progress = progress;
+        this.drafts = drafts;
     }
 
     public record TaskView(UUID id, UUID applicationId, String prompt, TaskStatus status,
@@ -78,6 +83,7 @@ public class TaskQueueService {
         progress.transition(taskId, TaskStatus.FAILED, EventType.TASK_FAILED,
                 "Task cancelled by user", "CANCELLED");
         finish(taskId);
+        drafts.failDrafts(taskId);
         return find(ownerId, taskId).orElseThrow();
     }
 
@@ -97,11 +103,23 @@ public class TaskQueueService {
         progress.transition(taskId, TaskStatus.FAILED, EventType.TASK_FAILED,
                 "Task cancelled by administrator", "CANCELLED");
         finish(taskId);
+        drafts.failDrafts(taskId);
         return Optional.of(new AdminCancel(task.status(), TaskStatus.FAILED, true));
     }
 
+    /** Legacy claim: the lease lasts until the task deadline and is never renewed. */
     @Transactional
     public Optional<Claim> claim() {
+        return claim(null);
+    }
+
+    /**
+     * Claim with a short lease that only a live worker renews ({@link #renew}). After a crash nothing renews it,
+     * so expiry recovery converges the task within one lease instead of waiting for the 12 minute deadline.
+     */
+    @Transactional
+    public Optional<Claim> claim(Duration lease) {
+        String expiry = lease == null ? "deadline_at" : "LEAST(deadline_at, clock_timestamp() + make_interval(secs => ?))";
         Optional<UUID> candidate = jdbc.sql("""
                 SELECT t.id FROM generation_tasks t
                 JOIN applications a ON a.id = t.application_id
@@ -117,16 +135,32 @@ public class TaskQueueService {
         // The SELECT's snapshot may predate another claimant's commit even when the
         // application row is now locked by us. A new READ COMMITTED statement must
         // recheck the application before changing QUEUED to RUNNING.
-        int changed = jdbc.sql("""
+        var update = jdbc.sql("""
                 UPDATE generation_tasks SET queue_state = 'RUNNING', lease_token = ?,
-                    lease_expires_at = deadline_at, row_version = row_version + 1
+                    lease_expires_at = %s, row_version = row_version + 1
                 WHERE id = ? AND queue_state = 'QUEUED' AND deadline_at > clock_timestamp()
                   AND NOT EXISTS (SELECT 1 FROM generation_tasks active
                                   WHERE active.application_id = generation_tasks.application_id
                                     AND active.queue_state = 'RUNNING')
-                """).params(token, candidate.get()).update();
+                """.formatted(expiry)).param(token);
+        if (lease != null) update = update.param(seconds(lease));
+        int changed = update.param(candidate.get()).update();
         if (changed != 1) return Optional.empty();
         return Optional.of(new Claim(candidate.get(), token, TaskStatus.PLAN));
+    }
+
+    /**
+     * Heartbeat of a live worker. Extends a still-valid lease, never beyond the task deadline. Returns false once
+     * the task was cancelled, finished or its lease already expired; a lost lease is never revived.
+     */
+    @Transactional
+    public boolean renew(Claim claim, Duration lease) {
+        return jdbc.sql("""
+                UPDATE generation_tasks
+                SET lease_expires_at = LEAST(deadline_at, clock_timestamp() + make_interval(secs => ?))
+                WHERE id = ? AND lease_token = ? AND queue_state = 'RUNNING'
+                  AND lease_expires_at > clock_timestamp() AND deadline_at > clock_timestamp()
+                """).params(seconds(lease), claim.taskId(), claim.token()).update() == 1;
     }
 
     @Transactional
@@ -134,11 +168,18 @@ public class TaskQueueService {
                             String message, String failureCode) {
         progress.transitionLeased(claim.taskId(), claim.token(), next, eventType, message, failureCode);
         if (terminal(next)) finish(claim.taskId());
+        if (next == TaskStatus.FAILED) drafts.failDrafts(claim.taskId());
         return TaskView.from(repository.findTask(claim.taskId()).orElseThrow());
     }
 
     @Transactional
     public boolean recoverOneExpired() {
+        return recoverExpired().isPresent();
+    }
+
+    /** Recovers one expired task as FAILED/INTERRUPTED (never READY) and returns its ID for resource cleanup. */
+    @Transactional
+    public Optional<UUID> recoverExpired() {
         Optional<UUID> expired = jdbc.sql("""
                 SELECT id FROM generation_tasks
                 WHERE queue_state IN ('QUEUED', 'RUNNING')
@@ -146,14 +187,15 @@ public class TaskQueueService {
                        OR (queue_state = 'RUNNING' AND lease_expires_at <= clock_timestamp()))
                 ORDER BY deadline_at, id LIMIT 1 FOR UPDATE SKIP LOCKED
                 """).query(UUID.class).optional();
-        if (expired.isEmpty()) return false;
+        if (expired.isEmpty()) return Optional.empty();
         Task task = repository.findTask(expired.get()).orElseThrow();
         if (!terminal(task.status())) {
             progress.transition(task.id(), TaskStatus.FAILED, EventType.TASK_FAILED,
                     "Task interrupted or timed out; result is unknown", "INTERRUPTED");
         }
         finish(task.id());
-        return true;
+        drafts.failDrafts(task.id());
+        return Optional.of(task.id());
     }
 
     private Task lockedOwnedTask(UUID ownerId, UUID taskId) {
@@ -170,6 +212,11 @@ public class TaskQueueService {
                 UPDATE generation_tasks SET queue_state = 'FINISHED', lease_token = NULL,
                     lease_expires_at = NULL WHERE id = ?
                 """).param(id).update();
+    }
+
+    private static double seconds(Duration lease) {
+        if (lease.isNegative() || lease.isZero()) throw new IllegalArgumentException("lease must be positive");
+        return lease.toMillis() / 1000.0;
     }
 
     private static boolean terminal(TaskStatus status) {

@@ -1,4 +1,4 @@
-import { requestJson } from '../../api/http'
+import { requestFeatureJson as requestJson } from '../workbench/feature-request'
 import { session } from '../auth/session'
 import { uuid } from '../workbench/task-api'
 import { digest, type Version } from '../versions/version-api'

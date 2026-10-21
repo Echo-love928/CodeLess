@@ -1,0 +1,157 @@
+{
+  "observedAtUTC": "2026-10-20T14:54:05.273039+00:00",
+  "B_before_followup": {
+    "headRefOid": "1cf20cf02e94e385c05ef9b325fd1e6a58cafa79",
+    "isDraft": true,
+    "reviews": [
+      {
+        "id": "PRR_kwDOUszp-M8AAAABTPrFpQ",
+        "author": {
+          "login": "yuanqizuimeng"
+        },
+        "authorAssociation": "COLLABORATOR",
+        "body": "D18-A 只读互审，仅针对候选 1cf20cf（运行时代码 2a0d284），基线 436c04a。\n\n**阻塞问题**\n本次范围内未发现 D18-B 代码阻塞。B 记录的完整门禁 e2e 73/74（D16-B 截图 T1 超时）仍按规则阻止合并，由本 PR 精确 HEAD 的必需检查决定。参考数据：同一 main 加 D18-A 的完整 gate 中，`tests/e2e/share/screenshot.spec.ts:5` 在我的机器上 5.0 秒通过（e2e 64/64），只能说明该用例对时序或环境敏感，不能替代本 PR 的检查。\n\n**建议（非阻塞）**\n1. `apps/web/src/features/workbench/feature-request.ts:8` 使用 `AbortSignal.any`。诊断请求总会传入调用方 signal，Safari < 17.4 / Firefox < 124 上会立即 TypeError，诊断区一直报错。若受控试用需要旧浏览器，可改为监听调用方 signal 再中止内部 controller。\n2. 取消请求同样受 15 秒截止约束；超时后再次取消是安全的。D18-A-T2 在真实 PostgreSQL 上验证：所有者 8 次、管理员 4 次取消与过期回收、清理并发，0 异常，只有 1 条 TASK_FAILED。可写入 ui-errors。\n3. D18-A（#54）之后，服务重启后任务约一个租约（默认 60 秒）内转为 FAILED/INTERRUPTED；“连接中断，正在恢复”期间可提示约一分钟内确认最终状态。\n4. D18-A 会把中断/取消任务的 DRAFT 版本收敛为 FAILED，冻结报告只有 failureCode。main 已有的 `version-api.ts:64` 会显示 `INTERRUPTED · 构建 结果未知；退出码 未知`，语义正确；最后启用 PR 应在真实后端上断言这段文案。\n\n**已核验内容**（隔离 worktree，B 自带记录器，deterministic-mock）\n- 范围：对 services、contracts、scripts、.github、infra、锁文件的 diff 为空。\n- unit exit 0，26 个文件 196/196；build exit 0；browser exit 0，17/17（30.3 秒）。首次直接跑 browser 因缺 dist 失败，属前置条件，已保留记录。\n- 无死按钮 / 无限 loading：终态 aria-busy=false，重试与刷新可用、无取消按钮；刷新 503 后释放；挂起 POST 在 15 秒截止后转为“核对本次提交”，只发出 1 次 POST。\n- 重试不重复旧请求：已受理失败用新 key、新 ID，旧任务保持 FAILED；丢失响应后同 key 同 prompt 重放，只有 1 个任务。与服务端 D05 幂等一致。\n- 键盘：Ctrl/⌘+Enter 提交，Enter 只换行，输入法组合期间不提交；平台与 iframe 两侧 Esc 退出后焦点回到选择框。\n- 窄屏：375×812 与 812×375 无横向溢出，任务、日志、iframe 标题与版本记录可见（人工查看本次生成的截图）。\n- 安全：无 v-html，日志按文本渲染；改动与测试中无密钥或令牌模式；INTERRUPTED 与发布失败文案与 D18-A 的重启收敛语义一致。\n\n完整记录：https://github.com/Echo-love928/CodeLess/blob/codex/d18-a-recovery-lifecycle/tests/recovery/review-D18-B.md\n批准只针对 1cf20cf，不豁免合并门禁：最终 HEAD 的必需检查须真实 success、无未解决讨论；新提交需要重新审查。",
+        "submittedAt": "2026-10-20T14:26:11Z",
+        "includesCreatedEdit": false,
+        "reactionGroups": [],
+        "state": "APPROVED",
+        "commit": {
+          "oid": "1cf20cf02e94e385c05ef9b325fd1e6a58cafa79"
+        }
+      }
+    ],
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T13:57:01Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Echo-love928/CodeLess/actions/runs/39434748491/job/118668698345",
+        "name": "verify:static",
+        "startedAt": "2026-10-20T13:56:21Z",
+        "status": "COMPLETED",
+        "workflowName": "ci"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T14:03:41Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Echo-love928/CodeLess/actions/runs/39434748491/job/118668698762",
+        "name": "verify:api",
+        "startedAt": "2026-10-20T13:56:21Z",
+        "status": "COMPLETED",
+        "workflowName": "ci"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T13:57:53Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Echo-love928/CodeLess/actions/runs/39434748491/job/118668698255",
+        "name": "verify:runner",
+        "startedAt": "2026-10-20T13:56:20Z",
+        "status": "COMPLETED",
+        "workflowName": "ci"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T13:56:58Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Echo-love928/CodeLess/actions/runs/39434748491/job/118668698573",
+        "name": "infra-preflight",
+        "startedAt": "2026-10-20T13:56:21Z",
+        "status": "COMPLETED",
+        "workflowName": "ci"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T13:59:00Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Echo-love928/CodeLess/actions/runs/39434748491/job/118668697919",
+        "name": "verify:e2e",
+        "startedAt": "2026-10-20T13:56:20Z",
+        "status": "COMPLETED",
+        "workflowName": "ci"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T14:03:47Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Echo-love928/CodeLess/actions/runs/39434748491/job/118672523640",
+        "name": "ci-gate",
+        "startedAt": "2026-10-20T14:03:43Z",
+        "status": "COMPLETED",
+        "workflowName": "ci"
+      }
+    ],
+    "url": "https://github.com/Echo-love928/CodeLess/pull/53"
+  },
+  "A_readonly_reference": {
+    "headRefOid": "da842a681594bfbfaf78ea7ef478d95a8e0474d3",
+    "isDraft": true,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T14:30:33Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Echo-love928/CodeLess/actions/runs/39439371062/job/118684843614",
+        "name": "verify:static",
+        "startedAt": "2026-10-20T14:27:29Z",
+        "status": "COMPLETED",
+        "workflowName": "ci"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T14:36:39Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Echo-love928/CodeLess/actions/runs/39439371062/job/118684844734",
+        "name": "verify:api",
+        "startedAt": "2026-10-20T14:27:30Z",
+        "status": "COMPLETED",
+        "workflowName": "ci"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T14:29:00Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Echo-love928/CodeLess/actions/runs/39439371062/job/118684844261",
+        "name": "verify:runner",
+        "startedAt": "2026-10-20T14:27:29Z",
+        "status": "COMPLETED",
+        "workflowName": "ci"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T14:28:05Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Echo-love928/CodeLess/actions/runs/39439371062/job/118684844551",
+        "name": "infra-preflight",
+        "startedAt": "2026-10-20T14:27:29Z",
+        "status": "COMPLETED",
+        "workflowName": "ci"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T14:30:16Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Echo-love928/CodeLess/actions/runs/39439371062/job/118684844308",
+        "name": "verify:e2e",
+        "startedAt": "2026-10-20T14:27:29Z",
+        "status": "COMPLETED",
+        "workflowName": "ci"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T14:36:44Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Echo-love928/CodeLess/actions/runs/39439371062/job/118689774443",
+        "name": "ci-gate",
+        "startedAt": "2026-10-20T14:36:41Z",
+        "status": "COMPLETED",
+        "workflowName": "ci"
+      }
+    ],
+    "url": "https://github.com/Echo-love928/CodeLess/pull/54"
+  },
+  "approvalAppliesOnlyTo": "1cf20cf02e94e385c05ef9b325fd1e6a58cafa79",
+  "newApprovalRequiredAfterPush": true,
+  "realABIntegration": "NOT_RUN; checklist reserved for final enabling PR"
+}

@@ -1,0 +1,42 @@
+{
+  "faultInjection" : {
+    "result" : "CLEANUP_LINK_REJECTED, not followed",
+    "plantedLink" : "versions/<orphan>/evil -> versions/<published>"
+  },
+  "publicationsAndLatestPointerUnchanged" : true,
+  "protected" : {
+    "usableHistory" : "055f2c9a-ca82-4b5a-a9c0-60d15cfa309a",
+    "published" : {
+      "versionId" : "ae31ddbd-47f5-4de8-affe-80206f3f0599",
+      "publicationId" : "40ee7431-cb0f-4393-825a-2a59a880776d",
+      "status" : "PUBLISHED"
+    },
+    "failedVersionDiagnostics" : "e3e5eb73-0d64-4d3c-95fc-f40126fd2d7a",
+    "publishing" : {
+      "versionId" : "b71cdcdd-f8ab-4f5a-9a80-e8f9ceaa15da",
+      "publicationId" : "14c60d87-f19e-42e8-adaf-133ac5205e8a",
+      "status" : "REQUESTED"
+    },
+    "currentPreview" : "18b15804-6d46-4ed9-939a-cd4ee45c9f26"
+  },
+  "storeRehashAfterSweep" : "outcome + artifactBytes verified for all four VERIFIED versions",
+  "case" : "cleanup never deletes published, publishing, current-preview or usable versions",
+  "protectedTreesByteIdentical" : [ "versions/<id> (except the stale .outcome-777 attempt)", "artifacts/<buildId>", "workspaces/<sourceTask>" ],
+  "report" : {
+    "status" : "PARTIAL",
+    "startedAt" : "2026-10-20T13:54:46.107135600Z",
+    "cutoff" : "2026-10-20T12:54:46.107135600Z",
+    "removed" : {
+      "FAILED_TASK_WORKSPACE" : 1,
+      "ORPHAN_ARTIFACT" : 1,
+      "ORPHAN_VERSION" : 1,
+      "PENDING_VERSION_ATTEMPT" : 1
+    },
+    "kept" : {
+      "PROTECTED" : 4,
+      "REFERENCED" : 9
+    },
+    "removedPaths" : [ "versions/3d367710-71c9-45ba-ad18-49811f558a03", "versions/ae31ddbd-47f5-4de8-affe-80206f3f0599/.outcome-777", "artifacts/0bc52b6c-5d45-432c-ad37-55fbdfb8cd9f", "workspaces/72423de7-9cc2-44f6-9cb4-b99546e846de" ],
+    "errors" : [ "CLEANUP_LINK_REJECTED:versions/098b832f-efd3-4882-9998-5cfd3d7302a4" ]
+  }
+}
