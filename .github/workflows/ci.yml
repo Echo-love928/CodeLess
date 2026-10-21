@@ -94,6 +94,23 @@ jobs:
           include-hidden-files: true
           if-no-files-found: warn
           retention-days: 7
+      - name: Retain deterministic full-flow failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: d20-full-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            .local-data/d20-b/runs/**/run.json
+            .local-data/d20-b/runs/**/identities.json
+            .local-data/d20-b/runs/**/playwright.json
+            .local-data/d20-b/runs/**/api.log
+            .local-data/d20-b/runs/**/browser.log
+            .local-data/d20-b/runs/**/failure-*.png
+            .local-data/d20-b/runs/**/failure-*-trace.zip
+            .local-data/d20-b/runs/**/browser/**
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
 
   ci-gate:
     name: ci-gate
