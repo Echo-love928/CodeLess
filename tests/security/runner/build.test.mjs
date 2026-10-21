@@ -42,7 +42,9 @@ test('D19 T1: real container denies external, management and metadata connection
   await evidence('T1-build-isolation', { result, proof })
 })
 test('D19 T2: timeout kills the container and its child; exact container is absent after cleanup', { timeout: 30000 }, async () => {
-  const result = await run('timeout', 2000)
+  // Allow cold container/Node startup while retaining the real child marker,
+  // TIMEOUT/137 and complete removal assertions. Production limits are unchanged.
+  const result = await run('timeout', 5000)
   assert.equal(result.status, 'FAILED'); assert.equal(result.failure, 'TIMEOUT', JSON.stringify(result))
   assert.equal(result.exitCode, 137); assert.equal(result.artifact, null)
   assert.match(result.log.text, /D19_CHILD_RUNNING/)

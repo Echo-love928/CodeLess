@@ -60,7 +60,10 @@ test('D19 T3/T4: real preview gateway and HTTPS nginx isolate credentials, CSP, 
     const publicPort = JSON.parse(docker(['inspect', name]))[0].NetworkSettings.Ports['8443/tcp'][0].HostPort
     const publicUrl = 'https://d' + deployment.replaceAll('-', '') + '.sites.codeless-public.test:' + publicPort
     browser = await chromium.launch({ args: ['--host-resolver-rules=MAP *.test 127.0.0.1', '--no-proxy-server'] })
-    const context = await browser.newContext({ ignoreHTTPSErrors: true }) // local self-signed fixture, no public TLS claim
+    const context = await browser.newContext({ ignoreHTTPSErrors: true,
+      // Local fixtures bypass inherited OS/browser proxy configuration. Every
+      // other destination fails through the non-forwarding proxy and route below.
+      proxy: { server: 'http://127.0.0.1:9', bypass: '*.test,127.0.0.1' } }) // local self-signed fixture, no public TLS claim
     await context.route('**/*', route => [platform, previewUrl, publicUrl].includes(new URL(route.request().url()).origin) ? route.continue() : route.abort())
     await context.addCookies([{ name: 'JSESSIONID', value: 'd19-platform-session', url: platform, secure: true, httpOnly: true, sameSite: 'Lax' },
       { name: 'platform-marker', value: 'd19-marker', url: platform, secure: true }])
@@ -107,10 +110,16 @@ test('D19 T3/T4: real preview gateway and HTTPS nginx isolate credentials, CSP, 
     // Native postMessage from the real bridge establishes the production session.
     await page.evaluate(async ({ previewUrl, version }) => {
       const { createSelectorSession } = await import('/session.js')
-      window.selections = []; window.ready = false
+      window.selections = []; window.ready = false; window.replayDeliveries = 0; window.expectedReplay = null
       window.session = createSelectorSession({ frame: document.querySelector('#preview').contentWindow, origin: previewUrl, versionId: version,
         onSelection: value => { if (value) window.selections.push(value) }, onExit() {}, onReady() { window.ready = true } })
-      addEventListener('message', event => window.session.receive(event)); window.session.probe()
+      addEventListener('message', event => {
+        window.session.receive(event)
+        // Count only the exact replay from this preview after receive has run.
+        // Counting does not depend on whether the session accepts the message.
+        if (event.source === document.querySelector('#preview').contentWindow && event.origin === previewUrl &&
+            window.expectedReplay && JSON.stringify(event.data) === JSON.stringify(window.expectedReplay)) window.replayDeliveries++
+      }); window.session.probe()
     }, { previewUrl, version })
     await page.waitForFunction(() => window.ready)
     await page.evaluate(() => window.session.mode(true))
@@ -137,16 +146,18 @@ test('D19 T3/T4: real preview gateway and HTTPS nginx isolate credentials, CSP, 
     assert.equal(await page.evaluate(() => window.selections.length), 0)
     await frame.locator('body').evaluate((_node, selection) => parent.postMessage(selection, '*'), selection)
     await page.waitForFunction(() => window.selections.length === 1)
+    await page.evaluate(selection => { window.expectedReplay = selection; window.replayDeliveries = 0 }, selection)
     await page.evaluate(() => window.session.close())
     await frame.locator('body').evaluate((_node, selection) => parent.postMessage(selection, '*'), selection)
-    await page.evaluate(() => new Promise(done => setTimeout(done, 0)))
-    assert.equal(await page.evaluate(() => window.selections.length), 1)
+    await page.waitForFunction(() => window.replayDeliveries === 1)
+    assert.equal(await page.evaluate(() => window.selections.length), 1, 'delivered replay after close must not select')
     for (const path of ['/__deployment.json', '/.env', '/.git/config', '/assets/../__deployment.json', '/assets/missing.js', '/api/v0/admin']) {
       const result = await publicPage.goto(publicUrl + path); assert.equal(result.status(), 404, path); violations.push({ path, status: result.status() })
     }
     assert.throws(() => previewOrigins(platform, platform), /separate/)
     assert.throws(() => publicationSite('https://public.codeless.test', platform, preview), /separate/)
-    await evidence('T3-T4-site-boundaries', { previewRead, publicRead, credentialLeaksAtGateway: 0, rejectedMessages: 6, acceptedMessages: 1, closedSessionReplayRejected: true,
+    await evidence('T3-T4-site-boundaries', { previewRead, publicRead, credentialLeaksAtGateway: 0, rejectedMessages: 6, acceptedMessages: 1,
+      closedSessionReplayDeliveries: await page.evaluate(() => window.replayDeliveries), closedSessionReplayRejected: true,
       publicInlineScriptBlocked: true, publicEmbeddingBlocked: true, publicCsp: response.headers()['content-security-policy'], violations, transport: 'LOCAL_TLS_FIXTURE_REAL_GATEWAY_NGINX_CHROMIUM' })
   } finally {
     if (browser) await browser.close()

@@ -2,6 +2,8 @@
 
 基线 `3ec4b99fbc262aef20e72c23cfe34d0da0740ef9`。本专项沿用 D01 固定版本，不新增模型工具、依赖、公共契约或网络权限。
 
+587f830复审后，站点测试显式设置本地代理bypass，并在确认准确的原生重放消息已送达、经过生产receive后才断言close拒绝；不再用setTimeout(0)代替跨进程消息送达。对应故障对照及六条建议的处理见D19-B交接顶部；新提交需要重新批准。
+
 ## 持续门禁
 
 `tests/infra/security-runner.test.mjs` 由既有 `pnpm verify:runner` 的 glob 发现，因此现有 CI runner job 与依赖它的 ci-gate 会执行本专项。11 项测试没有 skip、retry 或可选的基础设施降级。Docker、Chromium、TLS fixture 或断言失败均为非零退出；测试预期的安全拒绝只有在拒绝、目标未收到请求、清理等断言成立后才通过。
@@ -9,6 +11,9 @@
 ```powershell
 corepack pnpm install --frozen-lockfile
 node tests/security/runner/record-command.mjs security
+# 单独核验站点，以及复现审查发现的两个测试缺口
+node tests/security/runner/record-command.mjs site
+node tests/security/runner/evidence/2026-10-21/review-followup/fixture-controls.mjs
 # Windows 全阶段使用既有 Java21 和固定 pnpm shim
 New-Item -ItemType Directory -Force .local-data/d19-b/bin | Out-Null
 corepack enable --install-directory .local-data/d19-b/bin pnpm
@@ -23,7 +28,7 @@ Linux 直接使用锁定 Node24.16.0、pnpm12.6.0、Java21 与 Playwright1.60.0�
 | 子项 / 验收 | 测试与断言 |
 | --- | --- |
 | D19-B-01 / T1 | `build.test.mjs` 的固定测试镜像调用生产 `createBuildRunner`。非 root、只读根/输入、无宿主目录/socket/secret；宿主注入明确命名的三种秘密 fixture 后，容器仍不可见。对公网、10/172/192管理网段、169.254及100.100元数据连接要求明确 ENETUNREACH/EHOSTUNREACH/EACCES，超时不能当作拒绝证据。 |
-| D19-B-01 / T2 | 同测试镜像真正启动子进程，父任务2秒截止后真实 exit137、TIMEOUT、无产物、容器与工作目录已删除；独立 docker ps 为空、inspect 确认 No such container。回收依据为 Docker 终态及整个容器 PID namespace 被移除，不以宿主 Windows 的 PID 列表替代 Linux 容器进程。 |
+| D19-B-01 / T2 | 同测试镜像真正启动子进程，故障fixture采用5秒执行预算（包含容器/Node冷启动），要求真实exit137、TIMEOUT、子进程标记、无产物、容器与工作目录已删除；独立docker ps为空、inspect确认No such container。外层仍30秒，生产限额不变；旧2秒结果作为历史保留。回收依据为Docker终态及整个容器PID namespace被移除，不以宿主Windows的PID列表替代Linux容器进程。 |
 | D19-B-02 / T1 | `network.test.mjs` 拒绝私网/元数据/保留/IPv6/数字地址；25种 HTTP redirect 状态与目标组合只允许第一次固定 HTTPS 请求，不跟随 Location。绑定地址由自有 lookup 返回，TLS/SNI证书校验未关闭，拒绝未知文件、超量字节、同长度篡改与挂起流。 |
 | D19-B-02 / T4 | `browser.test.mjs` 对真实私网 canary 的 fetch/导航和 metadata/WebSocket 攻击失败且 canary hits=0；真实 Chromium 忙循环无法通过验证。截图在真实 Chromium 执行私网导航、WebSocket与忙循环，均失败、无PNG且确认 browserClosed。 |
 | D19-B-03 / T3 | `site.test.mjs` 使用真实预览 gateway、TLS nginx 和 Chromium，在同一浏览器上下文种入平台 HttpOnly会话、普通Cookie、LocalStorage和SessionStorage。预览读取 parent、公开站点读取 opener 都抛 SecurityError；生成站点自身存储无平台值，gateway 未收到平台Cookie。 |

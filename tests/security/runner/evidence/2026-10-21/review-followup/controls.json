@@ -1,0 +1,58 @@
+[
+  {
+    "name": "baseline-proxy",
+    "fault": "proxy",
+    "expectedExit": 1,
+    "actualExit": 1,
+    "signal": null,
+    "startedAt": "2026-10-21T07:05:32.948Z",
+    "completedAt": "2026-10-21T07:05:37.885Z",
+    "variantSha256": "58afe8feb51933584378964d1f9ee9f5bdc9128e0ef496bb0ec8086ce1de3e21",
+    "logSha256": "0bbdb17089c9b67380188044212a7c008b4c19e58b70685b18e83caa1dc41fb7",
+    "testsExpectedToFail": false,
+    "baselineFalsePass": false,
+    "diagnostic": "(node:15388) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n✖ D19 T3/T4: real preview gateway and HTTPS nginx isolate credentials, CSP, messages and hosting paths (4513.0964ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 4857.4994\n\n✖ failing tests:\n\ntest at .local-data\\d19-b\\review-followup\\2026-10-21T07-05-32.880Z\\baseline-proxy.test.mjs:22:1\n✖ D19 T3/T4: real preview gateway and HTTPS nginx isolate credentials, CSP, messages and hosting paths (4513.0964ms)\n  page.goto: net::ERR_PROXY_CONNECTION_FAILED at https://platform.codeless.test:60140/\n  Call log:\n  \u001b[2m  - navigating to \"https://platform.codeless.test:60140/\", waiting until \"load\"\u001b[22m\n  \n      at TestContext.<anonymous> (C:\\Users\\12058\\Documents\\ChatGPT\\CodeLess\\.worktrees\\d19-b\\.local-data\\d19-b\\review-followup\\2026-10-21T07-05-32.880Z\\baseline-proxy.test.mjs:69:16) {\n    name: 'Error'\n  }\n"
+  },
+  {
+    "name": "fixed-proxy",
+    "fault": "proxy",
+    "expectedExit": 0,
+    "actualExit": 0,
+    "signal": null,
+    "startedAt": "2026-10-21T07:05:37.887Z",
+    "completedAt": "2026-10-21T07:05:41.111Z",
+    "variantSha256": "20661128fe1f61c8eaffec1f4f7f3674e3cdda0e19614af56104040e16b3c993",
+    "logSha256": "f69f387f98a46d5507091106ded94c826ebcdd1314ac54dcbc1dc8911eb28b02",
+    "testsExpectedToFail": false,
+    "baselineFalsePass": false,
+    "diagnostic": "(node:8744) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n✔ D19 T3/T4: real preview gateway and HTTPS nginx isolate credentials, CSP, messages and hosting paths (2801.6803ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 3146.9095\n"
+  },
+  {
+    "name": "baseline-delayed-close-mutant",
+    "fault": "replay",
+    "expectedExit": 0,
+    "actualExit": 0,
+    "signal": null,
+    "startedAt": "2026-10-21T07:05:41.114Z",
+    "completedAt": "2026-10-21T07:05:44.291Z",
+    "variantSha256": "cf6cb5f5c98c0e43bf676c8aaf0f79624546bfb871e698cf302ed8796f61ba65",
+    "logSha256": "560eacd1f175347f0d262d02b5ee32ebb5d307e4bff49444e0a8d11c4ff08747",
+    "testsExpectedToFail": false,
+    "baselineFalsePass": true,
+    "diagnostic": "(node:47504) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n✔ D19 T3/T4: real preview gateway and HTTPS nginx isolate credentials, CSP, messages and hosting paths (2760.9132ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 3098.3163\n"
+  },
+  {
+    "name": "fixed-delayed-close-mutant",
+    "fault": "replay",
+    "expectedExit": 1,
+    "actualExit": 1,
+    "signal": null,
+    "startedAt": "2026-10-21T07:05:44.293Z",
+    "completedAt": "2026-10-21T07:05:48.451Z",
+    "variantSha256": "5100fdb557dd47fc6aace143857ebb40a8aa7e7d4b03f8fea81d93b6fb8a7cff",
+    "logSha256": "ac2db5c5900f4e0bdee1f2ecbae3e78a5094648c8124b440d5ea37e469f66d43",
+    "testsExpectedToFail": true,
+    "baselineFalsePass": false,
+    "diagnostic": "(node:27424) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n✖ D19 T3/T4: real preview gateway and HTTPS nginx isolate credentials, CSP, messages and hosting paths (3737.5022ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 4081.5845\n\n✖ failing tests:\n\ntest at .local-data\\d19-b\\review-followup\\2026-10-21T07-05-32.880Z\\fixed-delayed-close-mutant.test.mjs:22:1\n✖ D19 T3/T4: real preview gateway and HTTPS nginx isolate credentials, CSP, messages and hosting paths (3737.5022ms)\n  AssertionError [ERR_ASSERTION]: delivered replay after close must not select\n  \n  2 !== 1\n  \n      at TestContext.<anonymous> (file:///C:/Users/12058/Documents/ChatGPT/CodeLess/.worktrees/d19-b/.local-data/d19-b/review-followup/2026-10-21T07-05-32.880Z/fixed-delayed-close-mutant.test.mjs:153:12)\n      at async Test.run (node:internal/test_runner/test:1313:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: 2,\n    expected: 1,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n"
+  }
+]

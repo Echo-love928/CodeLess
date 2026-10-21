@@ -6,6 +6,7 @@ import { createWriteStream } from 'node:fs'
 
 const mode = process.argv[2]
 const commands = {
+  site: [process.execPath, ['--test', 'tests/security/runner/site.test.mjs']],
   store: [process.execPath, ['--test', 'tests/security/runner/store.test.mjs']],
   security: [process.execPath, ['--test', 'tests/infra/security-runner.test.mjs']],
   gate: [process.execPath, ['scripts/ci-gate.mjs']],
@@ -26,9 +27,14 @@ let [command, args] = commands[mode]
 if (command === 'pnpm' && process.platform === 'win32') { command = 'cmd.exe'; args = ['/d', '/s', '/c', 'pnpm', ...args] }
 const revision = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim()
 const status = spawnSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).stdout
-const tracked = spawnSync('git', ['ls-files', 'services/runner', 'infra', 'tests/security/runner', 'tests/infra/security-runner.test.mjs', '--cached', '--others', '--exclude-standard'], { encoding: 'utf8' }).stdout.trim().split(/\r?\n/)
-const sources = {}
-for (const path of new Set(tracked.filter(path => path && !path.includes('/evidence/')))) sources[path] = createHash('sha256').update(await readFile(path)).digest('hex')
+async function sourceSnapshot() {
+  const tracked = spawnSync('git', ['ls-files', 'services/runner', 'infra', 'tests/security/runner', 'tests/infra/security-runner.test.mjs', '--cached', '--others', '--exclude-standard'], { encoding: 'utf8' }).stdout.trim().split(/\r?\n/)
+  const sources = {}
+  for (const path of new Set(tracked.filter(path => path && !path.includes('/evidence/')))) sources[path] = createHash('sha256').update(await readFile(path)).digest('hex')
+  return sources
+}
+const sources = await sourceSnapshot()
+const initialCanonicalReasons = status.trim() ? ['WORKTREE_DIRTY_AT_START'] : []
 const output = []
 const originals = new Map()
 if (['gate', 'e2e', 'api', 'runner'].includes(mode)) {
@@ -36,7 +42,9 @@ if (['gate', 'e2e', 'api', 'runner'].includes(mode)) {
   for (const path of paths.filter(path => path.includes('/evidence/'))) originals.set(path, await readFile(path))
 }
 const log = createWriteStream(join(directory, 'command.log'), { flags: 'wx' })
-await writeFile(join(directory, 'run.json'), JSON.stringify({ mode, command, args, startedAt, revision, status, sources, exitCode: null, state: 'RUNNING' }, null, 2))
+await writeFile(join(directory, 'run.json'), JSON.stringify({ mode, command, args, startedAt, revision, status, sources,
+  canonical: initialCanonicalReasons.length ? false : null, canonicalReasons: initialCanonicalReasons,
+  revisionRole: 'CHECKOUT_REFERENCE', exitCode: null, state: 'RUNNING' }, null, 2))
 console.log(JSON.stringify({ directory, mode, state: 'RUNNING' }))
 const child = spawn(command, args, { env, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] })
 for (const stream of [child.stdout, child.stderr]) stream.on('data', bytes => { output.push(bytes); log.write(bytes) })
@@ -52,7 +60,13 @@ child.once('close', async (exitCode, signal) => {
     await mkdir(resolve(destination, '..'), { recursive: true }); await writeFile(destination, generated)
     await writeFile(path, original); restoredHistory.push(path)
   }
-  const result = { mode, command, args, startedAt, completedAt: new Date().toISOString(), revision, status, sources,
+  const revisionAtEnd = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim()
+  const finalSources = await sourceSnapshot(), canonicalReasons = [...initialCanonicalReasons]
+  if (revisionAtEnd !== revision) canonicalReasons.push('HEAD_CHANGED_DURING_RUN')
+  if (JSON.stringify(finalSources) !== JSON.stringify(sources)) canonicalReasons.push('SOURCE_CHANGED_DURING_RUN')
+  const canonical = canonicalReasons.length === 0
+  const result = { mode, command, args, startedAt, completedAt: new Date().toISOString(), revision, revisionAtEnd, status, sources,
+    canonical, canonicalReasons, revisionRole: 'CHECKOUT_REFERENCE', codeIdentity: canonical ? 'COMMIT' : 'WORKTREE_SOURCE_SNAPSHOT',
     exitCode, signal, restoredHistory, logSha256: createHash('sha256').update(bytes).digest('hex'), modelProvider: 'deterministic-mock', realModelCalls: 0 }
   await writeFile(join(directory, 'run.json'), JSON.stringify(result, null, 2))
   console.log(JSON.stringify({ directory, exitCode, signal, tail: bytes.toString('utf8').slice(-5000) }, null, 2))
