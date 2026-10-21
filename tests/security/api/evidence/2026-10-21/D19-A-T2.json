@@ -1,0 +1,2067 @@
+{
+  "violations" : [ ],
+  "safeMethodTricks" : {
+    "HEAD cancel" : 405,
+    "POST with X-HTTP-Method-Override" : 403,
+    "GET cancel" : 405
+  },
+  "foreignOriginGetsNoCorsGrant" : true,
+  "tokenVariants" : [ {
+    "route" : "POST /api/v0/auth/login",
+    "token" : "missing",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/auth/login",
+    "token" : "other session's valid token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/auth/login",
+    "token" : "upper-cased own token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/auth/login",
+    "token" : "empty",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/auth/login",
+    "token" : "own token truncated",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/auth/login",
+    "token" : "own token in query string only",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/auth/logout",
+    "token" : "missing",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/auth/logout",
+    "token" : "other session's valid token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/auth/logout",
+    "token" : "upper-cased own token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/auth/logout",
+    "token" : "empty",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/auth/logout",
+    "token" : "own token truncated",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/auth/logout",
+    "token" : "own token in query string only",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications",
+    "token" : "missing",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications",
+    "token" : "other session's valid token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications",
+    "token" : "upper-cased own token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications",
+    "token" : "empty",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications",
+    "token" : "own token truncated",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications",
+    "token" : "own token in query string only",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/admin/tasks/{taskId}/cancel",
+    "token" : "missing",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/admin/tasks/{taskId}/cancel",
+    "token" : "other session's valid token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/admin/tasks/{taskId}/cancel",
+    "token" : "upper-cased own token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/admin/tasks/{taskId}/cancel",
+    "token" : "empty",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/admin/tasks/{taskId}/cancel",
+    "token" : "own token truncated",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/admin/tasks/{taskId}/cancel",
+    "token" : "own token in query string only",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/versions/{versionId}/component-selection",
+    "token" : "missing",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/versions/{versionId}/component-selection",
+    "token" : "other session's valid token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/versions/{versionId}/component-selection",
+    "token" : "upper-cased own token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/versions/{versionId}/component-selection",
+    "token" : "empty",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/versions/{versionId}/component-selection",
+    "token" : "own token truncated",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/versions/{versionId}/component-selection",
+    "token" : "own token in query string only",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials",
+    "token" : "missing",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials",
+    "token" : "other session's valid token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials",
+    "token" : "upper-cased own token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials",
+    "token" : "empty",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials",
+    "token" : "own token truncated",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/preview-credentials",
+    "token" : "own token in query string only",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/publications",
+    "token" : "missing",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/publications",
+    "token" : "other session's valid token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/publications",
+    "token" : "upper-cased own token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/publications",
+    "token" : "empty",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/publications",
+    "token" : "own token truncated",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/publications",
+    "token" : "own token in query string only",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "PATCH /api/v0/applications/{applicationId}",
+    "token" : "missing",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "PATCH /api/v0/applications/{applicationId}",
+    "token" : "other session's valid token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "PATCH /api/v0/applications/{applicationId}",
+    "token" : "upper-cased own token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "PATCH /api/v0/applications/{applicationId}",
+    "token" : "empty",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "PATCH /api/v0/applications/{applicationId}",
+    "token" : "own token truncated",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "PATCH /api/v0/applications/{applicationId}",
+    "token" : "own token in query string only",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/restore",
+    "token" : "missing",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/restore",
+    "token" : "other session's valid token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/restore",
+    "token" : "upper-cased own token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/restore",
+    "token" : "empty",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/restore",
+    "token" : "own token truncated",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/versions/{versionId}/restore",
+    "token" : "own token in query string only",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/tasks/{taskId}/cancel",
+    "token" : "missing",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/tasks/{taskId}/cancel",
+    "token" : "other session's valid token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/tasks/{taskId}/cancel",
+    "token" : "upper-cased own token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/tasks/{taskId}/cancel",
+    "token" : "empty",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/tasks/{taskId}/cancel",
+    "token" : "own token truncated",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/tasks/{taskId}/cancel",
+    "token" : "own token in query string only",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/tasks",
+    "token" : "missing",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/tasks",
+    "token" : "other session's valid token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/tasks",
+    "token" : "upper-cased own token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/tasks",
+    "token" : "empty",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/tasks",
+    "token" : "own token truncated",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/tasks",
+    "token" : "own token in query string only",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/edits",
+    "token" : "missing",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/edits",
+    "token" : "other session's valid token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/edits",
+    "token" : "upper-cased own token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/edits",
+    "token" : "empty",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/edits",
+    "token" : "own token truncated",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/edits",
+    "token" : "own token in query string only",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/component-edits",
+    "token" : "missing",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/component-edits",
+    "token" : "other session's valid token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/component-edits",
+    "token" : "upper-cased own token",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/component-edits",
+    "token" : "empty",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/component-edits",
+    "token" : "own token truncated",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  }, {
+    "route" : "POST /api/v0/applications/{applicationId}/component-edits",
+    "token" : "own token in query string only",
+    "status" : 403,
+    "code" : "CSRF_INVALID"
+  } ],
+  "case" : "D19-A-T2 writes cannot bypass CSRF",
+  "pathSpellings" : [ {
+    "request" : "POST /api;x=1/v0/auth/login",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /%61pi/v0/auth/login",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/%76%30/auth/login",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0;x=1/auth/login",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST //api/v0/auth/login",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api//v0/auth/login",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /./api/v0/auth/login",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /x/../api/v0/auth/login",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /API/v0/auth/login",
+    "status" : 404,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/%61uth/login",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/auth/login;x=1",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/auth/login;jsessionid=0",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/auth/login/",
+    "status" : 401,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api;x=1/v0/auth/logout",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /%61pi/v0/auth/logout",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/%76%30/auth/logout",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0;x=1/auth/logout",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST //api/v0/auth/logout",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api//v0/auth/logout",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /./api/v0/auth/logout",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /x/../api/v0/auth/logout",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /API/v0/auth/logout",
+    "status" : 404,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/%61uth/logout",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/auth/logout;x=1",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/auth/logout;jsessionid=0",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/auth/logout/",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api;x=1/v0/applications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /%61pi/v0/applications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/%76%30/applications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0;x=1/applications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST //api/v0/applications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api//v0/applications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /./api/v0/applications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /x/../api/v0/applications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /API/v0/applications",
+    "status" : 404,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/%61pplications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications;x=1",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications;jsessionid=0",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications/",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api;x=1/v0/admin/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /%61pi/v0/admin/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/%76%30/admin/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0;x=1/admin/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST //api/v0/admin/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api//v0/admin/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /./api/v0/admin/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /x/../api/v0/admin/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /API/v0/admin/tasks/{id}/cancel",
+    "status" : 404,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/%61dmin/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/admin/tasks/{id}/cancel;x=1",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/admin/tasks/{id}/cancel;jsessionid=0",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/admin/tasks/{id}/cancel/",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api;x=1/v0/versions/{id}/component-selection",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /%61pi/v0/versions/{id}/component-selection",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/%76%30/versions/{id}/component-selection",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0;x=1/versions/{id}/component-selection",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST //api/v0/versions/{id}/component-selection",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api//v0/versions/{id}/component-selection",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /./api/v0/versions/{id}/component-selection",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /x/../api/v0/versions/{id}/component-selection",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /API/v0/versions/{id}/component-selection",
+    "status" : 404,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/%76ersions/{id}/component-selection",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/versions/{id}/component-selection;x=1",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/versions/{id}/component-selection;jsessionid=0",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/versions/{id}/component-selection/",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api;x=1/v0/applications/{id}/versions/{id}/preview-credentials",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /%61pi/v0/applications/{id}/versions/{id}/preview-credentials",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/%76%30/applications/{id}/versions/{id}/preview-credentials",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0;x=1/applications/{id}/versions/{id}/preview-credentials",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST //api/v0/applications/{id}/versions/{id}/preview-credentials",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api//v0/applications/{id}/versions/{id}/preview-credentials",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /./api/v0/applications/{id}/versions/{id}/preview-credentials",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /x/../api/v0/applications/{id}/versions/{id}/preview-credentials",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /API/v0/applications/{id}/versions/{id}/preview-credentials",
+    "status" : 404,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/%61pplications/{id}/versions/{id}/preview-credentials",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/versions/{id}/preview-credentials;x=1",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/versions/{id}/preview-credentials;jsessionid=0",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/versions/{id}/preview-credentials/",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api;x=1/v0/publications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /%61pi/v0/publications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/%76%30/publications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0;x=1/publications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST //api/v0/publications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api//v0/publications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /./api/v0/publications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /x/../api/v0/publications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /API/v0/publications",
+    "status" : 404,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/%70ublications",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/publications;x=1",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/publications;jsessionid=0",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/publications/",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "PATCH /api;x=1/v0/applications/{id}",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "PATCH /%61pi/v0/applications/{id}",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "PATCH /api/%76%30/applications/{id}",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "PATCH /api/v0;x=1/applications/{id}",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "PATCH //api/v0/applications/{id}",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "PATCH /api//v0/applications/{id}",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "PATCH /./api/v0/applications/{id}",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "PATCH /x/../api/v0/applications/{id}",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "PATCH /API/v0/applications/{id}",
+    "status" : 404,
+    "sessionStillValid" : true
+  }, {
+    "request" : "PATCH /api/v0/%61pplications/{id}",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "PATCH /api/v0/applications/{id};x=1",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "PATCH /api/v0/applications/{id};jsessionid=0",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "PATCH /api/v0/applications/{id}/",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api;x=1/v0/applications/{id}/versions/{id}/restore",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /%61pi/v0/applications/{id}/versions/{id}/restore",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/%76%30/applications/{id}/versions/{id}/restore",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0;x=1/applications/{id}/versions/{id}/restore",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST //api/v0/applications/{id}/versions/{id}/restore",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api//v0/applications/{id}/versions/{id}/restore",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /./api/v0/applications/{id}/versions/{id}/restore",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /x/../api/v0/applications/{id}/versions/{id}/restore",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /API/v0/applications/{id}/versions/{id}/restore",
+    "status" : 404,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/%61pplications/{id}/versions/{id}/restore",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/versions/{id}/restore;x=1",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/versions/{id}/restore;jsessionid=0",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/versions/{id}/restore/",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api;x=1/v0/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /%61pi/v0/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/%76%30/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0;x=1/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST //api/v0/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api//v0/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /./api/v0/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /x/../api/v0/tasks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /API/v0/tasks/{id}/cancel",
+    "status" : 404,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/%74asks/{id}/cancel",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/tasks/{id}/cancel;x=1",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/tasks/{id}/cancel;jsessionid=0",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/tasks/{id}/cancel/",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api;x=1/v0/tasks",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /%61pi/v0/tasks",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/%76%30/tasks",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0;x=1/tasks",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST //api/v0/tasks",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api//v0/tasks",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /./api/v0/tasks",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /x/../api/v0/tasks",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /API/v0/tasks",
+    "status" : 404,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/%74asks",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/tasks;x=1",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/tasks;jsessionid=0",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/tasks/",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api;x=1/v0/applications/{id}/edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /%61pi/v0/applications/{id}/edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/%76%30/applications/{id}/edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0;x=1/applications/{id}/edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST //api/v0/applications/{id}/edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api//v0/applications/{id}/edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /./api/v0/applications/{id}/edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /x/../api/v0/applications/{id}/edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /API/v0/applications/{id}/edits",
+    "status" : 404,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/%61pplications/{id}/edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/edits;x=1",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/edits;jsessionid=0",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/edits/",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api;x=1/v0/applications/{id}/component-edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /%61pi/v0/applications/{id}/component-edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/%76%30/applications/{id}/component-edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0;x=1/applications/{id}/component-edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST //api/v0/applications/{id}/component-edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api//v0/applications/{id}/component-edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /./api/v0/applications/{id}/component-edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /x/../api/v0/applications/{id}/component-edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /API/v0/applications/{id}/component-edits",
+    "status" : 404,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/%61pplications/{id}/component-edits",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/component-edits;x=1",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/component-edits;jsessionid=0",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "POST /api/v0/applications/{id}/component-edits/",
+    "status" : 403,
+    "sessionStillValid" : true
+  }, {
+    "request" : "GET /api;x=1/v0/auth/me",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/auth/me",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/auth/me",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/auth/me",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/auth/me",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/auth/me",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/auth/me",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/auth/me",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/auth/me",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%61uth/me",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/auth/me;x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/auth/me;jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/auth/me/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/applications",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/applications",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/applications",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/applications",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/applications",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/applications",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/applications",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/applications",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/applications",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%61pplications",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/applications;x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/applications;jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/applications/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/admin/session",
+    "status" : 403
+  }, {
+    "request" : "GET /%61pi/v0/admin/session",
+    "status" : 403
+  }, {
+    "request" : "GET /api/%76%30/admin/session",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0;x=1/admin/session",
+    "status" : 403
+  }, {
+    "request" : "GET //api/v0/admin/session",
+    "status" : 403
+  }, {
+    "request" : "GET /api//v0/admin/session",
+    "status" : 403
+  }, {
+    "request" : "GET /./api/v0/admin/session",
+    "status" : 403
+  }, {
+    "request" : "GET /x/../api/v0/admin/session",
+    "status" : 403
+  }, {
+    "request" : "GET /API/v0/admin/session",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%61dmin/session",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/session;x=1",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/session;jsessionid=0",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/session/",
+    "status" : 403
+  }, {
+    "request" : "GET /api;x=1/v0/admin/users",
+    "status" : 403
+  }, {
+    "request" : "GET /%61pi/v0/admin/users",
+    "status" : 403
+  }, {
+    "request" : "GET /api/%76%30/admin/users",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0;x=1/admin/users",
+    "status" : 403
+  }, {
+    "request" : "GET //api/v0/admin/users",
+    "status" : 403
+  }, {
+    "request" : "GET /api//v0/admin/users",
+    "status" : 403
+  }, {
+    "request" : "GET /./api/v0/admin/users",
+    "status" : 403
+  }, {
+    "request" : "GET /x/../api/v0/admin/users",
+    "status" : 403
+  }, {
+    "request" : "GET /API/v0/admin/users",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%61dmin/users",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/users;x=1",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/users;jsessionid=0",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/users/",
+    "status" : 403
+  }, {
+    "request" : "GET /api;x=1/v0/admin/applications",
+    "status" : 403
+  }, {
+    "request" : "GET /%61pi/v0/admin/applications",
+    "status" : 403
+  }, {
+    "request" : "GET /api/%76%30/admin/applications",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0;x=1/admin/applications",
+    "status" : 403
+  }, {
+    "request" : "GET //api/v0/admin/applications",
+    "status" : 403
+  }, {
+    "request" : "GET /api//v0/admin/applications",
+    "status" : 403
+  }, {
+    "request" : "GET /./api/v0/admin/applications",
+    "status" : 403
+  }, {
+    "request" : "GET /x/../api/v0/admin/applications",
+    "status" : 403
+  }, {
+    "request" : "GET /API/v0/admin/applications",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%61dmin/applications",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/applications;x=1",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/applications;jsessionid=0",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/applications/",
+    "status" : 403
+  }, {
+    "request" : "GET /api;x=1/v0/admin/tasks",
+    "status" : 403
+  }, {
+    "request" : "GET /%61pi/v0/admin/tasks",
+    "status" : 403
+  }, {
+    "request" : "GET /api/%76%30/admin/tasks",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0;x=1/admin/tasks",
+    "status" : 403
+  }, {
+    "request" : "GET //api/v0/admin/tasks",
+    "status" : 403
+  }, {
+    "request" : "GET /api//v0/admin/tasks",
+    "status" : 403
+  }, {
+    "request" : "GET /./api/v0/admin/tasks",
+    "status" : 403
+  }, {
+    "request" : "GET /x/../api/v0/admin/tasks",
+    "status" : 403
+  }, {
+    "request" : "GET /API/v0/admin/tasks",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%61dmin/tasks",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/tasks;x=1",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/tasks;jsessionid=0",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/tasks/",
+    "status" : 403
+  }, {
+    "request" : "GET /api;x=1/v0/admin/deployments",
+    "status" : 403
+  }, {
+    "request" : "GET /%61pi/v0/admin/deployments",
+    "status" : 403
+  }, {
+    "request" : "GET /api/%76%30/admin/deployments",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0;x=1/admin/deployments",
+    "status" : 403
+  }, {
+    "request" : "GET //api/v0/admin/deployments",
+    "status" : 403
+  }, {
+    "request" : "GET /api//v0/admin/deployments",
+    "status" : 403
+  }, {
+    "request" : "GET /./api/v0/admin/deployments",
+    "status" : 403
+  }, {
+    "request" : "GET /x/../api/v0/admin/deployments",
+    "status" : 403
+  }, {
+    "request" : "GET /API/v0/admin/deployments",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%61dmin/deployments",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/deployments;x=1",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/deployments;jsessionid=0",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/deployments/",
+    "status" : 403
+  }, {
+    "request" : "GET /api;x=1/v0/admin/model-calls",
+    "status" : 403
+  }, {
+    "request" : "GET /%61pi/v0/admin/model-calls",
+    "status" : 403
+  }, {
+    "request" : "GET /api/%76%30/admin/model-calls",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0;x=1/admin/model-calls",
+    "status" : 403
+  }, {
+    "request" : "GET //api/v0/admin/model-calls",
+    "status" : 403
+  }, {
+    "request" : "GET /api//v0/admin/model-calls",
+    "status" : 403
+  }, {
+    "request" : "GET /./api/v0/admin/model-calls",
+    "status" : 403
+  }, {
+    "request" : "GET /x/../api/v0/admin/model-calls",
+    "status" : 403
+  }, {
+    "request" : "GET /API/v0/admin/model-calls",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%61dmin/model-calls",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/model-calls;x=1",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/model-calls;jsessionid=0",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/model-calls/",
+    "status" : 403
+  }, {
+    "request" : "GET /api;x=1/v0/admin/metrics",
+    "status" : 403
+  }, {
+    "request" : "GET /%61pi/v0/admin/metrics",
+    "status" : 403
+  }, {
+    "request" : "GET /api/%76%30/admin/metrics",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0;x=1/admin/metrics",
+    "status" : 403
+  }, {
+    "request" : "GET //api/v0/admin/metrics",
+    "status" : 403
+  }, {
+    "request" : "GET /api//v0/admin/metrics",
+    "status" : 403
+  }, {
+    "request" : "GET /./api/v0/admin/metrics",
+    "status" : 403
+  }, {
+    "request" : "GET /x/../api/v0/admin/metrics",
+    "status" : 403
+  }, {
+    "request" : "GET /API/v0/admin/metrics",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%61dmin/metrics",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/metrics;x=1",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/metrics;jsessionid=0",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/metrics/",
+    "status" : 403
+  }, {
+    "request" : "GET /api;x=1/v0/admin/audit",
+    "status" : 403
+  }, {
+    "request" : "GET /%61pi/v0/admin/audit",
+    "status" : 403
+  }, {
+    "request" : "GET /api/%76%30/admin/audit",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0;x=1/admin/audit",
+    "status" : 403
+  }, {
+    "request" : "GET //api/v0/admin/audit",
+    "status" : 403
+  }, {
+    "request" : "GET /api//v0/admin/audit",
+    "status" : 403
+  }, {
+    "request" : "GET /./api/v0/admin/audit",
+    "status" : 403
+  }, {
+    "request" : "GET /x/../api/v0/admin/audit",
+    "status" : 403
+  }, {
+    "request" : "GET /API/v0/admin/audit",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%61dmin/audit",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/audit;x=1",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/audit;jsessionid=0",
+    "status" : 403
+  }, {
+    "request" : "GET /api/v0/admin/audit/",
+    "status" : 403
+  }, {
+    "request" : "GET /api;x=1/v0/applications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/applications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/applications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/applications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/applications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/applications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/applications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/applications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/applications/{id}",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%61pplications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/applications/{id};x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/applications/{id};jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/applications/{id}/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/versions/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/versions/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/versions/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/versions/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/versions/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/versions/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/versions/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/versions/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/versions/{id}",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%76ersions/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id};x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id};jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/applications/{id}/versions",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/applications/{id}/versions",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/applications/{id}/versions",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/applications/{id}/versions",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/applications/{id}/versions",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/applications/{id}/versions",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/applications/{id}/versions",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/applications/{id}/versions",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/applications/{id}/versions",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%61pplications/{id}/versions",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/applications/{id}/versions;x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/applications/{id}/versions;jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/applications/{id}/versions/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/versions/{id}/files",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/versions/{id}/files",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/versions/{id}/files",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/versions/{id}/files",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/versions/{id}/files",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/versions/{id}/files",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/versions/{id}/files",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/versions/{id}/files",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/versions/{id}/files",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%76ersions/{id}/files",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/files;x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/files;jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/files/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/versions/{id}/files/content",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/versions/{id}/files/content",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/versions/{id}/files/content",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/versions/{id}/files/content",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/versions/{id}/files/content",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/versions/{id}/files/content",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/versions/{id}/files/content",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/versions/{id}/files/content",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/versions/{id}/files/content",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%76ersions/{id}/files/content",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/files/content;x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/files/content;jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/files/content/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/versions/{id}/snapshot",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/versions/{id}/snapshot",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/versions/{id}/snapshot",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/versions/{id}/snapshot",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/versions/{id}/snapshot",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/versions/{id}/snapshot",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/versions/{id}/snapshot",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/versions/{id}/snapshot",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/versions/{id}/snapshot",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%76ersions/{id}/snapshot",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/snapshot;x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/snapshot;jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/snapshot/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/versions/{id}/export",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/versions/{id}/export",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/versions/{id}/export",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/versions/{id}/export",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/versions/{id}/export",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/versions/{id}/export",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/versions/{id}/export",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/versions/{id}/export",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/versions/{id}/export",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%76ersions/{id}/export",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/export;x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/export;jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/export/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/versions/{id}/component-mapping",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/versions/{id}/component-mapping",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/versions/{id}/component-mapping",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/versions/{id}/component-mapping",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/versions/{id}/component-mapping",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/versions/{id}/component-mapping",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/versions/{id}/component-mapping",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/versions/{id}/component-mapping",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/versions/{id}/component-mapping",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%76ersions/{id}/component-mapping",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/component-mapping;x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/component-mapping;jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/versions/{id}/component-mapping/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/tasks/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/tasks/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/tasks/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/tasks/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/tasks/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/tasks/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/tasks/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/tasks/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/tasks/{id}",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%74asks/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/tasks/{id};x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/tasks/{id};jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/tasks/{id}/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/tasks/{id}/events",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/tasks/{id}/events",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/tasks/{id}/events",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/tasks/{id}/events",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/tasks/{id}/events",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/tasks/{id}/events",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/tasks/{id}/events",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/tasks/{id}/events",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/tasks/{id}/events",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%74asks/{id}/events",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/tasks/{id}/events;x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/tasks/{id}/events;jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/tasks/{id}/events/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/tasks/{id}/diagnostics",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/tasks/{id}/diagnostics",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/tasks/{id}/diagnostics",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/tasks/{id}/diagnostics",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/tasks/{id}/diagnostics",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/tasks/{id}/diagnostics",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/tasks/{id}/diagnostics",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/tasks/{id}/diagnostics",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/tasks/{id}/diagnostics",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%74asks/{id}/diagnostics",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/tasks/{id}/diagnostics;x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/tasks/{id}/diagnostics;jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/tasks/{id}/diagnostics/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/tasks/{id}/edit",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/tasks/{id}/edit",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/tasks/{id}/edit",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/tasks/{id}/edit",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/tasks/{id}/edit",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/tasks/{id}/edit",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/tasks/{id}/edit",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/tasks/{id}/edit",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/tasks/{id}/edit",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%74asks/{id}/edit",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/tasks/{id}/edit;x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/tasks/{id}/edit;jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/tasks/{id}/edit/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/publications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/publications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/publications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/publications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/publications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/publications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/publications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/publications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/publications/{id}",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%70ublications/{id}",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/publications/{id};x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/publications/{id};jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/publications/{id}/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/publications/{id}/deployment",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/publications/{id}/deployment",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/publications/{id}/deployment",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/publications/{id}/deployment",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/publications/{id}/deployment",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/publications/{id}/deployment",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/publications/{id}/deployment",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/publications/{id}/deployment",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/publications/{id}/deployment",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%70ublications/{id}/deployment",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/publications/{id}/deployment;x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/publications/{id}/deployment;jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/publications/{id}/deployment/",
+    "status" : 404
+  }, {
+    "request" : "GET /api;x=1/v0/applications/{id}/publications",
+    "status" : 400
+  }, {
+    "request" : "GET /%61pi/v0/applications/{id}/publications",
+    "status" : 400
+  }, {
+    "request" : "GET /api/%76%30/applications/{id}/publications",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0;x=1/applications/{id}/publications",
+    "status" : 400
+  }, {
+    "request" : "GET //api/v0/applications/{id}/publications",
+    "status" : 400
+  }, {
+    "request" : "GET /api//v0/applications/{id}/publications",
+    "status" : 400
+  }, {
+    "request" : "GET /./api/v0/applications/{id}/publications",
+    "status" : 400
+  }, {
+    "request" : "GET /x/../api/v0/applications/{id}/publications",
+    "status" : 400
+  }, {
+    "request" : "GET /API/v0/applications/{id}/publications",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/%61pplications/{id}/publications",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/applications/{id}/publications;x=1",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/applications/{id}/publications;jsessionid=0",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/applications/{id}/publications/",
+    "status" : 404
+  }, {
+    "request" : "GET /api/v0/auth/me;jsessionid={victim session} without cookie",
+    "status" : 401
+  }, {
+    "request" : "GET /api/v0/%zz/me",
+    "status" : 400
+  }, {
+    "request" : "GET /%zzpi/v0/auth/me",
+    "status" : 400
+  }, {
+    "request" : "GET /api/v0/auth/me%",
+    "status" : 400
+  } ],
+  "stateUnchanged" : true,
+  "source" : "ApiSecurityMatrixTest real HTTP + PostgreSQL"
+}
