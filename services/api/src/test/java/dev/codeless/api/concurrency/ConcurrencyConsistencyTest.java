@@ -938,6 +938,9 @@ class ConcurrencyConsistencyTest {
         publications.process(vanished);
         UUID pending = UUID.fromString(http.post(aliceTab1, "/api/v0/publications", body, "d20a-03-" + UUID.randomUUID()).json().path("id").asText());
         UUID readyTask = jdbc.sql("SELECT source_task_id FROM application_versions WHERE id=?").param(version).query(UUID.class).single();
+        // Whatever other applications already carry (nothing in a passing run) must be all that is left once the control
+        // application is excluded; an earlier test's leftover then fails that test's own audit, not this control.
+        var baseline = ConsistencyAudit.run(jdbc, transactions, snapshots, records, HOSTING, Set.of(app)).violations();
         // E1: a gap in the event sequence.
         jdbc.sql("INSERT INTO task_events(id,task_id,sequence,type,stage,message) SELECT ?,id,event_sequence+2,'TOOL_RESULT','READY','injected' FROM generation_tasks WHERE id=?")
                 .params(UUID.randomUUID(), readyTask).update();
@@ -972,10 +975,10 @@ class ConcurrencyConsistencyTest {
         var expected = List.of(List.of("E1", "task " + readyTask), List.of("V3", failing.toString()), List.of("P2", "publication " + pending),
                 List.of("P3", "publication " + pending), List.of("P4", "publication " + hosted), List.of("P4", "publication " + vanished));
         ConcurrencyHarness.evidence("D20-A-03-negative-control", Map.of("injected", expected, "violations", report.violations(),
-                "violationsWithControlApplicationExcluded", clean.violations()));
+                "violationsWithControlApplicationExcluded", clean.violations(), "violationsBeforeInjection", baseline));
         expected.forEach(pair -> assertThat(report.violations())
                 .as("audit must report %s for %s", pair.get(0), pair.get(1)).anyMatch(v -> v.startsWith(pair.get(0)) && v.contains(pair.get(1))));
-        assertThat(clean.violations()).isEmpty();
+        assertThat(clean.violations()).as("outside the control application").containsExactlyInAnyOrderElementsOf(baseline);
     }
 
     // ---------------------------------------------------------------- D20-A-04 freezes that outlast the lease (D20-B review)

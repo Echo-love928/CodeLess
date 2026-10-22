@@ -41,8 +41,10 @@ can pause the first freeze a predicate matches. `CODELESS_D20A_SLOW_FREEZE_MS` (
 `@slow` runs) adds a fixed delay to every freeze behind one monitor, emulating a slow volume serialized by the store.
 
 The audit after each test checks every row, but a violation fails only the test after which it first appears; later
-tests still audit everything and fail on anything new. One defect is reported once, by the test that produced it
-(the D20-B review run had one root failure in T3 and five later tests failing on the same rows).
+tests still audit everything and fail on anything new (the D20-B review run had one root failure in T3 and five later
+tests failing on the same rows). A leftover can still surface again under another invariant as it converges, for
+example V3 while its version is DRAFT and V2 once recovery failed it. The negative control compares the audit without
+its own application against the audit taken before its injections, so earlier leftovers do not fail it.
 
 ## Reproduce
 

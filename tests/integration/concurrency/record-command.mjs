@@ -24,10 +24,12 @@ const api = 'services/api/src/main/java/dev/codeless/api/'
 const acceptance = 'ConcurrencyConsistencyTest'
 const tests = {
   acceptance,
-  // Changed: VersionController list, PublicationService list/deployment. Plus the suites whose queue, cancel,
-  // convergence, edit and publication semantics the acceptance class relies on.
+  // Changed: VersionController list, PublicationService list/deployment, AgentRunStore draft/complete, TaskScheduler.
+  // Plus the suites whose queue, cancel, convergence, orphan sweep, store, edit and publication semantics the
+  // acceptance class relies on.
   regression: 'VersionHttpIntegrationTest,PublicationIntegrationTest,ProcessRestartRecoveryTest,ApiSecurityMatrixTest,'
-    + 'TaskQueueIntegrationTest,RecoveryConvergenceTest,EditLifecycleIntegrationTest,DeploymentRecordsTest',
+    + 'TaskQueueIntegrationTest,RecoveryConvergenceTest,EditLifecycleIntegrationTest,DeploymentRecordsTest,'
+    + 'StorageSweeperTest,LocalVolumeSnapshotStoreTest',
 }
 const mutationSets = {
   'mutation-version-snapshot': { revert: [api + 'versions/VersionController.java'],
