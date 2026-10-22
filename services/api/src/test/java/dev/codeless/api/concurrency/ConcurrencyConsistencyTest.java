@@ -625,7 +625,7 @@ class ConcurrencyConsistencyTest {
         UUID id = UUID.fromString(ids.iterator().next());
 
         // Instance 1 is inside hosting; duplicates, competing workers on both instances and a worker tick arrive meanwhile.
-        CountDownLatch inside = HOSTING.hold(1);
+        CountDownLatch inside = HOSTING.hold(Set.of(id));
         var during = new ArrayList<Object>();
         try (ExecutorService pool = Executors.newFixedThreadPool(10)) {
             Future<?> first = pool.submit(() -> publications.process(id));
@@ -768,7 +768,7 @@ class ConcurrencyConsistencyTest {
         assertThat(stale).containsOnlyKeys("v1WithForeignDigest", "v1WithV2Digest").allSatisfy((k, v) -> assertThat(v).isEqualTo(409));
 
         // Workers on both instances hold inside hosting while a second edit commits and restores flip the pointer.
-        CountDownLatch inside = HOSTING.hold(4);
+        CountDownLatch inside = HOSTING.hold(Set.copyOf(v1Publications));
         var pointer = new ArrayList<UUID>();
         UUID v3;
         UUID v2Publication;

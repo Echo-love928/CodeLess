@@ -119,17 +119,23 @@ final class ConcurrencyHarness {
         volatile String mode = "PASS";
         volatile CountDownLatch entered;
         volatile CountDownLatch release;
+        volatile Set<UUID> held = Set.of();
 
         void reset() {
             mode = "PASS";
             entered = null;
             release = null;
+            held = Set.of();
         }
 
-        /** The next publish calls block inside the gateway until {@link #open()}. */
-        CountDownLatch hold(int calls) {
+        /**
+         * Publishing exactly these publications blocks inside the gateway until {@link #open()}. Any other publication
+         * (for example one a failed earlier test left REQUESTED) passes straight through.
+         */
+        CountDownLatch hold(Set<UUID> publications) {
             release = new CountDownLatch(1);
-            entered = new CountDownLatch(calls);
+            entered = new CountDownLatch(publications.size());
+            held = Set.copyOf(publications);
             return entered;
         }
 
@@ -147,7 +153,7 @@ final class ConcurrencyHarness {
             publishes.computeIfAbsent(payload.publicationId(), id -> new AtomicInteger()).incrementAndGet();
             payloads.put(payload.publicationId(), payload);
             CountDownLatch arrived = entered, gate = release;
-            if (arrived != null && gate != null) {
+            if (arrived != null && gate != null && held.contains(payload.publicationId())) {
                 arrived.countDown();
                 try {
                     if (!gate.await(25, TimeUnit.SECONDS)) throw new IllegalStateException("DEPLOYMENT_TIMEOUT");
