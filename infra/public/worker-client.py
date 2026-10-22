@@ -23,7 +23,7 @@ def receive(connection, length):
 def main():
     args = sys.argv[1:]
     if args == ['--version']:
-        return subprocess.run(['/opt/codeless/tools/node-v24.16.0-linux-x64/bin/node', '--version'],
+        return subprocess.run(['/opt/codeless/tools/node-v24.22.1-linux-x64/bin/node', '--version'],
                               env={'PATH': '/usr/bin:/bin'}).returncode
     limit = 128 * 1024 if len(args) == 5 else 48 * 1024 * 1024
     data = sys.stdin.buffer.read(limit + 1)

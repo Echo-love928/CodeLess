@@ -129,7 +129,7 @@ test('D15-B-T1/T2/T3: real Docker/Vue/Chromium -> publication -> actual HTTPS Ng
       '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--pids-limit', '32', '--memory', '128m', '--cpus', '0.5',
       '--mount', `type=bind,source=${join(repository, 'services/runner/src/publish')},target=/probe,readonly`,
       '--mount', `type=bind,source=${join(repository, 'tests/e2e/deploy/probe-fixture.mjs')},target=/fixture.mjs,readonly`,
-      '--mount', `type=bind,source=${cert},target=/certs/server.pem,readonly`, 'node:24.16.0-bookworm-slim', 'node', '/fixture.mjs']
+      '--mount', `type=bind,source=${cert},target=/certs/server.pem,readonly`, 'node:24.22.1-bookworm-slim', 'node', '/fixture.mjs']
     const probe = JSON.parse(docker(probeArgs, JSON.stringify({ url: receipt.url, address, files: receipt.files })))
     assert.equal(probe.status, 'PASSED')
     // The production entry point rejects this private fixture even inside the same isolated container.

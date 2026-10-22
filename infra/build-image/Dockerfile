@@ -1,4 +1,4 @@
-FROM node:24.16.0-bookworm-slim@sha256:2c87ef9bd3c6a3bd4b472b4bec2ce9d16354b0c574f736c476489d09f560a203
+FROM node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
 
 WORKDIR /opt/codeless/template
 COPY templates/vue/package.json templates/vue/pnpm-lock.yaml templates/vue/pnpm-workspace.yaml ./

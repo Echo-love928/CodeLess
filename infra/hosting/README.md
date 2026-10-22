@@ -112,7 +112,7 @@ the receipt/probe separately; only D15-A may update SQL and the last-success poi
 deployment/app/version/digests and owner before the commit. A failed/unknown probe must never replace
 the successful pointer. A staged directory or returned receipt URL alone does not prove publication.
 
-The public probe runs the pinned Node24.16.0 image as nonroot, read-only, bounded CPU/memory/PIDs,
+The public probe runs the pinned Node24.22.1 image as nonroot, read-only, bounded CPU/memory/PIDs,
 no platform environment, no browser scripts, credentials, redirects or arbitrary destinations.
 DNS resolves once with a deadline and rejects private/reserved/IPv6 answers; every TLS connection is
 pinned to that accepted IPv4 address with normal certificate validation/SNI. This v0 needs public A

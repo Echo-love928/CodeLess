@@ -23,7 +23,7 @@ export function createPublicProbe({ publicOrigin, platformOrigin, previewOrigin 
     const args = ['run', '--name', name, '--rm', '-i', '--read-only', '--user', '10001:10001',
       '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--pids-limit', '32', '--memory', '128m', '--cpus', '0.5',
       '--mount', `type=bind,source=${directory},target=/probe,readonly`,
-      'node:24.16.0-bookworm-slim', 'node', '/probe/probe-worker.mjs']
+      'node:24.22.1-bookworm-slim', 'node', '/probe/probe-worker.mjs']
     // Worker policy is standalone; it does not mount API source, platform secrets or Docker socket.
     return new Promise(done => {
       const child = spawn('docker', args, { windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] })
