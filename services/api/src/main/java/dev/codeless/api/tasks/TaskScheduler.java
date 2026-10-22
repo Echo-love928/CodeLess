@@ -10,6 +10,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -19,6 +21,8 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnProperty(name = "codeless.tasks.enabled", havingValue = "true", matchIfMissing = true)
 public class TaskScheduler {
+    private static final Logger log = LoggerFactory.getLogger(TaskScheduler.class);
+
     private final TaskQueueService queue;
     private final TaskStageRunner runner;
     private final Duration lease;
@@ -102,7 +106,7 @@ public class TaskScheduler {
             try {
                 result = runner.execute(claim, stage);
             } catch (Exception exception) {
-                failIfLeased(claim, "RUNNER_ERROR");
+                failIfLeased(claim, stage, "RUNNER_ERROR", exception);
                 return;
             }
             try {
@@ -115,11 +119,11 @@ public class TaskScheduler {
                 stage = runner.advance(queue, claim, result, type).status();
                 if (stage == TaskStatus.FAILED || stage == TaskStatus.READY) return;
             } catch (RuntimeException exception) {
-                failIfLeased(claim, "INVALID_STAGE_RESULT");
+                failIfLeased(claim, stage, "INVALID_STAGE_RESULT", exception);
                 return;
             }
         }
-        failIfLeased(claim, "STAGE_LIMIT");
+        failIfLeased(claim, stage, "STAGE_LIMIT", null);
     }
 
     private void release(UUID taskId) {
@@ -131,12 +135,18 @@ public class TaskScheduler {
         }
     }
 
-    private void failIfLeased(TaskQueueService.Claim claim, String code) {
+    private void failIfLeased(TaskQueueService.Claim claim, TaskStatus stage, String code, Exception cause) {
+        boolean recorded = false;
         try {
             queue.advance(claim, TaskStatus.FAILED, EventType.TASK_FAILED,
                     "Task execution failed safely", code);
+            recorded = true;
         } catch (RuntimeException ignored) {
             // Cancellation or lease expiry already owns the final state; expiry recovery handles the latter.
         }
+        // The cause never reaches the public failure code, so this line is the only way to attribute it.
+        if (cause != null)
+            log.warn("Task {} stopped at {} as {} ({})", claim.taskId(), stage, code,
+                    recorded ? "recorded" : "lease no longer held; cancellation or expiry recovery decides", cause);
     }
 }

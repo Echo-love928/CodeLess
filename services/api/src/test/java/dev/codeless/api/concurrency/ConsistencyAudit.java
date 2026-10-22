@@ -214,30 +214,36 @@ final class ConsistencyAudit {
             if (calls > 1) violations.add("P3 " + id + ": hosted " + calls + " times");
             if (calls != (reachedHosting ? 1 : 0)) violations.add("P3 " + id + ": " + calls + " hosting calls but ledger " + ledger.stream().map(DeploymentRecords.Event::phase).toList());
             DeploymentGateway.Payload payload = hosting.payloads.get(publication.id());
-            if (payload == null) continue;
-            if (!payload.versionId().equals(publication.version()) || !payload.artifactDigest().equals(binding.artifactDigest()))
-                violations.add("P4 " + id + ": payload names another version or digest");
-            var bytes = new LinkedHashMap<String, byte[]>();
-            payload.assets().forEach(a -> bytes.put(a.path(), a.bytes()));
+            if (payload != null && (!payload.versionId().equals(publication.version()) || !payload.artifactDigest().equals(binding.artifactDigest())))
+                violations.add("P4 " + id + ": hosting request names another version or digest");
+            // What the location serves now, not the request that once reached the gateway (D20-B review).
+            String location = ConcurrencyHarness.Hosting.location(publication.id());
+            if ("PUBLISHED".equals(publication.status()) && !location.equals(publication.url()))
+                violations.add("P4 " + id + ": published URL is not its own hosted location");
+            Map<String, byte[]> bytes = hosting.served.get(location);
+            if (bytes == null) {
+                if ("PUBLISHED".equals(publication.status())) violations.add("P4 " + id + ": nothing is served at its published location");
+                continue;
+            }
             if (!ConcurrencyHarness.manifestDigest(bytes).equals(binding.artifactDigest()))
-                violations.add("P4 " + id + ": hosted bytes do not hash to the bound artifact digest");
+                violations.add("P4 " + id + ": served bytes do not hash to the bound artifact digest");
             if (version != null) {
                 try {
                     var manifest = snapshots.outcome(version.id(), version.sourceDigest(), "VERIFIED").artifact().files();
                     for (var entry : manifest)
                         if (!bytes.containsKey(entry.path()) || !LocalVolumeSnapshotStore.hash(bytes.get(entry.path())).equals(entry.digest()))
-                            violations.add("P4 " + id + ": hosted " + entry.path() + " differs from the frozen artifact");
-                    if (bytes.size() != manifest.size()) violations.add("P4 " + id + ": hosted file set differs from the frozen artifact");
+                            violations.add("P4 " + id + ": served " + entry.path() + " differs from the frozen artifact");
+                    if (bytes.size() != manifest.size()) violations.add("P4 " + id + ": served file set differs from the frozen artifact");
                 } catch (RuntimeException unreadable) {
                     violations.add("P4 " + id + ": frozen artifact unreadable");
                 }
             }
             String html = new String(bytes.getOrDefault("index.html", new byte[0]), UTF_8);
             if (html.contains("data-owner") && !html.contains("data-owner=&quot;" + publication.requestedBy()) && !html.contains("data-owner=\"" + publication.requestedBy()))
-                violations.add("X1 " + id + ": hosted page belongs to another owner");
+                violations.add("X1 " + id + ": served page belongs to another owner");
             for (UUID other : owners.values())
                 if (!other.equals(publication.requestedBy()) && html.contains(other.toString()))
-                    violations.add("X1 " + id + ": hosted page contains another user's id");
+                    violations.add("X1 " + id + ": served page contains another user's id");
         }
         if (hosting != null && !hosting.overwrites.isEmpty()) violations.add("P3 hosting locations overwritten: " + hosting.overwrites);
 

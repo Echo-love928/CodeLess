@@ -12,6 +12,8 @@ import dev.codeless.api.tasks.TaskStageRunner;
 import dev.codeless.api.tools.FileToolService;
 import dev.codeless.api.versions.LocalVolumeSnapshotStore;
 import dev.codeless.api.versions.SnapshotStore;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -30,7 +32,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -163,11 +167,16 @@ final class ConcurrencyHarness {
                 }
             }
             if ("UNAVAILABLE".equals(mode)) throw new IllegalStateException("HOSTING_UNAVAILABLE");
-            String url = "https://hosting.d20a.test/p/" + payload.publicationId() + "/";
+            String url = location(payload.publicationId());
             var files = new LinkedHashMap<String, byte[]>();
             for (var asset : payload.assets()) files.put(asset.path(), asset.bytes());
             if (served.putIfAbsent(url, files) != null) overwrites.add(url);
             return url;
+        }
+
+        /** Every publication's own immutable location; {@link #served} is keyed by it. */
+        static String location(UUID publication) {
+            return "https://hosting.d20a.test/p/" + publication + "/";
         }
 
         @Override public Probe probe(Payload payload, String url, Instant deadline) {
@@ -183,6 +192,92 @@ final class ConcurrencyHarness {
         var entries = files.entrySet().stream().sorted(Map.Entry.comparingByKey())
                 .map(e -> new SnapshotStore.Entry(e.getKey(), e.getValue().length, LocalVolumeSnapshotStore.hash(e.getValue()))).toList();
         return LocalVolumeSnapshotStore.hash(JSON.writeValueAsBytes(entries));
+    }
+
+    /**
+     * Test seam around the production snapshot store: a JDK proxy of the interface, so every call still reaches the
+     * real store. {@link #hold} pauses the first freeze a predicate matches, so a test can let a lease run out inside
+     * it. {@code CODELESS_D20A_SLOW_FREEZE_MS} (default 0, used only by the recorder's stress runs) adds that delay to
+     * every freeze behind one monitor: a slow volume serialized by the store's own lock, as on the D20-B review host.
+     */
+    static final class StoreGate {
+        record Call(String method, UUID version, Path input, String status) {}
+
+        static final class Pause {
+            final Predicate<Call> matches;
+            final AtomicBoolean taken = new AtomicBoolean();
+            final CountDownLatch entered = new CountDownLatch(1);
+            final CountDownLatch release = new CountDownLatch(1);
+
+            Pause(Predicate<Call> matches) {
+                this.matches = matches;
+            }
+        }
+
+        final long slowFreezeMillis;
+        final List<Pause> pauses = new CopyOnWriteArrayList<>();
+        final AtomicInteger freezes = new AtomicInteger();
+        private final Object volume = new Object();
+
+        StoreGate(long slowFreezeMillis) {
+            if (slowFreezeMillis < 0 || slowFreezeMillis > 5000) throw new IllegalArgumentException("slow freeze must be 0..5000 ms");
+            this.slowFreezeMillis = slowFreezeMillis;
+        }
+
+        static StoreGate fromEnvironment() {
+            return new StoreGate(Long.parseLong(System.getenv().getOrDefault("CODELESS_D20A_SLOW_FREEZE_MS", "0")));
+        }
+
+        Pause hold(Predicate<Call> matches) {
+            Pause pause = new Pause(matches);
+            pauses.add(pause);
+            return pause;
+        }
+
+        /** Releases and forgets every pause; a test that failed midway never leaves a worker parked. */
+        void reset() {
+            pauses.forEach(pause -> pause.release.countDown());
+            pauses.clear();
+        }
+
+        SnapshotStore wrap(SnapshotStore store) {
+            return (SnapshotStore) Proxy.newProxyInstance(SnapshotStore.class.getClassLoader(), new Class<?>[] {SnapshotStore.class},
+                    (proxy, method, args) -> {
+                        if (method.getDeclaringClass() == Object.class) {
+                            return switch (method.getName()) {
+                                case "equals" -> proxy == args[0];
+                                case "hashCode" -> System.identityHashCode(proxy);
+                                default -> "StoreGate(" + store + ")";
+                            };
+                        }
+                        Call call = switch (method.getName()) {
+                            case "freezeSource" -> new Call("freezeSource", (UUID) args[0], (Path) args[1], null);
+                            case "freezeOutcome" -> new Call("freezeOutcome", (UUID) args[0], null, (String) args[2]);
+                            default -> null;
+                        };
+                        if (call == null) return invoke(store, method, args);
+                        for (Pause pause : pauses) {
+                            if (pause.matches.test(call) && pause.taken.compareAndSet(false, true)) {
+                                pause.entered.countDown();
+                                if (!pause.release.await(60, TimeUnit.SECONDS)) throw new IllegalStateException("store pause never released");
+                            }
+                        }
+                        freezes.incrementAndGet();
+                        if (slowFreezeMillis == 0) return invoke(store, method, args);
+                        synchronized (volume) {
+                            Thread.sleep(slowFreezeMillis);
+                            return invoke(store, method, args);
+                        }
+                    });
+        }
+
+        private static Object invoke(SnapshotStore store, java.lang.reflect.Method method, Object[] args) throws Throwable {
+            try {
+                return method.invoke(store, args);
+            } catch (InvocationTargetException failure) {
+                throw failure.getCause();
+            }
+        }
     }
 
     /** A pause point inside the fixture runner, for one task and stage. */

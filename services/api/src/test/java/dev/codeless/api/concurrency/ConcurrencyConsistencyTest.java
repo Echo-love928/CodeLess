@@ -79,7 +79,8 @@ import tools.jackson.databind.JsonNode;
  *   <li>D20-A-01: duplicate submissions to one application, two users racing, cancel racing the READY commit.</li>
  *   <li>D20-A-02: publishing an old version while edits, READY commits and restores change the application.</li>
  *   <li>D20-A-03: {@link ConsistencyAudit} after every test over every row, plus a negative control.</li>
- *   <li>D20-A-04: owner reads that must be one snapshot, placed exactly between two statements by {@link StatementGate}.</li>
+ *   <li>D20-A-04: owner reads that must be one snapshot, placed exactly between two statements by {@link StatementGate};
+ *   READY commits and drafts whose freeze outlasts the lease, paused inside the store by {@link ConcurrencyHarness.StoreGate}.</li>
  * </ul>
  * Own PostgreSQL (the queue is global to a database) and own roots; the context is closed after the class.
  */
@@ -101,6 +102,7 @@ class ConcurrencyConsistencyTest {
     static final String ADMIN_PASSWORD = "admin-password-for-test-only";
     static final Path ROOT = Path.of("target", "d20a-concurrency", UUID.randomUUID().toString()).toAbsolutePath().normalize();
     static final StatementGate GATE = new StatementGate();
+    static final ConcurrencyHarness.StoreGate STORE = ConcurrencyHarness.StoreGate.fromEnvironment();
     static final ConcurrencyHarness.Hosting HOSTING = new ConcurrencyHarness.Hosting();
     static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse(
             "postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94").asCompatibleSubstituteFor("postgres"))
@@ -138,6 +140,14 @@ class ConcurrencyConsistencyTest {
                 }
             };
         }
+
+        @Bean static BeanPostProcessor storeGate() {
+            return new BeanPostProcessor() {
+                @Override public Object postProcessAfterInitialization(Object bean, String name) {
+                    return bean instanceof SnapshotStore store && !Proxy.isProxyClass(bean.getClass()) ? STORE.wrap(store) : bean;
+                }
+            };
+        }
     }
 
     record Account(UUID id, String email, String password) {}
@@ -163,6 +173,8 @@ class ConcurrencyConsistencyTest {
     Account alice, bob;
     Session aliceTab1, aliceTab2, bobTab, admin;
     final Set<UUID> quarantined = ConcurrentHashMap.newKeySet();
+    /** Every violation an earlier audit already failed a test for; see {@link #audit}. */
+    final Set<String> reported = ConcurrentHashMap.newKeySet();
     final Map<String, Object> audits = new LinkedHashMap<>();
 
     @BeforeAll
@@ -185,18 +197,28 @@ class ConcurrencyConsistencyTest {
     void reset() {
         HOSTING.reset();
         GATE.reset();
+        STORE.reset();
     }
 
-    /** D20-A-03 after every test: every row of the suite's database and every bound ledger/payload must agree. */
+    /**
+     * D20-A-03 after every test: every row of the suite's database and every bound ledger/served location must agree.
+     * Each audit checks everything, but a violation fails only the test after which it first appears, so one defect is
+     * reported once, at its source, instead of failing every later test (the D20-B review run failed six tests for one).
+     */
     @AfterEach
     void audit(TestInfo test) throws Exception {
         GATE.reset();
+        STORE.reset();
         HOSTING.open();
-        assertThat(queuedOrRunning()).as("a test left work in the queue").isZero();
+        int left = queuedOrRunning();
         var report = ConsistencyAudit.run(jdbc, transactions, snapshots, records, HOSTING, Set.copyOf(quarantined));
-        audits.put(test.getTestMethod().orElseThrow().getName(), Map.of("checked", report.checked(), "violations", report.violations()));
+        var fresh = report.violations().stream().filter(violation -> !reported.contains(violation)).toList();
+        reported.addAll(report.violations());
+        audits.put(test.getTestMethod().orElseThrow().getName(), ConcurrencyHarness.ordered("checked", report.checked(),
+                "violations", report.violations(), "firstReportedHere", fresh, "queuedOrRunningLeft", left));
         ConcurrencyHarness.evidence("D20-A-03-audit", Map.of("invariants", INVARIANTS, "afterEachTest", audits));
-        assertThat(report.violations()).as("consistency audit after %s", test.getDisplayName()).isEmpty();
+        assertThat(left).as("a test left work in the queue").isZero();
+        assertThat(fresh).as("consistency audit after %s (all violations: %s)", test.getDisplayName(), report.violations()).isEmpty();
     }
 
     static final Map<String, String> INVARIANTS = new TreeMap<>(Map.ofEntries(
@@ -214,9 +236,9 @@ class ConcurrencyConsistencyTest {
             Map.entry("P1", "ledger binding equals SQL row, version, build and artifact digest"),
             Map.entry("P2", "SQL publication status agrees with the ledger phase"),
             Map.entry("P3", "each publication reached hosting at most once, exactly when the ledger says PUBLISHING; no location overwritten"),
-            Map.entry("P4", "hosted bytes hash to the bound digest and equal the frozen artifact"),
+            Map.entry("P4", "bytes served at the publication's own location hash to the bound digest and equal the frozen artifact"),
             Map.entry("P5", "requester owns the application"),
-            Map.entry("X1", "hosted page carries only its owner's marker")));
+            Map.entry("X1", "served page carries only its owner's marker")));
 
     // ---------------------------------------------------------------- D20-A-01 duplicate tasks in one application
 
@@ -534,6 +556,11 @@ class ConcurrencyConsistencyTest {
         assertThat(tasks.get(alice)).hasSize(4);
         assertThat(tasks.get(bob)).hasSize(4);
         assertThat(intersection(tasks.get(alice), tasks.get(bob))).isEmpty();
+        // Every task must commit before its version is used; a failure names each task's own end state.
+        var outcomes = new TreeMap<String, String>();
+        Stream.of(alice, bob).flatMap(user -> tasks.get(user).stream())
+                .forEach(task -> outcomes.put(task, status(UUID.fromString(task)) + "/" + failureCode(UUID.fromString(task))));
+        assertThat(outcomes.values()).as("T3 tasks (status/failure code): %s", outcomes).allMatch("READY/"::equals);
 
         // Same publication key from both users at the same moment, three clicks each, then two worker instances.
         var publicationIds = new ConcurrentHashMap<Account, Set<String>>();
@@ -586,9 +613,9 @@ class ConcurrencyConsistencyTest {
             String publication = publicationIds.get(user).iterator().next();
             Res cross = http.get(sessions.get(other).getFirst(), "/api/v0/publications/" + publication + "/deployment");
             assertThat(cross.status()).isEqualTo(404);
-            var payload = HOSTING.payloads.get(UUID.fromString(publication));
-            String html = new String(payload.assets().stream().filter(a -> a.path().equals("index.html")).findFirst().orElseThrow().bytes(),
-                    java.nio.charset.StandardCharsets.UTF_8);
+            var served = HOSTING.served.get(ConcurrencyHarness.Hosting.location(UUID.fromString(publication)));
+            assertThat(served).as("served location of %s", publication).isNotNull();
+            String html = new String(served.get("index.html"), java.nio.charset.StandardCharsets.UTF_8);
             assertThat(html).contains("data-owner=\"" + user.id() + "\"").doesNotContain(other.id().toString());
             for (String task : tasks.get(user)) {
                 UUID owner = jdbc.sql("SELECT a.owner_id FROM generation_tasks t JOIN applications a ON a.id=t.application_id WHERE t.id=?")
@@ -802,8 +829,10 @@ class ConcurrencyConsistencyTest {
         for (UUID publication : v1Publications) {
             assertThat(publicationStatus(publication)).isEqualTo("PUBLISHED");
             var payload = HOSTING.payloads.get(publication);
-            var served = new LinkedHashMap<String, byte[]>();
-            payload.assets().forEach(a -> served.put(a.path(), a.bytes()));
+            String location = ConcurrencyHarness.Hosting.location(publication);
+            assertThat(jdbc.sql("SELECT url FROM publications WHERE id=?").param(publication).query(String.class).single()).isEqualTo(location);
+            var served = HOSTING.served.get(location);
+            assertThat(served).as("served location of %s", publication).isNotNull();
             assertThat(payload.versionId()).isEqualTo(v1);
             assertThat(payload.artifactDigest()).isEqualTo(v1Digest);
             assertThat(ConcurrencyHarness.manifestDigest(served)).isEqualTo(v1Digest);
@@ -905,6 +934,8 @@ class ConcurrencyConsistencyTest {
         Map<String, Object> body = Map.of("applicationId", app.toString(), "versionId", version.toString(), "artifactDigest", artifactDigest(version));
         UUID hosted = UUID.fromString(http.post(aliceTab1, "/api/v0/publications", body, "d20a-03-" + UUID.randomUUID()).json().path("id").asText());
         publications.process(hosted);
+        UUID vanished = UUID.fromString(http.post(aliceTab1, "/api/v0/publications", body, "d20a-03-" + UUID.randomUUID()).json().path("id").asText());
+        publications.process(vanished);
         UUID pending = UUID.fromString(http.post(aliceTab1, "/api/v0/publications", body, "d20a-03-" + UUID.randomUUID()).json().path("id").asText());
         UUID readyTask = jdbc.sql("SELECT source_task_id FROM application_versions WHERE id=?").param(version).query(UUID.class).single();
         // E1: a gap in the event sequence.
@@ -925,23 +956,122 @@ class ConcurrencyConsistencyTest {
         // P2/P3: the ledger claims success that SQL never committed and hosting never saw.
         var ledger = new DeploymentRecords(ROOT.resolve("deployments"));
         for (String phase : List.of("PUBLISHING", "PROBING", "SUCCEEDED")) ledger.append(pending, phase, null);
-        // P4: what was served is not the frozen artifact.
-        var original = HOSTING.payloads.get(hosted);
-        var tampered = new ArrayList<DeploymentGateway.Asset>();
-        for (var asset : original.assets())
-            tampered.add(asset.path().equals("assets/app.js") ? new DeploymentGateway.Asset(asset.path(), asset.digest(), "tampered".getBytes()) : asset);
-        HOSTING.payloads.put(hosted, new DeploymentGateway.Payload(hosted, original.versionId(), original.artifactDigest(), tampered));
+        // P4: one location now serves bytes that are not the frozen artifact, another serves nothing at all. Only the
+        // served map changes; the request payloads that once reached the gateway stay exactly as they were.
+        String hostedAt = ConcurrencyHarness.Hosting.location(hosted), vanishedAt = ConcurrencyHarness.Hosting.location(vanished);
+        var original = HOSTING.served.get(hostedAt);
+        var tampered = new LinkedHashMap<>(original);
+        tampered.put("assets/app.js", "tampered".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        HOSTING.served.put(hostedAt, tampered);
+        var removed = HOSTING.served.remove(vanishedAt);
 
         var report = ConsistencyAudit.run(jdbc, transactions, snapshots, records, HOSTING, Set.of());
         var clean = ConsistencyAudit.run(jdbc, transactions, snapshots, records, HOSTING, Set.of(app));
-        var expected = Map.of("E1", "task " + readyTask, "V3", failing.toString(), "P2", "publication " + pending,
-                "P3", "publication " + pending, "P4", "publication " + hosted);
+        HOSTING.served.put(hostedAt, original);
+        HOSTING.served.put(vanishedAt, removed);
+        var expected = List.of(List.of("E1", "task " + readyTask), List.of("V3", failing.toString()), List.of("P2", "publication " + pending),
+                List.of("P3", "publication " + pending), List.of("P4", "publication " + hosted), List.of("P4", "publication " + vanished));
         ConcurrencyHarness.evidence("D20-A-03-negative-control", Map.of("injected", expected, "violations", report.violations(),
                 "violationsWithControlApplicationExcluded", clean.violations()));
-        expected.forEach((invariant, subject) -> assertThat(report.violations())
-                .as("audit must report %s for %s", invariant, subject).anyMatch(v -> v.startsWith(invariant) && v.contains(subject)));
+        expected.forEach(pair -> assertThat(report.violations())
+                .as("audit must report %s for %s", pair.get(0), pair.get(1)).anyMatch(v -> v.startsWith(pair.get(0)) && v.contains(pair.get(1))));
         assertThat(clean.violations()).isEmpty();
-        HOSTING.payloads.put(hosted, original);
+    }
+
+    // ---------------------------------------------------------------- D20-A-04 freezes that outlast the lease (D20-B review)
+
+    /**
+     * The D20-B review run: on a slow volume the READY commit's VERIFIED freeze outlasted the 3 s lease. The heartbeat
+     * renews with an UPDATE of the row the commit holds, so it waited; the commit then failed its own lease check and
+     * rolled back behind the frozen outcome, and expiry recovery failed the version (SQL FAILED, store VERIFIED). Here
+     * the freeze is paused until the committed lease has visibly run out and a second instance has tried to recover
+     * the task; the commit must still land exactly once and leave SQL and the store agreeing.
+     */
+    @Test @Order(10)
+    void d20a04ReadyCommitWhoseFreezeOutlastsTheLeaseCommitsOnce() throws Exception {
+        UUID app = application(aliceTab1, "D20A slow READY commit");
+        UUID task = submit(aliceTab1, app, "D20A slow READY commit");
+        var pause = STORE.hold(call -> {
+            JsonNode draft = runner.drafts.get(task);
+            return "freezeOutcome".equals(call.method()) && "VERIFIED".equals(call.status()) && draft != null
+                    && call.version().toString().equals(draft.path("versionId").asText());
+        });
+        var observed = new LinkedHashMap<String, Object>();
+        try (ExecutorService pool = Executors.newSingleThreadExecutor()) {
+            Future<?> tick = pool.submit(() -> {
+                schedulers.get(0).tick();
+                return null;
+            });
+            try {
+                assertThat(pause.entered.await(60, TimeUnit.SECONDS)).as("READY commit reached its outcome freeze").isTrue();
+                // The commit holds the task row, so the heartbeat cannot renew it: the committed lease runs out.
+                observed.put("leaseExpiredWhileFreezeHeld", waitUntil(() -> leaseExpired(task), 15_000));
+                schedulers.get(1).tick(); // a second instance's expiry recovery skips the row the commit holds
+                observed.put("committedStateDuringFreeze", status(task) + "/" + failureCode(task));
+            } finally {
+                pause.release.countDown();
+            }
+            tick.get(60, TimeUnit.SECONDS);
+        }
+        schedulers.get(1).tick(); // and once the commit is in, there is nothing left to recover
+        UUID version = UUID.fromString(runner.drafts.get(task).path("versionId").asText());
+        observed.put("final", status(task) + "/" + failureCode(task));
+        observed.put("versionStatus", versionStatus(version));
+        observed.put("verifiedOutcomeReadable", readable(version, "VERIFIED"));
+        observed.put("latestIsThisVersion", version.equals(latest(app)));
+        observed.put("verifyExecutions", runner.executions(task, TaskStatus.VERIFY));
+        ConcurrencyHarness.evidence("D20-A-04-ready-commit-outlasting-lease", ConcurrencyHarness.ordered("task", task, "version", version,
+                "leaseMs", 3000, "observed", observed, "fixture", "stage runner fixture; scheduler, lease, READY commit, store and recovery are production"));
+        assertThat(observed.get("leaseExpiredWhileFreezeHeld")).as("the lease ran out while the commit held the row").isEqualTo(true);
+        assertThat(observed.get("committedStateDuringFreeze")).isEqualTo("VERIFY/");
+        assertThat(observed.get("final")).as("observed %s", observed).isEqualTo("READY/");
+        assertThat(observed.get("versionStatus")).isEqualTo("VERIFIED");
+        assertThat(observed.get("verifiedOutcomeReadable")).isEqualTo(true);
+        assertThat(observed.get("latestIsThisVersion")).isEqualTo(true);
+        assertThat(observed.get("verifyExecutions")).isEqualTo(1);
+    }
+
+    /**
+     * The same starvation one stage earlier: the draft froze its source while holding the task row, so a slow freeze
+     * let the lease run out and the draft's own lease check then refused a live worker (FAILED/INTERRUPTED instead of
+     * READY). The source freeze is paused past the lease that was current when it began and past a recovery attempt
+     * by a second instance; the heartbeat must keep the lease alive meanwhile.
+     */
+    @Test @Order(11)
+    void d20a04DraftWhoseSourceFreezeOutlastsTheLeaseKeepsTheLiveWorkersTask() throws Exception {
+        UUID app = application(aliceTab1, "D20A slow draft");
+        UUID task = submit(aliceTab1, app, "D20A slow draft");
+        var pause = STORE.hold(call -> "freezeSource".equals(call.method()) && call.input().toString().contains(task.toString()));
+        var observed = new LinkedHashMap<String, Object>();
+        try (ExecutorService pool = Executors.newSingleThreadExecutor()) {
+            Future<?> tick = pool.submit(() -> {
+                schedulers.get(0).tick();
+                return null;
+            });
+            try {
+                assertThat(pause.entered.await(60, TimeUnit.SECONDS)).as("draft reached its source freeze").isTrue();
+                long leaseAtFreeze = leaseExpiryMillis(task);
+                observed.put("heldPastTheLeaseAtFreeze", waitUntil(() -> dbMillis() > leaseAtFreeze + 1000, 15_000));
+                schedulers.get(1).tick(); // a second instance's expiry recovery
+                observed.put("committedStateDuringFreeze", status(task) + "/" + failureCode(task));
+                observed.put("leaseRenewedDuringFreeze", leaseExpiryMillis(task) > leaseAtFreeze);
+            } finally {
+                pause.release.countDown();
+            }
+            tick.get(60, TimeUnit.SECONDS);
+        }
+        schedulers.get(1).tick();
+        observed.put("final", status(task) + "/" + failureCode(task));
+        observed.put("generateExecutions", runner.executions(task, TaskStatus.GENERATE));
+        observed.put("versionsFromTask", count("SELECT count(*) FROM application_versions WHERE source_task_id=?", task));
+        ConcurrencyHarness.evidence("D20-A-04-draft-freeze-outlasting-lease", ConcurrencyHarness.ordered("task", task, "leaseMs", 3000,
+                "observed", observed, "fixture", "stage runner fixture; scheduler, heartbeat, lease, draft commit, store and recovery are production"));
+        assertThat(observed.get("heldPastTheLeaseAtFreeze")).isEqualTo(true);
+        assertThat(observed.get("committedStateDuringFreeze")).isEqualTo("GENERATE/");
+        assertThat(observed.get("leaseRenewedDuringFreeze")).as("observed %s", observed).isEqualTo(true);
+        assertThat(observed.get("final")).as("observed %s", observed).isEqualTo("READY/");
+        assertThat(observed.get("generateExecutions")).isEqualTo(1);
+        assertThat(observed.get("versionsFromTask")).isEqualTo(1);
     }
 
     // ---------------------------------------------------------------- helpers
@@ -969,6 +1099,46 @@ class ConcurrencyConsistencyTest {
         schedulers.getFirst().tick();
         assertThat(status(task)).isEqualTo("READY");
         return latest(app);
+    }
+
+    /** Submits a generation over HTTP and leaves it queued. */
+    private UUID submit(Session session, UUID app, String prompt) throws Exception {
+        Res created = http.post(session, "/api/v0/tasks", Map.of("applicationId", app.toString(), "prompt", prompt), null);
+        assertThat(created.status()).as(created.body()).isEqualTo(202);
+        return UUID.fromString(created.json().path("id").asText());
+    }
+
+    /** Whether the committed lease of {@code task} has run out, as any other connection sees it. */
+    private boolean leaseExpired(UUID task) {
+        return jdbc.sql("SELECT coalesce(lease_expires_at <= clock_timestamp(), false) FROM generation_tasks WHERE id=?")
+                .param(task).query(Boolean.class).single();
+    }
+
+    private long leaseExpiryMillis(UUID task) {
+        return jdbc.sql("SELECT (extract(epoch FROM lease_expires_at) * 1000)::bigint FROM generation_tasks WHERE id=?")
+                .param(task).query(Long.class).single();
+    }
+
+    private long dbMillis() {
+        return jdbc.sql("SELECT (extract(epoch FROM clock_timestamp()) * 1000)::bigint").query(Long.class).single();
+    }
+
+    private static boolean waitUntil(java.util.function.BooleanSupplier condition, long millis) throws InterruptedException {
+        long until = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(millis);
+        while (System.nanoTime() < until) {
+            if (condition.getAsBoolean()) return true;
+            Thread.sleep(50);
+        }
+        return condition.getAsBoolean();
+    }
+
+    private boolean readable(UUID version, String status) {
+        try {
+            snapshots.outcome(version, sourceDigest(version), status);
+            return true;
+        } catch (RuntimeException absentOrOther) {
+            return false;
+        }
     }
 
     private UUID editTask(Session session, UUID app, UUID base, String prompt) throws Exception {
