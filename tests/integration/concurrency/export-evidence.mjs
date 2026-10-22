@@ -21,12 +21,14 @@ const junit = dir => {
 }
 const runs = readdirSync(root).filter(name => existsSync(join(root, name, 'run.json'))).sort()
   .map(name => ({ name, meta: JSON.parse(readFileSync(join(root, name, 'run.json'), 'utf8')) }))
-const canonical = runs.filter(r => r.meta.mode === 'acceptance' && r.meta.status === 'PASSED' && r.meta.uncommittedScopedFiles.length === 0).at(-1)
+// Slow-volume (@slow) runs are stress evidence, never the canonical acceptance.
+const canonical = runs.filter(r => r.meta.mode === 'acceptance' && !r.meta.slowFreezeMs && r.meta.status === 'PASSED'
+  && r.meta.uncommittedScopedFiles.length === 0).at(-1)
 if (!canonical) throw new Error('No PASSED acceptance run on a clean committed tree')
 mkdirSync(target, { recursive: true })
 const evidence = join(root, canonical.name, 'concurrency')
 for (const name of readdirSync(evidence).filter(n => n.endsWith('.json'))) copyFileSync(join(evidence, name), join(target, name))
-const summary = runs.map(({ name, meta }) => ({ run: name, mode: meta.mode, head: meta.head, status: meta.status, exitCode: meta.exitCode,
+const summary = runs.map(({ name, meta }) => ({ run: name, mode: meta.mode, slowFreezeMs: meta.slowFreezeMs ?? 0, head: meta.head, status: meta.status, exitCode: meta.exitCode,
   signal: meta.signal, completionVerified: meta.completionVerified ?? null, startedAt: meta.startedAt, completedAt: meta.completedAt ?? null,
   uncommittedScopedFiles: meta.uncommittedScopedFiles, logDigest: meta.logDigest ?? null, modelProvider: meta.modelProvider,
   ...(meta.mode.startsWith('mutation') ? { mutations: meta.mutations, expectedFailures: meta.expectedFailures, failedTests: meta.failedTests,

@@ -15,7 +15,9 @@
         "hostingCalls" : 0,
         "excludedApplications" : 0
       },
-      "violations" : [ ]
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
     },
     "d20aT2CancelRacingTheReadyCommitNeverOverwritesTheSuccessfulVersion" : {
       "checked" : {
@@ -36,7 +38,9 @@
         "hostingCalls" : 16,
         "excludedApplications" : 0
       },
-      "violations" : [ ]
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
     },
     "d20aT2CancellingQueuedOrRunningFollowUpsLeavesTheSuccessfulVersionUsable" : {
       "checked" : {
@@ -57,7 +61,9 @@
         "hostingCalls" : 16,
         "excludedApplications" : 0
       },
-      "violations" : [ ]
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
     },
     "d20aT3TwoUsersRacingWithIdenticalKeysShareNoData" : {
       "checked" : {
@@ -78,7 +84,9 @@
         "hostingCalls" : 18,
         "excludedApplications" : 0
       },
-      "violations" : [ ]
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
     },
     "d20aT1EveryPublicationRequestIsOneLogicalPublicationHostedOnce" : {
       "checked" : {
@@ -100,7 +108,9 @@
         "hostingCalls" : 26,
         "excludedApplications" : 0
       },
-      "violations" : [ ]
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
     },
     "d20aT4PublishingAnOldVersionDuringEditsKeepsItsFixedHash" : {
       "checked" : {
@@ -122,7 +132,9 @@
         "hostingCalls" : 31,
         "excludedApplications" : 0
       },
-      "violations" : [ ]
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
     },
     "d20a04VersionListIsOneSnapshotWhileVersionsCommit" : {
       "checked" : {
@@ -144,7 +156,9 @@
         "hostingCalls" : 31,
         "excludedApplications" : 0
       },
-      "violations" : [ ]
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
     },
     "d20a04PublicationListAndDeploymentAreOneSnapshotWhileAWorkerCommits" : {
       "checked" : {
@@ -166,7 +180,9 @@
         "hostingCalls" : 33,
         "excludedApplications" : 0
       },
-      "violations" : [ ]
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
     },
     "d20a03AuditRejectsInjectedInconsistencies" : {
       "checked" : {
@@ -185,10 +201,60 @@
           "FAILED/FAILED" : 1,
           "PUBLISHED/SUCCEEDED" : 32
         },
-        "hostingCalls" : 34,
+        "hostingCalls" : 35,
         "excludedApplications" : 1
       },
-      "violations" : [ ]
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
+    },
+    "d20a04ReadyCommitWhoseFreezeOutlastsTheLeaseCommitsOnce" : {
+      "checked" : {
+        "tasks" : {
+          "FAILED" : 21,
+          "READY" : 31
+        },
+        "events" : 289,
+        "versions" : {
+          "DRAFT" : 13,
+          "FAILED" : 15,
+          "VERIFIED" : 31
+        },
+        "builds" : 32,
+        "publications" : {
+          "FAILED/FAILED" : 1,
+          "PUBLISHED/SUCCEEDED" : 32
+        },
+        "hostingCalls" : 35,
+        "excludedApplications" : 1
+      },
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
+    },
+    "d20a04DraftWhoseSourceFreezeOutlastsTheLeaseKeepsTheLiveWorkersTask" : {
+      "checked" : {
+        "tasks" : {
+          "FAILED" : 21,
+          "READY" : 32
+        },
+        "events" : 295,
+        "versions" : {
+          "DRAFT" : 14,
+          "FAILED" : 15,
+          "VERIFIED" : 32
+        },
+        "builds" : 33,
+        "publications" : {
+          "FAILED/FAILED" : 1,
+          "PUBLISHED/SUCCEEDED" : 32
+        },
+        "hostingCalls" : 35,
+        "excludedApplications" : 1
+      },
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
     }
   },
   "invariants" : {
@@ -200,7 +266,7 @@
     "P1" : "ledger binding equals SQL row, version, build and artifact digest",
     "P2" : "SQL publication status agrees with the ledger phase",
     "P3" : "each publication reached hosting at most once, exactly when the ledger says PUBLISHING; no location overwritten",
-    "P4" : "hosted bytes hash to the bound digest and equal the frozen artifact",
+    "P4" : "bytes served at the publication's own location hash to the bound digest and equal the frozen artifact",
     "P5" : "requester owns the application",
     "V1" : "VERIFIED has its own SUCCEEDED/exit 0 build and a frozen outcome with that build and artifact digest",
     "V2" : "FAILED never has a usable VERIFIED outcome and has its frozen FAILED report",
@@ -208,6 +274,6 @@
     "V4" : "source task exists and belongs to the same application",
     "V5" : "READY task has exactly one VERIFIED version named by its READY event; others none",
     "V6" : "latest pointer is a VERIFIED version of the same application",
-    "X1" : "hosted page carries only its owner's marker"
+    "X1" : "served page carries only its owner's marker"
   }
 }
