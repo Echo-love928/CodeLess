@@ -1,11 +1,12 @@
 // Developer-only fixed D20-A commands. Records native exit/signal, HEAD, tested file digests, the raw log, this run's
 // JUnit XML and the concurrency evidence under .local-data/d20-a/runs/. No API/runtime shell capability is exposed here.
-// Usage: node tests/integration/concurrency/record-command.mjs MODE
-//   acceptance | regression | mutation-<version-snapshot|publication-snapshot|publish-lock|owner-key|artifact-pin|convergence>
-//   | static | api | runner | e2e | gate
+// Usage: node tests/integration/concurrency/record-command.mjs MODE[@slow]
+//   acceptance | regression | static | api | runner | e2e | gate
+//   | mutation-<version-snapshot|publication-snapshot|publish-lock|owner-key|artifact-pin|convergence|lease-boundary|freeze-first|draft-in-lock>
 // Every mutation mode is a negative control: it reintroduces one defect (the pre-fix file from the D20-A base commit,
-// or a one-line anchor change), runs the acceptance class, restores the exact bytes and PASSES only if the build failed
-// through every expected test.
+// or anchor changes), runs the acceptance class, restores the exact bytes and PASSES only if Maven exited 1 without a
+// signal and every expected test failed. "@slow" (acceptance and mutation modes) adds a fixed 1500 ms to every snapshot
+// freeze behind one monitor, emulating the slow volume of the D20-B review host; it is recorded as slowFreezeMs.
 import { spawn, spawnSync } from 'node:child_process'
 import { openSync, closeSync, mkdirSync, writeFileSync, renameSync, readFileSync, unlinkSync, readdirSync, copyFileSync, existsSync, realpathSync, rmSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -13,8 +14,11 @@ import { join, relative } from 'node:path'
 import { randomUUID, createHash } from 'node:crypto'
 
 const repo = realpathSync(fileURLToPath(new URL('../../../', import.meta.url)))
-const [mode, ...extra] = process.argv.slice(2)
-if (extra.length) throw new Error('Usage: record-command.mjs MODE')
+const [requested, ...extra] = process.argv.slice(2)
+if (extra.length || !requested) throw new Error('Usage: record-command.mjs MODE[@slow]')
+const slow = requested.endsWith('@slow')
+const mode = slow ? requested.slice(0, -'@slow'.length) : requested
+const slowFreezeMs = slow ? 1500 : 0
 const base = 'c5bec0069702e87492f257093cccc9cce3e2e0eb' // origin/main when D20-A started: the pre-fix code.
 const api = 'services/api/src/main/java/dev/codeless/api/'
 const acceptance = 'ConcurrencyConsistencyTest'
@@ -39,6 +43,24 @@ const mutationSets = {
   'mutation-convergence': { anchors: [[api + 'recovery/DraftConvergence.java', '        if (code.isEmpty()) return List.of();',
     '        if (code.isEmpty() || true) return List.of(); // MUTATION']],
     expected: ['d20aT2CancelRacingTheReadyCommitNeverOverwritesTheSuccessfulVersion', 'd20aT2CancellingQueuedOrRunningFollowUpsLeavesTheSuccessfulVersionUsable'] },
+  // D20-B review: AgentRunStore exactly as reviewed (both lease-boundary defects); with @slow, the review host's T3 failure.
+  'mutation-lease-boundary': { revert: [api + 'agent/AgentRunStore.java'],
+    expected: ['d20a04ReadyCommitWhoseFreezeOutlastsTheLeaseCommitsOnce', 'd20a04DraftWhoseSourceFreezeOutlastsTheLeaseKeepsTheLiveWorkersTask'] },
+  // D20-B review: the READY commit froze its VERIFIED outcome before the lease-checked transition again.
+  'mutation-freeze-first': { anchors: [
+    [api + 'agent/AgentRunStore.java', '            snapshots.freezeOutcome(version,draft.path("sourceDigest").asText(),"VERIFIED",result,null);\n            return view;',
+      '            return view;'],
+    [api + 'agent/AgentRunStore.java', '            int changed=jdbc.sql("""',
+      '            snapshots.freezeOutcome(version,draft.path("sourceDigest").asText(),"VERIFIED",result,null); // MUTATION: frozen first\n            int changed=jdbc.sql("""']],
+    expected: ['d20a04ReadyCommitWhoseFreezeOutlastsTheLeaseCommitsOnce'] },
+  // D20-B review: the draft froze its source while holding the task row lock again.
+  'mutation-draft-in-lock': { anchors: [[api + 'agent/AgentRunStore.java',
+    '        var frozen=snapshots.freezeSource(version,snapshot.directory(),snapshot.source().sourceDigest(),\n'
+      + '                tools.jackson.databind.json.JsonMapper.builder().build().valueToTree(snapshot.source().files()));',
+    '        var frozen=tx.execute(s -> { lock(claim,TaskStatus.GENERATE); /* MUTATION: frozen inside the row lock */ '
+      + 'return snapshots.freezeSource(version,snapshot.directory(),snapshot.source().sourceDigest(),\n'
+      + '                tools.jackson.databind.json.JsonMapper.builder().build().valueToTree(snapshot.source().files())); });']],
+    expected: ['d20a04DraftWhoseSourceFreezeOutlastsTheLeaseKeepsTheLiveWorkersTask'] },
 }
 const mutating = Object.hasOwn(mutationSets, mode)
 const mutation = mutating ? mutationSets[mode] : null
@@ -46,6 +68,7 @@ const mutation = mutating ? mutationSets[mode] : null
 let command, args
 const windows = process.platform === 'win32'
 const target = mutating ? acceptance : tests[mode]
+if (slow && !(mutating || mode === 'acceptance')) throw new Error('@slow applies to acceptance and mutation modes only')
 if (target) {
   const maven = ['-f', 'services/api/pom.xml', `-Dtest=${target}`, 'test']
   command = windows ? (process.env.ComSpec ?? 'cmd.exe') : './services/api/mvnw'
@@ -58,9 +81,10 @@ if (target) {
 } else throw new Error('Unknown fixed command mode')
 
 const env = { ...process.env, CODELESS_MODEL_PROVIDER: 'deterministic-mock' }
-for (const key of ['CODELESS_MODEL_API_KEY', 'CODELESS_MODEL_NAME', 'CODELESS_PLAYWRIGHT_CHANNEL']) delete env[key]
+for (const key of ['CODELESS_MODEL_API_KEY', 'CODELESS_MODEL_NAME', 'CODELESS_PLAYWRIGHT_CHANNEL', 'CODELESS_D20A_SLOW_FREEZE_MS']) delete env[key]
+if (slow) env.CODELESS_D20A_SLOW_FREEZE_MS = String(slowFreezeMs)
 const root = join(repo, '.local-data/d20-a')
-const run = join(root, 'runs', `${new Date().toISOString().replaceAll(':', '-')}-${mode}-${randomUUID()}`)
+const run = join(root, 'runs', `${new Date().toISOString().replaceAll(':', '-')}-${mode}${slow ? '-slow' : ''}-${randomUUID()}`)
 mkdirSync(run, { recursive: true })
 const lock = join(root, 'command.lock')
 const lockFd = openSync(lock, 'wx') // Never run two Maven/gate commands against the same target directory.
@@ -73,7 +97,7 @@ const scoped = ['services/api/src/main', 'services/api/src/test', 'services/api/
 const modified = git('diff', '--name-only', '-z', 'HEAD', '--', ...scoped), untracked = git('ls-files', '--others', '--exclude-standard', '-z', '--', ...scoped)
 if (modified.status !== 0 || untracked.status !== 0) throw new Error('Cannot record tested file hashes')
 const sha = bytes => 'sha256:' + createHash('sha256').update(bytes).digest('hex')
-const metadata = { mode, head: head.stdout.trim(), command: [command, ...args], startedAt: new Date().toISOString(), status: 'RUNNING',
+const metadata = { mode, slowFreezeMs, head: head.stdout.trim(), command: [command, ...args], startedAt: new Date().toISOString(), status: 'RUNNING',
   exitCode: null, signal: null, modelProvider: 'deterministic-mock',
   uncommittedScopedFiles: [...new Set((modified.stdout + untracked.stdout).split('\0').filter(Boolean))].map(path => ({ path,
     digest: existsSync(join(repo, path)) ? sha(readFileSync(join(repo, path))) : null })) }
@@ -92,12 +116,16 @@ if (mutating) {
     changes.push([join(repo, file), old.stdout])
     metadata.mutations = [...(metadata.mutations ?? []), { file, revertedTo: base, digest: sha(old.stdout) }]
   }
+  // Anchors on one file compose in order; line breaks follow the checkout (CRLF or LF).
+  const edited = new Map()
   for (const [file, from, to] of mutation.anchors ?? []) {
-    const path = join(repo, file), text = readFileSync(path, 'utf8')
-    if (text.split(from).length !== 2) throw new Error(`mutation anchor not unique: ${file}`)
-    changes.push([path, Buffer.from(text.replace(from, to))])
+    const path = join(repo, file), text = edited.get(path) ?? readFileSync(path, 'utf8')
+    const eol = text.includes('\r\n') ? '\r\n' : '\n', match = from.replaceAll('\n', eol)
+    if (text.split(match).length !== 2) throw new Error(`mutation anchor not unique: ${file}`)
+    edited.set(path, text.replace(match, () => to.replaceAll('\n', eol)))
     metadata.mutations = [...(metadata.mutations ?? []), { file, from: from.trim(), to: to.trim() }]
   }
+  for (const [path, text] of edited) changes.push([path, Buffer.from(text)])
   for (const [path, bytes] of changes) {
     if (!originals.has(path)) originals.set(path, readFileSync(path))
     writeFileSync(path, bytes)
@@ -144,7 +172,8 @@ function finish(code, signal, error) {
     const failed = failedTests(join(run, 'junit'))
     metadata.failedTests = failed
     metadata.expectedFailures = mutation.expected
-    metadata.completionVerified = code !== 0 && mutation.expected.every(name => failed.includes(name))
+    // Maven's own test-failure exit; a signal or another code is an aborted run, never a negative control (D20-B review).
+    metadata.completionVerified = code === 1 && signal === null && mutation.expected.every(name => failed.includes(name))
     metadata.restoredDigests = [...new Set(metadata.mutations.map(m => m.file))].map(file => ({ file,
       digest: sha(readFileSync(join(repo, file))), matchesHead: git('diff', '--quiet', 'HEAD', '--', file).status === 0 }))
     metadata.status = error ? 'LAUNCH_FAILED' : metadata.completionVerified && metadata.restoredDigests.every(d => d.matchesHead) ? 'PASSED' : 'FAILED'
