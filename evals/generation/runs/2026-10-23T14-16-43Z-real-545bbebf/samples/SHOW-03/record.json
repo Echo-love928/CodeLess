@@ -1,0 +1,177 @@
+{
+  "schemaVersion" : 1,
+  "sampleId" : "SHOW-03",
+  "kind" : "REQUIREMENT",
+  "batchId" : "2026-10-23T14-16-43Z-real-545bbebf",
+  "mode" : "REAL",
+  "attempt" : 1,
+  "harness" : {
+    "java" : "21.0.12.1",
+    "os" : "Windows 11",
+    "runtimeBudget" : {
+      "modelRequests" : 12,
+      "chargedTokens" : 50000,
+      "repairRounds" : 3,
+      "toolSlots" : 20,
+      "framingTokensPerRequest" : 512,
+      "outputTokensPerRequest" : 4096
+    },
+    "environment" : {
+      "containerCliOnPath" : true
+    },
+    "provider" : {
+      "transport" : "DeepSeekModelProvider",
+      "model" : "deepseek-flash",
+      "id" : "deepseek"
+    },
+    "taskId" : "38e065a7-225c-4e26-8381-92a8245b0445",
+    "startedAt" : "2026-10-23T14:18:37.984417100Z",
+    "finishedAt" : "2026-10-23T14:18:38.624728Z",
+    "wallClockMs" : 640
+  },
+  "injection" : null,
+  "application" : {
+    "id" : "26a422d7-7020-44d7-b4ed-c6283436de87",
+    "name" : "林夏摄影作品集",
+    "dataMode" : "MOCK",
+    "status" : "ACTIVE",
+    "latestReadyVersionId" : null,
+    "createdAt" : "2026-10-23T14:18:38.025257Z",
+    "updatedAt" : "2026-10-23T14:18:38.025257Z"
+  },
+  "task" : {
+    "id" : "38e065a7-225c-4e26-8381-92a8245b0445",
+    "applicationId" : "26a422d7-7020-44d7-b4ed-c6283436de87",
+    "prompt" : "生成摄影师林夏的作品集展示页：页面顶部有“关于我”“作品集”“联系方式”三个导航按钮，点击后切换显示对应区块，默认显示“关于我”；“作品集”区块展示四件作品卡片，每张显示作品标题和拍摄地点，用纯色色块代替图片，不加载任何外部图片；“联系方式”区块显示邮箱 linxia@example.com。使用 Mock 数据。",
+    "status" : "FAILED",
+    "repairAttempts" : 0,
+    "failureCode" : "MODEL_NETWORK",
+    "eventSequence" : 2,
+    "queueState" : "FINISHED",
+    "deadlineAt" : "2026-10-23T14:30:38.037539Z",
+    "createdAt" : "2026-10-23T14:18:38.037539Z",
+    "updatedAt" : "2026-10-23T14:18:38.616535Z"
+  },
+  "taskEvents" : [ {
+    "id" : "fd0bcfd0-cbb0-4111-8dbe-bd169ee4e0e3",
+    "sequence" : 1,
+    "type" : "STAGE_STARTED",
+    "stage" : "PLAN",
+    "message" : "Task accepted in PLAN",
+    "occurredAt" : "2026-10-23T14:18:38.037539Z"
+  }, {
+    "id" : "e22f1d49-f27d-44c7-a374-45e9e3b6289e",
+    "sequence" : 2,
+    "type" : "TASK_FAILED",
+    "stage" : "FAILED",
+    "message" : "Generation stopped; recovery information retained",
+    "occurredAt" : "2026-10-23T14:18:38.618468Z"
+  } ],
+  "versions" : [ ],
+  "builds" : [ ],
+  "modelCalls" : [ {
+    "id" : "b2aff2d4-f309-44c6-a406-8f1be8f04dce",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "FAILED",
+    "inputTokens" : null,
+    "outputTokens" : null,
+    "errorCode" : "MODEL_NETWORK",
+    "createdAt" : "2026-10-23T14:18:38.153104Z",
+    "completedAt" : "2026-10-23T14:18:38.578204Z"
+  } ],
+  "modelAudit" : [ {
+    "callId" : "b2aff2d4-f309-44c6-a406-8f1be8f04dce",
+    "taskId" : "38e065a7-225c-4e26-8381-92a8245b0445",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : null,
+    "requestId" : null,
+    "responseId" : null,
+    "status" : "FAILED",
+    "durationMs" : 405,
+    "usage" : {
+      "inputTokens" : null,
+      "outputTokens" : null,
+      "totalTokens" : null,
+      "raw" : null
+    },
+    "errorCode" : "MODEL_NETWORK",
+    "createdAt" : "2026-10-23T14:18:38.153104Z",
+    "completedAt" : "2026-10-23T14:18:38.568307400Z"
+  } ],
+  "journal" : [ {
+    "payload" : {
+      "reservedTokens" : 9637,
+      "slots" : 1
+    },
+    "stage" : "PLAN",
+    "sequence" : 1,
+    "kind" : "model.request",
+    "taskId" : "38e065a7-225c-4e26-8381-92a8245b0445",
+    "at" : "2026-10-23T14:18:38.142523900Z"
+  }, {
+    "payload" : {
+      "roles" : [ "system", "user" ],
+      "inputBytes" : 467,
+      "policyBytes" : 4562,
+      "policyDigest" : "sha256:8f30c489856194854ea9aac7c80a858f868a15ed814b9265a6b49a40aa94fa0e",
+      "callId" : "b2aff2d4-f309-44c6-a406-8f1be8f04dce",
+      "transport" : {
+        "maxOutputTokens" : 4096,
+        "bodyDigest" : "sha256:2d0645c04cfb1dcb3f600ee4cb59765bd28945b46dc394f78b3a1465ac9a836b",
+        "responseFormat" : "json_object",
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "thinking" : "disabled",
+        "bodyBytes" : 5647,
+        "stream" : false
+      },
+      "inputDigest" : "sha256:cade59e0ff3af99849ec4432b41e42eac4a2ae6607d87e830e721390962252dc"
+    },
+    "stage" : "PLAN",
+    "sequence" : 2,
+    "kind" : "model.input",
+    "taskId" : "38e065a7-225c-4e26-8381-92a8245b0445",
+    "at" : "2026-10-23T14:18:38.193082Z"
+  }, {
+    "payload" : {
+      "meteringSource" : "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "chargedTokens" : 9637,
+      "estimated" : true,
+      "reservationTokens" : 9637,
+      "usage" : {
+        "inputTokens" : null,
+        "outputTokens" : null,
+        "totalTokens" : null,
+        "raw" : null
+      },
+      "releasedTokens" : 0
+    },
+    "stage" : "PLAN",
+    "sequence" : 3,
+    "kind" : "model.usage",
+    "taskId" : "38e065a7-225c-4e26-8381-92a8245b0445",
+    "at" : "2026-10-23T14:18:38.558070Z"
+  }, {
+    "payload" : {
+      "category" : "MODEL_INTERFACE",
+      "code" : "MODEL_NETWORK",
+      "recovery" : "MANUAL_REVIEW_NO_AUTOMATIC_RETRY"
+    },
+    "stage" : "PLAN",
+    "sequence" : 4,
+    "kind" : "failure",
+    "taskId" : "38e065a7-225c-4e26-8381-92a8245b0445",
+    "at" : "2026-10-23T14:18:38.596772600Z"
+  } ],
+  "platformMeter" : {
+    "models" : 1,
+    "tools" : 0,
+    "chargedTokens" : 9637
+  },
+  "sources" : [ ],
+  "screenshots" : [ ],
+  "harnessError" : null
+}

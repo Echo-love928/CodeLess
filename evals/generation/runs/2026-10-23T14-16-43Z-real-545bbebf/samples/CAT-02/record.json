@@ -1,0 +1,177 @@
+{
+  "schemaVersion" : 1,
+  "sampleId" : "CAT-02",
+  "kind" : "REQUIREMENT",
+  "batchId" : "2026-10-23T14-16-43Z-real-545bbebf",
+  "mode" : "REAL",
+  "attempt" : 1,
+  "harness" : {
+    "java" : "21.0.12.1",
+    "os" : "Windows 11",
+    "runtimeBudget" : {
+      "repairRounds" : 3,
+      "chargedTokens" : 50000,
+      "modelRequests" : 12,
+      "outputTokensPerRequest" : 4096,
+      "framingTokensPerRequest" : 512,
+      "toolSlots" : 20
+    },
+    "environment" : {
+      "containerCliOnPath" : true
+    },
+    "provider" : {
+      "id" : "deepseek",
+      "model" : "deepseek-flash",
+      "transport" : "DeepSeekModelProvider"
+    },
+    "taskId" : "9878ef9c-f292-4a2b-8381-dcf788049c6f",
+    "startedAt" : "2026-10-23T14:20:14.161922800Z",
+    "finishedAt" : "2026-10-23T14:20:14.608245100Z",
+    "wallClockMs" : 446
+  },
+  "injection" : null,
+  "application" : {
+    "id" : "eb681fb2-cd68-486c-8d7f-82aea6c93c2e",
+    "name" : "城市咖啡馆目录",
+    "dataMode" : "MOCK",
+    "status" : "ACTIVE",
+    "latestReadyVersionId" : null,
+    "createdAt" : "2026-10-23T14:20:14.198536Z",
+    "updatedAt" : "2026-10-23T14:20:14.198536Z"
+  },
+  "task" : {
+    "id" : "9878ef9c-f292-4a2b-8381-dcf788049c6f",
+    "applicationId" : "eb681fb2-cd68-486c-8d7f-82aea6c93c2e",
+    "prompt" : "生成一个城市咖啡馆目录：使用 Mock 数据列出 6 家咖啡馆（名称、所在城区、评分、招牌饮品）；可以通过下拉框按城区筛选，也可以按名称搜索；点击咖啡馆卡片后在列表下方显示该咖啡馆的详情。",
+    "status" : "FAILED",
+    "repairAttempts" : 0,
+    "failureCode" : "MODEL_NETWORK",
+    "eventSequence" : 2,
+    "queueState" : "FINISHED",
+    "deadlineAt" : "2026-10-23T14:32:14.208684Z",
+    "createdAt" : "2026-10-23T14:20:14.208684Z",
+    "updatedAt" : "2026-10-23T14:20:14.599958Z"
+  },
+  "taskEvents" : [ {
+    "id" : "faa276eb-87ac-4ab3-a47a-37bf091e29ca",
+    "sequence" : 1,
+    "type" : "STAGE_STARTED",
+    "stage" : "PLAN",
+    "message" : "Task accepted in PLAN",
+    "occurredAt" : "2026-10-23T14:20:14.208684Z"
+  }, {
+    "id" : "79e52221-39a0-42cc-9e53-03e21746ece2",
+    "sequence" : 2,
+    "type" : "TASK_FAILED",
+    "stage" : "FAILED",
+    "message" : "Generation stopped; recovery information retained",
+    "occurredAt" : "2026-10-23T14:20:14.601173Z"
+  } ],
+  "versions" : [ ],
+  "builds" : [ ],
+  "modelCalls" : [ {
+    "id" : "e4d612e9-e6fb-4796-88e4-c331b8f247f6",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "FAILED",
+    "inputTokens" : null,
+    "outputTokens" : null,
+    "errorCode" : "MODEL_NETWORK",
+    "createdAt" : "2026-10-23T14:20:14.301399Z",
+    "completedAt" : "2026-10-23T14:20:14.567498Z"
+  } ],
+  "modelAudit" : [ {
+    "callId" : "e4d612e9-e6fb-4796-88e4-c331b8f247f6",
+    "taskId" : "9878ef9c-f292-4a2b-8381-dcf788049c6f",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : null,
+    "requestId" : null,
+    "responseId" : null,
+    "status" : "FAILED",
+    "durationMs" : 249,
+    "usage" : {
+      "inputTokens" : null,
+      "outputTokens" : null,
+      "totalTokens" : null,
+      "raw" : null
+    },
+    "errorCode" : "MODEL_NETWORK",
+    "createdAt" : "2026-10-23T14:20:14.301399Z",
+    "completedAt" : "2026-10-23T14:20:14.559429600Z"
+  } ],
+  "journal" : [ {
+    "stage" : "PLAN",
+    "payload" : {
+      "slots" : 1,
+      "reservedTokens" : 9477
+    },
+    "at" : "2026-10-23T14:20:14.291279900Z",
+    "taskId" : "9878ef9c-f292-4a2b-8381-dcf788049c6f",
+    "kind" : "model.request",
+    "sequence" : 1
+  }, {
+    "stage" : "PLAN",
+    "payload" : {
+      "policyDigest" : "sha256:8f30c489856194854ea9aac7c80a858f868a15ed814b9265a6b49a40aa94fa0e",
+      "policyBytes" : 4562,
+      "inputBytes" : 307,
+      "roles" : [ "system", "user" ],
+      "inputDigest" : "sha256:b6ca462fadacd82754632bc4d27eaee22329738cb37054e1442b21a06f31c082",
+      "transport" : {
+        "bodyDigest" : "sha256:dbd2ee5895cf1b9ee70a3581cce6aafd7e2929cf590d944f6e1cf612e7940285",
+        "maxOutputTokens" : 4096,
+        "stream" : false,
+        "bodyBytes" : 5487,
+        "thinking" : "disabled",
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "responseFormat" : "json_object"
+      },
+      "callId" : "e4d612e9-e6fb-4796-88e4-c331b8f247f6"
+    },
+    "at" : "2026-10-23T14:20:14.337955700Z",
+    "taskId" : "9878ef9c-f292-4a2b-8381-dcf788049c6f",
+    "kind" : "model.input",
+    "sequence" : 2
+  }, {
+    "stage" : "PLAN",
+    "payload" : {
+      "chargedTokens" : 9477,
+      "meteringSource" : "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "releasedTokens" : 0,
+      "usage" : {
+        "inputTokens" : null,
+        "outputTokens" : null,
+        "totalTokens" : null,
+        "raw" : null
+      },
+      "reservationTokens" : 9477,
+      "estimated" : true
+    },
+    "at" : "2026-10-23T14:20:14.549315900Z",
+    "taskId" : "9878ef9c-f292-4a2b-8381-dcf788049c6f",
+    "kind" : "model.usage",
+    "sequence" : 3
+  }, {
+    "stage" : "PLAN",
+    "payload" : {
+      "category" : "MODEL_INTERFACE",
+      "recovery" : "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+      "code" : "MODEL_NETWORK"
+    },
+    "at" : "2026-10-23T14:20:14.583732300Z",
+    "taskId" : "9878ef9c-f292-4a2b-8381-dcf788049c6f",
+    "kind" : "failure",
+    "sequence" : 4
+  } ],
+  "platformMeter" : {
+    "models" : 1,
+    "tools" : 0,
+    "chargedTokens" : 9477
+  },
+  "sources" : [ ],
+  "screenshots" : [ ],
+  "harnessError" : null
+}

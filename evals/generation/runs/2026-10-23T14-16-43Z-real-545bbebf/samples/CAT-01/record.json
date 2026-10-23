@@ -1,0 +1,177 @@
+{
+  "schemaVersion" : 1,
+  "sampleId" : "CAT-01",
+  "kind" : "REQUIREMENT",
+  "batchId" : "2026-10-23T14-16-43Z-real-545bbebf",
+  "mode" : "REAL",
+  "attempt" : 1,
+  "harness" : {
+    "java" : "21.0.12.1",
+    "os" : "Windows 11",
+    "runtimeBudget" : {
+      "modelRequests" : 12,
+      "outputTokensPerRequest" : 4096,
+      "framingTokensPerRequest" : 512,
+      "toolSlots" : 20,
+      "repairRounds" : 3,
+      "chargedTokens" : 50000
+    },
+    "environment" : {
+      "containerCliOnPath" : true
+    },
+    "provider" : {
+      "id" : "deepseek",
+      "model" : "deepseek-flash",
+      "transport" : "DeepSeekModelProvider"
+    },
+    "taskId" : "d9bfd28b-b18f-4ed9-b60d-b1e57c3e469e",
+    "startedAt" : "2026-10-23T14:20:01.114815100Z",
+    "finishedAt" : "2026-10-23T14:20:01.579457900Z",
+    "wallClockMs" : 464
+  },
+  "injection" : null,
+  "application" : {
+    "id" : "102ddd4e-7f83-4f5e-80f7-980e276e090f",
+    "name" : "图书目录",
+    "dataMode" : "STATIC",
+    "status" : "ACTIVE",
+    "latestReadyVersionId" : null,
+    "createdAt" : "2026-10-23T14:20:01.155147Z",
+    "updatedAt" : "2026-10-23T14:20:01.155147Z"
+  },
+  "task" : {
+    "id" : "d9bfd28b-b18f-4ed9-b60d-b1e57c3e469e",
+    "applicationId" : "102ddd4e-7f83-4f5e-80f7-980e276e090f",
+    "prompt" : "生成一个图书目录页：内置 8 本图书的静态数据（书名、作者、分类：小说/科技/历史、一句简介）；提供搜索框按书名或作者实时过滤，提供“全部/小说/科技/历史”分类筛选按钮；点击某本书后显示它的详情区域（书名、作者、分类、简介）。",
+    "status" : "FAILED",
+    "repairAttempts" : 0,
+    "failureCode" : "MODEL_NETWORK",
+    "eventSequence" : 2,
+    "queueState" : "FINISHED",
+    "deadlineAt" : "2026-10-23T14:32:01.166718Z",
+    "createdAt" : "2026-10-23T14:20:01.166718Z",
+    "updatedAt" : "2026-10-23T14:20:01.571740Z"
+  },
+  "taskEvents" : [ {
+    "id" : "ce7559a0-29c6-426a-96f6-60e937277a0b",
+    "sequence" : 1,
+    "type" : "STAGE_STARTED",
+    "stage" : "PLAN",
+    "message" : "Task accepted in PLAN",
+    "occurredAt" : "2026-10-23T14:20:01.166718Z"
+  }, {
+    "id" : "bc11f29d-5a9f-4120-aa19-a9c57ad68be8",
+    "sequence" : 2,
+    "type" : "TASK_FAILED",
+    "stage" : "FAILED",
+    "message" : "Generation stopped; recovery information retained",
+    "occurredAt" : "2026-10-23T14:20:01.572872Z"
+  } ],
+  "versions" : [ ],
+  "builds" : [ ],
+  "modelCalls" : [ {
+    "id" : "9edd5675-b76c-49f9-8ab7-5536bfbcf6e3",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "FAILED",
+    "inputTokens" : null,
+    "outputTokens" : null,
+    "errorCode" : "MODEL_NETWORK",
+    "createdAt" : "2026-10-23T14:20:01.281194Z",
+    "completedAt" : "2026-10-23T14:20:01.537841Z"
+  } ],
+  "modelAudit" : [ {
+    "callId" : "9edd5675-b76c-49f9-8ab7-5536bfbcf6e3",
+    "taskId" : "d9bfd28b-b18f-4ed9-b60d-b1e57c3e469e",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : null,
+    "requestId" : null,
+    "responseId" : null,
+    "status" : "FAILED",
+    "durationMs" : 237,
+    "usage" : {
+      "inputTokens" : null,
+      "outputTokens" : null,
+      "totalTokens" : null,
+      "raw" : null
+    },
+    "errorCode" : "MODEL_NETWORK",
+    "createdAt" : "2026-10-23T14:20:01.281194Z",
+    "completedAt" : "2026-10-23T14:20:01.528337400Z"
+  } ],
+  "journal" : [ {
+    "payload" : {
+      "slots" : 1,
+      "reservedTokens" : 9541
+    },
+    "at" : "2026-10-23T14:20:01.258548600Z",
+    "taskId" : "d9bfd28b-b18f-4ed9-b60d-b1e57c3e469e",
+    "kind" : "model.request",
+    "sequence" : 1,
+    "stage" : "PLAN"
+  }, {
+    "payload" : {
+      "roles" : [ "system", "user" ],
+      "inputDigest" : "sha256:f34941e6af173bf742fe4e4a94d6eaf3e5b5e42fb1871c77242cb554438d9cb7",
+      "transport" : {
+        "maxOutputTokens" : 4096,
+        "stream" : false,
+        "bodyBytes" : 5551,
+        "thinking" : "disabled",
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "responseFormat" : "json_object",
+        "bodyDigest" : "sha256:d42e538d4e7267b0b00200d7d10857debbc6e1ce9f8a74a3dc476b823f4e611e"
+      },
+      "callId" : "9edd5675-b76c-49f9-8ab7-5536bfbcf6e3",
+      "policyDigest" : "sha256:8f30c489856194854ea9aac7c80a858f868a15ed814b9265a6b49a40aa94fa0e",
+      "policyBytes" : 4562,
+      "inputBytes" : 371
+    },
+    "at" : "2026-10-23T14:20:01.319924800Z",
+    "taskId" : "d9bfd28b-b18f-4ed9-b60d-b1e57c3e469e",
+    "kind" : "model.input",
+    "sequence" : 2,
+    "stage" : "PLAN"
+  }, {
+    "payload" : {
+      "releasedTokens" : 0,
+      "usage" : {
+        "inputTokens" : null,
+        "outputTokens" : null,
+        "totalTokens" : null,
+        "raw" : null
+      },
+      "reservationTokens" : 9541,
+      "estimated" : true,
+      "chargedTokens" : 9541,
+      "meteringSource" : "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT"
+    },
+    "at" : "2026-10-23T14:20:01.517791200Z",
+    "taskId" : "d9bfd28b-b18f-4ed9-b60d-b1e57c3e469e",
+    "kind" : "model.usage",
+    "sequence" : 3,
+    "stage" : "PLAN"
+  }, {
+    "payload" : {
+      "recovery" : "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+      "code" : "MODEL_NETWORK",
+      "category" : "MODEL_INTERFACE"
+    },
+    "at" : "2026-10-23T14:20:01.552971300Z",
+    "taskId" : "d9bfd28b-b18f-4ed9-b60d-b1e57c3e469e",
+    "kind" : "failure",
+    "sequence" : 4,
+    "stage" : "PLAN"
+  } ],
+  "platformMeter" : {
+    "models" : 1,
+    "tools" : 0,
+    "chargedTokens" : 9541
+  },
+  "sources" : [ ],
+  "screenshots" : [ ],
+  "harnessError" : null
+}
