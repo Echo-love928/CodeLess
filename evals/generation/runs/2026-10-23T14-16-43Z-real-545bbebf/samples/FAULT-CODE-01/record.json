@@ -1,0 +1,177 @@
+{
+  "schemaVersion" : 1,
+  "sampleId" : "FAULT-CODE-01",
+  "kind" : "CODE_FAULT",
+  "batchId" : "2026-10-23T14-16-43Z-real-545bbebf",
+  "mode" : "REAL",
+  "attempt" : 1,
+  "harness" : {
+    "java" : "21.0.12.1",
+    "os" : "Windows 11",
+    "runtimeBudget" : {
+      "modelRequests" : 12,
+      "outputTokensPerRequest" : 4096,
+      "framingTokensPerRequest" : 512,
+      "toolSlots" : 20,
+      "repairRounds" : 3,
+      "chargedTokens" : 50000
+    },
+    "environment" : {
+      "containerCliOnPath" : true
+    },
+    "provider" : {
+      "id" : "deepseek",
+      "model" : "deepseek-flash",
+      "transport" : "DeepSeekModelProvider"
+    },
+    "taskId" : "a72f215f-746c-4fb7-8ecf-9c4df663e36a",
+    "startedAt" : "2026-10-23T14:20:41.667656100Z",
+    "finishedAt" : "2026-10-23T14:20:42.113486700Z",
+    "wallClockMs" : 445
+  },
+  "injection" : null,
+  "application" : {
+    "id" : "bfb8ea88-ec5f-41aa-af8c-965a5a60bb62",
+    "name" : "Grace Hopper 个人展示",
+    "dataMode" : "STATIC",
+    "status" : "ACTIVE",
+    "latestReadyVersionId" : null,
+    "createdAt" : "2026-10-23T14:20:41.705469Z",
+    "updatedAt" : "2026-10-23T14:20:41.705469Z"
+  },
+  "task" : {
+    "id" : "a72f215f-746c-4fb7-8ecf-9c4df663e36a",
+    "applicationId" : "bfb8ea88-ec5f-41aa-af8c-965a5a60bb62",
+    "prompt" : "生成 Grace Hopper 的个人展示页：顶部显示姓名“Grace Hopper”和一句简介“计算机科学先驱，COBOL 语言的推动者”；中间用三张卡片展示代表作品：“Harvard Mark I 编程”“A-0 编译器”“COBOL 标准化”，每张卡片有标题和一句说明；底部显示联系邮箱 grace.hopper@example.com（纯文本，不需要发送邮件）。使用静态数据。",
+    "status" : "FAILED",
+    "repairAttempts" : 0,
+    "failureCode" : "MODEL_NETWORK",
+    "eventSequence" : 2,
+    "queueState" : "FINISHED",
+    "deadlineAt" : "2026-10-23T14:32:41.714642Z",
+    "createdAt" : "2026-10-23T14:20:41.714642Z",
+    "updatedAt" : "2026-10-23T14:20:42.107315Z"
+  },
+  "taskEvents" : [ {
+    "id" : "5d676ab9-3ef3-4ec6-9d81-145c2f877367",
+    "sequence" : 1,
+    "type" : "STAGE_STARTED",
+    "stage" : "PLAN",
+    "message" : "Task accepted in PLAN",
+    "occurredAt" : "2026-10-23T14:20:41.714642Z"
+  }, {
+    "id" : "8dd44ffd-40f3-4d4c-bc48-1ac68f821ff7",
+    "sequence" : 2,
+    "type" : "TASK_FAILED",
+    "stage" : "FAILED",
+    "message" : "Generation stopped; recovery information retained",
+    "occurredAt" : "2026-10-23T14:20:42.108438Z"
+  } ],
+  "versions" : [ ],
+  "builds" : [ ],
+  "modelCalls" : [ {
+    "id" : "16c9057e-921a-4cee-92a2-7224d196dfe2",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "FAILED",
+    "inputTokens" : null,
+    "outputTokens" : null,
+    "errorCode" : "MODEL_NETWORK",
+    "createdAt" : "2026-10-23T14:20:41.804465Z",
+    "completedAt" : "2026-10-23T14:20:42.076888Z"
+  } ],
+  "modelAudit" : [ {
+    "callId" : "16c9057e-921a-4cee-92a2-7224d196dfe2",
+    "taskId" : "a72f215f-746c-4fb7-8ecf-9c4df663e36a",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : null,
+    "requestId" : null,
+    "responseId" : null,
+    "status" : "FAILED",
+    "durationMs" : 256,
+    "usage" : {
+      "inputTokens" : null,
+      "outputTokens" : null,
+      "totalTokens" : null,
+      "raw" : null
+    },
+    "errorCode" : "MODEL_NETWORK",
+    "createdAt" : "2026-10-23T14:20:41.804465Z",
+    "completedAt" : "2026-10-23T14:20:42.068661Z"
+  } ],
+  "journal" : [ {
+    "payload" : {
+      "slots" : 1,
+      "reservedTokens" : 9627
+    },
+    "at" : "2026-10-23T14:20:41.792374400Z",
+    "taskId" : "a72f215f-746c-4fb7-8ecf-9c4df663e36a",
+    "kind" : "model.request",
+    "sequence" : 1,
+    "stage" : "PLAN"
+  }, {
+    "payload" : {
+      "inputBytes" : 457,
+      "roles" : [ "system", "user" ],
+      "inputDigest" : "sha256:2a8348c599ccc8ec6fb1238d93c2019a3d5cf3c50d82db6fb8fe6623338cc804",
+      "transport" : {
+        "maxOutputTokens" : 4096,
+        "stream" : false,
+        "bodyBytes" : 5637,
+        "thinking" : "disabled",
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "responseFormat" : "json_object",
+        "bodyDigest" : "sha256:0f3555cd7fae720cc28ea954f71b67f128db3e1f051385df37048441d1405123"
+      },
+      "callId" : "16c9057e-921a-4cee-92a2-7224d196dfe2",
+      "policyDigest" : "sha256:8f30c489856194854ea9aac7c80a858f868a15ed814b9265a6b49a40aa94fa0e",
+      "policyBytes" : 4562
+    },
+    "at" : "2026-10-23T14:20:41.840774800Z",
+    "taskId" : "a72f215f-746c-4fb7-8ecf-9c4df663e36a",
+    "kind" : "model.input",
+    "sequence" : 2,
+    "stage" : "PLAN"
+  }, {
+    "payload" : {
+      "meteringSource" : "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "releasedTokens" : 0,
+      "usage" : {
+        "inputTokens" : null,
+        "outputTokens" : null,
+        "totalTokens" : null,
+        "raw" : null
+      },
+      "reservationTokens" : 9627,
+      "estimated" : true,
+      "chargedTokens" : 9627
+    },
+    "at" : "2026-10-23T14:20:42.048324700Z",
+    "taskId" : "a72f215f-746c-4fb7-8ecf-9c4df663e36a",
+    "kind" : "model.usage",
+    "sequence" : 3,
+    "stage" : "PLAN"
+  }, {
+    "payload" : {
+      "category" : "MODEL_INTERFACE",
+      "recovery" : "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+      "code" : "MODEL_NETWORK"
+    },
+    "at" : "2026-10-23T14:20:42.089826500Z",
+    "taskId" : "a72f215f-746c-4fb7-8ecf-9c4df663e36a",
+    "kind" : "failure",
+    "sequence" : 4,
+    "stage" : "PLAN"
+  } ],
+  "platformMeter" : {
+    "models" : 1,
+    "tools" : 0,
+    "chargedTokens" : 9627
+  },
+  "sources" : [ ],
+  "screenshots" : [ ],
+  "harnessError" : null
+}

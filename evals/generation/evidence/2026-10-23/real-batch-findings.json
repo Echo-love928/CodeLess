@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "kind": "REAL_BATCH_FINDINGS",
+  "batchId": "2026-10-23T14-16-43Z-real-545bbebf",
+  "findings": [
+    {
+      "id": "D21-A-F2",
+      "title": "Intermittent TLS certificate-path failure between this host and the model endpoint blocked 6/9 requirement samples and 3 fault samples at their first PLAN request",
+      "classification": "ENVIRONMENT (external network path); the platform reports it as MODEL_NETWORK, the evaluation as MODEL_TRANSPORT",
+      "batchEvidence": "SHOW-03, TASK-02, TASK-03, CAT-01, CAT-02, CAT-03, FAULT-CODE-01, FAULT-CODE-02, FAULT-ENV-01: one PLAN call each, FAILED MODEL_NETWORK within 0.4-0.6 s, usage UNKNOWN, no retry, no file tool call. Successes (SHOW-01, SHOW-02, TASK-01, FAULT-CODE-03) interleave with failures in identical sample JVMs.",
+      "probe": {
+        "tools": "tests/agent/repair/TransportProbe.java x6 and NetworkEnvironmentProbe.java (D10-A; no Authorization, no model call)",
+        "window": "2026-10-23T14:31:55Z..14:32:05Z",
+        "connections": 12,
+        "succeeded": 1,
+        "failedWith": "java.util.concurrent.ExecutionException > javax.net.ssl.SSLHandshakeException > sun.security.validator.ValidatorException > sun.security.provider.certpath.SunCertPathBuilderException",
+        "successfulResponses": [
+          "requested=HTTP_1_1 received=HTTP_1_1 status=401 elapsedMs=215"
+        ],
+        "environment": {
+          "kind": "environment",
+          "java": "21.0.12.1+1-LTS",
+          "dns": [
+            "198.18.0.152"
+          ],
+          "defaultProxySelector": "sun.net.spi.DefaultProxySelector",
+          "selectedProxy": "[DIRECT]",
+          "useSystemProxies": "false",
+          "customTrustStore": false,
+          "credentialsUsed": false,
+          "modelCalls": 0
+        },
+        "privateLogSha256": {
+          "transport": "sha256:2f2358f87e0d675a60c9380f3f0148263a985733f5b42e5290ce0eab3419c151",
+          "environment": "sha256:83d45a5269138cb24cd669fae4e399dacc92e7030af976d9e099d5ae942570da"
+        }
+      },
+      "limits": "DeepSeekModelProvider maps the exception to MODEL_NETWORK without its class, so batch failures are attributed by timing and the immediate probe, not by their own stack. Same chain as D10-A (2026-10-07/08). No truststore, TLS, proxy or provider setting was changed.",
+      "owner": "Host network owner (user). Real acceptance stays blocked until handshakes validate; a rerun is a new batch and this batch stays."
+    },
+    {
+      "id": "D21-A-F3",
+      "title": "REPAIR on Chinese-content apps can exhaust the 50,000 charged-token budget through the UTF-8 byte reservation, stranding an applied fix before its final done",
+      "classification": "PLATFORM BUDGET POLICY (RuntimeBudget.inputReservation = UTF-8 bytes of policy+input + 512, plus 4096 output)",
+      "sample": "FAULT-CODE-03",
+      "recordSha256": "sha256:a02e6c149935fa32014e186366690691486b402fa95f00dbc75b659bd4aaba01",
+      "taskId": "23f86a81-2357-4f0a-b95d-3d446c0429e5",
+      "finalCode": "AGENT_MODEL_BUDGET_EXCEEDED",
+      "repairAttempts": 1,
+      "platformMeter": {
+        "models": 8,
+        "tools": 11,
+        "chargedTokens": 32231
+      },
+      "observation": "The injected async PAGE_EXCEPTION was classified CODE -> REPAIR; the real model read the page and applied an update (tool SUCCEEDED); the next REPAIR reservation did not fit in the remaining 17,769 charged tokens, so the fix was never rebuilt or verified. completionOnly only triggers on the last model call, not on the token budget.",
+      "calls": [
+        {
+          "stage": "PLAN",
+          "policyBytes": 4562,
+          "inputBytes": 371,
+          "inputTokens": 1278,
+          "outputTokens": 357,
+          "reservationTokens": 9541,
+          "chargedTokens": 1635
+        },
+        {
+          "stage": "GENERATE",
+          "policyBytes": 4381,
+          "inputBytes": 4636,
+          "inputTokens": 2493,
+          "outputTokens": 565,
+          "reservationTokens": 13625,
+          "chargedTokens": 3058
+        },
+        {
+          "stage": "GENERATE",
+          "policyBytes": 4381,
+          "inputBytes": 5099,
+          "inputTokens": 2699,
+          "outputTokens": 21,
+          "reservationTokens": 14088,
+          "chargedTokens": 2720
+        },
+        {
+          "stage": "GENERATE",
+          "policyBytes": 4381,
+          "inputBytes": 7251,
+          "inputTokens": 3485,
+          "outputTokens": 1810,
+          "reservationTokens": 16240,
+          "chargedTokens": 5295
+        },
+        {
+          "stage": "GENERATE",
+          "policyBytes": 4381,
+          "inputBytes": 7848,
+          "inputTokens": 3754,
+          "outputTokens": 24,
+          "reservationTokens": 16837,
+          "chargedTokens": 3778
+        },
+        {
+          "stage": "GENERATE",
+          "policyBytes": 4381,
+          "inputBytes": 13922,
+          "inputTokens": 5846,
+          "outputTokens": 382,
+          "reservationTokens": 22911,
+          "chargedTokens": 6228
+        },
+        {
+          "stage": "REPAIR",
+          "policyBytes": 1291,
+          "inputBytes": 7184,
+          "inputTokens": 2835,
+          "outputTokens": 24,
+          "reservationTokens": 13083,
+          "chargedTokens": 2859
+        },
+        {
+          "stage": "REPAIR",
+          "policyBytes": 1291,
+          "inputBytes": 13006,
+          "inputTokens": 4800,
+          "outputTokens": 1858,
+          "reservationTokens": 18905,
+          "chargedTokens": 6658
+        }
+      ],
+      "owner": "D24-A/D26-A buffer (AgentModel/RuntimeBudget are out of D21-A scope; not changed here)"
+    }
+  ]
+}

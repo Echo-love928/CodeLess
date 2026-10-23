@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "task": "D21-A",
+  "candidateRun": "evals/generation/evidence/commands.jsonl mode=api (HEAD c25b722): 296 tests, 5 failures, 0 errors, 0 skipped; all 5 in dev.codeless.api.preview.PreviewAcceptanceProcessTest",
+  "baseRun": {
+    "revision": "bc3d00eaf53df121ea01ea355c47932294a0b47b",
+    "checkout": "temporary detached worktree, removed after the run",
+    "command": "cmd.exe /d /c services/api/mvnw.cmd -B -ntp -f services/api/pom.xml -Dtest=PreviewAcceptanceProcessTest test",
+    "exitCode": 1,
+    "result": "8 tests, 5 failures, 0 errors, 0 skipped",
+    "failing": ["interruptionStopsTreeAndRetainsInterrupt:30", "parentExceptionIsNotReplacedByCleanup:25", "stopSignalWriteFailureStillReclaimsAndRunsProjectCleanup:50", "timeoutAssertionAlwaysStopsRootBranchAndLeaf:24", "unavailableProcessReportStillRunsProjectCleanupAndPreservesParent:38"],
+    "privateLog": ".local-data/d21-a/base-preview-acceptance.log",
+    "privateLogSha256": "sha256:100c8ff8719fece9ec704e9ae7fb33186df0a3b2b8f1f8a341ff825081e851e2"
+  },
+  "conclusion": "Same five failures with identical names and lines on the unmodified base; this PR changes no production code and no file under services/api/src/test/java/dev/codeless/api/preview. Pre-existing local Windows failure (also recorded by D17-A/D19-A); remote CI on the PR head decides.",
+  "e2eSideEffect": "verify:e2e rewrote 9 committed PNGs under docs/evidence/D10/deterministic and tests/e2e/{share,versions}/evidence; restored with git checkout, not part of this PR."
+}

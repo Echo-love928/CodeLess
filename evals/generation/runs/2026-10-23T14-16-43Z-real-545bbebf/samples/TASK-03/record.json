@@ -1,0 +1,177 @@
+{
+  "schemaVersion" : 1,
+  "sampleId" : "TASK-03",
+  "kind" : "REQUIREMENT",
+  "batchId" : "2026-10-23T14-16-43Z-real-545bbebf",
+  "mode" : "REAL",
+  "attempt" : 1,
+  "harness" : {
+    "java" : "21.0.12.1",
+    "os" : "Windows 11",
+    "runtimeBudget" : {
+      "repairRounds" : 3,
+      "toolSlots" : 20,
+      "framingTokensPerRequest" : 512,
+      "outputTokensPerRequest" : 4096,
+      "modelRequests" : 12,
+      "chargedTokens" : 50000
+    },
+    "environment" : {
+      "containerCliOnPath" : true
+    },
+    "provider" : {
+      "transport" : "DeepSeekModelProvider",
+      "model" : "deepseek-flash",
+      "id" : "deepseek"
+    },
+    "taskId" : "5fc90ad8-7d17-4633-a23f-8f9e4392b90b",
+    "startedAt" : "2026-10-23T14:19:47.743258200Z",
+    "finishedAt" : "2026-10-23T14:19:48.212059400Z",
+    "wallClockMs" : 468
+  },
+  "injection" : null,
+  "application" : {
+    "id" : "7566c77a-6f97-4287-a928-a2564c6cd08f",
+    "name" : "家庭购物清单",
+    "dataMode" : "LOCAL_STORAGE",
+    "status" : "ACTIVE",
+    "latestReadyVersionId" : null,
+    "createdAt" : "2026-10-23T14:19:47.778430Z",
+    "updatedAt" : "2026-10-23T14:19:47.778430Z"
+  },
+  "task" : {
+    "id" : "5fc90ad8-7d17-4633-a23f-8f9e4392b90b",
+    "applicationId" : "7566c77a-6f97-4287-a928-a2564c6cd08f",
+    "prompt" : "生成一个家庭购物清单：输入商品名称和数量后点击“加入清单”添加；每个商品可以标记“已购买”或删除；提供“清除已购买”按钮一次移除所有已购买商品；清单保存在 LocalStorage，刷新页面后恢复。",
+    "status" : "FAILED",
+    "repairAttempts" : 0,
+    "failureCode" : "MODEL_NETWORK",
+    "eventSequence" : 2,
+    "queueState" : "FINISHED",
+    "deadlineAt" : "2026-10-23T14:31:47.789754Z",
+    "createdAt" : "2026-10-23T14:19:47.789754Z",
+    "updatedAt" : "2026-10-23T14:19:48.204424Z"
+  },
+  "taskEvents" : [ {
+    "id" : "5914181d-df1f-4f9e-9f1f-cc83c45cf75d",
+    "sequence" : 1,
+    "type" : "STAGE_STARTED",
+    "stage" : "PLAN",
+    "message" : "Task accepted in PLAN",
+    "occurredAt" : "2026-10-23T14:19:47.789754Z"
+  }, {
+    "id" : "a716a3b2-d5d9-4c26-b699-6cc2ebcd125f",
+    "sequence" : 2,
+    "type" : "TASK_FAILED",
+    "stage" : "FAILED",
+    "message" : "Generation stopped; recovery information retained",
+    "occurredAt" : "2026-10-23T14:19:48.205368Z"
+  } ],
+  "versions" : [ ],
+  "builds" : [ ],
+  "modelCalls" : [ {
+    "id" : "7fa8f549-5700-45c7-9eef-88653a24316b",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "FAILED",
+    "inputTokens" : null,
+    "outputTokens" : null,
+    "errorCode" : "MODEL_NETWORK",
+    "createdAt" : "2026-10-23T14:19:47.894188Z",
+    "completedAt" : "2026-10-23T14:19:48.172931Z"
+  } ],
+  "modelAudit" : [ {
+    "callId" : "7fa8f549-5700-45c7-9eef-88653a24316b",
+    "taskId" : "5fc90ad8-7d17-4633-a23f-8f9e4392b90b",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : null,
+    "requestId" : null,
+    "responseId" : null,
+    "status" : "FAILED",
+    "durationMs" : 260,
+    "usage" : {
+      "inputTokens" : null,
+      "outputTokens" : null,
+      "totalTokens" : null,
+      "raw" : null
+    },
+    "errorCode" : "MODEL_NETWORK",
+    "createdAt" : "2026-10-23T14:19:47.894188Z",
+    "completedAt" : "2026-10-23T14:19:48.165283700Z"
+  } ],
+  "journal" : [ {
+    "stage" : "PLAN",
+    "sequence" : 1,
+    "kind" : "model.request",
+    "taskId" : "5fc90ad8-7d17-4633-a23f-8f9e4392b90b",
+    "at" : "2026-10-23T14:19:47.872729200Z",
+    "payload" : {
+      "reservedTokens" : 9493,
+      "slots" : 1
+    }
+  }, {
+    "stage" : "PLAN",
+    "sequence" : 2,
+    "kind" : "model.input",
+    "taskId" : "5fc90ad8-7d17-4633-a23f-8f9e4392b90b",
+    "at" : "2026-10-23T14:19:47.934229500Z",
+    "payload" : {
+      "policyDigest" : "sha256:8f30c489856194854ea9aac7c80a858f868a15ed814b9265a6b49a40aa94fa0e",
+      "callId" : "7fa8f549-5700-45c7-9eef-88653a24316b",
+      "transport" : {
+        "bodyDigest" : "sha256:16a14cf4c808ff2def87313db6731ce8829e5eb7afb6741ea8ae75590bc1c8fa",
+        "responseFormat" : "json_object",
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "thinking" : "disabled",
+        "bodyBytes" : 5503,
+        "stream" : false,
+        "maxOutputTokens" : 4096
+      },
+      "inputDigest" : "sha256:50964945fee6b3fcc5c4f7e83bf8d5353371653fe168329955f21ebe262a1fdf",
+      "roles" : [ "system", "user" ],
+      "inputBytes" : 323,
+      "policyBytes" : 4562
+    }
+  }, {
+    "stage" : "PLAN",
+    "sequence" : 3,
+    "kind" : "model.usage",
+    "taskId" : "5fc90ad8-7d17-4633-a23f-8f9e4392b90b",
+    "at" : "2026-10-23T14:19:48.155254900Z",
+    "payload" : {
+      "chargedTokens" : 9493,
+      "estimated" : true,
+      "reservationTokens" : 9493,
+      "usage" : {
+        "inputTokens" : null,
+        "outputTokens" : null,
+        "totalTokens" : null,
+        "raw" : null
+      },
+      "releasedTokens" : 0,
+      "meteringSource" : "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT"
+    }
+  }, {
+    "stage" : "PLAN",
+    "sequence" : 4,
+    "kind" : "failure",
+    "taskId" : "5fc90ad8-7d17-4633-a23f-8f9e4392b90b",
+    "at" : "2026-10-23T14:19:48.187870500Z",
+    "payload" : {
+      "code" : "MODEL_NETWORK",
+      "recovery" : "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+      "category" : "MODEL_INTERFACE"
+    }
+  } ],
+  "platformMeter" : {
+    "models" : 1,
+    "tools" : 0,
+    "chargedTokens" : 9493
+  },
+  "sources" : [ ],
+  "screenshots" : [ ],
+  "harnessError" : null
+}
