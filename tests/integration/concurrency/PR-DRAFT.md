@@ -47,7 +47,7 @@
 - **慢卷模拟**：
   - `acceptance@slow` 11/11 通过，每次冻结加 1500 ms 并串行。
   - `mutation-lease-boundary@slow`（`AgentRunStore` 用 B 审查时的版本）复现了 B 的模式：T3 的 8 个任务全部失败（INTERRUPTED 或 RUNNER_ERROR），出现 V2 “FAILED version has a usable VERIFIED outcome / without a frozen FAILED report”，d20a01 也失败。
-- **反证 11/11 PASSED**：每个都是 Maven exit 1、signal 为 null、预期用例全部失败，文件按字节还原。
+- **反证 @`94a5e70`，9 个模式各 1 次，全部 PASSED**：每次都是 Maven exit 1、signal 为 null、预期用例全部失败，文件按字节还原。连同上面的 `mutation-lease-boundary@slow`，共 10 次反证运行。
   - 快照修复回退 ×2。
   - 去掉 worker 行锁（T1）。
   - 发布键去掉 owner（T3）。
@@ -56,6 +56,7 @@
   - `lease-boundary`：两个新用例都失败。
   - `freeze-first`：READY 提交用例失败；另外 T1 的 `ready()` 在本机正常速度下也触发了同一回滚，留下 V2 残留。
   - `draft-in-lock`：草稿用例失败。
+  - 计数口径：各模式的预期失败用例累计 11 个（lease-boundary 与 freeze-first、draft-in-lock 有重叠，去重后 9 个）。上一版正文的“11/11”与记录不符，已按 `commands.json` 更正。
 - **红色运行**：修复前的 `AgentRunStore` 加新用例，两项按上述方式失败（`.local-data/d20-a/red-2/`，私有）。
 - **回归**：7 个不需要真实构建运行时的套件 35/35 通过，包括 StorageSweeper 与 LocalVolumeSnapshotStore。
   - 依赖真实运行时的套件被本机 Node 锁挡住。
