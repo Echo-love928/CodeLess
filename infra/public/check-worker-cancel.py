@@ -24,7 +24,7 @@ for folder, _, files in os.walk(source):
         target = Path(folder) / name
         os.chown(target, api.pw_uid, shared.gr_gid)
         target.chmod(0o640)
-node = '/opt/codeless/tools/node-v24.16.0-linux-x64/bin/node'
+node = '/opt/codeless/tools/node-v24.22.1-linux-x64/bin/node'
 digest = json.loads(subprocess.run([node, '--input-type=module', '-e',
     "import {readSnapshot} from './services/runner/src/artifacts/snapshot.mjs'; console.log(JSON.stringify((await readSnapshot(process.argv[1], {source:true})).manifest.digest))",
     str(source)], cwd=repository, capture_output=True, text=True, check=True).stdout)

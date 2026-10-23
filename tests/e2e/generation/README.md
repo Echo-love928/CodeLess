@@ -1,6 +1,6 @@
 # D10-B deterministic generation flows
 
-Run from the repository root with D01 Node 24.16.0 / pnpm 12.6.0, Docker and the locked Playwright Chromium installed:
+Run from the repository root with the locked Node 24.22.1 / pnpm 12.6.0, Docker and the locked Playwright Chromium installed:
 
 ```powershell
 pnpm verify:static

@@ -1,0 +1,246 @@
+{
+  "purpose": "ADR-005 Node lock upgrade: full local pnpm ci:gate on the committed lock",
+  "run": "gate-2026-10-22T07-38-34Z",
+  "head": "aa1301a4569eefe23e189017a29bae18d50f6293",
+  "trackedChangesAtStart": 0,
+  "command": "corepack pnpm ci:gate",
+  "environment": {
+    "node": "/f/nodejs/node v24.22.1",
+    "pnpm": "12.6.0",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS",
+    "docker": "29.9.2",
+    "model": "deterministic-mock key_set= name_set= channel_set=",
+    "os": "Windows 11 22621 (core.autocrlf=true checkout)"
+  },
+  "start": "2026-10-22T07:38:36Z",
+  "end": "2026-10-22T07:58:56Z",
+  "nativeExit": 1,
+  "gateLine": "[ci-gate] failed with exit code 1",
+  "outerPnpmLines": [
+    "[ELIFECYCLE] Command failed with exit code 1."
+  ],
+  "stageExitNote": "A stage failed only if its own section has a pnpm ELIFECYCLE line; the gate keeps the first non-zero stage exit.",
+  "stages": {
+    "verify:static": {
+      "lifecycleFailures": [],
+      "versionCheck": "version check passed: Node 24.22.1, pnpm 12.6.0; Java/Spring/Maven locks consistent",
+      "boundaries": [
+        "OpenAPI surface and authentication boundary passed",
+        "runner contract boundary passed",
+        "cross-resource READY/publication flow passed"
+      ],
+      "contractTests": {
+        "tests": 18,
+        "pass": 18,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "webVitest": [
+        "Test Files  26 passed (26)",
+        "Tests  199 passed (199)"
+      ],
+      "webBuild": [
+        "✓ built in 3.34s"
+      ]
+    },
+    "verify:api": {
+      "lifecycleFailures": [
+        "[ELIFECYCLE] Command failed with exit code 1."
+      ],
+      "total": "[ERROR] Tests run: 285, Failures: 5, Errors: 0, Skipped: 0",
+      "build": "[INFO] BUILD FAILURE",
+      "testClasses": 62,
+      "failingClasses": [
+        {
+          "class": "preview.PreviewAcceptanceProcessTest",
+          "run": 8,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0,
+          "time": "20.45 s"
+        }
+      ],
+      "failureLines": [
+        "[ERROR]   PreviewAcceptanceProcessTest.interruptionStopsTreeAndRetainsInterrupt:30->stopped:18 [root stopped]",
+        "[ERROR]   PreviewAcceptanceProcessTest.parentExceptionIsNotReplacedByCleanup:25->stopped:18 [root stopped]",
+        "[ERROR]   PreviewAcceptanceProcessTest.stopSignalWriteFailureStillReclaimsAndRunsProjectCleanup:50",
+        "[ERROR]   PreviewAcceptanceProcessTest.timeoutAssertionAlwaysStopsRootBranchAndLeaf:24->stopped:18 [root stopped]",
+        "[ERROR]   PreviewAcceptanceProcessTest.unavailableProcessReportStillRunsProjectCleanupAndPreservesParent:38"
+      ],
+      "prepareRuntimeSuites": [
+        {
+          "class": "AgentLoopIntegrationTest",
+          "run": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": "111.9 s"
+        },
+        {
+          "class": "CsrfDuringGenerationTest",
+          "run": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": "13.60 s"
+        },
+        {
+          "class": "RepairLoopIntegrationTest",
+          "run": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": "283.5 s"
+        },
+        {
+          "class": "PublicationIntegrationTest",
+          "run": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": "32.77 s"
+        },
+        {
+          "class": "EditLifecycleIntegrationTest",
+          "run": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": "121.9 s"
+        },
+        {
+          "class": "EditVerificationIntegrationTest",
+          "run": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": "70.77 s"
+        },
+        {
+          "class": "LocalEditScopeIntegrationTest",
+          "run": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": "71.50 s"
+        },
+        {
+          "class": "SourceExportIntegrationTest",
+          "run": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": "100.1 s"
+        },
+        {
+          "class": "PreviewPlatformIntegrationTest",
+          "run": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": "60.16 s"
+        },
+        {
+          "class": "VersionHttpIntegrationTest",
+          "run": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": "17.61 s"
+        }
+      ]
+    },
+    "verify:runner": {
+      "lifecycleFailures": [],
+      "boundaries": [
+        "runner contract boundary passed"
+      ],
+      "nodeTests": {
+        "tests": 101,
+        "pass": 101,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    "verify:e2e": {
+      "lifecycleFailures": [],
+      "boundaries": [
+        "OpenAPI surface and authentication boundary passed",
+        "cross-resource READY/publication flow passed"
+      ],
+      "playwright": [
+        "75 passed (1.1m)"
+      ]
+    }
+  },
+  "knownWindowsLocalFailures": {
+    "class": "dev.codeless.api.preview.PreviewAcceptanceProcessTest",
+    "gate": {
+      "run": 8,
+      "failures": 5,
+      "errors": 0,
+      "skipped": 0,
+      "time": "20.45 s"
+    },
+    "gateSignatures": [
+      "PreviewAcceptanceProcessTest.interruptionStopsTreeAndRetainsInterrupt:30->stopped:18 [root stopped]",
+      "PreviewAcceptanceProcessTest.parentExceptionIsNotReplacedByCleanup:25->stopped:18 [root stopped]",
+      "PreviewAcceptanceProcessTest.stopSignalWriteFailureStillReclaimsAndRunsProjectCleanup:50",
+      "PreviewAcceptanceProcessTest.timeoutAssertionAlwaysStopsRootBranchAndLeaf:24->stopped:18 [root stopped]",
+      "PreviewAcceptanceProcessTest.unavailableProcessReportStillRunsProjectCleanupAndPreservesParent:38"
+    ],
+    "base": {
+      "record": "D19-A attribution on unmodified base 3ec4b99 with Node 24.16.0 (docs/handoffs/D19-A.md section 4)",
+      "logSha256": "3acd4a01f3778fb1926616ee0e1ee8f478ef52fd0275cd28e7afcf4255964209",
+      "signatures": [
+        "PreviewAcceptanceProcessTest.interruptionStopsTreeAndRetainsInterrupt:30->stopped:18 [root stopped]",
+        "PreviewAcceptanceProcessTest.parentExceptionIsNotReplacedByCleanup:25->stopped:18 [root stopped]",
+        "PreviewAcceptanceProcessTest.stopSignalWriteFailureStillReclaimsAndRunsProjectCleanup:50",
+        "PreviewAcceptanceProcessTest.timeoutAssertionAlwaysStopsRootBranchAndLeaf:24->stopped:18 [root stopped]",
+        "PreviewAcceptanceProcessTest.unavailableProcessReportStillRunsProjectCleanupAndPreservesParent:38"
+      ]
+    },
+    "identicalToBase": true
+  },
+  "log": {
+    "file": ".local-data/node-lock/gate-2026-10-22T07-38-34Z/gate.log (private)",
+    "bytes": 370837,
+    "lines": 2872,
+    "sha256": "b541112256a8a6781b06a86721c85359e8b95b1f7a53abfe4bc264d124450afb"
+  },
+  "additionalChecks": {
+    "infraPreflight": {
+      "why": "CI-only infra-preflight job (not part of ci:gate); compose runner now node:24.22.1-bookworm-slim",
+      "command": "bash infra/ci-preflight.sh .env.example",
+      "head": "aa1301a4569eefe23e189017a29bae18d50f6293",
+      "start": "2026-10-22T08:00:09Z",
+      "end": "2026-10-22T08:00:34Z",
+      "nativeExit": 0,
+      "result": "Docker, PostgreSQL, gateways and private runner preflight passed",
+      "cleanup": "compose project removed with down -v; no codeless-preflight containers left",
+      "log": {
+        "file": ".local-data/node-lock/infra-preflight/preflight.log (private)",
+        "bytes": 4426,
+        "sha256": "2d1fac946c94c189988a44619aeee129d107997767be476d3d4c7685ab54e179"
+      }
+    }
+  },
+  "screenshots": {
+    "rewrittenByVerifyE2e": [
+      "docs/evidence/D10/deterministic/cancelled.png",
+      "docs/evidence/D10/deterministic/failure.png",
+      "docs/evidence/D10/deterministic/recovered.png",
+      "docs/evidence/D10/deterministic/success.png",
+      "tests/e2e/share/evidence/2026-10-19/T2-mobile-placeholder.png",
+      "tests/e2e/versions/evidence/2026-10-12/fixture/T1-version-switch.png",
+      "tests/e2e/versions/evidence/2026-10-12/fixture/T2-source-error.png",
+      "tests/e2e/versions/evidence/2026-10-12/fixture/T3-failed-keeps-preview.png",
+      "tests/e2e/versions/evidence/2026-10-12/fixture/T4-script-as-text.png"
+    ],
+    "action": "copied to .local-data/node-lock/gate-generated-png/ and restored to their tracked bytes; not part of this change"
+  }
+}

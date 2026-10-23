@@ -1,0 +1,122 @@
+{
+  "review": {
+    "pr": 59,
+    "reviewId": 5612271142,
+    "state": "COMMENTED",
+    "commit": "3e5d336518b0a005cc046619b78f10cb85631f45",
+    "submittedAt": "2026-10-22T09:46:27Z",
+    "reviewerHost": {
+      "node": "v24.22.1",
+      "java": "21.0.12.1",
+      "docker": "29.9.2",
+      "run": "2026-10-22T09-30-47.732Z-acceptance-c69fa67a…",
+      "native": 1,
+      "signal": null,
+      "junit": {
+        "tests": 9,
+        "failures": 6,
+        "errors": 0,
+        "skipped": 0
+      },
+      "seconds": 564.3,
+      "t3Tasks": {
+        "READY": 1,
+        "FAILED/INTERRUPTED": 5,
+        "FAILED/INVALID_STAGE_RESULT": 2
+      },
+      "versionsSqlFailedStoreVerified": 5
+    },
+    "note": "Reported by D20-B in the review body; raw logs stay on the reviewer host."
+  },
+  "localReproductionOfReviewedCommit": {
+    "worktree": ".local-data/d20-a/repro-3e5d336",
+    "run": "2026-10-22T14-29-41.594Z-acceptance-75f097fd-4026-4ba6-87b6-24e60c0a2c3a",
+    "head": "3e5d336518b0a005cc046619b78f10cb85631f45",
+    "status": "PASSED",
+    "junit": {
+      "tests": 9,
+      "failures": 0
+    },
+    "seconds": 294.802,
+    "conclusion": "This host is not slow enough to hit the window naturally; attribution uses the deterministic StoreGate replays and the @slow emulation."
+  },
+  "chain": [
+    "The heartbeat renews the lease with UPDATE generation_tasks ... WHERE id=?; a worker transaction holding that row FOR UPDATE blocks it.",
+    "Pre-fix AgentRunStore.complete froze the VERIFIED outcome (process-wide synchronized, toRealPath per segment) before its lease-checked READY transition.",
+    "A freeze longer than the remaining 3 s lease made the transition fail with \"Lease is no longer active\"; SQL rolled back after the outcome was atomically on disk.",
+    "Recovery failed the task; DraftConvergence then found SNAPSHOT_ALREADY_FROZEN (CONFLICT): SQL FAILED, store VERIFIED (audit V2).",
+    "A renew that began before expiry and waited on the row until the rollback is not re-evaluated under READ COMMITTED, so it revived the lease and failIfLeased recorded FAILED/INVALID_STAGE_RESULT; otherwise recovery recorded FAILED/INTERRUPTED.",
+    "Pre-fix draft froze the source inside the row lock and re-checked the lease afterwards: lease lost, no version, FAILED/INTERRUPTED."
+  ],
+  "reviewerCountsInference": "Consistent split (unverified, reviewer logs not on this host): five residues from READY-commit failures (INTERRUPTED and INVALID_STAGE_RESULT), the remaining INTERRUPTED tasks lost their lease in GENERATE without a version.",
+  "redRunPreFixAgentRunStore": {
+    "private": ".local-data/d20-a/red-2/",
+    "tests": 2,
+    "failures": [
+      {
+        "test": "d20a04ReadyCommitWhoseFreezeOutlastsTheLeaseCommitsOnce",
+        "message": "[observed {leaseExpiredWhileFreezeHeld=true, committedStateDuringFreeze=VERIFY/, final=FAILED/INVALID_STAGE_RESULT, versionStatus=FAILED, verifiedOutcomeReadable=true, latestIsThisVersion=false, verifyExecutions=1}] expected: \"READY/\" but was: \"FAILED/INVALID_STAGE_RESULT\""
+      },
+      {
+        "test": "d20a04DraftWhoseSourceFreezeOutlastsTheLeaseKeepsTheLiveWorkersTask",
+        "message": "[observed {heldPastTheLeaseAtFreeze=true, committedStateDuringFreeze=GENERATE/, leaseRenewedDuringFreeze=false, final=FAILED/INTERRUPTED, generateExecutions=1, versionsFromTask=0}] expected: true but was: false"
+      }
+    ]
+  },
+  "slowVolumeEmulation": {
+    "slowFreezeMs": 1500,
+    "fixed": [
+      {
+        "head": "94a5e70082fc718ba42ac8af158361e95ee28322",
+        "run": "2026-10-22T14-50-34.279Z-acceptance-slow-5e277f9b-274c-4836-b346-392e23b5ca7a",
+        "status": "PASSED",
+        "tests": 11
+      },
+      {
+        "head": "d55a8def41e4643825427ce383c8074574c93a14",
+        "run": "2026-10-22T15-43-42.616Z-acceptance-slow-c6df1f1f-6de9-45f5-a835-976b68fa0597",
+        "status": "PASSED",
+        "tests": 11
+      }
+    ],
+    "preFix": {
+      "mode": "mutation-lease-boundary@slow",
+      "run": "2026-10-22T14-56-36.348Z-mutation-lease-boundary-slow-b723ed2c-970a-48d2-b9b6-2373b01d69d5",
+      "failedTests": [
+        "d20a01DuplicateSubmissionsToOneApplicationRunOnceEachInOrder",
+        "d20aT3TwoUsersRacingWithIdenticalKeysShareNoData",
+        "d20a03AuditRejectsInjectedInconsistencies",
+        "d20a04ReadyCommitWhoseFreezeOutlastsTheLeaseCommitsOnce",
+        "d20a04DraftWhoseSourceFreezeOutlastsTheLeaseKeepsTheLiveWorkersTask"
+      ],
+      "t3Tasks": {
+        "FAILED/INTERRUPTED": 4,
+        "FAILED/RUNNER_ERROR": 4
+      },
+      "auditMessages": [
+        "V2 ...: FAILED version has a usable VERIFIED outcome",
+        "V2 ...: FAILED version without a frozen FAILED report"
+      ]
+    }
+  },
+  "naturalReproductionAtNormalSpeed": {
+    "mode": "mutation-freeze-first",
+    "run": "2026-10-22T15-04-56.228Z-mutation-freeze-first-fb3fe32b-5b26-4658-8be9-82b6ced5fda5",
+    "observed": "T1 ready(): READY commit failed with \"Lease is no longer active\" on this host without any emulated delay; the version later converged FAILED/INTERRUPTED with a CONFLICT report (V2)."
+  },
+  "localGate": {
+    "head": "d55a8def41e4643825427ce383c8074574c93a14",
+    "run": "2026-10-22T16-08-36.416Z-gate-39b8ce85-3109-4084-85d6-a8fb8067877d",
+    "status": "FAILED",
+    "exitCode": 1,
+    "signal": null,
+    "node": "v24.22.1",
+    "stages": {
+      "static": "FAILED at verify-versions: \"Node expected 24.16.0, got 24.22.1\" (lock unchanged; see #60)",
+      "api": "225 tests, 5 failures (PreviewAcceptanceProcessTest, known on this host), 10 errors (suites refused by tests/agent/prepare-runtime.mjs:8 \"D01 Node version required\"); ConcurrencyConsistencyTest 11/11",
+      "runner": "101/101",
+      "e2e": "Playwright 75/75; 9 rewritten committed screenshots saved to .local-data/d20-a/gate-generated-png-2/ and restored"
+    },
+    "ciGate": "not green locally; merge uses the PR's remote checks"
+  }
+}

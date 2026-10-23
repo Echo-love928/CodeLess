@@ -80,11 +80,11 @@ def main():
     request = {'password': credentials['CODELESS_DEMO_PASSWORD'], 'adminPassword': credentials['CODELESS_ADMIN_PASSWORD'],
                'failedVersionApplicationId': 'd83b28da-198c-4477-85e3-420ecbf83582',
                'retryFailed': os.environ.get('CODELESS_ACCEPTANCE_RETRY_FAILED') == 'true'}
-    env = {'PATH': '/opt/codeless/tools/node-v24.16.0-linux-x64/bin:/usr/bin:/bin',
+    env = {'PATH': '/opt/codeless/tools/node-v24.22.1-linux-x64/bin:/usr/bin:/bin',
            'HOME': str(BASE / 'acceptance-private/home'), 'TMPDIR': str(BASE / 'acceptance-private/home/tmp'),
            'PLAYWRIGHT_BROWSERS_PATH': '/opt/codeless/browsers', 'LANG': 'C.UTF-8'}
     child = subprocess.Popen(['/usr/sbin/runuser', '-u', evaluator.pw_name, '--',
-                              '/opt/codeless/tools/node-v24.16.0-linux-x64/bin/node',
+                              '/opt/codeless/tools/node-v24.22.1-linux-x64/bin/node',
                               str(BASE / 'repository/infra/public/acceptance.mjs'), str(evidence), str(public_evidence / 'acceptance.json')],
                              stdin=subprocess.PIPE, env=env, start_new_session=True)
     child.stdin.write(json.dumps(request).encode())

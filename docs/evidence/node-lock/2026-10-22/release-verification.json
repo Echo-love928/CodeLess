@@ -1,0 +1,351 @@
+{
+  "purpose": "ADR-005 Node lock upgrade 24.16.0 -> 24.22.1: release, signature, binary and image identity",
+  "collectedAt": "2026-10-22T07:40:12.262Z",
+  "sources": [
+    "https://nodejs.org/dist/index.json",
+    "https://raw.githubusercontent.com/nodejs/Release/main/schedule.json",
+    "https://nodejs.org/download/release/v24.22.1/SHASUMS256.txt(.asc)",
+    "https://raw.githubusercontent.com/nodejs/release-keys/HEAD/keys.list",
+    "docker buildx imagetools inspect --raw node:24.22.1-bookworm-slim"
+  ],
+  "previousLock": {
+    "version": "v24.16.0",
+    "date": "2026-05-21",
+    "lts": "Krypton",
+    "security": false,
+    "npm": "11.13.0",
+    "v8": "13.6.233.17",
+    "openssl": "3.5.6"
+  },
+  "newLock": {
+    "version": "v24.22.1",
+    "date": "2026-10-20",
+    "lts": "Krypton",
+    "security": true,
+    "npm": "11.19.1",
+    "v8": "13.6.233.17",
+    "openssl": "3.5.9"
+  },
+  "newestOverall": {
+    "version": "v26.12.1",
+    "date": "2026-10-21",
+    "lts": false,
+    "security": true,
+    "npm": "11.20.0",
+    "v8": "14.6.202.34",
+    "openssl": "3.5.9"
+  },
+  "line": {
+    "major": "v24",
+    "start": "2025-05-06",
+    "lts": "2025-10-28",
+    "maintenance": "2026-10-20",
+    "end": "2028-04-30",
+    "codename": "Krypton"
+  },
+  "securityReleasesAfterPreviousLock": [
+    "v24.17.0",
+    "v24.18.1",
+    "v24.22.1"
+  ],
+  "fixedSincePreviousLock": {
+    "cveCount": 30,
+    "severity": {
+      "High": 10,
+      "Medium": 13,
+      "Low": 7
+    },
+    "releases": [
+      {
+        "version": "v24.17.0",
+        "notesDate": "2026-06-18",
+        "url": "https://nodejs.org/en/blog/release/v24.17.0",
+        "cveCount": 11,
+        "severity": {
+          "High": 2,
+          "Medium": 6,
+          "Low": 3
+        },
+        "fixes": [
+          {
+            "cves": [
+              "CVE-2026-48618"
+            ],
+            "change": "tls: normalize hostname for server identity checks (Matteo Collina)",
+            "severity": "High"
+          },
+          {
+            "cves": [
+              "CVE-2026-48933"
+            ],
+            "change": "crypto: guard WebCrypto cipher output length (Filip Skokan)",
+            "severity": "High"
+          },
+          {
+            "cves": [
+              "CVE-2026-48615"
+            ],
+            "change": "lib,test: redact proxy credentials in tunnel errors (Matteo Collina)",
+            "severity": "Medium"
+          },
+          {
+            "cves": [
+              "CVE-2026-48619"
+            ],
+            "change": "http2: cap originSet size to prevent unbounded memory growth (Matteo Collina)",
+            "severity": "Medium"
+          },
+          {
+            "cves": [
+              "CVE-2026-48928"
+            ],
+            "change": "tls: fix case-sensitive SNI context matching (Matteo Collina)",
+            "severity": "Medium"
+          },
+          {
+            "cves": [
+              "CVE-2026-48930"
+            ],
+            "change": "dns,net: reject hostnames with embedded NUL bytes (Matteo Collina)",
+            "severity": "Medium"
+          },
+          {
+            "cves": [
+              "CVE-2026-48934"
+            ],
+            "change": "tls: bind reusable sessions to authenticated host (Matteo Collina)",
+            "severity": "Medium"
+          },
+          {
+            "cves": [
+              "CVE-2026-48937"
+            ],
+            "change": "deps: fix integration issues with the latest nghttp2",
+            "severity": "Medium"
+          },
+          {
+            "cves": [
+              "CVE-2026-48617"
+            ],
+            "change": "permission: handle process.chdir on writereport (RafaelGSS)",
+            "severity": "Low"
+          },
+          {
+            "cves": [
+              "CVE-2026-48931"
+            ],
+            "change": "http: fix response queue poisoning in http.Agent (Matteo Collina)",
+            "severity": "Low"
+          },
+          {
+            "cves": [
+              "CVE-2026-48935"
+            ],
+            "change": "permission: disable FileHandle utimes with permission model (RafaelGSS)",
+            "severity": "Low"
+          }
+        ]
+      },
+      {
+        "version": "v24.18.1",
+        "notesDate": "2026-07-29",
+        "url": "https://nodejs.org/en/blog/release/v24.18.1",
+        "cveCount": 11,
+        "severity": {
+          "High": 3,
+          "Medium": 5,
+          "Low": 3
+        },
+        "fixes": [
+          {
+            "cves": [
+              "CVE-2026-56846"
+            ],
+            "change": "http2: retain header memory in session accounting (Matteo Collina)",
+            "severity": "High"
+          },
+          {
+            "cves": [
+              "CVE-2026-56848"
+            ],
+            "change": "http2: defer rst stream while in scope (Matteo Collina)",
+            "severity": "High"
+          },
+          {
+            "cves": [
+              "CVE-2026-58043"
+            ],
+            "change": "permission: avoid granting radix split nodes (RafaelGSS)",
+            "severity": "High"
+          },
+          {
+            "cves": [
+              "CVE-2026-56850"
+            ],
+            "change": "https: distinguish PFX object-array agent keys (RafaelGSS)",
+            "severity": "Medium"
+          },
+          {
+            "cves": [
+              "CVE-2026-58040"
+            ],
+            "change": "https: bind identity checks to session reuse (Matteo Collina)",
+            "severity": "Medium"
+          },
+          {
+            "cves": [
+              "CVE-2026-58041"
+            ],
+            "change": "sqlite: invalidate tag store iterators on statement reset (Matteo Collina)",
+            "severity": "Medium"
+          },
+          {
+            "cves": [
+              "CVE-2026-58042"
+            ],
+            "change": "dns: handle large resolveAny address replies (RafaelGSS)",
+            "severity": "Medium"
+          },
+          {
+            "cves": [
+              "CVE-2026-58045"
+            ],
+            "change": "zlib: throw on out-of-bounds write buffers (RafaelGSS)",
+            "severity": "Medium"
+          },
+          {
+            "cves": [
+              "CVE-2026-56847"
+            ],
+            "change": "permission: enforce fs write permission for trace events (RafaelGSS)",
+            "severity": "Low"
+          },
+          {
+            "cves": [
+              "CVE-2026-58039"
+            ],
+            "change": "permission: check final report output path (RafaelGSS)",
+            "severity": "Low"
+          },
+          {
+            "cves": [
+              "CVE-2026-58044"
+            ],
+            "change": "http: reject requests exceeding max header count (Matteo Collina)",
+            "severity": "Low"
+          }
+        ]
+      },
+      {
+        "version": "v24.22.1",
+        "notesDate": "2026-10-21",
+        "url": "https://nodejs.org/en/blog/release/v24.22.1",
+        "cveCount": 8,
+        "severity": {
+          "High": 5,
+          "Medium": 2,
+          "Low": 1
+        },
+        "fixes": [
+          {
+            "cves": [
+              "CVE-2026-106069",
+              "CVE-2026-106072"
+            ],
+            "change": "tls: reject non-canonical IP addresses (Matteo Collina)",
+            "severity": "High"
+          },
+          {
+            "cves": [
+              "CVE-2026-105482"
+            ],
+            "change": "dns: validate resolve inputs for null bytes (James M Snell)",
+            "severity": "High"
+          },
+          {
+            "cves": [
+              "CVE-2026-105483"
+            ],
+            "change": "tls: fix ip normalization regression (James M Snell)",
+            "severity": "High"
+          },
+          {
+            "cves": [
+              "CVE-2026-111497"
+            ],
+            "change": "deps: brotli: cherry-pick 0ed4268a4401abcb44720963 (Evgenii Kliuchnikov)",
+            "severity": "High"
+          },
+          {
+            "cves": [
+              "CVE-2026-105481"
+            ],
+            "change": "http: ensure agent data guard works without I/O (James M Snell)",
+            "severity": "Medium"
+          },
+          {
+            "cves": [
+              "CVE-2026-106074"
+            ],
+            "change": "crypto: reset random caches across snapshots (Filip Skokan)",
+            "severity": "Medium"
+          },
+          {
+            "cves": [
+              "CVE-2026-106073"
+            ],
+            "change": "permission: check permission model in realpathSync (RafaelGSS)",
+            "severity": "Low"
+          }
+        ]
+      }
+    ]
+  },
+  "signature": {
+    "file": "SHASUMS256.txt.asc",
+    "goodSignature": true,
+    "signerKey": "5BE8A3F6C8A5C01D106C0AD820B1A390B168D356",
+    "signerUid": "Antoine du Hamel <antoine.duhamel@platformatic.dev>",
+    "signerInNodeReleaseKeysList": true,
+    "keyring": "temporary GNUPGHOME with only the 29 keys from nodejs/release-keys keys.list (user keyring untouched)"
+  },
+  "binaries": {
+    "node-v24.22.1-linux-x64.tar.xz": "6c172a9ab6718f7b801fb5a7bd486af2ee5e32758086a04b84fcce2aa77095e6",
+    "win-x64/node.exe": "d702daa815eabbff763c7d3808e235cf031cf2ca70211b56847bc72f51e240e5",
+    "localWindowsNodeExe": {
+      "path": "F:/nodejs/node.exe",
+      "sha256": "d702daa815eabbff763c7d3808e235cf031cf2ca70211b56847bc72f51e240e5"
+    },
+    "localMatchesOfficialWinX64": true
+  },
+  "image": {
+    "reference": "node:24.22.1-bookworm-slim",
+    "indexDigest": "sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205",
+    "mediaType": "application/vnd.oci.image.index.v1+json",
+    "platforms": [
+      {
+        "platform": "linux/amd64",
+        "digest": "sha256:2dd9a4f758e173b65fee15388f7706af6fb01ef50cf7a2c0538711d67a6981ae",
+        "source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/bookworm-slim",
+        "base": "debian:bookworm-slim"
+      },
+      {
+        "platform": "linux/arm64/v8",
+        "digest": "sha256:294d33a992da016e059121deb0c979dffb4478b77a304376bca41393297c1ea2",
+        "source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/bookworm-slim",
+        "base": "debian:bookworm-slim"
+      },
+      {
+        "platform": "linux/ppc64le",
+        "digest": "sha256:41a7d6337c4dfc9f286af709ad6551d931660f822c464e134f329a799a7f9cb9",
+        "source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/bookworm-slim",
+        "base": "debian:bookworm-slim"
+      }
+    ],
+    "previousIndexDigest": "sha256:2c87ef9bd3c6a3bd4b472b4bec2ce9d16354b0c574f736c476489d09f560a203",
+    "containerCheck": [
+      "node=v24.22.1 arch=x64 openssl=3.5.9 undici=7.30.1 ares=1.34.9",
+      "corepack=0.36.0 debian=12.15"
+    ]
+  }
+}

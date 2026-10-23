@@ -110,16 +110,22 @@ public final class AgentRunStore {
             journal.append(claim.taskId(),stage.name(),kind,Map.of("reservedTokens",tokens,"slots",slots));
         });
     }
+    /**
+     * The source is frozen before the task row lock: the heartbeat renews the lease with an UPDATE of that row, so a
+     * slow freeze inside the lock let the lease run out and the next check refuse a live worker (D20-B review). Until
+     * the fenced INSERT commits, nothing references the new directory; a lost lease leaves an orphan for the sweeper.
+     */
     public JsonNode draft(TaskQueueService.Claim claim, FileToolService.Snapshot snapshot, JsonNode actions) {
+        tx.executeWithoutResult(s -> lock(claim,TaskStatus.GENERATE)); // A cancelled or expired worker freezes nothing.
+        UUID version=UUID.randomUUID();
+        var frozen=snapshots.freezeSource(version,snapshot.directory(),snapshot.source().sourceDigest(),
+                tools.jackson.databind.json.JsonMapper.builder().build().valueToTree(snapshot.source().files()));
         return tx.execute(s -> {
             lock(claim,TaskStatus.GENERATE);
             UUID app=jdbc.sql("SELECT application_id FROM generation_tasks WHERE id=?").param(claim.taskId()).query(UUID.class).single();
             jdbc.sql("SELECT id FROM applications WHERE id=? FOR UPDATE").param(app).query(UUID.class).single();
             int number=jdbc.sql("SELECT coalesce(max(number),0)+1 FROM application_versions WHERE application_id=?")
                     .param(app).query(Integer.class).single();
-            UUID version=UUID.randomUUID();
-            var frozen=snapshots.freezeSource(version,snapshot.directory(),snapshot.source().sourceDigest(),
-                    tools.jackson.databind.json.JsonMapper.builder().build().valueToTree(snapshot.source().files()));
             jdbc.sql("INSERT INTO application_versions(id,application_id,number,source_digest,status,source_task_id) VALUES (?,?,?,?,'DRAFT',?)")
                     .params(version,app,number,snapshot.source().sourceDigest(),claim.taskId()).update();
             journal.append(claim.taskId(),"GENERATE","draft",Map.of("versionId",version,"sourceDigest",snapshot.source().sourceDigest(),
@@ -129,6 +135,12 @@ public final class AgentRunStore {
             return AgentJournal.latest(journal.read(claim.taskId()),"draft");
         });
     }
+    /**
+     * The VERIFIED outcome is the one step a rollback cannot undo, so it is frozen last, after every check that can
+     * still refuse this commit (edit base, DRAFT state, lease). Frozen first, a lease that ran out during the slow
+     * freeze (the heartbeat waits on this row lock) rolled the commit back behind a VERIFIED outcome of a version
+     * convergence then failed (D20-B review). The lock still excludes cancel and expiry recovery until commit.
+     */
     public TaskQueueService.TaskView complete(TaskQueueService queue, TaskQueueService.Claim claim, JsonNode draft, JsonNode result) {
         return tx.execute(s -> {
             lock(claim,TaskStatus.VERIFY);
@@ -142,7 +154,6 @@ public final class AgentRunStore {
             JsonNode build=result.path("build"), verification=result.path("verification");
             UUID buildId=UUID.fromString(build.path("id").asText());
             String artifact=build.path("artifact").path("digest").asText();
-            snapshots.freezeOutcome(version,draft.path("sourceDigest").asText(),"VERIFIED",result,null);
             int changed=jdbc.sql("""
                     INSERT INTO builds(id,task_id,version_id,status,exit_code,artifact_digest,created_at,completed_at)
                     SELECT ?,t.id,v.id,'SUCCEEDED',0,?,CAST(? AS timestamptz),CAST(? AS timestamptz)
@@ -159,6 +170,7 @@ public final class AgentRunStore {
                     .params(version,view.applicationId()).update();
             journal.append(claim.taskId(),"VERIFY","completion",Map.of("versionId",version,"buildId",buildId,
                     "verificationId",verification.path("id").asText(),"sourceDigest",draft.path("sourceDigest").asText(),"artifactDigest",artifact));
+            snapshots.freezeOutcome(version,draft.path("sourceDigest").asText(),"VERIFIED",result,null);
             return view;
         });
     }

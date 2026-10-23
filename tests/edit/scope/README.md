@@ -12,7 +12,7 @@ node tests/edit/scope/export-evidence.mjs
 `acceptance` 实际执行 `LocalEditScopeIntegrationTest,LocalEditScopeTest`；Maven 默认 API 门禁也自动发现它们。
 `gate` 原样执行根 ci-gate，串行运行 pnpm verify:static/api/runner/e2e。
 记录器清除真实模型凭据和浏览器 channel，锁定 deterministic-mock 和已有 Chromium。
-无开发环境 env.ps1 时按 docs/environment.md 配置锁定的 Java21/Maven3.9.11/Node24.16.0/pnpm12.6.0。
+无开发环境 env.ps1 时按 docs/environment.md 配置锁定的 Java21/Maven3.9.11/Node24.22.1/pnpm12.6.0。
 需要真实 Docker/PostgreSQL/Chromium；缺失直接失败，没有空脚本、skip 或替代构建。
 
 T1：真实 HTTP 拒绝未知 componentId、客户端 sourceFile、版本错配和摘要错配，数据库任务数不变。

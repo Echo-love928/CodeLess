@@ -21,7 +21,7 @@ $env:JAVA_HOME='C:/Program Files/Java/jdk-21.0.12.1'
 node tests/security/runner/record-command.mjs gate
 ```
 
-Linux 直接使用锁定 Node24.16.0、pnpm12.6.0、Java21 与 Playwright1.60.0；不得用 root 宿主账号运行构建测试。需要 Docker Engine、D05 镜像构建所需缓存/网络、锁定 Chromium、nginx:1.27.5-alpine 和 openssl。没有安装浏览器时不能冒充通过。`record-command.mjs` 保存命令、原生退出码、源码 SHA256、日志 SHA256 和每项结果；完整日志在 `.local-data/d19-b/<run>/`。它备份并还原旧测试自动生成的历史证据，实际新产物保留在对应 run，不篡改历史失败。
+Linux 直接使用锁定 Node24.22.1、pnpm12.6.0、Java21 与 Playwright1.60.0；不得用 root 宿主账号运行构建测试。需要 Docker Engine、D05 镜像构建所需缓存/网络、锁定 Chromium、nginx:1.27.5-alpine 和 openssl。没有安装浏览器时不能冒充通过。`record-command.mjs` 保存命令、原生退出码、源码 SHA256、日志 SHA256 和每项结果；完整日志在 `.local-data/d19-b/<run>/`。它备份并还原旧测试自动生成的历史证据，实际新产物保留在对应 run，不篡改历史失败。
 
 ## 边界与可复现证据
 
