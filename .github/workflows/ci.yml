@@ -11,7 +11,7 @@ permissions:
 jobs:
   static:
     name: verify:static
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -23,7 +23,7 @@ jobs:
 
   api:
     name: verify:api
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -38,7 +38,7 @@ jobs:
 
   runner:
     name: verify:runner
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -99,7 +99,7 @@ jobs:
     name: ci-gate
     if: always()
     needs: [static, api, runner, e2e, infra]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Reject failed, cancelled, skipped, or unknown checks
         env:
