@@ -1,4 +1,4 @@
-任务ID：D20-A（成员A）／分支 `codex/d20-a-concurrency`／base `main = c5bec00`
+任务ID：D20-A（成员A）／分支 `codex/d20-a-concurrency`／base `main = 9f99612`（已合入 #61；分支从 `c5bec00` 开始）
 
 ## 问题与结果
 
@@ -27,6 +27,15 @@
   - 慢卷模拟下验收 11/11 通过。
 - **其余写路径**：同应用重复提交、取消与 READY 提交竞争、双用户同键、单次逻辑发布、并发修改期间发布旧版本，在真实 PostgreSQL 上逐项测出没有缺陷，以测试和反证留存。
 
+### 三、同步 main 与说明更正（第三轮，2026-10-23）
+
+- B 批准了 `80d355c`（review 5626075409），并在其主机上复跑 acceptance，11/11 通过。批准只覆盖该提交。
+- B 的两条非阻塞说明建议已更正：
+  - 交接 9.1 不再把 B 的线程快照归到冻结中。那次快照只佐证路径安全检查的成本，冻结的归因不变。
+  - 反证计数改为 9 个模式、10 次运行，见“验证”。
+- `80d355c` 的远端 CI 失败来自 runner 镜像迁移，与本 PR 的代码无关。#61 把各作业固定到 `ubuntu-24.04`，已合入 main。
+- 本 PR 用 merge 同步 `main = 9f99612`，合并提交为 `e4d91d9`，只带入 #61 的 `ci.yml`；随后在合并提交上重跑 canonical acceptance。生产代码没有变化。
+
 ## 范围（对应 D20-A-01..04）
 
 | 子项 | 文件 |
@@ -41,9 +50,12 @@
 
 ## 验证（deterministic-mock；固定命令见 `tests/integration/concurrency/record-command.mjs`）
 
-- **canonical acceptance**：@`d55a8de`，干净的已提交树。`ConcurrencyConsistencyTest` 11/11 通过，native 0，每个测试后审计 0 违规。
-  - T2：16 轮中取消胜 12、提交胜 4。
+- **canonical acceptance**：@`e4d91d9`（第三轮，同步 main 后的合并提交），干净的已提交树，Node v24.22.1、Java 21.0.12.1、Docker 29.9.2。
+  - `ConcurrencyConsistencyTest` 11/11 通过，native 0，signal 为 null，测试类 219.7 秒；每个测试后审计 0 违规，没有遗留的排队任务。
+  - T2：16 轮中取消胜 11、提交胜 5。
   - 两个新用例：冻结期间租约确实过期，READY 提交仍然只提交一次；草稿冻结期间心跳持续续租。
+  - 负向对照报出 10 条违规（E1、E3、V3、V5、P2、P3、P4）；排除对照应用后与注入前的基线一致。
+  - 第二轮 @`d55a8de` 同样 11/11（T2 取消胜 12、提交胜 4）。B 在其主机上复跑 `80d355c`，也是 11/11，测试类 574.855 秒。
 - **慢卷模拟**：
   - `acceptance@slow` 11/11 通过，每次冻结加 1500 ms 并串行。
   - `mutation-lease-boundary@slow`（`AgentRunStore` 用 B 审查时的版本）复现了 B 的模式：T3 的 8 个任务全部失败（INTERRUPTED 或 RUNNER_ERROR），出现 V2 “FAILED version has a usable VERIFIED outcome / without a frozen FAILED report”，d20a01 也失败。
@@ -61,9 +73,10 @@
 - **回归**：7 个不需要真实构建运行时的套件 35/35 通过，包括 StorageSweeper 与 LocalVolumeSnapshotStore。
   - 依赖真实运行时的套件被本机 Node 锁挡住。
   - 在合入 #60（Node 24.22.1 锁）的本地组合副本里另跑了 9 个这类套件：80/80（AgentLoop、Csrf、RepairLoop、Publication、EditLifecycle、EditVerification、LocalEditScope、SourceExport、VersionHttp，Node 24.22.1）。
-- **本机门禁**：@`d55a8de`：static 停在 Node 版本检查（锁定 24.16.0，由 #60 处理）；api 225 项中 5 failure（本机既有 PreviewAcceptanceProcessTest）和 10 error（被 Node 锁挡住的套件），本卡 11/11；runner 101/101；e2e 75/75；本机 ci-gate 未全绿。合并以本 PR 的远端检查为准。
+- **本机门禁**：@`d55a8de`：static 停在 Node 版本检查（锁定 24.16.0，由 #60 处理）；api 225 项中 5 failure（本机既有 PreviewAcceptanceProcessTest）和 10 error（被 Node 锁挡住的套件），本卡 11/11；runner 101/101；e2e 75/75；本机 ci-gate 未全绿。合并以本 PR 的远端检查为准。第三轮没有重跑本机门禁、`@slow` 和反证：同步只带入 `ci.yml`，生产代码没有变化。
+- **远端检查**：`80d355c` 的 run 39923146981 中，verify:api、verify:runner、ci-gate 失败，原因是 `ubuntu-latest` 切到 Ubuntu 26.04 后，Playwright 1.60.0 无法准备 Chromium；本卡用例在远端 11/11。这次失败保留，没有重跑。#61 合入后，以本 PR 最新 HEAD 的检查为准。
 
-逐轮命令、提交、退出码、JUnit 统计与证据见 `tests/integration/concurrency/evidence/2026-10-22/`，交接见 `docs/handoffs/D20-A.md`（第 9 节为第二轮）。
+逐轮命令、提交、退出码、JUnit 统计与证据见 `tests/integration/concurrency/evidence/2026-10-22/`（第一、二轮）和 `evidence/2026-10-23/`（第三轮 canonical 证据与 `third-round.json`），交接见 `docs/handoffs/D20-A.md`（第 9 节为第二轮，第 10 节为第三轮）。
 
 ## 失败路径
 
@@ -93,7 +106,7 @@
 ## 剩余事项
 
 - 与 D20-B（#58）的组合联调由最后启用的 PR 执行。
-- Node 锁定版本与本机 Node 的冲突由 #60 单独处理，需维护者按 ADR-005 确认。
+- Node 锁定版本与本机 Node 的冲突由 #60 单独处理。#60 已同步同一 main（`033fd13`），待维护者按 ADR-005 确认。
 - 交接第 7 节列出了未修的残余风险：
   - 应用列表的 total 与分页属于同类问题。
   - 冻结仍是进程级 `synchronized`，带来跨用户的延迟耦合，但不再导致租约丢失。
@@ -102,7 +115,7 @@
 
 ## 审查者
 
-成员B；作者不自批。
+成员B；作者不自批。B 已批准 `80d355c`（[review 5626075409](https://github.com/Echo-love928/CodeLess/pull/59#pullrequestreview-5626075409)）。之后的新提交（文档更正、同步 main、第三轮证据）需要 B 增量复审。
 
 ## 合并条件
 
