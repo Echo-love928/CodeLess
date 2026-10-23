@@ -1,0 +1,140 @@
+{
+  "task": "D20-B",
+  "test": "D20-B T1–T4: two isolated users generate, reconnect, edit, publish, download and retain a usable version after real failure",
+  "retry": 0,
+  "actors": [
+    {
+      "app": "3a16b28e-62ba-4fed-9fc3-da4bb831c56b",
+      "generation": "028cfab2-ce3a-4a10-b22c-62afcd2dcf0d",
+      "original": "449f60af-d518-4c2e-bd29-c6cb86eba996",
+      "edit": "dc068091-a81b-41db-bb4c-3c606023ed8f",
+      "edited": "90ff078a-037a-452e-ac9d-856025014cd6",
+      "publication": {
+        "id": "8842e6c9-24c5-8cf7-8a8d-961afbdc0906",
+        "applicationId": "3a16b28e-62ba-4fed-9fc3-da4bb831c56b",
+        "versionId": "90ff078a-037a-452e-ac9d-856025014cd6",
+        "requestedBy": "05582e58-99e3-4038-afc2-b2cbd21dd651",
+        "status": "PUBLISHED",
+        "url": "https://d8842e6c924c58cf78a8d961afbdc0906.sites.codeless-public.test:63030/",
+        "createdAt": "2026-10-21T14:28:49.308838Z",
+        "publishedAt": "2026-10-21T14:28:52.106498Z"
+      },
+      "downloadDigest": "sha256:7312323aa28b3890e7bb68c10662a5d64a75cda2f73f6aa42607c526c71082fd"
+    },
+    {
+      "app": "1ab59c77-a539-4c97-a3dc-d29ff35b6a74",
+      "generation": "b91a02a8-41c3-4125-854f-0979ec94f49c",
+      "original": "799a6092-bdaf-4844-bc18-28fbe42eeaa0",
+      "edit": "eba37653-316a-419c-9094-560e1e2b72f5",
+      "edited": "8b298765-ca47-46fd-9ec9-5cf06d3e645b",
+      "publication": {
+        "id": "937b0900-152e-8132-958b-0e4b67caff91",
+        "applicationId": "1ab59c77-a539-4c97-a3dc-d29ff35b6a74",
+        "versionId": "8b298765-ca47-46fd-9ec9-5cf06d3e645b",
+        "requestedBy": "df132f4a-2350-4160-9e87-9520c63ae9ba",
+        "status": "PUBLISHED",
+        "url": "https://d937b0900152e8132958b0e4b67caff91.sites.codeless-public.test:63030/",
+        "createdAt": "2026-10-21T14:29:31.518425Z",
+        "publishedAt": "2026-10-21T14:29:34.454141Z"
+      },
+      "downloadDigest": "sha256:28696dbcf606cbe4ad73661f936c137ec95be6af864f30cde81cad307530b49b"
+    }
+  ],
+  "offlineReconnect": {
+    "taskId": "028cfab2-ce3a-4a10-b22c-62afcd2dcf0d",
+    "actualBrowserOffline": true,
+    "manualRefresh": true
+  },
+  "crossUser": [
+    {
+      "readerApplication": "3a16b28e-62ba-4fed-9fc3-da4bb831c56b",
+      "denied": [
+        {
+          "path": "applications/1ab59c77-a539-4c97-a3dc-d29ff35b6a74",
+          "status": 404
+        },
+        {
+          "path": "tasks/b91a02a8-41c3-4125-854f-0979ec94f49c",
+          "status": 404
+        },
+        {
+          "path": "tasks/b91a02a8-41c3-4125-854f-0979ec94f49c/events",
+          "status": 404
+        },
+        {
+          "path": "versions/8b298765-ca47-46fd-9ec9-5cf06d3e645b",
+          "status": 404
+        },
+        {
+          "path": "versions/8b298765-ca47-46fd-9ec9-5cf06d3e645b/snapshot",
+          "status": 404
+        },
+        {
+          "path": "versions/8b298765-ca47-46fd-9ec9-5cf06d3e645b/export",
+          "status": 404
+        },
+        {
+          "path": "publications/937b0900-152e-8132-958b-0e4b67caff91",
+          "status": 404
+        },
+        {
+          "path": "publications/937b0900-152e-8132-958b-0e4b67caff91/deployment",
+          "status": 404
+        }
+      ]
+    },
+    {
+      "readerApplication": "1ab59c77-a539-4c97-a3dc-d29ff35b6a74",
+      "denied": [
+        {
+          "path": "applications/3a16b28e-62ba-4fed-9fc3-da4bb831c56b",
+          "status": 404
+        },
+        {
+          "path": "tasks/028cfab2-ce3a-4a10-b22c-62afcd2dcf0d",
+          "status": 404
+        },
+        {
+          "path": "tasks/028cfab2-ce3a-4a10-b22c-62afcd2dcf0d/events",
+          "status": 404
+        },
+        {
+          "path": "versions/90ff078a-037a-452e-ac9d-856025014cd6",
+          "status": 404
+        },
+        {
+          "path": "versions/90ff078a-037a-452e-ac9d-856025014cd6/snapshot",
+          "status": 404
+        },
+        {
+          "path": "versions/90ff078a-037a-452e-ac9d-856025014cd6/export",
+          "status": 404
+        },
+        {
+          "path": "publications/8842e6c9-24c5-8cf7-8a8d-961afbdc0906",
+          "status": 404
+        },
+        {
+          "path": "publications/8842e6c9-24c5-8cf7-8a8d-961afbdc0906/deployment",
+          "status": 404
+        }
+      ]
+    }
+  ],
+  "wrongVersion": {
+    "stale": 409,
+    "staleCode": "EDIT_VERSION_CONFLICT",
+    "mismatchedArtifact": 409
+  },
+  "failedTaskId": "ba3639b6-75f4-4585-a958-d3474e851681",
+  "failurePreservesVersion": {
+    "failedTaskId": "ba3639b6-75f4-4585-a958-d3474e851681",
+    "failureCode": "AGENT_BUILD_EXIT",
+    "failedVersionId": "8e823690-21a2-43eb-90c8-b55a3db229be",
+    "latestReadyVersionId": "90ff078a-037a-452e-ac9d-856025014cd6",
+    "latestSuccessfulPublication": "8842e6c9-24c5-8cf7-8a8d-961afbdc0906",
+    "historicalVersionId": "449f60af-d518-4c2e-bd29-c6cb86eba996",
+    "wrongDownloadBlocked": true
+  },
+  "contextCleanupErrors": []
+}

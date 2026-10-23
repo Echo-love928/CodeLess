@@ -1,0 +1,135 @@
+{
+  "review": {
+    "pr": 59,
+    "reviewId": 5626075409,
+    "state": "APPROVED",
+    "commit": "80d355c338d739cffcd80782fb7e77d8bed9be45",
+    "submittedAt": "2026-10-23T08:58:01Z",
+    "reviewerHost": {
+      "node": "v24.22.1",
+      "java": "21.0.12.1",
+      "docker": "29.9.2",
+      "runs": [
+        {
+          "run": "2026-10-23T08-43-03.093Z-acceptance-46fefc50-a798-42c3-8400-b5773b08d418",
+          "native": 1,
+          "note": "Docker Desktop was not running: test class initialization error, the 11 tests did not execute. Kept as recorded."
+        },
+        {
+          "run": "2026-10-23T08-46-15.809Z-acceptance-dde3e293-088e-4d9c-8d2d-8ac79813594c",
+          "status": "PASSED",
+          "native": 0,
+          "signal": null,
+          "junit": {
+            "tests": 11,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          "seconds": 574.855,
+          "auditViolationsAfterEachTest": 0,
+          "logSha256": "224d1ec855043b040da70bd0fe5cad040d5d4933476f9b3d35f35c8de9f7c17d",
+          "junitSha256": "53fe5d6eb125b2c8e5a6b591f784dd55021b95b2853fd9d501d62342acca130b"
+        }
+      ]
+    },
+    "oldFailureCheck": "In the retained 3e5d336 log exactly 5 distinct versions report \"its report is CONFLICT\" and their 5 retained disk reports are VERIFIED. The heartbeat-renewal branch was not reproduced separately.",
+    "nonBlockingSuggestions": [
+      {
+        "topic": "docs/handoffs/D20-A.md:184 placed B's thread snapshot inside the freeze",
+        "fact": "PID 41992 main was in the ninth item's ConsistencyAudit -> DeploymentRecords.check -> WindowsPath.toRealPath",
+        "resolution": "Handoff 9.1 now treats the snapshot only as evidence of the path-safety check cost; the freeze attribution rests on the deterministic tests and mutations."
+      },
+      {
+        "topic": "the count of 11 counter-evidence runs",
+        "fact": "2026-10-22/commands.json records 10 mutation runs on 94a5e70: 9 modes at normal speed plus lease-boundary@slow",
+        "resolution": "Handoff section 3, 9.4 and the PR body now say 9 modes and 10 runs; 11 is the sum of expected failing tests over the 9 modes (9 distinct tests)."
+      }
+    ],
+    "note": "Reported by D20-B in the review body; raw logs stay on the reviewer host."
+  },
+  "remoteChecksOf80d355c": {
+    "run": 39923146981,
+    "conclusion": "failure",
+    "failed": ["verify:api", "verify:runner", "ci-gate"],
+    "succeeded": ["infra-preflight", "verify:static", "verify:e2e"],
+    "cause": "ubuntu-latest moved to Ubuntu 26.04 (ubuntu26/20261012.163); Playwright 1.60.0 refuses to prepare Chromium there. verify:api: 225 tests, 0 failures, 10 errors, all in @BeforeAll runtime preparation.",
+    "concurrencyConsistencyTest": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0
+    },
+    "rerun": false
+  },
+  "ciFix": {
+    "pr": 61,
+    "commit": "25728c55b0a6440d4a00f1f315ffbb5401d5f684",
+    "mergedAs": "9f99612d77533781f4c2544aaf3f6d8cfc744fe1",
+    "change": "runs-on ubuntu-latest -> ubuntu-24.04 for verify:static, verify:api, verify:runner and ci-gate; nothing else",
+    "run": 39925141537,
+    "conclusion": "success",
+    "independentReview": {
+      "reviewId": 5627321416,
+      "state": "APPROVED",
+      "submittedAt": "2026-10-23T11:01:22Z"
+    }
+  },
+  "mainSync": {
+    "mergeCommit": "e4d91d94b95f9487404a37cd40b2734a32939206",
+    "parents": ["eca1ff65e241066f276c2f582752b35b76e711e1", "9f99612d77533781f4c2544aaf3f6d8cfc744fe1"],
+    "filesFromMain": [".github/workflows/ci.yml"],
+    "runtimeCodeLastChanged": "b90406b4bca906a4e3386b1700760620dd2783ba"
+  },
+  "acceptance": {
+    "run": "2026-10-23T11-25-01.107Z-acceptance-9634ff61-0326-4746-9951-f4c41918901a",
+    "head": "e4d91d94b95f9487404a37cd40b2734a32939206",
+    "host": {
+      "node": "v24.22.1",
+      "java": "21.0.12.1",
+      "docker": "29.9.2"
+    },
+    "status": "PASSED",
+    "exitCode": 0,
+    "signal": null,
+    "completionVerified": true,
+    "uncommittedScopedFiles": [],
+    "junit": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 219.714
+    },
+    "junitSha256": "097bde9c664b26524ef2b36be3512d7088abc03c95c76b3307dc5983c6e0639d",
+    "logDigest": "sha256:c13cc785dd24973d65221bcad321da9eb0c93877921d7ce05d34d6cea3da054e",
+    "auditViolationsAfterEachTest": 0,
+    "queuedOrRunningLeft": 0,
+    "negativeControl": {
+      "violations": 10,
+      "invariants": ["E1", "E3", "V3", "V5", "P2", "P3", "P4"],
+      "withControlApplicationExcludedEqualsBaseline": true
+    },
+    "t2": {
+      "rounds": 16,
+      "cancelWins": 11,
+      "commitWins": 5
+    },
+    "readyCommitOutlastingLease": {
+      "leaseExpiredWhileFreezeHeld": true,
+      "final": "READY/",
+      "versionStatus": "VERIFIED",
+      "verifiedOutcomeReadable": true,
+      "latestIsThisVersion": true,
+      "verifyExecutions": 1
+    },
+    "draftFreezeOutlastingLease": {
+      "heldPastTheLeaseAtFreeze": true,
+      "leaseRenewedDuringFreeze": true,
+      "final": "READY/",
+      "generateExecutions": 1,
+      "versionsFromTask": 1
+    },
+    "evidence": "The 12 JSON files in this directory are this run's evidence, copied by export-evidence.mjs."
+  },
+  "notRunThisRound": ["acceptance@slow", "mutation modes", "local ci:gate", "main+A+B combined run"]
+}

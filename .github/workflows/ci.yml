@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: 24.16.0
+          node-version: 24.22.1
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify:static
@@ -28,12 +28,16 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: 24.16.0
+          node-version: 24.22.1
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
       - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Prepare locked Chromium
+        timeout-minutes: 5
+        run: node .github/scripts/prepare-chromium.mjs
       - run: pnpm verify:api
 
   runner:
@@ -43,7 +47,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: 24.16.0
+          node-version: 24.22.1
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - name: Prepare locked Chromium
@@ -61,7 +65,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: 24.16.0
+          node-version: 24.22.1
       - name: Check Docker, PostgreSQL and isolated services
         run: bash infra/ci-preflight.sh .env.example
 
@@ -73,7 +77,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: 24.16.0
+          node-version: 24.22.1
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - name: Prepare locked Chromium
@@ -91,6 +95,25 @@ jobs:
           path: |
             .local-data/d15-b/hosting/chromium-netlog.json
             .local-data/d15-b/hosting/chromium-network-failure.json
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Retain deterministic full-flow failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: d20-full-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            apps/web/test-results/**
+            test-results/**
+            .local-data/d20-b/runs/**/run.json
+            .local-data/d20-b/runs/**/identities.json
+            .local-data/d20-b/runs/**/playwright.json
+            .local-data/d20-b/runs/**/api.log
+            .local-data/d20-b/runs/**/browser.log
+            .local-data/d20-b/runs/**/failure-*.png
+            .local-data/d20-b/runs/**/failure-*-trace.zip
+            .local-data/d20-b/runs/**/browser/**
           include-hidden-files: true
           if-no-files-found: warn
           retention-days: 7

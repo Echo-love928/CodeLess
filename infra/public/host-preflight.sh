@@ -34,9 +34,9 @@ fi
 if ! command -v timeout >/dev/null 2>&1; then
     printf '%s\n' 'BOUNDED_COMMANDS=UNAVAILABLE_TIMEOUT_MISSING'
 else
-    if ! command -v node >/dev/null 2>&1 && [ -x /opt/codeless/tools/node-v24.16.0-linux-x64/bin/node ]; then
+    if ! command -v node >/dev/null 2>&1 && [ -x /opt/codeless/tools/node-v24.22.1-linux-x64/bin/node ]; then
         # Process-local lookup for the separately installed locked runtime.
-        PATH=/opt/codeless/tools/node-v24.16.0-linux-x64/bin:$PATH
+        PATH=/opt/codeless/tools/node-v24.22.1-linux-x64/bin:$PATH
         export PATH
     fi
     for tool in node java git openssl; do

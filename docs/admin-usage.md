@@ -63,7 +63,7 @@ ALREADY_TERMINAL 显示“已经终止”，不声称再次取消；UNKNOWN/FAIL
 
 ## 本地验收
 
-固定 Node 24.16.0、pnpm 12.6.0、Java 21.0.12.1、Playwright 1.60.0。
+固定 Node 24.22.1、pnpm 12.6.0、Java 21.0.12.1、Playwright 1.60.0。
 
 ```powershell
 $env:JAVA_HOME = 'C:\Program Files\Java\jdk-21.0.12.1'

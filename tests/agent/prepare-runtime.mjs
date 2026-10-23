@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 // Scoped test setup for the existing API gate, whose CI job has Java/Node/Docker but
 // no pnpm dependencies, browser or trusted image yet. Only frozen repository inputs.
 const root = fileURLToPath(new URL('../../', import.meta.url))
-if (process.version !== 'v24.16.0') throw new Error('D01 Node version required')
+if (process.version !== 'v24.22.1') throw new Error('D01 Node version required')
 function run(command, args) {
   const windows = process.platform === 'win32'
   const cmd = windows && command === 'corepack' ? (process.env.ComSpec ?? 'cmd.exe') : command
