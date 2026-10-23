@@ -45,7 +45,7 @@ fi
 apt-get -o Acquire::Retries=3 update
 apt-get -y --no-install-recommends install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-node_release=node-v24.16.0-linux-x64
+node_release=node-v24.22.1-linux-x64
 install -d -m 0755 /opt/codeless/tools /var/lib/codeless/bootstrap
 if [ ! -e "/opt/codeless/tools/$node_release" ]; then
     # No unverified archive is extracted or executed.
@@ -54,18 +54,18 @@ if [ ! -e "/opt/codeless/tools/$node_release" ]; then
     for name in "$node_release.tar.xz" SHASUMS256.txt; do
         curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
             --connect-timeout 15 --max-time 300 \
-            "https://nodejs.org/download/release/v24.16.0/$name" -o "$name"
+            "https://nodejs.org/download/release/v24.22.1/$name" -o "$name"
     done
     awk -v name="$node_release.tar.xz" '$2 == name { print; count++ }
         END { if (count != 1) exit 1 }' SHASUMS256.txt > selected.sha256
     sha256sum -c selected.sha256
     tar -xJf "$node_release.tar.xz" -C /opt/codeless/tools
 fi
-[ "$(/opt/codeless/tools/$node_release/bin/node --version)" = v24.16.0 ]
+[ "$(/opt/codeless/tools/$node_release/bin/node --version)" = v24.22.1 ]
 printf '%s\n' 'INSTALLED_PACKAGES:'
 dpkg-query -W -f='${Package}=${Version}\n' \
     openjdk-21-jdk-headless docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-/opt/codeless/tools/node-v24.16.0-linux-x64/bin/node --version
+/opt/codeless/tools/node-v24.22.1-linux-x64/bin/node --version
 java -version
 systemctl is-active docker
 docker info --format 'DOCKER_VERSION={{.ServerVersion}} SECURITY={{json .SecurityOptions}}'

@@ -10,7 +10,7 @@ CodeLess 是面向受控试用的自然语言前端应用生成平台。首版�
 | Spring Boot | 4.1.1 |
 | Spring AI BOM | 2.0.1 |
 | Maven | 3.9.11（由 Wrapper 管理） |
-| Node.js | 24.16.0 |
+| Node.js | 24.22.1（2026-10-22 由 24.16.0 升级，见 ADR-005） |
 | pnpm | 12.6.0（由 Corepack 管理） |
 
 版本与升级规则见 [docs/architecture.md](docs/architecture.md)，产品边界见 [docs/scope.md](docs/scope.md)，HTTP/JSON 契约入口见 [contracts/README.md](contracts/README.md)。D01 骨架不会加载模型 provider，也不需要模型凭据。
@@ -35,13 +35,13 @@ Windows PowerShell：
 
 ## 启动前端
 
-前置条件：Node.js **24.16.0** 与 Corepack。所有依赖由仓库根目录的 workspace 和 `pnpm-lock.yaml` 管理，`apps/web` 不再维护独立锁文件。
+前置条件：Node.js **24.22.1** 与 Corepack。所有依赖由仓库根目录的 workspace 和 `pnpm-lock.yaml` 管理，`apps/web` 不再维护独立锁文件。
 
 先在仓库根目录准备 pnpm shim，再安装依赖：
 
 ```bash
 corepack enable pnpm
-node --version          # v24.16.0
+node --version          # v24.22.1
 pnpm --version          # 12.6.0，由 packageManager 声明选择
 pnpm install --frozen-lockfile
 pnpm --filter @codeless/web dev

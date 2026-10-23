@@ -1,0 +1,30 @@
+{
+  "responseBodiesScanned" : 26,
+  "foreignIdentifiersFound" : 0,
+  "samePublicationKey" : "d20a-shared-publication-key-0001",
+  "users" : {
+    "d20a-alice-aa49ca14@d20a.test" : {
+      "publication" : "2d309764-a0a1-830a-85a7-4baa0b2b001e",
+      "applications" : [ "cb8c30a6-c2aa-48f3-a7ea-2d634e2911b0", "6fbcba24-9f24-4b9a-b625-c01351f2e855" ],
+      "hostedOwnerMarker" : "aa49ca14-5d20-464d-a3ba-4f001f4eb73f",
+      "hostingCalls" : 1,
+      "tasks" : [ "1951cdf7-8729-41ea-9854-c6a92a2b87bf", "bac44a83-6189-4336-ac1e-0a2953baded5", "c1d3c5a7-6b5b-489b-94a2-0888230dae04", "3b6c023d-8ec0-42ea-9b6e-8d038ae25303" ]
+    },
+    "d20a-bob-fe9fc11f@d20a.test" : {
+      "publication" : "fa521a29-32e1-8610-bb33-42bd587c27de",
+      "applications" : [ "96361b54-bcaf-460b-b8d3-5ec8d13d4e1d", "79690e0e-2d5b-46f9-9c0f-1bbe913ced92" ],
+      "hostedOwnerMarker" : "fe9fc11f-fc44-48df-a015-9f418e5b1e5a",
+      "hostingCalls" : 1,
+      "tasks" : [ "607e6afd-04ae-4799-93c1-0faf32f2df4c", "37034aff-ace5-45d6-97c4-2d09da18773a", "7b71c30b-4709-41b2-bab9-b828a2a0cb4f", "24945aee-1b69-4150-8b6d-b74acf47f8c8" ]
+    }
+  },
+  "publicationWorkerInstances" : 2,
+  "sameTaskKey" : "d20a-shared-task-key",
+  "schedulerInstances" : 3,
+  "crossUserReads" : {
+    "d20a-bob-fe9fc11f@d20a.test GET /api/v0/applications/{d20a-alice-aa49ca14@d20a.test app}/versions?size=100" : 404,
+    "d20a-bob-fe9fc11f@d20a.test GET /api/v0/applications/{d20a-alice-aa49ca14@d20a.test app}/publications" : 404,
+    "d20a-alice-aa49ca14@d20a.test GET /api/v0/applications/{d20a-bob-fe9fc11f@d20a.test app}/versions?size=100" : 404,
+    "d20a-alice-aa49ca14@d20a.test GET /api/v0/applications/{d20a-bob-fe9fc11f@d20a.test app}/publications" : 404
+  }
+}

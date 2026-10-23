@@ -1,0 +1,279 @@
+{
+  "invariants" : {
+    "E1" : "task events are exactly 1..event_sequence",
+    "E2" : "first event is STAGE_STARTED/PLAN",
+    "E3" : "READY/FAILED has exactly one terminal event, last, matching status; FAILED has a code",
+    "E4" : "terminal tasks are FINISHED and unleased; nonterminal tasks stay queued or running",
+    "E5" : "stage changes follow PLAN->GENERATE->VERIFY->(REPAIR->GENERATE)*->READY|FAILED",
+    "P1" : "ledger binding equals SQL row, version, build and artifact digest",
+    "P2" : "SQL publication status agrees with the ledger phase",
+    "P3" : "each publication reached hosting at most once, exactly when the ledger says PUBLISHING; no location overwritten",
+    "P4" : "bytes served at the publication's own location hash to the bound digest and equal the frozen artifact",
+    "P5" : "requester owns the application",
+    "V1" : "VERIFIED has its own SUCCEEDED/exit 0 build and a frozen outcome with that build and artifact digest",
+    "V2" : "FAILED never has a usable VERIFIED outcome and has its frozen FAILED report",
+    "V3" : "DRAFT has no frozen outcome and no terminal source task",
+    "V4" : "source task exists and belongs to the same application",
+    "V5" : "READY task has exactly one VERIFIED version named by its READY event; others none",
+    "V6" : "latest pointer is a VERIFIED version of the same application",
+    "X1" : "served page carries only its owner's marker"
+  },
+  "afterEachTest" : {
+    "d20a01DuplicateSubmissionsToOneApplicationRunOnceEachInOrder" : {
+      "checked" : {
+        "tasks" : {
+          "READY" : 13
+        },
+        "events" : 78,
+        "versions" : {
+          "DRAFT" : 1,
+          "VERIFIED" : 13
+        },
+        "builds" : 13,
+        "publications" : { },
+        "hostingCalls" : 0,
+        "excludedApplications" : 0
+      },
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
+    },
+    "d20aT2CancelRacingTheReadyCommitNeverOverwritesTheSuccessfulVersion" : {
+      "checked" : {
+        "tasks" : {
+          "FAILED" : 11,
+          "READY" : 19
+        },
+        "events" : 180,
+        "versions" : {
+          "DRAFT" : 2,
+          "FAILED" : 11,
+          "VERIFIED" : 19
+        },
+        "builds" : 19,
+        "publications" : {
+          "PUBLISHED/SUCCEEDED" : 16
+        },
+        "hostingCalls" : 16,
+        "excludedApplications" : 0
+      },
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
+    },
+    "d20aT2CancellingQueuedOrRunningFollowUpsLeavesTheSuccessfulVersionUsable" : {
+      "checked" : {
+        "tasks" : {
+          "FAILED" : 19,
+          "READY" : 20
+        },
+        "events" : 212,
+        "versions" : {
+          "DRAFT" : 3,
+          "FAILED" : 13,
+          "VERIFIED" : 20
+        },
+        "builds" : 20,
+        "publications" : {
+          "PUBLISHED/SUCCEEDED" : 16
+        },
+        "hostingCalls" : 16,
+        "excludedApplications" : 0
+      },
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
+    },
+    "d20aT3TwoUsersRacingWithIdenticalKeysShareNoData" : {
+      "checked" : {
+        "tasks" : {
+          "FAILED" : 19,
+          "READY" : 28
+        },
+        "events" : 260,
+        "versions" : {
+          "DRAFT" : 7,
+          "FAILED" : 13,
+          "VERIFIED" : 28
+        },
+        "builds" : 28,
+        "publications" : {
+          "PUBLISHED/SUCCEEDED" : 18
+        },
+        "hostingCalls" : 18,
+        "excludedApplications" : 0
+      },
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
+    },
+    "d20aT1EveryPublicationRequestIsOneLogicalPublicationHostedOnce" : {
+      "checked" : {
+        "tasks" : {
+          "FAILED" : 19,
+          "READY" : 30
+        },
+        "events" : 272,
+        "versions" : {
+          "DRAFT" : 9,
+          "FAILED" : 13,
+          "VERIFIED" : 30
+        },
+        "builds" : 30,
+        "publications" : {
+          "FAILED/FAILED" : 1,
+          "PUBLISHED/SUCCEEDED" : 25
+        },
+        "hostingCalls" : 26,
+        "excludedApplications" : 0
+      },
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
+    },
+    "d20aT4PublishingAnOldVersionDuringEditsKeepsItsFixedHash" : {
+      "checked" : {
+        "tasks" : {
+          "FAILED" : 19,
+          "READY" : 33
+        },
+        "events" : 290,
+        "versions" : {
+          "DRAFT" : 10,
+          "FAILED" : 13,
+          "VERIFIED" : 33
+        },
+        "builds" : 33,
+        "publications" : {
+          "FAILED/FAILED" : 1,
+          "PUBLISHED/SUCCEEDED" : 30
+        },
+        "hostingCalls" : 31,
+        "excludedApplications" : 0
+      },
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
+    },
+    "d20a04VersionListIsOneSnapshotWhileVersionsCommit" : {
+      "checked" : {
+        "tasks" : {
+          "FAILED" : 20,
+          "READY" : 35
+        },
+        "events" : 307,
+        "versions" : {
+          "DRAFT" : 11,
+          "FAILED" : 14,
+          "VERIFIED" : 35
+        },
+        "builds" : 35,
+        "publications" : {
+          "FAILED/FAILED" : 1,
+          "PUBLISHED/SUCCEEDED" : 30
+        },
+        "hostingCalls" : 31,
+        "excludedApplications" : 0
+      },
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
+    },
+    "d20a04PublicationListAndDeploymentAreOneSnapshotWhileAWorkerCommits" : {
+      "checked" : {
+        "tasks" : {
+          "FAILED" : 20,
+          "READY" : 36
+        },
+        "events" : 313,
+        "versions" : {
+          "DRAFT" : 12,
+          "FAILED" : 14,
+          "VERIFIED" : 36
+        },
+        "builds" : 36,
+        "publications" : {
+          "FAILED/FAILED" : 1,
+          "PUBLISHED/SUCCEEDED" : 32
+        },
+        "hostingCalls" : 33,
+        "excludedApplications" : 0
+      },
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
+    },
+    "d20a03AuditRejectsInjectedInconsistencies" : {
+      "checked" : {
+        "tasks" : {
+          "FAILED" : 20,
+          "READY" : 36
+        },
+        "events" : 313,
+        "versions" : {
+          "DRAFT" : 12,
+          "FAILED" : 14,
+          "VERIFIED" : 36
+        },
+        "builds" : 37,
+        "publications" : {
+          "FAILED/FAILED" : 1,
+          "PUBLISHED/SUCCEEDED" : 32
+        },
+        "hostingCalls" : 35,
+        "excludedApplications" : 1
+      },
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
+    },
+    "d20a04ReadyCommitWhoseFreezeOutlastsTheLeaseCommitsOnce" : {
+      "checked" : {
+        "tasks" : {
+          "FAILED" : 20,
+          "READY" : 37
+        },
+        "events" : 319,
+        "versions" : {
+          "DRAFT" : 13,
+          "FAILED" : 14,
+          "VERIFIED" : 37
+        },
+        "builds" : 38,
+        "publications" : {
+          "FAILED/FAILED" : 1,
+          "PUBLISHED/SUCCEEDED" : 32
+        },
+        "hostingCalls" : 35,
+        "excludedApplications" : 1
+      },
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
+    },
+    "d20a04DraftWhoseSourceFreezeOutlastsTheLeaseKeepsTheLiveWorkersTask" : {
+      "checked" : {
+        "tasks" : {
+          "FAILED" : 20,
+          "READY" : 38
+        },
+        "events" : 325,
+        "versions" : {
+          "DRAFT" : 14,
+          "FAILED" : 14,
+          "VERIFIED" : 38
+        },
+        "builds" : 39,
+        "publications" : {
+          "FAILED/FAILED" : 1,
+          "PUBLISHED/SUCCEEDED" : 32
+        },
+        "hostingCalls" : 35,
+        "excludedApplications" : 1
+      },
+      "violations" : [ ],
+      "firstReportedHere" : [ ],
+      "queuedOrRunningLeft" : 0
+    }
+  }
+}

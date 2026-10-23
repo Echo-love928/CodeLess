@@ -25,6 +25,8 @@
 
 D01 锁定 Java 21、Spring Boot 4.1.1、Spring AI BOM 2.0.1、Maven 3.9.11、Node 24.16.0、pnpm 12.6.0。Spring AI 2.0.x 与 Spring Boot 4.0/4.1 同代；D01 骨架仅导入 BOM，不启用需要密钥的 provider。
 
+当前 Node 锁定为 24.22.1。2026-10-22 按本 ADR 单独升级：24.16.0 之后的 24.17.0、24.18.1、24.22.1 均为安全发布（合计修复 30 个 CVE，其中 10 个 High）；24.22.1 是 Node 24 LTS “Krypton” 2026-10-21 的安全发布。其余锁定不变；改动清单与兼容性证据见 `docs/handoffs/NODE-LOCK-UPGRADE.md`。
+
 `pom.xml`、Maven Wrapper、`package.json` 和 CI 必须保持这些版本一致。升级必须单独提交兼容性证据，不能使用 `latest`、版本区间或未锁定的 CI 工具链。
 
 ## ADR-006：初始门禁

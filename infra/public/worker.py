@@ -24,7 +24,7 @@ import uuid
 ROOT = Path('/srv/codeless')
 REPOSITORY = ROOT / 'repository'
 PRIVATE = ROOT / 'private/agent'
-NODE = '/opt/codeless/tools/node-v24.16.0-linux-x64/bin/node'
+NODE = '/opt/codeless/tools/node-v24.22.1-linux-x64/bin/node'
 SOCKET = '/run/codeless-worker/worker.sock'
 CONFIG = '/etc/codeless/worker.json'
 MAX_FRAME = 65 * 1024 * 1024
@@ -179,7 +179,7 @@ def binding(request):
 
 
 def environment(config, job):
-    return {'PATH': '/opt/codeless/ops/bin:/opt/codeless/tools/node-v24.16.0-linux-x64/bin:/usr/bin:/bin',
+    return {'PATH': '/opt/codeless/ops/bin:/opt/codeless/tools/node-v24.22.1-linux-x64/bin:/usr/bin:/bin',
             'HOME': '/srv/codeless/worker-home', 'LANG': 'C.UTF-8',
             'PLAYWRIGHT_BROWSERS_PATH': '/opt/codeless/browsers', 'CODELESS_WORKER_JOB': job,
             'CODELESS_HOSTING_ROOT': '/srv/codeless/publication/sites',

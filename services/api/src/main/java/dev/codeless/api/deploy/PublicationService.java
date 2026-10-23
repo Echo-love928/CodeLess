@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.*;
 
 @Service
@@ -37,9 +38,12 @@ public class PublicationService {
     private final DeploymentRecords records;
     private final DeploymentGateway hosting;
     private final TransactionTemplate tx;
+    /** Owner reads: rows and latestSuccessful from one snapshot, never a worker commit landing between statements (D20-A). */
+    private final TransactionTemplate snapshot;
     public PublicationService(JdbcClient jdbc,ArtifactRepository artifacts,SnapshotStore snapshots,DeploymentRecords records,
                               DeploymentGateway hosting,PlatformTransactionManager manager) {
         this.jdbc=jdbc;this.artifacts=artifacts;this.snapshots=snapshots;this.records=records;this.hosting=hosting;tx=new TransactionTemplate(manager);
+        snapshot=new TransactionTemplate(manager);snapshot.setReadOnly(true);snapshot.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
     }
     private static AuthFailure conflict(String code) {return new AuthFailure(HttpStatus.CONFLICT,code);}
     private static View view(Publication p) {return new View(p.id(),p.applicationId(),p.versionId(),p.requestedBy(),p.status().name(),p.url(),p.createdAt(),p.publishedAt());}
@@ -103,19 +107,23 @@ public class PublicationService {
                 .param(app).query(UUID.class).optional().map(id->view(artifacts.findPublication(id).orElseThrow())).orElse(null);
     }
     public Page list(UUID owner,UUID app) {
-        owned(owner,app);
-        var items=jdbc.sql("SELECT id FROM publications WHERE application_id=? ORDER BY created_at DESC,id DESC LIMIT 100")
-                .param(app).query(UUID.class).list().stream().map(id->view(artifacts.findPublication(id).orElseThrow())).toList();
-        return new Page(items,latest(app));
+        return snapshot.execute(status->{
+            owned(owner,app);
+            var items=jdbc.sql("SELECT id FROM publications WHERE application_id=? ORDER BY created_at DESC,id DESC LIMIT 100")
+                    .param(app).query(UUID.class).list().stream().map(id->view(artifacts.findPublication(id).orElseThrow())).toList();
+            return new Page(items,latest(app));
+        });
     }
     public Deployment deployment(UUID owner,UUID id) {
-        var p=ownedPublication(owner,id);var b=records.binding(id);bindingMatches(p,b);var events=records.events(id);
-        String phase=events.isEmpty()?"UNKNOWN":events.getLast().phase();
-        // SQL and volume are separate resources; a terminal ledger entry without SQL commit is never success.
-        if(!switch(p.status()) {case PUBLISHED -> "SUCCEEDED".equals(phase);case FAILED -> "FAILED".equals(phase);
-            case REQUESTED -> Set.of("PREPARING","PUBLISHING","PROBING").contains(phase);}) phase="UNKNOWN";
-        return new Deployment(view(p),phase,b.sourceDigest(),b.artifactDigest(),b.reportDigest(),events,
-                "FAILED".equals(phase)?events.getLast().failureCode():null,latest(p.applicationId()));
+        return snapshot.execute(status->{
+            var p=ownedPublication(owner,id);var b=records.binding(id);bindingMatches(p,b);var events=records.events(id);
+            String phase=events.isEmpty()?"UNKNOWN":events.getLast().phase();
+            // SQL and volume are separate resources; a terminal ledger entry without SQL commit is never success.
+            if(!switch(p.status()) {case PUBLISHED -> "SUCCEEDED".equals(phase);case FAILED -> "FAILED".equals(phase);
+                case REQUESTED -> Set.of("PREPARING","PUBLISHING","PROBING").contains(phase);}) phase="UNKNOWN";
+            return new Deployment(view(p),phase,b.sourceDigest(),b.artifactDigest(),b.reportDigest(),events,
+                    "FAILED".equals(phase)?events.getLast().failureCode():null,latest(p.applicationId()));
+        });
     }
     /** Internal worker entry. No HTTP endpoint and absent from the model tool registry. */
     public void process(UUID id) {

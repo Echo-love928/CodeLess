@@ -1,6 +1,6 @@
 # D13-B acceptance
 
-Use locked Node24.16.0/pnpm12.6.0 and Playwright1.60.0 Chromium. Run from repository root:
+Use locked Node24.22.1/pnpm12.6.0 and Playwright1.60.0 Chromium. Run from repository root:
 
 ```text
 node tests/e2e/selector/record-command.mjs static
