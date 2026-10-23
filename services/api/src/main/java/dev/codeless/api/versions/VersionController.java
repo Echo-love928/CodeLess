@@ -12,6 +12,9 @@ import java.time.OffsetDateTime;
 import java.util.*;
 import org.springframework.http.*;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,9 +25,13 @@ public class VersionController {
     private final JdbcClient jdbc;
     private final SnapshotStore snapshots;
     private final VersionRestoreService restore;
+    private final TransactionTemplate snapshot;
     public VersionController(OwnershipGuard ownership, ArtifactRepository artifacts, JdbcClient jdbc, SnapshotStore snapshots,
-                             VersionRestoreService restore) {
+                             VersionRestoreService restore, PlatformTransactionManager manager) {
         this.ownership=ownership; this.artifacts=artifacts; this.jdbc=jdbc; this.snapshots=snapshots; this.restore=restore;
+        this.snapshot=new TransactionTemplate(manager);
+        snapshot.setReadOnly(true);
+        snapshot.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
     }
     public record Page(List<VersionView> items, int page, int size, long total, UUID latestReadyVersionId) {}
     public record FilesView(UUID versionId, String sourceDigest, List<SnapshotStore.Entry> files) {}
@@ -64,16 +71,20 @@ public class VersionController {
                 || status!=null && !Set.of("DRAFT","VERIFIED","FAILED").contains(status))
             throw new AuthFailure(HttpStatus.BAD_REQUEST,"INVALID_REQUEST");
         String filter=status==null ? "" : " AND status=:status";
-        var count=jdbc.sql("SELECT count(*) FROM application_versions WHERE application_id=:app"+filter).param("app",applicationId);
-        var select=jdbc.sql("SELECT * FROM application_versions WHERE application_id=:app"+filter+" ORDER BY number DESC LIMIT :size OFFSET :offset")
-                .param("app",applicationId).param("size",size).param("offset",(long)page*size);
-        if(status!=null) {count.param("status",status);select.param("status",status);}
-        var items=select.query((rs,n)->new VersionView(rs.getObject("id",UUID.class),rs.getObject("application_id",UUID.class),rs.getInt("number"),
-                rs.getString("source_digest"),rs.getString("status"),rs.getObject("build_id",UUID.class),rs.getObject("created_at",OffsetDateTime.class),
-                rs.getObject("source_task_id",UUID.class))).list();
-        UUID latest=jdbc.sql("SELECT latest_ready_version_id FROM applications WHERE id=?").param(applicationId)
-                .query((rs,n)->Optional.ofNullable(rs.getObject(1,UUID.class))).single().orElse(null);
-        return ok(new Page(items,page,size,count.query(Long.class).single(),latest));
+        // Page, total and latest pointer come from one snapshot: a READY commit or new draft landing between separate
+        // statements otherwise showed the latest pointer as DRAFT, or a total that disagrees with the page (D20-A).
+        return ok(snapshot.execute(tx -> {
+            var count=jdbc.sql("SELECT count(*) FROM application_versions WHERE application_id=:app"+filter).param("app",applicationId);
+            var select=jdbc.sql("SELECT * FROM application_versions WHERE application_id=:app"+filter+" ORDER BY number DESC LIMIT :size OFFSET :offset")
+                    .param("app",applicationId).param("size",size).param("offset",(long)page*size);
+            if(status!=null) {count.param("status",status);select.param("status",status);}
+            var items=select.query((rs,n)->new VersionView(rs.getObject("id",UUID.class),rs.getObject("application_id",UUID.class),rs.getInt("number"),
+                    rs.getString("source_digest"),rs.getString("status"),rs.getObject("build_id",UUID.class),rs.getObject("created_at",OffsetDateTime.class),
+                    rs.getObject("source_task_id",UUID.class))).list();
+            UUID latest=jdbc.sql("SELECT latest_ready_version_id FROM applications WHERE id=?").param(applicationId)
+                    .query((rs,n)->Optional.ofNullable(rs.getObject(1,UUID.class))).single().orElse(null);
+            return new Page(items,page,size,count.query(Long.class).single(),latest);
+        }));
     }
     @GetMapping("/versions/{versionId}/files")
     public ResponseEntity<FilesView> files(@PathVariable UUID versionId,HttpServletRequest request) {

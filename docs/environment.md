@@ -2,7 +2,7 @@
 
 ## 版本与边界
 
-沿用 D01 锁定的 Node 24.16.0、pnpm 12.6.0、Java 21、Maven 3.9.11。`infra/compose.dev.yml` 固定 PostgreSQL `17.6-alpine`（与 D02-A 测试使用同一摘要 `sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94`）、Nginx `1.27.5-alpine`、runner Node `24.16.0-bookworm-slim`。Nginx/Node 镜像固定版本标签，公网部署仍需核对镜像摘要。CI 使用仓库现有 Playwright 1.60.0。
+沿用 ADR-005 锁定的 Node 24.22.1、pnpm 12.6.0、Java 21、Maven 3.9.11。`infra/compose.dev.yml` 固定 PostgreSQL `17.6-alpine`（与 D02-A 测试使用同一摘要 `sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94`）、Nginx `1.27.5-alpine`、runner Node `24.22.1-bookworm-slim`。Nginx/Node 镜像固定版本标签，公网部署仍需核对镜像摘要。CI 使用仓库现有 Playwright 1.60.0。
 
 Docker Compose 提供本机开发的 PostgreSQL、平台网关、预览网关、发布网关和独立 runner。四个宿主端口只绑定 `127.0.0.1`；runner 没有宿主端口，只有内部网络中的 `/internal/health`。预览和发布网关当前只提供健康检查，其他路径返回 404，待已验证不可变版本的交付链路接入后才开放内容。它们不是公网 DNS/TLS 或真实发布成功的证明。
 
@@ -14,7 +14,7 @@ Docker Compose 提供本机开发的 PostgreSQL、平台网关、预览网关、
 
 ## 启动与健康检查
 
-需要 Docker Engine 与 Compose v2、Node 24.16.0 和 Corepack。在仓库根目录执行：
+需要 Docker Engine 与 Compose v2、Node 24.22.1 和 Corepack。在仓库根目录执行：
 
 Windows 用户目录安装的 Docker Desktop 若未把 CLI 加入 PATH，可在当前 PowerShell 会话先执行 `$env:Path = "$env:LOCALAPPDATA\Programs\DockerDesktop\resources\bin;$env:Path"`，然后以 `docker version` 确认引擎可用。
 

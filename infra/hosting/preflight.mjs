@@ -29,7 +29,7 @@ export async function preflight(env = process.env) {
     platformOrigin: env.CODELESS_PLATFORM_ORIGIN, previewOrigin: env.CODELESS_PREVIEW_ORIGIN })
   if (await readFile(env.CODELESS_HOSTING_CONFIG, 'utf8') !== nginx) throw new Error('installed ingress configuration mismatch')
   const version = spawnSync(env.CODELESS_NODE_EXECUTABLE, ['--version'], { encoding: 'utf8', timeout: 5000, windowsHide: true })
-  if (version.status !== 0 || version.stdout.trim() !== 'v24.16.0') throw new Error('locked Node24.16.0 required')
+  if (version.status !== 0 || version.stdout.trim() !== 'v24.22.1') throw new Error('locked Node24.22.1 required')
   const docker = spawnSync('docker', ['info', '--format', '{{.ServerVersion}}'], { timeout: 10000, encoding: 'utf8', windowsHide: true })
   if (docker.status !== 0) throw new Error('trusted Docker host unavailable')
   const hostname = new URL(deploymentUrl(randomUUID(), site)).hostname

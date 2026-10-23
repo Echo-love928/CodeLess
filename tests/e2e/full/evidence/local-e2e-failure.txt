@@ -1,0 +1,185 @@
+Timed out waiting 120s for the test suite to run[39m
+[31mTimed out waiting 120s for the teardown for test suite to run[39m
+
+
+  1) [chromium] › ..\..\tests\e2e\generation\flow.spec.ts:44:5 › D10-B success fixture: missing component -> real failed build -> repair -> real verification -> preview 
+
+    Error: (node:22876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    node:internal/modules/run_main:107
+        triggerUncaughtException(
+        ^
+
+    AssertionError [ERR_ASSERTION]: {"id":"768318ee-3a5a-41f4-a132-2dad86270669","buildId":"210f1c2f-d368-4fc4-b4cb-1059f5978fd3","sourceDigest":"sha256:c9a504fc5c405ecc1718851bb5896ac235ab66e8786215c0b57fae38af337e90","artifactDigest":"sha256:1410e9df9e22a4ccbdbaf4ced6555c8d1e55a7c45ac501bb80054d5a1414323b","status":"FAILED","failure":"CLEANUP_TIMEOUT","startedAt":"2026-10-21T14:52:03.588Z","completedAt":"2026-10-21T14:52:34.955Z","workerExitCode":1,"timedOut":true,"phase":"CLEANUP","diagnostics":null,"cleanup":{"browserClosed":false,"processTreeTerminated":true},"screenshot":null,"reportPath":"C:\\Users\\12058\\Documents\\ChatGPT\\CodeLess\\.worktrees\\d20-b\\.local-data\\d10-b\\generation\\verification\\768318ee-3a5a-41f4-a132-2dad86270669\\result.json"}
+
+    'FAILED' !== 'PASSED'
+
+
+      24 |     child.on('error', reject); child.on('close', code => done({ code, log }))
+      25 |   })
+    > 26 |   expect(observed.code, observed.log).toBe(0)
+         |                                       ^
+      27 |   results = JSON.parse(await readFile(join(runtime, 'manifest.json'), 'utf8'))
+      28 |   assets = JSON.parse(await readFile(join(runtime, 'assets.json'), 'utf8'))
+      29 | })
+        at [90mfile:///C:/Users/12058/Documents/ChatGPT/CodeLess/.worktrees/d20-b/[39mtests/e2e/generation/prepare-fixture.mjs:41:12 {
+      generatedMessage: [33mfalse[39m,
+      code: [32m'ERR_ASSERTION'[39m,
+      actual: [32m'FAILED'[39m,
+      expected: [32m'PASSED'[39m,
+      operator: [32m'strictEqual'[39m,
+      diff: [32m'simple'[39m
+    }
+
+    Node.js v24.16.0
+
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\.worktrees\d20-b\tests\e2e\generation\flow.spec.ts:26:39
+
+    Error Context: test-results\generation-flow-D10-B-succ-ceeab-real-verification---preview-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\generation-flow-D10-B-succ-ceeab-real-verification---preview-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\generation-flow-D10-B-succ-ceeab-real-verification---preview-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › ..\..\tests\e2e\preview\flow.spec.ts:6:5 › D09-B: real builds, isolated preview iframe and refresh 
+
+    Error: (node:15620) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    (node:9568) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    [31m✖ D09-B-T1/T3/T4: real Vue build and Chromium preview, platform isolation and version refresh [90m(75750.2412ms)[39m[39m
+    [34mℹ tests 1[39m
+    [34mℹ suites 0[39m
+    [34mℹ pass 0[39m
+    [34mℹ fail 1[39m
+    [34mℹ cancelled 0[39m
+    [34mℹ skipped 0[39m
+    [34mℹ todo 0[39m
+    [34mℹ duration_ms 77450.3101[39m
+
+    [31m✖ failing tests:[39m
+
+    test at tests\e2e\preview\browser.acceptance.mjs:37:1
+    [31m✖ D09-B-T1/T3/T4: real Vue build and Chromium preview, platform isolation and version refresh [90m(75750.2412ms)[39m[39m
+      Error: {"status":"FAILED","build":{"id":"44a880c5-abe6-4fdf-9710-127150c75f5e","imageId":"sha256:ab5801e96cd8bfd5ad3e9ca6d93e5dff12a81ab4f570e592c5bdc941b835f9f1","containerName":"codeless-build-44a880c5-abe6-4fdf-9710-127150c75f5e","status":"SUCCEEDED","failure":null,"exitCode":0,"oomKilled":false,"timedOut":false,"log":{"text":"\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 30 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.36 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[32mai-component-catalog.json  \u001b[39m\u001b[1m\u001b[2m 0.59 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.31 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[35mindex-D-nVVYb8.css  \u001b[39m\u001b[1m\u001b[2m 0.44 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.29 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-BnIS_X2P.js   \u001b[39m\u001b[1m\u001b[2m84.88 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.90 kB\u001b[22m\n\u001b[32m✓ built in 1.16s\u001b[39m\n","bytes":738,"observedBytes":738,"truncated":false},"artifact":{"digest":"sha256:1410e9df9e22a4ccbdbaf4ced6555c8d1e55a7c45ac501bb80054d5a1414323b","bytes":86266,"files":[{"path":"ai-component-catalog.json","bytes":587,"digest":"sha256:721fb84bd1828304f86a6444c102a8e741c56975fc5d2d71e198493e365726d6"},{"path":"assets/index-BnIS_X2P.js","bytes":84877,"digest":"sha256:c529d85895fbc4de2e124170578b82de9b697ec06d379988ee2993e508f549d2"},{"path":"assets/index-D-nVVYb8.css","bytes":439,"digest":"sha256:0a69c49a8ee841d8203715e31f4cc2a5e1c1dca5cbdf3e0cdb69266b23cf8857"},{"path":"index.html","bytes":363,"digest":"sha256:e1adf243d5c2627cc02c90fd2c0a248ea4205ae1e0eb22c5db0089c54d2c6710"}],"directory":"C:\\Users\\12058\\Documents\\ChatGPT\\CodeLess\\.worktrees\\d20-b\\.local-data\\d09-b\\preview-evidence\\artifacts\\44a880c5-abe6-4fdf-9710-127150c75f5e"},"cleanup":{"containerRemoved":true,"workspaceRemoved":true,"errors":[]},"createdAt":"2026-10-21T14:51:36.176Z","completedAt":"2026-10-21T14:51:49.608Z"},"verification":{"id":"6ed95197-ef44-434e-97b8-e7aa3a78f5ee","buildId":"44a880c5-abe6-4fdf-9710-127150c75f5e","sourceDigest":"sha256:c9a504fc5c405ecc1718851bb5896ac235ab66e8786215c0b57fae38af337e90","artifactDigest":"sha256:1410e9df9e22a4ccbdbaf4ced6555c8d1e55a7c45ac501bb80054d5a1414323b","status":"FAILED","failure":"CLEANUP_TIMEOUT","startedAt":"2026-10-21T14:51:49.905Z","completedAt":"2026-10-21T14:52:21.415Z","workerExitCode":1,"timedOut":true,"phase":"CLEANUP","diagnostics":null,"cleanup":{"browserClosed":false,"processTreeTerminated":false},"screenshot":null,"reportPath":"C:\\Users\\12058\\Documents\\ChatGPT\\CodeLess\\.worktrees\\d20-b\\.local-data\\d09-b\\preview-evidence\\verification\\6ed95197-ef44-434e-97b8-e7aa3a78f5ee\\result.json"},"sourceDigest":"sha256:c9a504fc5c405ecc1718851bb5896ac235ab66e8786215c0b57fae38af337e90"}
+      
+      [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+      
+      Expected: [32m"[7mVERIFI[27mED"[39m
+      Received: [31m"[7mFAIL[27mED"[39m
+          at captureRawStack [90m(C:\Users\12058\Documents\ChatGPT\CodeLess\.worktrees\d20-b\[39mnode_modules\[4m.pnpm[24m\playwright-core@1.60.0\node_modules\[4mplaywright-core[24m\lib\coreBundle.js:3130:17[90m)[39m
+          at callMatcherAsStep [90m(C:\Users\12058\Documents\ChatGPT\CodeLess\.worktrees\d20-b\[39mnode_modules\[4m.pnpm[24m\playwright@1.60.0\node_modules\[4mplaywright[24m\lib\matchers\expect.js:12873:57[90m)[39m
+          at Object.toBe [90m(C:\Users\12058\Documents\ChatGPT\CodeLess\.worktrees\d20-b\[39mnode_modules\[4m.pnpm[24m\playwright@1.60.0\node_modules\[4mplaywright[24m\lib\matchers\expect.js:12863:23[90m)[39m
+          at TestContext.<anonymous> [90m(C:\Users\12058\Documents\ChatGPT\CodeLess\.worktrees\d20-b\[39mtests\e2e\preview\browser.acceptance.mjs:67:47[90m)[39m {
+        matcherResult: { actual: [32m'FAILED'[39m, expected: [32m'VERIFIED'[39m, message: [32m'\x1B[2mexpect(\x1B[22m\x1B[31mreceived\x1B[39m\x1B[2m).\x1B[22mtoBe\x1B[2m(\x1B[22m\x1B[32mexpected\x1B[39m\x1B[2m) // Object.is equality\x1B[22m\n\nExpected: \x1B[32m"\x1B[7mVERIFI\x1B[27mED"\x1B[39m\nReceived: \x1B[31m"\x1B[7mFAIL\x1B[27mED"\x1B[39m'[39m, name: [32m'toBe'[39m, pass: [33mfalse[39m }
+      }
+
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+        at test at tests\e2e\preview\browser.acceptance.mjs:37:1
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\.worktrees\d20-b\tests\e2e\preview\flow.spec.ts:18:38
+
+    Error Context: test-results\preview-flow-D09-B-real-bu-f4f60--preview-iframe-and-refresh-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\preview-flow-D09-B-real-bu-f4f60--preview-iframe-and-refresh-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\preview-flow-D09-B-real-bu-f4f60--preview-iframe-and-refresh-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › ..\..\tests\e2e\share\screenshot.spec.ts:5:5 › D16-B screenshot queue and real Chromium acceptance 
+
+    Error: (node:54184) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    (node:54116) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    [32m✔ the 101st and later deployments rotate oldest terminal covers and still capture; reads serialize with retention [90m(5557.8997ms)[39m[39m
+    [32m✔ capacity never deletes pending jobs to admit another deployment [90m(2421.4488ms)[39m[39m
+    [32m✔ offline recovery refuses a live owner, missing maintenance acknowledgement, foreign host and invalid lock [90m(144.9971ms)[39m[39m
+    [32m✔ offline command reclaims a provably exited owner; interrupted jobs fail closed on reopen [90m(1180.6071ms)[39m[39m
+    (node:54132) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    [31m✖ T1: deployment resolver + durable queue + real Chromium PNG bind the exact published version [90m(29852.6997ms)[39m[39m
+    [32m✔ T2: capture timeout retries finitely, persists FAILED, and never mutates PUBLISHED [90m(490.5208ms)[39m[39m
+    [32m✔ T3: rejects URLs/objects, uncommitted deployments, wrong versions and all nonpublic DNS answers before capture [90m(762.4952ms)[39m[39m
+    [32m✔ T3: pinned asset reader rejects redirects, unknown paths, tampering and private worker addresses [90m(7.223ms)[39m[39m
+    [32m✔ real Chromium cannot make private/metadata/page-selected requests through the capture network boundary [90m(1481.4109ms)[39m[39m
+    [32m✔ real stdio worker is forcibly bounded and its process tree is reclaimed [90m(1067.9838ms)[39m[39m
+    [32m✔ unknown cleanup stops retries; queue ownership and read-time image digest are fail-closed [90m(376.0072ms)[39m[39m
+    [34mℹ tests 11[39m
+    [34mℹ suites 0[39m
+    [34mℹ pass 10[39m
+    [34mℹ fail 1[39m
+    [34mℹ cancelled 0[39m
+    [34mℹ skipped 0[39m
+    [34mℹ todo 0[39m
+    [34mℹ duration_ms 34761.3868[39m
+
+    [31m✖ failing tests:[39m
+
+    test at tests\e2e\share\screenshot.acceptance.mjs:57:1
+    [31m✖ T1: deployment resolver + durable queue + real Chromium PNG bind the exact published version [90m(29852.6997ms)[39m[39m
+      AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+      
+      2 !== 1
+      
+          at TestContext.<anonymous> [90m(file:///C:/Users/12058/Documents/ChatGPT/CodeLess/.worktrees/d20-b/[39mtests/e2e/share/screenshot.acceptance.mjs:68:91[90m)[39m
+      [90m    at async Test.run (node:internal/test_runner/test:1313:7)[39m
+      [90m    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)[39m {
+        generatedMessage: [33mtrue[39m,
+        code: [32m'ERR_ASSERTION'[39m,
+        actual: [33m2[39m,
+        expected: [33m1[39m,
+        operator: [32m'strictEqual'[39m,
+        diff: [32m'simple'[39m
+      }
+
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+        at test at tests\e2e\share\screenshot.acceptance.mjs:57:1
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\.worktrees\d20-b\tests\e2e\share\screenshot.spec.ts:14:87
+
+    Error Context: test-results\share-screenshot-D16-B-scr-6e7f0-nd-real-Chromium-acceptance-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\share-screenshot-D16-B-scr-6e7f0-nd-real-Chromium-acceptance-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results\share-screenshot-D16-B-scr-6e7f0-nd-real-Chromium-acceptance-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium] › ..\..\tests\e2e\generation\flow.spec.ts:44:5 › D10-B success fixture: missing component -> real failed build -> repair -> real verification -> preview 
+    [chromium] › ..\..\tests\e2e\preview\flow.spec.ts:6:5 › D09-B: real builds, isolated preview iframe and refresh 
+    [chromium] › ..\..\tests\e2e\share\screenshot.spec.ts:5:5 › D16-B screenshot queue and real Chromium acceptance 
+  4 did not run
+  68 passed (2.0m)
+  2 errors were not a part of any test, see above for details
+  x  36 [chromium] › ..\..\tests\e2e\runner\browser.spec.ts:6:5 › D08-B runner: build artifacts, controlled browser actions and isolation (1.4m)
+[ELIFECYCLE] Command failed with exit code 1.
+Error: ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL
+
+  × "pnpm recursive run" failed in C:
+  │ \Users\12058\Documents\ChatGPT\CodeLess\.worktrees\d20-b\apps\web
+
+[ELIFECYCLE] Command failed with exit code 1.
+[ci-gate] failed with exit code 1
+[ELIFECYCLE] Command failed with exit code 1.

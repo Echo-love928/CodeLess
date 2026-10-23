@@ -23,7 +23,7 @@ export function checkedCommand(command, args, options = {}, spawn = spawnSync) {
 }
 
 async function prepare() {
-  if (process.platform !== 'linux' || process.version !== 'v24.16.0') throw new Error('Locked Linux/Node CI environment required')
+  if (process.platform !== 'linux' || process.version !== 'v24.22.1') throw new Error('Locked Linux/Node CI environment required')
   for (const path of ubuntuSourceFiles) {
     let original
     try { original = await readFile(path, 'utf8') }

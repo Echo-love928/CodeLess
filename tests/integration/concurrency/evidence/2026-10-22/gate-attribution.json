@@ -1,0 +1,48 @@
+{
+  "task": "D20-A",
+  "localGate": {
+    "run": "2026-10-22T06-56-24.046Z-gate-42f0afc3-4a12-477b-be97-754b0c7cbd02",
+    "head": "c35f687874a78a1ea22f5e720f30b147b60fb181",
+    "uncommittedScopedFiles": 0,
+    "nativeExitCode": 1,
+    "node": "v24.22.1 (F:\\nodejs\\node.exe); repository lock is 24.16.0",
+    "stages": {
+      "verify:static": "FAILED at scripts/verify-versions.mjs: 'Node expected 24.16.0, got 24.22.1'; later static steps did not run in the gate",
+      "verify:api": "FAILED: 223 tests, 5 failures, 10 errors, 0 skipped; ConcurrencyConsistencyTest 9/9 passed inside the gate",
+      "verify:runner": "PASSED: node tests 101/101",
+      "verify:e2e": "PASSED: Playwright 75/75 (1.0m); 9 rewritten committed screenshots saved to .local-data/d20-a/gate-generated-png/ and restored byte for byte"
+    }
+  },
+  "apiFailures": {
+    "nodeVersionLock": {
+      "count": 10,
+      "suites": ["AgentLoopIntegrationTest", "CsrfDuringGenerationTest", "RepairLoopIntegrationTest", "PublicationIntegrationTest",
+        "EditLifecycleIntegrationTest", "EditVerificationIntegrationTest", "LocalEditScopeIntegrationTest", "SourceExportIntegrationTest",
+        "PreviewPlatformIntegrationTest", "VersionHttpIntegrationTest"],
+      "cause": "Each suite spawns `node ../../tests/agent/prepare-runtime.mjs` in its setup and asserts exit 0; line 8 throws 'D01 Node version required' unless process.version is v24.16.0. No test method of these suites ran.",
+      "unchangedFile": "git diff c5bec00 -- tests/agent/prepare-runtime.mjs is empty",
+      "directReproduction": ".local-data/d20-a/attribution/node-version.log (node tests/agent/prepare-runtime.mjs -> exit 1, sha256 87b3efe2e60cb41d0f70574789dd423d2d0f14e0a6460db4c5099c33672e26d6)"
+    },
+    "knownWindowsLocal": {
+      "count": 5,
+      "suite": "PreviewAcceptanceProcessTest",
+      "cases": ["interruptionStopsTreeAndRetainsInterrupt", "parentExceptionIsNotReplacedByCleanup",
+        "stopSignalWriteFailureStillReclaimsAndRunsProjectCleanup", "timeoutAssertionAlwaysStopsRootBranchAndLeaf",
+        "unavailableProcessReportStillRunsProjectCleanupAndPreservesParent"],
+      "cause": "Same five names as the base-commit attributions recorded by D18-A (436c04a) and D19-A (3ec4b99) on this machine; D20-A does not touch preview process code."
+    }
+  },
+  "staticSubstepsOutsideGate": {
+    "log": ".local-data/d20-a/static-substeps.log (sha256 62f3b24f9ab74b37e71a6120aaee02776e85fd22d98f95140d33582dcf383a02)",
+    "validateContracts": 0, "contractNodeTests": "18/18, exit 0", "redoclyLint": 0, "webVerify": "lint, vitest, build: exit 0",
+    "note": "Same commands run-static.mjs runs after the version check, executed directly with Node 24.22.1; supplementary, not the gate."
+  },
+  "remote": {
+    "run": 39737026462,
+    "head": "c35f687874a78a1ea22f5e720f30b147b60fb181",
+    "readOnce": "2026-10-22",
+    "jobs": {"infra-preflight": "success", "verify:static": "success", "verify:api": "success", "verify:runner": "success",
+      "verify:e2e": "success", "ci-gate": "success"},
+    "note": "Remote Linux CI uses setup-node 24.16.0. A later PR HEAD must be judged by its own checks."
+  }
+}

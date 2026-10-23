@@ -1,6 +1,6 @@
 # D11 versions acceptance
 
-Use D01's Java21 / Node24.16.0 / pnpm12.6.0 environment and a ready Docker daemon. No lock, isolation, timeout or dependency version changes are needed.
+Use the locked Java21 / Node24.22.1 / pnpm12.6.0 environment and a ready Docker daemon. No lock, isolation, timeout or dependency version changes are needed.
 
 ```powershell
 node tests/versions/record-command.mjs acceptance

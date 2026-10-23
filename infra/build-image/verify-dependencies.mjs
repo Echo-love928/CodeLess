@@ -8,7 +8,7 @@ for (const key of ['dependencies', 'devDependencies']) {
     throw new Error(`${key} differs from the reviewed allowlist`)
   }
 }
-if (pkg.engines?.node !== '24.16.0' || pkg.engines?.pnpm !== '12.6.0') {
+if (pkg.engines?.node !== '24.22.1' || pkg.engines?.pnpm !== '12.6.0') {
   throw new Error('toolchain versions differ from D01 lock')
 }
 if (Object.keys(pkg.scripts ?? {}).join(',') !== 'build' ||

@@ -30,7 +30,7 @@
 
 ## 本地检查
 
-按仓库 README 准备 Node 24.16.0、Corepack shim 和 pnpm 12.6.0，在根目录执行 `pnpm install --frozen-lockfile`。在 `apps/web` 内可单独运行 `pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm build`；根目录 `pnpm verify:static` 会包含这些静态与构建检查。
+按仓库 README 准备 Node 24.22.1、Corepack shim 和 pnpm 12.6.0，在根目录执行 `pnpm install --frozen-lockfile`。在 `apps/web` 内可单独运行 `pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm build`；根目录 `pnpm verify:static` 会包含这些静态与构建检查。
 
 浏览器验收使用根目录 `pnpm verify:e2e`，它会先核验契约，再运行前端 `pnpm smoke`。首次使用需执行 `pnpm exec playwright install chromium`；如使用本机 Chrome 通道，在执行前设置 `CODELESS_PLAYWRIGHT_CHANNEL=chrome`。浏览器用例覆盖三页刷新、搜索、需求反馈、文案编辑、设备切换、状态组件与窄屏布局。
 

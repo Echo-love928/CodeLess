@@ -21,7 +21,7 @@ if (web.packageManager !== pkg.packageManager) failures.push('apps/web packageMa
 const lockedFiles = [
   ['services/api/pom.xml', ['<java.version>21</java.version>', '<version>4.1.1</version>', '<spring-ai.version>2.0.1</spring-ai.version>']],
   ['services/api/.mvn/wrapper/maven-wrapper.properties', ['apache-maven/3.9.11/', 'distributionSha512Sum=03e2d65d']],
-  ['.github/workflows/ci.yml', ['node-version: 24.16.0', 'java-version: 21']],
+  ['.github/workflows/ci.yml', ['node-version: 24.22.1', 'java-version: 21']],
   ['docs/architecture.md', ['Spring Boot 4.1.1', 'Spring AI BOM 2.0.1', 'Maven 3.9.11']]
 ];
 for (const [path, markers] of lockedFiles) {

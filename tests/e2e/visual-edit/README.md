@@ -10,7 +10,7 @@ Chromium/TLS/签名预览、选中组件、共享确认、精确新版本及旧�
 保留其全部既有断言。A/B 组合目录另加入 D14-A 的 EditVerificationIntegrationTest（7项），验证
 文案/颜色、TS1109修复、无进展停止、失败指针与历史恢复；它不替代B四类UI fixture的结果。
 
-固定环境：Node24.16.0、corepack/pnpm12.6.0、Java21、Maven3.9.11及锁定bundled Chromium。
+固定环境：Node24.22.1、corepack/pnpm12.6.0、Java21、Maven3.9.11及锁定bundled Chromium。
 本机Java位置 `C:/Program Files/Java/jdk-21.0.12.1`；嵌套pnpm使用已有 `.local-data/d13-b/bin` shim。
 
 ```powershell
