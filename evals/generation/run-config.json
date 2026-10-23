@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "configId": "D21-generation-run-v1",
+  "frozenBy": "D21-A",
+  "frozenOn": "2026-10-23",
+  "provider": {
+    "id": "deepseek",
+    "modelSource": "CODELESS_MODEL_NAME",
+    "credentialSource": "CODELESS_MODEL_API_KEY",
+    "transport": "DeepSeekModelProvider: one chat completion per request, response_format json_object, thinking disabled, stream false, no provider retry or fallback",
+    "maxOutputTokens": 4096,
+    "requestTimeoutSecondsMax": 60
+  },
+  "runtimeBudget": {
+    "repairRounds": 3,
+    "modelRequests": 12,
+    "toolSlots": 20,
+    "chargedTokens": 50000,
+    "outputTokensPerRequest": 4096,
+    "framingTokensPerRequest": 512,
+    "taskDeadlineMinutes": 12
+  },
+  "attemptPolicy": {
+    "initialAttemptsPerSample": 1,
+    "outerRetries": 0,
+    "rerun": "NEW_BATCH_ONLY",
+    "failedSamplesDeleted": false,
+    "resume": "Only samples that have no invocation record may start; a sample that ever started is never started again in the same batch."
+  },
+  "execution": {
+    "harness": "services/api/src/test/java/dev/codeless/api/eval/GenerationEvalIT.java",
+    "driver": "scripts/eval/run-batch.mjs",
+    "isolation": "One Maven/JVM process, one fresh PostgreSQL 17.6 container and one private runtime root per sample",
+    "order": "requirements.json order, then faults.json order",
+    "concurrency": 1,
+    "sampleProcessTimeoutMinutes": 25,
+    "realApprovalEnv": "CODELESS_EVAL_REAL_APPROVED=1"
+  },
+  "metering": {
+    "actualTokens": "Provider-reported prompt_tokens/completion_tokens only; a call is KNOWN only when both are present.",
+    "unknown": "A finished call with any missing count is UNKNOWN; exact totals are null unless every call is KNOWN.",
+    "cache": "Provider cache-hit tokens are part of prompt_tokens and are never added a second time.",
+    "charged": "Runtime budget charges (conservative reservations) are reported separately and never as actual usage."
+  }
+}
