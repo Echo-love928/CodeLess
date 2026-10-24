@@ -55,6 +55,8 @@ export function validateEditRecord(record, edit, base, batch, trustedMapping) {
   assert.equal(record.before.version.taskId, base.record.task.id)
   assert.equal(record.before.version.applicationId, task.applicationId)
   assert.equal(record.before.version.sourceDigest, base.version.sourceDigest)
+  assert.equal(record.before.version.number, base.version.number)
+  assert.equal(record.before.version.buildId, base.version.buildId)
   const before = snapshotSource(record.before); verified(record.before)
   validateManifest(record.before.mapping, trustedMapping)
   const mapping = trustedMapping.components.find(c => c.componentId === edit.componentId && c.sourceFile === edit.file)
@@ -93,6 +95,8 @@ export function validateEditRecord(record, edit, base, batch, trustedMapping) {
     assert.ok(record.after.version.id !== baseVersionId)
     assert.equal(record.after.version.taskId, task.id); assert.equal(record.after.version.applicationId, task.applicationId)
     assert.ok(record.after.version.number > record.before.version.number)
+    assert.notEqual(record.after.version.buildId, record.before.version.buildId)
+    assert.notEqual(record.after.snapshot.validation?.report?.verificationId, record.before.snapshot.validation.report.verificationId)
     after = snapshotSource(record.after); verified(record.after)
   } else if (record.after) {
     assert.equal(record.after.version.taskId, task.id); assert.equal(record.after.version.applicationId, task.applicationId)

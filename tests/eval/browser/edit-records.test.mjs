@@ -20,7 +20,11 @@ test('edit records bind task, server component selection, immutable versions and
     r => { r.edit.source.sourceFile = 'src/pages/Other.vue' }, r => { r.before.mapping.components[0].fileDigest = 'sha256:' + '0'.repeat(64) },
     r => { r.modelCalls.items[0].provider = 'deepseek' }, r => { r.modelCalls.totalItems = 2 },
     r => { r.modelCalls.items = [] }, r => { r.after.files[0].content += '\nmodified' },
-    r => { r.after.files[0].path = '../outside.vue' }, r => { r.after.snapshot.validation.report.exitCode = null }]
+    r => { r.after.files[0].path = '../outside.vue' }, r => { r.after.snapshot.validation.report.exitCode = null },
+    r => { r.before.version.number = 0 },
+    r => { r.before.version.buildId = randomUUID(); r.before.snapshot.validation.report.buildId = r.before.version.buildId },
+    r => { r.after.version.buildId = r.before.version.buildId; r.after.snapshot.validation.report.buildId = r.before.version.buildId },
+    r => { r.after.snapshot.validation.report.verificationId = r.before.snapshot.validation.report.verificationId }]
   for (const change of changes) { const record = structuredClone(f.record); change(record); assert.throws(() => validateEditRecord(record, f.edit, f.base, f.batch, f.mapping)) }
 })
 
