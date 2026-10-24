@@ -109,4 +109,9 @@ test('the container-CLI fault removes exactly the PATH entries that hold a docke
   const { env } = sampleEnvironment({ base, mode: 'MOCK', sample: { fault: null }, specPath: 's', outputDir: 'o', java: 'J' })
   assert.deepEqual(Object.keys(env).filter((key) => /^(CODELESS_|SPRING_|JAVA_TOOL)/.test(key)).sort(),
     ['CODELESS_EVAL_OUTPUT_DIR', 'CODELESS_EVAL_SAMPLE_FILE', 'CODELESS_MODEL_PROVIDER'])
+  // The private wire capture reaches only REAL sample JVMs, like the credential.
+  const mock = sampleEnvironment({ base, mode: 'MOCK', sample: { fault: null }, specPath: 's', outputDir: 'o', java: 'J', captureDir: 'w' }).env
+  assert.equal(mock.CODELESS_EVAL_PRIVATE_CAPTURE_DIR, undefined)
+  const real = sampleEnvironment({ base, mode: 'REAL', sample: { fault: null }, specPath: 's', outputDir: 'o', java: 'J', captureDir: 'w' }).env
+  assert.equal(real.CODELESS_EVAL_PRIVATE_CAPTURE_DIR, 'w')
 })
