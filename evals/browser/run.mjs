@@ -118,6 +118,19 @@ finally {
   await browser?.close()
   report.completedAt = new Date().toISOString()
   await save()
+  // CI does not retain runner work directories. Keep the failed phase visible
+  // without logging immutable source contents or changing any verdict.
+  if (report.status === 'FAILED') {
+    const phase = value => value ? { status: value.status, failure: value.failure,
+      error: value.error?.replaceAll(root, '<repo>'), evidenceError: value.evidenceError?.replaceAll(root, '<repo>') } : null
+    console.log(JSON.stringify({ failures: {
+      requirements: report.rows.filter(row => !row.passed).map(row => ({ sampleId: row.sampleId, failure: row.failure,
+        platformFailureCode: row.platformFailureCode, build: phase(row.build), browser: phase(row.browser) })),
+      edits: report.edits.filter(row => row.passed === false).map(row => ({ sampleId: row.sampleId, failure: row.failure,
+        build: phase(row.build), baselineBrowser: phase(row.baselineBrowser), browser: phase(row.browser), scope: row.scope })),
+      controls: report.controls.filter(control => !control.detected).map(control => ({ name: control.name, browser: phase(control.browser) })),
+    } }))
+  }
   console.log(JSON.stringify({ output, status: report.status, requirements: report.requirements?.[report.mode?.toLowerCase()], edits: report.editSummary?.[report.mode?.toLowerCase()], error: report.error }))
   process.exitCode = report.status === 'PASSED' ? 0 : 1
 }
