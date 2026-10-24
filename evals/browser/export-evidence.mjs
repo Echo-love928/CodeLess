@@ -32,7 +32,8 @@ for (const path of process.argv.slice(2)) {
     editSummary: { denominator: 6, real: report.editSummary.real, mock: report.editSummary.mock, unknown: report.editSummary.unknown }, targets: report.targets }
   const shots = report.mode === 'MOCK'
     ? ['SHOW-03/page.png', 'TASK-01/page.png', 'CAT-03/page.png', 'EDIT-05/before/page.png', 'EDIT-05/after/page.png', 'controls/white-screen/page.png', 'controls/lost-persistence/page.png']
-    : ['SHOW-01/page.png', 'SHOW-02/page.png', 'TASK-01/page.png']
+    : report.rows.filter(row => /^(?:SHOW|TASK|CAT)-0[1-3]$/.test(row.sampleId) && row.browser?.screenshot?.path === 'page.png')
+      .map(row => row.sampleId + '/page.png')
   exported.publicScreenshots = shots.map(path => name + '-' + path.replaceAll('/', '-'))
   await writeFile(join(destination, name + '.json'), JSON.stringify(exported, null, 2) + '\n')
   for (const path of shots) await copyFile(join(directory, path), join(destination, name + '-' + path.replaceAll('/', '-')))
