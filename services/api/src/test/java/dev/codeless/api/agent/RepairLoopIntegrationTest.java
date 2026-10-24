@@ -35,6 +35,8 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         try {return Files.readString(Path.of("../../tests/agent/repair/fixtures/model-json-object.json")).strip();}
         catch(java.io.IOException error){throw new IllegalStateException(error);}
     }
+    // Renders visible text but not the component the original acceptance waits for (locator timeout, D24-A).
+    private static final String NO_CARD="<script setup lang=\"ts\"></script><template><main><p>作品：CodeLess Showcase</p></main></template>";
     private static final String BROWSER_ERROR="<script setup lang=\"ts\">import { onMounted } from 'vue';"
             +"import ProfileCard from '../components/ProfileCard.vue';"
             +"onMounted(() => { window.setTimeout(() => { throw new Error('D10_A_BROWSER_PAGE_EXCEPTION'); }, 0); });"
@@ -58,7 +60,7 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
     }
     final class Fixture implements ModelProvider {
         final String mode;final Seed seed;final MockModelProvider mock=new MockModelProvider();final AtomicInteger count=new AtomicInteger();
-        final List<JsonNode> inputs=new ArrayList<>();
+        final List<JsonNode> inputs=new ArrayList<>();final List<JsonNode> rejected=new ArrayList<>();
         Fixture(String mode,Seed seed){this.mode=mode;this.seed=seed;}
         public String id(){return "deterministic-mock";}public String model(){return "d10-repair-"+mode+"-fixture";}
         public Reply call(Prompt prompt,int max,Duration timeout) {
@@ -69,15 +71,28 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                 if(phase.equals("GENERATE"))assertThat(prompt.getSystemMessage().getText()).contains("never json_object","Invalid replies terminate",
                     "REPAIR copies input.originalActions exactly into actions");
                 else assertThat(prompt.getSystemMessage().getText()).contains("Each key occurs exactly once","The root type occurs once",
-                    "input.completionProposal is the complete done example")
+                    "done is {\"type\":\"done\"}","The host reuses the original actions in input.completionProposal, which cannot change.")
                     .doesNotContain("json_object","response_format","Invalid protocol reply");
                 assertThat(max).isEqualTo(RuntimeBudget.OUTPUT_TOKENS);
             }
             if(!phase.equals("REPAIR")) {
                 var reply=mock.call(prompt,max,timeout);var node=json.readTree(reply.content());
                 if(node.path("arguments").path("path").asText().equals(PAGE))
-                    ((tools.jackson.databind.node.ObjectNode)node.path("arguments")).put("content",mode.equals("browser")?BROWSER_ERROR:BROKEN);
+                    ((tools.jackson.databind.node.ObjectNode)node.path("arguments")).put("content",mode.equals("browser")?BROWSER_ERROR:
+                            mode.equals("locator")?NO_CARD:mode.startsWith("rejected")?FIXED:BROKEN);
                 content=node.toString();
+                if(mode.startsWith("rejected") && node.path("type").asText().equals("done")) {
+                    var last=input.path("observations").get(input.path("observations").size()-1);
+                    if(!last.path("status").asText().equals("REJECTED")) {
+                        var actions=new ArrayList<Object>();actions.add(Map.of("type","navigate","path","/"));
+                        for(int i=0;i<20;i++)actions.add(Map.of("type","expectVisible","target",Map.of("testId","profile-name")));
+                        content=json.writeValueAsString(Map.of("type","done","actions",actions));
+                    } else {
+                        rejected.add(last);
+                        if(mode.equals("rejected-twice")) content=json.writeValueAsString(Map.of("type","done","actions",List.of(Map.of("type","navigate","path","/"),
+                                Map.of("type","click","target",Map.of("testId","toggle-{{item.id}}")),Map.of("type","expectVisible","target",Map.of("testId","profile-name")))));
+                    }
+                }
                 if(mode.equals("invalid-generate") && phase.equals("GENERATE")) {
                     int observed=input.path("observations").size();
                     if(observed==1)content=json.writeValueAsString(Map.of("type","tool","name","files.read","arguments",Map.of("path","src/components/ProfileCard.vue")));
@@ -89,6 +104,11 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                     assertThat(input.path("failure").path("diagnostic").asText()).contains("D10_A_BROWSER_PAGE_EXCEPTION");
                     assertThat(queue.find(seed.owner(),seed.task()).orElseThrow().status()).isEqualTo(TaskStatus.REPAIR);
                     assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
+                }
+                if(mode.equals("locator")) {
+                    assertThat(input.path("failure").path("code").asText()).isEqualTo("AGENT_ACTION_TIMEOUT");
+                    assertThat(input.path("failure").path("category").asText()).isEqualTo("CODE");
+                    assertThat(input.path("failure").path("failedAction").path("index").asInt()).isEqualTo(1);
                 }
                 if(mode.equals("invalid-repair")) return new Reply(recordedInvalidReply(),new Evidence(model(),"explicit-recorded-protocol-fixture","explicit-recorded-protocol-fixture",new Usage(31,17,48,null)));
                 if(mode.equals("network")) throw new ModelFailure("MODEL_NETWORK");
@@ -115,10 +135,19 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                 } else if(observed==0) content=json.writeValueAsString(Map.of("type","tool","name","files.read","arguments",Map.of("path",PAGE)));
                 else if(observed==1) {
                     JsonNode actual=input.path("observations").get(0);
-                    assertThat(actual.path("content").asText()).isEqualTo(mode.equals("browser")?BROWSER_ERROR:BROKEN);
+                    assertThat(actual.path("content").asText()).isEqualTo(mode.equals("browser")?BROWSER_ERROR:mode.equals("locator")?NO_CARD:BROKEN);
                     content=json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of(
                             "path",PAGE,"expectedDigest",actual.path("afterDigest").asText(),"content",FIXED)));
-                } else content=json.writeValueAsString(Map.of("type","done","actions",input.path("completionProposal").path("actions")));
+                    if(mode.equals("host-complete")) {
+                        // Synthetic exhaustion (as in D10AT3): reserve whatever is left, and charge this patch request in full.
+                        var lease=new TaskQueueService.Claim(seed.task(),jdbc.sql("SELECT lease_token FROM generation_tasks WHERE id=?").param(seed.task()).query(UUID.class).single(),TaskStatus.REPAIR);
+                        long left=RuntimeBudget.TOKENS-RuntimeBudget.meter(journal.read(seed.task())).chargedTokens();
+                        store.reserve(lease,TaskStatus.REPAIR,"model.request",(int)left);
+                        int input0=RuntimeBudget.inputReservation(prompt.getSystemMessage().getText(),prompt.getUserMessage().getText());
+                        return new Reply(content,new Evidence(model(),"explicit-fixture-request","explicit-fixture-response",new Usage(input0,max,input0+max,null)));
+                    }
+                } else content=Set.of("bare","locator").contains(mode)?"{\"type\":\"done\"}":
+                        json.writeValueAsString(Map.of("type","done","actions",input.path("completionProposal").path("actions")));
             }
             Usage usage=mode.equals("unknown")?Usage.unknown():new Usage(31,17,48,null);
             return new Reply(content,new Evidence(model(),"explicit-fixture-request","explicit-fixture-response",usage));
@@ -275,14 +304,84 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
         report("D10-A-repeated-read-stop",seed,Map.of("recordedProvider",provider.model(),"extraModelCalls",0,"outerRetries",0));
     }
-    @Test void recordedUnknownPatchUsageRetainsFullReservationAndStopsBeforeDone() throws Exception {
+    @Test void recordedUnknownPatchUsageKeepsItsFullReservationAndTheHostVerifiesThePatch() throws Exception {
+        // Until D24-A this patch was discarded: done could not be reserved, so the task stopped AGENT_MODEL_BUDGET_EXCEEDED
+        // with a real, digest-checked fix on disk (D21-A F3). The unknown usage still keeps its full reservation, no
+        // request beyond the caps is made, and only the real rebuild and browser decide the outcome.
         var seed=seed();var provider=recordedProvider(seed,"unknown-patch");var task=run(seed,provider);
-        assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_MODEL_BUDGET_EXCEEDED");assertThat(provider.count).isEqualTo(11);
-        var events=journal.read(seed.task());var usage=AgentJournal.latest(events,"model.usage");assertThat(usage.path("estimated").asBoolean()).isTrue();
+        assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);assertThat(provider.count).isEqualTo(11);
+        var events=journal.read(seed.task());
+        var usage=events.stream().filter(e->e.path("kind").asText().equals("model.usage")&&e.path("stage").asText().equals("REPAIR")).reduce((a,b)->b).orElseThrow().path("payload");
+        assertThat(usage.path("estimated").asBoolean()).isTrue();
         assertThat(usage.path("chargedTokens")).isEqualTo(usage.path("reservationTokens"));assertThat(usage.path("usage").path("totalTokens").isNull()).isTrue();
-        assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.done")).count()).isZero();assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(14);
-        assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
-        report("D10-A-recorded-unknown-budget",seed,Map.of("recordedProvider",provider.model(),"doneProviderCalled",false,"outerRetries",0));
+        var done=events.stream().filter(e->e.path("kind").asText().equals("repair.done")).map(e->e.path("payload")).toList();
+        assertThat(done).hasSize(1);assertThat(done.getFirst().path("origin").asText()).isEqualTo("HOST_BUDGET_EXHAUSTED");
+        var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
+        assertThat(drafts).hasSize(2);assertThat(done.getFirst().path("actions")).isEqualTo(drafts.getFirst().path("actions")).isEqualTo(drafts.getLast().path("actions"));
+        var results=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
+        assertThat(results).hasSize(2);assertThat(results.getLast().path("verification").path("status").asText()).isEqualTo("PASSED");
+        var meter=RuntimeBudget.meter(events);assertThat(meter.models()).isEqualTo(11);assertThat(meter.chargedTokens()).isLessThanOrEqualTo(RuntimeBudget.TOKENS);
+        assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNotNull();
+        report("D24-A-recorded-unknown-budget-host-completion",seed,Map.of("recordedProvider",provider.model(),"doneProviderCalled",false,"outerRetries",0,
+                "meter",meter,"realBuildAndBrowser",true));
+    }
+    @Test void invalidDoneGetsOneCorrectiveObservationAndThenVerifies() throws Exception {
+        var seed=seed();var provider=new Fixture("rejected-once",seed);var task=run(seed,provider);
+        assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);assertThat(provider.count.get()).isEqualTo(5);
+        assertThat(provider.rejected).hasSize(1);var observed=provider.rejected.getFirst();
+        assertThat(observed.path("tool").asText()).isEqualTo("done");assertThat(observed.path("status").asText()).isEqualTo("REJECTED");
+        assertThat(observed.path("errorCode").asText()).isEqualTo("AGENT_ACCEPTANCE_INVALID");assertThat(observed.path("reason").asText()).isEqualTo("TOO_MANY_ACTIONS");
+        assertThat(observed.path("limit").asInt()).isEqualTo(20);assertThat(observed.path("actual").asInt()).isEqualTo(21);
+        var events=journal.read(seed.task());
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("done.rejected")).count()).isEqualTo(1);
+        assertThat(AgentJournal.latest(events,"draft").path("actions").size()).isEqualTo(2);
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(1);
+        report("D24-A-done-rejected-once",seed,Map.of("rejection",observed,"modelCalls",5,"outerRetries",0));
+    }
+    @Test void secondInvalidDoneStopsWithTheOriginalCodeBeforeAnyRunner() throws Exception {
+        var seed=seed();var provider=new Fixture("rejected-twice",seed);
+        new TaskScheduler(queue,loop(provider,(draft,deadline)->{throw new AssertionError("invalid acceptance must never launch runner");})).tick();
+        var task=queue.find(seed.owner(),seed.task()).orElseThrow();
+        assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_ACCEPTANCE_INVALID");
+        assertThat(provider.count.get()).isEqualTo(5);var events=journal.read(seed.task());
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("done.rejected")).count()).isEqualTo(1);
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("draft")).count()).isZero();
+        assertThat(AgentJournal.latest(events,"failure").path("code").asText()).isEqualTo("AGENT_ACCEPTANCE_INVALID");
+    }
+    @Test void bareDoneFinishesRepairWithTheUnchangedOriginalActions() throws Exception {
+        var seed=seed();var provider=new Fixture("bare",seed);var task=run(seed,provider);
+        assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);var events=journal.read(seed.task());
+        assertThat(AgentJournal.latest(events,"model.response")).isEqualTo(json.readTree("{\"type\":\"done\"}"));
+        assertThat(AgentJournal.latest(events,"repair.done").path("origin").asText()).isEqualTo("MODEL");
+        var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
+        assertThat(drafts).hasSize(2);assertThat(drafts.getLast().path("actions")).isEqualTo(drafts.getFirst().path("actions"));
+        assertThat(AgentJournal.latest(events,"repair.done").path("actions")).isEqualTo(drafts.getFirst().path("actions"));
+        report("D24-A-bare-repair-done",seed,Map.of("modelCalls",provider.count.get(),"outerRetries",0,"realBuildAndBrowser",true));
+    }
+    @Test void hostVerifiesAnActualPatchWhenNoFurtherRequestCanBeFunded() throws Exception {
+        var seed=seed();var provider=new Fixture("host-complete",seed);var task=run(seed,provider);
+        assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);assertThat(provider.count.get()).isEqualTo(6);
+        var events=journal.read(seed.task());var done=AgentJournal.latest(events,"repair.done");
+        assertThat(done.path("origin").asText()).isEqualTo("HOST_BUDGET_EXHAUSTED");
+        var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
+        assertThat(drafts).hasSize(2);assertThat(done.path("actions")).isEqualTo(drafts.getFirst().path("actions"));
+        var meter=RuntimeBudget.meter(events);assertThat(meter.chargedTokens()).isEqualTo(RuntimeBudget.TOKENS);assertThat(meter.models()).isEqualTo(7);
+        var results=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
+        assertThat(results).hasSize(2);assertThat(results.getLast().path("verification").path("status").asText()).isEqualTo("PASSED");
+        report("D24-A-host-completion",seed,Map.of("meter",meter,"doneRequests",0,"outerRetries",0,"realBuildAndBrowser",true));
+    }
+    @Test void locatorTimeoutOnARenderedPageIsRepairedInsteadOfStoppingAsInfrastructure() throws Exception {
+        var seed=seed();var provider=new Fixture("locator",seed);var task=run(seed,provider);
+        assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);var events=journal.read(seed.task());
+        var failure=events.stream().filter(e->e.path("kind").asText().equals("repair.failure")).findFirst().orElseThrow().path("payload");
+        assertThat(failure.path("code").asText()).isEqualTo("AGENT_ACTION_TIMEOUT");assertThat(failure.path("category").asText()).isEqualTo("CODE");
+        assertThat(failure.path("decision").asText()).isEqualTo("REPAIR");assertThat(failure.path("diagnostic").asText()).contains("profile-name");
+        var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
+        assertThat(failure.path("failedAction").path("action")).isEqualTo(drafts.getFirst().path("actions").get(1));
+        var results=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
+        assertThat(results.getFirst().path("verification").path("failure").asText()).isEqualTo("ACTION_TIMEOUT");
+        assertThat(results.getLast().path("verification").path("status").asText()).isEqualTo("PASSED");
+        report("D24-A-locator-timeout-repair",seed,Map.of("failure",failure,"outerRetries",0,"realBuildAndBrowser",true));
     }
     private RecordedRepairFixture recordedProvider(Seed seed,String mode) {
         return recordedProvider(seed,mode,RepairContextTest.RECORD);

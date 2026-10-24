@@ -75,9 +75,15 @@ class GenerationEvalIT extends PostgresTestBase {
             ModelProvider base=mode.equals("MOCK") && !deadRoute?new SyntheticCounters(new MockModelProvider()):
                     new DeepSeekModelProvider(mode.equals("REAL")?System.getenv("CODELESS_MODEL_API_KEY"):MISSING,
                             mode.equals("REAL")?System.getenv("CODELESS_MODEL_NAME"):"d21-eval-unreachable");
-            provider=new EvalProvider(base,fault.path("class").asText().equals("CODE")?fault:null,requirement.path("category").asText(),
+            // Private diagnosis only (D24-A): a REAL sample's complete request/reply bytes go to the batch's private root,
+            // never into the committed record. Requests, replies, budget and the absence of retries are unchanged.
+            String capture=System.getenv("CODELESS_EVAL_PRIVATE_CAPTURE_DIR");
+            ModelProvider wire=mode.equals("REAL") && !deadRoute && capture!=null && !capture.isBlank()
+                    ?new PrivateModelCapture((DeepSeekModelProvider)base,Path.of(capture)):base;
+            provider=new EvalProvider(wire,fault.path("class").asText().equals("CODE")?fault:null,requirement.path("category").asText(),
                     mode.equals("MOCK") && deadRoute?"deterministic-mock":null);
-            harness.put("provider",Map.of("id",provider.id(),"model",provider.model(),"transport",base.getClass().getSimpleName()));
+            harness.put("provider",Map.of("id",provider.id(),"model",provider.model(),"transport",base.getClass().getSimpleName(),
+                    "privateCapture",wire!=base));
             UUID owner=UUID.randomUUID();app=UUID.randomUUID();
             repository.createUser(owner,"d21-eval-"+spec.path("sampleId").asText().toLowerCase(Locale.ROOT)+"@eval.codeless.test","D21 evaluation");
             repository.createApplication(app,owner,requirement.path("applicationName").asText(),DataMode.valueOf(requirement.path("dataMode").asText()));

@@ -42,11 +42,12 @@ or a necessary patch; it does not encourage rereading already current source.
 | --- | --- |
 | Confirmed compiler diagnostic with nonzero exit, no OOM/timeout and confirmed cleanup | Request REPAIR if limits permit. |
 | Completed browser ACTION_FAILED/PAGE_EXCEPTION/CONSOLE_ERROR/BLANK_PAGE after successful build and confirmed cleanup | Request REPAIR; original actions cannot be weakened. |
+| ACTION_TIMEOUT of a locator wait (not a navigation) on a page with visible content or application errors, no blocked/failed request and complete diagnostics (D24-A) | Request REPAIR with `failedAction`; otherwise INFRASTRUCTURE as before. |
 | Same diagnostic fingerprint and same sourceDigest on next verification | FAILED / AGENT_REPAIR_NO_PROGRESS. |
 | Three completed repair rounds still fail | FAILED / AGENT_REPAIR_LIMIT_EXCEEDED. |
 | Docker, image, filesystem, worker/browser launch, network/resource error, timeout, cleanup or unknown failure | FAILED with original safe error; no model repair/retry. |
 | Model transport/auth/rate limit/invalid response/protocol failure | FAILED with original safe error; no model retry. |
-| Next request would exceed 12 model calls or 50,000 reserved/charged tokens | FAILED / AGENT_MODEL_BUDGET_EXCEEDED, before provider invocation. |
+| Next request would exceed 12 model calls, or its input reservation plus the 256-token minimum output exceeds the 50,000 remaining | FAILED / AGENT_MODEL_BUDGET_EXCEEDED, before provider invocation. In REPAIR after an actual digest-checked source change, the host instead submits the patch to verification (`repair.done` origin `HOST_BUDGET_EXHAUSTED`). |
 | Next operation would exceed 20 tool slots | FAILED / AGENT_TOOL_BUDGET_EXCEEDED, before file/runner operation. |
 | Authenticated cancellation | Existing FAILED / CANCELLED; late writes/commit are fenced. |
 | Existing 12-minute SQL deadline or lease expires | Existing queue recovers FAILED / INTERRUPTED; no late commit. |
@@ -59,8 +60,11 @@ count. Reservations persist under the task row lock in the shared private journa
 new service instances cannot reset them. The journal has 160 bounded checkpoints to
 hold all 12 calls/20 tools/three repairs with their audit records.
 
-Every model request reserves UTF-8 input bytes plus 512 framing tokens and 4096 max
-output tokens. Provider total usage, if present, is checked against known input+
+Every model request reserves UTF-8 input bytes plus 512 framing tokens and an output
+allowance: 4096 when the remaining cap allows it, otherwise what remains (at least 256),
+sent to the provider as max_tokens (D24-A). The caps are unchanged; a request that fits
+is no longer refused for 4096 output tokens it would not use, and unknown output is
+charged at that allowance. Provider total usage, if present, is checked against known input+
 output; otherwise missing parts retain the corresponding conservative reservation.
 `model.usage` stores original nullable counters, `chargedTokens`, `releasedTokens`,
 `estimated` and `meteringSource`. Unknown usage is never zero. Received usage survives
@@ -87,3 +91,20 @@ AGENT_REPAIR_ACCEPTANCE_CHANGED; AGENT_BUILD_EXIT remains the actual compiler co
 The final enabling integration PR must test real authenticated UI -> queue ->
 repair -> build/browser -> immutable version -> signed isolated preview. Backend
 fixtures alone do not constitute M1 real-model or UI integration acceptance.
+
+## D24-A additions
+
+- GENERATE observations of a successful create/update carry `committedContent`
+  (`COMMITTED_WRITE_DIGEST_MATCHED`) like REPAIR, so the model no longer spends a
+  request reading back its own write; the prompt no longer asks for that read.
+- A GENERATE done whose actions break the runner grammar, the three document routes,
+  route coverage, the 20-action limit, or contain `{{`/`${` placeholders gets one
+  `done.rejected` observation with a fixed reason; a second invalid done stops with
+  the original AGENT_ACCEPTANCE_INVALID/INCOMPLETE code.
+- REPAIR completes with `{"type":"done"}`; an included actions array must still equal
+  the original exactly. After a source change, a request that cannot fund a full 4096
+  output is completion-only.
+- GENERATE input carries `componentIds` (kebab-case file names) for planned pages and
+  components; the trusted build catalog still decides selectability.
+- A refused reply records a content-free `model.invalid` event (parser reason and
+  position, root shape, byte count and digest, or the provider check that refused it).

@@ -94,6 +94,20 @@ public final class AgentRunStore {
     public void reserve(TaskQueueService.Claim claim, TaskStatus stage, String kind, int tokens) {
         reserve(claim,stage,kind,tokens,1);
     }
+    /**
+     * Reserve one model request: the conservative input bound plus the largest output allowance the remaining
+     * token cap permits. A request that cannot fund the provider minimum is refused here, before invocation.
+     */
+    public int reserveModel(TaskQueueService.Claim claim, TaskStatus stage, int inputReservation) {
+        return tx.execute(s -> {
+            lock(claim,stage);
+            Integer output=RuntimeBudget.outputAllowance(RuntimeBudget.meter(journal.read(claim.taskId())),inputReservation);
+            if(output==null) throw new AgentFailure("AGENT_MODEL_BUDGET_EXCEEDED");
+            journal.append(claim.taskId(),stage.name(),"model.request",Map.of("reservedTokens",Math.addExact(inputReservation,output),
+                    "slots",1,"outputTokens",output));
+            return output;
+        });
+    }
     public void reserveVerification(TaskQueueService.Claim claim) {
         // Reserve both fixed operations before launch, even if the build later prevents the browser.
         reserve(claim,TaskStatus.VERIFY,"tool.request",0,2);

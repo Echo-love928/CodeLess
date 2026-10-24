@@ -70,7 +70,7 @@ export function javaHome(env = process.env) {
 }
 
 /** JVM environment for one sample. The provider credential reaches only REAL sample JVMs. */
-export function sampleEnvironment({ base, mode, sample, specPath, outputDir, java }) {
+export function sampleEnvironment({ base, mode, sample, specPath, outputDir, java, captureDir }) {
   const env = {}
   for (const [key, value] of Object.entries(base)) if (!STRIPPED.test(key)) env[key] = value
   const previous = env[pathKey(env)] ?? ''
@@ -87,6 +87,8 @@ export function sampleEnvironment({ base, mode, sample, specPath, outputDir, jav
     env.CODELESS_EVAL_REAL_APPROVED = '1'
     env.CODELESS_MODEL_API_KEY = base.CODELESS_MODEL_API_KEY
     env.CODELESS_MODEL_NAME = base.CODELESS_MODEL_NAME
+    // Complete request/reply bytes for diagnosing invalid replies; private root only, scanned for the credential.
+    if (captureDir) env.CODELESS_EVAL_PRIVATE_CAPTURE_DIR = captureDir
   }
   return { env, removedPathEntries: removed.length }
 }
@@ -239,7 +241,7 @@ export async function runBatch(options, deps = {}) {
       frozenDigests: Object.fromEntries(Object.keys(FROZEN).map((key) => [key, frozen[key].sha256])) }
     writeOnce(join(sdir, 'spec.json'), canonical(spec))
     const { env: jvm, removedPathEntries } = sampleEnvironment({ base: env, mode: options.mode, sample,
-      specPath: join(sdir, 'spec.json'), outputDir: sdir, java })
+      specPath: join(sdir, 'spec.json'), outputDir: sdir, java, captureDir: join(privateRoot, sample.id + '-wire') })
     const log = join(privateRoot, sample.id + '.log')
     writeOnce(join(sdir, 'invocation.json'), canonical({ schemaVersion: 1, sampleId: sample.id, attempt: 1, startedAt: now().toISOString(),
       harness: 'GenerationEvalIT', checkout: cwd === root ? 'IN_PLACE' : 'ISOLATED', head: batch.git.head,

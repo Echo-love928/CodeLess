@@ -2,6 +2,7 @@ package dev.codeless.api.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 import com.sun.net.httpserver.HttpServer;
 import java.net.InetSocketAddress;
@@ -181,5 +182,26 @@ class DeepSeekModelProviderTest {
         response = "x".repeat(256 * 1024 + 1);
         assertThatThrownBy(() -> call(Duration.ofSeconds(5))).hasMessage("MODEL_RESPONSE_LIMIT");
         assertThat(calls).hasValue(4);
+    }
+    @Test
+    void invalidResponseKeepsItsCodeAndNamesTheRefusingCheckWithoutProviderText() {
+        // D24-A: the code and the UI message stay MODEL_INVALID_RESPONSE; the fixed word only locates the check.
+        var cases = new java.util.LinkedHashMap<String, String>();
+        cases.put(completion("length", "{\"type\":\"tool\"", "{\"prompt_tokens\":12,\"completion_tokens\":7}"), "FINISH_REASON_LENGTH");
+        cases.put(completion("content_filter", "{}", null), "FINISH_REASON_CONTENT_FILTER");
+        cases.put(completion("Weird Reason!", "{}", null), "FINISH_REASON_OTHER");
+        cases.put(completion("stop", " ", null), "CONTENT_EMPTY");
+        cases.put("{\"id\":\"r\",\"model\":\"m\",\"choices\":[]}", "CHOICES_INVALID");
+        cases.put("{\"id\":\"r\",\"model\":\"m\",\"choices\":[{\"finish_reason\":\"stop\",\"message\":{\"content\":\"{}\",\"tool_calls\":[]}}]}", "TOOL_CALLS_PRESENT");
+        cases.put("{invalid", "BODY_INVALID");
+        for (var entry : cases.entrySet()) {
+            response = entry.getKey();
+            var failure = catchThrowableOfType(ModelFailure.class, () -> call(Duration.ofSeconds(5)));
+            assertThat(failure.code()).as(entry.getValue()).isEqualTo("MODEL_INVALID_RESPONSE");
+            assertThat(failure.detail()).isEqualTo(entry.getValue());
+            assertThat(failure.getMessage()).isEqualTo("MODEL_INVALID_RESPONSE");
+        }
+        assertThat(new ModelFailure("MODEL_INVALID_RESPONSE", ModelProvider.Evidence.unknown(), "free text: secret").detail()).isNull();
+        assertThat(calls).hasValue(cases.size());
     }
 }

@@ -26,6 +26,8 @@ if (!Object.hasOwn(commands, mode) || (['report-check', 'verify'].includes(mode)
   console.error('usage: node scripts/eval/record-command.mjs unit|mutation|static|api|runner|e2e|gate|report-check <dir>|verify <dir>')
   process.exit(2)
 }
+// Later cards that reuse this recorder label their own records (for example D24-A).
+const task = /^D[0-9]{2}-[AB]$/.test(process.env.CODELESS_EVIDENCE_TASK ?? '') ? process.env.CODELESS_EVIDENCE_TASK : 'D21-A'
 const started = new Date()
 const output = join(root, '.local-data/d21-a/commands', started.toISOString().replaceAll(':', '-') + '-' + mode)
 mkdirSync(output, { recursive: true })
@@ -46,7 +48,7 @@ try { [exitCode, signal] = await once(child, 'close') } catch (error) { launchEr
 const after = gitState()
 const text = readFileSync(log, 'utf8')
 const summary = {
-  task: 'D21-A', mode, target: target ? relative(root, resolve(target)).split('\\').join('/') : null,
+  task, mode, target: target ? relative(root, resolve(target)).split('\\').join('/') : null,
   command: [relative(root, command) || command, ...args].join(' '), startedAt: started.toISOString(), completedAt: new Date().toISOString(),
   exitCode, signal, launchError, status: exitCode === 0 && signal === null ? 'PASSED' : 'FAILED',
   head: before.head, scopedClean: before.scopedClean && after.scopedClean && before.head === after.head,

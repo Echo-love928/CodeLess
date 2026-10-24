@@ -121,27 +121,31 @@ public final class AgentLoop implements TaskStageRunner {
         // be read, updated or deleted while producing it; model text grants no paths.
         Set<String> operable=new TreeSet<>(planned);
         edit.ifPresent(value -> value.path("sourceFiles").forEach(f -> operable.add(f.path("path").asText())));
+        String policy=(repair?repairPolicy:generationPolicy+(edit.isPresent()?EDIT_POLICY:""))+(local.isPresent()?"\n"+localEditPolicy:"");
+        // Edits keep the IDs already declared in their trusted base; a new generation gets deterministic ones.
+        Map<String,String> componentIds=repair||edit.isPresent()?Map.of():componentIds(planned);
+        int rejectedDone=0;
         for(int i=0;i<RuntimeBudget.MODEL_CALLS;i++) {
             var meter=repair?RuntimeBudget.meter(store.read(claim,stage)):null;
-            boolean completionOnly=repair&&Boolean.TRUE.equals(repairContext.progress().get("sourceChanged"))&&RuntimeBudget.MODEL_CALLS-meter.models()==1;
-            var input=new LinkedHashMap<String,Object>();input.put("phase",stage.name());input.put("request",context.prompt());
-            input.put("dataMode",context.dataMode());
-            if(local.isPresent()) {
-                input.put("scope",local.get().path("allowedWriteFiles"));
-                input.put("verificationRoutes",plan.path("pages").valueStream().map(page -> page.path("route").asText()).toList());
+            boolean changed=repair&&Boolean.TRUE.equals(repairContext.progress().get("sourceChanged"));
+            boolean completionOnly=changed&&RuntimeBudget.MODEL_CALLS-meter.models()==1;
+            JsonNode request=input(stage,context,plan,local,edit,completionOnly,repair?repairContext.observations():observations,
+                    failure,originalActions,repairContext,meter,componentIds);
+            if(changed && !completionOnly) {
+                // After an actual source change, a request that cannot fund a full-size write may only complete.
+                Integer full=model.allowance(meter,policy,request);
+                if(full==null || full<RuntimeBudget.OUTPUT_TOKENS) {
+                    completionOnly=true;
+                    request=input(stage,context,plan,local,edit,true,repairContext.observations(),failure,originalActions,repairContext,meter,componentIds);
+                }
             }
-            else input.put("plan",repair?RepairContext.planProjection(plan):plan);
-            input.put("tools",completionOnly?List.of():registry.definitions().path("tools"));
-            input.put("observations",repair?repairContext.observations():observations);
-            edit.ifPresent(value -> input.put("editContext",value));
-            if(repair) {input.put("failure",failure);input.put("completionProposal",Map.of("type","done","actions",originalActions));input.put("sourceFiles",repairContext.sourceFiles());
-                input.put("repairAttempt",context.repairAttempts());input.put("repairProgress",repairContext.progress());
-                if(completionOnly)input.put("completionOnly",true);
-                local.ifPresent(value -> input.put("sourceFiles",LocalEditScope.files(repairContext.sourceFiles(),LocalEditScope.target(value))));
-                input.put("budget",Map.of("modelCallsRemaining",RuntimeBudget.MODEL_CALLS-meter.models(),
-                        "toolCallsRemaining",RuntimeBudget.TOOL_CALLS-meter.tools(),"tokensRemaining",RuntimeBudget.TOKENS-meter.chargedTokens()));}
-            JsonNode reply=model.call(claim,stage,(repair?repairPolicy:generationPolicy+(edit.isPresent()?EDIT_POLICY:""))+
-                    (local.isPresent()?"\n"+localEditPolicy:""),json.valueToTree(input));
+            if(changed && model.allowance(meter,policy,request)==null) {
+                // The round holds digest-checked source changes and the caps cannot fund another request: submit
+                // them for real verification with the unchanged original actions instead of discarding the patch.
+                store.append(claim,stage,"repair.done",Map.of("actions",originalActions,"origin","HOST_BUDGET_EXHAUSTED"));
+                return new StageResult(TaskStatus.GENERATE,"Repair budget exhausted after a source change; source must be frozen and verified",null);
+            }
+            JsonNode reply=model.call(claim,stage,policy,request);
             if(local.isPresent() && "scopeExpansion".equals(reply.path("type").asText())) {
                 closed(reply,Set.of("type","reason"));
                 if(!reply.path("reason").isTextual() || reply.path("reason").asText().isBlank() || reply.path("reason").asText().length()>1000)
@@ -176,19 +180,93 @@ public final class AgentLoop implements TaskStageRunner {
                     boolean repeated=repairContext.observe(name,arguments,projected);
                     if(repeated)store.append(claim,stage,"repair.read.repeat",Map.of("tool",name,"path",arguments.path("path").asText(),
                             "callId",actual.callId(),"progress",repairContext.progress()));
-                } else observations.add(projected);
+                } else observations.add(committed(name,arguments,projected,actual));
             } else if(reply.path("type").asText().equals("done")) {
-                closed(reply,Set.of("type","actions"));
-                validateCoverage(plan,reply.path("actions"));
                 if(repair) {
-                    if(!originalActions.equals(reply.path("actions"))) throw new AgentFailure("AGENT_REPAIR_ACCEPTANCE_CHANGED");
-                    store.append(claim,stage,"repair.done",Map.of("actions",originalActions));
+                    // The original actions are host-owned in REPAIR, so {"type":"done"} suffices; a copy must be exact.
+                    if(reply.has("actions")) {
+                        closed(reply,Set.of("type","actions"));
+                        validateCoverage(plan,reply.path("actions"));
+                        if(!originalActions.equals(reply.path("actions"))) throw new AgentFailure("AGENT_REPAIR_ACCEPTANCE_CHANGED");
+                    } else closed(reply,Set.of("type"));
+                    store.append(claim,stage,"repair.done",Map.of("actions",originalActions,"origin","MODEL"));
                     return new StageResult(TaskStatus.GENERATE,"Repair proposal applied; source must be frozen and verified",null);
+                }
+                closed(reply,Set.of("type","actions"));
+                var rejection=AcceptanceActions.check(plan,reply.path("actions"));
+                if(rejection!=null) {
+                    // One corrective observation per stage, paid from the same caps; a second invalid done stops.
+                    if(rejectedDone++>0) throw new AgentFailure(rejection.code());
+                    var observed=new LinkedHashMap<String,Object>();observed.put("tool","done");observed.put("status","REJECTED");
+                    observed.put("errorCode",rejection.code());observed.putAll(rejection.detail());
+                    store.append(claim,stage,"done.rejected",observed);
+                    observations.add(json.valueToTree(observed));
+                    continue;
                 }
                 return snapshot(claim,plan,reply.path("actions"));
             } else throw new AgentFailure("AGENT_MODEL_PROTOCOL_INVALID");
         }
         throw new AgentFailure("AGENT_MODEL_BUDGET_EXCEEDED");
+    }
+    private JsonNode input(TaskStatus stage,AgentRunStore.Context context,JsonNode plan,Optional<JsonNode> local,Optional<JsonNode> edit,
+                           boolean completionOnly,List<JsonNode> observations,JsonNode failure,JsonNode originalActions,
+                           RepairContext repairContext,RuntimeBudget.Meter meter,Map<String,String> componentIds) {
+        boolean repair=failure!=null;
+        var input=new LinkedHashMap<String,Object>();input.put("phase",stage.name());input.put("request",context.prompt());
+        input.put("dataMode",context.dataMode());
+        if(local.isPresent()) {
+            input.put("scope",local.get().path("allowedWriteFiles"));
+            input.put("verificationRoutes",plan.path("pages").valueStream().map(page -> page.path("route").asText()).toList());
+        }
+        else input.put("plan",repair?RepairContext.planProjection(plan):plan);
+        if(!componentIds.isEmpty()) input.put("componentIds",componentIds);
+        input.put("tools",completionOnly?List.of():registry.definitions().path("tools"));
+        input.put("observations",observations);
+        edit.ifPresent(value -> input.put("editContext",value));
+        if(repair) {input.put("failure",failure);input.put("completionProposal",Map.of("type","done","actions",originalActions));input.put("sourceFiles",repairContext.sourceFiles());
+            input.put("repairAttempt",context.repairAttempts());input.put("repairProgress",repairContext.progress());
+            if(completionOnly)input.put("completionOnly",true);
+            local.ifPresent(value -> input.put("sourceFiles",LocalEditScope.files(repairContext.sourceFiles(),LocalEditScope.target(value))));
+            input.put("budget",Map.of("modelCallsRemaining",RuntimeBudget.MODEL_CALLS-meter.models(),
+                    "toolCallsRemaining",RuntimeBudget.TOOL_CALLS-meter.tools(),"tokensRemaining",RuntimeBudget.TOKENS-meter.chargedTokens()));}
+        return json.valueToTree(input);
+    }
+    /**
+     * A successful GENERATE write is fed back with its own bytes, once they match both the actual afterDigest and
+     * the current manifest, so the model does not spend a request reading back what it just wrote (D24-A).
+     */
+    private JsonNode committed(String name,JsonNode arguments,JsonNode projected,FileToolService.Result actual) {
+        if(!Set.of("files.create","files.update").contains(name) || !arguments.path("content").isString() || !projected.isObject()) return projected;
+        String content=arguments.path("content").asText(),path=arguments.path("path").asText(),digest=actual.afterDigest();
+        boolean current=actual.source()!=null && actual.source().files().stream().anyMatch(f -> f.path().equals(path) && f.digest().equals(digest));
+        if(digest==null || !current || !digest.equals(sha256(content))) throw new AgentFailure("AGENT_CHECKPOINT_INVALID");
+        var observed=(tools.jackson.databind.node.ObjectNode)projected.deepCopy();
+        observed.put("committedContent",content);observed.put("contentOrigin","COMMITTED_WRITE_DIGEST_MATCHED");
+        return observed;
+    }
+    private static String sha256(String content) {
+        try {return "sha256:"+HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(content.getBytes(StandardCharsets.UTF_8)));}
+        catch(java.security.NoSuchAlgorithmException unavailable) {throw new AgentFailure("AGENT_CHECKPOINT_INVALID");}
+    }
+    /**
+     * Deterministic data-ai-component IDs for planned page/component files: the kebab-case file name, prefixed
+     * with page-/component- only when two planned names collide. The trusted build catalog still decides.
+     */
+    static Map<String,String> componentIds(Collection<String> paths) {
+        var names=new TreeMap<String,String>();
+        for(String path:paths) if(path.matches("src/(?:pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue"))
+            names.put(path,kebab(path.substring(path.lastIndexOf('/')+1,path.length()-4)));
+        var ids=new TreeMap<String,String>();
+        for(var entry:names.entrySet()) {
+            String id=entry.getValue();
+            if(Collections.frequency(names.values(),id)>1) id=(entry.getKey().startsWith("src/pages/")?"page-":"component-")+id;
+            if(id.length()<=64 && dev.codeless.api.mapping.ComponentMapping.id(id)) ids.put(entry.getKey(),id);
+        }
+        return ids;
+    }
+    static String kebab(String name) {
+        return name.replaceAll("([a-z0-9])([A-Z])","$1-$2").replaceAll("([A-Z]+)([A-Z][a-z])","$1-$2").replace('_','-')
+                .toLowerCase(Locale.ROOT).replaceAll("-{2,}","-").replaceAll("^-|-$","");
     }
     private static final String EDIT_POLICY="\nThis is an edit of a cloned immutable Vue version. Preserve existing files unless the request requires a change. "
             +"The plan must list the entire resulting source file set, including unchanged files. Existing files already exist: use files.update with expectedDigest, not files.create. "
@@ -234,12 +312,20 @@ public final class AgentLoop implements TaskStageRunner {
             var diagnostic=new LinkedHashMap<String,Object>();diagnostic.put("code",failure.code());diagnostic.put("category",failure.category().name());
             diagnostic.put("fingerprint",failure.fingerprint());diagnostic.put("diagnostic",failure.diagnostic());
             diagnostic.put("sourceDigest",draft.path("sourceDigest").asText());diagnostic.put("repairAttempts",context.repairAttempts());
+            failedAction(draft.path("actions"),actual).ifPresent(value -> diagnostic.put("failedAction",value));
             diagnostic.put("decision",stop==null?"REPAIR":stop);
             store.append(claim,TaskStatus.VERIFY,"repair.failure",diagnostic);
             if(stop!=null) throw new AgentFailure(stop);
             return new StageResult(TaskStatus.REPAIR,"Observed source error; bounded repair requested",null);
         }
         return new StageResult(TaskStatus.READY,"PREVIEW_READY pending atomic version commit",null);
+    }
+    /** The frozen action the browser was executing when an ACTION_* failure stopped it (actions pass in order). */
+    private static Optional<Map<String,Object>> failedAction(JsonNode actions,JsonNode result) {
+        var browser=result.path("verification");
+        if(!browser.path("failure").asText().startsWith("ACTION_") || !browser.path("diagnostics").path("actions").isArray()) return Optional.empty();
+        int index=browser.path("diagnostics").path("actions").size();
+        return index<actions.size()?Optional.of(Map.of("index",index,"action",actions.get(index))):Optional.empty();
     }
     @Override public TaskQueueService.TaskView advance(TaskQueueService queue,TaskQueueService.Claim claim,StageResult result,EventType type) {
         if(result.next()!=TaskStatus.READY) return TaskStageRunner.super.advance(queue,claim,result,type);

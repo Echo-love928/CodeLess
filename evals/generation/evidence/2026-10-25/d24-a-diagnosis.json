@@ -1,0 +1,512 @@
+{
+  "schemaVersion": 1,
+  "task": "D24-A",
+  "kind": "DIAGNOSIS_OF_PUBLISHED_RECORDS",
+  "modelCalls": 0,
+  "source": {
+    "pr": "Echo-love928/CodeLess#65",
+    "file": "evals/browser/evidence/real-acceptance-2026-10-24-raw.zip",
+    "zipSha256": "sha256:7ed1e0ba8132ef4714d52e61be1b997adcab8f43ee12edb3c08c09bd6eb05699",
+    "batchId": "2026-10-24T13-47-29Z-real-103b5585"
+  },
+  "rules": {
+    "tokens": 50000,
+    "outputTokens": 4096,
+    "framingTokens": 512,
+    "minOutputTokens": 256,
+    "modelCalls": 12
+  },
+  "samples": [
+    {
+      "sampleId": "CAT-01",
+      "recordSha256": "sha256:6012ee23fa02e617e62baf860756ac9867ec9c6a5fb7b47a604209ff6df3116e",
+      "taskId": "a9978317-e1a7-4ed4-b3dc-952cff45ba60",
+      "status": "FAILED",
+      "failureCode": "AGENT_ACCEPTANCE_INVALID",
+      "repairAttempts": 0,
+      "models": 6,
+      "chargedTokens": 23053,
+      "generateReadBacks": 2,
+      "repairFailures": [],
+      "runner": [],
+      "failure": {
+        "code": "AGENT_ACCEPTANCE_INVALID",
+        "category": "INFRASTRUCTURE",
+        "stage": "GENERATE"
+      }
+    },
+    {
+      "sampleId": "CAT-02",
+      "recordSha256": "sha256:59e74a00b5481e821b1e7725d4745261aaaa7e14d86297cee974ddbc4ea9f044",
+      "taskId": "489afbd0-a516-490c-a753-77868f82883e",
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_BUDGET_EXCEEDED",
+      "repairAttempts": 0,
+      "models": 8,
+      "chargedTokens": 31860,
+      "generateReadBacks": 3,
+      "repairFailures": [],
+      "runner": [],
+      "budget": {
+        "refusedBefore": "TOKEN_RESERVATION",
+        "chargedAtRefusal": 31860,
+        "remainingAtRefusal": 18140,
+        "lastRecordedRequest": {
+          "stage": "GENERATE",
+          "inputBound": 17434,
+          "reservedTokens": 21530,
+          "inputTokens": 5635,
+          "inputTokensPerReservedInputByte": 0.323
+        },
+        "proxy": "PREVIOUS_REQUEST_INPUT_BOUND",
+        "oldRuleNeeded": 21530,
+        "newRuleOutputAllowanceAtPreviousSize": 706
+      },
+      "failure": {
+        "code": "AGENT_MODEL_BUDGET_EXCEEDED",
+        "category": "CONTROL",
+        "stage": "GENERATE"
+      }
+    },
+    {
+      "sampleId": "CAT-03",
+      "recordSha256": "sha256:c8ae842d0fe66981a72f99763fd8dff3ce49b6b37a39f312ec5cdfd70811e46f",
+      "taskId": "ace53db6-2923-4e05-a312-41b8483a3da0",
+      "status": "FAILED",
+      "failureCode": "MODEL_INVALID_RESPONSE",
+      "repairAttempts": 0,
+      "models": 2,
+      "chargedTokens": 4898,
+      "generateReadBacks": 0,
+      "repairFailures": [],
+      "runner": [],
+      "failure": {
+        "code": "MODEL_INVALID_RESPONSE",
+        "category": "MODEL_INTERFACE",
+        "stage": "GENERATE"
+      }
+    },
+    {
+      "sampleId": "FAULT-CODE-01",
+      "recordSha256": "sha256:ea0dd12f00300eaba0b0074d06efb78ca6ad589fed80f16710c5cfc2491a81b0",
+      "taskId": "fd38c6f1-0355-4794-ab74-80bc218a960f",
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_BUDGET_EXCEEDED",
+      "repairAttempts": 2,
+      "models": 12,
+      "chargedTokens": 40217,
+      "generateReadBacks": 3,
+      "repairFailures": [
+        {
+          "code": "AGENT_BUILD_EXIT",
+          "category": "CODE",
+          "decision": "REPAIR",
+          "repairAttempts": 0
+        },
+        {
+          "code": "AGENT_ACTION_FAILED",
+          "category": "CODE",
+          "decision": "REPAIR",
+          "repairAttempts": 1
+        }
+      ],
+      "runner": [
+        {
+          "build": "FAILED",
+          "buildFailure": "BUILD_EXIT",
+          "verification": null,
+          "verificationFailure": null,
+          "visibleContent": null,
+          "pageErrors": null,
+          "consoleErrors": null,
+          "blockedOrFailedRequests": null,
+          "locatorWait": false
+        },
+        {
+          "build": "SUCCEEDED",
+          "buildFailure": null,
+          "verification": "FAILED",
+          "verificationFailure": "ACTION_FAILED",
+          "visibleContent": true,
+          "pageErrors": 0,
+          "consoleErrors": 0,
+          "blockedOrFailedRequests": 0,
+          "locatorWait": false
+        }
+      ],
+      "budget": {
+        "refusedBefore": "MODEL_CALLS",
+        "chargedAtRefusal": 40217,
+        "remainingAtRefusal": 9783,
+        "lastRecordedRequest": {
+          "stage": "REPAIR",
+          "inputBound": 7976,
+          "reservedTokens": 12072,
+          "inputTokens": 2470,
+          "inputTokensPerReservedInputByte": 0.31
+        },
+        "proxy": "PREVIOUS_REQUEST_INPUT_BOUND",
+        "oldRuleNeeded": 12072,
+        "newRuleOutputAllowanceAtPreviousSize": 1807
+      },
+      "failure": {
+        "code": "AGENT_MODEL_BUDGET_EXCEEDED",
+        "category": "CONTROL",
+        "stage": "REPAIR"
+      }
+    },
+    {
+      "sampleId": "FAULT-CODE-02",
+      "recordSha256": "sha256:d8b561141d14564830ffd5711571544874b3b119cd39cbb0deeac57dff08af21",
+      "taskId": "7fac2203-e2f8-4398-be8a-d33a66f2ec99",
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_PROTOCOL_INVALID",
+      "repairAttempts": 1,
+      "models": 9,
+      "chargedTokens": 32715,
+      "generateReadBacks": 2,
+      "repairFailures": [
+        {
+          "code": "AGENT_BUILD_EXIT",
+          "category": "CODE",
+          "decision": "REPAIR",
+          "repairAttempts": 0
+        }
+      ],
+      "runner": [
+        {
+          "build": "FAILED",
+          "buildFailure": "BUILD_EXIT",
+          "verification": null,
+          "verificationFailure": null,
+          "visibleContent": null,
+          "pageErrors": null,
+          "consoleErrors": null,
+          "blockedOrFailedRequests": null,
+          "locatorWait": false
+        }
+      ],
+      "failure": {
+        "code": "AGENT_MODEL_PROTOCOL_INVALID",
+        "category": "MODEL_INTERFACE",
+        "stage": "REPAIR"
+      }
+    },
+    {
+      "sampleId": "FAULT-CODE-03",
+      "recordSha256": "sha256:c170e130330e2aa251b36f88371cfae526433da5ef8af0ed8728043de14e0019",
+      "taskId": "4ed629e9-60a2-4d8a-b06e-47f24f56550c",
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_BUDGET_EXCEEDED",
+      "repairAttempts": 1,
+      "models": 8,
+      "chargedTokens": 32483,
+      "generateReadBacks": 2,
+      "repairFailures": [
+        {
+          "code": "AGENT_PAGE_EXCEPTION",
+          "category": "CODE",
+          "decision": "REPAIR",
+          "repairAttempts": 0
+        }
+      ],
+      "runner": [
+        {
+          "build": "SUCCEEDED",
+          "buildFailure": null,
+          "verification": "FAILED",
+          "verificationFailure": "PAGE_EXCEPTION",
+          "visibleContent": true,
+          "pageErrors": 1,
+          "consoleErrors": 0,
+          "blockedOrFailedRequests": 0,
+          "locatorWait": false
+        }
+      ],
+      "budget": {
+        "refusedBefore": "TOKEN_RESERVATION",
+        "chargedAtRefusal": 32483,
+        "remainingAtRefusal": 17517,
+        "lastRecordedRequest": {
+          "stage": "REPAIR",
+          "inputBound": 14554,
+          "reservedTokens": 18650,
+          "inputTokens": 4773,
+          "inputTokensPerReservedInputByte": 0.328
+        },
+        "proxy": "PREVIOUS_REQUEST_INPUT_BOUND",
+        "oldRuleNeeded": 18650,
+        "newRuleOutputAllowanceAtPreviousSize": 2963
+      },
+      "failure": {
+        "code": "AGENT_MODEL_BUDGET_EXCEEDED",
+        "category": "CONTROL",
+        "stage": "REPAIR"
+      }
+    },
+    {
+      "sampleId": "FAULT-ENV-01",
+      "recordSha256": "sha256:a4b66506a6602abcddad52583d81eb422c663e941da4cf2d8645947f6a6da493",
+      "taskId": "cc878e2e-d6d9-4809-9248-a10cee06990f",
+      "status": "FAILED",
+      "failureCode": "AGENT_RUNNER_UNAVAILABLE",
+      "repairAttempts": 0,
+      "models": 8,
+      "chargedTokens": 28549,
+      "generateReadBacks": 3,
+      "repairFailures": [
+        {
+          "code": "AGENT_RUNNER_UNAVAILABLE",
+          "category": "INFRASTRUCTURE",
+          "decision": "AGENT_RUNNER_UNAVAILABLE",
+          "repairAttempts": 0
+        }
+      ],
+      "runner": [
+        {
+          "build": null,
+          "buildFailure": null,
+          "verification": null,
+          "verificationFailure": null,
+          "visibleContent": null,
+          "pageErrors": null,
+          "consoleErrors": null,
+          "blockedOrFailedRequests": null,
+          "locatorWait": false
+        }
+      ],
+      "failure": {
+        "code": "AGENT_RUNNER_UNAVAILABLE",
+        "category": "INFRASTRUCTURE",
+        "stage": "VERIFY"
+      }
+    },
+    {
+      "sampleId": "FAULT-ENV-02",
+      "recordSha256": "sha256:84199b2dbab50d6add2fa23e71c1caa92309851e7908509b13b494e8cfe5f6a8",
+      "taskId": "3330f09f-f407-4e8d-aa13-e5f33674bc55",
+      "status": "FAILED",
+      "failureCode": "MODEL_NETWORK",
+      "repairAttempts": 0,
+      "models": 1,
+      "chargedTokens": 9562,
+      "generateReadBacks": 0,
+      "repairFailures": [],
+      "runner": [],
+      "failure": {
+        "code": "MODEL_NETWORK",
+        "category": "MODEL_INTERFACE",
+        "stage": "PLAN"
+      }
+    },
+    {
+      "sampleId": "SHOW-01",
+      "recordSha256": "sha256:a53ae5b968be2edba786d427ecc76dd1687fd610caab12145b32f542b0352b77",
+      "taskId": "a5e3ec52-c4a9-43ec-bc57-5372e9ff7eaa",
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_BUDGET_EXCEEDED",
+      "repairAttempts": 1,
+      "models": 11,
+      "chargedTokens": 38255,
+      "generateReadBacks": 3,
+      "repairFailures": [
+        {
+          "code": "AGENT_BUILD_EXIT",
+          "category": "CODE",
+          "decision": "REPAIR",
+          "repairAttempts": 0
+        }
+      ],
+      "runner": [
+        {
+          "build": "FAILED",
+          "buildFailure": "BUILD_EXIT",
+          "verification": null,
+          "verificationFailure": null,
+          "visibleContent": null,
+          "pageErrors": null,
+          "consoleErrors": null,
+          "blockedOrFailedRequests": null,
+          "locatorWait": false
+        }
+      ],
+      "budget": {
+        "refusedBefore": "TOKEN_RESERVATION",
+        "chargedAtRefusal": 38255,
+        "remainingAtRefusal": 11745,
+        "lastRecordedRequest": {
+          "stage": "REPAIR",
+          "inputBound": 9879,
+          "reservedTokens": 13975,
+          "inputTokens": 3216,
+          "inputTokensPerReservedInputByte": 0.326
+        },
+        "proxy": "PREVIOUS_REQUEST_INPUT_BOUND",
+        "oldRuleNeeded": 13975,
+        "newRuleOutputAllowanceAtPreviousSize": 1866
+      },
+      "failure": {
+        "code": "AGENT_MODEL_BUDGET_EXCEEDED",
+        "category": "CONTROL",
+        "stage": "REPAIR"
+      }
+    },
+    {
+      "sampleId": "SHOW-02",
+      "recordSha256": "sha256:85c8a8426f9fb06cc68683dec8adc26f9e67143bcea2ed3b8c7fc0730d051a96",
+      "taskId": "199f2723-c614-48c5-962d-932b347bcce3",
+      "status": "READY",
+      "failureCode": null,
+      "repairAttempts": 0,
+      "models": 8,
+      "chargedTokens": 27791,
+      "generateReadBacks": 3,
+      "repairFailures": [],
+      "runner": [
+        {
+          "build": "SUCCEEDED",
+          "buildFailure": null,
+          "verification": "PASSED",
+          "verificationFailure": null,
+          "visibleContent": true,
+          "pageErrors": 0,
+          "consoleErrors": 0,
+          "blockedOrFailedRequests": 0,
+          "locatorWait": false
+        }
+      ]
+    },
+    {
+      "sampleId": "SHOW-03",
+      "recordSha256": "sha256:9c2bc145a5b50477f95206ce3b3f072f735cf30d215942b03998a3cf1cd9c709",
+      "taskId": "dab36bbc-2157-4e36-818d-39d52eebedad",
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_BUDGET_EXCEEDED",
+      "repairAttempts": 0,
+      "models": 8,
+      "chargedTokens": 30040,
+      "generateReadBacks": 3,
+      "repairFailures": [],
+      "runner": [],
+      "budget": {
+        "refusedBefore": "TOKEN_RESERVATION",
+        "chargedAtRefusal": 30040,
+        "remainingAtRefusal": 19960,
+        "lastRecordedRequest": {
+          "stage": "GENERATE",
+          "inputBound": 16798,
+          "reservedTokens": 20894,
+          "inputTokens": 5312,
+          "inputTokensPerReservedInputByte": 0.316
+        },
+        "proxy": "PREVIOUS_REQUEST_INPUT_BOUND",
+        "oldRuleNeeded": 20894,
+        "newRuleOutputAllowanceAtPreviousSize": 3162
+      },
+      "failure": {
+        "code": "AGENT_MODEL_BUDGET_EXCEEDED",
+        "category": "CONTROL",
+        "stage": "GENERATE"
+      }
+    },
+    {
+      "sampleId": "TASK-01",
+      "recordSha256": "sha256:f8e0ed1d8e9a7d651beba64689f4b62972b5a19069582986762dbdd66ae6b9b2",
+      "taskId": "48f1f725-ed69-46ce-9067-9e9084f12b8b",
+      "status": "FAILED",
+      "failureCode": "AGENT_ACTION_TIMEOUT",
+      "repairAttempts": 0,
+      "models": 6,
+      "chargedTokens": 21687,
+      "generateReadBacks": 2,
+      "repairFailures": [
+        {
+          "code": "AGENT_ACTION_TIMEOUT",
+          "category": "INFRASTRUCTURE",
+          "decision": "AGENT_ACTION_TIMEOUT",
+          "repairAttempts": 0
+        }
+      ],
+      "runner": [
+        {
+          "build": "SUCCEEDED",
+          "buildFailure": null,
+          "verification": "FAILED",
+          "verificationFailure": "ACTION_TIMEOUT",
+          "visibleContent": true,
+          "pageErrors": 0,
+          "consoleErrors": 0,
+          "blockedOrFailedRequests": 0,
+          "locatorWait": true
+        }
+      ],
+      "failure": {
+        "code": "AGENT_ACTION_TIMEOUT",
+        "category": "CONTROL",
+        "stage": "VERIFY"
+      }
+    },
+    {
+      "sampleId": "TASK-02",
+      "recordSha256": "sha256:ae7c72a0e02f24c9e2a59ba9763a8193ca6fae486be6b35f17132c29f558d6bf",
+      "taskId": "32eaceff-45b9-43ac-85df-f03f500b867e",
+      "status": "READY",
+      "failureCode": null,
+      "repairAttempts": 0,
+      "models": 6,
+      "chargedTokens": 22553,
+      "generateReadBacks": 2,
+      "repairFailures": [],
+      "runner": [
+        {
+          "build": "SUCCEEDED",
+          "buildFailure": null,
+          "verification": "PASSED",
+          "verificationFailure": null,
+          "visibleContent": true,
+          "pageErrors": 0,
+          "consoleErrors": 0,
+          "blockedOrFailedRequests": 0,
+          "locatorWait": false
+        }
+      ]
+    },
+    {
+      "sampleId": "TASK-03",
+      "recordSha256": "sha256:933a2dff16917e398fcc14d97e1c41653b65cb566a42a4144006b39e10b05b9d",
+      "taskId": "9bb3c095-cd53-47e9-a015-0e95cef8dcb9",
+      "status": "FAILED",
+      "failureCode": "AGENT_ACTION_TIMEOUT",
+      "repairAttempts": 0,
+      "models": 6,
+      "chargedTokens": 22178,
+      "generateReadBacks": 2,
+      "repairFailures": [
+        {
+          "code": "AGENT_ACTION_TIMEOUT",
+          "category": "INFRASTRUCTURE",
+          "decision": "AGENT_ACTION_TIMEOUT",
+          "repairAttempts": 0
+        }
+      ],
+      "runner": [
+        {
+          "build": "SUCCEEDED",
+          "buildFailure": null,
+          "verification": "FAILED",
+          "verificationFailure": "ACTION_TIMEOUT",
+          "visibleContent": true,
+          "pageErrors": 0,
+          "consoleErrors": 0,
+          "blockedOrFailedRequests": 0,
+          "locatorWait": true
+        }
+      ],
+      "failure": {
+        "code": "AGENT_ACTION_TIMEOUT",
+        "category": "CONTROL",
+        "stage": "VERIFY"
+      }
+    }
+  ]
+}
