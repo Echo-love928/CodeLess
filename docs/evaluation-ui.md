@@ -23,6 +23,11 @@ B 不修改 A 的 prompt、原始记录、报告或失败样本。更换需求�
 
 语义定位约定：作品/目录卡片为 `article`，卡片标题使用 heading，字段各自为非空 `p`；
 任务行是 `li`/`article`，输入为 textbox/数量 spinbutton、完成/购买为 checkbox，列为含对应 heading 的 section；
+目录搜索支持 textbox 或 searchbox。CAT-03 点击卡片内的名称 heading，兼容名称可点和整卡可点。
+字段可直接显示值，也可带作者/分类/类别/城区/地区/评分/招牌饮品/推荐饮品/简介/简短描述/描述/许可证/许可协议/开源许可证/开源许可前缀（中文或英文冒号）；
+比对详情时去除这些显示标签，书籍搜索优先读取有“作者”标签的字段，否则沿用第一字段。
+分类组合查询的排除项从初始列表中选取不在实际筛选结果内的条目，不以整段文字等于分类名推断归属。
+TASK-02 创建按钮接受运行前冻结的文案“添加 / 添加任务 / 新建任务 / 创建任务 / 新增任务”，不接受临时生成的选择器。
 详情为含“详情”heading 的 section/region。约定冻结在运行前。缺少可定位语义导致失败时保留 BEHAVIOR_ERROR，
 由人工判断是产品行为缺陷还是定位兼容问题；不得运行后删除失败动作、生成 JS 或使用页面内容作为指令。
 这九个小样本及定位约定不代表任意 UI 的通用智能判定。
@@ -61,7 +66,7 @@ node evals/browser/record-command.mjs gate
 
 前置：锁定 Node24.22.1/pnpm12.6.0、Java21（门禁）、Docker、已准备的受控构建镜像及 Playwright1.60.0 Chromium。
 镜像与浏览器沿用 `tests/agent/prepare-runtime.mjs` / 现有门禁准备入口，不安装生成代码自选依赖。
-runner 门禁通过新增 `tests/infra/d21-evaluation.test.mjs` 自动执行9项单元测试和完整 fixture，
+runner 门禁通过 `tests/infra/d21-evaluation.test.mjs` 自动执行单元测试、独立静态页面浏览器对照和完整 fixture，
 没有更改公共脚本、CI、锁、生产模块或原 e2e 的120秒截止。
 
 对尚未合并的 A，先获取其只读副本（不合并进 B）：
@@ -75,6 +80,7 @@ tar -xf .local-data/d21-a-reference.tar -C .local-data/d21-a-reference
 
 将 tar 解压到已创建的 `.local-data/d21-a-reference/`，批次目录是
 `evals/generation/runs/2026-10-23T14-16-43Z-real-545bbebf`。
+上述为首轮证据版本；A 的修复轮使用新的私有目录只读提取 `342b8b07b6a592c46898056f460fd13e6e6c6f2a`，不覆盖旧副本。
 
 采集器从 `batch.json`/冻结副本和九份原始 `record.json` 自动取得任务、版本、来源、原浏览器验证，
 校验固定分母、唯一任务、原始prompt、provider、原生 invocation 结果、版本/task/build/source 关联与所有源码摘要。

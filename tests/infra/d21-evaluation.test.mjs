@@ -1,6 +1,7 @@
 // Existing runner gate discovers the task's deterministic assertion tests.
 await import('../eval/browser/core.test.mjs')
 await import('../eval/browser/batch.test.mjs')
+await import('../eval/browser/behavior.test.mjs')
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
