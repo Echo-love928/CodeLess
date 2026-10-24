@@ -1,5 +1,6 @@
 // D21-A batch verifier: denominator and task-ID completeness (T1), raw-input fidelity, append-only shape,
-// mock/real separation, credential scan and report recomputation (T4). Exit 0 only if every check passes.
+// process-result integrity, mock/real separation, credential scan and report recomputation (T4).
+// Exit 0 only if every check passes.
 //   node scripts/eval/verify-batch.mjs <batchDir> [--historical]
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -8,6 +9,18 @@ import { CATEGORIES, REAL_RUNS, loadFrozen, plannedSamples, root, sha256 } from 
 import { checkReport, loadBatch } from './report.mjs'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+
+/** Success claims in the committed report, read independently of the ledger that produced them. */
+function claimedSuccess(dir) {
+  const path = join(dir, 'report.json')
+  const claims = new Map()
+  if (!existsSync(path)) return claims
+  let report
+  try { report = JSON.parse(readFileSync(path, 'utf8')) } catch { return claims }
+  for (const s of report.requirements?.samples ?? []) claims.set(s.sampleId, s.finalSuccess === true || s.firstPass === true)
+  for (const r of report.faults?.results ?? []) claims.set(r.faultId, r.status === 'PASSED' || r.sample?.finalSuccess === true)
+  return claims
+}
 
 export function verifyBatch(batchDir, { historical = false, repositoryRoot = root } = {}) {
   const checks = []
@@ -40,6 +53,9 @@ export function verifyBatch(batchDir, { historical = false, repositoryRoot = roo
   add('mode matches location', batch.mode === 'REAL' ? underRuns : !underRuns, batch.mode + (underRuns ? ' under ' : ' outside ') + REAL_RUNS)
   const taskIds = []
   const appIds = []
+  const logged = existsSync(join(dir, 'batch-events.jsonl'))
+    ? readFileSync(join(dir, 'batch-events.jsonl'), 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line)) : []
+  const claims = claimedSuccess(dir)
   for (const item of items) {
     const id = item.planned.id
     const spec = item.spec
@@ -49,6 +65,16 @@ export function verifyBatch(batchDir, { historical = false, repositoryRoot = roo
     const started = existsSync(join(dir, 'samples', id, 'invocation.json'))
       ? JSON.parse(readFileSync(join(dir, 'samples', id, 'invocation.json'), 'utf8')) : null
     add(id + ': exactly one attempt started and finished', started?.attempt === 1 && item.invocation?.attempt === 1)
+    // The process result decides whether anything may count: it must agree with the append-only log
+    // written at the same moment, and only a JVM that exited 0 by itself may back a success claim.
+    const result = item.invocation
+    const event = logged.find((entry) => entry.sampleId === id)
+    add(id + ': process result matches the append-only event log', Boolean(result && event) && event.exitCode === result.exitCode
+      && event.timedOut === result.timedOut && event.recordPresent === result.recordPresent)
+    add(id + ': record presence matches the process result', result?.recordPresent === Boolean(item.record))
+    const cleanExit = result?.exitCode === 0 && result.timedOut === false && !result.signal && !result.launchError
+    add(id + ': success claimed only after a clean process exit', cleanExit || claims.get(id) !== true,
+      cleanExit ? null : 'exitCode=' + (result?.exitCode ?? null) + ' timedOut=' + (result?.timedOut ?? null))
     const record = item.record
     add(id + ': raw record present', Boolean(record), record ? null : 'missing record counts as a failure in the denominator')
     if (!record) continue
@@ -80,8 +106,7 @@ export function verifyBatch(batchDir, { historical = false, repositoryRoot = roo
   }
   add('task IDs unique across samples', new Set(taskIds).size === taskIds.length)
   add('application IDs unique across samples', new Set(appIds).size === appIds.length)
-  const events = existsSync(join(dir, 'batch-events.jsonl'))
-    ? readFileSync(join(dir, 'batch-events.jsonl'), 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line).sampleId) : []
+  const events = logged.map((entry) => entry.sampleId)
   add('append-only event log has one entry per sample', events.length === expected.length && new Set(events).size === events.length
     && expected.every((id) => events.includes(id)), events.length + ' entries')
   add('batch completed', Boolean(complete))

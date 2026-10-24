@@ -1,6 +1,6 @@
 # D21-A 生成评测报告 2026-10-23T14-16-43Z-real-545bbebf
 
-由 `scripts/eval/report.mjs#v1` 从本目录原始记录生成；`node scripts/eval/report.mjs <batchDir> --check` 可复算。
+由 `scripts/eval/report.mjs#v2` 从本目录原始记录生成；`node scripts/eval/report.mjs <batchDir> --check` 可复算。
 
 - 模式：**REAL**（REAL_MODEL）；真实模型证据：是
 - Provider：deepseek / deepseek-flash；其他 provider 调用：0
@@ -13,7 +13,7 @@
 - 首轮成功（首次真实构建+浏览器即通过、0 次修复）：**3/9**（33.3%）
 - 3 轮内最终成功（平台 READY）：**3/9**（33.3%）；目标 ≥8/9：未达到（基线目标，不是既有成绩）
 - 需求级最终成功（叠加 D21-B 行为断言）：PENDING_D21_B，当前为未知，不计为成功
-- 缺失记录：无；harness 错误：无
+- 缺失记录：无；harness 错误：无；样本进程异常（不计成功）：无
 - 修复：共 0 轮，0 个样本发生修复
 - 实际 token：≥71992（6 次未知）；输入 — / 输出 —；已知下限 输入 66134 / 输出 5858；缓存命中（已含在输入中）49536
 - 运行时预算计费（含保守估算，非实际用量）：129210，估算调用 6
@@ -43,6 +43,9 @@
 
 | 检查 | 期望 | 实际 | 结果 |
 | --- | --- | --- | --- |
+| sample JVM exit | "OK" | "OK" | 通过 |
+| harness error | null | null | 通过 |
+| journal and model calls recorded | true | true | 通过 |
 | injection applied | "APPLIED" | null | **未通过** |
 | injection labelled | "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR" | null | **未通过** |
 | first verify | "FAILED" | "NONE" | **未通过** |
@@ -59,6 +62,9 @@
 
 | 检查 | 期望 | 实际 | 结果 |
 | --- | --- | --- | --- |
+| sample JVM exit | "OK" | "OK" | 通过 |
+| harness error | null | null | 通过 |
+| journal and model calls recorded | true | true | 通过 |
 | injection applied | "APPLIED" | null | **未通过** |
 | injection labelled | "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR" | null | **未通过** |
 | first verify | "FAILED" | "NONE" | **未通过** |
@@ -75,6 +81,9 @@
 
 | 检查 | 期望 | 实际 | 结果 |
 | --- | --- | --- | --- |
+| sample JVM exit | "OK" | "OK" | 通过 |
+| harness error | null | null | 通过 |
+| journal and model calls recorded | true | true | 通过 |
 | injection applied | "APPLIED" | "APPLIED" | 通过 |
 | injection labelled | "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR" | "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR" | 通过 |
 | first verify | "FAILED" | "FAILED" | 通过 |
@@ -91,6 +100,9 @@
 
 | 检查 | 期望 | 实际 | 结果 |
 | --- | --- | --- | --- |
+| sample JVM exit | "OK" | "OK" | 通过 |
+| harness error | null | null | 通过 |
+| journal and model calls recorded | true | true | 通过 |
 | container CLI absent in sample JVM | false | false | 通过 |
 | final | "FAILED" | "FAILED" | 通过 |
 | failure stage | "VERIFY" | "PLAN" | **未通过** |
@@ -107,6 +119,9 @@
 
 | 检查 | 期望 | 实际 | 结果 |
 | --- | --- | --- | --- |
+| sample JVM exit | "OK" | "OK" | 通过 |
+| harness error | null | null | 通过 |
+| journal and model calls recorded | true | true | 通过 |
 | proxy route refused before task | "REFUSED" | "REFUSED" | 通过 |
 | final | "FAILED" | "FAILED" | 通过 |
 | failure code | "MODEL_NETWORK" | "MODEL_NETWORK" | 通过 |

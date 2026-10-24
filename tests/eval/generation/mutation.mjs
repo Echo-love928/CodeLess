@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url'
 const root = fileURLToPath(new URL('../../../', import.meta.url))
 const MUTATIONS = [
   { id: 'T3 unknown usage reported as an exact total', file: 'scripts/eval/ledger.mjs',
-    from: 'ledger.complete = ledger.knownCalls === ledger.calls', to: 'ledger.complete = true' },
+    from: 'ledger.complete = recorded && ledger.knownCalls === ledger.calls', to: 'ledger.complete = true' },
   { id: 'T1 denominator taken from existing records', file: 'scripts/eval/ledger.mjs',
     from: 'const denominator = items.length', to: 'const denominator = items.filter((item) => item.record).length' },
   { id: 'T4 stale report accepted', file: 'scripts/eval/report.mjs',
@@ -21,7 +21,20 @@ const MUTATIONS = [
     from: 'const result = await (deps.execute ?? executeSample)({ cwd, env: jvm, log, timeoutMs: SAMPLE_TIMEOUT_MS, sample, outputDir: sdir })',
     to: 'let result = await (deps.execute ?? executeSample)({ cwd, env: jvm, log, timeoutMs: SAMPLE_TIMEOUT_MS, sample, outputDir: sdir })\n    if (result.exitCode !== 0) result = await (deps.execute ?? executeSample)({ cwd, env: jvm, log, timeoutMs: SAMPLE_TIMEOUT_MS, sample, outputDir: sdir })' },
   { id: 'credential passed to MOCK sample JVMs', file: 'scripts/eval/run-batch.mjs',
-    from: "if (mode === 'REAL') {\n    env.CODELESS_EVAL_REAL_APPROVED", to: "if (true) {\n    env.CODELESS_EVAL_REAL_APPROVED" }
+    from: "if (mode === 'REAL') {\n    env.CODELESS_EVAL_REAL_APPROVED", to: "if (true) {\n    env.CODELESS_EVAL_REAL_APPROVED" },
+  // D21-B review of 6e707c0.
+  { id: 'P1 READY counted although the sample JVM failed', file: 'scripts/eval/ledger.mjs',
+    from: "const finalSuccess = outcome === 'READY' && !harnessError && processStatus === 'OK'", to: "const finalSuccess = outcome === 'READY' && !harnessError" },
+  { id: 'P1 verifier accepts a success claim after a failed process', file: 'scripts/eval/verify-batch.mjs',
+    from: 'cleanExit || claims.get(id) !== true', to: 'true' },
+  { id: 'P1 fault result ignores the sample JVM exit', file: 'scripts/eval/ledger.mjs',
+    from: "const checks = [check('sample JVM exit', 'OK', sample.execution)]", to: 'const checks = []' },
+  { id: 'P2 missing call rows summed as zero (aggregate)', file: 'scripts/eval/ledger.mjs',
+    from: 'if (usage.samplesWithoutTaskRecord > 0 || usage.samplesWithoutCallRecord > 0) {', to: 'if (usage.samplesWithoutTaskRecord > 0) {' },
+  { id: 'P2 missing call rows summed as zero (sample)', file: 'scripts/eval/ledger.mjs',
+    from: 'usage: usageLedger(calls), cache', to: 'usage: usageLedger(calls ?? []), cache' },
+  { id: 'P2 unreadable journal charged as zero', file: 'scripts/eval/ledger.mjs',
+    from: "  if (!journalRecorded(record)) return { calls: null, chargedTokens: null, estimatedCalls: null }\n", to: '' }
 ]
 
 function copy() {
@@ -29,6 +42,8 @@ function copy() {
   for (const path of ['scripts/eval', 'tests/eval/generation']) cpSync(join(root, path), join(dir, path), { recursive: true })
   mkdirSync(join(dir, 'evals/generation'), { recursive: true })
   for (const name of ['requirements.json', 'faults.json', 'run-config.json']) cpSync(join(root, 'evals/generation', name), join(dir, 'evals/generation', name))
+  const repro = 'evals/generation/runs/2026-10-23T14-16-43Z-real-545bbebf/samples/SHOW-01' // the reviewer's unchanged real record
+  cpSync(join(root, repro), join(dir, repro), { recursive: true })
   return dir
 }
 function run(dir) {

@@ -102,8 +102,9 @@ test('the credential reaches only REAL sample JVMs and is never written to batch
 
 test('the container-CLI fault removes exactly the PATH entries that hold a docker executable', () => {
   const probe = (path) => /docker-bin[\\/]docker\.exe$/.test(path)
-  const value = ['C:/node', 'C:/docker-bin', 'C:/git', 'C:/docker-bin'].join(delimiter)
-  assert.deepEqual(withoutContainerCli(value, probe), { path: ['C:/node', 'C:/git'].join(delimiter), removed: ['C:/docker-bin', 'C:/docker-bin'] })
+  // No drive letters: ':' is the PATH delimiter on Linux CI.
+  const value = ['/opt/node', '/opt/docker-bin', '/usr/git', '/opt/docker-bin'].join(delimiter)
+  assert.deepEqual(withoutContainerCli(value, probe), { path: ['/opt/node', '/usr/git'].join(delimiter), removed: ['/opt/docker-bin', '/opt/docker-bin'] })
   const base = { PATH: 'C:/x', CODELESS_MODEL_API_KEY: SECRET, CODELESS_MODEL_NAME: 'm', SPRING_PROFILES_ACTIVE: 'prod', JAVA_TOOL_OPTIONS: '-Dx' }
   const { env } = sampleEnvironment({ base, mode: 'MOCK', sample: { fault: null }, specPath: 's', outputDir: 'o', java: 'J' })
   assert.deepEqual(Object.keys(env).filter((key) => /^(CODELESS_|SPRING_|JAVA_TOOL)/.test(key)).sort(),

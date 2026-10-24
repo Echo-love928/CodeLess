@@ -89,11 +89,16 @@ export function defaultRecord(sample, batchId, mode) {
     calls: [{ stage: 'PLAN', error: 'MODEL_NETWORK' }], failure: { code: 'MODEL_NETWORK', stage: 'PLAN', category: 'MODEL_INTERFACE' } }), kind: sample.kind }
 }
 
+/** invocation-result.json of a sample JVM that ran to the end by itself with exit 0. */
+export const CLEAN_EXIT = Object.freeze({ attempt: 1, exitCode: 0, signal: null, timedOut: false, launchError: null })
+
 /**
  * Writes a complete synthetic batch the way the driver lays one out, inside a throwaway repository root
  * (frozen files copied to evals/generation/), so location and frozen-drift rules apply as in the real tree.
+ * invocations: per-sample fields merged into that sample's process result (and its event-log line).
  */
-export function syntheticBatch({ mode = 'REAL', parent = mkdtempSync(join(tmpdir(), 'd21a-eval-')), overrides = {}, omit = [] } = {}) {
+export function syntheticBatch({ mode = 'REAL', parent = mkdtempSync(join(tmpdir(), 'd21a-eval-')), overrides = {}, omit = [],
+  invocations = {} } = {}) {
   const frozen = loadFrozen()
   const repo = parent
   mkdirSync(join(repo, 'evals/generation'), { recursive: true })
@@ -115,12 +120,13 @@ export function syntheticBatch({ mode = 'REAL', parent = mkdtempSync(join(tmpdir
     writeFileSync(join(sdir, 'spec.json'), canonical({ schemaVersion: 1, batchId, sampleId: sample.id, kind: sample.kind, mode,
       category: sample.category, requirement: sample.requirement, fault: sample.fault }))
     writeFileSync(join(sdir, 'invocation.json'), canonical({ sampleId: sample.id, attempt: 1 }))
-    writeFileSync(join(sdir, 'invocation-result.json'), canonical({ sampleId: sample.id, attempt: 1, exitCode: 0, timedOut: false }))
+    const result = { sampleId: sample.id, ...CLEAN_EXIT, recordPresent: !omit.includes(sample.id), ...invocations[sample.id] }
+    writeFileSync(join(sdir, 'invocation-result.json'), canonical(result))
     if (!omit.includes(sample.id)) {
       const record = overrides[sample.id] ? overrides[sample.id](sample, batchId, mode) : defaultRecord(sample, batchId, mode)
       writeFileSync(join(sdir, 'record.json'), canonical(record))
     }
-    lines.push(JSON.stringify({ sampleId: sample.id }))
+    lines.push(JSON.stringify({ sampleId: sample.id, exitCode: result.exitCode, timedOut: result.timedOut, recordPresent: result.recordPresent }))
   }
   writeFileSync(join(dir, 'batch-events.jsonl'), lines.join('\n') + '\n')
   writeFileSync(join(dir, 'batch-complete.json'), canonical({ batchId, secretScan: { credentialOccurrences: 0 } }))

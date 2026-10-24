@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { loadFrozen, plannedSamples } from '../../../scripts/eval/lib.mjs'
 import { aggregateUsage, callUsage, faultResult, failureType, median, requirementSummary, sampleMetrics, usageLedger } from '../../../scripts/eval/ledger.mjs'
-import { syntheticRecord } from './fixtures.mjs'
+import { CLEAN_EXIT, syntheticRecord } from './fixtures.mjs'
 
 const samples = plannedSamples(loadFrozen())
 const requirement = samples[0].requirement
@@ -45,9 +45,9 @@ test('failure types keep model, code, budget and environment failures apart', ()
 })
 
 test('first pass needs a verified first candidate; a repaired READY is final success but not first pass', () => {
-  const first = sampleMetrics({ planned: samples[0], record: syntheticRecord({ sampleId: 'SHOW-01', batchId: 'b', requirement }) })
+  const first = sampleMetrics({ planned: samples[0], invocation: CLEAN_EXIT, record: syntheticRecord({ sampleId: 'SHOW-01', batchId: 'b', requirement }) })
   assert.deepEqual([first.firstVerify, first.firstPass, first.finalSuccess, first.repairRounds, first.failure], ['VERIFIED', true, true, 0, null])
-  const repaired = sampleMetrics({ planned: samples[0], record: syntheticRecord({ sampleId: 'SHOW-01', batchId: 'b', requirement,
+  const repaired = sampleMetrics({ planned: samples[0], invocation: CLEAN_EXIT, record: syntheticRecord({ sampleId: 'SHOW-01', batchId: 'b', requirement,
     verifies: [{ code: 'AGENT_BUILD_EXIT', category: 'CODE', decision: 'REPAIR' }, 'VERIFIED'] }) })
   assert.deepEqual([repaired.firstVerify, repaired.firstPass, repaired.finalSuccess, repaired.repairRounds], ['FAILED', false, true, 1])
   assert.equal(repaired.durationMs, 60000)
@@ -57,12 +57,12 @@ test('first pass needs a verified first candidate; a repaired READY is final suc
 
 test('a harness error never counts as success even when the task row says READY', () => {
   const record = { ...syntheticRecord({ sampleId: 'SHOW-01', batchId: 'b', requirement }), harnessError: { type: 'X', message: 'collect failed' } }
-  const metrics = sampleMetrics({ planned: samples[0], record })
+  const metrics = sampleMetrics({ planned: samples[0], invocation: CLEAN_EXIT, record })
   assert.deepEqual([metrics.outcome, metrics.finalSuccess, metrics.failure.type], ['READY', false, 'HARNESS'])
 })
 
 test('T1: the requirement denominator stays 9 when records are missing; missing samples are failures', () => {
-  const items = samples.filter((s) => s.kind === 'REQUIREMENT').map((s, index) => ({ planned: s,
+  const items = samples.filter((s) => s.kind === 'REQUIREMENT').map((s, index) => ({ planned: s, invocation: CLEAN_EXIT,
     record: index === 4 ? null : syntheticRecord({ sampleId: s.id, batchId: 'b', requirement: s.requirement,
       ...(index === 2 ? { verifies: [{ code: 'AGENT_BUILD_EXIT', category: 'CODE', decision: 'AGENT_REPAIR_LIMIT_EXCEEDED' }],
         failure: { code: 'AGENT_REPAIR_LIMIT_EXCEEDED', stage: 'VERIFY' } } : {}) }) }))
@@ -90,17 +90,17 @@ test('T2: a code fault passes only if it failed as CODE first and was repaired w
   const record = syntheticRecord({ sampleId: fault.id, batchId: 'b', requirement: fault.requirement,
     verifies: [{ code: 'AGENT_BUILD_EXIT', category: 'CODE', decision: 'REPAIR' }, 'VERIFIED'],
     injection: { status: 'APPLIED', origin: fault.fault.origin } })
-  assert.equal(faultResult({ planned: fault, record }).status, 'PASSED')
+  assert.equal(faultResult({ planned: fault, invocation: CLEAN_EXIT, record }).status, 'PASSED')
   const unrepaired = syntheticRecord({ sampleId: fault.id, batchId: 'b', requirement: fault.requirement,
     verifies: [{ code: 'AGENT_BUILD_EXIT', category: 'CODE', decision: 'REPAIR' }, { code: 'AGENT_BUILD_EXIT', category: 'CODE', decision: 'REPAIR' },
       { code: 'AGENT_BUILD_EXIT', category: 'CODE', decision: 'REPAIR' }, { code: 'AGENT_BUILD_EXIT', category: 'CODE', decision: 'AGENT_REPAIR_LIMIT_EXCEEDED' }],
     failure: { code: 'AGENT_REPAIR_LIMIT_EXCEEDED', stage: 'VERIFY' }, injection: { status: 'APPLIED', origin: fault.fault.origin } })
-  const failed = faultResult({ planned: fault, record: unrepaired })
+  const failed = faultResult({ planned: fault, invocation: CLEAN_EXIT, record: unrepaired })
   assert.equal(failed.status, 'FAILED')
   assert.deepEqual(failed.checks.filter((c) => !c.pass).map((c) => c.check), ['final'])
   const changed = syntheticRecord({ sampleId: fault.id, batchId: 'b', requirement: fault.requirement, actionsChange: true,
     verifies: [{ code: 'AGENT_BUILD_EXIT', category: 'CODE', decision: 'REPAIR' }, 'VERIFIED'], injection: { status: 'APPLIED', origin: fault.fault.origin } })
-  assert.deepEqual(faultResult({ planned: fault, record: changed }).checks.filter((c) => !c.pass).map((c) => c.check), ['acceptance actions unchanged'])
+  assert.deepEqual(faultResult({ planned: fault, invocation: CLEAN_EXIT, record: changed }).checks.filter((c) => !c.pass).map((c) => c.check), ['acceptance actions unchanged'])
 })
 
 test('T2: an environment fault fails if the platform sent it to REPAIR or changed code', () => {
@@ -108,20 +108,20 @@ test('T2: an environment fault fails if the platform sent it to REPAIR or change
   const stopped = syntheticRecord({ sampleId: fault.id, batchId: 'b', requirement: fault.requirement, environment: { containerCliOnPath: false },
     verifies: [{ code: 'AGENT_RUNNER_UNAVAILABLE', category: 'INFRASTRUCTURE', decision: 'AGENT_RUNNER_UNAVAILABLE' }],
     failure: { code: 'AGENT_RUNNER_UNAVAILABLE', stage: 'VERIFY' } })
-  assert.equal(faultResult({ planned: fault, record: stopped }).status, 'PASSED')
+  assert.equal(faultResult({ planned: fault, invocation: CLEAN_EXIT, record: stopped }).status, 'PASSED')
   const misrouted = syntheticRecord({ sampleId: fault.id, batchId: 'b', requirement: fault.requirement, environment: { containerCliOnPath: false },
     verifies: [{ code: 'AGENT_RUNNER_UNAVAILABLE', category: 'CODE', decision: 'REPAIR' }, { code: 'AGENT_RUNNER_UNAVAILABLE', category: 'INFRASTRUCTURE', decision: 'AGENT_RUNNER_UNAVAILABLE' }],
     failure: { code: 'AGENT_RUNNER_UNAVAILABLE', stage: 'VERIFY' } })
-  const result = faultResult({ planned: fault, record: misrouted })
+  const result = faultResult({ planned: fault, invocation: CLEAN_EXIT, record: misrouted })
   assert.equal(result.status, 'FAILED')
   assert.deepEqual(result.checks.filter((c) => !c.pass).map((c) => c.check), ['no REPAIR decision', 'repair rounds', 'REPAIR model calls', 'immutable candidates'])
   const network = samples.find((s) => s.id === 'FAULT-ENV-02')
   const refused = syntheticRecord({ sampleId: network.id, batchId: 'b', requirement: network.requirement, plan: false, verifies: [],
     environment: { containerCliOnPath: true, proxyTcpProbe: 'REFUSED' }, calls: [{ stage: 'PLAN', error: 'MODEL_NETWORK' }],
     failure: { code: 'MODEL_NETWORK', stage: 'PLAN', category: 'MODEL_INTERFACE' } })
-  assert.equal(faultResult({ planned: network, record: refused }).status, 'PASSED')
+  assert.equal(faultResult({ planned: network, invocation: CLEAN_EXIT, record: refused }).status, 'PASSED')
   const retried = syntheticRecord({ sampleId: network.id, batchId: 'b', requirement: network.requirement, plan: false, verifies: [],
     environment: { containerCliOnPath: true, proxyTcpProbe: 'REFUSED' }, calls: [{ stage: 'PLAN', error: 'MODEL_NETWORK' }, { stage: 'PLAN', error: 'MODEL_NETWORK' }],
     failure: { code: 'MODEL_NETWORK', stage: 'PLAN', category: 'MODEL_INTERFACE' } })
-  assert.deepEqual(faultResult({ planned: network, record: retried }).checks.filter((c) => !c.pass).map((c) => c.check), ['model calls (no retry)'])
+  assert.deepEqual(faultResult({ planned: network, invocation: CLEAN_EXIT, record: retried }).checks.filter((c) => !c.pass).map((c) => c.check), ['model calls (no retry)'])
 })
