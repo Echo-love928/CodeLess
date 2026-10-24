@@ -41,7 +41,7 @@ const commandRoot = join(root, '.local-data/d21-b/commands'), commands = []
 try {
   for (const directory of await readdir(commandRoot)) {
     const record = await readJSON(join(commandRoot, directory, 'command.json'))
-    commands.push({ ...record, command: record.command.map(strip), output: '.local-data/d21-b/commands/' + directory })
+    commands.push({ ...record, command: record.command.map((value, index) => index === 0 ? value.split(/[\\/]/).at(-1) : strip(value)), output: '.local-data/d21-b/commands/' + directory })
   }
 } catch (error) { if (error.code !== 'ENOENT') throw error }
 await writeFile(join(destination, 'commands.json'), JSON.stringify(commands, null, 2) + '\n')
