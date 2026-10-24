@@ -66,9 +66,11 @@ runner 门禁通过新增 `tests/infra/d21-evaluation.test.mjs` 自动执行9项
 
 对尚未合并的 A，先获取其只读副本（不合并进 B）：
 
-```sh
+```powershell
+New-Item -ItemType Directory -Force .local-data/d21-a-reference | Out-Null
 git fetch origin codex/d21-a-real-eval
 git archive --format=tar --output=.local-data/d21-a-reference.tar 6e707c0ffdd189e4c268d5bf405fb543c8e7ce54 evals/generation scripts/eval tests/eval/generation
+tar -xf .local-data/d21-a-reference.tar -C .local-data/d21-a-reference
 ```
 
 将 tar 解压到已创建的 `.local-data/d21-a-reference/`，批次目录是

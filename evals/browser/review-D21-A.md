@@ -6,6 +6,17 @@
 
 ## 阻塞问题
 
+**[P1] 外层harness异常仍可能被计为首轮/最终成功。** `scripts/eval/ledger.mjs:102,119`
+保存invocation信息，却只用READY和record.harnessError判定finalSuccess；
+`scripts/eval/verify-batch.mjs:51`只检查attempt，没有要求原生exit0/无signal/无超时。
+只读调用 `sampleMetrics`，保持本批SHOW-01原record不变，分别传入
+`invocation:{exitCode:1,timedOut:false}` 和 `{exitCode:null,timedOut:true}`，
+两次都返回 `firstPass:true,finalSuccess:true,failure:null`，预期均应不成功。
+Maven/JVM在record写完后异常退出或被截止时，报告因此可能过计。
+建议A将执行结果纳入成功条件，并增加非零、超时、缺失invocation的反例。
+本次原批invocation正常，因此该发现不改变当前3/9；复现不修改原批、不发模型请求。
+证据 `evidence/a-invocation-gap.json`。B采集器对非零exit/超时另行拒绝，不读取A成功计数。
+
 真实质量验收仍受阻。A原始批次明确保留6/9个 `MODEL_NETWORK` 需求失败、代码故障0/3修复成功及环境故障1/2通过。
 这些结果没有达到≥8/9或代码故障可修复的目标；远端CI通过不能代替真实质量验收。
 已有F1/F2/F3的归因边界由A文档保留，本审查不扩写为已确定的模型质量缺陷。
