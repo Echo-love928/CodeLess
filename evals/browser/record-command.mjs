@@ -7,8 +7,8 @@ import { environment, root, run, windows } from '../../tests/e2e/full/support.mj
 import { sha } from './core.mjs'
 
 const mode = process.argv[2]
-const commands = { unit: [process.execPath, '--test', 'tests/eval/browser/core.test.mjs', 'tests/eval/browser/batch.test.mjs', 'tests/eval/browser/behavior.test.mjs'],
-  fixture: [process.execPath, 'evals/browser/run.mjs', '--fixture'], batch: [process.execPath, 'evals/browser/run.mjs', '--batch', process.argv[3]],
+const commands = { unit: [process.execPath, '--test', 'tests/eval/browser/core.test.mjs', 'tests/eval/browser/batch.test.mjs', 'tests/eval/browser/behavior.test.mjs', 'tests/eval/browser/edit-records.test.mjs'],
+  fixture: [process.execPath, 'evals/browser/run.mjs', '--fixture'], batch: [process.execPath, 'evals/browser/run.mjs', '--batch', ...process.argv.slice(3)],
   gate: ['corepack', 'pnpm', 'ci:gate'], static: ['corepack', 'pnpm', 'verify:static'], api: ['corepack', 'pnpm', 'verify:api'],
   runner: ['corepack', 'pnpm', 'verify:runner'], e2e: ['corepack', 'pnpm', 'verify:e2e'] }
 if (!Object.hasOwn(commands, mode) || commands[mode].some(value => !value)) throw new Error('Expected unit/fixture/batch <directory>/static/api/runner/e2e/gate')

@@ -6,6 +6,7 @@ import { randomUUID } from 'node:crypto'
 import { chromium } from '@playwright/test'
 import { inspect } from '../../../evals/browser/browser.mjs'
 import { sha } from '../../../evals/browser/core.mjs'
+import { edits, editTarget } from '../../../evals/edit/cases.mjs'
 
 let browser
 const output = join(process.cwd(), '.local-data/d21-b/behavior-controls', randomUUID())
@@ -62,6 +63,30 @@ async function check(id, html, name) {
   return inspect(browser, { directory, files: [{ path: 'index.html', digest: sha(html) }] },
     { id, route: id.startsWith('CAT-') ? '/catalog' : '/tasks', output: join(directory, 'evidence') })
 }
+
+async function custom(html, name, action) {
+  const directory = join(output, name)
+  await mkdir(directory, { recursive: true }); await writeFile(join(directory, 'index.html'), html)
+  return inspect(browser, { directory, files: [{ path: 'index.html', digest: sha(html) }] },
+    { route: '/', output: join(directory, 'evidence'), action })
+}
+
+test('late mount: load before the first visible render is not a white screen', async () => {
+  const result = await custom('<!doctype html><html><body><div id="app"></div><script>setTimeout(()=>{document.getElementById("app").innerHTML="<h1>Ready</h1>"},250)</script></body></html>',
+    'late-mount', (page, expect) => expect(page.locator('h1')).toHaveText('Ready'))
+  assert.equal(result.status, 'PASSED', JSON.stringify(result))
+})
+
+test('late mount: a permanently empty page is still a white screen', async () => {
+  const result = await custom('<!doctype html><html><body><div id="app"></div></body></html>', 'empty-mount', () => {})
+  assert.equal(result.status, 'FAILED'); assert.equal(result.failure, 'WHITE_SCREEN')
+})
+
+test('uniform padding rejects changing only the top edge', async () => {
+  const result = await custom('<!doctype html><html><body><article style="padding:12px;padding-top:24px">Card</article></body></html>',
+    'partial-padding', (page, expect) => editTarget(page, edits.find(e => e.id === 'EDIT-03'), expect))
+  assert.equal(result.status, 'FAILED'); assert.equal(result.failure, 'BEHAVIOR_ERROR')
+})
 
 for (const id of ['CAT-01', 'CAT-02', 'CAT-03']) {
   for (const labels of [false, true]) test(`${id}: ${labels ? 'labelled' : 'bare'} fields and value-only details are valid`, async () => {

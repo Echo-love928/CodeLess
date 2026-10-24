@@ -7,6 +7,7 @@ const destination = join(root, 'evals/browser/evidence')
 await mkdir(destination, { recursive: true })
 const strip = value => typeof value === 'string' ? value.replaceAll(root, '<repo>').replaceAll(root.replaceAll('\\', '/'), '<repo>') : value
 const browser = value => value ? { status: value.status, failure: value.failure, error: strip(value.error ?? null),
+  readiness: value.readiness ?? null,
   pageErrors: value.pageErrors, consoleErrors: value.consoleErrors, blockedRequests: value.blockedRequests, failedRequests: value.failedRequests,
   screenshot: value.screenshot, trace: value.trace } : null
 const build = value => value ? { status: value.status, exitCode: value.exitCode, failure: value.failure,
@@ -20,6 +21,9 @@ for (const path of process.argv.slice(2)) {
     originalVerification: row.originalVerification ?? null, build: build(row.build), browser: browser(row.browser), passed: row.passed, failure: row.failure }))
   const edits = report.edits.map(row => ({ sampleId: row.sampleId, mode: row.mode, passed: row.passed,
     status: row.status ?? (row.passed ? 'PASSED' : 'FAILED'), failure: row.failure,
+    blockedBy: row.blockedBy ?? null, mappingReason: row.mappingReason ?? null, baseFailureCode: row.baseFailureCode ?? null,
+    taskId: row.taskId ?? null, beforeVersionId: row.beforeVersionId ?? null, afterVersionId: row.afterVersionId ?? null,
+    rawDigest: row.rawDigest ?? null, usage: row.usage ?? null, platformFailureCode: row.platformFailureCode ?? null,
     mapping: row.mapping ?? null, scope: row.scope ?? null, beforeDigest: row.beforeDigest ?? null, afterDigest: row.afterDigest ?? null,
     build: build(row.build), baselineBrowser: browser(row.baselineBrowser), browser: browser(row.browser) }))
   const exported = { schemaVersion: 1, originalReportDigest: sha(await readFile(full)), runId: basename(directory),

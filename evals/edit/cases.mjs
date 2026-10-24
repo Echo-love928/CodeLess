@@ -36,7 +36,10 @@ export async function editTarget(page, edit, expect, phase = 'after') {
   if (edit.count) await expect(targets).toHaveCount(edit.count)
   else await expect(targets).not.toHaveCount(0)
   for (const target of await targets.all()) {
-    if (edit.kind === 'css') await expect(target).toHaveCSS(edit.property, edit[phase])
+    if (edit.kind === 'css') {
+      const properties = edit.id === 'EDIT-03' ? ['padding-top', 'padding-right', 'padding-bottom', 'padding-left'] : [edit.property]
+      for (const property of properties) await expect(target).toHaveCSS(property, edit[phase])
+    }
     else await expect(target).toHaveText(edit[phase])
   }
   if (edit.id === 'EDIT-04' && phase === 'after') {

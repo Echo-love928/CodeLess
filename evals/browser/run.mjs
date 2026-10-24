@@ -1,4 +1,4 @@
-// Usage: node evals/browser/run.mjs --fixture | --batch <A batch directory>
+// Usage: node evals/browser/run.mjs --fixture | --batch <A batch directory> [--edit-records <directory>]
 import assert from 'node:assert/strict'
 import { cp, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
@@ -12,6 +12,9 @@ import { edits, editTarget, scopeDiff } from '../edit/cases.mjs'
 import { sha, manifest, loadBatch, safeFile, summarize, verdict } from './core.mjs'
 import { fixture, changeFixture } from './fixture.mjs'
 import { inspect } from './browser.mjs'
+import { bindCatalog } from '../../services/runner/src/mapping/manifest.mjs'
+import { loadEditRecords } from '../edit/records.mjs'
+import { replayEdits } from '../edit/replay.mjs'
 
 const root = fileURLToPath(new URL('../../', import.meta.url))
 const fixtureMode = process.argv[2] === '--fixture'
@@ -67,7 +70,9 @@ try {
     assert.equal(loaded.batch.frozen.requirements.sha256, requirementsDigest, 'Behavior suite targets a different frozen requirement set')
     report.batchId = loaded.batch.batchId; report.mode = loaded.batch.mode
     report.batchDigest = sha(await readFile(join(directory, 'batch.json')))
-    const catalogs = new Map()
+    const mappings = new Map()
+    assert.ok(process.argv.length === 4 || (process.argv.length === 6 && process.argv[4] === '--edit-records'), 'Unexpected batch flags')
+    const editRecords = await loadEditRecords(process.argv[5] ? resolve(process.argv[5]) : null, loaded.batch)
     for (const row of loaded.rows) {
       const record = row.record, version = row.version
       const result = { sampleId: row.sampleId, mode: row.mode, taskId: record?.task.id ?? null, versionId: version?.id ?? null,
@@ -89,26 +94,22 @@ try {
         result.build = await build(sourceRoot)
         report.runnerImage = result.build.imageId
         if (result.build.status === 'SUCCEEDED') result.browser = await inspect(browser, result.build.artifact, { id: row.sampleId, route: cases.find(c => c.id === row.sampleId).route, output: join(output, row.sampleId) })
-        if (result.build.status === 'SUCCEEDED') catalogs.set(row.sampleId, JSON.parse(await readFile(join(result.build.artifact.directory, 'ai-component-catalog.json'), 'utf8')))
+        if (result.build.status === 'SUCCEEDED') mappings.set(row.sampleId, bindCatalog({
+          catalog: JSON.parse(await readFile(join(result.build.artifact.directory, 'ai-component-catalog.json'), 'utf8')),
+          sourceManifest: actual, versionId: version.id, sourceDigest: version.sourceDigest }))
         Object.assign(result, verdict({ platform: result.platform, build: result.build, browser: result.browser }))
       } catch (error) { Object.assign(result, { passed: false, failure: 'EVIDENCE_OR_HARNESS', error: error.message }) }
       report.rows.push(result); await save()
     }
-    // A exports generation tasks, not component-edit tasks. Assess eligibility without
-    // forging selectors, changing immutable sources, or spending on new model tasks.
-    for (const edit of edits) {
-      const mapping = catalogs.get(edit.base)?.files.find(file => file.sourceFile === edit.file)
-      report.edits.push({ sampleId: edit.id, mode: loaded.batch.mode, baseSampleId: edit.base,
-        prompt: edit.prompt, componentId: edit.componentId, targetFile: edit.file, mapping: mapping ?? null,
-        passed: null, status: 'NOT_EXECUTED', failure: !mapping || mapping.disabledReason || mapping.componentId !== edit.componentId ? 'COMPONENT_MAPPING_UNAVAILABLE' : 'EDIT_TASK_RECORD_REQUIRED',
-        modelRequests: 0 })
-    }
+    report.edits = await replayEdits({ loaded, rows: report.rows, mappings, records: editRecords, build, browser, output,
+      save: async rows => { report.edits = rows; await save() } })
   }
   report.requirements = summarize(report.rows)
   report.editSummary = summarize(report.edits, edits.map(edit => edit.id))
   report.targets = { generationAtLeast: 8, generationMet: report.requirements.real.observed === 9 ? report.requirements.real.passed >= 8 : null,
     editsAtLeast: 5, editsMet: report.editSummary.real.observed === 6 && report.editSummary.real.notExecuted === 0 ? report.editSummary.real.passed >= 5 : null }
-  report.status = report.rows.every(row => row.passed) && (fixtureMode ? report.edits.every(row => row.passed) && report.controls.every(c => c.detected) : true) ? 'PASSED' : 'FAILED'
+  report.status = report.rows.every(row => row.passed) && report.edits.every(row => row.passed === true)
+    && (!fixtureMode || report.controls.every(c => c.detected)) ? 'PASSED' : 'FAILED'
 } catch (error) {
   report.status = 'FAILED'; report.error = error.stack
   report.requirements ??= summarize(report.rows)

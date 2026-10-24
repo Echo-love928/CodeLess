@@ -43,8 +43,16 @@ export async function inspect(browser, artifact, { id, route, query = '', output
     page.on('requestfailed', request => result.failedRequests.push(new URL(request.url()).pathname))
     const response = await page.goto(origin + route + query, { waitUntil: 'load' })
     assert.equal(response.status(), 200)
-    const body = page.locator('body')
-    if (!(await body.innerText()).trim() || !(await body.boundingBox())?.height) { result.failure = 'WHITE_SCREEN'; throw new Error('No visible page content') }
+    // load is a document event, not proof that the SPA has mounted its first route.
+    // Use the existing 4s action deadline, once, before deciding the page is blank.
+    const started = Date.now()
+    try {
+      await page.waitForFunction(() => Boolean(document.body?.innerText.trim() && document.body.getBoundingClientRect().height), null, { timeout: 4000 })
+      result.readiness = { status: 'VISIBLE', elapsedMs: Date.now() - started }
+    } catch (error) {
+      result.readiness = { status: 'EMPTY_AT_DEADLINE', elapsedMs: Date.now() - started }
+      result.failure = result.pageErrors.length ? 'RUNTIME_ERROR' : 'WHITE_SCREEN'; throw error
+    }
     if (action) await action(page, expect)
     else await behavior(page, id, expect)
     assert.equal(result.pageErrors.length, 0, 'Runtime exception')
