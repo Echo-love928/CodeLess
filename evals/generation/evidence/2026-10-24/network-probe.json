@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "kind": "PRE_BATCH_NETWORK_PROBE",
+  "finding": "D21-A-F2",
+  "purpose": "Decide whether the new REAL batch requested by the D21-B review (blocker 3) can run. Credential-free; no model call.",
+  "tool": "tests/agent/repair/TransportProbe.java (D10-A): unauthenticated POST to https://api.deepseek.com/chat/completions over HTTP/2 and HTTP/1.1; HTTP 401 means TLS succeeded and the endpoint was reached",
+  "windows": [
+    {
+      "at": "from 2026-10-24T04:21:38Z, two consecutive commands (1 + 5 probe runs); end time not recorded",
+      "connections": 12,
+      "reachedEndpoint": 12,
+      "evidence": "console observation during the session; the log was not retained"
+    },
+    {
+      "at": "2026-10-24T04:39:17Z..04:39:30Z",
+      "connections": 12,
+      "reachedEndpoint": 1,
+      "failedConnections": 11,
+      "failedWith": "java.util.concurrent.ExecutionException > javax.net.ssl.SSLHandshakeException > sun.security.validator.ValidatorException > sun.security.provider.certpath.SunCertPathBuilderException",
+      "privateLog": ".local-data/d21-a/probe/2026-10-24/transport.log",
+      "privateLogSha256": "sha256:77d2d382af6d62bf4e042224fd80611dcbfa105e416f5da77ba7f967731da42b"
+    }
+  ],
+  "dns": "api.deepseek.com resolves to 198.18.0.133, the fake-IP range of the local TUN proxy, as on 2026-10-23",
+  "decision": "No new REAL batch was started. The path recovered and then failed again within 18 minutes, so a batch would most likely stop again at the first PLAN request with MODEL_NETWORK and could not provide the missing repair evidence. The JDK truststore, TLS settings, proxy and provider were not changed (not permitted for this card).",
+  "next": "After the host network path is stable (repeated probe runs all reach HTTP 401), run CODELESS_EVAL_REAL_APPROVED=1 node scripts/eval/run-batch.mjs --mode real as a new batch; the first batch stays unchanged."
+}
