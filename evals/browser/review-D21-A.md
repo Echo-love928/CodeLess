@@ -1,5 +1,33 @@
 # D21-A 只读互审
 
+## 增量复审：342b8b0（2026-10-24）
+
+当前对象为 PR63 HEAD `342b8b07b6a592c46898056f460fd13e6e6c6f2a`；仅核对相对 `6e707c0` 的修复及受影响范围。
+以下旧审查和旧反例证据保留为历史，不代表当前 P1/P2 仍存在；没有修改 A 分支、原始记录或 main，没有发布批准或合并。
+
+### 阻塞问题
+
+- 原“真实验收证据不足”仍未解决：需求3/9、代码故障0/3、环境故障1/2，六项真实编辑尚缺证据；不能用 CI 成功替代。
+  `evals/generation/evidence/2026-10-24/network-probe.json` 记录 F2 复发，未启动新批次是保留冻结样本的正确处理。
+- 原 P1/P2 代码阻塞解除：`scripts/eval/ledger.mjs` 的 `execution()` 和 `sampleMetrics()` 拒绝非零、超时、信号、启动失败、缺失及无效结果；
+  无 modelCalls 时单样本和聚合精确用量保持 null，缺失/不可读 journal 不把工具槽、计费、验证次数记成0。
+
+### 建议
+
+- 等网络和组件映射条件恢复后补完整新批次；维护者未确定不同合并口径，本轮保持未批准、不合并。
+- 不要求为消除 squash 历史而重写真实证据引用的 c25b722；以有效合并结果及精确 HEAD 检查审查，不把旧分支的树间差异当作删除 main 测试。
+
+### 已核验内容
+
+- 从固定SHA独立提取只读副本。`node tests/eval/generation/mutation.mjs` 原生exit0：未变异的32项测试通过，12个负向对照全部检出。
+- `verifyBatch()` 184/184；`checkReport()` 为true；新版报告47个输入摘要与旧版逐项一致。
+  `git diff 6e707c0 342b8b0 -- evals/generation/runs` 仅有 report.json/report.md，原始样本未改；首轮/最终3/9和token数字不变。
+- 新增 `integrity.test.mjs` 覆盖原始 SHOW-01 三个复现及其扩展边界、进程事件一致性、缺调用记录和不可读日志。
+  `scripts/run-static.mjs` 只增加评测测试登记，没有削弱原有断言。
+- GitHub运行40064641526对应精确HEAD，static/api/runner/e2e/infra/ci-gate六项SUCCESS；不把此结论改写为本地API通过。
+
+---
+
 对象：[PR63](https://github.com/Echo-love928/CodeLess/pull/63)，HEAD
 `6e707c0ffdd189e4c268d5bf405fb543c8e7ce54`，base `7863d10`。2026-10-24 Asia/Tokyo。
 以agent-reach/GitHub CLI只读获取；未评论、批准、修改A分支或合并。

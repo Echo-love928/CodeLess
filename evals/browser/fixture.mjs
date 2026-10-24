@@ -44,15 +44,15 @@ if (params.has('runtimeError')) setTimeout(() => { throw new Error('D21 explicit
 <section v-if="section==='联系方式'"><h1>联系方式</h1><p>linxia@example.com</p></section></template>
 <template v-if="id.startsWith('TASK-')"><h1>个人待办清单</h1><p v-if="id==='TASK-01'">未完成：{{ pending }}</p>
 <input v-model="title" aria-label="标题"/><input v-if="id==='TASK-03'" v-model.number="quantity" type="number" aria-label="数量"/>
-<button @click="add">{{ id==='TASK-03' ? '加入清单' : '添加' }}</button>
+<button @click="add">{{ id==='TASK-03' ? '加入清单' : id==='TASK-02' ? '新建任务' : '添加' }}</button>
 <template v-if="id==='TASK-02'"><section v-for="(name,index) in ['待开始','进行中','已完成']" :key="name"><h2>{{ name }}</h2><ul>
 <li v-for="item in tasks.filter(task => task.stage===index)" :key="item.title"><span>{{ item.title }}</span><button @click="item.stage=Math.min(2,item.stage+1)">下一步</button><button @click="remove(item)">删除</button></li></ul></section></template>
 <template v-else><ul><li v-for="item in tasks" :key="item.title"><span>{{ item.title }}</span><span v-if="id==='TASK-03'">{{ item.quantity }}</span><input v-model="item.done" type="checkbox" aria-label="已购买或完成"/><button @click="remove(item)">删除</button></li></ul>
 <button v-if="id==='TASK-03'" @click="tasks=tasks.filter(item=>!item.done)">清除已购买</button></template></template>
-<template v-if="id.startsWith('CAT-')"><h1>目录</h1><input v-model="query" aria-label="搜索"/>
+<template v-if="id.startsWith('CAT-')"><h1>目录</h1><input v-model="query" type="search" aria-label="搜索"/>
 <select v-if="id==='CAT-02'" v-model="category" aria-label="城区"><option v-for="name in ['全部',...categories]" :key="name">{{ name }}</option></select>
 <nav v-else><button v-for="name in ['全部',...categories]" :key="name" @click="category=name">{{ name }}</button></nav>
-<article v-for="item in filtered" :key="item.name" @click="selected=item"><h2>{{ item.name }}</h2><p>{{ item.author }}</p><p>{{ item.category }}</p><p>{{ item.description }}</p></article>
+<article v-for="item in filtered" :key="item.name"><h2 @click="selected=item">{{ item.name }}</h2><p>{{ id==='CAT-01' ? '作者：' : id==='CAT-03' ? '许可证：' : '' }}{{ item.author }}</p><p>{{ id==='CAT-02' ? '城区：' : id==='CAT-03' ? '类别：' : '分类：' }}{{ item.category }}</p><p>简介：{{ item.description }}</p></article>
 <p v-if="!filtered.length">没有匹配的工具</p><section v-if="selected" role="region" aria-label="详情"><h2>详情</h2><p>{{ selected.name }}</p><p>{{ selected.author }}</p><p>{{ selected.category }}</p><p>{{ selected.description }}</p></section></template>
 </template></main></template>`
   for (const name of ['HomePage', 'TasksPage', 'CatalogPage']) await writeFile(join(root, `src/pages/${name}.vue`), name === 'TasksPage' ? source.replace('data-ai-component="home-page"', 'data-ai-component="tasks-page"') : name === 'CatalogPage' ? source.replace('data-ai-component="home-page"', 'data-ai-component="catalog-page"') : source)

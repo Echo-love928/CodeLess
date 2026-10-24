@@ -18,9 +18,9 @@ export async function behavior(page, id, expect) {
   const visible = async value => expect(text(value)).toBeVisible()
   const row = title => page.locator('li, article').filter({ has: text(title) }).last()
   const title = 'D21验收任务甲', other = 'D21验收任务乙'
-  const add = async (name, label = '添加') => {
+  const add = async (name, control = button('添加')) => {
     await page.getByRole('textbox').first().fill(name)
-    await button(label).click()
+    await control.click()
     await expect(row(name)).toBeVisible()
   }
   const remove = async name => { await row(name).getByRole('button', { name: '删除', exact: true }).click(); await expect(row(name)).toHaveCount(0) }
@@ -72,7 +72,8 @@ export async function behavior(page, id, expect) {
   } else if (id === 'TASK-02') {
     const column = name => page.locator('section').filter({ has: page.getByRole('heading', { name, exact: true }) }).last()
     for (const name of ['待开始', '进行中', '已完成']) await expect(column(name)).toBeVisible()
-    await add(title)
+    // The frozen requirement specifies creating a task, not a particular button caption.
+    await add(title, page.getByRole('button', { name: /^(?:添加|添加任务|新建任务|创建任务|新增任务)$/ }))
     await expect(column('待开始')).toContainText(title)
     await row(title).getByRole('button', { name: '下一步', exact: true }).click()
     await expect(column('进行中')).toContainText(title)
@@ -98,22 +99,26 @@ export async function behavior(page, id, expect) {
     const cards = page.locator('article')
     const size = { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
     await expect(cards).toHaveCount(size)
-    const initial = await Promise.all((await cards.all()).map(async card => ({ name: (await card.getByRole('heading').innerText()).trim(), fields: await card.locator('p').allTextContents() })))
+    // Labels are presentation: compare the field values even when cards/details label them differently.
+    const fieldValue = value => value.trim().replace(/^(?:作者|分类|类别|城区|地区|评分|招牌饮品|推荐饮品|简介|简短描述|描述|许可证|许可协议|开源许可证|开源许可)\s*[：:]\s*/, '').trim()
+    const initial = await Promise.all((await cards.all()).map(async card => {
+      const rawFields = await card.locator('p').allTextContents()
+      return { name: (await card.getByRole('heading').innerText()).trim(), rawFields, fields: rawFields.map(fieldValue) }
+    }))
     for (const item of initial) {
       expect(item.fields.length).toBeGreaterThanOrEqual(3)
       expect(item.fields.every(field => field.trim())).toBe(true)
       if (id === 'CAT-02') expect(item.fields.join(' ')).toMatch(/(?:[0-5](?:\.\d+)?)[分星]?/)
       if (id === 'CAT-03') expect(item.fields.join(' ')).toMatch(/MIT|Apache|BSD|GPL|ISC|MPL|Unlicense/i)
     }
-    const first = cards.first(), name = initial[0].name
-    const fields = await first.locator('p').allTextContents()
+    const name = initial[0].name, fields = initial[0].fields
     expect(fields.length).toBeGreaterThanOrEqual(3)
     expect(fields.every(value => value.trim())).toBe(true)
-    const search = page.getByRole('textbox').first()
+    const search = page.getByRole('textbox').or(page.getByRole('searchbox')).first()
     const checkSearch = async term => { await search.fill(term); await expect(cards).not.toHaveCount(0); for (const card of await cards.all()) await expect(card).toContainText(term) }
     await checkSearch(name)
     expect(await cards.count()).toBeLessThan(size)
-    await cards.first().click()
+    await cards.first().getByRole('heading').click()
     const detail = page.locator('[role="region"][aria-label="详情"], section').filter({ has: page.getByRole('heading', { name: /详情/ }) }).last()
     await expect(detail).toBeVisible(); await expect(detail).toContainText(name)
     for (const field of fields) await expect(detail).toContainText(field)
@@ -122,7 +127,10 @@ export async function behavior(page, id, expect) {
       expect(detailBox.y).toBeGreaterThanOrEqual(cardBox.y + cardBox.height)
     }
     await search.fill('')
-    if (id === 'CAT-01') { await checkSearch(fields[0]); await search.fill('') }
+    if (id === 'CAT-01') {
+      const author = initial[0].rawFields.find(value => /^\s*作者\s*[：:]/.test(value))
+      await checkSearch(author ? fieldValue(author) : fields[0]); await search.fill('')
+    }
     const categories = id === 'CAT-01' ? ['小说', '科技', '历史'] : id === 'CAT-03' ? ['构建', '测试', '文档'] : []
     if (id === 'CAT-02') {
       const options = await page.getByRole('combobox').locator('option').allTextContents()
@@ -135,12 +143,13 @@ export async function behavior(page, id, expect) {
       await expect(cards).not.toHaveCount(0)
       expect(await cards.count()).toBeLessThan(size)
       for (const card of await cards.all()) await expect(card).toContainText(category)
+      const categoryNames = new Set((await cards.getByRole('heading').allTextContents()).map(value => value.trim()))
       // Searching for an item from a different category must keep the category active.
       const matchName = await cards.first().getByRole('heading').innerText()
       await checkSearch(matchName)
       await search.fill(name)
       for (const card of await cards.all()) { await expect(card).toContainText(category); await expect(card).toContainText(name) }
-      const excluded = initial.find(item => !item.fields.includes(category))
+      const excluded = initial.find(item => !categoryNames.has(item.name))
       expect(excluded).toBeTruthy()
       await search.fill(excluded.name); await expect(cards).toHaveCount(0)
       await search.fill('')
