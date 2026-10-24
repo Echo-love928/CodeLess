@@ -26,7 +26,7 @@ function add() { if (title.value.trim()) { tasks.value.push({ title:title.value.
 function remove(item:Item) { tasks.value = tasks.value.filter(task => task !== item) }
 const count = id === 'CAT-01' ? 8 : id === 'CAT-02' ? 6 : 9
 const categories = id === 'CAT-01' ? ['小说','科技','历史'] : id === 'CAT-02' ? ['西湖区','上城区','拱墅区'] : ['构建','测试','文档']
-const items = Array.from({ length:count }, (_, i) => ({ name:'条目'+i, author:'作者'+i, category:categories[i%3], description:'简介'+i }))
+const items = Array.from({ length:count }, (_, i) => ({ name:'条目'+i, author:id === 'CAT-02' ? '评分4.5' : id === 'CAT-03' ? 'MIT' : '作者'+i, category:categories[i%3], description:id === 'CAT-02' ? '招牌拿铁'+i : '简介'+i }))
 const filtered = computed(() => items.filter(item => (category.value === '全部' || item.category === category.value) && (item.name.includes(query.value) || item.author.includes(query.value))))
 const selected = ref<typeof items[number] | null>(null)
 if (params.has('runtimeError')) setTimeout(() => { throw new Error('D21 explicit runtime fault') }, 0)
