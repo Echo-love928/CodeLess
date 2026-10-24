@@ -1,0 +1,56 @@
+
+Running 1 test using 1 worker
+
+(node:118196) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:118196) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 tests\e2e\full\business.acceptance.ts:38:1 › D20-B T1–T4: two isolated users generate, reconnect, edit, publish, download and retain a usable version after real failure (3.0m)
+
+
+  1) tests\e2e\full\business.acceptance.ts:38:1 › D20-B T1–T4: two isolated users generate, reconnect, edit, publish, download and retain a usable version after real failure 
+
+    [31mTest timeout of 180000ms exceeded.[39m
+
+    Error: Real task 3f7d85ab-7ab2-4668-8c62-3f90fd3f22d0 terminal state
+
+    Real task 3f7d85ab-7ab2-4668-8c62-3f90fd3f22d0 terminal state
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"R[7mEADY[27m"[39m
+    Received: [31m"R[7mUNNING[27m"[39m
+
+    Call Log:
+    - Test timeout of 180000ms exceeded
+
+      31 |     state = await get(page, 'tasks/' + id)
+      32 |     return ['READY', 'FAILED'].includes(state.status) ? state.status : 'RUNNING'
+    > 33 |   }, { timeout: 60_000, intervals: [200, 500, 1000], message: 'Real task ' + id + ' terminal state' }).toBe(expected)
+         |                                                                                                        ^
+      34 |   return state
+      35 | }
+      36 | type Actor = { page: Page; context: BrowserContext; app: string; generation: string; original: string; edited?: string; edit?: string; publication?: any; downloadDigest?: string }
+        at terminal (<repo>\tests\e2e\full\business.acceptance.ts:33:104)
+        at <repo>\tests\e2e\full\business.acceptance.ts:106:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .local-data\d20-b\runs\2026-10-24T03-27-25.381Z-3f415d09-d22c-4ba5-969b-b7cf65316817\browser\business.acceptance.ts-D20-75b0e--version-after-real-failure\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .local-data\d20-b\runs\2026-10-24T03-27-25.381Z-3f415d09-d22c-4ba5-969b-b7cf65316817\browser\business.acceptance.ts-D20-75b0e--version-after-real-failure\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: .local-data\d20-b\runs\2026-10-24T03-27-25.381Z-3f415d09-d22c-4ba5-969b-b7cf65316817\browser\business.acceptance.ts-D20-75b0e--version-after-real-failure\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    .local-data\d20-b\runs\2026-10-24T03-27-25.381Z-3f415d09-d22c-4ba5-969b-b7cf65316817\browser\business.acceptance.ts-D20-75b0e--version-after-real-failure\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace .local-data\d20-b\runs\2026-10-24T03-27-25.381Z-3f415d09-d22c-4ba5-969b-b7cf65316817\browser\business.acceptance.ts-D20-75b0e--version-after-real-failure\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests\e2e\full\business.acceptance.ts:38:1 › D20-B T1–T4: two isolated users generate, reconnect, edit, publish, download and retain a usable version after real failure 
