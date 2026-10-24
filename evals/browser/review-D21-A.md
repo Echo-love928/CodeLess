@@ -1,5 +1,29 @@
 # D21-A 只读互审
 
+## 增量复核：0d831a7（2026-10-24，已发布Comment）
+
+审查对象 `0d831a7730c7df542961553a2e68e41bf84b858e`，base `e69d8c6fc1d117daaebc58b94b63c75840b6efdd`。
+按用户本轮明确要求，已在PR63发布 [Comment review 5638353778](https://github.com/Echo-love928/CodeLess/pull/63#pullrequestreview-5638353778)，锚定该提交；没有批准、合并或修改A/main。
+
+### 阻塞问题
+
+- 真实验收仍不足，需求3/9、代码故障0/3、环境故障1/2；原P1/P2代码问题保持解除。
+
+### 建议
+
+- `sync-gate-attribution.json` 的 `e2e.runs[0].result` 称Playwright为verify:e2e最后一步，应改正：当前 `apps/web/package.json` 的smoke在其后还运行D20 full。
+- Windows清理竞态继续单列，不直接将taskkill 255放宽为清理成功；本轮未改平台实现。
+
+### 已核验内容
+
+- `git range-diff bc3d00e..342b8b0 e69d8c6..7084686`四项全部为`=`，可沿用前次32测试/12反例/184校验/47输入摘要及复算结论，未重复运行未改变的评测。
+- 342b8b0与0d831a7的评测脚本、测试、runs原始批次无差异；7084686..0d831a7仅有四个指定文档/证据文件。
+- 新增9条命令保留e2e首次失败及重跑通过、API失败，未覆盖原结果；7084686树6a3b351与归因文件候选树相符。
+- 已核对capture.mjs的退出128与附加关闭证据条件；作者120次对照的10/8次失败及私有日志摘要没有在本轮独立重跑或逐日志核验。
+- 精确HEAD远端运行40095500638六项SUCCESS；独立读取e2e日志确认75项及D20完整双用户链PASSED、browserExitCode=0。没有将远端成功回填为本地API通过。
+
+---
+
 ## 增量复审：342b8b0（2026-10-24）
 
 当前对象为 PR63 HEAD `342b8b07b6a592c46898056f460fd13e6e6c6f2a`；仅核对相对 `6e707c0` 的修复及受影响范围。

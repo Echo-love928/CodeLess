@@ -73,7 +73,7 @@ export async function behavior(page, id, expect) {
     const column = name => page.locator('section').filter({ has: page.getByRole('heading', { name, exact: true }) }).last()
     for (const name of ['待开始', '进行中', '已完成']) await expect(column(name)).toBeVisible()
     // The frozen requirement specifies creating a task, not a particular button caption.
-    await add(title, page.getByRole('button', { name: /^(?:添加|添加任务|新建任务|创建任务|新增任务)$/ }))
+    await add(title, page.getByRole('button', { name: /^(?:[+＋]\s*)?(?:添加|添加任务|新建|创建|新增|新建任务|创建任务|新增任务)$/ }))
     await expect(column('待开始')).toContainText(title)
     await row(title).getByRole('button', { name: '下一步', exact: true }).click()
     await expect(column('进行中')).toContainText(title)
@@ -100,7 +100,7 @@ export async function behavior(page, id, expect) {
     const size = { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
     await expect(cards).toHaveCount(size)
     // Labels are presentation: compare the field values even when cards/details label them differently.
-    const fieldValue = value => value.trim().replace(/^(?:作者|分类|类别|城区|地区|评分|招牌饮品|推荐饮品|简介|简短描述|描述|许可证|许可协议|开源许可证|开源许可)\s*[：:]\s*/, '').trim()
+    const fieldValue = value => value.trim().replace(/^(?:作者|分类|类别|所在城区|城区|地区|评分|招牌饮品|推荐饮品|一句简介|简介|简短描述|描述|许可证|许可协议|开源许可证|开源许可)\s*[：:]\s*/, '').trim()
     const initial = await Promise.all((await cards.all()).map(async card => {
       const rawFields = await card.locator('p').allTextContents()
       return { name: (await card.getByRole('heading').innerText()).trim(), rawFields, fields: rawFields.map(fieldValue) }
@@ -118,7 +118,7 @@ export async function behavior(page, id, expect) {
     const checkSearch = async term => { await search.fill(term); await expect(cards).not.toHaveCount(0); for (const card of await cards.all()) await expect(card).toContainText(term) }
     await checkSearch(name)
     expect(await cards.count()).toBeLessThan(size)
-    await cards.first().getByRole('heading').click()
+    await cards.first().getByText(name, { exact: true }).click()
     const detail = page.locator('[role="region"][aria-label="详情"], section').filter({ has: page.getByRole('heading', { name: /详情/ }) }).last()
     await expect(detail).toBeVisible(); await expect(detail).toContainText(name)
     for (const field of fields) await expect(detail).toContainText(field)
@@ -129,7 +129,8 @@ export async function behavior(page, id, expect) {
     await search.fill('')
     if (id === 'CAT-01') {
       const author = initial[0].rawFields.find(value => /^\s*作者\s*[：:]/.test(value))
-      await checkSearch(author ? fieldValue(author) : fields[0]); await search.fill('')
+      const bareAuthor = fields.find(value => !['小说', '科技', '历史'].includes(value))
+      await checkSearch(author ? fieldValue(author) : bareAuthor); await search.fill('')
     }
     const categories = id === 'CAT-01' ? ['小说', '科技', '历史'] : id === 'CAT-03' ? ['构建', '测试', '文档'] : []
     if (id === 'CAT-02') {

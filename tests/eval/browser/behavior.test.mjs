@@ -17,7 +17,8 @@ after(async () => { await browser?.close() })
 
 // Independent plain DOM implementations, deliberately different from the Vue fixture.
 // Fields in cards and details use different labels; CAT-03 only opens from the name.
-function catalog(id, { labels = false, authorFirst = true, searchType = 'text', combine = true, detailAuthor = true, nameOnly = true } = {}) {
+function catalog(id, { labels = false, authorFirst = true, categoryFirst = false, searchType = 'text', combine = true,
+  detailAuthor = true, nameOnly = true, nameControl = 'heading', categoryLabel = null, descriptionLabel = '简介', detailLayout = 'text' } = {}) {
   const count = { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
   const categories = id === 'CAT-01' ? ['小说', '科技', '历史'] : id === 'CAT-02' ? ['西湖区', '上城区', '拱墅区'] : ['构建', '测试', '文档']
   return `<!doctype html><html lang="zh"><meta charset="utf-8"><body><h1>独立目录实现</h1>
@@ -28,12 +29,14 @@ function catalog(id, { labels = false, authorFirst = true, searchType = 'text', 
     const items=Array.from({length:${count}},(_,i)=>({name:'名称'+i,author:'作者值'+i,category:categories[i%3],description:'简介值'+i}));
     const main=document.querySelector('main'), search=document.querySelector('input'), nav=document.querySelector('nav'), detail=document.querySelector('section');
     let category='全部';
-    function show(item){detail.hidden=false;detail.querySelector('div').textContent=[item.name,${detailAuthor ? 'item.author' : "'错误作者'"},item.category,item.description,'4.5','MIT'].join(' ')}
+    function show(item){detail.hidden=false;const values=[item.name,${detailAuthor ? 'item.author' : "'错误作者'"},item.category,item.description,'4.5','MIT'],body=detail.querySelector('div');body.replaceChildren();
+      if(${JSON.stringify(detailLayout)}==='dl'){const dl=document.createElement('dl');values.forEach((value,i)=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=['名称','作者','所在城区','一句简介','评分','许可证'][i];dd.textContent=value;dl.append(dt,dd)});body.append(dl)}else body.textContent=values.join(' ')}
     function render(){main.replaceChildren();const visible=items.filter(item=>(category==='全部'||${combine ? 'item.category===category' : 'search.value||item.category===category'})&&(item.name.includes(search.value)||item.author.includes(search.value)));
-      for(const item of visible){const card=document.createElement('article'),heading=document.createElement('h3');heading.textContent=item.name;if(id==='CAT-03'&&${nameOnly})heading.onclick=()=>show(item);else card.onclick=()=>show(item);card.append(heading);
+      for(const item of visible){const card=document.createElement('article'),heading=document.createElement('h3');heading.textContent=item.name;
+        if(id==='CAT-03'&&${nameOnly}){if(${JSON.stringify(nameControl)}==='heading')heading.onclick=()=>show(item);else{const control=document.createElement(${JSON.stringify(nameControl)}==='link'?'a':'button');control.textContent=item.name;if(control.tagName==='A')control.href='#';if(${JSON.stringify(nameControl)}==='button-wide')control.style.width='100%';control.onclick=event=>{event.preventDefault();show(item)};heading.replaceChildren(control)}}else card.onclick=()=>show(item);card.append(heading);
         const author=id==='CAT-02'?'评分：4.5':id==='CAT-03'?'许可证：MIT':'作者：'+item.author;
-        const fields=[author,(id==='CAT-02'?'城区：':id==='CAT-03'?'类别：':'分类：')+item.category,'简介：'+item.description];
-        if(!authorFirst)fields.reverse();for(const raw of fields){const p=document.createElement('p');p.textContent=labels?raw:raw.replace(/^[^：]+：/,'');card.append(p)}main.append(card)}
+        const fields=[author,(${JSON.stringify(categoryLabel)}||(id==='CAT-02'?'城区':id==='CAT-03'?'类别':'分类'))+'：'+item.category,${JSON.stringify(descriptionLabel)}+'：'+item.description];
+        if(${categoryFirst})fields.unshift(fields.splice(1,1)[0]);if(!authorFirst)fields.reverse();for(const raw of fields){const p=document.createElement('p');p.textContent=labels?raw:raw.replace(/^[^：]+：/,'');card.append(p)}main.append(card)}
       document.querySelector('#empty').hidden=visible.length>0;
     }
     if(id==='CAT-02'){const select=document.createElement('select');select.ariaLabel='城区';for(const name of ['全部',...categories]){const option=document.createElement('option');option.textContent=name;select.append(option)}select.onchange=()=>{category=select.value;render()};nav.append(select)}
@@ -70,11 +73,27 @@ test('CAT-03: a whole clickable card also opens details when its name is clicked
   const result = await check('CAT-03', catalog('CAT-03', { nameOnly: false, labels: true }), 'whole-card')
   assert.equal(result.status, 'PASSED', JSON.stringify(result))
 })
+for (const nameControl of ['button', 'link', 'button-wide']) test('CAT-03: name target ' + nameControl + ' inside a wide heading is clicked', async () => {
+  const result = await check('CAT-03', catalog('CAT-03', { nameControl, labels: true }), 'name-' + nameControl)
+  assert.equal(result.status, 'PASSED', JSON.stringify(result))
+})
+test('CAT-01: a bare category before the author is not used as the search term', async () => {
+  const result = await check('CAT-01', catalog('CAT-01', { categoryFirst: true }), 'bare-category-first')
+  assert.equal(result.status, 'PASSED', JSON.stringify(result))
+})
+for (const detailLayout of ['text', 'dl']) test('CAT-02: 所在城区 label matches value-only ' + detailLayout + ' details', async () => {
+  const result = await check('CAT-02', catalog('CAT-02', { labels: true, categoryLabel: '所在城区', detailLayout }), 'district-' + detailLayout)
+  assert.equal(result.status, 'PASSED', JSON.stringify(result))
+})
+test('CAT-01: 一句简介 is a presentation label', async () => {
+  const result = await check('CAT-01', catalog('CAT-01', { labels: true, descriptionLabel: '一句简介' }), 'one-line-description')
+  assert.equal(result.status, 'PASSED', JSON.stringify(result))
+})
 test('CAT-01: labelled author is searchable even when the paragraphs are reordered; searchbox is supported', async () => {
   const result = await check('CAT-01', catalog('CAT-01', { labels: true, authorFirst: false, searchType: 'search' }), 'reordered-searchbox')
   assert.equal(result.status, 'PASSED', JSON.stringify(result))
 })
-for (const label of ['添加', '新建任务', '创建任务']) test('TASK-02: creates and persists tasks with button ' + label, async () => {
+for (const label of ['添加', '新建任务', '创建任务', '新建', '创建', '新增', '+ 新建任务', '＋ 创建任务']) test('TASK-02: creates and persists tasks with button ' + label, async () => {
   const result = await check('TASK-02', tasks(label), 'task-' + label)
   assert.equal(result.status, 'PASSED', JSON.stringify(result))
 })
