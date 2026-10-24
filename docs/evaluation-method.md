@@ -95,7 +95,7 @@ node tests/eval/generation/mutation.mjs                                # 负向�
 
 报告生成器当前为 `scripts/eval/report.mjs#v2`（2026-10-24，D21-B 审查后加入进程完整性与采集缺口规则）。首个真实批次的派生报告已用 v2
 从未改动的原始记录重算：47 个输入文件摘要不变，v1 已有的全部数字不变，只新增 `execution`、`callRecord`、`samplesWithoutCallRecord`、
-`samplesWithoutJournal`、`executionFailures` 字段和每个故障结果的三项完整性检查；v1 报告保留在提交 `6e707c0` 中。
+`samplesWithoutJournal`、`executionFailures` 字段和每个故障结果的三项完整性检查；v1 报告保留在提交 `6e707c0` 中（2026-10-24 变基后为 `a49a32f`，见 D21-A 交接 §0.2）。
 
 ## 7. mock 与真实分账
 

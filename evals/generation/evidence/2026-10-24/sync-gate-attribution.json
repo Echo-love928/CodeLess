@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "task": "D21-A",
+  "round": "sync onto the rewritten main (2026-10-24)",
+  "candidate": {
+    "head": "e676f29e947ee3039e648931bedba6c72577737c",
+    "tree": "6a3b351ccbc576a7a235537e5c334cbfe5b6b095",
+    "base": "origin/main 33d955abbbbead5f351016f41a3f1810df44f4d1 (tree 56ac89e2ad6dcd136d5a9a7578dd8e517ff8c27a)",
+    "laterRebase": "main was rewritten again during these gates, to e69d8c6fc1d117daaebc58b94b63c75840b6efdd with the same tree 56ac89e. The branch was rebased onto it: 70846868e53ee6498ccb6b2a29b1a38e1d217ee5 replaces e676f29 with the same tree 6a3b351, and e676f29 was not pushed."
+  },
+  "api": {
+    "candidateRun": "evals/generation/evidence/commands.jsonl mode=api startedAt=2026-10-24T12:01:57.530Z: exit 1; 296 tests, 5 failures, 0 errors, 0 skipped; all 5 in dev.codeless.api.preview.PreviewAcceptanceProcessTest",
+    "failing": ["interruptionStopsTreeAndRetainsInterrupt:30", "parentExceptionIsNotReplacedByCleanup:25", "stopSignalWriteFailureStillReclaimsAndRunsProjectCleanup:50", "timeoutAssertionAlwaysStopsRootBranchAndLeaf:24", "unavailableProcessReportStillRunsProjectCleanupAndPreservesParent:38"],
+    "conclusion": "Same names and lines as the unmodified base bc3d00e run in evidence/2026-10-23/gate-attribution.json. Within services/, the only file that differs between bc3d00e, 33d955a and e676f29 is the eval test services/api/src/test/java/dev/codeless/api/eval/GenerationEvalIT.java, which default Surefire does not run. Pre-existing local Windows failure; remote CI on the PR head decides."
+  },
+  "e2e": {
+    "runs": [
+      {
+        "record": "commands.jsonl mode=e2e startedAt=2026-10-24T12:00:43.447Z",
+        "exitCode": 1,
+        "result": "Playwright 74 passed, 1 failed: tests/e2e/share/screenshot.spec.ts:5 'D16-B screenshot queue and real Chromium acceptance', which runs tests/e2e/share/screenshot.acceptance.mjs (11 tests, 10 pass, 1 fail). Playwright is the last step of verify:e2e and all 75 tests ran."
+      },
+      {
+        "record": "commands.jsonl mode=e2e startedAt=2026-10-24T12:32:39.299Z",
+        "exitCode": 0,
+        "result": "Playwright 75 passed",
+        "note": "One rerun of the same command at the same HEAD, made after the attribution below. Both records are kept."
+      }
+    ],
+    "failingCase": "tests/e2e/share/screenshot.acceptance.mjs:140 'real stdio worker is forcibly bounded and its process tree is reclaimed': assert.equal(result.cleanupConfirmed, true) received false",
+    "inputs": "git diff 103b676 e676f29 -- services tests/e2e package.json pnpm-lock.yaml .npmrc lists only GenerationEvalIT.java (not used by verify:e2e). services/runner and tests/e2e are identical, the lockfile blob is the same (b560dc6), and both worktrees resolve Playwright 1.60.0.",
+    "diagnostic": {
+      "method": "Repeat the failing test body (captureDeployment with the acceptance file's target and timeoutMs 150) against each worktree's code, and print result.cleanupProof (taskkill exit code and output), which the assertion does not show. Diagnostic only, not a gate.",
+      "order": "2026-10-24T12:29Z..12:32Z: 20 runs on the candidate, 20 on the base, then 5 alternating rounds of 20 runs per tree",
+      "results": [
+        { "tree": "base 103b676 (tree 56ac89e, the same tree as origin/main 33d955a and e69d8c6)", "runs": 120, "pass": 110, "fail": 10 },
+        { "tree": "candidate e676f29 (tree 6a3b351)", "runs": 120, "pass": 112, "fail": 8 }
+      ],
+      "split": "Every passing run: taskkill exit 128, '错误: 没有找到进程 \"<pid>\"。' (process not found). Every failing run: taskkill exit 255, '错误: 无法终止 PID <worker> (属于 PID <parent> 子进程)的进程。 原因: 没有此任务的实例在运行。' taskkill never returned 0.",
+      "encoding": "taskkill writes GBK and capture.mjs appends the bytes to a string as UTF-8, so cleanupProof.diagnostics is lossy. Both messages above were confirmed by encoding them as GBK and comparing after the same lossy decoding: equal for a 255 run and a 128 run.",
+      "privateFiles": [
+        { "path": ".local-data/d21-a/sync/diag-capture.mjs", "sha256": "sha256:b6c871b5b1ffabda87d4cb6e36d1bbb33b77088c292e834d8b6fa67accbaf7ac" },
+        { "path": ".local-data/d21-a/sync/diag-rebase.out", "sha256": "sha256:2e469312e479303992a3f8ee6d98268ed2fb59f949dc64299c261091dfad2cee" },
+        { "path": ".local-data/d21-a/sync/diag-base.out", "sha256": "sha256:e302954ca2850c8c51f06c8090f11462d724ce73c44fcdf718a1a84465869af7" },
+        { "path": ".local-data/d21-a/sync/diag-alt.out", "sha256": "sha256:aebee1e816fe0e6b4898000c9ad3aaafaddfed09f491892d088f6b76e0a62efb" },
+        { "path": ".local-data/d21-a/sync/decode-check.mjs", "sha256": "sha256:0683f4679b6e11aa4ade945f5a00566ddba4c73ade9fef570f0153782eae216f" }
+      ]
+    },
+    "mechanism": "The worker gets deadline Date.now() + timeoutMs and the parent's stop timer uses the same timeoutMs, so both fire at about 150 ms. In all 240 runs the worker had already exited, or exited while taskkill /PID <worker> /T /F was walking its tree. services/runner/src/screenshot/capture.mjs accepts only exit 128 (with closed-browser evidence or the launch barrier not crossed) as already closed; the in-walk exit gives 255, so cleanupConfirmed is false. The check fails closed: it reports unconfirmed cleanup, never a false success.",
+    "conclusion": "Pre-existing intermittent Windows race in the D16-B screenshot cleanup proof, reproduced on main's own tree at a similar rate (10/120 vs 8/120). This PR changes nothing under services/runner or tests/e2e, and this card does not change platform code. The earlier e2e passes at c25b722 and 9be1328 do not contradict a per-run failure rate of about 7%. Remote CI on the PR head decides."
+  },
+  "e2eSideEffect": "Both verify:e2e runs rewrote the same 9 committed PNGs under docs/evidence/D10/deterministic and tests/e2e/{share,versions}/evidence; restored with git checkout, not part of this PR."
+}
