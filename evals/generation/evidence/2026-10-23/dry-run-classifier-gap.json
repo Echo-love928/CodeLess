@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "kind": "DRY_RUN_FINDING",
+  "mode": "MOCK",
+  "modelEvidence": false,
+  "note": "Deterministic mock provider (synthetic counters) with the real PostgreSQL, restricted Docker build and Chromium verifier. Platform-classifier behaviour only; not model quality. Dry-run batches stay private under .local-data/d21-a/mock-runs/.",
+  "finding": {
+    "id": "D21-A-F1",
+    "title": "A synchronous runtime error that keeps the expected element from rendering is reported as ACTION_TIMEOUT and classified INFRASTRUCTURE, so the platform never attempts repair",
+    "where": "services/api/src/main/java/dev/codeless/api/agent/RepairController.java classify(): the CODE page set is ACTION_FAILED, PAGE_EXCEPTION, CONSOLE_ERROR, BLANK_PAGE; ACTION_TIMEOUT is not in it even when diagnostics.consoleErrors holds the application error",
+    "direction": "Safe (no code is changed for an environment error) but loses repairability of a real code error",
+    "owner": "D24-A/D26-A buffer (RepairController is A-owned platform code; out of D21-A scope, not changed here)"
+  },
+  "observed": {
+    "batchId": "2026-10-23T14-07-56Z-mock-c3c5f44d",
+    "sampleId": "FAULT-CODE-03",
+    "recordSha256": "sha256:b6b890458a63e9c1c9e80eb9ca701cf2340ddcb67e421c661d12d0d0445a973a",
+    "taskId": "b30a5ad7-6340-4729-80d9-829852f5c8d5",
+    "provider": {
+      "transport": "SyntheticCounters",
+      "model": "plan-fixture-v1",
+      "id": "deterministic-mock"
+    },
+    "injection": {
+      "injection": "RUNTIME_SETUP_EXCEPTION",
+      "strategy": "LAST_LINE_OF_SCRIPT_SETUP",
+      "target": "src/pages/HomePage.vue",
+      "snippetLine": "if (typeof window !== 'undefined') { throw new Error('D21_EVAL_INJECTED_RUNTIME_FAULT'); }"
+    },
+    "build": {
+      "status": "SUCCEEDED",
+      "exitCode": 0
+    },
+    "verification": {
+      "status": "FAILED",
+      "failure": "ACTION_TIMEOUT",
+      "workerExitCode": 1,
+      "error": "locator.waitFor: Timeout 2000ms exceeded.\nCall log:\n  - waiting for getByTestId('profile-name') to be visible",
+      "pageErrors": [],
+      "consoleErrors": [
+        "Error: D21_EVAL_INJECTED_RUNTIME_FAULT",
+        "Error: D21_EVAL_INJECTED_RUNTIME_FAULT"
+      ],
+      "actions": [
+        {
+          "index": 0,
+          "type": "navigate",
+          "status": "PASSED"
+        }
+      ]
+    },
+    "repairDecision": {
+      "code": "AGENT_ACTION_TIMEOUT",
+      "category": "INFRASTRUCTURE",
+      "decision": "AGENT_ACTION_TIMEOUT"
+    },
+    "task": {
+      "status": "FAILED",
+      "failureCode": "AGENT_ACTION_TIMEOUT",
+      "repairAttempts": 0
+    }
+  },
+  "revisedDesign": {
+    "batchId": "2026-10-23T14-14-37Z-mock-06c86770",
+    "sampleId": "FAULT-CODE-03",
+    "recordSha256": "sha256:c6116f142f63568e06cb22a9a89687f41fdae718428bc0c0efdd17980d0c4f36",
+    "taskId": "e09aca1a-fb1f-4d75-b27b-277e666013cb",
+    "provider": {
+      "model": "plan-fixture-v1",
+      "id": "deterministic-mock",
+      "transport": "SyntheticCounters"
+    },
+    "injection": {
+      "injection": "RUNTIME_ASYNC_PAGE_EXCEPTION",
+      "strategy": "LAST_LINE_OF_SCRIPT_SETUP",
+      "target": "src/pages/HomePage.vue",
+      "snippetLine": "setTimeout(() => { throw new Error('D21_EVAL_INJECTED_RUNTIME_FAULT'); }, 0);"
+    },
+    "build": {
+      "status": "SUCCEEDED",
+      "exitCode": 0
+    },
+    "verification": {
+      "status": "FAILED",
+      "failure": "PAGE_EXCEPTION",
+      "workerExitCode": 1,
+      "error": "",
+      "pageErrors": [
+        "D21_EVAL_INJECTED_RUNTIME_FAULT",
+        "D21_EVAL_INJECTED_RUNTIME_FAULT"
+      ],
+      "consoleErrors": [],
+      "actions": [
+        {
+          "index": 0,
+          "type": "navigate",
+          "status": "PASSED"
+        },
+        {
+          "index": 1,
+          "type": "expectText",
+          "status": "PASSED"
+        }
+      ]
+    },
+    "repairDecision": {
+      "code": "AGENT_PAGE_EXCEPTION",
+      "category": "CODE",
+      "decision": "REPAIR"
+    },
+    "task": {
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_PROTOCOL_INVALID",
+      "repairAttempts": 1
+    }
+  }
+}

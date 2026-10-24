@@ -1,0 +1,50 @@
+{
+  "at": "2026-10-23T14:17:09.495Z",
+  "checkout": "ISOLATED",
+  "ok": true,
+  "steps": [
+    {
+      "name": "node",
+      "command": "F:\\nodejs\\node.exe --version",
+      "exitCode": 0,
+      "error": null,
+      "output": "v24.22.1"
+    },
+    {
+      "name": "java",
+      "command": "F:\\JAVA\\CodeLess\\CodeLess\\.local-data\\d07-a\\tools\\java21\\jdk-21.0.12.1+1\\bin\\java.exe -version",
+      "exitCode": 0,
+      "error": null,
+      "output": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)"
+    },
+    {
+      "name": "docker server",
+      "command": "docker version --format {{.Server.Version}}",
+      "exitCode": 0,
+      "error": null,
+      "output": "29.9.2"
+    },
+    {
+      "name": "runtime prerequisites (pnpm deps, Chromium, build image)",
+      "command": "F:\\nodejs\\node.exe tests/agent/prepare-runtime.mjs",
+      "exitCode": 0,
+      "error": null,
+      "output": "#14 naming to docker.io/library/codeless-vue-build:d05 done\n#14 unpacking to docker.io/library/codeless-vue-build:d05 done\n#14 DONE 0.2s"
+    },
+    {
+      "name": "build image id",
+      "command": "docker image inspect codeless-vue-build:d05 --format {{.Id}}",
+      "exitCode": 0,
+      "error": null,
+      "output": "sha256:9fed2819f4e31a7e618d21ffe0518bc4e23ed34ac6be82bfbb95faf9a82630cd"
+    },
+    {
+      "name": "maven test-compile",
+      "command": "C:\\Windows\\system32\\cmd.exe /d /c services\\api\\mvnw.cmd -B -ntp -f services/api/pom.xml -DskipTests test-compile",
+      "exitCode": 0,
+      "error": null,
+      "output": "[INFO] Total time:  9.800 s\n[INFO] Finished at: 2026-10-23T23:17:09+09:00\n[INFO] ------------------------------------------------------------------------"
+    }
+  ],
+  "buildImageId": "sha256:9fed2819f4e31a7e618d21ffe0518bc4e23ed34ac6be82bfbb95faf9a82630cd"
+}
