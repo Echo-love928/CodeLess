@@ -25,10 +25,6 @@ public final class AgentModel {
     public AgentModel(ModelProvider provider, ModelCallRepository records, ModelCallAudit audit, AgentRunStore store) {
         this.provider=provider;this.records=records;this.audit=audit;this.store=store;
     }
-    /** Whether the caps can still fund this request; the same rule reserveModel enforces before invocation. */
-    public boolean fundable(TaskQueueService.Claim claim, TaskStatus stage, String policy, JsonNode input) {
-        return store.fundable(claim,stage,RuntimeBudget.inputReservation(policy,input.toString()));
-    }
     /** Output allowance the next request of this size would receive, or null when it cannot be funded. */
     public Integer allowance(RuntimeBudget.Meter meter, String policy, JsonNode input) {
         return RuntimeBudget.outputAllowance(meter,RuntimeBudget.inputReservation(policy,input.toString()));

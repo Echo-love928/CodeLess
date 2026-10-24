@@ -108,10 +108,6 @@ public final class AgentRunStore {
             return output;
         });
     }
-    /** Whether the caps could still fund a request of this size; reads the same meter that reserveModel enforces. */
-    public boolean fundable(TaskQueueService.Claim claim, TaskStatus stage, int inputReservation) {
-        return RuntimeBudget.outputAllowance(RuntimeBudget.meter(read(claim,stage)),inputReservation)!=null;
-    }
     public void reserveVerification(TaskQueueService.Claim claim) {
         // Reserve both fixed operations before launch, even if the build later prevents the browser.
         reserve(claim,TaskStatus.VERIFY,"tool.request",0,2);
