@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url'
 import { CATEGORIES, canonical, plannedSamples, sha256, validateFrozen } from './lib.mjs'
 import { consistency, faultSummary, requirementSummary } from './ledger.mjs'
 
-export const GENERATOR = 'scripts/eval/report.mjs#v1'
+export const GENERATOR = 'scripts/eval/report.mjs#v2'
 
 /** Loads one batch. Every file read is listed with its digest; planned samples come from the batch's frozen copies. */
 export function loadBatch(batchDir) {
@@ -72,9 +72,14 @@ export function buildReport(batchDir) {
 }
 
 const pct = (value) => (value === null ? '未知' : (value * 100).toFixed(1) + '%')
-const tokens = (usage) => usage.complete ? String(usage.totalTokens) : '≥' + usage.knownTotalTokens + '（' + usage.unknownCalls + ' 次未知' +
-  (usage.samplesWithoutTaskRecord ? '，' + usage.samplesWithoutTaskRecord + ' 个样本无任务记录' : '') + '）'
+const tokens = (usage) => usage.complete ? String(usage.totalTokens) : usage.callRecord === 'MISSING' ? '未知（无调用记录）'
+  : '≥' + usage.knownTotalTokens + '（' + usage.unknownCalls + ' 次未知' +
+  (usage.samplesWithoutTaskRecord ? '，' + usage.samplesWithoutTaskRecord + ' 个样本无任务记录' : '') +
+  (usage.samplesWithoutCallRecord ? '，' + usage.samplesWithoutCallRecord + ' 个样本无调用记录' : '') + '）'
 const ms = (value) => (value === null ? '未知' : (value / 1000).toFixed(1) + ' s')
+const count = (value) => (value === null ? '未知' : String(value))
+// A READY task row whose harness or sample JVM failed is shown as such: it is not a success.
+const final = (s) => (s.finalSuccess ? 'READY' : s.outcome === 'READY' ? 'READY（不计成功）' : s.outcome)
 const cell = (value) => (value === null || value === undefined ? '—' : String(value).replaceAll('|', '\\|'))
 
 export function renderMarkdown(report) {
@@ -91,16 +96,16 @@ export function renderMarkdown(report) {
       `- 首轮成功（首次真实构建+浏览器即通过、0 次修复）：**${r.firstPass.count}/${r.denominator}**（${pct(r.firstPass.rate)}）`,
       `- 3 轮内最终成功（平台 READY）：**${r.finalSuccess.count}/${r.denominator}**（${pct(r.finalSuccess.rate)}）；目标 ≥${r.target.finalSuccessAtLeast}/${r.target.of}：${r.target.met ? '达到' : '未达到'}（基线目标，不是既有成绩）`,
       `- 需求级最终成功（叠加 D21-B 行为断言）：${r.behaviorAssertions.status}，当前为未知，不计为成功`,
-      `- 缺失记录：${r.missingRecords.length ? r.missingRecords.join(', ') : '无'}；harness 错误：${r.harnessErrors.length ? r.harnessErrors.join(', ') : '无'}`,
+      `- 缺失记录：${r.missingRecords.length ? r.missingRecords.join(', ') : '无'}；harness 错误：${r.harnessErrors.length ? r.harnessErrors.join(', ') : '无'}；样本进程异常（不计成功）：${r.executionFailures.length ? r.executionFailures.map((f) => f.sampleId + ' ' + f.execution).join(', ') : '无'}`,
       `- 修复：共 ${r.repairs.totalRounds} 轮，${r.repairs.samplesWithRepairs} 个样本发生修复`,
       `- 实际 token：${tokens(r.usage)}；输入 ${cell(r.usage.inputTokens)} / 输出 ${cell(r.usage.outputTokens)}；已知下限 输入 ${r.usage.knownInputTokens} / 输出 ${r.usage.knownOutputTokens}；缓存命中（已含在输入中）${cell(r.cacheHitInputTokens)}`,
-      `- 运行时预算计费（含保守估算，非实际用量）：${r.charged.chargedTokens}，估算调用 ${r.charged.estimatedCalls}`,
-      `- 模型请求 ${r.modelCalls}，工具槽 ${r.toolSlots}；耗时中位数 ${ms(r.duration.medianMs)}，最大 ${ms(r.duration.maxMs)}（已知 ${r.duration.knownSamples}，未知 ${r.duration.unknownSamples}）`,
+      `- 运行时预算计费（含保守估算，非实际用量）：${count(r.charged.chargedTokens)}，估算调用 ${count(r.charged.estimatedCalls)}${r.charged.samplesWithoutJournal ? '（' + r.charged.samplesWithoutJournal + ' 个样本无可读任务日志）' : ''}`,
+      `- 模型请求 ${count(r.modelCalls)}，工具槽 ${count(r.toolSlots)}；耗时中位数 ${ms(r.duration.medianMs)}，最大 ${ms(r.duration.maxMs)}（已知 ${r.duration.knownSamples}，未知 ${r.duration.unknownSamples}）`,
       `- 失败类型：${Object.entries(r.failureTypes).filter(([, n]) => n).map(([t, n]) => t + '×' + n).join('，') || '无'}`, '',
       '| 需求 | 类别 | 任务 ID | 首次验证 | 最终 | 修复轮 | 失败类型 / 代码 | 模型请求 | 实际 token | 耗时 |',
       '| --- | --- | --- | --- | --- | ---: | --- | ---: | --- | ---: |')
     for (const s of r.samples) {
-      lines.push(`| ${s.sampleId} | ${s.category} | ${cell(s.taskId)} | ${s.firstVerify} | ${s.finalSuccess ? 'READY' : s.outcome} | ${cell(s.repairRounds)} | ${s.failure ? s.failure.type + ' / ' + cell(s.failure.code) : '—'} | ${s.modelCalls.total} | ${tokens(s.usage)} | ${ms(s.durationMs)} |`)
+      lines.push(`| ${s.sampleId} | ${s.category} | ${cell(s.taskId)} | ${s.firstVerify} | ${final(s)} | ${cell(s.repairRounds)} | ${s.failure ? s.failure.type + ' / ' + cell(s.failure.code) : '—'} | ${count(s.modelCalls.total)} | ${tokens(s.usage)} | ${ms(s.durationMs)} |`)
     }
     lines.push('')
   }
@@ -111,7 +116,7 @@ export function renderMarkdown(report) {
       `- 故障集实际 token：${tokens(f.usage)}`, '')
     for (const result of f.results) {
       lines.push(`### ${result.faultId}（${result.class} / ${result.injection}，基于 ${result.baseRequirement}）：${result.status}`, '',
-        `任务 ${cell(result.sample.taskId)}；最终 ${result.sample.finalSuccess ? 'READY' : result.sample.outcome}；修复轮 ${cell(result.sample.repairRounds)}；失败 ${result.sample.failure ? result.sample.failure.type + ' / ' + cell(result.sample.failure.code) : '—'}`, '',
+        `任务 ${cell(result.sample.taskId)}；最终 ${final(result.sample)}；修复轮 ${cell(result.sample.repairRounds)}；失败 ${result.sample.failure ? result.sample.failure.type + ' / ' + cell(result.sample.failure.code) : '—'}`, '',
         '| 检查 | 期望 | 实际 | 结果 |', '| --- | --- | --- | --- |')
       for (const c of result.checks) lines.push(`| ${c.check} | ${cell(JSON.stringify(c.expected))} | ${cell(JSON.stringify(c.actual))} | ${c.pass ? '通过' : '**未通过**'} |`)
       lines.push('')
