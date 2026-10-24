@@ -25,15 +25,16 @@ for (const path of process.argv.slice(2)) {
   const exported = { schemaVersion: 1, originalReportDigest: sha(await readFile(full)), runId: basename(directory),
     revision: report.revision, changes: report.changes, startedAt: report.startedAt, completedAt: report.completedAt,
     status: report.status, mode: report.mode, statistics: report.statistics, batchId: report.batchId ?? null,
-    batchDigest: report.batchDigest ?? null, runnerImage: report.runnerImage,
+    batchDigest: report.batchDigest ?? null, runnerImage: report.runnerImage, fixtureBuild: build(report.fixtureBuild),
     additionalModelRequests: report.additionalModelRequests, additionalRuntimeTokens: report.additionalRuntimeTokens,
     rows, edits, controls: report.controls.map(control => ({ ...control, browser: browser(control.browser) })),
     requirements: { denominator: 9, real: report.requirements.real, mock: report.requirements.mock, unknown: report.requirements.unknown },
     editSummary: { denominator: 6, real: report.editSummary.real, mock: report.editSummary.mock, unknown: report.editSummary.unknown }, targets: report.targets }
-  await writeFile(join(destination, name + '.json'), JSON.stringify(exported, null, 2) + '\n')
   const shots = report.mode === 'MOCK'
     ? ['SHOW-03/page.png', 'TASK-01/page.png', 'CAT-03/page.png', 'EDIT-05/before/page.png', 'EDIT-05/after/page.png', 'controls/white-screen/page.png', 'controls/lost-persistence/page.png']
     : ['SHOW-01/page.png', 'SHOW-02/page.png', 'TASK-01/page.png']
+  exported.publicScreenshots = shots.map(path => name + '-' + path.replaceAll('/', '-'))
+  await writeFile(join(destination, name + '.json'), JSON.stringify(exported, null, 2) + '\n')
   for (const path of shots) await copyFile(join(directory, path), join(destination, name + '-' + path.replaceAll('/', '-')))
 }
 const commandRoot = join(root, '.local-data/d21-b/commands'), commands = []
