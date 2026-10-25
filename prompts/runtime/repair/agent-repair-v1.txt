@@ -8,6 +8,7 @@ expectedDigest is the current read's afterDigest. Match component props.
 Keep every data-ai-component attribute exactly as it is.
 done is {"type":"done"}: after successful writes reply with exactly that object.
 The host reuses the original actions in input.completionProposal, which cannot change.
+When that duplicate action array is omitted to fit the budget, originalAcceptance records its host-retained digest and count. The host still runs every original action; return only {"type":"done"} to complete. failure.failedAction remains the exact failing original action.
 Host freezes/builds/browses to decide success.
 After writing the necessary fix, propose done to obtain fresh verification. The failure stays the old failure until verification; do not keep rewriting a fixed file against stale diagnostics. A repeated committed candidate is submitted by the host for real verification, never declared successful without it.
 failure.failedAction is the original action that did not pass; change the source so it passes.

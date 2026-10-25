@@ -73,7 +73,20 @@ export async function behavior(page, id, expect) {
     await reload(); await expect(row(title).getByRole('checkbox')).toBeChecked(); await expect(row(other)).toBeVisible()
     await remove(other); await reload(); await expect(row(other)).toHaveCount(0); await remove(title)
   } else if (id === 'TASK-02') {
-    const column = name => page.locator('section').filter({ has: page.getByRole('heading', { name: namePattern(name) }) }).last()
+    const columns = new Map(), names = ['待开始', '进行中', '已完成']
+    const columnHeading = new RegExp(names.map(name => namePattern(name).source).join('|'), 'u')
+    for (const name of names) {
+      let candidate = page.getByRole('heading', { name: namePattern(name) }).locator('..')
+      // Use the complete single-column ancestor, regardless of div/section or a nested flex header.
+      // Stop before the board ancestor that contains multiple status headings.
+      for (let depth = 0; depth < 32; depth++) {
+        const parent = candidate.locator('..')
+        if (await parent.getByRole('heading', { name: columnHeading }).count() !== 1) break
+        candidate = parent
+      }
+      columns.set(name, candidate)
+    }
+    const column = name => columns.get(name)
     for (const name of ['待开始', '进行中', '已完成']) await expect(column(name)).toBeVisible()
     // The frozen requirement specifies creating a task, not a particular button caption.
     await add(title, page.getByRole('button', { name: createTaskName }))
@@ -121,17 +134,19 @@ export async function behavior(page, id, expect) {
     // Labels are presentation: compare the field values even when cards/details label them differently.
     const fieldValue = value => value.trim().replace(/^(?:作者|分类|类别|所在城区|城区|地区|评分|招牌饮品|推荐饮品|一句简介|简介|简短描述|描述|许可证|许可协议|开源许可证|开源许可)(?:\s*[：:]\s*|\s+)/, '').trim()
     const cardName = async card => {
-      const heading = card.getByRole('heading')
-      if (await heading.count() === 1) return (await heading.innerText()).trim()
-      const control = card.getByRole('button').first(), spans = control.locator('span')
-      return (await spans.count() ? await spans.first().innerText() : (await control.innerText()).split('\n')[0]).trim()
+      // Inline details may add their own heading later; retain the card's first title/control.
+      const title = card.locator('h1,h2,h3,h4,h5,h6,button').first()
+      if (await title.evaluate(node => /^H[1-6]$/.test(node.tagName))) return (await title.innerText()).trim()
+      const spans = title.locator('span')
+      return (await spans.count() ? await spans.first().innerText() : (await title.innerText()).split('\n')[0]).trim()
     }
-    const detailFor = name => page.locator('[role="region"], section').filter({ hasNot: cards })
+    const detailFor = name => page.locator('[role="region"], section, div').filter({ hasNot: cards })
       .filter({ has: page.getByRole('heading', { name: new RegExp('详情|' + namePattern(name).source, 'u') }) }).last()
     const initial = []
     for (const card of await cards.all()) {
       const name = await cardName(card)
       let rawFields = await card.locator('p, dd').allTextContents()
+      if (id === 'CAT-03') rawFields = rawFields.flatMap(value => value.split(/\s+[·•|]\s+/u))
       // The requirement permits compact title/author lists with the remaining fields in details.
       // Read the real UI, then prove search/category behaviour against this initial inventory.
       if (id === 'CAT-01' && rawFields.length < 3) {
@@ -182,6 +197,7 @@ export async function behavior(page, id, expect) {
       await checkSearch(author ? fieldValue(author) : bareAuthor); await search.fill('')
     }
     const categories = id === 'CAT-01' ? ['小说', '科技', '历史'] : id === 'CAT-03' ? ['构建', '测试', '文档'] : []
+    const categorySelect = page.getByRole('combobox'), usesSelect = await categorySelect.count() === 1
     let initialDistrictValue
     if (id === 'CAT-02') {
       const select = page.getByRole('combobox')
@@ -193,7 +209,7 @@ export async function behavior(page, id, expect) {
       expect(categories.length).toBeGreaterThan(0)
     }
     for (const category of categories) {
-      if (id === 'CAT-02') await page.getByRole('combobox').selectOption({ label: category })
+      if (usesSelect) await categorySelect.selectOption({ label: category })
       else await button(category).click()
       await expect(cards).not.toHaveCount(0)
       expect(await cards.count()).toBeLessThan(size)
@@ -224,7 +240,8 @@ export async function behavior(page, id, expect) {
     await expect(cards).toHaveCount(0)
     if (id === 'CAT-03') await visible('没有匹配的工具')
     await search.fill('')
-    if (id === 'CAT-02') await page.getByRole('combobox').selectOption({ value: initialDistrictValue })
+    if (id === 'CAT-02') await categorySelect.selectOption({ value: initialDistrictValue })
+    else if (usesSelect) await categorySelect.selectOption({ label: '全部' })
     else await button('全部').click()
     await expect(cards).toHaveCount(size)
   } else throw new Error('Unknown requirement ' + id)

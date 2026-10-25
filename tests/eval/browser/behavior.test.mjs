@@ -22,7 +22,8 @@ after(async () => { await browser?.close() })
 // Fields in cards and details use different labels; CAT-03 only opens from the name.
 function catalog(id, { labels = false, authorFirst = true, categoryFirst = false, searchType = 'text', combine = true,
   detailAuthor = true, nameOnly = true, nameControl = 'heading', categoryLabel = null, descriptionLabel = '简介', detailLayout = 'text',
-  itemTag = 'article', sparse = false, namedDetail = false, cardLabelSeparator = '：', detailRating = '4.5', allLabel = '全部', brokenReset = false } = {}) {
+  itemTag = 'article', sparse = false, namedDetail = false, cardLabelSeparator = '：', detailRating = '4.5', allLabel = '全部', brokenReset = false,
+  combinedFields = false, inlineDetail = false, categorySelect = false, detailLicense = 'MIT', missingDescription = false } = {}) {
   const count = { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
   const categories = id === 'CAT-01' ? ['小说', '科技', '历史'] : id === 'CAT-02' ? ['西湖区', '上城区', '拱墅区'] : ['构建', '测试', '文档']
   return `<!doctype html><html lang="zh"><meta charset="utf-8"><body><h1>独立目录实现</h1>
@@ -31,9 +32,9 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
     <script>
     const id=${JSON.stringify(id)}, categories=${JSON.stringify(categories)}, labels=${labels}, authorFirst=${authorFirst};
     const items=Array.from({length:${count}},(_,i)=>({name:'名称'+i,author:'作者值'+i,category:categories[i%3],description:'简介值'+i}));
-    const main=document.querySelector('main'), search=document.querySelector('input'), nav=document.querySelector('nav'), detail=document.querySelector('section');
-    let category='全部';
-    function show(item){detail.hidden=false;const values=[item.name,${detailAuthor ? 'item.author' : "'错误作者'"},item.category,item.description,${JSON.stringify(detailRating)},'MIT'],body=detail.querySelector('div');body.replaceChildren();
+    const main=document.querySelector('main'), search=document.querySelector('input'), nav=document.querySelector('nav');let detail=document.querySelector('section');
+    let category='全部', selectedName='';
+    function show(item){selectedName=item.name;detail.hidden=false;if(${inlineDetail})main.querySelectorAll('${itemTag}')[items.indexOf(item)%main.children.length]?.append(detail);const values=[item.name,${detailAuthor ? 'item.author' : "'错误作者'"},item.category,item.description,${JSON.stringify(detailRating)},${JSON.stringify(detailLicense)}],body=detail.querySelector('div');body.replaceChildren();
       detail.querySelector('h2').textContent=${namedDetail} ? item.name : '详情';
       if(${sparse}){for(const value of values.slice(1,4)){const p=document.createElement('p');p.textContent=value;body.append(p)}}
       else if(${JSON.stringify(detailLayout)}==='dl'){const dl=document.createElement('dl');values.forEach((value,i)=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=['名称','作者','所在城区','一句简介','评分','许可证'][i];dd.textContent=value;dl.append(dt,dd)});body.append(dl)}else body.textContent=values.join(' ')}
@@ -43,22 +44,27 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
         if(id==='CAT-03'&&${nameOnly}){if(${JSON.stringify(nameControl)}==='heading')heading.onclick=()=>show(item);else{const control=document.createElement(${JSON.stringify(nameControl)}==='link'?'a':'button');control.textContent=item.name;if(control.tagName==='A')control.href='#';if(${JSON.stringify(nameControl)}==='button-wide')control.style.width='100%';control.onclick=event=>{event.preventDefault();show(item)};heading.replaceChildren(control)}}else card.onclick=()=>show(item);card.append(heading);
         const author=id==='CAT-02'?'评分：4.5':id==='CAT-03'?'许可证：MIT':'作者：'+item.author;
         const fields=[author,(${JSON.stringify(categoryLabel)}||(id==='CAT-02'?'城区':id==='CAT-03'?'类别':'分类'))+'：'+item.category,${JSON.stringify(descriptionLabel)}+'：'+item.description];
-        if(${categoryFirst})fields.unshift(fields.splice(1,1)[0]);if(!authorFirst)fields.reverse();for(const raw of fields){const p=document.createElement('p');p.textContent=labels?raw.replace('：',${JSON.stringify(cardLabelSeparator)}):raw.replace(/^[^：]+：/,'');card.append(p)}main.append(card)}
+        if(${missingDescription})fields.pop();if(${categoryFirst})fields.unshift(fields.splice(1,1)[0]);if(!authorFirst)fields.reverse();
+        const display=fields.map(raw=>labels?raw.replace('：',${JSON.stringify(cardLabelSeparator)}):raw.replace(/^[^：]+：/,''));
+        for(const raw of ${combinedFields}?[display.join(' · ')]:display){const p=document.createElement('p');p.textContent=raw;card.append(p)}main.append(card)}
       document.querySelector('#empty').hidden=visible.length>0;
+      if(${inlineDetail}&&selectedName)[...main.children].find(node=>node.querySelector('h3')?.textContent===selectedName)?.append(detail);
     }
-    if(id==='CAT-02'){const select=document.createElement('select');select.ariaLabel='城区';for(const name of ['全部',...categories]){const option=document.createElement('option');option.value=name;option.textContent=name==='全部'?${JSON.stringify(allLabel)}:name;select.append(option)}select.onchange=()=>{if(!${brokenReset}||select.value!=='全部')category=select.value;render()};nav.append(select)}
+    if(id==='CAT-02'||${categorySelect}){const select=document.createElement('select');select.ariaLabel='类别';for(const name of ['全部',...categories]){const option=document.createElement('option');option.value=name;option.textContent=name==='全部'?${JSON.stringify(allLabel)}:name;select.append(option)}select.onchange=()=>{if(!${brokenReset}||select.value!=='全部')category=select.value;render()};nav.append(select)}
     else for(const name of ['全部',...categories]){const button=document.createElement('button');button.textContent=name;button.onclick=()=>{category=name;render()};nav.append(button)}
+    if(${inlineDetail}){const replacement=document.createElement('div');replacement.innerHTML=detail.innerHTML;replacement.hidden=true;detail.replaceWith(replacement);detail=replacement}
     search.oninput=render;render();
     </script></body></html>`
 }
 
-function tasks(label, { split = false, wrongNext = false } = {}) {
+function tasks(label, { split = false, wrongNext = false, divColumns = false, stationary = false } = {}) {
   return `<!doctype html><html lang="zh"><meta charset="utf-8"><body><h1>独立看板实现</h1><input aria-label="标题"/><button id="create">${label}</button><main></main><script>
     let items=JSON.parse(localStorage.getItem('independent-board')||'[]');
     const input=document.querySelector('input'),main=document.querySelector('main');
     function render(){localStorage.setItem('independent-board',JSON.stringify(items));main.replaceChildren();
-      ['待开始','进行中','已完成'].forEach((name,index)=>{const section=document.createElement('section'),heading=document.createElement('h2'),list=document.createElement('ul');heading.textContent=name;section.append(heading,list);main.append(section);
-        for(const item of items.filter(item=>item.stage===index)){const row=document.createElement('li'),title=document.createElement('span'),next=document.createElement('button'),remove=document.createElement('button');title.textContent=item.title;next.textContent='下一步';remove.textContent='删除';next.onclick=()=>{item.stage=Math.min(2,item.stage+1);render()};remove.onclick=()=>{items=items.filter(other=>other!==item);render()};row.append(title,next,remove);list.append(row)}})}
+      const board=${divColumns}?document.createElement('section'):main;if(board!==main)main.append(board);
+      ['待开始','进行中','已完成'].forEach((name,index)=>{const section=document.createElement(${divColumns}?'div':'section'),header=document.createElement('div'),heading=document.createElement('h2'),list=document.createElement('ul');heading.textContent=name;header.append(heading);section.append(header,list);board.append(section);
+        for(const item of items.filter(item=>item.stage===index)){const row=document.createElement('li'),title=document.createElement('span'),next=document.createElement('button'),remove=document.createElement('button');title.textContent=item.title;next.textContent='下一步';remove.textContent='删除';next.onclick=()=>{if(!${stationary})item.stage=Math.min(2,item.stage+1);render()};remove.onclick=()=>{items=items.filter(other=>other!==item);render()};row.append(title,next,remove);list.append(row)}})}
     function splitNames(){if(!${split})return;for(const node of document.querySelectorAll('button,h2')){if(node.dataset.split)continue;node.dataset.split='yes';node.style.display='flex';const text=node.textContent;node.replaceChildren(...[...text].map(c=>{const span=document.createElement('span');span.textContent=c;return span}))}}
     const originalRender=render;render=()=>{originalRender();if(${wrongNext})for(const b of document.querySelectorAll('main button'))if(b.textContent==='下一步')b.textContent='下一步全部';splitNames()};
     document.querySelector('#create').onclick=()=>{items.push({title:input.value,stage:0});input.value='';render()};render();
@@ -113,6 +119,17 @@ test('TASK-02: flex children insert accessible-name spaces in buttons and headin
 test('TASK-02: whitespace normalization does not accept a different action', async () => {
   const result = await check('TASK-02', tasks('新建任务', { split: true, wrongNext: true }), 'wrong-flex-name')
   assert.equal(result.status, 'FAILED'); assert.equal(result.failure, 'BEHAVIOR_ERROR')
+})
+
+test('TASK-02: div columns inside one board section preserve independent status assertions', async () => {
+  const result=await check('TASK-02',tasks('新建任务',{split:true,divColumns:true}),'div-columns');assert.equal(result.status,'PASSED',JSON.stringify(result))
+})
+test('TASK-02: nested column layout still rejects a task that never moves', async () => {
+  const result=await check('TASK-02',tasks('新建任务',{divColumns:true,stationary:true}),'stationary-columns');assert.equal(result.status,'FAILED')
+})
+for(const options of [{},{detailLicense:'Wrong license'},{missingDescription:true},{combine:false}])test('CAT-03: combined metadata, inline details and category select '+JSON.stringify(options),async()=>{
+  const result=await check('CAT-03',catalog('CAT-03',{combinedFields:true,inlineDetail:true,categorySelect:true,...options}),'inline-catalog-'+Object.keys(options).join('-'))
+  assert.equal(result.status,Object.keys(options).length?'FAILED':'PASSED',JSON.stringify(result))
 })
 
 const targetMapping = () => ({ protocol: 'codeless-component-mapping/v1', versionId: '00000000-0000-4000-8000-000000000001',

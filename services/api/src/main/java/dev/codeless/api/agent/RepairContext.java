@@ -31,6 +31,15 @@ final class RepairContext {
         }
         return out;
     }
+    /** Drop only the duplicate model-facing action copy; the host's immutable draft is unchanged. */
+    static JsonNode compactCompletion(JsonNode input,JsonNode originalActions) {
+        var json=JsonMapper.builder().build();
+        var compact=(tools.jackson.databind.node.ObjectNode)input.deepCopy();
+        compact.set("completionProposal",json.valueToTree(Map.of("type","done")));
+        compact.set("originalAcceptance",json.valueToTree(Map.of("retainedByHost",true,"actionCount",originalActions.size(),
+                "digest",hash(originalActions.toString()))));
+        return compact.toString().getBytes(StandardCharsets.UTF_8).length<input.toString().getBytes(StandardCharsets.UTF_8).length?compact:input;
+    }
     List<JsonNode> observations(){return List.copyOf(latest.values());}
     JsonNode sourceFiles(){return sourceFiles;}
     boolean repeatedPatch(){return repeatedPatch;}

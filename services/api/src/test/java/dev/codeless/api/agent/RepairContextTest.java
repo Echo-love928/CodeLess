@@ -13,6 +13,29 @@ import tools.jackson.databind.json.JsonMapper;
 
 /** Recorded paid data is read-only. Future patch/done charges below are explicit synthetic scenarios. */
 class RepairContextTest {
+    @Test void compactCompletionFundsARequestWithoutChangingOriginalActionsOrAnySourceEvidence() {
+        var actions=json.createArrayNode();
+        actions.addObject().put("type","navigate").put("path","/");
+        for(int i=0;i<16;i++) actions.addObject().put("type","expectText").put("value","独立完整行为断言".repeat(20));
+        var original=actions.deepCopy();
+        var input=json.valueToTree(Map.of("completionProposal",Map.of("type","done","actions",actions),
+                "failure",Map.of("failedAction",Map.of("index",3,"action",actions.get(3))),
+                "observations",List.of(Map.of("content","real dependency content","afterDigest","observed")),
+                "sourceFiles",List.of(Map.of("path","src/pages/HomePage.vue","digest","current")),"tools",List.of("files.update")));
+        var saved=input.deepCopy();var compact=RepairContext.compactCompletion(input,actions);
+        var meter=new RuntimeBudget.Meter(9,11,40050);
+        assertThat(RuntimeBudget.outputAllowance(meter,RuntimeBudget.inputReservation("policy",input.toString()))).isNull();
+        assertThat(RuntimeBudget.outputAllowance(meter,RuntimeBudget.inputReservation("policy",compact.toString()))).isEqualTo(4096);
+        for(String field:List.of("failure","observations","sourceFiles","tools")) assertThat(compact.path(field)).isEqualTo(input.path(field));
+        assertThat(compact.path("completionProposal")).isEqualTo(json.valueToTree(Map.of("type","done")));
+        assertThat(compact.path("originalAcceptance").path("actionCount").asInt()).isEqualTo(17);
+        assertThat(compact.path("originalAcceptance").path("digest").asText()).startsWith("sha256:");
+        assertThat(actions).isEqualTo(original);assertThat(input).isEqualTo(saved);
+    }
+    @Test void compactProjectionNeverInflatesAnAlreadySmallCompletionProposal() {
+        var actions=json.createArrayNode();var input=json.valueToTree(Map.of("completionProposal",Map.of("type","done","actions",actions)));
+        assertThat(RepairContext.compactCompletion(input,actions)).isEqualTo(input);
+    }
     static final Path RECORD=Path.of("../../docs/evidence/D10/M1/45d37a80-c152-4672-9c0c-1fcf425fa014");
     final JsonMapper json=JsonMapper.builder().build();
     JsonNode doc() throws Exception{return json.readTree(Files.readString(RECORD.resolve("event-replay.json")));}

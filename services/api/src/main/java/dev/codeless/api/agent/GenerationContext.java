@@ -4,7 +4,7 @@ import java.util.*;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ObjectNode;
 
-/** Lossless source-content feedback; omit only superseded inventory copies and null receipt fields. */
+/** Keep current source bytes once per path; full historical receipts remain in the durable journal. */
 final class GenerationContext {
     private GenerationContext() {}
     static boolean complete(List<JsonNode> actual,Set<String> planned) {
@@ -17,14 +17,23 @@ final class GenerationContext {
     static List<JsonNode> observations(List<JsonNode> actual) {
         if(actual.size()<2) return List.copyOf(actual);
         var result=new ArrayList<JsonNode>();
+        var latestContent=new HashMap<String,Integer>();
         int lastInventory=-1;
-        for(int i=0;i<actual.size();i++) if(actual.get(i).path("source").isObject()) lastInventory=i;
+        for(int i=0;i<actual.size();i++) {
+            var receipt=actual.get(i);
+            if(receipt.path("source").isObject()) lastInventory=i;
+            if(receipt.has("committedContent") && !receipt.path("path").asText().isBlank()) latestContent.put(receipt.path("path").asText(),i);
+        }
         for(int i=0;i<actual.size();i++) {
             var original=actual.get(i);
             if(!original.isObject()) {result.add(original);continue;}
             var projected=(ObjectNode)original.deepCopy();
             for(String key:List.copyOf(projected.propertyNames())) if(projected.path(key).isNull()) projected.remove(key);
             if(i!=lastInventory) projected.remove("source");
+            Integer latest=latestContent.get(original.path("path").asText());
+            if(latest!=null && i<latest) {
+                projected.remove("committedContent");projected.remove("contentOrigin");projected.remove("content");
+            }
             result.add(projected);
         }
         return result;

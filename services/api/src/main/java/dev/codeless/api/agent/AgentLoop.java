@@ -128,9 +128,14 @@ public final class AgentLoop implements TaskStageRunner {
         for(int i=0;i<RuntimeBudget.MODEL_CALLS;i++) {
             var meter=RuntimeBudget.meter(store.read(claim,stage));
             boolean changed=repair&&Boolean.TRUE.equals(repairContext.progress().get("sourceChanged"));
-            boolean completionOnly=changed&&RuntimeBudget.MODEL_CALLS-meter.models()==1;
+            boolean completionOnly=changed&&RuntimeBudget.MODEL_CALLS-meter.models()==1
+                    || !repair&&local.isPresent()&&LocalGenerationContext.completionOnly(local.get(),observations);
             JsonNode request=input(stage,context,plan,local,edit,completionOnly,repair?repairContext.observations():observations,
                     failure,originalActions,repairContext,meter,componentIds);
+            if(repair && !completionOnly) {
+                Integer full=model.allowance(meter,policy,request);
+                if(full==null || full<RuntimeBudget.OUTPUT_TOKENS) request=RepairContext.compactCompletion(request,originalActions);
+            }
             if(!repair && edit.isEmpty() && GenerationContext.complete(observations,planned)) {
                 Integer full=model.allowance(meter,policy,request);
                 if(full==null || full<RuntimeBudget.OUTPUT_TOKENS) {
@@ -236,14 +241,16 @@ public final class AgentLoop implements TaskStageRunner {
         input.put("tools",completionOnly?List.of():registry.definitions().path("tools"));
         input.put("observations",repair?observations:GenerationContext.observations(observations));
         if(completionOnly) input.put("completionOnly",true);
-        edit.ifPresent(value -> input.put("editContext",value));
+        edit.ifPresent(value -> input.put("editContext",!repair&&local.isPresent()?LocalGenerationContext.projectBase(value,observations):value));
+        if(!repair&&local.isPresent()) input.put("editProgress",LocalGenerationContext.progress(local.get(),observations));
         if(repair) {input.put("failure",failure);input.put("completionProposal",Map.of("type","done","actions",originalActions));input.put("sourceFiles",repairContext.sourceFiles());
             input.put("repairAttempt",context.repairAttempts());input.put("repairProgress",repairContext.progress());
             if(completionOnly)input.put("completionOnly",true);
             local.ifPresent(value -> input.put("sourceFiles",LocalEditScope.files(repairContext.sourceFiles(),LocalEditScope.target(value))));
             input.put("budget",Map.of("modelCallsRemaining",RuntimeBudget.MODEL_CALLS-meter.models(),
                     "toolCallsRemaining",RuntimeBudget.TOOL_CALLS-meter.tools(),"tokensRemaining",RuntimeBudget.TOKENS-meter.chargedTokens()));}
-        return json.valueToTree(input);
+        JsonNode request=json.valueToTree(input);
+        return repair&&completionOnly?RepairContext.compactCompletion(request,originalActions):request;
     }
     /**
      * A successful GENERATE write is fed back with its own bytes, once they match both the actual afterDigest and
@@ -255,6 +262,7 @@ public final class AgentLoop implements TaskStageRunner {
         boolean current=actual.source()!=null && actual.source().files().stream().anyMatch(f -> f.path().equals(path) && f.digest().equals(digest));
         if(digest==null || !current || !digest.equals(sha256(content))) throw new AgentFailure("AGENT_CHECKPOINT_INVALID");
         var observed=(tools.jackson.databind.node.ObjectNode)projected.deepCopy();
+        observed.put("tool",name);observed.put("path",path);
         observed.put("committedContent",content);observed.put("contentOrigin","COMMITTED_WRITE_DIGEST_MATCHED");
         return observed;
     }
