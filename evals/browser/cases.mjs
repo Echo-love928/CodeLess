@@ -227,13 +227,22 @@ export async function behavior(page, id, expect) {
       await search.fill(name)
       for (const card of await cards.all()) {
         const current = await cardName(card)
-        expect(current).toContain(name)
+        if (id === 'CAT-03') await expect(card).toContainText(name)
+        else expect(current).toContain(name)
         if (id !== 'CAT-01') await expect(card).toContainText(category)
         else expect(initial.find(item => item.name === current)?.fields).toContain(category)
       }
       const excluded = initial.find(item => !categoryNames.has(item.name))
       expect(excluded).toBeTruthy()
-      await search.fill(excluded.name); await expect(cards).toHaveCount(0)
+      await search.fill(excluded.name)
+      // A name may also match another category's name/description (Atlas/AtlasTests).
+      // Every returned card must still belong to the selected category; require zero only
+      // when its initial visible values cannot possibly match the search term.
+      const term = excluded.name.toLocaleLowerCase()
+      const possibleMatch = initial.some(item => categoryNames.has(item.name)
+        && [item.name, ...item.fields].some(value => value.toLocaleLowerCase().includes(term)))
+      if (!possibleMatch) await expect(cards).toHaveCount(0)
+      for (const card of await cards.all()) expect(categoryNames.has(await cardName(card))).toBe(true)
       await search.fill('')
     }
     await search.fill('D21绝不存在的检索词')

@@ -23,7 +23,7 @@ after(async () => { await browser?.close() })
 function catalog(id, { labels = false, authorFirst = true, categoryFirst = false, searchType = 'text', combine = true,
   detailAuthor = true, nameOnly = true, nameControl = 'heading', categoryLabel = null, descriptionLabel = '简介', detailLayout = 'text',
   itemTag = 'article', sparse = false, namedDetail = false, cardLabelSeparator = '：', detailRating = '4.5', allLabel = '全部', brokenReset = false,
-  combinedFields = false, inlineDetail = false, categorySelect = false, detailLicense = 'MIT', missingDescription = false } = {}) {
+  combinedFields = false, inlineDetail = false, categorySelect = false, detailLicense = 'MIT', missingDescription = false, nameOverlap = false } = {}) {
   const count = { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
   const categories = id === 'CAT-01' ? ['小说', '科技', '历史'] : id === 'CAT-02' ? ['西湖区', '上城区', '拱墅区'] : ['构建', '测试', '文档']
   return `<!doctype html><html lang="zh"><meta charset="utf-8"><body><h1>独立目录实现</h1>
@@ -31,7 +31,8 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
     <section aria-label="详情" hidden><h2>详情</h2><div></div></section><p id="empty" hidden>没有匹配的工具</p>
     <script>
     const id=${JSON.stringify(id)}, categories=${JSON.stringify(categories)}, labels=${labels}, authorFirst=${authorFirst};
-    const items=Array.from({length:${count}},(_,i)=>({name:'名称'+i,author:'作者值'+i,category:categories[i%3],description:'简介值'+i}));
+    const names=['Atlas','AtlasTests','AtlasDocs','Bundler','SpecRunner','Guidebook','Compressor','BrowserRunner','Reference'];
+    const items=Array.from({length:${count}},(_,i)=>({name:${nameOverlap}?names[i]:'名称'+i,author:'作者值'+i,category:categories[i%3],description:${nameOverlap}&&i===4?'Atlas compatible utilities':'简介值'+i}));
     const main=document.querySelector('main'), search=document.querySelector('input'), nav=document.querySelector('nav');let detail=document.querySelector('section');
     let category='全部', selectedName='';
     function show(item){selectedName=item.name;detail.hidden=false;if(${inlineDetail})main.querySelectorAll('${itemTag}')[items.indexOf(item)%main.children.length]?.append(detail);const values=[item.name,${detailAuthor ? 'item.author' : "'错误作者'"},item.category,item.description,${JSON.stringify(detailRating)},${JSON.stringify(detailLicense)}],body=detail.querySelector('div');body.replaceChildren();
@@ -130,6 +131,10 @@ test('TASK-02: nested column layout still rejects a task that never moves', asyn
 for(const options of [{},{detailLicense:'Wrong license'},{missingDescription:true},{combine:false}])test('CAT-03: combined metadata, inline details and category select '+JSON.stringify(options),async()=>{
   const result=await check('CAT-03',catalog('CAT-03',{combinedFields:true,inlineDetail:true,categorySelect:true,...options}),'inline-catalog-'+Object.keys(options).join('-'))
   assert.equal(result.status,Object.keys(options).length?'FAILED':'PASSED',JSON.stringify(result))
+})
+for(const combine of [true,false])test('CAT-03: overlapping names across categories preserve AND filtering '+combine,async()=>{
+  const result=await check('CAT-03',catalog('CAT-03',{nameOverlap:true,combine,categorySelect:true}),'overlapping-names-'+combine)
+  assert.equal(result.status,combine?'PASSED':'FAILED',JSON.stringify(result))
 })
 
 const targetMapping = () => ({ protocol: 'codeless-component-mapping/v1', versionId: '00000000-0000-4000-8000-000000000001',
