@@ -21,12 +21,13 @@ test('D21-B-T1: fixed nine requirements, each category has three; missing record
 test('D21-B-T2: six requests retain only server-resolved selection fields', () => {
   assert.equal(edits.length, 6)
   for (const edit of edits) {
-    const selection = { versionId: '00000000-0000-4000-8000-000000000001', sourceDigest: sha('frozen'), componentId: edit.componentId, sourceFile: edit.file, selectable: true, shared: true, scope: 'SOURCE_FILE' }
-    const request = requestFor(edit, selection)
+    const selection = { versionId: '00000000-0000-4000-8000-000000000001', sourceDigest: sha('frozen'), componentId: 'renamed-target', sourceFile: 'src/components/PortfolioPanel.vue', selectable: true, shared: true, scope: 'SOURCE_FILE' }
+    const mapping = { protocol: 'codeless-component-mapping/v1', versionId: selection.versionId, sourceDigest: selection.sourceDigest, components: [{ componentId: selection.componentId, sourceFile: selection.sourceFile, scope: selection.scope, fileDigest: sha('file') }], disabled: [] }
+    const request = requestFor(edit, selection, mapping)
     assert.deepEqual(Object.keys(request).sort(), ['baseVersionId', 'prompt', 'selection'])
     assert.deepEqual(Object.keys(request.selection).sort(), ['componentId', 'sourceDigest', 'versionId'])
-    assert.throws(() => requestFor(edit, { ...selection, sourceFile: 'src/pages/Foreign.vue' }))
-    assert.throws(() => requestFor(edit, { ...selection, selectable: false }))
+    assert.throws(() => requestFor(edit, { ...selection, sourceFile: 'src/pages/Foreign.vue' }, mapping))
+    assert.throws(() => requestFor(edit, { ...selection, selectable: false }, mapping))
   }
 })
 test('D21-B-T2: target must change; unrelated modifications, additions, deletions and no-op fail', () => {

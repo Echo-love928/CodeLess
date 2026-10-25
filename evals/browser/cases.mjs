@@ -1,3 +1,4 @@
+import { namePattern, createTaskName } from './names.mjs'
 // IDs and assertions follow D21-A requirements.json, frozen 2026-10-23.
 export const requirementsDigest = 'sha256:ef219f3e5c0f05f3ab03ec854c66b32709349f80d1e1aee0076fe19d2b91cb2a'
 export const cases = [
@@ -14,7 +15,7 @@ export const cases = [
 
 export async function behavior(page, id, expect) {
   const text = value => page.getByText(value, { exact: true })
-  const button = value => page.getByRole('button', { name: value, exact: true })
+  const button = value => page.getByRole('button', { name: namePattern(value) })
   const visible = async value => expect(text(value)).toBeVisible()
   const row = title => page.locator('li, article').filter({ has: text(title) }).last()
   const title = 'D21验收任务甲', other = 'D21验收任务乙'
@@ -23,7 +24,7 @@ export async function behavior(page, id, expect) {
     await control.click()
     await expect(row(name)).toBeVisible()
   }
-  const remove = async name => { await row(name).getByRole('button', { name: '删除', exact: true }).click(); await expect(row(name)).toHaveCount(0) }
+  const remove = async name => { await row(name).getByRole('button', { name: namePattern('删除') }).click(); await expect(row(name)).toHaveCount(0) }
   const reload = () => page.reload({ waitUntil: 'load' })
   if (id === 'SHOW-01') {
     await visible('Grace Hopper')
@@ -48,7 +49,7 @@ export async function behavior(page, id, expect) {
     const signup = await button('我要报名').boundingBox(), message = await text('报名意向已记录（演示）').boundingBox()
     expect(message.y).toBeGreaterThanOrEqual(signup.y + signup.height)
   } else if (id === 'SHOW-03') {
-    const section = page.locator('section').filter({ has: page.getByRole('heading', { name: '关于我', exact: true }) }).last()
+    const section = page.locator('section').filter({ has: page.getByRole('heading', { name: namePattern('关于我') }) }).last()
     await expect(section).toBeVisible()
     await button('作品集').click()
     await expect(section).not.toBeVisible()
@@ -70,17 +71,17 @@ export async function behavior(page, id, expect) {
     await reload(); await expect(row(title).getByRole('checkbox')).toBeChecked(); await expect(row(other)).toBeVisible()
     await remove(other); await reload(); await expect(row(other)).toHaveCount(0); await remove(title)
   } else if (id === 'TASK-02') {
-    const column = name => page.locator('section').filter({ has: page.getByRole('heading', { name, exact: true }) }).last()
+    const column = name => page.locator('section').filter({ has: page.getByRole('heading', { name: namePattern(name) }) }).last()
     for (const name of ['待开始', '进行中', '已完成']) await expect(column(name)).toBeVisible()
     // The frozen requirement specifies creating a task, not a particular button caption.
-    await add(title, page.getByRole('button', { name: /^(?:[+＋]\s*)?(?:添加|添加任务|新建|创建|新增|新建任务|创建任务|新增任务)$/ }))
+    await add(title, page.getByRole('button', { name: createTaskName }))
     await expect(column('待开始')).toContainText(title)
-    await row(title).getByRole('button', { name: '下一步', exact: true }).click()
+    await row(title).getByRole('button', { name: namePattern('下一步') }).click()
     await expect(column('进行中')).toContainText(title)
     await expect(column('待开始')).not.toContainText(title)
     await expect(row(title)).toHaveCount(1)
     await reload(); await expect(column('进行中')).toContainText(title)
-    await row(title).getByRole('button', { name: '下一步', exact: true }).click()
+    await row(title).getByRole('button', { name: namePattern('下一步') }).click()
     await expect(column('已完成')).toContainText(title)
     await expect(column('进行中')).not.toContainText(title)
     await reload(); await expect(column('已完成')).toContainText(title); await remove(title)

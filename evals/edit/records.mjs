@@ -3,7 +3,7 @@ import { lstat, readFile, mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { sha, safeFile } from '../browser/core.mjs'
 import { validateManifest } from '../../services/runner/src/mapping/manifest.mjs'
-import { edits } from './cases.mjs'
+import { edits, requestFor } from './cases.mjs'
 
 export const uuid = value => typeof value === 'string' && /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(value)
 const sourcePath = value => /^src\/(?:pages|components)\/[A-Za-z][A-Za-z0-9_-]*\.vue$|^src\/data\/[A-Za-z][A-Za-z0-9_-]*\.ts$/.test(value)
@@ -29,7 +29,7 @@ export function snapshotSource(value) {
   return manifest
 }
 
-function verified(value) {
+export function verified(value) {
   assert.equal(value.version.status, 'VERIFIED')
   const validation = value.snapshot.validation, report = validation?.report
   assert.equal(validation?.status, 'VERIFIED'); assert.equal(validation.sourceDigest, value.version.sourceDigest)
@@ -42,7 +42,7 @@ function verified(value) {
   assert.equal(validation.artifact.digest, validation.artifactDigest)
 }
 
-export function validateEditRecord(record, edit, base, batch, trustedMapping) {
+export function validateEditRecord(record, edit, base, batch, trustedMapping, selection) {
   assert.equal(record.schemaVersion, 1); assert.equal(record.sampleId, edit.id)
   assert.equal(record.batchId, batch.batchId); assert.equal(record.mode, batch.mode)
   assert.equal(record.collection.kind, 'PLATFORM_API')
@@ -59,12 +59,13 @@ export function validateEditRecord(record, edit, base, batch, trustedMapping) {
   assert.equal(record.before.version.buildId, base.version.buildId)
   const before = snapshotSource(record.before); verified(record.before)
   validateManifest(record.before.mapping, trustedMapping)
-  const mapping = trustedMapping.components.find(c => c.componentId === edit.componentId && c.sourceFile === edit.file)
+  requestFor(edit, selection, trustedMapping)
+  const mapping = trustedMapping.components.find(c => c.componentId === selection.componentId && c.sourceFile === selection.sourceFile)
   assert.ok(mapping, 'Target is not selectable in the rebuilt trusted mapping')
-  assert.equal(mapping.fileDigest, before.find(f => f.path === edit.file)?.digest)
-  assert.equal(source.type, 'COMPONENT'); assert.equal(source.componentId, edit.componentId)
+  assert.equal(mapping.fileDigest, before.find(f => f.path === mapping.sourceFile)?.digest)
+  assert.equal(source.type, 'COMPONENT'); assert.equal(source.componentId, mapping.componentId)
   assert.equal(source.versionId, baseVersionId); assert.equal(source.sourceDigest, base.version.sourceDigest)
-  assert.equal(source.sourceFile, edit.file)
+  assert.equal(source.sourceFile, mapping.sourceFile)
   // REAL provenance comes from the captured task-specific audit, not a mode label.
   const audit = record.modelCalls
   assert.equal(audit.page, 0); assert.equal(audit.size, 100)
@@ -112,9 +113,7 @@ export function editBlocker(edit, base, mapping) {
   if (!base) return { failure: 'BASE_RECORD_MISSING', blockedBy: edit.base }
   if (base.platform !== 'READY') return { failure: 'BASE_GENERATION_FAILED', blockedBy: edit.base, baseFailureCode: base.platformFailureCode ?? null }
   if (base.build?.status !== 'SUCCEEDED') return { failure: 'BASE_REPLAY_FAILED', blockedBy: edit.base }
-  const file = mapping?.components.find(c => c.sourceFile === edit.file)
-  if (!file || file.componentId !== edit.componentId) return { failure: 'COMPONENT_MAPPING_UNAVAILABLE', blockedBy: edit.base,
-    mappingReason: mapping?.disabled.find(c => c.sourceFile === edit.file)?.reason ?? (file ? 'COMPONENT_ID_MISMATCH' : 'TARGET_FILE_UNMAPPED') }
+  if (!mapping) return { failure: 'COMPONENT_MAPPING_UNAVAILABLE', blockedBy: edit.base, mappingReason: 'CATALOG_UNAVAILABLE' }
   return { failure: 'EDIT_TASK_RECORD_REQUIRED', blockedBy: null }
 }
 

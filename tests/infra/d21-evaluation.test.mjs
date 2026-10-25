@@ -44,16 +44,20 @@ test('D21-B MOCK API record collection and six independent Docker/browser edit r
   const { edits } = await import('../../evals/edit/cases.mjs')
   const directory = join(cwd, '.local-data/d21-b/edits', randomUUID().slice(0, 8))
   await mkdir(directory, { recursive: true })
-  const catalog = JSON.parse(await readFile(join(fixtureReport.fixtureBuild.artifact.directory, 'ai-component-catalog.json')))
+  const build = await createBuildRunner({ workRoot: join(directory, 'work'), artifactRoot: join(directory, 'artifacts') })
+  const rootFixture = await mockRecord(t, 'EDIT-01', true)
+  const rootBuild = await build(rootFixture.source)
+  assert.equal(rootBuild.status, 'SUCCEEDED')
+  const catalog = JSON.parse(await readFile(join(rootBuild.artifact.directory, 'ai-component-catalog.json')))
   const roots = new Map(), previous = new Map(), records = [], loaded = { batch: null, rows: [] }, rows = [], mappings = new Map(), responses = new Map()
   for (const edit of edits) {
-    const f = await mockRecord(t, edit.id); loaded.batch ??= f.batch
+    const f = await mockRecord(t, edit.id, true); loaded.batch ??= f.batch
     if (!roots.has(edit.base)) {
       f.mapping = bindCatalog({ catalog, sourceManifest: { files: f.record.before.snapshot.files, digest: f.record.before.version.sourceDigest },
         versionId: f.record.before.version.id, sourceDigest: f.record.before.version.sourceDigest })
       f.record.before.mapping = f.mapping
       roots.set(edit.base, f); mappings.set(edit.base, f.mapping)
-      loaded.rows.push({ sampleId: edit.base, ...f.base }); rows.push({ sampleId: edit.base, platform: 'READY', build: fixtureReport.fixtureBuild })
+      loaded.rows.push({ sampleId: edit.base, ...f.base }); rows.push({ sampleId: edit.base, platform: 'READY', build: rootBuild })
     }
     const root = roots.get(edit.base), r = f.record
     r.before = previous.has(edit.base) ? structuredClone(previous.get(edit.base)) : root.record.before
@@ -62,7 +66,7 @@ test('D21-B MOCK API record collection and six independent Docker/browser edit r
     r.before.mapping = bindCatalog({ catalog: currentCatalog, sourceManifest: { files: r.before.snapshot.files, digest: r.before.version.sourceDigest },
       versionId: r.before.version.id, sourceDigest: r.before.version.sourceDigest })
     for (const file of r.before.files) await writeFile(join(f.candidate, file.path), file.content)
-    await changeFixture(f.candidate, edit); await refreshSnapshot(r.after, f.candidate)
+    await changeFixture(f.candidate, f.edit); await refreshSnapshot(r.after, f.candidate)
     r.edit.baseVersionId = r.before.version.id
     r.edit.source.versionId = r.before.version.id; r.edit.source.sourceDigest = r.before.version.sourceDigest
     r.edit.task.applicationId = r.before.version.applicationId
@@ -85,7 +89,6 @@ test('D21-B MOCK API record collection and six independent Docker/browser edit r
   const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => /^(PATH|SYSTEMROOT|WINDIR|USERPROFILE|HOME|TEMP|TMP|LOCALAPPDATA|PLAYWRIGHT_BROWSERS_PATH|LANG)$/i.test(k)))
   const browser = await chromium.launch({ headless: true, env })
   try {
-    const build = await createBuildRunner({ workRoot: join(directory, 'work'), artifactRoot: join(directory, 'artifacts') })
     const result = await replayEdits({ loaded, rows, mappings, records: await loadEditRecords(bundle, loaded.batch), build, browser, output: directory,
       // This test's named fixture has all nine examples behind a query selector.
       // Real records always use the unmodified, query-free production inspector.
@@ -95,6 +98,8 @@ test('D21-B MOCK API record collection and six independent Docker/browser edit r
       } })
     await writeFile(join(directory, 'report.json'), JSON.stringify({ mode: 'MOCK', realEditsExecuted: 0, additionalModelRequests: 0, edits: result }, null, 2))
     console.log(JSON.stringify({ editRecordReplay: directory, mode: 'MOCK', passed: result.filter(r => r.passed).length, total: result.length }))
+    assert.equal(result.find(r => r.sampleId === 'EDIT-02').targetFile, 'src/components/PortfolioTile.vue')
+    assert.equal(result.find(r => r.sampleId === 'EDIT-01').componentId, 'profile-shell')
     assert.ok(result.every(r => r.mode === 'MOCK' && r.passed && r.scope.passed && r.beforeVersionId !== r.afterVersionId), JSON.stringify(result))
   } finally { await browser.close() }
 })

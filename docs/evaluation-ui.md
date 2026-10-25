@@ -85,22 +85,23 @@ TASK-02 创建按钮接受运行前冻结的文案“添加 / 添加任务 / 新
 `evals/edit/cases.mjs` 冻结六个 prompt：姓名文案、卡片正文颜色、24px 内边距、报名按钮文案、
 三张共享卡片16px圆角、任务页标题。源码边界是选中的整个 SOURCE_FILE，所有共享实例同时修改；不承诺 AST/单实例精度。
 
-`requestFor` 只接受匹配组件/文件/版本/摘要的 selectable、shared、SOURCE_FILE 选择响应，输出现有
-`POST /api/v0/applications/{applicationId}/component-edits` 三字段 payload。
-路径不进入 selection，也没有发布或执行命令字段。实际提交仍需 owner 会话、CSRF、独立幂等键及用户确认共享影响。
+B 先按标题、报名按钮及三个冻结作品标题所在卡片定位语义目标，读取最近组件根的候选 ID，
+再用该版本源码重建出的可信 catalog 解析文件，并与服务端映射逐项核对。真实流程不使用固定 ID、文件名或初始样式；
+`fixture`/`fixtureBefore` 仅供 MOCK 源码写入器使用。中文可访问名称允许 flex/block 子元素间的显示空白，完整标签与英文词边界仍严格匹配。
+
+`requestFor` 对实际选择及可信映射核验后，只输出现有 component-edits 三字段 payload，不传 sourceFile。
+共享目标必须归于同一个 SOURCE_FILE。目标已满足要求、定位不匹配、缺/禁用标识及缺任务记录分别报告，未执行保持 null。
 
 ```sh
-node evals/edit/requests.mjs EDIT-01 /absolute/private/selection.json
+node evals/edit/requests.mjs EDIT-01 /absolute/private/selection.json /absolute/private/rebuilt-mapping.json
 ```
 
-fixture 每项从同一不可变基线独立复制：先核验基线 DOM/CSS，修改指定文件后真实构建再核验目标 DOM/CSS，
-用前后所有文件 SHA256 及完整路径集合检查只有目标发生变化。新增/删除/误改无关文件、无变化、缺失清单均失败。
-颜色/间距/圆角遍历全部共享实例；文案保留作品，按钮保留报名行为，任务标题编辑后重跑增删/计数/持久化。
-基线 CSS 是明确 fixture 的12px/4px/黑色值，不能直接当作其他真实版本的基线。
+前后版本均真实重建，观察实际基线并核验目标变化；卡片正文颜色遍历段落，内边距检查四边，共享圆角覆盖三个实例。
+作品标题/说明、报名行为、任务增删/计数/持久化保留。完整源码路径集合与 SHA256 证明只有选中文件变化。
+实际任务、不可变版本、完整账本及前后快照接入后才能认定真实编辑；MOCK 6/6 不计入 REAL。
 
-真实编辑需服务器认可的映射、实际编辑任务/版本和前后快照。A 的批次目前只有生成记录；
-B 会读取重建后的可信 catalog，记录每项编辑的可选中性。
-未发起的真实编辑保留 `passed:null / NOT_EXECUTED`，不把fixture的6/6转写为真实模型成绩。
+**实时交接、预检、逐项执行及销毁前采集方式见 [真实编辑交接协议](evaluation-edit-handoff.md)。**
+B 已实现只读 `handoff.mjs`，原始批次 ID 不足以证明运行时仍可编辑；A 需要确认保留入口与窗口。
 
 ## A 批次自动采集
 

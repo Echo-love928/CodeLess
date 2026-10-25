@@ -60,7 +60,8 @@ export function summarize(rows, ids = cases.map(c => c.id)) {
 }
 
 export async function loadBatch(directory) {
-  const batch = await readJSON(await safeFile(directory, 'batch.json'))
+  const batchBytes = await readFile(await safeFile(directory, 'batch.json'))
+  const batch = JSON.parse(batchBytes)
   assert.ok(['REAL', 'MOCK'].includes(batch.mode) && /^[A-Za-z0-9_.-]+$/.test(batch.batchId))
   assert.ok(batch.mode !== 'REAL' || (batch.realModelEvidence === true && batch.provider.id !== 'deterministic-mock'))
   const frozen = await readFile(await safeFile(directory, 'frozen/requirements.json'))
@@ -85,5 +86,5 @@ export async function loadBatch(directory) {
     const source = final ? record.sources.find(s => s.versionId === final.id) : null
     rows.push({ sampleId: id, mode: batch.mode, record, invocation, version: final, source, rawDigest: sha(await readFile(await safeFile(directory, `samples/${id}/record.json`))) })
   }
-  return { batch, rows }
+  return { batch, batchDigest: sha(batchBytes), rows }
 }

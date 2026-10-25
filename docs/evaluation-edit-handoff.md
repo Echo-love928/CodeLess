@@ -1,0 +1,69 @@
+# 真实编辑交接：B 消费端协议
+
+本文件规定 B 已实现的接收、预检和验收方式，供 A 确认并交付。**尚未收到 A 对运行时保留方式的确认，也没有新的真实编辑记录。** 批次 ID 或源码 ZIP 本身不表示可在线编辑，预检通过也不是编辑验收通过。
+
+## A 需要交付的输入
+
+完整的 14 样本原始生成批次保持不变，包含九个需求、三个代码故障、两个环境故障、调用账本、失败及未知 usage。B 的生成分母仍为九，不因失败缺样而缩小。
+
+六项编辑需要 SHOW-01、SHOW-02、TASK-01 的原始 VERIFIED 版本。交接应同时包含：
+
+- 原始批次、提交号、原始文件 SHA256 清单；三个样本的 applicationId / generation taskId / versionId / buildId / sourceDigest。
+- 可访问这些**原版本**的 API、所有者会话和逐任务模型账本的管理员读取权限。会话和凭据单独通过私密渠道提供，只在环境变量中使用，禁止放入 PR、JSON、截图或归档。
+- 运行时及不可变源码、构建、映射、验证和调用账本的保留约定：A 在 B 完成全部终态记录采集并确认归档摘要前不销毁数据库和文件。需要 A 明确确认保留责任人及可用窗口；B 的只读预检不能保证未来仍在线。
+
+可选方式是双方在同一个仍存活的 API 运行时中完成实际任务并执行采集，再交付七文件采集包。必须先有真实 component-edits 任务和服务端 API 记录，之后才允许销毁数据库。现有 GenerationEvalIT 的逐样本临时数据库会退出即销毁，而且不提供这个在线 API；A 需要为新批次提供上述保留/同场采集入口。B 不会把源码导入另一个应用后冒称原版本，也不会给原源码补标识或制造编辑任务。
+
+## 定位及六项操作
+
+| 编辑 | 原始需求 | 页面语义 | 修改目标 | 同应用前项 |
+| --- | --- | --- | --- | --- |
+| EDIT-01 | SHOW-01 | 姓名标题 Grace Hopper | 文案变为 Grace Hopper · 计算机先驱 | 无 |
+| EDIT-02 | SHOW-01 | 三个冻结作品标题所在卡片 | 正文颜色 #1d4ed8 | EDIT-01 |
+| EDIT-03 | SHOW-01 | 同上 | 四边内边距均为 24px | EDIT-02 |
+| EDIT-04 | SHOW-02 | 报名按钮 | 文案立即报名，确认行为保留 | 无 |
+| EDIT-05 | SHOW-01 | 三个冻结作品标题所在卡片 | 三个实例圆角均为 16px，标题与说明保留 | EDIT-03 |
+| EDIT-06 | TASK-01 | 个人待办清单标题 | 文案我的每日任务，增删/计数/持久化保留 | 无 |
+
+六个原始 prompt 不变，见 `evals/edit/cases.mjs`。B 从语义 DOM 读取最近组件根的候选 ID，随后只用**从该不可变源码真实重建出的 catalog**解析 sourceFile，并核对服务端映射。ID、文件名和初始 CSS 均可改变；正文卡片可以属于同一个页面组件，三个共享目标必须解析为同一个可信源码组件。DOM 声明的文件路径不参与解析。fixture 文件布局只供 MOCK 源码写入器使用。
+
+找不到语义元素记 LOCATOR_UNMATCHED；缺标识、未知 ID、禁用/重复映射及目标归属不一致分别记录 mappingReason。原生成失败、重建失败、缺编辑任务记录也分别保留。未执行仍为 `passed:null / NOT_EXECUTED`；已有记录但无法验证记 BLOCKED_VALIDATION。初始样式已经满足要求时记 BASELINE_ALREADY_MATCHES，不伪造一次可观察的编辑效果。
+
+## B 的可执行步骤
+
+先用原始批次重建并独立评测，命令可因真实失败退出 1，仍保留完整 report.json：
+
+```sh
+node evals/browser/record-command.mjs batch /absolute/private/A-batch
+```
+
+在运行时仍存活时设置 CODELESS_EVAL_API_URL（完整 `/api/v0/` 结尾）、CODELESS_EVAL_SESSION_COOKIE 和 CODELESS_EVAL_AUDIT_SESSION_COOKIE，然后预检：
+
+```sh
+node evals/edit/handoff.mjs /absolute/private/A-batch /absolute/private/B-run/report.json /absolute/private/new-preflight
+```
+
+预检只 GET，核验 API 当前版本、原 task/version/build/source 关联、前快照全部文件和摘要、验证报告、映射以及审计权限。任何缺失/不匹配都保留 BLOCKED，真实请求为 0。API 使用正常 TLS 校验，不跟随重定向，回环 HTTP 之外只允许 HTTPS。修复证书替换及真实证书链、12/12 探针由环境侧/A 处理；B 不修改 TLS/JDK/代理设置。
+
+`handoff.json` 给出六个固定 prompt、实际 selection、依赖关系和初始能力检查结果。**六个初始 payload 不可同时提交**：同应用依次执行 EDIT-01→02→03→05，每次采集后将已证明的 after 作为下一项 current。EDIT-04、06 使用各自的应用。对待执行项重新运行 B 的重放/语义探测，生成基于最新已证明版本的 selection；`requests.mjs` 只构造 payload，不发 POST：
+
+```sh
+node evals/edit/requests.mjs EDIT-02 /absolute/private/current-selection.json /absolute/private/current-rebuilt-mapping.json
+```
+
+selection 和 trustedMapping 来自 B report 对应项，不接受模型提出的路径。实际组件编辑通过平台 UI 或已有 component-edits 接口提交，沿用所有者会话、CSRF、独立幂等键和 SOURCE_FILE/共享实例提示。提交者即时记录 sampleId/taskId；不自动重发不确定的付费请求。若前项失败，保留该失败并停止依赖项，不偷偷回退/恢复版本或改变样本。
+
+任务终态后，在运行时销毁前填写 task-index.json（READY 必须填写其真实 versionId；FAILED 无版本则 null）：
+
+```json
+{"batchId":"真实批次ID","mode":"REAL","tasks":[{"sampleId":"EDIT-01","taskId":"实际任务UUID","versionId":"实际版本UUID或null"}]}
+```
+
+```sh
+node evals/edit/collect.mjs /absolute/private/A-batch /absolute/private/task-index.json /absolute/private/new-records
+node evals/browser/record-command.mjs batch /absolute/private/A-batch --edit-records /absolute/private/new-records
+```
+
+每次采集使用新目录；可先归档前缀任务，再在新目录采集完整索引。采集器逐项保存 index 和记录，后项读取失败也不会丢失先前记录的索引。最多六项；`index.json` 和每项 EDIT-0N.json 按 SHA256 关联，记录中包含真实服务端 task/source、前后不可变版本及全部源码、映射、验证和完整逐任务账本。失败任务和未知用量不删除；重复任务、跨样本/应用/版本/provider、伪造摘要、缺账本均拒绝。
+
+最终 B 会重新构建前后版本，验证目标实际变化、全部共享实例、任务行为及无关文件字节稳定。离线重建是独立行为验收；真正发生编辑必须由上述平台任务/版本/调用记录证明。MOCK 集成测试不得进入 REAL 成绩。保存每次失败和未知数据后才汇总九项行为、六项编辑并增量互审。旧 CI 单次 fixture 5/6 继续是 **UNATTRIBUTED（未归因）**。

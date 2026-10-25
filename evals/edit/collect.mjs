@@ -8,6 +8,17 @@ import { loadBatch, sha } from '../browser/core.mjs'
 import { edits } from './cases.mjs'
 import { uuid, snapshotSource } from './records.mjs'
 
+export async function readPlatformSnapshot(get, id) {
+  assert.ok(uuid(id))
+  const version = await get('versions/' + id), snapshot = await get('versions/' + id + '/snapshot'), files = []
+  assert.ok(Array.isArray(snapshot.files) && snapshot.files.length <= 40)
+  for (const file of snapshot.files) {
+    assert.match(file.path, /^src\/(?:pages|components)\/[A-Za-z][A-Za-z0-9_-]*\.vue$|^src\/data\/[A-Za-z][A-Za-z0-9_-]*\.ts$/)
+    files.push(await get('versions/' + id + '/files/content?path=' + encodeURIComponent(file.path)))
+  }
+  const result = { version, snapshot, files }; snapshotSource(result); return result
+}
+
 export async function collect(batch, requests, destination, get) {
   assert.equal(requests.batchId, batch.batchId); assert.equal(requests.mode, batch.mode)
   assert.ok(Array.isArray(requests.tasks) && requests.tasks.length <= 6)
@@ -19,16 +30,9 @@ export async function collect(batch, requests, destination, get) {
   }
   await mkdir(destination, { recursive: false })
   const index = { schemaVersion: 1, batchId: batch.batchId, mode: batch.mode, records: [] }
-  const snapshot = async id => {
-    const version = await get('versions/' + id), snapshot = await get('versions/' + id + '/snapshot'), files = []
-    assert.ok(Array.isArray(snapshot.files) && snapshot.files.length <= 40)
-    for (const file of snapshot.files) {
-      // Validate before constructing a request from a server-provided path.
-      assert.match(file.path, /^src\/(?:pages|components)\/[A-Za-z][A-Za-z0-9_-]*\.vue$|^src\/data\/[A-Za-z][A-Za-z0-9_-]*\.ts$/)
-      files.push(await get('versions/' + id + '/files/content?path=' + encodeURIComponent(file.path)))
-    }
-    const result = { version, snapshot, files }; snapshotSource(result); return result
-  }
+  const snapshot = id => readPlatformSnapshot(get, id)
+  // A later API failure must not orphan already captured immutable records.
+  await writeFile(resolve(destination, 'index.json'), JSON.stringify(index, null, 2) + '\n', { flag: 'wx' })
   for (const request of requests.tasks) {
     const edit = await get('tasks/' + request.taskId + '/edit')
     assert.equal(edit.task.id, request.taskId); assert.ok(uuid(edit.baseVersionId))
@@ -43,8 +47,8 @@ export async function collect(batch, requests, destination, get) {
     const raw = JSON.stringify(record, null, 2) + '\n'
     await writeFile(resolve(destination, request.sampleId + '.json'), raw, { flag: 'wx' })
     index.records.push({ sampleId: request.sampleId, digest: sha(raw) })
+    await writeFile(resolve(destination, 'index.json'), JSON.stringify(index, null, 2) + '\n')
   }
-  await writeFile(resolve(destination, 'index.json'), JSON.stringify(index, null, 2) + '\n', { flag: 'wx' })
   return index
 }
 

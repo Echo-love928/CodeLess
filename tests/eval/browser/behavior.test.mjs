@@ -6,7 +6,9 @@ import { randomUUID } from 'node:crypto'
 import { chromium } from '@playwright/test'
 import { inspect } from '../../../evals/browser/browser.mjs'
 import { sha } from '../../../evals/browser/core.mjs'
-import { edits, editTarget } from '../../../evals/edit/cases.mjs'
+import { edits, editTarget, observeTarget, workTitles } from '../../../evals/edit/cases.mjs'
+import { resolveTarget, alreadyMatches } from '../../../evals/edit/targets.mjs'
+import { namePattern, createTaskName } from '../../../evals/browser/names.mjs'
 
 let browser
 const output = join(process.cwd(), '.local-data/d21-b/behavior-controls', randomUUID())
@@ -46,13 +48,15 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
     </script></body></html>`
 }
 
-function tasks(label) {
+function tasks(label, { split = false, wrongNext = false } = {}) {
   return `<!doctype html><html lang="zh"><meta charset="utf-8"><body><h1>独立看板实现</h1><input aria-label="标题"/><button id="create">${label}</button><main></main><script>
     let items=JSON.parse(localStorage.getItem('independent-board')||'[]');
     const input=document.querySelector('input'),main=document.querySelector('main');
     function render(){localStorage.setItem('independent-board',JSON.stringify(items));main.replaceChildren();
       ['待开始','进行中','已完成'].forEach((name,index)=>{const section=document.createElement('section'),heading=document.createElement('h2'),list=document.createElement('ul');heading.textContent=name;section.append(heading,list);main.append(section);
         for(const item of items.filter(item=>item.stage===index)){const row=document.createElement('li'),title=document.createElement('span'),next=document.createElement('button'),remove=document.createElement('button');title.textContent=item.title;next.textContent='下一步';remove.textContent='删除';next.onclick=()=>{item.stage=Math.min(2,item.stage+1);render()};remove.onclick=()=>{items=items.filter(other=>other!==item);render()};row.append(title,next,remove);list.append(row)}})}
+    function splitNames(){if(!${split})return;for(const node of document.querySelectorAll('button,h2')){if(node.dataset.split)continue;node.dataset.split='yes';node.style.display='flex';const text=node.textContent;node.replaceChildren(...[...text].map(c=>{const span=document.createElement('span');span.textContent=c;return span}))}}
+    const originalRender=render;render=()=>{originalRender();if(${wrongNext})for(const b of document.querySelectorAll('main button'))if(b.textContent==='下一步')b.textContent='下一步全部';splitNames()};
     document.querySelector('#create').onclick=()=>{items.push({title:input.value,stage:0});input.value='';render()};render();
     </script></body></html>`
 }
@@ -83,9 +87,75 @@ test('late mount: a permanently empty page is still a white screen', async () =>
 })
 
 test('uniform padding rejects changing only the top edge', async () => {
-  const result = await custom('<!doctype html><html><body><article style="padding:12px;padding-top:24px">Card</article></body></html>',
+  const result = await custom('<!doctype html><html><meta charset="utf-8"><body>' + workTitles.map(title => `<article style="padding:12px;padding-top:24px"><h3>${title}</h3><p>Description</p></article>`).join('') + '</body></html>',
     'partial-padding', (page, expect) => editTarget(page, edits.find(e => e.id === 'EDIT-03'), expect))
   assert.equal(result.status, 'FAILED'); assert.equal(result.failure, 'BEHAVIOR_ERROR')
+  assert.match(result.error, /12px/)
+})
+
+test('accessible-name normalization preserves full labels and Latin word boundaries', () => {
+  assert.ok(namePattern('买牛奶未完成').test('买 牛 奶 未 完 成'))
+  assert.ok(namePattern('Grace Hopper').test('Grace\u00a0Hopper'))
+  assert.ok(!namePattern('Grace Hopper').test('GraceHopper'))
+  assert.ok(!namePattern('下一步').test('下一步全部'))
+  assert.ok(createTaskName.test('＋ 新 建 任 务')); assert.ok(!createTaskName.test('批量新建任务'))
+})
+
+test('TASK-02: flex children insert accessible-name spaces in buttons and headings', async () => {
+  const result = await check('TASK-02', tasks('+ 新建任务', { split: true }), 'flex-accessible-names')
+  assert.equal(result.status, 'PASSED', JSON.stringify(result))
+})
+
+test('TASK-02: whitespace normalization does not accept a different action', async () => {
+  const result = await check('TASK-02', tasks('新建任务', { split: true, wrongNext: true }), 'wrong-flex-name')
+  assert.equal(result.status, 'FAILED'); assert.equal(result.failure, 'BEHAVIOR_ERROR')
+})
+
+const targetMapping = () => ({ protocol: 'codeless-component-mapping/v1', versionId: '00000000-0000-4000-8000-000000000001',
+  sourceDigest: sha('source'), components: [{ componentId: 'portfolio-unit', sourceFile: 'src/components/ProjectTile.vue', fileDigest: sha('file'), scope: 'SOURCE_FILE' }], disabled: [] })
+
+test('semantic cards select an arbitrary trusted ID/path and observe actual baseline styles', async () => {
+  let selected, observed
+  const html = '<html><meta charset="utf-8"><body>' + workTitles.map(title => `<article data-ai-component="portfolio-unit" data-ai-source-file="src/pages/Forged.vue" style="padding:7px;color:purple;border-radius:9px"><h3>${title}</h3><p>Description</p></article>`).join('') + '</body></html>'
+  const result = await custom(html, 'semantic-renamed-cards', async (page, expect) => {
+    observed = await observeTarget(page, edits[2], expect)
+    selected = resolveTarget(observed, targetMapping())
+  })
+  assert.equal(result.status, 'PASSED', JSON.stringify(result))
+  assert.equal(selected.selection.sourceFile, 'src/components/ProjectTile.vue')
+  assert.ok(observed.every(v => Object.values(v.css).every(value => value === '7px')))
+  assert.equal(alreadyMatches(edits[2], observed), false)
+  assert.equal(alreadyMatches(edits[2], observed.map(v => ({ ...v, css: { 'padding-top': '24px', 'padding-right': '24px', 'padding-bottom': '24px', 'padding-left': '24px' } }))), true)
+})
+
+test('candidate IDs never bypass disabled, unknown, missing or different shared components', () => {
+  const mapping = targetMapping(), observations = [{ candidateId: 'portfolio-unit' }]
+  assert.equal(resolveTarget([{ candidateId: null }], mapping).mappingReason, 'MISSING_COMPONENT_ID')
+  assert.equal(resolveTarget([{ candidateId: 'forged' }], mapping).mappingReason, 'UNKNOWN_COMPONENT_ID')
+  const disabled = { ...mapping, components: [], disabled: [{ sourceFile: mapping.components[0].sourceFile, componentId: 'portfolio-unit', reason: 'DUPLICATE_COMPONENT_ID' }] }
+  assert.equal(resolveTarget(observations, disabled).mappingReason, 'DUPLICATE_COMPONENT_ID')
+  mapping.components.push({ ...mapping.components[0], sourceFile: 'src/components/Other.vue', componentId: 'other-unit' })
+  assert.equal(resolveTarget([...observations, { candidateId: 'other-unit' }], mapping).mappingReason, 'TARGET_COMPONENTS_DIFFER')
+})
+
+test('card body color may be applied to paragraph children instead of their container', async () => {
+  const html = '<html><meta charset="utf-8"><body>' + workTitles.map(title => `<article style="color:black"><h3>${title}</h3><p style="color:rgb(29,78,216)">Description</p></article>`).join('') + '</body></html>'
+  const result = await custom(html, 'semantic-body-color', (page, expect) => editTarget(page, edits[1], expect))
+  assert.equal(result.status, 'PASSED', JSON.stringify(result))
+})
+
+test('semantic heading/button targets resolve to renamed component files, including spaced accessible names', async () => {
+  for (const id of ['EDIT-01', 'EDIT-04', 'EDIT-06']) {
+    const edit = edits.find(e => e.id === id), mapping = targetMapping(), tag = id === 'EDIT-04' ? 'button' : 'h2'
+    const label = edit.before.match(/[^\p{Script=Han}]+|\p{Script=Han}/gu).map(part => `<span>${part}</span>`).join('')
+    const html = `<html><meta charset="utf-8"><body><section data-ai-component="portfolio-unit"><${tag} style="display:flex">${label}</${tag}></section></body></html>`
+    let selected
+    const result = await custom(html, 'semantic-' + id, async (page, expect) => {
+      selected = resolveTarget(await observeTarget(page, edit, expect), mapping)
+    })
+    assert.equal(result.status, 'PASSED', JSON.stringify(result))
+    assert.equal(selected.selection.sourceFile, 'src/components/ProjectTile.vue')
+  }
 })
 
 for (const id of ['CAT-01', 'CAT-02', 'CAT-03']) {

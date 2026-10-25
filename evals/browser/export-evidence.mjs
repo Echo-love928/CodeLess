@@ -12,9 +12,15 @@ const browser = value => value ? { status: value.status, failure: value.failure,
   screenshot: value.screenshot, trace: value.trace } : null
 const build = value => value ? { status: value.status, exitCode: value.exitCode, failure: value.failure,
   imageId: value.imageId, artifactDigest: value.artifact?.digest ?? null, cleanup: value.cleanup } : null
-for (const path of process.argv.slice(2)) {
+const args = process.argv.slice(2)
+let label = ''
+if (args[0] === '--label') {
+  args.shift(); label = args.shift()
+  if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(label ?? '')) throw new Error('Invalid evidence label')
+}
+for (const path of args) {
   const full = resolve(path), report = await readJSON(full), directory = resolve(full, '..')
-  const name = report.mode === 'MOCK' ? 'fixture' : 'real-batch'
+  const name = (report.mode === 'MOCK' ? 'fixture' : 'real-batch') + (label ? '-' + label : '')
   const rows = report.rows.map(row => ({ sampleId: row.sampleId, mode: row.mode, taskId: row.taskId ?? null,
     versionId: row.versionId ?? null, sourceDigest: row.sourceDigest, rawDigest: row.rawDigest ?? null,
     platform: row.platform ?? 'FIXTURE', platformFailureCode: row.platformFailureCode ?? null,
@@ -22,6 +28,8 @@ for (const path of process.argv.slice(2)) {
   const edits = report.edits.map(row => ({ sampleId: row.sampleId, mode: row.mode, passed: row.passed,
     status: row.status ?? (row.passed ? 'PASSED' : 'FAILED'), failure: row.failure,
     blockedBy: row.blockedBy ?? null, mappingReason: row.mappingReason ?? null, baseFailureCode: row.baseFailureCode ?? null,
+    selection: row.selection ?? null, componentId: row.componentId ?? null, targetFile: row.targetFile ?? null,
+    baselineAlreadyMatches: row.baselineAlreadyMatches ?? null, baseline: row.baseline ?? null,
     taskId: row.taskId ?? null, beforeVersionId: row.beforeVersionId ?? null, afterVersionId: row.afterVersionId ?? null,
     rawDigest: row.rawDigest ?? null, usage: row.usage ?? null, platformFailureCode: row.platformFailureCode ?? null,
     mapping: row.mapping ?? null, scope: row.scope ?? null, beforeDigest: row.beforeDigest ?? null, afterDigest: row.afterDigest ?? null,

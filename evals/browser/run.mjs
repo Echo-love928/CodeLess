@@ -46,13 +46,13 @@ try {
     for (const edit of edits) {
       const candidate = join(output, edit.id, 'source'); await cp(source, candidate, { recursive: true })
       await changeFixture(candidate, edit)
-      const after = await manifest(candidate), scope = scopeDiff(before.files, after.files, edit.file), builtAfter = await build(candidate)
+      const after = await manifest(candidate), scope = scopeDiff(before.files, after.files, edit.fixture.file), builtAfter = await build(candidate)
       const route = cases.find(c => c.id === edit.base).route
       const baselineBrowser = await inspect(browser, built.artifact, { route, query: '?case=' + edit.base, output: join(output, edit.id, 'before'), action: (page, expect) => editTarget(page, edit, expect, 'before') })
       const browserResult = builtAfter.status === 'SUCCEEDED' ? await inspect(browser, builtAfter.artifact, { route, query: '?case=' + edit.base, output: join(output, edit.id, 'after'), action: async (page, expect) => {
         await editTarget(page, edit, expect)
         if (edit.base === 'TASK-01') await behavior(page, edit.base, expect)
-        if (edit.file.endsWith('WorkCard.vue')) for (const title of ['Harvard Mark I 编程','A-0 编译器','COBOL 标准化']) await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible()
+        if (edit.fixture.file.endsWith('WorkCard.vue')) for (const title of ['Harvard Mark I 编程','A-0 编译器','COBOL 标准化']) await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible()
       } }) : null
       const outcome = verdict({ platform: 'READY', build: builtAfter, browser: browserResult, scope })
       report.edits.push({ sampleId: edit.id, mode: 'MOCK', request: edit.prompt, beforeDigest: before.digest, afterDigest: after.digest, scope, build: builtAfter, baselineBrowser, browser: browserResult,

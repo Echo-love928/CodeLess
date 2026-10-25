@@ -2,19 +2,19 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 // Trusted deterministic Vue proposals only. No model provider or runtime quality claim.
-export async function fixture(root) {
+export async function fixture(root, { cardFile = 'src/components/WorkCard.vue', cardId = 'work-card', pageId = 'home-page', tasksId = 'tasks-page' } = {}) {
   await mkdir(join(root, 'src/pages'), { recursive: true })
   await mkdir(join(root, 'src/components'), { recursive: true })
   await mkdir(join(root, 'src/data'), { recursive: true })
-  await writeFile(join(root, 'src/components/WorkCard.vue'), `<script setup lang="ts">
+  await writeFile(join(root, cardFile), `<script setup lang="ts">
 defineProps<{ title: string }>()
 </script>
-<template><article data-ai-component="work-card"><h3>{{ title }}</h3><p>代表作品的说明</p></article></template>
+<template><article data-ai-component="${cardId}"><h3>{{ title }}</h3><p>代表作品的说明</p></article></template>
 <style scoped>article { color:rgb(0, 0, 0); padding:12px; border-radius:4px; border:1px solid #ccc; }</style>`)
   await writeFile(join(root, 'src/data/stable.ts'), 'export const unchanged = "unrelated data must stay byte-identical"\n')
   const source = `<script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import WorkCard from '../components/WorkCard.vue'
+import WorkCard from '../components/${cardFile.split('/').at(-1)}'
 const params = new URLSearchParams(location.search)
 const id = params.get('case') ?? 'SHOW-01'
 const section = ref('关于我'), registered = ref(false), title = ref(''), quantity = ref(1), query = ref(''), category = ref('全部')
@@ -31,7 +31,7 @@ const filtered = computed(() => items.filter(item => (category.value === '全部
 const selected = ref<typeof items[number] | null>(null)
 if (params.has('runtimeError')) setTimeout(() => { throw new Error('D21 explicit runtime fault') }, 0)
 </script>
-<template><main data-ai-component="home-page">
+<template><main data-ai-component="${pageId}">
 <template v-if="!params.has('blank')">
 <template v-if="id === 'SHOW-01'"><h1>Grace Hopper</h1><p>计算机科学先驱，COBOL 语言的推动者</p>
 <WorkCard v-for="name in ['Harvard Mark I 编程','A-0 编译器','COBOL 标准化']" :key="name" :title="name"/><p>grace.hopper@example.com</p></template>
@@ -55,14 +55,14 @@ if (params.has('runtimeError')) setTimeout(() => { throw new Error('D21 explicit
 <article v-for="item in filtered" :key="item.name"><h2 @click="selected=item">{{ item.name }}</h2><p>{{ id==='CAT-01' ? '作者：' : id==='CAT-03' ? '许可证：' : '' }}{{ item.author }}</p><p>{{ id==='CAT-02' ? '城区：' : id==='CAT-03' ? '类别：' : '分类：' }}{{ item.category }}</p><p>简介：{{ item.description }}</p></article>
 <p v-if="!filtered.length">没有匹配的工具</p><section v-if="selected" role="region" aria-label="详情"><h2>详情</h2><p>{{ selected.name }}</p><p>{{ selected.author }}</p><p>{{ selected.category }}</p><p>{{ selected.description }}</p></section></template>
 </template></main></template>`
-  for (const name of ['HomePage', 'TasksPage', 'CatalogPage']) await writeFile(join(root, `src/pages/${name}.vue`), name === 'TasksPage' ? source.replace('data-ai-component="home-page"', 'data-ai-component="tasks-page"') : name === 'CatalogPage' ? source.replace('data-ai-component="home-page"', 'data-ai-component="catalog-page"') : source)
+  for (const name of ['HomePage', 'TasksPage', 'CatalogPage']) await writeFile(join(root, `src/pages/${name}.vue`), name === 'TasksPage' ? source.replace(`data-ai-component="${pageId}"`, `data-ai-component="${tasksId}"`) : name === 'CatalogPage' ? source.replace(`data-ai-component="${pageId}"`, 'data-ai-component="catalog-page"') : source)
 }
 
 export async function changeFixture(root, edit) {
   const { readFile } = await import('node:fs/promises')
-  const path = join(root, edit.file)
+  const path = join(root, edit.fixture.file)
   let source = await readFile(path, 'utf8')
   if (edit.kind === 'text') source = source.replace(edit.before, edit.after)
-  else { const property = edit.property === 'padding-top' ? 'padding' : edit.property; source = source.replace(`${property}:${edit.before}`, `${property}:${edit.after}`) }
+  else { const property = edit.property === 'padding-top' ? 'padding' : edit.property; source = source.replace(`${property}:${edit.fixtureBefore}`, `${property}:${edit.after}`) }
   await writeFile(path, source)
 }
