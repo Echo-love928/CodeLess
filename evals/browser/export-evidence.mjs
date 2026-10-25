@@ -1,11 +1,16 @@
 import { readdir, mkdir, readFile, writeFile, copyFile } from 'node:fs/promises'
-import { resolve, join, basename } from 'node:path'
+import { resolve, join, basename, isAbsolute, win32 } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { sha, readJSON } from './core.mjs'
 const root = fileURLToPath(new URL('../../', import.meta.url))
 const destination = join(root, 'evals/browser/evidence')
 await mkdir(destination, { recursive: true })
 const strip = value => typeof value === 'string' ? value.replaceAll(root, '<repo>').replaceAll(root.replaceAll('\\', '/'), '<repo>') : value
+const argument = value => {
+  const cleaned = strip(value)
+  return cleaned === value && (isAbsolute(value) || win32.isAbsolute(value))
+    ? '<external-input>/' + value.split(/[\\/]/).at(-1) : cleaned
+}
 const browser = value => value ? { status: value.status, failure: value.failure, error: strip(value.error ?? null),
   readiness: value.readiness ?? null,
   pageErrors: value.pageErrors, consoleErrors: value.consoleErrors, blockedRequests: value.blockedRequests, failedRequests: value.failedRequests,
@@ -57,7 +62,7 @@ const commandRoot = join(root, '.local-data/d21-b/commands'), commands = []
 try {
   for (const directory of await readdir(commandRoot)) {
     const record = await readJSON(join(commandRoot, directory, 'command.json'))
-    commands.push({ ...record, command: record.command.map((value, index) => index === 0 ? value.split(/[\\/]/).at(-1) : strip(value)), output: '.local-data/d21-b/commands/' + directory })
+    commands.push({ ...record, command: record.command.map((value, index) => index === 0 ? value.split(/[\\/]/).at(-1) : argument(value)), output: '.local-data/d21-b/commands/' + directory })
   }
 } catch (error) { if (error.code !== 'ENOENT') throw error }
 await writeFile(join(destination, 'commands.json'), JSON.stringify(commands, null, 2) + '\n')
