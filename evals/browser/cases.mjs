@@ -88,12 +88,26 @@ export async function behavior(page, id, expect) {
     await reload(); await expect(column('已完成')).toContainText(title); await remove(title)
     await reload(); await expect(row(title)).toHaveCount(0)
   } else if (id === 'TASK-03') {
+    const purchaseNames = values => new RegExp(values.map(value => namePattern(value).source).join('|'), 'u')
+    const markName = purchaseNames(['已购买', '标记已购买', '标记为已购买', '设为已购买', '未购买'])
+    const undoName = purchaseNames(['取消已购买', '取消购买', '取消标记', '标记未购买', '设为未购买'])
+    const markPurchased = async name => {
+      const item = row(name), checkbox = item.getByRole('checkbox')
+      if (await checkbox.count()) await checkbox.check()
+      else await item.getByRole('button', { name: markName }).click()
+    }
+    const purchased = async name => {
+      const item = row(name), checkbox = item.getByRole('checkbox')
+      if (await checkbox.count()) await expect(checkbox).toBeChecked()
+      else if (await item.getByRole('button', { pressed: true }).count()) await expect(item.getByRole('button', { pressed: true })).toHaveCount(1)
+      else await expect(item.getByRole('button', { name: undoName })).toBeVisible()
+    }
     const addProduct = async name => { await page.getByRole('textbox').first().fill(name); await page.getByRole('spinbutton').fill('3'); await button('加入清单').click(); await expect(row(name)).toContainText('3') }
     const third = 'D21验收任务丙'
     await addProduct(title); await addProduct(other); await addProduct(third)
-    await row(title).getByRole('checkbox').check()
-    await row(third).getByRole('checkbox').check()
-    await reload(); await expect(row(title).getByRole('checkbox')).toBeChecked(); await expect(row(third).getByRole('checkbox')).toBeChecked(); await expect(row(other)).toContainText('3')
+    await markPurchased(title)
+    await markPurchased(third)
+    await reload(); await purchased(title); await purchased(third); await expect(row(other)).toContainText('3')
     await button('清除已购买').click(); await expect(row(title)).toHaveCount(0); await expect(row(third)).toHaveCount(0); await expect(row(other)).toBeVisible()
     await reload(); await expect(row(title)).toHaveCount(0); await expect(row(third)).toHaveCount(0); await remove(other); await reload(); await expect(row(other)).toHaveCount(0)
   } else if (/^CAT-/.test(id)) {

@@ -15,7 +15,9 @@ final class RepairContext {
     private String sourceDigest;
     private int repeatedReads;
     private boolean changed;
-    RepairContext(JsonNode draft){sourceFiles=draft.path("files").deepCopy();sourceDigest=draft.path("sourceDigest").asText();}
+    private final Set<String> writtenStates=new HashSet<>();
+    private boolean repeatedPatch;
+    RepairContext(JsonNode draft){sourceFiles=draft.path("files").deepCopy();sourceDigest=draft.path("sourceDigest").asText();writtenStates.add(sourceDigest);}
     static JsonNode planProjection(JsonNode plan) {
         var json=JsonMapper.builder().build();var out=json.createObjectNode();
         for(String field:List.of("schemaVersion","template","dataMode","capabilities"))if(plan.has(field))out.set(field,plan.path(field).deepCopy());
@@ -31,11 +33,13 @@ final class RepairContext {
     }
     List<JsonNode> observations(){return List.copyOf(latest.values());}
     JsonNode sourceFiles(){return sourceFiles;}
+    boolean repeatedPatch(){return repeatedPatch;}
     Map<String,Object> progress(){return Map.of("repeatedReads",repeatedReads,"sourceChanged",changed,
             "next",changed?"PROPOSE_COMPLETION_OR_NECESSARY_PATCH":repeatedReads>0?"PATCH_USING_OBSERVED_DIGEST":
                     latest.values().stream().anyMatch(o->o.path("tool").asText().equals("files.read"))?
                             "PATCH_OR_READ_MISSING_DEPENDENCY":"READ_REQUIRED_DEPENDENCIES_ONCE");}
     boolean observe(String name,JsonNode arguments,JsonNode actual) {
+        repeatedPatch=false;
         var source=actual.path("source");String digest=source.path("sourceDigest").asText();
         if(!actual.path("status").asText().equals("SUCCEEDED")||!source.path("files").isArray()||digest.isBlank())throw new AgentFailure("AGENT_CHECKPOINT_INVALID");
         var current=new HashMap<String,String>();
@@ -71,6 +75,8 @@ final class RepairContext {
             var receipt=(tools.jackson.databind.node.ObjectNode)entry.getValue().deepCopy();receipt.remove("committedContent");entry.setValue(receipt);
         }
         latest.put(key,json.valueToTree(observed));
+        if(Set.of("files.create","files.update","files.delete").contains(name))
+            repeatedPatch=changed&&!writtenStates.add(digest);
         // Two repeated unchanged reads receive explicit feedback; a third stops with the existing CONTROL terminal.
         if(seen>3)throw new AgentFailure("AGENT_REPAIR_NO_PROGRESS");
         return seen>1;

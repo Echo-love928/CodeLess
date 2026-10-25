@@ -185,6 +185,12 @@ public final class AgentLoop implements TaskStageRunner {
                 JsonNode projected=local.isPresent()?LocalEditScope.observation(observed,LocalEditScope.target(local.get())):observed;
                 if(repair) {
                     boolean repeated=repairContext.observe(name,arguments,projected);
+                    if(repairContext.repeatedPatch()) {
+                        // A model is replaying an already committed candidate. Stop this proposal loop, not
+                        // verification: freeze the actual current bytes and rerun the unchanged original actions.
+                        store.append(claim,stage,"repair.done",Map.of("actions",originalActions,"origin","HOST_REPEATED_PATCH"));
+                        return new StageResult(TaskStatus.GENERATE,"Repeated committed repair candidate submitted for real verification",null);
+                    }
                     if(repeated)store.append(claim,stage,"repair.read.repeat",Map.of("tool",name,"path",arguments.path("path").asText(),
                             "callId",actual.callId(),"progress",repairContext.progress()));
                 } else observations.add(committed(name,arguments,projected,actual));

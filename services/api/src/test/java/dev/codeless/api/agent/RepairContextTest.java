@@ -44,6 +44,23 @@ class RepairContextTest {
         var source=(tools.jackson.databind.node.ObjectNode)actual.path("source");source.put("sourceDigest","sha256:"+"b".repeat(64));
         for(var file:source.path("files"))if(file.path("path").asText().equals("src/pages/HomePage.vue"))((tools.jackson.databind.node.ObjectNode)file).put("digest",actual.path("afterDigest").asText());return actual;
     }
+    @Test void committedNoOpAndRevisitedPatchAreDetectedButAnUnchangedOriginalIsNotAPatch() throws Exception {
+        var doc=doc();var read=results(doc).getFirst();var context=new RepairContext(latest(doc,"draft"));
+        var unchanged=(tools.jackson.databind.node.ObjectNode)read.deepCopy();unchanged.putNull("content");
+        context.observe("files.update",json.valueToTree(Map.of("path","src/pages/HomePage.vue","content",read.path("content").asText())),unchanged);
+        assertThat(context.repeatedPatch()).isFalse();assertThat(context.progress().get("sourceChanged")).isEqualTo(false);
+        var first=writeResult(read);String content=read.path("content").asText().replace("M1MissingCard.vue","ProfileCard.vue");
+        var args=json.valueToTree(Map.of("path","src/pages/HomePage.vue","content",content));
+        context.observe("files.update",args,first);assertThat(context.repeatedPatch()).isFalse();
+        context.observe("files.update",args,first);assertThat(context.repeatedPatch()).isTrue();
+        var other=(tools.jackson.databind.node.ObjectNode)first.deepCopy();String otherContent=content+"\n<!-- another committed candidate -->";
+        String otherHash="sha256:"+HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(otherContent.getBytes(StandardCharsets.UTF_8)));
+        other.put("afterDigest",otherHash);((tools.jackson.databind.node.ObjectNode)other.path("source")).put("sourceDigest","sha256:"+"c".repeat(64));
+        for(var file:other.path("source").path("files"))if(file.path("path").asText().equals("src/pages/HomePage.vue"))((tools.jackson.databind.node.ObjectNode)file).put("digest",otherHash);
+        context.observe("files.update",json.valueToTree(Map.of("path","src/pages/HomePage.vue","content",otherContent)),other);
+        assertThat(context.repeatedPatch()).isFalse();
+        context.observe("files.update",args,first);assertThat(context.repeatedPatch()).isTrue();
+    }
     @Test void oldRecordingExactlyReproducesAllReservationsAndTheCorrectStop() throws Exception {
         var doc=doc();String old=Files.readString(Path.of("../../tests/agent/repair/fixtures/m1-repair-policy-before.txt"));var observations=new ArrayList<JsonNode>();var reservations=new ArrayList<Integer>();
         for(var event:doc.path("events"))if(event.path("stage").asText().equals("REPAIR")){

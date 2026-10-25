@@ -233,6 +233,28 @@ function photography({ count = 4, blankLocation = false } = {}) {
     'tab===1?\'<section><h2>作品集</h2><ul>' + Array.from({ length: count }, (_, i) => '<li><div style="background:blue;height:10px"></div><h3>作品' + i + '</h3><p>' + (blankLocation ? '' : '地点' + i) + '</p></li>').join('') +
     '</ul></section>\':\'<section><h2>联系方式</h2><p>linxia@example.com</p></section>\'}show(0)</script></body></html>'
 }
+function shopping({ checkbox = false, persist = true, brokenClear = false } = {}) {
+  return `<html><meta charset="utf-8"><body><h1>购物工具</h1><input aria-label="商品"><input type="number" aria-label="数量"><button id="add">加入清单</button><button id="clear">清除已购买</button><ul></ul><script>
+    let items=JSON.parse(localStorage.getItem('independent-shopping')||'[]');
+    const list=document.querySelector('ul'),fields=document.querySelectorAll('input');
+    function render(){if(${persist})localStorage.setItem('independent-shopping',JSON.stringify(items));list.replaceChildren();
+      for(const item of items){const li=document.createElement('li'),title=document.createElement('span'),qty=document.createElement('span'),toggle=document.createElement(${checkbox}?'input':'button'),remove=document.createElement('button');
+        title.textContent=item.title;qty.textContent='数量：'+item.quantity;remove.textContent='删除';
+        if(${checkbox}){toggle.type='checkbox';toggle.checked=item.done;toggle.onchange=()=>{item.done=toggle.checked;render()}}
+        else{toggle.textContent=item.done?'取消已购买':'已购买';toggle.onclick=()=>{item.done=!item.done;render()}}
+        remove.onclick=()=>{items=items.filter(other=>other!==item);render()};li.append(title,qty,toggle,remove);list.append(li)}}
+    document.querySelector('#add').onclick=()=>{items.push({title:fields[0].value,quantity:Number(fields[1].value),done:false});fields[0].value='';render()};
+    document.querySelector('#clear').onclick=()=>{items=${brokenClear} ? [] : items.filter(item=>!item.done);render()};render();
+    </script></body></html>`
+}
+for (const checkbox of [false, true]) test('TASK-03: purchase state may use ' + (checkbox ? 'checkboxes' : 'toggle buttons'), async () => {
+  const result = await check('TASK-03', shopping({ checkbox }), 'shopping-control-' + checkbox)
+  assert.equal(result.status, 'PASSED', JSON.stringify(result))
+})
+for (const failure of ['persistence', 'clear']) test('TASK-03: button compatibility still rejects broken ' + failure, async () => {
+  const result = await check('TASK-03', shopping({ persist: failure !== 'persistence', brokenClear: failure === 'clear' }), 'shopping-broken-' + failure)
+  assert.equal(result.status, 'FAILED'); assert.equal(result.failure, 'BEHAVIOR_ERROR')
+})
 for (const variant of ['valid', 'count', 'location']) test('SHOW-03: list gallery ' + variant, async () => {
   const result = await check('SHOW-03', photography({ count: variant === 'count' ? 3 : 4, blankLocation: variant === 'location' }), 'list-gallery-' + variant)
   assert.equal(result.status, variant === 'valid' ? 'PASSED' : 'FAILED', JSON.stringify(result))

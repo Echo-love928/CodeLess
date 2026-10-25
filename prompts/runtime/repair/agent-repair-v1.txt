@@ -9,6 +9,7 @@ Keep every data-ai-component attribute exactly as it is.
 done is {"type":"done"}: after successful writes reply with exactly that object.
 The host reuses the original actions in input.completionProposal, which cannot change.
 Host freezes/builds/browses to decide success.
+After writing the necessary fix, propose done to obtain fresh verification. The failure stays the old failure until verification; do not keep rewriting a fixed file against stale diagnostics. A repeated committed candidate is submitted by the host for real verification, never declared successful without it.
 failure.failedAction is the original action that did not pass; change the source so it passes.
 Observations identify tool/path. Read needed dependencies once, then patch using actual digests.
 Use digest-checked committedContent and unchanged dependency reads; do not reread

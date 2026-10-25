@@ -68,8 +68,8 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
             String phase=input.path("phase").asText();String content;
             if(Set.of("GENERATE","REPAIR").contains(phase)) {
                 assertThat(prompt.getSystemMessage().getText()).startsWith("Application proposal protocol");
-                if(phase.equals("GENERATE"))assertThat(prompt.getSystemMessage().getText()).contains("never json_object","Invalid replies terminate",
-                    "REPAIR copies input.originalActions exactly into actions");
+                if(phase.equals("GENERATE"))assertThat(prompt.getSystemMessage().getText()).contains("The top-level type is either \"tool\" or \"done\"","Invalid replies terminate")
+                    .doesNotContain("json_object","response_format");
                 else assertThat(prompt.getSystemMessage().getText()).contains("Each key occurs exactly once","The root type occurs once",
                     "done is {\"type\":\"done\"}","The host reuses the original actions in input.completionProposal, which cannot change.")
                     .doesNotContain("json_object","response_format","Invalid protocol reply");
@@ -99,6 +99,8 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                     if(observed==2)content=recordedInvalidReply();
                 }
             } else {
+                if(mode.equals("repeated-bad") && input.path("repairAttempt").asInt()>1)
+                    throw new ModelFailure("MODEL_NETWORK");
                 if(mode.equals("browser")) {
                     assertThat(input.path("failure").path("code").asText()).isEqualTo("AGENT_PAGE_EXCEPTION");
                     assertThat(input.path("failure").path("diagnostic").asText()).contains("D10_A_BROWSER_PAGE_EXCEPTION");
@@ -137,7 +139,7 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                     JsonNode actual=input.path("observations").get(0);
                     assertThat(actual.path("content").asText()).isEqualTo(mode.equals("browser")?BROWSER_ERROR:mode.equals("locator")?NO_CARD:BROKEN);
                     content=json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of(
-                            "path",PAGE,"expectedDigest",actual.path("afterDigest").asText(),"content",FIXED)));
+                            "path",PAGE,"expectedDigest",actual.path("afterDigest").asText(),"content",mode.equals("repeated-bad")?NO_CARD:FIXED)));
                     if(mode.equals("host-complete")) {
                         // Synthetic exhaustion (as in D10AT3): reserve whatever is left, and charge this patch request in full.
                         var lease=new TaskQueueService.Claim(seed.task(),jdbc.sql("SELECT lease_token FROM generation_tasks WHERE id=?").param(seed.task()).query(UUID.class).single(),TaskStatus.REPAIR);
@@ -146,6 +148,9 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                         int input0=RuntimeBudget.inputReservation(prompt.getSystemMessage().getText(),prompt.getUserMessage().getText());
                         return new Reply(content,new Evidence(model(),"explicit-fixture-request","explicit-fixture-response",new Usage(input0,max,input0+max,null)));
                     }
+                } else if(Set.of("repeated-patch","repeated-bad").contains(mode)) {
+                    String digest="";for(var entry:input.path("sourceFiles"))if(entry.path("path").asText().equals(PAGE))digest=entry.path("digest").asText();
+                    content=json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of("path",PAGE,"expectedDigest",digest,"content",mode.equals("repeated-bad")?NO_CARD:FIXED)));
                 } else content=Set.of("bare","locator").contains(mode)?"{\"type\":\"done\"}":
                         json.writeValueAsString(Map.of("type","done","actions",input.path("completionProposal").path("actions")));
             }
@@ -158,6 +163,32 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         new TaskScheduler(queue,loop(provider,(draft,deadline)->{throw new AssertionError("invalid proposal must never launch runner");})).tick();
         assertRecordedInvalidTerminal(seed,provider,"GENERATE",4,0);
         assertThat(RuntimeBudget.meter(journal.read(seed.task())).tools()).isEqualTo(2);
+    }
+    @Test void repeatedCommittedPatchIsReallyVerifiedInsteadOfSpendingTheRemainingCallsOnRewrites() throws Exception {
+        var seed=seed();var provider=new Fixture("repeated-patch",seed);
+        var task=run(seed,provider);var events=journal.read(seed.task());
+        assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);
+        assertThat(task.repairAttempts()).isEqualTo(1);
+        assertThat(AgentJournal.latest(events,"repair.done").path("origin").asText()).isEqualTo("HOST_REPEATED_PATCH");
+        assertThat(AgentJournal.latest(events,"runner.result").path("verification").path("status").asText()).isEqualTo("PASSED");
+        assertThat(provider.count.get()).isEqualTo(7);
+        assertThat(RuntimeBudget.meter(events).chargedTokens()).isLessThanOrEqualTo(RuntimeBudget.TOKENS);
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(2);
+    }
+    @Test void repeatedBadPatchStillFailsTheOriginalBrowserAcceptance() throws Exception {
+        var seed=seed();var provider=new Fixture("repeated-bad",seed);
+        var task=run(seed,provider);var events=journal.read(seed.task());
+        assertThat(task.status()).isEqualTo(TaskStatus.FAILED);
+        assertThat(task.failureCode()).isEqualTo("MODEL_NETWORK"); // Explicit next-round fixture failure, not a retry.
+        assertThat(AgentJournal.latest(events,"repair.done").path("origin").asText()).isEqualTo("HOST_REPEATED_PATCH");
+        var results=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
+        assertThat(results).hasSize(2);
+        assertThat(results.getLast().path("build").path("status").asText()).isEqualTo("SUCCEEDED");
+        assertThat(results.getLast().path("verification").path("failure").asText()).isEqualTo("ACTION_TIMEOUT");
+        var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
+        assertThat(drafts).hasSize(2);
+        assertThat(drafts.getLast().path("actions")).isEqualTo(drafts.getFirst().path("actions"));
+        assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
     }
     @Test void recordedJsonObjectReplyStopsRepairWithoutFurtherEditsOrRetries() throws Exception {
         var seed=seed();var provider=new Fixture("invalid-repair",seed);run(seed,provider);

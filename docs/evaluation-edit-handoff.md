@@ -1,6 +1,6 @@
 # 真实编辑交接：B 消费端协议
 
-本文件规定 B 已实现的接收、预检和验收方式。2026-10-25，B 确认 A 提议的“保留三份原样本数据库及私有文件根，再还原到同一个在线 API、同场编辑采集”方向，可以开始无真实模型的实现与自测；导出/还原尚未实现验证，也没有新的真实编辑记录。批次 ID 或源码 ZIP 本身不表示可在线编辑，预检通过也不是编辑验收通过。
+本文件规定 B 已实现的接收、预检和验收方式。2026-10-25，“保留三份原样本数据库及私有文件根，再还原到同一个在线 API、同场编辑采集”的导出、合库、原用户登录、身份/摘要核对及一次 HTTP/CSRF MOCK 编辑采集已实现并通过自测，仍没有新的真实编辑验收记录。首次完整真实批次未达标，三个编辑基底只有 SHOW-01 READY，其他两个失败照实保留。当前进度见 `handoffs/D21-ACCEPTANCE-RECOVERY.md`。批次 ID 或源码 ZIP 本身不表示可在线编辑，预检通过也不是编辑验收通过。
 
 ## A 需要交付的输入
 
@@ -73,7 +73,7 @@ node evals/browser/record-command.mjs batch /absolute/private/A-batch --edit-rec
 1. **会话**：三个应用确实归同一个运行时所有者时，一个所有者 Cookie 和一个能读 `admin/model-calls` 的审计 Cookie 足够。apiReader 对所有普通读取使用前者，对 admin 路径使用后者；没有按样本切换账号的机制。当前 GenerationEvalIT 每个样本随机创建不同 owner UUID。建议新批次从生成开始使用同一批次所有者；如果还原时归并，保留原转储，另存原 ownerId → 运行时 ownerId 的迁移记录和归并范围。不能改 application/task/version/build/verification ID、源码、原任务状态和模型账本来完成归并。登录必须绑定现有的用户行，并保留 CSRF/权限校验，不另建同邮箱的无关所有者。
 2. **固定工具**：`codex/d21-b-behavior-evaluation` 的 `18da4d77d96320f8589d9cc4e934f16f9cabbb02` 已包含 handoff、requests、collect、replayEdits 和语义探测，不需要 B 进程或临时源码补丁。使用该提交完整工作树及其锁文件，按 evaluation-ui.md 准备 Node/pnpm、Docker 受控镜像与锁定 Chromium。A 运行时使用 A 最终批次记录的提交，不能以 B 工具分支替换。只读采集/重放不需要真实模型密钥；实际 component-edits 的付费执行需要 A 运行时的密钥。初始 report → handoff 后，逐项 collect，再带全部已采集前缀运行 `record-command.mjs batch ... --edit-records ...`，从新 report.edits 对应项取 selection/trustedMapping 写入新文件交给 requests。不要把初始 handoff 的六个 payload 一次提交。
 3. **归档**：完整六项时七文件包是 index + 六份记录；前缀/失败依赖链可能少于七文件，未执行项保持 NOT_EXECUTED。另保留原始完整 14 样本批次、冻结副本、原文件 SHA256、三份数据库导出/文件根及其清单、还原身份校验报告、每次 handoff/report/selection/request/task-index 的去凭据副本和命令/退出码、B 独立构建的产物清单/截图/trace。原构建与验证文件仍留在私有根，不声称七文件包覆盖所有运行时文件。会话、密钥和含凭据环境文件不进任何交付归档。归档文件本身还需要外层 SHA256 清单；收到 B 确认摘要前保留导出及数据库/文件，完成终态采集和复核确认后再销毁运行时。不是任务终态一出现就自动销毁。
-4. **谁启动**：优先由 A 在持有密钥且已验证 TLS 的本机起运行时，并执行 B 固定工具，B 消费包独立复核。不要求把真实密钥交给 B。导出还原方案是待实现设计；先用 MOCK 做导出→合库→真实 API 登录→身份/摘要预检→串行编辑/采集的自测。
+4. **谁启动**：优先由 A 在持有密钥且已验证 TLS 的本机起运行时，并执行 B 固定工具，B 消费包独立复核。不要求把真实密钥交给 B。导出→合库→真实 API 登录→身份/摘要核对→一次 MOCK 编辑/采集已完成自测；真实执行仍需三个原始 READY 基底及后续在线预检。
 5. **传输**：`http://127.0.0.1:<port>/api/v0/`、localhost 或 `[::1]` 满足 apiReader 的回环 HTTP 例外，配置 CODELESS_COOKIE_SECURE=false 可用于此本机运行时。服务实际绑定回环，不把 0.0.0.0/局域网地址当成回环；Cookie 应与所选主机一致，不依赖重定向。远端 API/模型仍正常 HTTPS/TLS 校验，证书链和 JVM TransportProbe 的 12/12 预检不因回环例外豁免。
 
 建议顺序保持 A 提议：导出还原 MOCK 自测 → 环境预检全过 → 一次完整真实批次并保留三个原样本 → 在线预检及串行真实编辑/采集 → B 离线验收。此确认不放宽 50,000 预算、不追加协议重试、不批准合并。三个保留样本中若有生成失败，保持原失败并阻塞对应编辑，不替换或重跑该样本。

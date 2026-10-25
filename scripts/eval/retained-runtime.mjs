@@ -6,7 +6,7 @@ import { join, resolve, delimiter, sep } from 'node:path'
 import { createHash, randomUUID } from 'node:crypto'
 import { createServer } from 'node:net'
 import { pathToFileURL } from 'node:url'
-import { javaHome, secretOccurrences } from './run-batch.mjs'
+import { javaHome, secretOccurrences, gitState } from './run-batch.mjs'
 import { root } from './lib.mjs'
 
 const hash = bytes => 'sha256:' + createHash('sha256').update(bytes).digest('hex')
@@ -55,7 +55,17 @@ export async function startRuntime(retainedRoot, output, mode, env = process.env
   assert.ok(samples.length && new Set(samples.map(s => s.application.ownerId)).size === 1)
   assert.equal(new Set(samples.map(s => s.batchId)).size, 1)
   const platformRevision = command('git', ['rev-parse', 'HEAD'])
-  if (mode === 'REAL') assert.ok(samples.every(s => s.platformRevision === platformRevision), 'Restore runtime must use the exact original platform commit')
+  if (mode === 'REAL') {
+    assert.ok(gitState().scopedClean, 'REAL restore needs a committed clean platform scope')
+    assert.ok(samples.every(s => s.platformRevision === platformRevision), 'Restore runtime must use the exact original platform commit')
+  }
+  // Build only, with credentials stripped. A fixed checkout must not depend on an operator's temporary classpath.
+  const classpathFile = join(output, 'classpath.txt')
+  const buildEnv = Object.fromEntries(Object.entries(env).filter(([key]) => !/CODELESS_|API_KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL|JAVA_TOOL_OPTIONS|JDK_JAVA_OPTIONS|_JAVA_OPTIONS/.test(key)))
+  buildEnv.JAVA_HOME = javaHome(env)
+  const mavenArgs = ['-f', 'services/api/pom.xml', '-DskipTests', 'test-compile', 'org.apache.maven.plugins:maven-dependency-plugin:3.10.0:build-classpath', '-DincludeScope=test', '-Dmdep.outputFile=' + classpathFile]
+  command(process.platform === 'win32' ? (env.ComSpec ?? 'cmd.exe') : './services/api/mvnw',
+    process.platform === 'win32' ? ['/d', '/c', 'services\\api\\mvnw.cmd', ...mavenArgs] : mavenArgs, { env: buildEnv, timeout: 600000, maxBuffer: 8388608 })
   const ownerId = samples[0].application.ownerId
   const container = 'codeless-d21-edit-' + randomUUID().slice(0, 8), dbPassword = randomUUID() + randomUUID()
   const privateRoot = join(output, 'private'), models = join(output, 'models')
@@ -66,7 +76,7 @@ export async function startRuntime(retainedRoot, output, mode, env = process.env
   const save = () => writeFile(join(output, 'runtime.json'), JSON.stringify(state, null, 2) + '\n')
   await save()
   for (let i = 0; i < 60; i++) {
-    const check = spawnSync('docker', ['exec', container, 'pg_isready', '-U', 'codeless_test'], { windowsHide: true })
+    const check = spawnSync('docker', ['exec', container, 'pg_isready', '-h', '127.0.0.1', '-U', 'codeless_test'], { windowsHide: true })
     if (check.status === 0) break
     assert.ok(i < 59, 'Restore database startup deadline'); await pause(500)
   }
@@ -88,7 +98,7 @@ export async function startRuntime(retainedRoot, output, mode, env = process.env
     CODELESS_MODEL_PROVIDER: mode === 'REAL' ? 'deepseek' : 'deterministic-mock', CODELESS_MODEL_AUDIT_ROOT: models,
     CODELESS_EVAL_OWNER_EMAIL: 'd21-eval-' + ownerId + '@eval.codeless.test', CODELESS_EVAL_OWNER_PASSWORD: ownerPassword, CODELESS_EVAL_ADMIN_PASSWORD: adminPassword })
   if (mode === 'REAL') Object.assign(runtimeEnv, { CODELESS_MODEL_API_KEY: env.CODELESS_MODEL_API_KEY, CODELESS_MODEL_NAME: env.CODELESS_MODEL_NAME })
-  const classpath = [join(root, 'services/api/target/test-classes'), join(root, 'services/api/target/classes'), (await readFile(join(root, '.local-data/d21-acceptance/classpath.txt'), 'utf8')).trim()].join(delimiter)
+  const classpath = [join(root, 'services/api/target/test-classes'), join(root, 'services/api/target/classes'), (await readFile(classpathFile, 'utf8')).trim()].join(delimiter)
   const log = await open(join(output, 'api.log'), 'wx')
   const child = spawn(join(javaHome(env), 'bin', 'java'), ['-cp', classpath, 'dev.codeless.api.eval.RetainedEvalRuntime',
     '--server.address=127.0.0.1', '--server.port=' + port, '--codeless.agent.enabled=true', '--codeless.agent.repository-root=' + root,
