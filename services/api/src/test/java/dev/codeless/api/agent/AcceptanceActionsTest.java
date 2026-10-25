@@ -28,13 +28,39 @@ class AcceptanceActionsTest {
         assertThat(AcceptanceActions.check(plan,actions()).detail()).containsEntry("reason","NO_ACTIONS");
         assertThat(AcceptanceActions.check(plan,json.readTree("{}")).detail()).containsEntry("reason","NO_ACTIONS");
     }
-    @Test void templatePlaceholdersCannotMatchRenderedDom() {
+    @Test void anUnresolvedTemplateInATestIdCannotMatchTheRenderedDom() {
         for(String action:List.of("{\"type\":\"click\",\"target\":{\"testId\":\"toggle-{{item.id}}\"}}",
-                "{\"type\":\"expectText\",\"target\":{\"text\":\"共 ${count} 本\"},\"value\":\"x\"}",
-                "{\"type\":\"expectText\",\"target\":{\"testId\":\"count\"},\"value\":\"共 {{ total }} 本\"}")) {
+                "{\"type\":\"click\",\"target\":{\"testId\":\"toggle-${item.id}\"}}",
+                "{\"type\":\"expectVisible\",\"target\":{\"testId\":\"row-}}\"}}")) {
             var rejection=AcceptanceActions.check(plan,actions(NAV,SEE,action));
             assertThat(rejection.detail()).as(action).containsEntry("reason","TEMPLATE_PLACEHOLDER").containsEntry("index",2);
         }
+    }
+    /**
+     * D21-B review of 911943f. <script setup lang="ts">const literal = "{{ count }}"</script> with
+     * <h1 data-testid="literal">{{ literal }}</h1> renders the braces verbatim, the runner grammar accepts the action
+     * and a real Vue build plus Chromium make it pass, so texts, names and values are not judged for braces here.
+     */
+    @Test void literalBracesInTextsNamesAndValuesAreLegitimateContent() {
+        for(String action:List.of("{\"type\":\"expectText\",\"target\":{\"testId\":\"literal\"},\"value\":\"{{ count }}\"}",
+                "{\"type\":\"expectText\",\"target\":{\"text\":\"{{ count }}\"},\"value\":\"{{ count }}\"}",
+                "{\"type\":\"expectVisible\",\"target\":{\"role\":\"heading\",\"name\":\"共 ${count} 本\"}}",
+                "{\"type\":\"fill\",\"target\":{\"testId\":\"name\"},\"value\":\"${name}\"}")) {
+            assertThat(AcceptanceActions.check(plan,actions(NAV,SEE,action))).as(action).isNull();
+        }
+    }
+    /** The runner trims with String.prototype.trim(): U+00A0, U+FEFF and U+2028 are blank there; U+001C and U+180E are not. */
+    @Test void blankTextFollowsTheRunnersJavaScriptTrimInsteadOfJavaIsBlank() {
+        for(String blank:List.of(" ","\u00a0","\ufeff","\u2028","\u3000","\u2003 \t")) {
+            var value=AcceptanceActions.check(plan,actions(NAV,SEE,"{\"type\":\"expectText\",\"target\":{\"testId\":\"name\"},\"value\":"+json.writeValueAsString(blank)+"}"));
+            assertThat(value).as("value of "+blank.length()+" blank chars").isNotNull();
+            assertThat(value.detail()).containsEntry("reason","INVALID_VALUE");
+            var target=AcceptanceActions.check(plan,actions(NAV,SEE,"{\"type\":\"click\",\"target\":{\"testId\":"+json.writeValueAsString(blank)+"}}"));
+            assertThat(target).as("target of "+blank.length()+" blank chars").isNotNull();
+            assertThat(target.detail()).containsEntry("reason","INVALID_TARGET");
+        }
+        for(String text:List.of("\\u001c","\\u180e","\\u0085"))
+            assertThat(AcceptanceActions.check(plan,actions(NAV,SEE,"{\"type\":\"expectText\",\"target\":{\"testId\":\"name\"},\"value\":\""+text+"\"}"))).as(text).isNull();
     }
     @Test void runnerRejectedShapesAreRejectedBeforeTheRunner() {
         // Same rejected actions as the runner's controlled action grammar test.

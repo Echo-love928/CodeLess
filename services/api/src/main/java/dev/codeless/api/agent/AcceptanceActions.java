@@ -44,7 +44,12 @@ final class AcceptanceActions {
         return value.isObject() && allowed.containsAll(value.propertyNames());
     }
     private static boolean text(JsonNode value,int max) {
-        return value.isString() && !value.asText().isBlank() && value.asText().length()<=max;
+        return value.isString() && !blank(value.asText()) && value.asText().length()<=max;
+    }
+    /** True when String.prototype.trim() would leave nothing: JS WhiteSpace and LineTerminator, not Character.isWhitespace. */
+    private static boolean blank(String value) {
+        return value.chars().allMatch(c -> c==0x09 || c==0x0a || c==0x0b || c==0x0c || c==0x0d || c==0x20 || c==0xa0
+                || c==0x1680 || c>=0x2000 && c<=0x200a || c==0x2028 || c==0x2029 || c==0x202f || c==0x205f || c==0x3000 || c==0xfeff);
     }
     private static String shape(JsonNode action) {
         if(!keys(action,Set.of("type","target","value","path")) || !TYPES.contains(action.path("type").asText())) return "UNSUPPORTED_ACTION";
@@ -67,11 +72,13 @@ final class AcceptanceActions {
                 && !text(action.path("value"),2000)) return "INVALID_VALUE";
         return null;
     }
-    /** Rendered DOM never contains Vue/JS interpolation syntax, so such a target or value cannot match. */
+    /**
+     * A testId is an attribute value the generated source has to produce, so interpolation syntax in one is an
+     * unresolved template that the rendered DOM can never match. Texts and values are not judged here: a Vue
+     * string such as "{{ count }}" bound with {{ literal }} renders its braces verbatim, and the runner accepts it.
+     */
     private static boolean placeholder(JsonNode action) {
-        var values=new ArrayList<String>();
-        action.path("target").forEach(value -> values.add(value.asText()));
-        if(action.path("value").isString()) values.add(action.path("value").asText());
-        return values.stream().anyMatch(value -> value.contains("{{") || value.contains("}}") || value.contains("${"));
+        String testId=action.path("target").path("testId").asText("");
+        return testId.contains("{{") || testId.contains("}}") || testId.contains("${");
     }
 }

@@ -98,13 +98,15 @@ fixtures alone do not constitute M1 real-model or UI integration acceptance.
   (`COMMITTED_WRITE_DIGEST_MATCHED`) like REPAIR, so the model no longer spends a
   request reading back its own write; the prompt no longer asks for that read.
 - A GENERATE done whose actions break the runner grammar, the three document routes,
-  route coverage, the 20-action limit, or contain `{{`/`${` placeholders gets one
+  route coverage, the 20-action limit, or a testId with `{{`/`${` (an unresolved template) gets one
   `done.rejected` observation with a fixed reason; a second invalid done stops with
   the original AGENT_ACCEPTANCE_INVALID/INCOMPLETE code.
 - REPAIR completes with `{"type":"done"}`; an included actions array must still equal
   the original exactly. After a source change, a request that cannot fund a full 4096
   output is completion-only.
 - GENERATE input carries `componentIds` (kebab-case file names) for planned pages and
-  components; the trusted build catalog still decides selectability.
+  components (a name nobody else shares keeps its kebab-case file name; collisions try a
+  page-/component- prefix, then a stable digest of the full path, so every ID is unique);
+  the trusted build catalog still decides selectability.
 - A refused reply records a content-free `model.invalid` event (parser reason and
   position, root shape, byte count and digest, or the provider check that refused it).

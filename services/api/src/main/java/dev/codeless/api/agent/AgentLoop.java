@@ -249,20 +249,53 @@ public final class AgentLoop implements TaskStageRunner {
         catch(java.security.NoSuchAlgorithmException unavailable) {throw new AgentFailure("AGENT_CHECKPOINT_INVALID");}
     }
     /**
-     * Deterministic data-ai-component IDs for planned page/component files: the kebab-case file name, prefixed
-     * with page-/component- only when two planned names collide. The trusted build catalog still decides.
+     * Deterministic, globally unique data-ai-component IDs for planned page/component files. A file name nobody
+     * else shares keeps its kebab-case name. Names that collide after normalisation (FooBar.vue and Foo_Bar.vue,
+     * or a page and a component with one name) try a page-/component- prefix next; whatever is still ambiguous or
+     * already taken, even by another file's own name such as PageHomePage.vue, gets a stable digest of its full
+     * path. The trusted build catalog still decides what is selectable.
      */
     static Map<String,String> componentIds(Collection<String> paths) {
-        var names=new TreeMap<String,String>();
+        var natural=new TreeMap<String,String>();
         for(String path:paths) if(path.matches("src/(?:pages|components)/[A-Za-z][A-Za-z0-9_-]*\\.vue"))
-            names.put(path,kebab(path.substring(path.lastIndexOf('/')+1,path.length()-4)));
+            natural.put(path,kebab(path.substring(path.lastIndexOf('/')+1,path.length()-4)));
         var ids=new TreeMap<String,String>();
-        for(var entry:names.entrySet()) {
-            String id=entry.getValue();
-            if(Collections.frequency(names.values(),id)>1) id=(entry.getKey().startsWith("src/pages/")?"page-":"component-")+id;
-            if(id.length()<=64 && dev.codeless.api.mapping.ComponentMapping.id(id)) ids.put(entry.getKey(),id);
+        var taken=new HashSet<String>();
+        var shared=new HashMap<String,Integer>();
+        natural.values().forEach(name -> shared.merge(name,1,Integer::sum));
+        for(var entry:natural.entrySet())
+            if(shared.get(entry.getValue())==1 && dev.codeless.api.mapping.ComponentMapping.id(entry.getValue())) {
+                ids.put(entry.getKey(),entry.getValue());taken.add(entry.getValue());
+            }
+        var pending=new TreeSet<String>(natural.keySet());
+        pending.removeAll(ids.keySet());
+        assign(pending,ids,taken,path -> (path.startsWith("src/pages/")?"page-":"component-")+natural.get(path));
+        for(int width=6;!pending.isEmpty() && width<=16;width++) {
+            int digits=width;
+            assign(pending,ids,taken,path -> {
+                String base=natural.get(path);
+                base=base.substring(0,Math.min(base.length(),63-digits));
+                while(base.endsWith("-")) base=base.substring(0,base.length()-1);
+                return base+"-"+sha256(path).substring("sha256:".length(),"sha256:".length()+digits);
+            });
         }
+        if(!pending.isEmpty()) throw new AgentFailure("AGENT_CONFIGURATION");
         return ids;
+    }
+    /** Gives each pending path its candidate when that is a valid ID, not taken, and not wanted by another pending path. */
+    private static void assign(Set<String> pending,Map<String,String> ids,Set<String> taken,java.util.function.Function<String,String> candidate) {
+        var wanted=new HashMap<String,String>();
+        var wants=new HashMap<String,Integer>();
+        for(String path:pending) {
+            String id=candidate.apply(path);
+            wanted.put(path,id);wants.merge(id,1,Integer::sum);
+        }
+        for(String path:List.copyOf(pending)) {
+            String id=wanted.get(path);
+            if(wants.get(id)==1 && !taken.contains(id) && dev.codeless.api.mapping.ComponentMapping.id(id)) {
+                ids.put(path,id);taken.add(id);pending.remove(path);
+            }
+        }
     }
     static String kebab(String name) {
         return name.replaceAll("([a-z0-9])([A-Z])","$1-$2").replaceAll("([A-Z]+)([A-Z][a-z])","$1-$2").replace('_','-')
