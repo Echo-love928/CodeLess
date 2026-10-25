@@ -20,6 +20,21 @@ class AcceptanceActionsTest {
         assertThat(missing.code()).isEqualTo("AGENT_ACCEPTANCE_INCOMPLETE");
         assertThat(missing.detail()).containsEntry("reason","ROUTE_NOT_ASSERTED").containsEntry("routes",List.of("/catalog"));
     }
+    @Test void sharedRunnerVectorsPreserveBlankFillWithoutWeakeningAssertions() throws Exception {
+        var vectors=json.readTree(java.nio.file.Files.readString(java.nio.file.Path.of("../../tests/runner/browser/input-values.json")));
+        for(var vector:vectors) {
+            var action=json.createObjectNode().put("type",vector.path("type").asText());
+            action.putObject("target").put("testId","input");
+            if(vector.has("value")) {
+                var value=vector.path("value");
+                if(value.isString())action.put("value",value.asText().repeat(vector.path("repeat").asInt(1)));
+                else action.set("value",value);
+            }
+            var proposal=actions(NAV,SEE,action.toString());
+            assertThat(AcceptanceActions.check(plan,proposal)==null).as(vector.toString()).isEqualTo(vector.path("accepted").asBoolean());
+            assertThat(proposal.get(2)).isEqualTo(action);
+        }
+    }
     @Test void moreThanTwentyActionsNamesTheLimitAndTheActualCount() {
         var items=new ArrayList<String>(List.of(NAV));for(int i=0;i<24;i++)items.add(SEE);
         var rejection=AcceptanceActions.check(plan,actions(items.toArray(String[]::new)));

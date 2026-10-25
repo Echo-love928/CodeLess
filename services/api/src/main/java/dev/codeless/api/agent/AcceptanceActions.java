@@ -68,7 +68,8 @@ final class AcceptanceActions {
         if(target.has("testId")) { if(!keys(target,Set.of("testId")) || !text(target.path("testId"),100)) return "INVALID_TARGET"; }
         else if(target.has("text")) { if(!keys(target,Set.of("text")) || !text(target.path("text"),256)) return "INVALID_TARGET"; }
         else if(!keys(target,Set.of("role","name")) || !ROLES.contains(target.path("role").asText()) || !text(target.path("name"),256)) return "INVALID_TARGET";
-        if(valued && !(type.equals("fill") && action.path("value").isString() && action.path("value").asText().isEmpty())
+        // Fill is literal user input, including blanks used to test form rejection. Locators and assertions stay nonblank.
+        if(valued && !(type.equals("fill") && action.path("value").isString() && action.path("value").asText().length()<=2000)
                 && !text(action.path("value"),2000)) return "INVALID_VALUE";
         return null;
     }

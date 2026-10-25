@@ -31,6 +31,7 @@ class DeepSeekModelProviderTest {
     private volatile long delay;
     private volatile boolean drip;
     private volatile boolean requestHeader = true;
+    private boolean requireJsonKeyword;
     private final String fakeKey = "local-transport-test-only-secret";
     private DeepSeekModelProvider provider;
     private volatile byte[] requestBytes;
@@ -46,6 +47,11 @@ class DeepSeekModelProviderTest {
             assertThat(exchange.getRequestMethod()).isEqualTo("POST");
             assertThat(exchange.getRequestHeaders().getFirst("Authorization")).isEqualTo("Bearer " + fakeKey);
             requestBytes=exchange.getRequestBody().readAllBytes();var body = mapper.readTree(requestBytes);
+            if(requireJsonKeyword) {
+                boolean present=false;
+                for(var message:body.path("messages"))present|=message.path("content").asText().toLowerCase(java.util.Locale.ROOT).contains("json");
+                if(!present){exchange.sendResponseHeaders(400,-1);exchange.close();return;}
+            }
             assertThat(body.get("max_tokens").intValue()).isEqualTo(1024);
             assertThat(body.get("stream").booleanValue()).isFalse();
             assertThat(body.path("response_format").path("type").asText()).isEqualTo("json_object");
@@ -127,6 +133,30 @@ class DeepSeekModelProviderTest {
             assertThat(failure.evidence().requestId()).isEqualTo("transport-req-1");
             assertThat(failure.evidence().usage().inputTokens()).isNull();
             assertThat(failure.getMessage()).doesNotContain(fakeKey);
+        }
+        assertThat(calls).hasValue(1);
+    }
+    @Test void completionOnlyPoliciesStillSatisfyJsonModeWithoutToolSchemas() throws Exception {
+        requireJsonKeyword=true;
+        String common=new org.springframework.core.io.ClassPathResource("model/prompts/agent-proposal-protocol-v1.txt")
+                .getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
+        for(String policy:java.util.List.of(common,new org.springframework.core.io.ClassPathResource("model/prompts/repair/agent-repair-v1.txt")
+                .getContentAsString(java.nio.charset.StandardCharsets.UTF_8))) {
+            assertThat(policy).contains("\"type\":\"done\"").doesNotContain("json_object","response_format");
+            var reply=provider.call(new Prompt(java.util.List.of(new SystemMessage(policy),
+                    new UserMessage("{\"completionOnly\":true,\"tools\":[]}"))),1024,Duration.ofSeconds(5));
+            assertThat(reply.content()).isEqualTo("{\"hello\":true}");
+        }
+        assertThat(calls).hasValue(2);
+    }
+    @Test void httpFailurePreservesOnlyNumericStatusWithoutReadingProviderBody() {
+        status=400;response=fakeKey;
+        try {call(Duration.ofSeconds(5));throw new AssertionError("expected HTTP failure");}
+        catch(ModelFailure failure) {
+            assertThat(failure.code()).isEqualTo("MODEL_HTTP_ERROR");
+            assertThat(failure.detail()).isEqualTo("HTTP_STATUS_400");
+            assertThat(failure.getMessage()).doesNotContain(fakeKey);
+            assertThat(failure.evidence().usage().totalTokens()).isNull();
         }
         assertThat(calls).hasValue(1);
     }

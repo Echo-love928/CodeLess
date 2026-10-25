@@ -22,7 +22,7 @@ after(async () => { await browser?.close() })
 // Fields in cards and details use different labels; CAT-03 only opens from the name.
 function catalog(id, { labels = false, authorFirst = true, categoryFirst = false, searchType = 'text', combine = true,
   detailAuthor = true, nameOnly = true, nameControl = 'heading', categoryLabel = null, descriptionLabel = '简介', detailLayout = 'text',
-  itemTag = 'article', sparse = false, namedDetail = false } = {}) {
+  itemTag = 'article', sparse = false, namedDetail = false, cardLabelSeparator = '：', detailRating = '4.5', allLabel = '全部', brokenReset = false } = {}) {
   const count = { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
   const categories = id === 'CAT-01' ? ['小说', '科技', '历史'] : id === 'CAT-02' ? ['西湖区', '上城区', '拱墅区'] : ['构建', '测试', '文档']
   return `<!doctype html><html lang="zh"><meta charset="utf-8"><body><h1>独立目录实现</h1>
@@ -33,7 +33,7 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
     const items=Array.from({length:${count}},(_,i)=>({name:'名称'+i,author:'作者值'+i,category:categories[i%3],description:'简介值'+i}));
     const main=document.querySelector('main'), search=document.querySelector('input'), nav=document.querySelector('nav'), detail=document.querySelector('section');
     let category='全部';
-    function show(item){detail.hidden=false;const values=[item.name,${detailAuthor ? 'item.author' : "'错误作者'"},item.category,item.description,'4.5','MIT'],body=detail.querySelector('div');body.replaceChildren();
+    function show(item){detail.hidden=false;const values=[item.name,${detailAuthor ? 'item.author' : "'错误作者'"},item.category,item.description,${JSON.stringify(detailRating)},'MIT'],body=detail.querySelector('div');body.replaceChildren();
       detail.querySelector('h2').textContent=${namedDetail} ? item.name : '详情';
       if(${sparse}){for(const value of values.slice(1,4)){const p=document.createElement('p');p.textContent=value;body.append(p)}}
       else if(${JSON.stringify(detailLayout)}==='dl'){const dl=document.createElement('dl');values.forEach((value,i)=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=['名称','作者','所在城区','一句简介','评分','许可证'][i];dd.textContent=value;dl.append(dt,dd)});body.append(dl)}else body.textContent=values.join(' ')}
@@ -43,10 +43,10 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
         if(id==='CAT-03'&&${nameOnly}){if(${JSON.stringify(nameControl)}==='heading')heading.onclick=()=>show(item);else{const control=document.createElement(${JSON.stringify(nameControl)}==='link'?'a':'button');control.textContent=item.name;if(control.tagName==='A')control.href='#';if(${JSON.stringify(nameControl)}==='button-wide')control.style.width='100%';control.onclick=event=>{event.preventDefault();show(item)};heading.replaceChildren(control)}}else card.onclick=()=>show(item);card.append(heading);
         const author=id==='CAT-02'?'评分：4.5':id==='CAT-03'?'许可证：MIT':'作者：'+item.author;
         const fields=[author,(${JSON.stringify(categoryLabel)}||(id==='CAT-02'?'城区':id==='CAT-03'?'类别':'分类'))+'：'+item.category,${JSON.stringify(descriptionLabel)}+'：'+item.description];
-        if(${categoryFirst})fields.unshift(fields.splice(1,1)[0]);if(!authorFirst)fields.reverse();for(const raw of fields){const p=document.createElement('p');p.textContent=labels?raw:raw.replace(/^[^：]+：/,'');card.append(p)}main.append(card)}
+        if(${categoryFirst})fields.unshift(fields.splice(1,1)[0]);if(!authorFirst)fields.reverse();for(const raw of fields){const p=document.createElement('p');p.textContent=labels?raw.replace('：',${JSON.stringify(cardLabelSeparator)}):raw.replace(/^[^：]+：/,'');card.append(p)}main.append(card)}
       document.querySelector('#empty').hidden=visible.length>0;
     }
-    if(id==='CAT-02'){const select=document.createElement('select');select.ariaLabel='城区';for(const name of ['全部',...categories]){const option=document.createElement('option');option.textContent=name;select.append(option)}select.onchange=()=>{category=select.value;render()};nav.append(select)}
+    if(id==='CAT-02'){const select=document.createElement('select');select.ariaLabel='城区';for(const name of ['全部',...categories]){const option=document.createElement('option');option.value=name;option.textContent=name==='全部'?${JSON.stringify(allLabel)}:name;select.append(option)}select.onchange=()=>{if(!${brokenReset}||select.value!=='全部')category=select.value;render()};nav.append(select)}
     else for(const name of ['全部',...categories]){const button=document.createElement('button');button.textContent=name;button.onclick=()=>{category=name;render()};nav.append(button)}
     search.oninput=render;render();
     </script></body></html>`
@@ -226,12 +226,12 @@ for (const broken of ['author', 'combination']) test('CAT-01: compact lists stil
   assert.equal(result.status, 'FAILED'); assert.equal(result.failure, 'BEHAVIOR_ERROR')
 })
 
-function photography({ count = 4, blankLocation = false } = {}) {
+function photography({ count = 4, blankLocation = false, email = 'linxia@example.com', labelledEmail = false, hiddenEmail = false } = {}) {
   return '<html><meta charset="utf-8"><body><button onclick="show(0)">关于我</button><button onclick="show(1)">作品集</button>' +
     '<button onclick="show(2)">联系方式</button><main></main><script>' +
     'function show(tab){document.querySelector("main").innerHTML=tab===0?\'<section><h2>关于我</h2><p>摄影师</p></section>\':' +
     'tab===1?\'<section><h2>作品集</h2><ul>' + Array.from({ length: count }, (_, i) => '<li><div style="background:blue;height:10px"></div><h3>作品' + i + '</h3><p>' + (blankLocation ? '' : '地点' + i) + '</p></li>').join('') +
-    '</ul></section>\':\'<section><h2>联系方式</h2><p>linxia@example.com</p></section>\'}show(0)</script></body></html>'
+    '</ul></section>\':\'<section><h2>联系方式</h2><p' + (hiddenEmail ? ' hidden' : '') + '>' + (labelledEmail ? '邮箱：' : '') + email + '</p></section>\'}show(0)</script></body></html>'
 }
 function shopping({ checkbox = false, persist = true, brokenClear = false } = {}) {
   return `<html><meta charset="utf-8"><body><h1>购物工具</h1><input aria-label="商品"><input type="number" aria-label="数量"><button id="add">加入清单</button><button id="clear">清除已购买</button><ul></ul><script>
@@ -258,4 +258,21 @@ for (const failure of ['persistence', 'clear']) test('TASK-03: button compatibil
 for (const variant of ['valid', 'count', 'location']) test('SHOW-03: list gallery ' + variant, async () => {
   const result = await check('SHOW-03', photography({ count: variant === 'count' ? 3 : 4, blankLocation: variant === 'location' }), 'list-gallery-' + variant)
   assert.equal(result.status, variant === 'valid' ? 'PASSED' : 'FAILED', JSON.stringify(result))
+})
+for (const variant of ['labelled', 'wrong', 'hidden']) test('SHOW-03: contact email ' + variant, async () => {
+  const result = await check('SHOW-03', photography({ labelledEmail: true,
+    email: variant === 'wrong' ? 'notlinxia@example.com.evil' : 'linxia@example.com', hiddenEmail: variant === 'hidden' }), 'email-' + variant)
+  assert.equal(result.status, variant === 'labelled' ? 'PASSED' : 'FAILED', JSON.stringify(result))
+})
+for (const broken of [false, true]) test('CAT-02: native button cards ' + (broken ? 'still enforce category intersection' : 'are complete interactive cards'), async () => {
+  const result = await check('CAT-02', catalog('CAT-02', { itemTag: 'button', labels: true, cardLabelSeparator: ' ', allLabel: '全部城区', combine: !broken }), 'button-card-' + broken)
+  assert.equal(result.status, broken ? 'FAILED' : 'PASSED', JSON.stringify(result))
+})
+test('CAT-02: colonless rating labels still reject a different rating in details', async () => {
+  const result = await check('CAT-02', catalog('CAT-02', { itemTag: 'button', labels: true, cardLabelSeparator: ' ', detailRating: '4.0' }), 'button-wrong-rating')
+  assert.equal(result.status, 'FAILED', JSON.stringify(result))
+})
+test('CAT-02: restoring the observed initial option must really restore every card', async () => {
+  const result = await check('CAT-02', catalog('CAT-02', { itemTag: 'button', allLabel: '全部城区', brokenReset: true }), 'button-broken-reset')
+  assert.equal(result.status, 'FAILED', JSON.stringify(result))
 })

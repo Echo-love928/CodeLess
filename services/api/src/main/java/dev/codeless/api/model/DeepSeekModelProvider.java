@@ -68,7 +68,7 @@ public final class DeepSeekModelProvider implements ModelProvider {
                 || timeout.toMillis() < 1 || timeout.compareTo(Duration.ofSeconds(120)) > 0)
             throw new ModelFailure("MODEL_INVALID_INPUT");
         String body=requestBody(prompt,maxOutputTokens);
-        var received = new AtomicReference<>(new ResponseHead(null, Evidence.unknown()));
+        var received = new AtomicReference<>(new ResponseHead(null, Evidence.unknown(), 0));
         CompletableFuture<HttpResponse<byte[]>> pending;
         try {
             HttpRequest request = HttpRequest.newBuilder(endpoint).timeout(timeout)
@@ -76,7 +76,7 @@ public final class DeepSeekModelProvider implements ModelProvider {
                     .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8)).build();
             pending = client.sendAsync(request, info -> {
                 String requestId = info.headers().firstValue("x-request-id").filter(DeepSeekModelProvider::safeId).orElse(null);
-                var head = new ResponseHead(httpError(info.statusCode()), new Evidence(null, requestId, null, Usage.unknown()));
+                var head = new ResponseHead(httpError(info.statusCode()), new Evidence(null, requestId, null, Usage.unknown()), info.statusCode());
                 received.set(head);
                 return new BoundedBody(head.errorCode() == null ? null : head.failure(head.errorCode()));
             });
@@ -130,9 +130,10 @@ public final class DeepSeekModelProvider implements ModelProvider {
             default -> status >= 500 ? "MODEL_UNAVAILABLE" : "MODEL_HTTP_ERROR";
         };
     }
-    private record ResponseHead(String errorCode, Evidence evidence) {
+    private record ResponseHead(String errorCode, Evidence evidence, int status) {
         ModelFailure failure(String transportCode) {
-            return new ModelFailure(errorCode == null ? transportCode : errorCode, evidence);
+            return new ModelFailure(errorCode == null ? transportCode : errorCode, evidence,
+                    errorCode != null && status > 0 ? "HTTP_STATUS_" + status : null);
         }
     }
 
