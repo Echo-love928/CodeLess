@@ -158,6 +158,17 @@ test('semantic heading/button targets resolve to renamed component files, includ
   }
 })
 
+for (const changedDescription of [false, true]) test('card preservation permits layout whitespace but rejects changed descriptions: ' + changedDescription, async () => {
+  const html = '<html><meta charset="utf-8"><body>' + workTitles.map((title, i) => `<article style="padding:7px"><h3>${title}</h3><p>Description ${i}</p></article>`).join('') + '</body></html>'
+  const after = '<html><meta charset="utf-8"><body>' + workTitles.map((title, i) => `<article style="padding:24px">\n  <h3>${title}</h3>\n  <p>${changedDescription && i === 0 ? 'Different' : 'Description ' + i}</p>\n</article>`).join('\n') + '</body></html>'
+  const result = await custom(html, 'semantic-preserve-description-' + changedDescription, async (page, expect) => {
+    const baseline = await observeTarget(page, edits[2], expect)
+    await page.setContent(after)
+    await editTarget(page, edits[2], expect, 'after', baseline)
+  })
+  assert.equal(result.status, changedDescription ? 'FAILED' : 'PASSED', JSON.stringify(result))
+})
+
 for (const id of ['CAT-01', 'CAT-02', 'CAT-03']) {
   for (const labels of [false, true]) test(`${id}: ${labels ? 'labelled' : 'bare'} fields and value-only details are valid`, async () => {
     const result = await check(id, catalog(id, { labels }), id + '-' + labels)

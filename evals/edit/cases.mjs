@@ -51,13 +51,16 @@ export async function observeTarget(page, edit, expect, phase = 'before') {
   for (const target of await targets.all()) {
     await expect(target).toBeVisible()
     if (edit.kind === 'css' && edit.property === 'color') await expect(target.locator('p')).not.toHaveCount(0)
-    observations.push(await target.evaluate((node, properties) => ({
+    let title = null
+    if (edit.kind === 'css') for (const value of workTitles)
+      if (await target.getByRole('heading', { name: namePattern(value) }).count() === 1) { title = value; break }
+    observations.push({ ...await target.evaluate((node, properties) => ({
       candidateId: node.closest('[data-ai-component]')?.getAttribute('data-ai-component') ?? null,
       text: node.textContent.trim(), descriptions: [...node.querySelectorAll('p')].map(p => p.textContent.trim()),
       css: Object.fromEntries(properties.flatMap(property => property === 'color'
         ? [...node.querySelectorAll('p')].map((p, i) => ['body-color-' + i, getComputedStyle(p).color])
         : [[property, getComputedStyle(node).getPropertyValue(property)]]))
-    }), edit.kind === 'css' ? (edit.id === 'EDIT-03' ? ['padding-top', 'padding-right', 'padding-bottom', 'padding-left'] : [edit.property]) : []))
+    }), edit.kind === 'css' ? (edit.id === 'EDIT-03' ? ['padding-top', 'padding-right', 'padding-bottom', 'padding-left'] : [edit.property]) : []), title })
   }
   if (edit.kind === 'css') for (const title of workTitles)
     await expect(targets.getByRole('heading', { name: namePattern(title) })).toHaveCount(1)
@@ -69,7 +72,8 @@ export async function editTarget(page, edit, expect, phase = 'after', baseline =
   if (phase === 'after') {
     if (edit.kind === 'css') {
       for (const value of values) for (const actual of Object.values(value.css)) expect(actual).toBe(edit.after)
-      const contents = observations => observations.map(v => JSON.stringify({ text: v.text, descriptions: v.descriptions })).sort()
+      const contents = observations => observations.map(v => JSON.stringify({ title: v.title,
+        descriptions: v.descriptions.map(text => text.replace(/\s+/gu, ' ').trim()) })).sort()
       if (baseline) expect(contents(values)).toEqual(contents(baseline))
     }
     if (edit.id === 'EDIT-04') {
