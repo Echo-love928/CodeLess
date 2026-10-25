@@ -41,6 +41,12 @@ export function newBatchId(mode, now) {
   return now.toISOString().slice(0, 19).replaceAll(':', '-') + 'Z-' + mode.toLowerCase() + '-' + randomUUID().slice(0, 8)
 }
 
+export function validNetworkPreflight(network, now = Date.now()) {
+  const completed = Date.parse(network?.completedAt)
+  return network?.status === 'PASSED' && network.tlsVerified === 12 && network.transportReached === 12 &&
+    network.endpoint === 'https://api.deepseek.com' && Number.isFinite(completed) && completed <= now && now - completed <= 10 * 60000
+}
+
 function writeOnce(path, text) { writeFileSync(path, text, { flag: 'wx' }) }
 
 function capture(command, args, options = {}) {
@@ -70,7 +76,7 @@ export function javaHome(env = process.env) {
 }
 
 /** JVM environment for one sample. The provider credential reaches only REAL sample JVMs. */
-export function sampleEnvironment({ base, mode, sample, specPath, outputDir, java, captureDir }) {
+export function sampleEnvironment({ base, mode, sample, specPath, outputDir, java, captureDir, revision }) {
   const env = {}
   for (const [key, value] of Object.entries(base)) if (!STRIPPED.test(key)) env[key] = value
   const previous = env[pathKey(env)] ?? ''
@@ -90,6 +96,9 @@ export function sampleEnvironment({ base, mode, sample, specPath, outputDir, jav
     // Complete request/reply bytes for diagnosing invalid replies; private root only, scanned for the credential.
     if (captureDir) env.CODELESS_EVAL_PRIVATE_CAPTURE_DIR = captureDir
   }
+  if (captureDir && ['SHOW-01', 'SHOW-02', 'TASK-01'].includes(sample.id))
+    env.CODELESS_EVAL_RETAIN_ROOT = join(dirname(captureDir), 'retained', sample.id)
+  if (revision && env.CODELESS_EVAL_RETAIN_ROOT) env.CODELESS_EVAL_REVISION = revision
   return { env, removedPathEntries: removed.length }
 }
 
@@ -179,6 +188,11 @@ export async function runBatch(options, deps = {}) {
   if (options.mode === 'REAL') {
     if (env.CODELESS_EVAL_REAL_APPROVED !== '1') throw new Error('REAL batch requires CODELESS_EVAL_REAL_APPROVED=1')
     if (!env.CODELESS_MODEL_API_KEY || !env.CODELESS_MODEL_NAME) throw new Error('REAL batch requires CODELESS_MODEL_API_KEY and CODELESS_MODEL_NAME')
+    if (!deps.preflight) {
+      if (!env.CODELESS_EVAL_NETWORK_PREFLIGHT) throw new Error('REAL batch needs network-preflight.mjs evidence before any sample starts')
+      if (!validNetworkPreflight(readJson(env.CODELESS_EVAL_NETWORK_PREFLIGHT)))
+        throw new Error('Network preflight missing, stale or unsuccessful; no REAL samples started')
+    }
   }
   const git = (deps.gitState ?? gitState)()
   let dir
@@ -227,6 +241,10 @@ export async function runBatch(options, deps = {}) {
   const cwd = deps.cwd ?? (options.isolated ? isolatedCheckout(batch.git.head, batchId + (options.resume ? '-resume-' + randomUUID().slice(0, 4) : '')) : root)
   const java = deps.javaHome ? deps.javaHome() : javaHome(env)
   const checks = deps.preflight ? deps.preflight() : preflight(cwd, java, sampleEnvironment({ base: env, mode: 'MOCK', sample: {}, specPath: '', outputDir: '', java }).env)
+  if (options.mode === 'REAL' && !deps.preflight) {
+    checks.network = readJson(env.CODELESS_EVAL_NETWORK_PREFLIGHT)
+    checks.ok = checks.ok && validNetworkPreflight(checks.network)
+  }
   const preflightName = 'preflight-' + (readdirSync(dir).filter((name) => name.startsWith('preflight-')).length + 1) + '.json'
   writeOnce(join(dir, preflightName), canonical({ at: now().toISOString(), checkout: cwd === root ? 'IN_PLACE' : 'ISOLATED', ...checks }))
   if (!checks.ok) throw new Error('preflight failed; no sample started (' + preflightName + ')')
@@ -241,7 +259,7 @@ export async function runBatch(options, deps = {}) {
       frozenDigests: Object.fromEntries(Object.keys(FROZEN).map((key) => [key, frozen[key].sha256])) }
     writeOnce(join(sdir, 'spec.json'), canonical(spec))
     const { env: jvm, removedPathEntries } = sampleEnvironment({ base: env, mode: options.mode, sample,
-      specPath: join(sdir, 'spec.json'), outputDir: sdir, java, captureDir: join(privateRoot, sample.id + '-wire') })
+      specPath: join(sdir, 'spec.json'), outputDir: sdir, java, captureDir: join(privateRoot, sample.id + '-wire'), revision: batch.git.head })
     const log = join(privateRoot, sample.id + '.log')
     writeOnce(join(sdir, 'invocation.json'), canonical({ schemaVersion: 1, sampleId: sample.id, attempt: 1, startedAt: now().toISOString(),
       harness: 'GenerationEvalIT', checkout: cwd === root ? 'IN_PLACE' : 'ISOLATED', head: batch.git.head,

@@ -126,11 +126,18 @@ public final class AgentLoop implements TaskStageRunner {
         Map<String,String> componentIds=repair||edit.isPresent()?Map.of():componentIds(planned);
         int rejectedDone=0;
         for(int i=0;i<RuntimeBudget.MODEL_CALLS;i++) {
-            var meter=repair?RuntimeBudget.meter(store.read(claim,stage)):null;
+            var meter=RuntimeBudget.meter(store.read(claim,stage));
             boolean changed=repair&&Boolean.TRUE.equals(repairContext.progress().get("sourceChanged"));
             boolean completionOnly=changed&&RuntimeBudget.MODEL_CALLS-meter.models()==1;
             JsonNode request=input(stage,context,plan,local,edit,completionOnly,repair?repairContext.observations():observations,
                     failure,originalActions,repairContext,meter,componentIds);
+            if(!repair && edit.isEmpty() && GenerationContext.complete(observations,planned)) {
+                Integer full=model.allowance(meter,policy,request);
+                if(full==null || full<RuntimeBudget.OUTPUT_TOKENS) {
+                    completionOnly=true;
+                    request=input(stage,context,plan,local,edit,true,observations,failure,originalActions,repairContext,meter,componentIds);
+                }
+            }
             if(changed && !completionOnly) {
                 // After an actual source change, a request that cannot fund a full-size write may only complete.
                 Integer full=model.allowance(meter,policy,request);
@@ -221,7 +228,8 @@ public final class AgentLoop implements TaskStageRunner {
         else input.put("plan",repair?RepairContext.planProjection(plan):plan);
         if(!componentIds.isEmpty()) input.put("componentIds",componentIds);
         input.put("tools",completionOnly?List.of():registry.definitions().path("tools"));
-        input.put("observations",observations);
+        input.put("observations",repair?observations:GenerationContext.observations(observations));
+        if(completionOnly) input.put("completionOnly",true);
         edit.ifPresent(value -> input.put("editContext",value));
         if(repair) {input.put("failure",failure);input.put("completionProposal",Map.of("type","done","actions",originalActions));input.put("sourceFiles",repairContext.sourceFiles());
             input.put("repairAttempt",context.repairAttempts());input.put("repairProgress",repairContext.progress());

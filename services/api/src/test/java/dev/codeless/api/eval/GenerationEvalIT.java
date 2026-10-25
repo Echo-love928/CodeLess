@@ -33,7 +33,9 @@ import tools.jackson.databind.json.JsonMapper;
  */
 @SpringBootTest(properties={"codeless.model.provider=deterministic-mock","codeless.agent.enabled=true","codeless.agent.repository-root=../.."})
 class GenerationEvalIT extends PostgresTestBase {
-    static final Path ROOT=Path.of("target","d21-eval",UUID.randomUUID().toString()).toAbsolutePath().normalize();
+    static final Path ROOT=System.getenv("CODELESS_EVAL_RETAIN_ROOT")==null
+            ?Path.of("target","d21-eval",UUID.randomUUID().toString()).toAbsolutePath().normalize()
+            :Path.of(System.getenv("CODELESS_EVAL_RETAIN_ROOT")).toAbsolutePath().normalize();
     static final String MISSING="d21-eval-mock-mode-no-credential";
     @DynamicPropertySource static void roots(DynamicPropertyRegistry registry) {
         registry.add("codeless.agent.private-root",()->ROOT.resolve("private").toString());
@@ -84,8 +86,10 @@ class GenerationEvalIT extends PostgresTestBase {
                     mode.equals("MOCK") && deadRoute?"deterministic-mock":null);
             harness.put("provider",Map.of("id",provider.id(),"model",provider.model(),"transport",base.getClass().getSimpleName(),
                     "privateCapture",wire!=base));
-            UUID owner=UUID.randomUUID();app=UUID.randomUUID();
-            repository.createUser(owner,"d21-eval-"+spec.path("sampleId").asText().toLowerCase(Locale.ROOT)+"@eval.codeless.test","D21 evaluation");
+            UUID owner=System.getenv("CODELESS_EVAL_RETAIN_ROOT")==null?UUID.randomUUID():
+                    UUID.nameUUIDFromBytes(("D21-owner:"+spec.path("batchId").asText()).getBytes(StandardCharsets.UTF_8));
+            app=UUID.randomUUID();
+            repository.createUser(owner,"d21-eval-"+owner+"@eval.codeless.test","D21 evaluation");
             repository.createApplication(app,owner,requirement.path("applicationName").asText(),DataMode.valueOf(requirement.path("dataMode").asText()));
             task=queue.create(owner,app,requirement.path("prompt").asText(),null).id();
             harness.put("taskId",task.toString());
@@ -98,7 +102,7 @@ class GenerationEvalIT extends PostgresTestBase {
             harness.put("startedAt",started.toString());harness.put("finishedAt",finished.toString());
             harness.put("wallClockMs",Duration.between(started,finished).toMillis());
             System.clearProperty("https.proxyHost");System.clearProperty("https.proxyPort");
-            try {collect(record,output,task,app,provider);}
+            try {collect(record,output,task,app,provider);if(System.getenv("CODELESS_EVAL_RETAIN_ROOT")!=null) retain(record,spec,task,app);}
             catch(Throwable error) {if(failure==null) failure=error; else failure.addSuppressed(error);}
             if(failure!=null) record.put("harnessError",Map.of("type",failure.getClass().getName(),"message",String.valueOf(failure.getMessage())));
             else record.put("harnessError",null);
@@ -106,6 +110,34 @@ class GenerationEvalIT extends PostgresTestBase {
         }
         if(failure instanceof Exception error) throw error;
         if(failure!=null) throw new IllegalStateException(failure);
+    }
+
+    /** Export before Testcontainers teardown; original private files remain at this batch-private root. */
+    private void retain(Map<String,Object> record,JsonNode spec,UUID task,UUID app) throws Exception {
+        if(task==null || app==null) throw new IllegalStateException("Cannot retain a missing original task");
+        Files.createDirectories(ROOT);
+        var dump=POSTGRES.execInContainer("pg_dump","-U",POSTGRES.getUsername(),"-d",POSTGRES.getDatabaseName(),
+                "--data-only","--inserts","--on-conflict-do-nothing","--file=/tmp/d21-retained.sql");
+        if(dump.getExitCode()!=0) throw new IllegalStateException("Original database export failed");
+        POSTGRES.copyFileFromContainer("/tmp/d21-retained.sql",ROOT.resolve("database.sql").toString());
+        var schema=POSTGRES.execInContainer("pg_dump","-U",POSTGRES.getUsername(),"-d",POSTGRES.getDatabaseName(),
+                "--schema-only","--no-owner","--no-privileges","--file=/tmp/d21-schema.sql");
+        if(schema.getExitCode()!=0) throw new IllegalStateException("Original schema export failed");
+        POSTGRES.copyFileFromContainer("/tmp/d21-schema.sql",ROOT.resolve("schema.sql").toString());
+        var manifest=new ArrayList<Map<String,Object>>();
+        try(var paths=Files.walk(ROOT)) {
+            for(Path file:paths.filter(Files::isRegularFile).sorted().toList()) {
+                if(Files.isSymbolicLink(file)) throw new IllegalStateException("Linked retained file");
+                manifest.add(Map.of("path",ROOT.relativize(file).toString().replace('\\','/'),"sha256",sha(Files.readAllBytes(file))));
+            }
+        }
+        var application=row("SELECT id,owner_id,latest_ready_version_id FROM applications WHERE id=?",app);
+        var retained=new LinkedHashMap<String,Object>();retained.put("schemaVersion",1);
+        retained.put("batchId",spec.path("batchId").asText());retained.put("sampleId",spec.path("sampleId").asText());
+        retained.put("mode",spec.path("mode").asText());retained.put("application",application);
+        retained.put("platformRevision",System.getenv("CODELESS_EVAL_REVISION"));
+        retained.put("task",record.get("task"));retained.put("versions",record.get("versions"));retained.put("files",manifest);
+        write(ROOT.resolve("retained.json"),json.writerWithDefaultPrettyPrinter().writeValueAsString(retained)+"\n");
     }
 
     /** Detects config drift between the frozen run configuration and the platform constants. */

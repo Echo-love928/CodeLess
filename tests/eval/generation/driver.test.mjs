@@ -4,10 +4,20 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, 
 import { tmpdir } from 'node:os'
 import { delimiter, join } from 'node:path'
 import { canonical, withoutContainerCli } from '../../../scripts/eval/lib.mjs'
-import { parseArgs, runBatch, sampleEnvironment, secretOccurrences } from '../../../scripts/eval/run-batch.mjs'
+import { parseArgs, runBatch, sampleEnvironment, secretOccurrences, validNetworkPreflight } from '../../../scripts/eval/run-batch.mjs'
 import { defaultRecord } from './fixtures.mjs'
 
 const SECRET = 'sk-d21-synthetic-credential-0123456789'
+
+test('REAL network gate requires fresh complete normal TLS and JVM evidence', () => {
+  const now = Date.parse('2026-10-25T07:00:00Z'), good = { status: 'PASSED', tlsVerified: 12, transportReached: 12,
+    endpoint: 'https://api.deepseek.com', completedAt: new Date(now - 60000).toISOString() }
+  assert.equal(validNetworkPreflight(good, now), true)
+  for (const patch of [{ status: 'BLOCKED' }, { tlsVerified: 11 }, { transportReached: 11 }, { endpoint: 'http://api.deepseek.com' },
+    { completedAt: 'invalid' }, { completedAt: new Date(now + 1).toISOString() }, { completedAt: new Date(now - 600001).toISOString() }])
+    assert.equal(validNetworkPreflight({ ...good, ...patch }, now), false)
+  assert.equal(validNetworkPreflight(null, now), false)
+})
 
 function harness(t, { failOn = [], env = {} } = {}) {
   const parent = mkdtempSync(join(tmpdir(), 'd21a-driver-'))
