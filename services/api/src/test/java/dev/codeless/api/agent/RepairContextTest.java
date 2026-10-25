@@ -16,7 +16,7 @@ class RepairContextTest {
     @Test void compactCompletionFundsARequestWithoutChangingOriginalActionsOrAnySourceEvidence() {
         var actions=json.createArrayNode();
         actions.addObject().put("type","navigate").put("path","/");
-        for(int i=0;i<16;i++) actions.addObject().put("type","expectText").put("value","独立完整行为断言".repeat(20));
+        for(int i=0;i<16;i++) actions.addObject().put("type","expectText").put("value","独立完整行为断言".repeat(25));
         var original=actions.deepCopy();
         var input=json.valueToTree(Map.of("completionProposal",Map.of("type","done","actions",actions),
                 "failure",Map.of("failedAction",Map.of("index",3,"action",actions.get(3))),

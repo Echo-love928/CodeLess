@@ -302,6 +302,8 @@ class AgentLoopIntegrationTest extends PostgresTestBase {
         var fed=(tools.jackson.databind.node.ObjectNode)received.get(2).path("observations").get(0).deepCopy();
         String committed=fed.remove("committedContent").asText();
         assertThat(fed.remove("contentOrigin").asText()).isEqualTo("COMMITTED_WRITE_DIGEST_MATCHED");
+        assertThat(fed.remove("tool").asText()).isEqualTo("files.create");
+        assertThat(fed.remove("path").asText()).isEqualTo(actual.path("source").path("files").get(0).path("path").asText());
         assertThat(fed).isEqualTo(actual);
         assertThat(committed).isEqualTo(json.readTree(mock.call(new Prompt(List.of(new org.springframework.ai.chat.messages.SystemMessage("p"),
                 new org.springframework.ai.chat.messages.UserMessage(received.get(1).toString()))),4096,Duration.ofSeconds(1)).content()).path("arguments").path("content").asText());
