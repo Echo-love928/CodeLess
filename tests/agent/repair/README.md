@@ -363,11 +363,21 @@ the numbers move a little; for example, CAT-03's last allowance goes from 1,104 
 
 To check on LF from a Windows checkout, as B did, in Git Bash:
 
-1. Convert only the text resources the API build copies.
-2. Run the tests.
-3. Delete and check out the converted files again. Under autocrlf, `git diff`
+1. Check that the text resources the API build copies have no local changes.
+   Step 4 restores them from Git and would discard any, so the snippet stops
+   without touching anything if `git status` lists one of them.
+2. Convert only those files to LF.
+3. Run the tests.
+4. Delete and check out the converted files again. Under autocrlf, `git diff`
    shows no change for a CRLF-to-LF edit, and a plain checkout may keep LF;
    deleting first makes the checkout rewrite them.
+
+If a run stops before step 4, the converted files differ only in line endings, and
+`git status` lists them, so the next run would stop at step 1. Run the snippet's
+`files=...` line and its `rm ... && git checkout ...` line by hand to restore them.
+To check files that do have local changes, commit or stash those changes first, or
+run the snippet in a separate checkout from `git worktree add --detach`; there
+`prepare-runtime.mjs` installs the pnpm dependencies on the first run.
 
 The shell `mvnw` is itself checked out as CRLF, so the snippet calls `mvnw.cmd`
 through cmd:
@@ -375,7 +385,12 @@ through cmd:
 ```bash
 unset CODELESS_MODEL_API_KEY CODELESS_MODEL_NAME; export CODELESS_MODEL_PROVIDER=deterministic-mock
 files=$(git ls-files 'prompts/runtime/*.txt' contracts/tools/registry.json 'contracts/plan/*.json' services/api/src/main/resources/model/prompts/agent-proposal-protocol-v1.txt)
-sed -i 's/\r$//' $files
-cmd.exe //d //c "services\api\mvnw.cmd -f services/api/pom.xml \"-Dtest=RepairLoopIntegrationTest,RepairBudgetRegressionTest\" test"
-rm $files && git checkout -- $files
+if [ -n "$(git status --porcelain -- $files)" ]; then
+  git status --short -- $files
+  echo 'Stopped: these files have local changes that the restore step would discard.' >&2
+else
+  sed -i 's/\r$//' $files
+  cmd.exe //d //c "services\api\mvnw.cmd -f services/api/pom.xml \"-Dtest=RepairLoopIntegrationTest,RepairBudgetRegressionTest\" test"
+  rm $files && git checkout -- $files
+fi
 ```
