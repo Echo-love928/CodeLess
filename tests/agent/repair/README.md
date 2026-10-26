@@ -315,3 +315,67 @@ change:
   assertions, but the journal of the fixed run matches them.
 - `RepairPreviewPlatformAcceptanceIT`: line 37 expects one generation task, but
   that check's component edit adds a second one.
+
+## D24-A round 3: read-gate tests no longer depend on prompt line endings (2026-10-26)
+
+B's review of `f35bea1` found that CI (`verify:api` on ubuntu-24.04) failed two round-2
+tests in `RepairLoopIntegrationTest` that pass on a Windows checkout:
+`repairReadThatTheRequestDoesNotOfferCannotConsumeAFileTool` and
+`capturedPatchIsVerifiedWithoutACompletionRequestWithinOriginalBudget`. The cause:
+
+- The repository has no `.gitattributes`. With `core.autocrlf=true` Windows checks
+  the prompts out as CRLF, so the 20-line REPAIR prompt is 20 bytes longer there.
+- The input reservation counts UTF-8 bytes, and the read rule counts the input
+  twice (this request and the next). Every REPAIR read decision therefore has 40
+  more tokens of margin on LF.
+- In the 720f replay, the second REPAIR request missed the read by 30 tokens as CRLF
+  and funded it with 10 to spare as LF, so CI replayed the recorded read 7.
+
+Both decisions follow the production rule. The tests had pinned a margin smaller
+than the line-ending shift.
+
+Both tests now reserve six tool slots at GENERATE's recorded done, before the
+failed build, so REPAIR starts with 15 of the 20 slots used:
+
+- The first REPAIR request has five left and offers the recorded read 6.
+- After that read four are left, below the five the read rule needs, so the second
+  request offers no read on either line ending.
+
+The tests assert those counts (`toolCallsRemaining` 5, 4) and offers directly. Every
+earlier assertion stays. Only the tool-slot totals move by six, to 16 and 20. No
+production code changed.
+
+A test that depends on whether a read is offered should pin the decision with an
+exact count (tool slots, model calls), not with a token margin within 40 tokens of
+the rule. Where usage is declared per byte, as in `RepairBudgetRegressionTest`, the
+shift is larger.
+
+A temporary print (never committed) logged every REPAIR read decision on both line
+endings. The content-free numbers are in
+`evidence/2026-10-26/d24-a-round3/read-gate-margins.json`.
+
+`evidence/2026-10-26/d24-a-round3/pre-fix-f208767-lf.json` reruns the round-2
+regression class on the pre-fix tree with LF resources. CAT-01, CAT-03 and
+FAULT-CODE-02 fail with the same codes as on CRLF, and both controls fail the same
+way, as their tests expect. So that evidence holds on CI's line endings too. Only
+the numbers move a little; for example, CAT-03's last allowance goes from 1,104 to
+1,137, still below its 1,361-token patch.
+
+To check on LF from a Windows checkout, as B did, in Git Bash:
+
+1. Convert only the text resources the API build copies.
+2. Run the tests.
+3. Delete and check out the converted files again. Under autocrlf, `git diff`
+   shows no change for a CRLF-to-LF edit, and a plain checkout may keep LF;
+   deleting first makes the checkout rewrite them.
+
+The shell `mvnw` is itself checked out as CRLF, so the snippet calls `mvnw.cmd`
+through cmd:
+
+```bash
+unset CODELESS_MODEL_API_KEY CODELESS_MODEL_NAME; export CODELESS_MODEL_PROVIDER=deterministic-mock
+files=$(git ls-files 'prompts/runtime/*.txt' contracts/tools/registry.json 'contracts/plan/*.json' services/api/src/main/resources/model/prompts/agent-proposal-protocol-v1.txt)
+sed -i 's/\r$//' $files
+cmd.exe //d //c "services\api\mvnw.cmd -f services/api/pom.xml \"-Dtest=RepairLoopIntegrationTest,RepairBudgetRegressionTest\" test"
+rm $files && git checkout -- $files
+```

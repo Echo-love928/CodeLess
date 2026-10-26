@@ -142,3 +142,16 @@ fixtures alone do not constitute M1 real-model or UI integration acceptance.
   model is called. The same class fails on the pre-fix tree f208767 with each paid task's
   code and passes here; its two controls (json_object before any write, a patch above 4096)
   fail identically on both trees.
+
+## D24-A round 3 (B's review of f35bea1)
+
+- No production change.
+- Prompt files are checked out as CRLF on Windows (`core.autocrlf=true`, no
+  `.gitattributes`) and as LF on CI. The input reservation counts UTF-8 bytes, so
+  every REPAIR read decision has 40 more tokens of margin on LF: 20 for the 20-line
+  REPAIR prompt, counted twice by the read rule. Where usage is declared per byte, the
+  shift is larger.
+- The two round-2 read-gate tests in `RepairLoopIntegrationTest` had pinned a margin
+  within that shift (−30 as CRLF, +10 as LF), so CI took a read that Windows refused.
+- They now pin the offers with an exact tool-slot count instead (`takeToolSlots`): five
+  slots left offer the read, four do not.
