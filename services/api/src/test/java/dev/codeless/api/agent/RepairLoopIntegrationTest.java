@@ -158,6 +158,62 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
             return new Reply(content,new Evidence(model(),"explicit-fixture-request","explicit-fixture-response",usage));
         }
     }
+    @Test void lowBudgetRepairCanPatchAfterReadsWithoutWeakeningActionsOrExceedingCaps() throws Exception {
+        for(boolean incorrect:List.of(false,true)) {
+            var seed=seed();var generation=new Fixture("fix",seed);var repairCalls=new AtomicInteger();
+            ModelProvider provider=new ModelProvider() {
+                public String id(){return "deterministic-mock";}
+                public String model(){return "synthetic-cat02-budget-context";}
+                public Reply call(Prompt prompt,int max,Duration timeout) {
+                    var input=json.readTree(prompt.getUserMessage().getText());String content;Usage usage;
+                    if(!input.path("phase").asText().equals("REPAIR")) {
+                        var reply=generation.call(prompt,max,timeout);var node=json.readTree(reply.content());
+                        if(node.path("name").asText().equals("files.create")&&node.path("arguments").path("path").asText().equals(PAGE))
+                            ((tools.jackson.databind.node.ObjectNode)node.path("arguments")).put("content",BROKEN+"\n<!-- synthetic budget padding "+"x".repeat(2400)+" -->");
+                        usage=new Usage(31,17,48,null);
+                        if(input.path("phase").asText().equals("GENERATE")&&node.path("type").asText().equals("done")) {
+                            var lease=new TaskQueueService.Claim(seed.task(),jdbc.sql("SELECT lease_token FROM generation_tasks WHERE id=?").param(seed.task()).query(UUID.class).single(),TaskStatus.GENERATE);
+                            long pending=RuntimeBudget.inputReservation(prompt.getSystemMessage().getText(),prompt.getUserMessage().getText())+max;
+                            long settled=RuntimeBudget.meter(journal.read(seed.task())).chargedTokens()-pending;
+                            int synthetic=(int)(30000-settled-48);
+                            store.reserve(lease,TaskStatus.GENERATE,"model.request",synthetic-2);
+                            store.reserve(lease,TaskStatus.GENERATE,"model.request",1);
+                            store.reserve(lease,TaskStatus.GENERATE,"model.request",1);
+                        }
+                        content=node.toString();
+                    } else {
+                        int step=repairCalls.getAndIncrement();assertThat(step).isLessThan(3);
+                        if(step<2) {
+                            content=json.writeValueAsString(Map.of("type","tool","name","files.read","arguments",Map.of("path",step==0?"src/components/ProfileCard.vue":PAGE)));
+                            usage=new Usage(5000,25,5025,null);
+                        } else {
+                            assertThat(input.path("budget").path("tokensRemaining").asInt()).isEqualTo(9950);
+                            assertThat(input.path("toolArgumentSchemas").isObject()).isTrue();
+                            JsonNode observed=null;for(var receipt:input.path("observations"))if(receipt.path("path").asText().equals(PAGE))observed=receipt;
+                            assertThat(observed).isNotNull();assertThat(observed.path("content").asText()).contains("synthetic budget padding");
+                            content=json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of("path",PAGE,
+                                    "expectedDigest",observed.path("afterDigest").asText(),"content",incorrect?NO_CARD:FIXED)));
+                            assertThat(max).isGreaterThanOrEqualTo(content.getBytes(java.nio.charset.StandardCharsets.UTF_8).length);
+                            usage=Usage.unknown(); // Charge the entire remaining reservation, not a guessed usage.
+                        }
+                    }
+                    return new Reply(content,new Evidence(model(),"explicit-synthetic-cat02-request","explicit-synthetic-cat02-response",usage));
+                }
+            };
+            var task=run(seed,provider);var events=journal.read(seed.task());
+            assertThat(repairCalls.get()).as(task.failureCode()).isEqualTo(3);
+            assertThat(task.status()).as(task.failureCode()).isEqualTo(incorrect?TaskStatus.FAILED:TaskStatus.READY);
+            var meter=RuntimeBudget.meter(events);assertThat(meter.chargedTokens()).isEqualTo(50000);
+            assertThat(meter.models()).isEqualTo(10);assertThat(meter.tools()).isLessThanOrEqualTo(20);
+            var done=AgentJournal.latest(events,"repair.done");assertThat(done.path("origin").asText()).isEqualTo("HOST_BUDGET_EXHAUSTED");
+            var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
+            assertThat(drafts).hasSize(2);assertThat(drafts.getLast().path("actions")).isEqualTo(drafts.getFirst().path("actions")).isEqualTo(done.path("actions"));
+            var results=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
+            assertThat(results).hasSize(2);assertThat(results.getLast().path("build").path("status").asText()).isEqualTo("SUCCEEDED");
+            assertThat(results.getLast().path("verification").path("status").asText()).isEqualTo(incorrect?"FAILED":"PASSED");
+            report("D21-CAT02-budget-context-"+incorrect,seed,Map.of("syntheticAccounting",true,"paidModelCalls",0,"originalActionsUnchanged",true,"realBuildAndBrowser",true));
+        }
+    }
     @Test void recordedJsonObjectReplyStopsGenerateBeforeAnyRunnerOrRepair() throws Exception {
         var seed=seed();var provider=new Fixture("invalid-generate",seed);
         new TaskScheduler(queue,loop(provider,(draft,deadline)->{throw new AssertionError("invalid proposal must never launch runner");})).tick();

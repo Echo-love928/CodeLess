@@ -134,7 +134,7 @@ public final class AgentLoop implements TaskStageRunner {
                     failure,originalActions,repairContext,meter,componentIds);
             if(repair && !completionOnly) {
                 Integer full=model.allowance(meter,policy,request);
-                if(full==null || full<RuntimeBudget.OUTPUT_TOKENS) request=RepairContext.compactCompletion(request,originalActions);
+                if(full==null || full<RuntimeBudget.OUTPUT_TOKENS) request=RepairContext.compactInput(request,originalActions);
             }
             if(!repair && edit.isEmpty() && GenerationContext.complete(observations,planned)) {
                 Integer full=model.allowance(meter,policy,request);
