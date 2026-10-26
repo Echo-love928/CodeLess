@@ -558,6 +558,21 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
             store.append(lease,TaskStatus.GENERATE,"tool.result",write);assertThat(write.status()).isEqualTo("SUCCEEDED");
         };
     }
+    /**
+     * D24-A round 3: takes tool slots at GENERATE's recorded done, before the failed build, so REPAIR starts with a fixed
+     * slot count. A read offer then turns on the slot rule, an exact count, not on a token margin that moves with the
+     * prompt's line endings: the 20-line REPAIR prompt is 20 bytes longer with CRLF, and the read rule counts the input twice.
+     */
+    private java.util.function.Consumer<JsonNode> takeToolSlots(Seed seed,int slots) {
+        return reply->{
+            var lease=new TaskQueueService.Claim(seed.task(),jdbc.sql("SELECT lease_token FROM generation_tasks WHERE id=?").param(seed.task()).query(UUID.class).single(),TaskStatus.GENERATE);
+            for(int i=0;i<slots;i++)store.reserve(lease,TaskStatus.GENERATE,"tool.request",0);
+        };
+    }
+    private List<JsonNode> repairRequests(RecordedRepairWireFixture wire) {
+        return wire.requests.stream().map(r -> json.readTree(r.path("messages").get(1).path("content").asText()))
+                .filter(input -> input.path("phase").asText().equals("REPAIR")).toList();
+    }
     @Test void completePaidProtocolErrorSurvivesRealWireParsingAndStopsWithoutRepairOrRetry() throws Exception {
         // The exact recorded final reply still ends the task. Recorded reads a request no longer offers are skipped
         // (D24-A round 2), so it arrives earlier, with its own recorded usage; skipped replies are never charged. After the
@@ -633,40 +648,50 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
     }
     @Test void repairReadThatTheRequestDoesNotOfferCannotConsumeAFileTool() throws Exception {
         // Formerly the last call after a patch offered no tools and refused a read. D24-A round 2 makes no call after a
-        // patch at all and offers a REPAIR read only while a full-size patch stays fundable; replayed verbatim, the first
-        // recorded 720f read a request no longer offers is refused before it can take a tool slot. After the recorded
-        // PLAN/GENERATE (31,403 tokens left) the first REPAIR request still funds the recorded read 6; the second refuses 7.
-        var seed=seed();var provider=new CapturedDoneRepairFixture("verbatim",recordedFault(seed));
+        // patch at all and offers a REPAIR read only while a full-size patch stays fundable and another call and five tool
+        // slots (read, write, snapshot, two verification) remain; replayed verbatim, the first recorded 720f read a request
+        // no longer offers is refused before it can take a tool slot. Six slots taken before REPAIR fix which request that
+        // is: the first REPAIR request (five slots left) still offers the recorded read 6, the second (four left) cannot
+        // offer 7. Round 3: on tokens alone the second request missed the read by 30 tokens with the prompt checked out as
+        // CRLF and funded it with 10 to spare as LF, so CI replayed the read 7 and reached READY.
+        var seed=seed();var provider=new CapturedDoneRepairFixture("verbatim",recordedFault(seed).andThen(takeToolSlots(seed,6)));
         try(var wire=new RecordedRepairWireFixture(provider)) {
             var task=run(seed,wire);var events=journal.read(seed.task());wire.assertHealthy();
             assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_TOOL_NOT_ALLOWED");
-            var last=json.readTree(wire.requests.getLast().path("messages").get(1).path("content").asText());
-            assertThat(last.path("phase").asText()).isEqualTo("REPAIR");
+            var repairs=repairRequests(wire);var last=repairs.getLast();
+            assertThat(repairs.stream().map(r -> r.path("budget").path("toolCallsRemaining").asInt()).toList()).containsExactly(5,4);
+            assertThat(RecordedRepairFixture.offers(repairs.getFirst(),"files.read")).isTrue();
             assertThat(RecordedRepairFixture.offers(last,"files.read")).isFalse();assertThat(RecordedRepairFixture.offers(last,"files.update")).isTrue();
             assertThat(last.path("repairProgress").path("next").asText()).startsWith("PATCH_");
             assertThat(provider.count).isEqualTo(8);assertThat(provider.replayed).containsExactly(0,1,2,3,4,5,6,7);assertThat(provider.skipped).isEmpty();
             assertThat(AgentJournal.latest(events,"model.response").path("name").asText()).isEqualTo("files.read");
-            assertThat(RuntimeBudget.meter(events).models()).isEqualTo(8);assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(10);
+            // Nine slots before REPAIR, six taken and one for the read 6: the refused read 7 took none.
+            assertThat(RuntimeBudget.meter(events).models()).isEqualTo(8);assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(16);
             assertThat(events.stream().filter(e->e.path("stage").asText().equals("REPAIR")&&e.path("kind").asText().equals("tool.result")).count()).isEqualTo(1);
             assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.done")).count()).isZero();
             assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
             report("D10-A-last-repair-tool-denied",seed,Map.of("originTask",provider.recording.path("originTask").asText(),"replayedVerbatim",true,
-                "paidCalls",0,"outerRetries",0,"refusedToolExecuted",false,"wireDigests",wire.digests));
+                "toolSlotsTakenBeforeRepair",6,"paidCalls",0,"outerRetries",0,"refusedToolExecuted",false,"wireDigests",wire.digests));
         }
     }
     @Test void capturedPatchIsVerifiedWithoutACompletionRequestWithinOriginalBudget() throws Exception {
         // 720f's recorded patch is verified as soon as it is committed, so the synthetic completion this test once needed
-        // is gone, and the fixture fails on any REPAIR request after the patch. Recorded reads not offered are skipped: the
-        // recorded read 6 is still offered, 7 is not, so the recorded patch 8 follows the read 6.
-        var seed=seed();var provider=new CapturedDoneRepairFixture("patch",recordedFault(seed));
+        // is gone, and the fixture fails on any REPAIR request after the patch. Recorded reads not offered are skipped. Six
+        // slots taken before REPAIR fix the offers whatever the prompt's line endings (round 3, as above): the recorded read
+        // 6 is offered with five slots left, 7 is not with four, so the recorded patch 8 follows the read 6, and the patch,
+        // the snapshot and the two verification operations use exactly the last four slots.
+        var seed=seed();var provider=new CapturedDoneRepairFixture("patch",recordedFault(seed).andThen(takeToolSlots(seed,6)));
         try(var wire=new RecordedRepairWireFixture(provider)) {
             var task=run(seed,wire);var events=journal.read(seed.task());wire.assertHealthy();
             assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);
+            var repairs=repairRequests(wire);
+            assertThat(repairs.stream().map(r -> r.path("budget").path("toolCallsRemaining").asInt()).toList()).containsExactly(5,4);
+            assertThat(repairs.stream().map(r -> RecordedRepairFixture.offers(r,"files.read")).toList()).containsExactly(true,false);
             assertThat(provider.replayed).containsExactly(0,1,2,3,4,5,6,8);assertThat(provider.skipped).containsExactly(7);
             assertThat(provider.count).isEqualTo(8);
             long charged=provider.replayed.stream().mapToLong(i->provider.recordedUsage(i).path("totalTokens").asLong()).sum();
             var meter=RuntimeBudget.meter(events);assertThat(meter.models()).isEqualTo(8);
-            assertThat(meter.tools()).isEqualTo(14);assertThat(meter.chargedTokens()).isEqualTo(charged).isLessThanOrEqualTo(50000);
+            assertThat(meter.tools()).isEqualTo(20);assertThat(meter.chargedTokens()).isEqualTo(charged).isLessThanOrEqualTo(50000);
             var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
             var results=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
             assertThat(drafts).hasSize(2);assertThat(drafts.getFirst().path("actions")).isEqualTo(drafts.getLast().path("actions"));
@@ -677,7 +702,7 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
             assertThat(AgentJournal.latest(events,"model.usage").path("estimated").asBoolean()).isFalse(); // The recorded patch usage was measured.
             assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.read.repeat")).count()).isZero();
             report("D10-A-captured720f-host-verified-patch",seed,Map.of("originTask",provider.recording.path("originTask").asText(),"syntheticCompletion",false,
-                "skippedRecordedReads",provider.skipped,"paidCalls",0,"outerRetries",0,"realBuildAndBrowser",true,"modelQualityEvidence",false,"wireDigests",wire.digests));
+                "skippedRecordedReads",provider.skipped,"toolSlotsTakenBeforeRepair",6,"paidCalls",0,"outerRetries",0,"realBuildAndBrowser",true,"modelQualityEvidence",false,"wireDigests",wire.digests));
         }
     }
     @Test void exact17ccDuplicateReplyIsRejectedBeforePatchAndKeepsCompleteMeasuredUsage() throws Exception {
