@@ -23,8 +23,9 @@ after(async () => { await browser?.close() })
 function catalog(id, { labels = false, authorFirst = true, categoryFirst = false, searchType = 'text', combine = true,
   detailAuthor = true, nameOnly = true, nameControl = 'heading', categoryLabel = null, descriptionLabel = '简介', detailLayout = 'text',
   itemTag = 'article', sparse = false, namedDetail = false, cardLabelSeparator = '：', detailRating = '4.5', allLabel = '全部', brokenReset = false,
-  combinedFields = false, inlineDetail = false, categorySelect = false, detailLicense = 'MIT', missingDescription = false, nameOverlap = false } = {}) {
-  const count = { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
+  combinedFields = false, inlineDetail = false, categorySelect = false, detailLicense = 'MIT', missingDescription = false, nameOverlap = false,
+  wrapperTag = null, countOverride = null, detailDescription = true } = {}) {
+  const count = countOverride ?? { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
   const categories = id === 'CAT-01' ? ['小说', '科技', '历史'] : id === 'CAT-02' ? ['西湖区', '上城区', '拱墅区'] : ['构建', '测试', '文档']
   return `<!doctype html><html lang="zh"><meta charset="utf-8"><body><h1>独立目录实现</h1>
     <input type="${searchType}" aria-label="搜索"/><nav></nav><main></main>
@@ -35,7 +36,7 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
     const items=Array.from({length:${count}},(_,i)=>({name:${nameOverlap}?names[i]:'名称'+i,author:'作者值'+i,category:categories[i%3],description:${nameOverlap}&&i===4?'Atlas compatible utilities':'简介值'+i}));
     const main=document.querySelector('main'), search=document.querySelector('input'), nav=document.querySelector('nav');let detail=document.querySelector('section');
     let category='全部', selectedName='';
-    function show(item){selectedName=item.name;detail.hidden=false;if(${inlineDetail})main.querySelectorAll('${itemTag}')[items.indexOf(item)%main.children.length]?.append(detail);const values=[item.name,${detailAuthor ? 'item.author' : "'错误作者'"},item.category,item.description,${JSON.stringify(detailRating)},${JSON.stringify(detailLicense)}],body=detail.querySelector('div');body.replaceChildren();
+    function show(item){selectedName=item.name;detail.hidden=false;if(${inlineDetail})main.querySelectorAll('${itemTag}')[items.indexOf(item)%main.children.length]?.append(detail);const values=[item.name,${detailAuthor ? 'item.author' : "'错误作者'"},item.category,${detailDescription ? 'item.description' : "'错误饮品'"},${JSON.stringify(detailRating)},${JSON.stringify(detailLicense)}],body=detail.querySelector('div');body.replaceChildren();
       detail.querySelector('h2').textContent=${namedDetail} ? item.name : '详情';
       if(${sparse}){for(const value of values.slice(1,4)){const p=document.createElement('p');p.textContent=value;body.append(p)}}
       else if(${JSON.stringify(detailLayout)}==='dl'){const dl=document.createElement('dl');values.forEach((value,i)=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=['名称','作者','所在城区','一句简介','评分','许可证'][i];dd.textContent=value;dl.append(dt,dd)});body.append(dl)}else body.textContent=values.join(' ')}
@@ -47,7 +48,7 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
         const fields=[author,(${JSON.stringify(categoryLabel)}||(id==='CAT-02'?'城区':id==='CAT-03'?'类别':'分类'))+'：'+item.category,${JSON.stringify(descriptionLabel)}+'：'+item.description];
         if(${missingDescription})fields.pop();if(${categoryFirst})fields.unshift(fields.splice(1,1)[0]);if(!authorFirst)fields.reverse();
         const display=fields.map(raw=>labels?raw.replace('：',${JSON.stringify(cardLabelSeparator)}):raw.replace(/^[^：]+：/,''));
-        for(const raw of ${combinedFields}?[display.join(' · ')]:display){const p=document.createElement('p');p.textContent=raw;card.append(p)}main.append(card)}
+        for(const raw of ${combinedFields}?[display.join(' · ')]:display){const p=document.createElement('p');p.textContent=raw;card.append(p)}if(${JSON.stringify(wrapperTag)}){const wrapper=document.createElement(${JSON.stringify(wrapperTag)});wrapper.append(card);main.append(wrapper)}else main.append(card)}
       document.querySelector('#empty').hidden=visible.length>0;
       if(${inlineDetail}&&selectedName)[...main.children].find(node=>node.querySelector('h3')?.textContent===selectedName)?.append(detail);
     }
@@ -297,4 +298,13 @@ test('CAT-02: colonless rating labels still reject a different rating in details
 test('CAT-02: restoring the observed initial option must really restore every card', async () => {
   const result = await check('CAT-02', catalog('CAT-02', { itemTag: 'button', allLabel: '全部城区', brokenReset: true }), 'button-broken-reset')
   assert.equal(result.status, 'FAILED', JSON.stringify(result))
+})
+for (const variant of ['valid','missing','extra','wrong-drink','wrong-rating','broken-combination']) test('CAT-02: nested list/article cards '+variant, async () => {
+  const options={wrapperTag:'li',labels:true,descriptionLabel:'招牌',
+    countOverride:variant==='missing'?5:variant==='extra'?7:null,
+    detailDescription:variant!=='wrong-drink',detailRating:variant==='wrong-rating'?'4.0':'4.5',combine:variant!=='broken-combination'}
+  const result=await check('CAT-02',catalog('CAT-02',options),'nested-cards-'+variant)
+  assert.equal(result.status,variant==='valid'?'PASSED':'FAILED',JSON.stringify(result))
+  assert.deepEqual(result.pageErrors,[])
+  if(variant!=='valid')assert.equal(result.failure,'BEHAVIOR_ERROR')
 })
