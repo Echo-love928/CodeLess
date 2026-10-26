@@ -103,10 +103,42 @@ fixtures alone do not constitute M1 real-model or UI integration acceptance.
   the original AGENT_ACCEPTANCE_INVALID/INCOMPLETE code.
 - REPAIR completes with `{"type":"done"}`; an included actions array must still equal
   the original exactly. After a source change, a request that cannot fund a full 4096
-  output is completion-only.
+  output is completion-only. (Round 2 below: no request follows a source change.)
 - GENERATE input carries `componentIds` (kebab-case file names) for planned pages and
   components (a name nobody else shares keeps its kebab-case file name; collisions try a
   page-/component- prefix, then a stable digest of the full path, so every ID is unique);
   the trusted build catalog still decides selectability.
 - A refused reply records a content-free `model.invalid` event (parser reason and
   position, root shape, byte count and digest, or the provider check that refused it).
+
+## D24-A round 2 (B's batch 1ff42488: CAT-01, CAT-03, FAULT-CODE-02)
+
+- REPAIR starts from the failed candidate's own frozen bytes (`repairSources`, origin
+  `FROZEN_FAILED_CANDIDATE_DIGEST_MATCHED`); every file must hash to the digest its draft
+  recorded, otherwise AGENT_CHECKPOINT_INVALID. Files are seeded failure-first (planned files
+  the diagnostic names, the failing route's page, their relative imports, then the rest)
+  while the request still funds a full 4096 output; below that only the first one stays, and
+  only while the compacted write-only request can be funded. A content-free `repair.context`
+  event records seeded paths (digest, bytes) and omitted ones. Diagnostic text only orders
+  host-owned bytes; it grants no path. A genuine read of the same bytes supersedes a seed.
+- `files.read`/`files.list` are offered only while a read and a full-size write after it can
+  both be funded: at least 2 model calls and 5 tool slots left, and tokens left covering this
+  request, its 4096 output, the next request and the exact receipt of the largest readable
+  unseeded file plus 512. Otherwise only the write tools are offered; a reply naming a tool the
+  request did not offer stops with AGENT_TOOL_NOT_ALLOWED, and `repairProgress.next` never
+  points at a read the request does not offer.
+- The first digest-checked source change ends the proposal: the host appends `repair.done`
+  with the unchanged original actions (origin `HOST_COMMITTED_PATCH`) and runs the real
+  build/browser verification. No reply is solicited after a write. A `{"type":"done"}` before
+  any change is handled as before (origin `MODEL`). A fix spanning several files takes one
+  patch per repair attempt; the 3-attempt cap is unchanged.
+- Unchanged: 50,000 tokens, 12 model calls, 20 tool slots and 4096 output per task, strict
+  protocol checks (an unknown root type still stops with AGENT_MODEL_PROTOCOL_INVALID, a
+  `length` finish with MODEL_INVALID_RESPONSE), the original acceptance actions and every
+  recorded failure.
+- `RepairBudgetRegressionTest` replays the three task shapes with one fixed synthetic policy
+  through the production DeepSeek wire to a loopback server that cuts replies at max_tokens.
+  Usage is declared synthetic (0.3 token per UTF-8 byte, an estimate, never measured); no paid
+  model is called. The same class fails on the pre-fix tree f208767 with each paid task's
+  code and passes here; its two controls (json_object before any write, a patch above 4096)
+  fail identically on both trees.

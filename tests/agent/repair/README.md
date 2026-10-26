@@ -202,9 +202,17 @@ Reproduce without credentials, with the D01 environment and Docker:
 Remove-Item Env:CODELESS_MODEL_API_KEY,Env:CODELESS_MODEL_NAME,Env:CODELESS_M1_REAL_APPROVED -ErrorAction SilentlyContinue
 $env:CODELESS_MODEL_PROVIDER='deterministic-mock'
 services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RepairContextTest,RepairPolicyTest,DeepSeekModelProviderTest' test
-services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RepairLoopIntegrationTest#capturedWrappedDoneStopsAfterActualPatchWithoutUnwrappingOrRetry+capturedPatchAndSyntheticExactCompletionRebuildWithinOriginalBudget,ProtocolRepairPreviewIT' '-DreuseForks=false' '-DforkCount=1' test
+services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RepairLoopIntegrationTest#capturedWrappedDoneStopsWithoutUnwrappingOrRetry+capturedPatchIsVerifiedWithoutACompletionRequestWithinOriginalBudget,ProtocolRepairPreviewIT' '-DreuseForks=false' '-DforkCount=1' test
 pnpm ci:gate
 ```
+
+D24-A round 2 renamed these two cases (formerly
+`capturedWrappedDoneStopsAfterActualPatchWithoutUnwrappingOrRetry` and
+`capturedPatchAndSyntheticExactCompletionRebuildWithinOriginalBudget`, the names in the
+2026-10-11 evidence) because no request now follows an actual patch: the wrapped
+reply is replayed at the first REPAIR request, and the recorded patch is verified
+by the host without the synthetic completion. The paragraph below describes the
+2026-10-11 behaviour; see the round-2 section at the end.
 
 The negative case replays the complete invalid application reply and stops after
 the real patch without unwrapping it, accepting it, or issuing a thirteenth call.
@@ -258,3 +266,52 @@ was explicitly authorized and applied to the shared preview test; it binds both
 additional signatures to the gateway's injected clock without changing any
 production rule or assertion. Both prior failed full gates remain in the closure
 command evidence; the final gate result is recorded separately.
+
+## D24-A round 2: CAT-01, CAT-03 and FAULT-CODE-02 of batch 1ff42488 (2026-10-26)
+
+`RepairBudgetRegressionTest` reproduces the three paid REPAIR failures that B
+reviewed in `2026-10-26T00-56-31Z-real-1ff42488`. A single fixed synthetic policy
+reads the files it wants while a request offers reads, writes one whole-file patch
+of the failing page, and answers any further request with the task's recorded reply
+type. Requests cross the production DeepSeek wire (`MaxTokensWireFixture`) to a
+loopback server that cuts a reply at `max_tokens` with `finish_reason=length`, as
+the provider does. Usage is declared synthetic: 0.3 token per UTF-8 byte, an
+estimate that is never measured. No paid model is called. PostgreSQL, file tools,
+the failed and fixed Docker builds and the browser are real.
+
+The same two files, byte-identical, run on the pre-fix tree `f208767` and on the
+fix:
+
+```powershell
+Remove-Item Env:CODELESS_MODEL_API_KEY,Env:CODELESS_MODEL_NAME -ErrorAction SilentlyContinue
+$env:CODELESS_MODEL_PROVIDER='deterministic-mock'
+$env:CODELESS_REGRESSION_TREE='<label>'; $env:CODELESS_REPAIR_EVIDENCE_DIR='<directory>'
+services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RepairBudgetRegressionTest' test
+```
+
+On `f208767`: CAT-01 fails with AGENT_MODEL_BUDGET_EXCEEDED after three legal reads,
+CAT-03 with MODEL_INVALID_RESPONSE / FINISH_REASON_LENGTH at a 1,104-token allowance
+below the 1,361-token patch, and FAULT-CODE-02 with AGENT_MODEL_PROTOCOL_INVALID on
+the json_object reply after its successful write. On the fix all three are READY
+after one REPAIR request with the full 4,096 allowance and a real rebuild/browser
+pass. Both controls (json_object before any write; a patch above 4,096) fail the
+same way on both trees. CAT-01 and CAT-03 enter REPAIR at a synthetic 28,500 and
+33,600 charged tokens. Content-free results and file digests are in
+`evidence/2026-10-26/d24-a-round2/`. This is not model-quality evidence.
+
+The opt-in preview ITs with a REPAIR fixture no longer see a request after the
+patch: `ProtocolRepairPreviewIT` expects 8 model calls (was 10),
+`RecordedRepairPreviewIT` 9 (was 12), and `FaultAtFreezePreviewAcceptanceIT`, which
+`ApplicationHttpDiagnosticsIT` extends, 6 (was 7). Three of these ITs fail on
+`f208767` and on the fix at the same file, line and value, so the cause is not this
+change:
+
+- `RealSourcePreviewReplayIT`: the deployment-name pattern in
+  `tests/e2e/generation/platform-cleanup.mjs:17` rejects `preview-platform-replay-…`.
+- `RecordedRepairPreviewIT`: the recorded `ProfileCard.vue` has no
+  `data-ai-component` (`MISSING_COMPONENT_ID`). As a result `profile-card` is not
+  selectable in the component-selection check that the default acceptance script
+  runs (`tests/runner/mapping/platform-checks.mjs:14`). The IT stops before its Java
+  assertions, but the journal of the fixed run matches them.
+- `RepairPreviewPlatformAcceptanceIT`: line 37 expects one generation task, but
+  that check's component edit adds a second one.

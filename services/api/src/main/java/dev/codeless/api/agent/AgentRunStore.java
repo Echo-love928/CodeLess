@@ -85,6 +85,22 @@ public final class AgentRunStore {
                 WHERE t.id=? AND v.id=? AND v.status='VERIFIED'
                 """).params(claim.taskId(),base).query(String.class).optional().orElseThrow(() -> new AgentFailure("EDIT_BASE_UNAVAILABLE"));
     }
+    /**
+     * REPAIR context from the failed candidate's own immutable source: every manifest file re-read and re-hashed, with
+     * no model call or file tool spent (D24-A round 2). The lease is checked first; the read happens outside the row
+     * lock so the heartbeat is never kept waiting on file I/O.
+     */
+    public Map<String,String> repairSources(TaskQueueService.Claim claim, JsonNode draft) {
+        tx.executeWithoutResult(s -> lock(claim,TaskStatus.REPAIR));
+        try {
+            var text=new LinkedHashMap<String,String>();
+            snapshots.sourceBytes(UUID.fromString(draft.path("versionId").asText()),draft.path("sourceDigest").asText())
+                    .forEach((path,bytes) -> text.put(path,new String(bytes,java.nio.charset.StandardCharsets.UTF_8)));
+            return text;
+        } catch(dev.codeless.api.versions.SnapshotFailure | IllegalArgumentException unavailable) {
+            throw new AgentFailure("AGENT_CHECKPOINT_INVALID");
+        }
+    }
     public List<JsonNode> read(TaskQueueService.Claim claim, TaskStatus stage) {
         return tx.execute(s -> { lock(claim,stage); return journal.read(claim.taskId()); });
     }

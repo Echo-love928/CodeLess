@@ -129,11 +129,14 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                     var actions=input.path("completionProposal").path("actions").deepCopy();
                     if(mode.equals("weaken")) ((tools.jackson.databind.node.ObjectNode)actions.get(1)).put("value","fake success");
                     content=json.writeValueAsString(Map.of("type","done","actions",actions));
-                } else if(mode.equals("limit")) {
+                } else if(mode.equals("bare")) content="{\"type\":\"done\"}"; // Only before a write: none is solicited after one (D24-A round 2).
+                else if(mode.equals("read-loop")) content=json.writeValueAsString(Map.of("type","tool","name","files.read","arguments",Map.of("path",PAGE)));
+                else if(mode.equals("limit")) {
+                    // Each round's changing write ends its proposal (D24-A round 2), so every round starts with no observation.
+                    assertThat(observed).isZero();
                     String digest="";for(var entry:input.path("sourceFiles"))if(entry.path("path").asText().equals(PAGE))digest=entry.path("digest").asText();
-                    content=observed==0?json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of(
-                            "path",PAGE,"expectedDigest",digest,"content",BROKEN+"\n<!-- attempt "+input.path("repairAttempt").asInt()+" -->"))):
-                            json.writeValueAsString(Map.of("type","done","actions",input.path("completionProposal").path("actions")));
+                    content=json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of(
+                            "path",PAGE,"expectedDigest",digest,"content",BROKEN+"\n<!-- attempt "+input.path("repairAttempt").asInt()+" -->")));
                 } else if(observed==0) content=json.writeValueAsString(Map.of("type","tool","name","files.read","arguments",Map.of("path",PAGE)));
                 else if(observed==1) {
                     JsonNode actual=input.path("observations").get(0);
@@ -148,17 +151,17 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                         int input0=RuntimeBudget.inputReservation(prompt.getSystemMessage().getText(),prompt.getUserMessage().getText());
                         return new Reply(content,new Evidence(model(),"explicit-fixture-request","explicit-fixture-response",new Usage(input0,max,input0+max,null)));
                     }
-                } else if(Set.of("repeated-patch","repeated-bad").contains(mode)) {
-                    String digest="";for(var entry:input.path("sourceFiles"))if(entry.path("path").asText().equals(PAGE))digest=entry.path("digest").asText();
-                    content=json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of("path",PAGE,"expectedDigest",digest,"content",mode.equals("repeated-bad")?NO_CARD:FIXED)));
-                } else content=Set.of("bare","locator").contains(mode)?"{\"type\":\"done\"}":
-                        json.writeValueAsString(Map.of("type","done","actions",input.path("completionProposal").path("actions")));
+                } else throw new AssertionError("No REPAIR request follows an actual patch (D24-A round 2)");
             }
             Usage usage=mode.equals("unknown")?Usage.unknown():new Usage(31,17,48,null);
             return new Reply(content,new Evidence(model(),"explicit-fixture-request","explicit-fixture-response",usage));
         }
     }
-    @Test void lowBudgetRepairCanPatchAfterReadsWithoutWeakeningActionsOrExceedingCaps() throws Exception {
+    @Test void lowBudgetRepairPatchesFromSeededSourcesWithoutWeakeningActionsOrExceedingCaps() throws Exception {
+        // CAT-02 scenario: 30,000 tokens are charged before REPAIR. Until D24-A round 2 two dependency reads left 9,950
+        // tokens, so the write needed compacted schemas and the host completed on budget exhaustion. Now the failed
+        // candidate's own bytes are seeded, a read is not offered because it could starve the patch, and the first
+        // request funds the full output allowance; the unknown-usage write is still charged its whole reservation.
         for(boolean incorrect:List.of(false,true)) {
             var seed=seed();var generation=new Fixture("fix",seed);var repairCalls=new AtomicInteger();
             ModelProvider provider=new ModelProvider() {
@@ -181,35 +184,57 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
                             store.reserve(lease,TaskStatus.GENERATE,"model.request",1);
                         }
                         content=node.toString();
+                    } else if(repairCalls.getAndIncrement()>0) {
+                        // The incorrect patch failed the unchanged original acceptance, and round 2 is now funded: it starts
+                        // from that frozen candidate. This model gives up with a bare done, so the unchanged source is rebuilt
+                        // and stops as no progress; formerly the budget was already exhausted after round 1.
+                        assertThat(incorrect).isTrue();assertThat(repairCalls.get()).isEqualTo(2);
+                        assertThat(input.path("repairAttempt").asInt()).isEqualTo(2);assertThat(input.path("observations")).isEmpty();
+                        assertThat(input.path("tools").valueStream().map(t->t.path("name").asText()).toList()).doesNotContain("files.read","files.list");
+                        JsonNode seeded=null;for(var file:input.path("repairSources").path("files"))if(file.path("path").asText().equals(PAGE))seeded=file;
+                        // Below a full-size write the failed page is still seeded, since the compacted request can be funded.
+                        assertThat(seeded).isNotNull();assertThat(seeded.path("content").asText()).isEqualTo(NO_CARD);
+                        assertThat(max).isLessThan(RuntimeBudget.OUTPUT_TOKENS);
+                        content="{\"type\":\"done\"}";usage=Usage.unknown();
                     } else {
-                        int step=repairCalls.getAndIncrement();assertThat(step).isLessThan(3);
-                        if(step<2) {
-                            content=json.writeValueAsString(Map.of("type","tool","name","files.read","arguments",Map.of("path",step==0?"src/components/ProfileCard.vue":PAGE)));
-                            usage=new Usage(5000,25,5025,null);
-                        } else {
-                            assertThat(input.path("budget").path("tokensRemaining").asInt()).isEqualTo(9950);
-                            assertThat(input.path("toolArgumentSchemas").isObject()).isTrue();
-                            JsonNode observed=null;for(var receipt:input.path("observations"))if(receipt.path("path").asText().equals(PAGE))observed=receipt;
-                            assertThat(observed).isNotNull();assertThat(observed.path("content").asText()).contains("synthetic budget padding");
-                            content=json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of("path",PAGE,
-                                    "expectedDigest",observed.path("afterDigest").asText(),"content",incorrect?NO_CARD:FIXED)));
-                            assertThat(max).isGreaterThanOrEqualTo(content.getBytes(java.nio.charset.StandardCharsets.UTF_8).length);
-                            usage=Usage.unknown(); // Charge the entire remaining reservation, not a guessed usage.
-                        }
+                        assertThat(input.path("budget").path("tokensRemaining").asInt()).isEqualTo(20000);
+                        assertThat(input.path("observations")).isEmpty();
+                        assertThat(input.path("tools").valueStream().map(t->t.path("name").asText()).toList())
+                                .contains("files.update").doesNotContain("files.read","files.list");
+                        assertThat(input.path("repairProgress").path("next").asText()).isEqualTo("PATCH_FROM_REPAIR_SOURCES");
+                        assertThat(input.path("repairSources").path("origin").asText()).isEqualTo("FROZEN_FAILED_CANDIDATE_DIGEST_MATCHED");
+                        JsonNode seeded=null;for(var file:input.path("repairSources").path("files"))if(file.path("path").asText().equals(PAGE))seeded=file;
+                        assertThat(seeded).isNotNull();assertThat(seeded.path("content").asText()).contains("synthetic budget padding");
+                        content=json.writeValueAsString(Map.of("type","tool","name","files.update","arguments",Map.of("path",PAGE,
+                                "expectedDigest",seeded.path("digest").asText(),"content",incorrect?NO_CARD:FIXED)));
+                        assertThat(max).isEqualTo(RuntimeBudget.OUTPUT_TOKENS);
+                        usage=Usage.unknown(); // Charge the entire reservation, not a guessed usage.
                     }
                     return new Reply(content,new Evidence(model(),"explicit-synthetic-cat02-request","explicit-synthetic-cat02-response",usage));
                 }
             };
             var task=run(seed,provider);var events=journal.read(seed.task());
-            assertThat(repairCalls.get()).as(task.failureCode()).isEqualTo(3);
+            assertThat(repairCalls.get()).as(task.failureCode()).isEqualTo(incorrect?2:1);
             assertThat(task.status()).as(task.failureCode()).isEqualTo(incorrect?TaskStatus.FAILED:TaskStatus.READY);
-            var meter=RuntimeBudget.meter(events);assertThat(meter.chargedTokens()).isEqualTo(50000);
-            assertThat(meter.models()).isEqualTo(10);assertThat(meter.tools()).isLessThanOrEqualTo(20);
-            var done=AgentJournal.latest(events,"repair.done");assertThat(done.path("origin").asText()).isEqualTo("HOST_BUDGET_EXHAUSTED");
+            if(incorrect)assertThat(task.failureCode()).isEqualTo("AGENT_REPAIR_NO_PROGRESS");
+            var contexts=events.stream().filter(e->e.path("kind").asText().equals("repair.context")).map(e->e.path("payload")).toList();
+            assertThat(contexts).hasSize(repairCalls.get()).allSatisfy(c->assertThat(c.path("seeded").get(0).path("path").asText()).isEqualTo(PAGE));
+            if(incorrect)assertThat(contexts.getLast().path("seeded")).hasSize(1);
+            var repairUsage=events.stream().filter(e->e.path("kind").asText().equals("model.usage")&&e.path("stage").asText().equals("REPAIR")).map(e->e.path("payload")).toList();
+            assertThat(repairUsage).hasSize(repairCalls.get()).allSatisfy(usage->{assertThat(usage.path("estimated").asBoolean()).isTrue();
+                assertThat(usage.path("chargedTokens")).isEqualTo(usage.path("reservationTokens"));});
+            var meter=RuntimeBudget.meter(events);
+            assertThat(meter.chargedTokens()).isEqualTo(30000+repairUsage.stream().mapToLong(u->u.path("chargedTokens").asLong()).sum()).isLessThanOrEqualTo(50000);
+            assertThat(meter.models()).isEqualTo(7+repairCalls.get());assertThat(meter.tools()).isLessThanOrEqualTo(20);
+            var origins=events.stream().filter(e->e.path("kind").asText().equals("repair.done")).map(e->e.path("payload").path("origin").asText()).toList();
+            assertThat(origins).isEqualTo(incorrect?List.of("HOST_COMMITTED_PATCH","MODEL"):List.of("HOST_COMMITTED_PATCH"));
+            var done=AgentJournal.latest(events,"repair.done");
             var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
-            assertThat(drafts).hasSize(2);assertThat(drafts.getLast().path("actions")).isEqualTo(drafts.getFirst().path("actions")).isEqualTo(done.path("actions"));
+            assertThat(drafts).hasSize(incorrect?3:2).allSatisfy(draft->assertThat(draft.path("actions")).isEqualTo(done.path("actions")));
+            if(incorrect)assertThat(drafts.getLast().path("sourceDigest")).isEqualTo(drafts.get(1).path("sourceDigest"));
             var results=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
-            assertThat(results).hasSize(2);assertThat(results.getLast().path("build").path("status").asText()).isEqualTo("SUCCEEDED");
+            assertThat(results).hasSize(incorrect?3:2);assertThat(results.get(1).path("build").path("status").asText()).isEqualTo("SUCCEEDED");
+            assertThat(results.get(1).path("verification").path("status").asText()).isEqualTo(incorrect?"FAILED":"PASSED");
             assertThat(results.getLast().path("verification").path("status").asText()).isEqualTo(incorrect?"FAILED":"PASSED");
             report("D21-CAT02-budget-context-"+incorrect,seed,Map.of("syntheticAccounting",true,"paidModelCalls",0,"originalActionsUnchanged",true,"realBuildAndBrowser",true));
         }
@@ -221,13 +246,16 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         assertThat(RuntimeBudget.meter(journal.read(seed.task())).tools()).isEqualTo(2);
     }
     @Test void repeatedCommittedPatchIsReallyVerifiedInsteadOfSpendingTheRemainingCallsOnRewrites() throws Exception {
+        // Before D24-A round 2 the same committed patch had to be resent once (HOST_REPEATED_PATCH). Now the first actual
+        // change ends the proposal: the fixture fails on any later REPAIR request, and the patch is verified right away.
         var seed=seed();var provider=new Fixture("repeated-patch",seed);
         var task=run(seed,provider);var events=journal.read(seed.task());
         assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);
         assertThat(task.repairAttempts()).isEqualTo(1);
-        assertThat(AgentJournal.latest(events,"repair.done").path("origin").asText()).isEqualTo("HOST_REPEATED_PATCH");
+        assertThat(AgentJournal.latest(events,"repair.done").path("origin").asText()).isEqualTo("HOST_COMMITTED_PATCH");
         assertThat(AgentJournal.latest(events,"runner.result").path("verification").path("status").asText()).isEqualTo("PASSED");
-        assertThat(provider.count.get()).isEqualTo(7);
+        assertThat(provider.count.get()).isEqualTo(6);
+        assertThat(events.stream().filter(e->e.path("stage").asText().equals("REPAIR")&&e.path("kind").asText().equals("tool.result")).count()).isEqualTo(2);
         assertThat(RuntimeBudget.meter(events).chargedTokens()).isLessThanOrEqualTo(RuntimeBudget.TOKENS);
         assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(2);
     }
@@ -236,7 +264,8 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         var task=run(seed,provider);var events=journal.read(seed.task());
         assertThat(task.status()).isEqualTo(TaskStatus.FAILED);
         assertThat(task.failureCode()).isEqualTo("MODEL_NETWORK"); // Explicit next-round fixture failure, not a retry.
-        assertThat(AgentJournal.latest(events,"repair.done").path("origin").asText()).isEqualTo("HOST_REPEATED_PATCH");
+        // The bad patch is verified as soon as it is committed (D24-A round 2; formerly after a resend, HOST_REPEATED_PATCH).
+        assertThat(AgentJournal.latest(events,"repair.done").path("origin").asText()).isEqualTo("HOST_COMMITTED_PATCH");
         var results=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
         assertThat(results).hasSize(2);
         assertThat(results.getLast().path("build").path("status").asText()).isEqualTo("SUCCEEDED");
@@ -283,7 +312,8 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         assertThat(drafts).hasSize(2);assertThat(drafts.getFirst().path("sourceDigest")).isNotEqualTo(drafts.getLast().path("sourceDigest"));
         assertThat(drafts.getFirst().path("actions")).isEqualTo(drafts.getLast().path("actions"));
         assertThat(jdbc.sql("SELECT count(*) FROM application_versions WHERE application_id=? AND status='FAILED'").param(seed.app()).query(Integer.class).single()).isEqualTo(1);
-        assertThat(provider.count.get()).isEqualTo(7);assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(10);
+        // Read, patch; no completion request follows the patch (D24-A round 2), so 6 model calls instead of 7.
+        assertThat(provider.count.get()).isEqualTo(6);assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(10);
         report("D10-A-browser-error",seed,Map.of("before",BROWSER_ERROR,"after",FIXED,"realBuild",true,"realBrowser",true,"originalActionsPreserved",true));
     }
     void report(String name,Seed seed,Object extra) throws Exception {
@@ -300,7 +330,8 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         assertThat(results.getFirst().path("build").path("log").path("text").asText()).contains("MissingCard.vue");
         assertThat(results.getLast().path("build").path("exitCode").asInt(-1)).isZero();
         assertThat(results.getLast().path("verification").path("status").asText()).isEqualTo("PASSED");
-        assertThat(provider.count.get()).isEqualTo(7);assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(10);
+        // Read, patch; no completion request follows the patch (D24-A round 2), so 6 model calls instead of 7.
+        assertThat(provider.count.get()).isEqualTo(6);assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(10);
         assertThat(jdbc.sql("SELECT count(*) FROM application_versions WHERE application_id=? AND status='FAILED'").param(seed.app()).query(Integer.class).single()).isEqualTo(1);
         assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNotNull();
         assertThat(events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload").path("sourceDigest").asText()).distinct().count()).isEqualTo(2);
@@ -309,7 +340,8 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
     @Test void D10AT2_changingButUnrepairableSourceStopsAfterThreeRounds() throws Exception {
         var seed=seed();var provider=new Fixture("limit",seed);var task=run(seed,provider);
         assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_REPAIR_LIMIT_EXCEEDED");
-        assertThat(task.repairAttempts()).isEqualTo(3);assertThat(provider.count.get()).isEqualTo(10);
+        // One changing write per round and no completion request after it (D24-A round 2): 4 + 3 model calls, not 4 + 3x2.
+        assertThat(task.repairAttempts()).isEqualTo(3);assertThat(provider.count.get()).isEqualTo(7);
         var events=journal.read(seed.task());assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(17);
         assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(4);
         assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
@@ -381,36 +413,70 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         }
     }
     @Test void recordedUnchangedReadLoopStopsBeforeAnotherModelOrBuild() throws Exception {
+        // D24-A round 2: replayed verbatim, the recorded read loop now stops earlier. A REPAIR read is offered only while a
+        // full-size patch stays fundable after it, so the first recorded read a request no longer offers is refused before
+        // any file tool, build or further model call. After the recorded PLAN/GENERATE (31,602 tokens left) the first two
+        // REPAIR requests still fund a read, and the third refuses the recorded read 8. The repeated-read stop with reads
+        // offered is covered separately.
         var seed=seed();var provider=recordedProvider(seed,"loop");var task=run(seed,provider);
+        assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_TOOL_NOT_ALLOWED");
+        var events=journal.read(seed.task());var last=provider.inputs.getLast();
+        var repairInputs=provider.inputs.stream().filter(i->i.path("phase").asText().equals("REPAIR")).toList();
+        assertThat(repairInputs).hasSize(3);assertThat(RecordedRepairFixture.offers(repairInputs.get(0),"files.read")).isTrue();
+        assertThat(RecordedRepairFixture.offers(repairInputs.get(1),"files.read")).isTrue();
+        assertThat(last.path("phase").asText()).isEqualTo("REPAIR");assertThat(RecordedRepairFixture.offers(last,"files.read")).isFalse();
+        assertThat(provider.replayed).isEqualTo(8);assertThat(provider.skipped).isEmpty();
+        assertThat(AgentJournal.latest(events,"model.response").path("name").asText()).isEqualTo("files.read");
+        assertThat(provider.count).isEqualTo(9);
+        assertThat(RuntimeBudget.meter(events).models()).isEqualTo(9);assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(11);
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("tool.result")&&e.path("stage").asText().equals("REPAIR")).count()).isEqualTo(2);
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(1);
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.done")).count()).isZero();
+        assertThat(AgentJournal.latest(events,"failure").path("recovery").asText()).isEqualTo("MANUAL_REVIEW_NO_AUTOMATIC_RETRY");
+        assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
+        report("D10-A-repeated-read-stop",seed,Map.of("recordedProvider",provider.model(),"extraModelCalls",0,"outerRetries",0,
+                "offeredRecordedReads",2,"refusedRecordedReadIndex",provider.replayed));
+    }
+    @Test void unchangedReadLoopWithReadsOfferedStillStopsBeforeAnotherModelOrBuild() throws Exception {
+        // With an ample budget REPAIR reads stay offered; the fourth unchanged read of one file still stops with CONTROL.
+        var seed=seed();var provider=new Fixture("read-loop",seed);var task=run(seed,provider);
         assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_REPAIR_NO_PROGRESS");
-        assertThat(provider.count).isEqualTo(11);var events=journal.read(seed.task());
-        assertThat(RuntimeBudget.meter(events).models()).isEqualTo(11);assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(14);
-        assertThat(events.stream().filter(e->e.path("kind").asText().equals("tool.result")&&e.path("stage").asText().equals("REPAIR")).count()).isEqualTo(5);
+        assertThat(provider.count.get()).isEqualTo(8);var events=journal.read(seed.task());
+        var last=provider.inputs.getLast();assertThat(RecordedRepairFixture.offers(last,"files.read")).isTrue();
+        assertThat(last.path("repairProgress").path("next").asText()).isEqualTo("PATCH_USING_OBSERVED_DIGEST");
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("tool.result")&&e.path("stage").asText().equals("REPAIR")).count()).isEqualTo(4);
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.read.repeat")).count()).isEqualTo(2);
         assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(1);
         assertThat(AgentJournal.latest(events,"failure").path("category").asText()).isEqualTo("CONTROL");
         assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
-        report("D10-A-repeated-read-stop",seed,Map.of("recordedProvider",provider.model(),"extraModelCalls",0,"outerRetries",0));
+        report("D24-A-offered-read-loop-stop",seed,Map.of("modelCalls",provider.count.get(),"extraModelCalls",0,"outerRetries",0));
     }
     @Test void recordedUnknownPatchUsageKeepsItsFullReservationAndTheHostVerifiesThePatch() throws Exception {
         // Until D24-A this patch was discarded: done could not be reserved, so the task stopped AGENT_MODEL_BUDGET_EXCEEDED
-        // with a real, digest-checked fix on disk (D21-A F3). The unknown usage still keeps its full reservation, no
+        // with a real, digest-checked fix on disk (D21-A F3). Round 2 no longer solicits recorded reads a request does not
+        // offer and verifies the patch as soon as it is committed. The unknown usage still keeps its full reservation, no
         // request beyond the caps is made, and only the real rebuild and browser decide the outcome.
         var seed=seed();var provider=recordedProvider(seed,"unknown-patch");var task=run(seed,provider);
-        assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);assertThat(provider.count).isEqualTo(11);
+        assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);
+        // The recorded reads 6 and 7 are still offered; the synthetic patch takes the place of the skipped reads 8 and 9.
+        assertThat(provider.skipped).containsExactly(8,9);assertThat(provider.replayed).isEqualTo(-1);
+        assertThat(provider.count).isEqualTo(9);
         var events=journal.read(seed.task());
         var usage=events.stream().filter(e->e.path("kind").asText().equals("model.usage")&&e.path("stage").asText().equals("REPAIR")).reduce((a,b)->b).orElseThrow().path("payload");
         assertThat(usage.path("estimated").asBoolean()).isTrue();
         assertThat(usage.path("chargedTokens")).isEqualTo(usage.path("reservationTokens"));assertThat(usage.path("usage").path("totalTokens").isNull()).isTrue();
         var done=events.stream().filter(e->e.path("kind").asText().equals("repair.done")).map(e->e.path("payload")).toList();
-        assertThat(done).hasSize(1);assertThat(done.getFirst().path("origin").asText()).isEqualTo("HOST_BUDGET_EXHAUSTED");
+        assertThat(done).hasSize(1);assertThat(done.getFirst().path("origin").asText()).isEqualTo("HOST_COMMITTED_PATCH");
         var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
         assertThat(drafts).hasSize(2);assertThat(done.getFirst().path("actions")).isEqualTo(drafts.getFirst().path("actions")).isEqualTo(drafts.getLast().path("actions"));
         var results=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
         assertThat(results).hasSize(2);assertThat(results.getLast().path("verification").path("status").asText()).isEqualTo("PASSED");
-        var meter=RuntimeBudget.meter(events);assertThat(meter.models()).isEqualTo(11);assertThat(meter.chargedTokens()).isLessThanOrEqualTo(RuntimeBudget.TOKENS);
+        long recorded=0;for(int i=0;i<10;i++)if(!provider.skipped.contains(i))recorded+=provider.recordedUsage(i).path("totalTokens").asLong();
+        var meter=RuntimeBudget.meter(events);assertThat(meter.models()).isEqualTo(provider.count);
+        assertThat(meter.chargedTokens()).isEqualTo(recorded+usage.path("chargedTokens").asLong()).isLessThanOrEqualTo(RuntimeBudget.TOKENS);
         assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNotNull();
         report("D24-A-recorded-unknown-budget-host-completion",seed,Map.of("recordedProvider",provider.model(),"doneProviderCalled",false,"outerRetries",0,
-                "meter",meter,"realBuildAndBrowser",true));
+                "meter",meter,"realBuildAndBrowser",true,"skippedRecordedReads",provider.skipped));
     }
     @Test void invalidDoneGetsOneCorrectiveObservationAndThenVerifies() throws Exception {
         var seed=seed();var provider=new Fixture("rejected-once",seed);var task=run(seed,provider);
@@ -436,20 +502,27 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         assertThat(AgentJournal.latest(events,"failure").path("code").asText()).isEqualTo("AGENT_ACCEPTANCE_INVALID");
     }
     @Test void bareDoneFinishesRepairWithTheUnchangedOriginalActions() throws Exception {
+        // D24-A round 2 solicits no reply after a write, so a bare {"type":"done"} can only precede one. It still means
+        // "verify with the host-owned original actions"; the unchanged failing source then stops without a READY claim.
         var seed=seed();var provider=new Fixture("bare",seed);var task=run(seed,provider);
-        assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);var events=journal.read(seed.task());
+        assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_REPAIR_NO_PROGRESS");
+        var events=journal.read(seed.task());assertThat(provider.count.get()).isEqualTo(5);
         assertThat(AgentJournal.latest(events,"model.response")).isEqualTo(json.readTree("{\"type\":\"done\"}"));
         assertThat(AgentJournal.latest(events,"repair.done").path("origin").asText()).isEqualTo("MODEL");
         var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
         assertThat(drafts).hasSize(2);assertThat(drafts.getLast().path("actions")).isEqualTo(drafts.getFirst().path("actions"));
+        assertThat(drafts.getLast().path("sourceDigest")).isEqualTo(drafts.getFirst().path("sourceDigest"));
         assertThat(AgentJournal.latest(events,"repair.done").path("actions")).isEqualTo(drafts.getFirst().path("actions"));
+        assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(2);
+        assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
         report("D24-A-bare-repair-done",seed,Map.of("modelCalls",provider.count.get(),"outerRetries",0,"realBuildAndBrowser",true));
     }
     @Test void hostVerifiesAnActualPatchWhenNoFurtherRequestCanBeFunded() throws Exception {
         var seed=seed();var provider=new Fixture("host-complete",seed);var task=run(seed,provider);
         assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);assertThat(provider.count.get()).isEqualTo(6);
         var events=journal.read(seed.task());var done=AgentJournal.latest(events,"repair.done");
-        assertThat(done.path("origin").asText()).isEqualTo("HOST_BUDGET_EXHAUSTED");
+        // Formerly HOST_BUDGET_EXHAUSTED; since D24-A round 2 every actual patch is verified as soon as it is committed.
+        assertThat(done.path("origin").asText()).isEqualTo("HOST_COMMITTED_PATCH");
         var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
         assertThat(drafts).hasSize(2);assertThat(done.path("actions")).isEqualTo(drafts.getFirst().path("actions"));
         var meter=RuntimeBudget.meter(events);assertThat(meter.chargedTokens()).isEqualTo(RuntimeBudget.TOKENS);assertThat(meter.models()).isEqualTo(7);
@@ -486,24 +559,32 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         };
     }
     @Test void completePaidProtocolErrorSurvivesRealWireParsingAndStopsWithoutRepairOrRetry() throws Exception {
+        // The exact recorded final reply still ends the task. Recorded reads a request no longer offers are skipped
+        // (D24-A round 2), so it arrives earlier, with its own recorded usage; skipped replies are never charged. After the
+        // recorded PLAN/GENERATE (30,696 tokens left) the first REPAIR request still funds a read, so the recorded read 6
+        // replays; the second offers none, so the recorded read 7 is skipped and the recorded bytes 8 follow.
         var seed=seed();Path directory=Path.of("../../docs/evidence/D10/M1/17f440cf-7970-46cc-b598-dd2d91a20ade");
         var provider=recordedProvider(seed,"recorded-invalid",directory);
         try(var wire=new dev.codeless.api.model.RecordedRepairWireFixture(provider)) {
             var task=run(seed,wire);var events=journal.read(seed.task());
             assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_MODEL_PROTOCOL_INVALID");
-            assertThat(provider.count).isEqualTo(9);assertThat(wire.requests).hasSize(9);wire.assertHealthy();
-            assertThat(RuntimeBudget.meter(events)).isEqualTo(new RuntimeBudget.Meter(9,11,28515));
+            assertThat(provider.replayed).isEqualTo(8);assertThat(provider.skipped).containsExactly(7);
+            int calls=8;long charged=0;
+            for(int i=0;i<9;i++)if(!provider.skipped.contains(i))charged+=provider.recordedUsage(i).path("totalTokens").asLong();
+            assertThat(provider.count).isEqualTo(calls);assertThat(wire.requests).hasSize(calls);wire.assertHealthy();
+            assertThat(RuntimeBudget.meter(events)).isEqualTo(new RuntimeBudget.Meter(calls,calls+2,charged));
             assertThat(AgentJournal.latest(events,"model.response")).isEqualTo(json.readTree("{\"type\":\"json_object\",\"error\":\"Invalid protocol reply.\"}"));
             assertThat(AgentJournal.latest(events,"failure").path("category").asText()).isEqualTo("MODEL_INTERFACE");
             assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(1);
             assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.done")).count()).isZero();
             assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
             var fingerprints=events.stream().filter(e->e.path("kind").asText().equals("model.input")).map(e->e.path("payload")).toList();
-            assertThat(fingerprints).hasSize(9);for(int i=0;i<9;i++)assertThat(fingerprints.get(i).path("transport").path("bodyDigest").asText()).isEqualTo(wire.digests.get(i));
+            assertThat(fingerprints).hasSize(calls);for(int i=0;i<calls;i++)assertThat(fingerprints.get(i).path("transport").path("bodyDigest").asText()).isEqualTo(wire.digests.get(i));
             var input=json.readTree(wire.requests.getLast().path("messages").get(1).path("content").asText());
-            assertThat(input.path("observations")).hasSize(2);assertThat(input.path("repairProgress").path("next").asText()).isEqualTo("PATCH_OR_READ_MISSING_DEPENDENCY");
-            assertThat(input.path("budget").path("tokensRemaining").asLong()).isEqualTo(25090);
-            report("D10-A-protocol31-invalid",seed,Map.of("originTask","17f440cf-7970-46cc-b598-dd2d91a20ade",
+            assertThat(RecordedRepairFixture.offers(input,"files.read")).isFalse();assertThat(input.path("observations")).hasSize(1);
+            assertThat(input.path("repairProgress").path("next").asText()).startsWith("PATCH_");
+            assertThat(input.path("budget").path("tokensRemaining").asLong()).isEqualTo(50000-charged+provider.recordedUsage(8).path("totalTokens").asLong());
+            report("D10-A-protocol31-invalid",seed,Map.of("originTask","17f440cf-7970-46cc-b598-dd2d91a20ade","skippedRecordedReads",provider.skipped,
                     "offlineWireRequests",wire.requests,"wireDigests",wire.digests,"paidCalls",0,"outerRetries",0,"historicalWireCaptured",false));
         }
     }
@@ -528,63 +609,75 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
             }
         }
     }
-    @Test void capturedWrappedDoneStopsAfterActualPatchWithoutUnwrappingOrRetry() throws Exception {
-        var seed=seed();var provider=new CapturedDoneRepairFixture(false,recordedFault(seed));
+    @Test void capturedWrappedDoneStopsWithoutUnwrappingOrRetry() throws Exception {
+        // The exact 657 wrapped-done bytes used to follow 720f's actual patch. D24-A round 2 solicits no reply after a write,
+        // so they are placed at the first REPAIR request, before any write: still terminal, never unwrapped or retried.
+        var seed=seed();var provider=new CapturedDoneRepairFixture("wrapped-first",recordedFault(seed));
         try(var wire=new RecordedRepairWireFixture(provider)) {
             var task=run(seed,wire);var events=journal.read(seed.task());wire.assertHealthy();
             assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_MODEL_PROTOCOL_INVALID");
-            assertThat(provider.count).isEqualTo(12);assertThat(RuntimeBudget.meter(events)).isEqualTo(new RuntimeBudget.Meter(12,14,36844));
+            assertThat(provider.count).isEqualTo(7);assertThat(provider.replayed).containsExactly(0,1,2,3,4,5,11);assertThat(provider.skipped).containsExactly(6,7,8,9,10);
+            long charged=provider.replayed.stream().mapToLong(i->provider.recordedUsage(i).path("totalTokens").asLong()).sum();
+            assertThat(RuntimeBudget.meter(events)).isEqualTo(new RuntimeBudget.Meter(7,9,charged));
             assertThat(AgentJournal.latest(events,"model.response").path("type").asText()).isEqualTo("json_object");
+            assertThat(AgentJournal.latest(events,"failure").path("category").asText()).isEqualTo("MODEL_INTERFACE");
             assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.done")).count()).isZero();
             assertThat(events.stream().filter(e->e.path("kind").asText().equals("draft")).count()).isEqualTo(1);
             assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(1);
-            assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.read.repeat")).count()).isEqualTo(1);
+            assertThat(events.stream().filter(e->e.path("stage").asText().equals("REPAIR")&&e.path("kind").asText().equals("tool.result")).count()).isZero();
             assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
-            assertThat(Files.readString(Path.of("target/repair-integration/workspaces",seed.task().toString(),"source",PAGE))).contains("../components/ProfileCard.vue");
+            assertThat(Files.readString(Path.of("target/repair-integration/workspaces",seed.task().toString(),"source",PAGE))).contains("../components/M1MissingCard.vue");
             report("D10-A-wrapped-done720f-invalid",seed,Map.of("originTask",provider.recording.path("originTask").asText(),"completeReplyBytes",657,
-                "paidCalls",0,"outerRetries",0,"actualPatchExecuted",true,"modelQualityEvidence",false,"wireDigests",wire.digests));
+                "placement","FIRST_REPAIR_REQUEST_BEFORE_ANY_WRITE","paidCalls",0,"outerRetries",0,"actualPatchExecuted",false,"modelQualityEvidence",false,"wireDigests",wire.digests));
         }
     }
-    @Test void lastRepairModelCallAfterPatchCannotConsumeAnotherFileTool() throws Exception {
-        var seed=seed();var captured=new CapturedDoneRepairFixture(false,recordedFault(seed));
-        ModelProvider provider=new ModelProvider() {
-            public String id(){return "deterministic-mock";}public String model(){return "synthetic-last-repair-tool-boundary-fixture";}
-            public Reply call(Prompt prompt,int max,Duration timeout) {
-                var reply=captured.call(prompt,max,timeout);if(captured.count<12)return reply;
-                var input=json.readTree(prompt.getUserMessage().getText());
-                assertThat(input.path("completionOnly").asBoolean()).isTrue();assertThat(input.path("tools")).isEmpty();
-                assertThat(input.path("budget").path("modelCallsRemaining").asInt()).isEqualTo(1);
-                return new Reply(json.writeValueAsString(Map.of("type","tool","name","files.read","arguments",Map.of("path",PAGE))),
-                    new Evidence(model(),"synthetic-last-tool","synthetic-last-tool",new Usage(31,17,48,json.valueToTree(Map.of("fixture",true,"measurement","SYNTHETIC_LAST_CALL_TOOL_BOUNDARY")))));
-            }
-        };
+    @Test void repairReadThatTheRequestDoesNotOfferCannotConsumeAFileTool() throws Exception {
+        // Formerly the last call after a patch offered no tools and refused a read. D24-A round 2 makes no call after a
+        // patch at all and offers a REPAIR read only while a full-size patch stays fundable; replayed verbatim, the first
+        // recorded 720f read a request no longer offers is refused before it can take a tool slot. After the recorded
+        // PLAN/GENERATE (31,403 tokens left) the first REPAIR request still funds the recorded read 6; the second refuses 7.
+        var seed=seed();var provider=new CapturedDoneRepairFixture("verbatim",recordedFault(seed));
         try(var wire=new RecordedRepairWireFixture(provider)) {
             var task=run(seed,wire);var events=journal.read(seed.task());wire.assertHealthy();
             assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_TOOL_NOT_ALLOWED");
-            assertThat(captured.count).isEqualTo(12);assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(14);
-            assertThat(events.stream().filter(e->e.path("stage").asText().equals("REPAIR")&&e.path("kind").asText().equals("tool.result")).count()).isEqualTo(5);
+            var last=json.readTree(wire.requests.getLast().path("messages").get(1).path("content").asText());
+            assertThat(last.path("phase").asText()).isEqualTo("REPAIR");
+            assertThat(RecordedRepairFixture.offers(last,"files.read")).isFalse();assertThat(RecordedRepairFixture.offers(last,"files.update")).isTrue();
+            assertThat(last.path("repairProgress").path("next").asText()).startsWith("PATCH_");
+            assertThat(provider.count).isEqualTo(8);assertThat(provider.replayed).containsExactly(0,1,2,3,4,5,6,7);assertThat(provider.skipped).isEmpty();
+            assertThat(AgentJournal.latest(events,"model.response").path("name").asText()).isEqualTo("files.read");
+            assertThat(RuntimeBudget.meter(events).models()).isEqualTo(8);assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(10);
+            assertThat(events.stream().filter(e->e.path("stage").asText().equals("REPAIR")&&e.path("kind").asText().equals("tool.result")).count()).isEqualTo(1);
             assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.done")).count()).isZero();
             assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
-            report("D10-A-last-repair-tool-denied",seed,Map.of("originTask",captured.recording.path("originTask").asText(),"lastReplySynthetic",true,
-                "paidCalls",0,"outerRetries",0,"lastToolExecuted",false,"wireDigests",wire.digests));
+            report("D10-A-last-repair-tool-denied",seed,Map.of("originTask",provider.recording.path("originTask").asText(),"replayedVerbatim",true,
+                "paidCalls",0,"outerRetries",0,"refusedToolExecuted",false,"wireDigests",wire.digests));
         }
     }
-    @Test void capturedPatchAndSyntheticExactCompletionRebuildWithinOriginalBudget() throws Exception {
-        var seed=seed();var provider=new CapturedDoneRepairFixture(true,recordedFault(seed));
+    @Test void capturedPatchIsVerifiedWithoutACompletionRequestWithinOriginalBudget() throws Exception {
+        // 720f's recorded patch is verified as soon as it is committed, so the synthetic completion this test once needed
+        // is gone, and the fixture fails on any REPAIR request after the patch. Recorded reads not offered are skipped: the
+        // recorded read 6 is still offered, 7 is not, so the recorded patch 8 follows the read 6.
+        var seed=seed();var provider=new CapturedDoneRepairFixture("patch",recordedFault(seed));
         try(var wire=new RecordedRepairWireFixture(provider)) {
             var task=run(seed,wire);var events=journal.read(seed.task());wire.assertHealthy();
-            assertThat(task.status()).isEqualTo(TaskStatus.READY);assertThat(provider.count).isEqualTo(10);
-            var meter=RuntimeBudget.meter(events);assertThat(meter.models()).isEqualTo(10);assertThat(meter.tools()).isEqualTo(15);assertThat(meter.chargedTokens()).isLessThanOrEqualTo(50000);
+            assertThat(task.status()).as(task.failureCode()).isEqualTo(TaskStatus.READY);
+            assertThat(provider.replayed).containsExactly(0,1,2,3,4,5,6,8);assertThat(provider.skipped).containsExactly(7);
+            assertThat(provider.count).isEqualTo(8);
+            long charged=provider.replayed.stream().mapToLong(i->provider.recordedUsage(i).path("totalTokens").asLong()).sum();
+            var meter=RuntimeBudget.meter(events);assertThat(meter.models()).isEqualTo(8);
+            assertThat(meter.tools()).isEqualTo(14);assertThat(meter.chargedTokens()).isEqualTo(charged).isLessThanOrEqualTo(50000);
             var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
             var results=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
             assertThat(drafts).hasSize(2);assertThat(drafts.getFirst().path("actions")).isEqualTo(drafts.getLast().path("actions"));
             assertThat(drafts.getFirst().path("sourceDigest")).isNotEqualTo(drafts.getLast().path("sourceDigest"));
             assertThat(results.getFirst().path("build").path("exitCode").asInt()).isEqualTo(2);
             assertThat(results.getLast().path("build").path("exitCode").asInt()).isZero();assertThat(results.getLast().path("verification").path("status").asText()).isEqualTo("PASSED");
-            assertThat(AgentJournal.latest(events,"model.usage").path("estimated").asBoolean()).isTrue();
+            assertThat(AgentJournal.latest(events,"repair.done").path("origin").asText()).isEqualTo("HOST_COMMITTED_PATCH");
+            assertThat(AgentJournal.latest(events,"model.usage").path("estimated").asBoolean()).isFalse(); // The recorded patch usage was measured.
             assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.read.repeat")).count()).isZero();
-            report("D10-A-captured720f-synthetic-done",seed,Map.of("originTask",provider.recording.path("originTask").asText(),"syntheticCompletion",true,
-                "paidCalls",0,"outerRetries",0,"realBuildAndBrowser",true,"modelQualityEvidence",false,"wireDigests",wire.digests));
+            report("D10-A-captured720f-host-verified-patch",seed,Map.of("originTask",provider.recording.path("originTask").asText(),"syntheticCompletion",false,
+                "skippedRecordedReads",provider.skipped,"paidCalls",0,"outerRetries",0,"realBuildAndBrowser",true,"modelQualityEvidence",false,"wireDigests",wire.digests));
         }
     }
     @Test void exact17ccDuplicateReplyIsRejectedBeforePatchAndKeepsCompleteMeasuredUsage() throws Exception {
@@ -592,16 +685,20 @@ class RepairLoopIntegrationTest extends PostgresTestBase {
         try(var wire=new RecordedRepairWireFixture(provider)) {
             var task=run(seed,wire);var events=journal.read(seed.task());wire.assertHealthy();
             assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("MODEL_INVALID_RESPONSE");
-            assertThat(provider.count).isEqualTo(9);assertThat(wire.requests).hasSize(9);
-            assertThat(RuntimeBudget.meter(events)).isEqualTo(new RuntimeBudget.Meter(9,11,29340));
+            // Recorded reads a request no longer offers are skipped (D24-A round 2): the read 6 is still offered, 7 is not,
+            // so the exact bytes arrive one request earlier, after one read instead of two.
+            var skipped=provider.setup.skipped;assertThat(skipped).containsExactly(7);int calls=8;
+            assertThat(provider.count).isEqualTo(calls);assertThat(wire.requests).hasSize(calls);
+            assertThat(RuntimeBudget.meter(events)).isEqualTo(new RuntimeBudget.Meter(calls,calls+2,provider.charged));
+            assertThat(RecordedRepairFixture.offers(json.readTree(wire.requests.getLast().path("messages").get(1).path("content").asText()),"files.read")).isFalse();
             assertThat(AgentJournal.latest(events,"model.response").path("name").asText()).isEqualTo("files.read");
-            assertThat(events.stream().filter(e->e.path("kind").asText().equals("model.response")).count()).isEqualTo(8);
+            assertThat(events.stream().filter(e->e.path("kind").asText().equals("model.response")).count()).isEqualTo(calls-1);
             assertThat(AgentJournal.latest(events,"model.usage").path("chargedTokens").asInt()).isEqualTo(4548);
             assertThat(AgentJournal.latest(events,"model.usage").path("estimated").asBoolean()).isFalse();
             assertThat(AgentJournal.latest(events,"failure").path("category").asText()).isEqualTo("MODEL_INTERFACE");
             assertThat(events.stream().filter(e->e.path("kind").asText().equals("runner.result")).count()).isEqualTo(1);
             assertThat(events.stream().filter(e->e.path("kind").asText().equals("draft")).count()).isEqualTo(1);
-            assertThat(events.stream().filter(e->e.path("stage").asText().equals("REPAIR")&&e.path("kind").asText().equals("tool.result")).count()).isEqualTo(2);
+            assertThat(events.stream().filter(e->e.path("stage").asText().equals("REPAIR")&&e.path("kind").asText().equals("tool.result")).count()).isEqualTo(1);
             assertThat(events.stream().filter(e->e.path("kind").asText().equals("repair.done")).count()).isZero();
             assertThat(repository.findApplicationForOwner(seed.app(),seed.owner()).orElseThrow().latestReadyVersionId()).isNull();
             assertThat(jdbc.sql("SELECT input_tokens=3685 AND output_tokens=863 AND error_code='MODEL_INVALID_RESPONSE' FROM model_calls WHERE task_id=? ORDER BY created_at DESC LIMIT 1")

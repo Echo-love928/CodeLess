@@ -38,9 +38,10 @@ class FaultAtFreezePreviewAcceptanceIT extends PreviewPlatformIntegrationTest {
         assertThat(generated).hasSize(1);assertThat(generated.getFirst().path("payload").path("arguments").path("content").asText()).doesNotContain("M1MissingCard.vue");
         var fault=json.readTree(Files.readString(ROOT.resolve("evidence/controlled-fault.json")));
         assertThat(fault.path("timing").asText()).isEqualTo("AFTER_GENERATE_DONE_BEFORE_IMMUTABLE_SNAPSHOT");
-        assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(12);assertThat(RuntimeBudget.meter(events).models()).isEqualTo(7);
+        // D24-A round 2: the committed patch is verified at once, so the former REPAIR completion request is gone (formerly 7 calls).
+        assertThat(RuntimeBudget.meter(events).tools()).isEqualTo(12);assertThat(RuntimeBudget.meter(events).models()).isEqualTo(6);
         Files.writeString(ROOT.resolve("evidence/late-fault-regression.json"),json.writeValueAsString(Map.of("modelProvider","deterministic-mock",
-            "modelQualityEvidence",false,"taskId",task,"repairAttempts",1,"models",7,"tools",12,"sourceDigests",drafts.stream().map(d->d.path("sourceDigest").asText()).toList(),
+            "modelQualityEvidence",false,"taskId",task,"repairAttempts",1,"models",6,"tools",12,"sourceDigests",drafts.stream().map(d->d.path("sourceDigest").asText()).toList(),
             "firstBuildExit",results.getFirst().path("build").path("exitCode").asInt(),"lastBrowser","PASSED","originalActionsPreserved",true)));
         System.out.println("Late fault fixture evidence: "+ROOT.resolve("evidence"));
     }

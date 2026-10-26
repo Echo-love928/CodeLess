@@ -113,7 +113,6 @@ public final class AgentLoop implements TaskStageRunner {
         JsonNode originalActions=repair?previousDraft.path("actions"):null;
         RepairContext repairContext=repair?new RepairContext(previousDraft):null;
         Set<String> planned=new TreeSet<>();plan.path("files").forEach(f -> planned.add(f.path("path").asText()));
-        Set<String> names=new HashSet<>();registry.definitions().path("tools").forEach(t -> names.add(t.path("name").asText()));
         var currentEdit=store.editContext(claim,stage);
         var local=currentEdit.filter(LocalEditScope::component);
         var edit=repair?local:currentEdit;
@@ -124,15 +123,18 @@ public final class AgentLoop implements TaskStageRunner {
         String policy=(repair?repairPolicy:generationPolicy+(edit.isPresent()?EDIT_POLICY:""))+(local.isPresent()?"\n"+localEditPolicy:"");
         // Edits keep the IDs already declared in their trusted base; a new generation gets deterministic ones.
         Map<String,String> componentIds=repair||edit.isPresent()?Map.of():componentIds(planned);
+        // A component REPAIR may read only its selected file; plan or model text grants no other path.
+        Set<String> readable=local.isPresent()?Set.of(LocalEditScope.target(local.get())):operable;
+        if(repair) seed(claim,stage,context,plan,local,edit,failure,originalActions,previousDraft,repairContext,policy);
         int rejectedDone=0;
         for(int i=0;i<RuntimeBudget.MODEL_CALLS;i++) {
             var meter=RuntimeBudget.meter(store.read(claim,stage));
-            boolean changed=repair&&Boolean.TRUE.equals(repairContext.progress().get("sourceChanged"));
-            boolean completionOnly=changed&&RuntimeBudget.MODEL_CALLS-meter.models()==1
-                    || !repair&&local.isPresent()&&LocalGenerationContext.completionOnly(local.get(),observations);
-            JsonNode request=input(stage,context,plan,local,edit,completionOnly,repair?repairContext.observations():observations,
+            boolean completionOnly=!repair&&local.isPresent()&&LocalGenerationContext.completionOnly(local.get(),observations);
+            JsonNode request=input(stage,context,plan,local,edit,completionOnly,true,repair?repairContext.observations():observations,
                     failure,originalActions,repairContext,meter,componentIds);
-            if(repair && !completionOnly) {
+            if(repair) {
+                if(!readsFundable(meter,policy,request,repairContext.readGrowth(readable)))
+                    request=input(stage,context,plan,local,edit,false,false,repairContext.observations(),failure,originalActions,repairContext,meter,componentIds);
                 Integer full=model.allowance(meter,policy,request);
                 if(full==null || full<RuntimeBudget.OUTPUT_TOKENS) request=RepairContext.compactInput(request,originalActions);
             }
@@ -140,23 +142,11 @@ public final class AgentLoop implements TaskStageRunner {
                 Integer full=model.allowance(meter,policy,request);
                 if(full==null || full<RuntimeBudget.OUTPUT_TOKENS) {
                     completionOnly=true;
-                    request=input(stage,context,plan,local,edit,true,observations,failure,originalActions,repairContext,meter,componentIds);
+                    request=input(stage,context,plan,local,edit,true,true,observations,failure,originalActions,repairContext,meter,componentIds);
                 }
             }
-            if(changed && !completionOnly) {
-                // After an actual source change, a request that cannot fund a full-size write may only complete.
-                Integer full=model.allowance(meter,policy,request);
-                if(full==null || full<RuntimeBudget.OUTPUT_TOKENS) {
-                    completionOnly=true;
-                    request=input(stage,context,plan,local,edit,true,repairContext.observations(),failure,originalActions,repairContext,meter,componentIds);
-                }
-            }
-            if(changed && model.allowance(meter,policy,request)==null) {
-                // The round holds digest-checked source changes and the caps cannot fund another request: submit
-                // them for real verification with the unchanged original actions instead of discarding the patch.
-                store.append(claim,stage,"repair.done",Map.of("actions",originalActions,"origin","HOST_BUDGET_EXHAUSTED"));
-                return new StageResult(TaskStatus.GENERATE,"Repair budget exhausted after a source change; source must be frozen and verified",null);
-            }
+            // A reply may name only a tool this very request offered.
+            Set<String> offered=new HashSet<>();request.path("tools").forEach(t -> offered.add(t.path("name").asText()));
             JsonNode reply=model.call(claim,stage,policy,request);
             if(local.isPresent() && "scopeExpansion".equals(reply.path("type").asText())) {
                 closed(reply,Set.of("type","reason"));
@@ -169,7 +159,7 @@ public final class AgentLoop implements TaskStageRunner {
             if(reply.path("type").asText().equals("tool")) {
                 closed(reply,Set.of("type","name","arguments"));
                 String name=reply.path("name").asText();
-                if(!names.contains(name)||completionOnly) throw new AgentFailure("AGENT_TOOL_NOT_ALLOWED");
+                if(!offered.contains(name)) throw new AgentFailure("AGENT_TOOL_NOT_ALLOWED");
                 JsonNode arguments=reply.path("arguments");
                 // A component edit authorizes the whole selected file, including REPAIR.
                 // Plan/model text cannot widen that immutable server-resolved scope.
@@ -190,11 +180,11 @@ public final class AgentLoop implements TaskStageRunner {
                 JsonNode projected=local.isPresent()?LocalEditScope.observation(observed,LocalEditScope.target(local.get())):observed;
                 if(repair) {
                     boolean repeated=repairContext.observe(name,arguments,projected);
-                    if(repairContext.repeatedPatch()) {
-                        // A model is replaying an already committed candidate. Stop this proposal loop, not
-                        // verification: freeze the actual current bytes and rerun the unchanged original actions.
-                        store.append(claim,stage,"repair.done",Map.of("actions",originalActions,"origin","HOST_REPEATED_PATCH"));
-                        return new StageResult(TaskStatus.GENERATE,"Repeated committed repair candidate submitted for real verification",null);
+                    if(repairContext.changed()) {
+                        // The first digest-checked source change ends this proposal, so no reply is solicited after a
+                        // write (D24-A round 2): freeze the actual bytes and rerun every unchanged original action.
+                        store.append(claim,stage,"repair.done",Map.of("actions",originalActions,"origin","HOST_COMMITTED_PATCH"));
+                        return new StageResult(TaskStatus.GENERATE,"Committed repair patch submitted for real verification",null);
                     }
                     if(repeated)store.append(claim,stage,"repair.read.repeat",Map.of("tool",name,"path",arguments.path("path").asText(),
                             "callId",actual.callId(),"progress",repairContext.progress()));
@@ -226,8 +216,47 @@ public final class AgentLoop implements TaskStageRunner {
         }
         throw new AgentFailure("AGENT_MODEL_BUDGET_EXCEEDED");
     }
+    /**
+     * D24-A round 2: REPAIR starts from the failed candidate's own frozen, digest-checked bytes instead of paying a model
+     * call and a tool slot per dependency read. Files are seeded failure-first while the request still funds a full-size
+     * write; below that only the first one stays, and only while the request the loop then sends (write tools only,
+     * compacted) can still be funded. A content-free record names what was seeded and what was left.
+     */
+    private void seed(TaskQueueService.Claim claim,TaskStatus stage,AgentRunStore.Context context,JsonNode plan,Optional<JsonNode> local,
+                      Optional<JsonNode> edit,JsonNode failure,JsonNode originalActions,JsonNode draft,RepairContext repairContext,String policy) {
+        var sources=store.repairSources(claim,draft);
+        repairContext.frozen(sources);
+        var meter=RuntimeBudget.meter(store.read(claim,stage));
+        for(String path:local.isPresent()?List.of(LocalEditScope.target(local.get())):RepairContext.seedOrder(plan,failure,originalActions,sources)) {
+            if(!repairContext.seed(path)) continue;
+            Integer full=model.allowance(meter,policy,input(stage,context,plan,local,edit,false,true,repairContext.observations(),
+                    failure,originalActions,repairContext,meter,Map.of()));
+            if(full!=null && full>=RuntimeBudget.OUTPUT_TOKENS) continue;
+            if(repairContext.seeded()>1 || model.allowance(meter,policy,RepairContext.compactInput(input(stage,context,plan,local,edit,false,false,
+                    repairContext.observations(),failure,originalActions,repairContext,meter,Map.of()),originalActions))==null) repairContext.unseed(path);
+            break;
+        }
+        store.append(claim,stage,"repair.context",Map.of("origin",RepairContext.SOURCE_ORIGIN,"versionId",draft.path("versionId").asText(),
+                "sourceDigest",draft.path("sourceDigest").asText(),"seeded",repairContext.seedSummary(),"omitted",repairContext.unseeded()));
+    }
+    /**
+     * D24-A round 2: a REPAIR read is offered only while it cannot starve the patch. Charged at its whole reservation
+     * (unknown usage), the read plus the next request grown by the largest receipt it could add must still leave a
+     * full-size write; another model call and five slots (read, write, snapshot, two verification) must remain too.
+     */
+    private static boolean readsFundable(RuntimeBudget.Meter meter,String policy,JsonNode request,int growth) {
+        if(RuntimeBudget.MODEL_CALLS-meter.models()<2 || RuntimeBudget.TOOL_CALLS-meter.tools()<5) return false;
+        int input=RuntimeBudget.inputReservation(policy,request.toString());
+        Integer allowance=RuntimeBudget.outputAllowance(meter,input);
+        return allowance!=null && RuntimeBudget.TOKENS-meter.chargedTokens()-(long)input-allowance-input-growth>=RuntimeBudget.OUTPUT_TOKENS;
+    }
+    private JsonNode writeTools() {
+        var writes=json.createArrayNode();
+        for(var tool:registry.definitions().path("tools")) if(!RepairContext.READ_TOOLS.contains(tool.path("name").asText())) writes.add(tool);
+        return writes;
+    }
     private JsonNode input(TaskStatus stage,AgentRunStore.Context context,JsonNode plan,Optional<JsonNode> local,Optional<JsonNode> edit,
-                           boolean completionOnly,List<JsonNode> observations,JsonNode failure,JsonNode originalActions,
+                           boolean completionOnly,boolean reads,List<JsonNode> observations,JsonNode failure,JsonNode originalActions,
                            RepairContext repairContext,RuntimeBudget.Meter meter,Map<String,String> componentIds) {
         boolean repair=failure!=null;
         var input=new LinkedHashMap<String,Object>();input.put("phase",stage.name());input.put("request",context.prompt());
@@ -238,19 +267,19 @@ public final class AgentLoop implements TaskStageRunner {
         }
         else input.put("plan",repair?RepairContext.planProjection(plan):plan);
         if(!componentIds.isEmpty()) input.put("componentIds",componentIds);
-        input.put("tools",completionOnly?List.of():registry.definitions().path("tools"));
+        input.put("tools",completionOnly?List.of():reads?registry.definitions().path("tools"):writeTools());
         input.put("observations",repair?observations:GenerationContext.observations(observations));
         if(completionOnly) input.put("completionOnly",true);
         edit.ifPresent(value -> input.put("editContext",!repair&&local.isPresent()?LocalGenerationContext.projectBase(value,observations):value));
         if(!repair&&local.isPresent()) input.put("editProgress",LocalGenerationContext.progress(local.get(),observations));
         if(repair) {input.put("failure",failure);input.put("completionProposal",Map.of("type","done","actions",originalActions));input.put("sourceFiles",repairContext.sourceFiles());
-            input.put("repairAttempt",context.repairAttempts());input.put("repairProgress",repairContext.progress());
-            if(completionOnly)input.put("completionOnly",true);
+            input.put("repairAttempt",context.repairAttempts());input.put("repairProgress",repairContext.progress(reads&&!completionOnly));
             local.ifPresent(value -> input.put("sourceFiles",LocalEditScope.files(repairContext.sourceFiles(),LocalEditScope.target(value))));
+            JsonNode sources=repairContext.repairSources();
+            if(sources!=null) input.put("repairSources",sources);
             input.put("budget",Map.of("modelCallsRemaining",RuntimeBudget.MODEL_CALLS-meter.models(),
                     "toolCallsRemaining",RuntimeBudget.TOOL_CALLS-meter.tools(),"tokensRemaining",RuntimeBudget.TOKENS-meter.chargedTokens()));}
-        JsonNode request=json.valueToTree(input);
-        return repair&&completionOnly?RepairContext.compactCompletion(request,originalActions):request;
+        return json.valueToTree(input);
     }
     /**
      * A successful GENERATE write is fed back with its own bytes, once they match both the actual afterDigest and
