@@ -1,0 +1,32 @@
+$ node scripts/validate-contracts.mjs flow && pnpm --filter @codeless/web smoke
+OpenAPI surface and authentication boundary passed
+application: valid accepted; invalid rejected
+task: valid accepted; invalid rejected
+event: valid accepted; invalid rejected
+build: valid accepted; invalid rejected
+version: valid accepted; invalid rejected
+publication: valid accepted; invalid rejected
+task-diagnostics: valid accepted; invalid rejected
+preview-credential: valid accepted; invalid rejected
+cross-resource READY/publication flow passed
+$ pnpm build && playwright test --config playwright.config.ts && node ../../tests/e2e/full/run.mjs
+$ vue-tsc --noEmit && vite build
+vite v6.2.3 building for production...
+transforming...
+✓ 1507 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                       0.54 kB │ gzip:  0.36 kB
+dist/assets/AdminPage-Bf4vwQWg.css    5.74 kB │ gzip:  1.62 kB
+dist/assets/index-thRdBSjx.css       58.89 kB │ gzip: 11.15 kB
+dist/assets/AdminPage-Cyu-UwUC.js    19.08 kB │ gzip:  7.47 kB
+dist/assets/index-Yi1-sPzt.js       227.63 kB │ gzip: 82.55 kB
+✓ built in 3.88s
+Error: http://127.0.0.1:4173/login is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer.
+
+[ELIFECYCLE] Command failed with exit code 1.
+Error: ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL
+
+  × "pnpm recursive run" failed in F:\JAVA\CodeLess\CodeLess\apps\web
+
+[ELIFECYCLE] Command failed with exit code 1.

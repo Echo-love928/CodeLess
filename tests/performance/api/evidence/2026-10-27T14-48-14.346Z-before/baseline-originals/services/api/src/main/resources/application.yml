@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: codeless-api
+  datasource:
+    url: ${CODELESS_DATABASE_URL}
+    username: ${CODELESS_DATABASE_USER}
+    password: ${CODELESS_DATABASE_PASSWORD}
+  flyway:
+    enabled: true
+  jackson:
+    default-property-inclusion: non-null
+server:
+  shutdown: graceful
+  servlet:
+    session:
+      timeout: 30m
+      # Never accept or emit ;jsessionid= in URLs, where a session id ends up in logs, history and Referer headers.
+      tracking-modes: cookie
+      cookie:
+        http-only: true
+        secure: ${CODELESS_COOKIE_SECURE:true}
+        same-site: lax
+codeless:
+  capacity:
+    queue: ${CODELESS_TASK_QUEUE_LIMIT:32}
+    user-active: ${CODELESS_USER_ACTIVE_TASK_LIMIT:16}
+    app-active: ${CODELESS_APP_ACTIVE_TASK_LIMIT:8}
+    model-concurrency: ${CODELESS_MODEL_CONCURRENCY:2}
+  deploy:
+    hosting-enabled: ${CODELESS_PUBLICATION_ENABLED:false}
+    node-executable: ${CODELESS_NODE_EXECUTABLE:}
+    gateway-entry: ${CODELESS_PUBLICATION_GATEWAY_ENTRY:}
+    hosting-root: ${CODELESS_HOSTING_ROOT:}
+    public-origin: ${CODELESS_PUBLICATION_ORIGIN:}
+    platform-origin: ${CODELESS_PLATFORM_ORIGIN:}
+    preview-origin: ${CODELESS_PREVIEW_ORIGIN:}
+  model:
+    provider: ${CODELESS_MODEL_PROVIDER:deterministic-mock}
+    audit-root: ${CODELESS_MODEL_AUDIT_ROOT:.local-data/model-calls}

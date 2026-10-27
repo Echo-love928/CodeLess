@@ -1,0 +1,302 @@
+$ node scripts/validate-contracts.mjs runner && node --test tests/infra/*.test.mjs
+build: valid accepted; invalid rejected
+version: valid accepted; invalid rejected
+runner contract boundary passed
+✔ only confirmed completed builds are accepted; unknowns and failures stay rejected (14.6756ms)
+✔ artifact path, full manifest and digest are verified before service listens (12.2534ms)
+✔ private loopback service rejects unauthenticated, traversal, method, foreign host and proxy targets (59.9285ms)
+✔ symbolic directories, hardlinks and artifact byte limits fail closed (37.251ms)
+✔ controlled action grammar rejects scripts, arbitrary selectors, URLs and relaxed limits (1.0477ms)
+✔ only the three fixed Vue document routes map to the frozen index; assets and unknown paths do not (20.6543ms)
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.30kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+#2 DONE 0.1s
+
+#3 [internal] load build context
+#3 transferring context: 1.03kB done
+#3 DONE 0.0s
+
+#4 [ 1/10] FROM docker.io/library/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+#4 resolve docker.io/library/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 0.0s done
+#4 DONE 0.0s
+
+#5 [10/10] COPY infra/build-image/container-build.mjs /opt/codeless/container-build.mjs
+#5 CACHED
+
+#6 exporting to image
+#6 exporting layers done
+#6 exporting manifest sha256:c70b4dda9d5746b2f637340a1d84fe1bdaea030bde665a7cba57449aa2feb350 done
+#6 exporting config sha256:d5b6892718c79ba383ea1101392f2e86ed0a13ee95e6fc78027990bcae2ba22c done
+#6 exporting attestation manifest sha256:85f96188dcc9084b5d4d48fbf10274365ea2c67cc6eeae65ecd4fb8d1f02c88b
+#6 exporting attestation manifest sha256:85f96188dcc9084b5d4d48fbf10274365ea2c67cc6eeae65ecd4fb8d1f02c88b 0.0s done
+#6 exporting manifest list sha256:c7ed544565069ba2bb6d9c40eb158c7eb59d999b79618f7d83cb545097b34414 0.0s done
+#6 naming to docker.io/library/codeless-vue-build:d05 done
+#6 unpacking to docker.io/library/codeless-vue-build:d05 done
+#6 DONE 0.1s
+D07-B-T1: {"id":"2a26a542-ce84-4a89-bff1-7cee3cb873e2","imageId":"sha256:3f911c6479146951444fa6fc079bad7442f282d94899f11484083d34d3e3f040","containerName":"codeless-build-2a26a542-ce84-4a89-bff1-7cee3cb873e2","status":"SUCCEEDED","failure":null,"exitCode":0,"oomKilled":false,"timedOut":false,"log":{"text":"\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 30 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.36 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[32mai-component-catalog.json  \u001b[39m\u001b[1m\u001b[2m 0.59 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.31 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[35mindex-D-nVVYb8.css  \u001b[39m\u001b[1m\u001b[2m 0.44 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.29 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-BnIS_X2P.js   \u001b[39m\u001b[1m\u001b[2m84.88 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.90 kB\u001b[22m\n\u001b[32m✓ built in 1.50s\u001b[39m\n","bytes":738,"observedBytes":738,"truncated":false},"artifact":{"digest":"sha256:1410e9df9e22a4ccbdbaf4ced6555c8d1e55a7c45ac501bb80054d5a1414323b","bytes":86266,"files":[{"path":"ai-component-catalog.json","bytes":587,"digest":"sha256:721fb84bd1828304f86a6444c102a8e741c56975fc5d2d71e198493e365726d6"},{"path":"assets/index-BnIS_X2P.js","bytes":84877,"digest":"sha256:c529d85895fbc4de2e124170578b82de9b697ec06d379988ee2993e508f549d2"},{"path":"assets/index-D-nVVYb8.css","bytes":439,"digest":"sha256:0a69c49a8ee841d8203715e31f4cc2a5e1c1dca5cbdf3e0cdb69266b23cf8857"},{"path":"index.html","bytes":363,"digest":"sha256:e1adf243d5c2627cc02c90fd2c0a248ea4205ae1e0eb22c5db0089c54d2c6710"}],"directory":"C:\\Users\\yuanqi\\AppData\\Local\\Temp\\codeless-d07-goJqHw\\artifacts\\2a26a542-ce84-4a89-bff1-7cee3cb873e2"},"cleanup":{"containerRemoved":true,"workspaceRemoved":true,"errors":[]},"createdAt":"2026-10-27T14:35:09.908Z","completedAt":"2026-10-27T14:35:17.167Z"}
+✔ D07-B-T1: controlled Vue template produces stable artifact digest and real logs (10214.4328ms)
+✔ deep configured work roots build as non-root without exposing host credentials (9266.7262ms)
+D07-B-T2: {"id":"55b4309d-f2ee-4113-9f0c-2781c1fb9626","imageId":"sha256:f43eb79c29bb682ffd9642eca57b888abde721d30d58c323fa56e3b15862313a","containerName":"codeless-build-55b4309d-f2ee-4113-9f0c-2781c1fb9626","status":"FAILED","failure":"TIMEOUT","exitCode":137,"oomKilled":false,"timedOut":true,"log":{"text":"loop child started\n","bytes":19,"observedBytes":19,"truncated":false},"artifact":null,"cleanup":{"containerRemoved":true,"workspaceRemoved":true,"errors":[]},"createdAt":"2026-10-27T14:35:26.444Z","completedAt":"2026-10-27T14:35:29.227Z"}
+✔ D07-B-T2: infinite loop and child process time out and container is removed (2787.3519ms)
+D07-B-T3: {"id":"47ff55ba-4fb6-499f-bcef-860fce72e2a0","imageId":"sha256:f43eb79c29bb682ffd9642eca57b888abde721d30d58c323fa56e3b15862313a","containerName":"codeless-build-47ff55ba-4fb6-499f-bcef-860fce72e2a0","status":"FAILED","failure":"OOM","exitCode":137,"oomKilled":true,"timedOut":false,"log":{"text":"MEMORY_CGROUP_OOM {\"signal\":\"SIGKILL\",\"memoryMax\":100663296,\"swapMax\":0,\"oomKillBefore\":0,\"oomKillAfter\":1}\n","bytes":108,"observedBytes":108,"truncated":false},"artifact":null,"cleanup":{"containerRemoved":true,"workspaceRemoved":true,"errors":[]},"createdAt":"2026-10-27T14:35:29.230Z","completedAt":"2026-10-27T14:35:32.059Z"}
+✔ D07-B-T3: real cgroup OOM is distinguished from timeout and compiler failure (2831.9407ms)
+D12-integration-SIGKILL: {"id":"68e87523-a3ac-4cc8-8c8a-7834c1e12d2c","imageId":"sha256:f43eb79c29bb682ffd9642eca57b888abde721d30d58c323fa56e3b15862313a","containerName":"codeless-build-68e87523-a3ac-4cc8-8c8a-7834c1e12d2c","status":"FAILED","failure":"BUILD_EXIT","exitCode":137,"oomKilled":false,"timedOut":false,"log":{"text":"","bytes":0,"observedBytes":0,"truncated":false},"artifact":null,"cleanup":{"containerRemoved":true,"workspaceRemoved":true,"errors":[]},"createdAt":"2026-10-27T14:35:32.062Z","completedAt":"2026-10-27T14:35:34.593Z","oomEvidence":{"status":"NO_OOM_EVENT","events":[]}}
+✔ real child SIGKILL propagated as exit 137 without a Docker OOM event stays BUILD_EXIT (2533.8257ms)
+D07-B-T4: {"id":"ef67083d-a26a-460a-8798-0529c0899a06","imageId":"sha256:f43eb79c29bb682ffd9642eca57b888abde721d30d58c323fa56e3b15862313a","containerName":"codeless-build-ef67083d-a26a-460a-8798-0529c0899a06","status":"SUCCEEDED","failure":null,"exitCode":0,"oomKilled":false,"timedOut":false,"log":{"text":"non-root, read-only, network and sensitive access denied\n","bytes":57,"observedBytes":57,"truncated":false},"artifact":{"digest":"sha256:bb8239fccb04be011e428f70d50027effb2101740a5b3f66b7c0ff8d6f9a4a6c","bytes":54,"files":[{"path":"app.js","bytes":23,"digest":"sha256:91a79ea9a09ad1460aa34b2363e106fefab3902dbb3b07ed7b05a2a5059ed38d"},{"path":"index.html","bytes":31,"digest":"sha256:4ddc7f1abc17f096cad3c1bb6b9f0b73b9973199811d5eb5e4d0946e4a7868f6"}],"directory":"C:\\Users\\yuanqi\\AppData\\Local\\Temp\\codeless-d07-goJqHw\\artifacts\\ef67083d-a26a-460a-8798-0529c0899a06"},"cleanup":{"containerRemoved":true,"workspaceRemoved":true,"errors":[]},"createdAt":"2026-10-27T14:35:34.596Z","completedAt":"2026-10-27T14:35:36.535Z"}
+✔ D07-B-T4: actual network, secrets, socket, root and input writes denied (1942.1078ms)
+✔ stdout/stderr floods are drained and bounded without hiding the observed exit (2406.0298ms)
+✔ nonzero, empty and symlink artifacts cannot become successful builds (3780.8283ms)
+✔ artifact size limits fail closed even after exit zero (969.2797ms)
+✔ concurrent tasks have independent containers, workspaces and artifact directories (1289.3903ms)
+✔ invalid source and missing image keep unknown exit null and clean scratch (490.0711ms)
+✔ a failed trusted container observer fails closed before execution and cleans its container (535.9305ms)
+✔ worker policy refuses unpinned images, unknown limits and resource relaxation (3.0231ms)
+✔ OOM requires same-container daemon evidence and drops all attributes (0.4975ms)
+✔ empty evidence remains no OOM; malformed/truncated/over-limit evidence stays unknown (0.3223ms)
+✔ cross-volume promotion freezes bounded bytes and atomically publishes the same hashes (22.0604ms)
+✔ cross-volume promotion refuses changed or oversized bytes without publishing (15.0844ms)
+✔ promotion preserves unrelated errors and cleans a failed private promotion (17.8424ms)
+✔ CI provisioning changes only the observed slow Ubuntu mirror in legacy and deb822 sources (0.9152ms)
+✔ GitHub mirror+file configuration is prepared while preserving mirror priorities (1.0493ms)
+✔ failed or unknown browser prerequisites cannot be reported as ready (0.4567ms)
+✔ keyless local example has all required environment settings (1.2101ms)
+✔ missing and conflicting configuration fails clearly with LF and CRLF (1.1284ms)
+✔ runner stays without a host port and excludes platform secrets (1.4984ms)
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.30kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+#2 DONE 0.0s
+
+#3 [internal] load build context
+#3 transferring context: 1.03kB 0.0s done
+#3 DONE 0.0s
+
+#4 [ 1/10] FROM docker.io/library/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+#4 resolve docker.io/library/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 0.0s done
+#4 DONE 0.0s
+
+#5 [ 6/10] RUN node /opt/codeless/verify-dependencies.mjs
+#5 CACHED
+
+#6 [ 7/10] RUN corepack enable && corepack prepare pnpm@12.6.0 --activate && corepack pnpm install --frozen-lockfile
+#6 CACHED
+
+#7 [ 9/10] COPY templates/vue/src ./src
+#7 CACHED
+
+#8 [ 2/10] WORKDIR /opt/codeless/template
+#8 CACHED
+
+#9 [ 8/10] COPY templates/vue/index.html templates/vue/tsconfig.json templates/vue/vite.config.ts ./
+#9 CACHED
+
+#10 [ 4/10] COPY templates/vue/allowed-dependencies.json ./
+#10 CACHED
+
+#11 [ 3/10] COPY templates/vue/package.json templates/vue/pnpm-lock.yaml templates/vue/pnpm-workspace.yaml ./
+#11 CACHED
+
+#12 [ 5/10] COPY infra/build-image/verify-dependencies.mjs /opt/codeless/verify-dependencies.mjs
+#12 CACHED
+
+#13 [10/10] COPY infra/build-image/container-build.mjs /opt/codeless/container-build.mjs
+#13 CACHED
+
+#14 exporting to image
+#14 exporting layers done
+#14 exporting manifest sha256:c70b4dda9d5746b2f637340a1d84fe1bdaea030bde665a7cba57449aa2feb350 done
+#14 exporting config sha256:d5b6892718c79ba383ea1101392f2e86ed0a13ee95e6fc78027990bcae2ba22c done
+#14 exporting attestation manifest sha256:f4d7c64d710b573af1651ade147f2a46b91c1439fe825b0dadbf74728ce11935 0.0s done
+#14 exporting manifest list sha256:8ac0c2210ac02cb54c963824adde4422a55a0b2aac956b3d5e1c2ff5035930a7 0.0s done
+#14 naming to docker.io/library/codeless-vue-build:d05 done
+#14 unpacking to docker.io/library/codeless-vue-build:d05 done
+#14 DONE 0.1s
+✔ mapping schema matches selectable/disabled runtime contract and rejects unsafe shape (12.9933ms)
+✔ catalog digest, missing files, aliases, duplicate ID and snapshot-only binding fail closed (8.0922ms)
+✔ unsafe marker namespace disables even a different valid target ID (0.3584ms)
+✔ public OpenAPI includes every enabling path and session/CSRF/error boundary (1.0209ms)
+✔ closed component identity and edit request reject path, instance, publish and forged version (117.8696ms)
+✔ actual authenticated version snapshot declares the optional immutable sidecar digest (712.7842ms)
+D12-B-T1: {"manifest":{"protocol":"codeless-component-mapping/v1","versionId":"55555555-5555-4555-8555-555555555555","sourceDigest":"sha256:499720bad8bd70d14b27cc0a997a5a23eda5021e3a1072b5d7471670c5472ad6","components":[{"componentId":"shared-card","sourceFile":"src/components/SharedCard.vue","fileDigest":"sha256:65ec81b23ac6f84dd1df0b45740be29545c8c5e008d0591d2f788457daa12dc9","scope":"SOURCE_FILE"},{"componentId":"home-page","sourceFile":"src/pages/HomePage.vue","fileDigest":"sha256:33f1ce80bc0ed5b7f6fde7685fb346f92b083182723fe1935562f17fad137a3a","scope":"SOURCE_FILE"}],"disabled":[]},"selection":{"selectable":true,"versionId":"55555555-5555-4555-8555-555555555555","sourceDigest":"sha256:499720bad8bd70d14b27cc0a997a5a23eda5021e3a1072b5d7471670c5472ad6","componentId":"shared-card","sourceFile":"src/components/SharedCard.vue","fileDigest":"sha256:65ec81b23ac6f84dd1df0b45740be29545c8c5e008d0591d2f788457daa12dc9","scope":"SOURCE_FILE","shared":true,"notice":"修改此源码组件会影响该版本中的所有实例；不支持仅修改某个 DOM 实例。"},"buildId":"4a83311f-eb87-42b5-a33b-7924edb2e553","imageId":"sha256:3f911c6479146951444fa6fc079bad7442f282d94899f11484083d34d3e3f040","exitCode":0,"artifactDigest":"sha256:2504faf3770c294b9e298298a9a874ae4155755a6d5f63eb8ac4105e492c79b9","log":{"text":"\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 31 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[32mai-component-catalog.json  \u001b[39m\u001b[1m\u001b[2m 0.77 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.37 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-DenTdoYe.js   \u001b[39m\u001b[1m\u001b[2m84.64 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.61 kB\u001b[22m\n\u001b[32m✓ built in 1.34s\u001b[39m\n","bytes":619,"observedBytes":619,"truncated":false}}
+✔ D12-B-T1: real production build locates a bounded existing immutable source file (8027.8116ms)
+D12-B-T2: {"markers":["shared-card","shared-card","shared-card"],"selections":[{"selectable":true,"versionId":"55555555-5555-4555-8555-555555555555","sourceDigest":"sha256:499720bad8bd70d14b27cc0a997a5a23eda5021e3a1072b5d7471670c5472ad6","componentId":"shared-card","sourceFile":"src/components/SharedCard.vue","fileDigest":"sha256:65ec81b23ac6f84dd1df0b45740be29545c8c5e008d0591d2f788457daa12dc9","scope":"SOURCE_FILE","shared":true,"notice":"修改此源码组件会影响该版本中的所有实例；不支持仅修改某个 DOM 实例。"},{"selectable":true,"versionId":"55555555-5555-4555-8555-555555555555","sourceDigest":"sha256:499720bad8bd70d14b27cc0a997a5a23eda5021e3a1072b5d7471670c5472ad6","componentId":"shared-card","sourceFile":"src/components/SharedCard.vue","fileDigest":"sha256:65ec81b23ac6f84dd1df0b45740be29545c8c5e008d0591d2f788457daa12dc9","scope":"SOURCE_FILE","shared":true,"notice":"修改此源码组件会影响该版本中的所有实例；不支持仅修改某个 DOM 实例。"},{"selectable":true,"versionId":"55555555-5555-4555-8555-555555555555","sourceDigest":"sha256:499720bad8bd70d14b27cc0a997a5a23eda5021e3a1072b5d7471670c5472ad6","componentId":"shared-card","sourceFile":"src/components/SharedCard.vue","fileDigest":"sha256:65ec81b23ac6f84dd1df0b45740be29545c8c5e008d0591d2f788457daa12dc9","scope":"SOURCE_FILE","shared":true,"notice":"修改此源码组件会影响该版本中的所有实例；不支持仅修改某个 DOM 实例。"}],"browser":"148.0.7778.96","source":"real Docker/Vue/Chromium; no model"}
+D12-B-T3: {"oldVersionId":"55555555-5555-4555-8555-555555555555","newVersionId":"66666666-6666-4666-8666-666666666666","sameSourceDigest":"sha256:499720bad8bd70d14b27cc0a997a5a23eda5021e3a1072b5d7471670c5472ad6","result":"VERSION_MISMATCH"}
+D12-B-T4: {"paths":["../secret","/etc/passwd","src/pages/../HomePage.vue","src\\components\\SharedCard.vue","src/components/%2e%2e.vue","src/components/NUL.vue","src/components/Card.vue:secret","src/components/Missing.vue","src/pages/HomePage.vue"],"result":"all rejected; client cannot provide sourceFile or instance scope"}
+✔ D12-B-T2: real nested and repeated Vue instances select the same shared source scope (1123.9373ms)
+✔ D12-B-T3: even identical source bytes cannot reuse an old version mapping (0.5579ms)
+✔ D12-B-T4: forged paths, existing-file remaps and malformed mappings are rejected (0.793ms)
+D12-B-disabled: {"manifest":{"protocol":"codeless-component-mapping/v1","versionId":"66666666-6666-4666-8666-666666666666","sourceDigest":"sha256:672c06f4f6952e7a0a15894348d02aa3a56f5674ecb1a373d59c5dc976f540a7","components":[],"disabled":[{"sourceFile":"src/components/CommentOnly.vue","componentId":null,"reason":"MISSING_COMPONENT_ID"},{"sourceFile":"src/components/DuplicateA.vue","componentId":"duplicate-id","reason":"DUPLICATE_COMPONENT_ID"},{"sourceFile":"src/components/DuplicateB.vue","componentId":"duplicate-id","reason":"DUPLICATE_COMPONENT_ID"},{"sourceFile":"src/components/Dynamic.vue","componentId":null,"reason":"UNSAFE_MARKER"},{"sourceFile":"src/components/Fragment.vue","componentId":null,"reason":"UNSUPPORTED_ROOT"},{"sourceFile":"src/components/Invalid.vue","componentId":null,"reason":"INVALID_COMPONENT_ID"},{"sourceFile":"src/components/Missing.vue","componentId":null,"reason":"MISSING_COMPONENT_ID"},{"sourceFile":"src/components/Nested.vue","componentId":"nested-id","reason":"UNSAFE_MARKER"},{"sourceFile":"src/components/RepeatedRoot.vue","componentId":"repeated-root","reason":"UNSAFE_MARKER"},{"sourceFile":"src/components/RootComponent.vue","componentId":null,"reason":"UNSUPPORTED_ROOT"},{"sourceFile":"src/components/SharedCard.vue","componentId":"shared-card","reason":"UNSAFE_MARKER"},{"sourceFile":"src/components/Spread.vue","componentId":"spread-id","reason":"UNSAFE_MARKER"},{"sourceFile":"src/pages/HomePage.vue","componentId":"home-page","reason":"UNSAFE_MARKER"}]},"exitCode":0}
+✔ missing, dynamic, nested, fragment and duplicate identifiers disable selection in an actual build (9587.163ms)
+✔ source mismatch and build failure never produce a selectable manifest (10.3325ms)
+D12-B-R1: {"markers":["home-page","shared-card"],"selections":[{"selectable":false,"reason":"UNSAFE_MARKER"},{"selectable":false,"reason":"UNSAFE_MARKER"}],"manifest":{"protocol":"codeless-component-mapping/v1","versionId":"66666666-6666-4666-8666-666666666666","sourceDigest":"sha256:029d02c4a6c73323dc967b0e76cca3d766b57fe3e21f1e789fda84fed5702328","components":[],"disabled":[{"sourceFile":"src/components/SharedCard.vue","componentId":"shared-card","reason":"UNSAFE_MARKER"},{"sourceFile":"src/pages/HomePage.vue","componentId":"home-page","reason":"UNSAFE_MARKER"}]},"exitCode":0,"browser":"148.0.7778.96"}
+✔ R1: call-site spread and dynamic arguments cannot select another component source (11000.3659ms)
+D12-B-R2-call-sites: {"markers":["shared-card","shared-card","home-page","home-page","home-page","home-page"],"selections":[{"selectable":false,"reason":"UNSAFE_MARKER"},{"selectable":false,"reason":"UNSAFE_MARKER"},{"selectable":false,"reason":"UNSAFE_MARKER"},{"selectable":false,"reason":"UNSAFE_MARKER"},{"selectable":false,"reason":"UNSAFE_MARKER"},{"selectable":false,"reason":"UNSAFE_MARKER"}],"manifest":{"protocol":"codeless-component-mapping/v1","versionId":"66666666-6666-4666-8666-666666666666","sourceDigest":"sha256:70c9b23202ab912b49e9734bceae94f82d97e669658e256975219ee385de7e5e","components":[],"disabled":[{"sourceFile":"src/components/SharedCard.vue","componentId":"shared-card","reason":"UNSAFE_MARKER"},{"sourceFile":"src/pages/HomePage.vue","componentId":"home-page","reason":"UNSAFE_MARKER"}]},"exitCode":0,"imageId":"sha256:3f911c6479146951444fa6fc079bad7442f282d94899f11484083d34d3e3f040","browser":"148.0.7778.96","realDocker":true,"realChromium":true,"modelRequests":0}
+✔ R2: call-site HTML marker case aliases cannot select the parent source (8543.6483ms)
+D12-B-R2-roots: {"markers":["shared-card","shared-card","shared-card","upper-root","mixed-root","home-page","home-page"],"selections":[{"selectable":false,"reason":"UNSAFE_MARKER"},{"selectable":false,"reason":"UNSAFE_MARKER"},{"selectable":false,"reason":"UNSAFE_MARKER"},{"selectable":false,"reason":"UNSAFE_MARKER"},{"selectable":false,"reason":"UNSAFE_MARKER"},{"selectable":false,"reason":"UNSAFE_MARKER"},{"selectable":false,"reason":"UNSAFE_MARKER"}],"manifest":{"protocol":"codeless-component-mapping/v1","versionId":"66666666-6666-4666-8666-666666666666","sourceDigest":"sha256:c5652a9fe84f82b42cfcf55334f349d9b7d08768e82703ebfef9d7760cccb1cd","components":[],"disabled":[{"sourceFile":"src/components/RootBind.vue","componentId":"bind-root","reason":"UNSAFE_MARKER"},{"sourceFile":"src/components/RootDuplicate.vue","componentId":null,"reason":"UNSAFE_MARKER"},{"sourceFile":"src/components/RootMixed.vue","componentId":"mixed-root","reason":"UNSAFE_MARKER"},{"sourceFile":"src/components/RootUpper.vue","componentId":"upper-root","reason":"UNSAFE_MARKER"},{"sourceFile":"src/components/SharedCard.vue","componentId":"shared-card","reason":"UNSAFE_MARKER"},{"sourceFile":"src/pages/HomePage.vue","componentId":"home-page","reason":"UNSAFE_MARKER"}]},"exitCode":0,"imageId":"sha256:3f911c6479146951444fa6fc079bad7442f282d94899f11484083d34d3e3f040","browser":"148.0.7778.96","realDocker":true,"realChromium":true,"modelRequests":0}
+✔ R2: root case aliases, duplicate aliases and static bind arguments disable the namespace (6438.0467ms)
+✔ Maven bootstrap recovers from HTTP 429 and reuses the verified distribution (4148.7509ms)
+✔ persistent Maven HTTP 429 exhausts four attempts and remains a failure (6598.1663ms)
+✔ Maven HTTP 404 fails immediately without installing or running Maven (464.0482ms)
+✔ Maven download retries preserve checksum enforcement (2613.6685ms)
+✔ Maven execution failures propagate without redownloading or retrying tests (748.8054ms)
+✔ D09-B-T1/T4: bootstrap scopes a secure preview cookie; documents/resources are immutable and no-store (166.3579ms)
+✔ D09-B-T2: missing/expired/forged credentials and altered version/host/path/method are rejected (39.7937ms)
+✔ registration trusts only live worker handles and matching successful browser evidence; versions cannot be replaced (18.2692ms)
+✔ configuration rejects same-site or insecure previews and unsupported public suffixes (0.617ms)
+✔ resident registry rehydrates committed bindings, restarts, revokes removal, and denies stale/unavailable catalogue (239.7041ms)
+✔ private receipts, source, artifact, browser report and screenshot must all match before registration (666.1811ms)
+✔ catalogue cannot supply paths, duplicate versions or changed immutable bindings; capacity and retention fail closed (187.3797ms)
+✔ cleanup failures cannot export private paths or raw secrets (0.6617ms)
+✔ missing cleanup evidence stays unknown (0.2263ms)
+Ingress restart regression: {"legacy":{"initial":{"status":200,"fixtureReached":true,"nginx502":false},"stopped":{"status":502,"fixtureReached":false,"nginx502":true},"firstAfterRestart":{"status":502,"fixtureReached":false,"nginx502":true},"elapsedMs":2,"upstreamFixture":true,"modelQualityAccepted":false,"syntheticPeerAliases":2},"fixed":{"initial":{"status":200,"fixtureReached":true,"nginx502":false},"stopped":{"status":502,"fixtureReached":false,"nginx502":true},"firstAfterRestart":{"status":200,"fixtureReached":true,"nginx502":false},"elapsedMs":6,"upstreamFixture":true,"modelQualityAccepted":false,"syntheticPeerAliases":2},"modelQualityAccepted":false,"platformApiFixture":true,"signingFixture":true,"postRestartRetries":0}
+✔ real nginx does not quarantine the restarted preview gateway after a stopped-upstream probe (7331.8916ms)
+✔ resumed successful publication retains its original pending-at-edit evidence (0.8756ms)
+✔ resuming cannot erase a failed or missing pending-at-edit observation (1.9408ms)
+✔ unified ingress preserves original isolation templates and routes only bounded TLS names (79.3952ms)
+✔ public assembly refuses alternate ports and shared-site configurations (0.5945ms)
+✔ publication resource check enumerates missing inputs without claiming public success (2.0493ms)
+✔ publication resource check rejects shared sites and credential-bearing preview origins (1.5175ms)
+✔ missing public resources produce native CLI exit 2 (223.8606ms)
+✔ publication survives private worker umask while keeping receipt and staging private (349.3099ms)
+✔ D15-B-01: frozen bytes, deployment isolation, source/catalog exclusion and same-ID retry binding (410.0758ms)
+✔ D15-B-02/03: dedicated sites and SSRF targets fail closed (1.3496ms)
+✔ A frozen-byte gateway works after handle closure; tampering, ID conflicts and deadlines fail closed (107.9231ms)
+✔ a full 32MiB admitted artifact can be replayed with its separate private receipt; larger input fails (294.9042ms)
+✔ internal health responds without exposing environment secrets (23.3743ms)
+✔ health is the only route and has a strict method (5.1672ms)
+✔ runner refuses a public bind by default (0.8475ms)
+✔ runner entrypoint starts and serves health over a loopback socket (767.0406ms)
+✔ observed exit result maps to the shared build contract (2.4609ms)
+✔ D19 T4: publication writer rejects traversal, private files, aliases and oversized input before writing (5418.8466ms)
+✔ D19 T4: admitted bytes and receipt are frozen before asynchronous publication (39.2154ms)
+✔ D19 T1: real container denies external, management and metadata connections and host secrets (1496.2026ms)
+✔ D19 T2: timeout kills the container and its child; exact container is absent after cleanup (6560.9036ms)
+✔ D19 T1: private, metadata, numeric and IPv6 addresses are refused before transport (6.728ms)
+✔ D19 T1: all redirect statuses and locations are rejected without a second request (4.9016ms)
+✔ D19 T4: pinned transport rejects unknown paths, overflow, hash mismatch and stalls deterministically (80.4582ms)
+✔ D19 T1: browser navigation and fetch to a live private canary never reach it (3518.4366ms)
+✔ D19 T2: CPU-exhausting browser script hits its deadline and cannot pass verification (3077.4182ms)
+✔ D19 T4: real screenshot browser rejects private navigation, WebSocket and busy-loop fixtures (8901.5549ms)
+(node:43260) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ D19 T3/T4: real preview gateway and HTTPS nginx isolate credentials, CSP, messages and hosting paths (4892.2978ms)
+✔ runner matches the shared Java/browser site-boundary cases (275.6571ms)
+✔ cn/top and mixed dedicated sites render bound publication hosts; old suffixes still work (5.8107ms)
+✔ new suffixes cannot collapse preview/publication/platform into one site or admit unsupported origins (0.8749ms)
+✔ locked Redocly default probe rejects redirects then forces exit from beforeExit (1675.4911ms)
+ℹ Actual forced-exit path: exit 0; native crash NOT_OBSERVED in this invocation
+✔ gate environment validates the actual contract with zero optional HTTP attempts (1013.5032ms)
+✔ offline CLI still rejects a genuinely invalid specification with exit 1 (1070.5959ms)
+✔ actual static gate scopes offline settings to Redocly and preserves other child environments (959.14ms)
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [ 1/10] FROM docker.io/library/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+#1 resolve docker.io/library/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 0.0s done
+#1 DONE 0.0s
+
+#2 [10/10] COPY infra/build-image/container-build.mjs /opt/codeless/container-build.mjs
+#2 CACHED
+
+#3 [internal] load build definition from Dockerfile
+#3 transferring dockerfile: 1.30kB done
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 1.03kB done
+#5 DONE 0.0s
+
+#6 exporting to image
+#6 exporting layers done
+#6 exporting manifest sha256:c70b4dda9d5746b2f637340a1d84fe1bdaea030bde665a7cba57449aa2feb350 done
+#6 exporting config sha256:d5b6892718c79ba383ea1101392f2e86ed0a13ee95e6fc78027990bcae2ba22c done
+#6 exporting attestation manifest sha256:5e0ee2895e2c2360cba5f2d9ec1e809825dc632b26809c0098a84769e4016239 0.0s done
+#6 exporting manifest list sha256:3f911c6479146951444fa6fc079bad7442f282d94899f11484083d34d3e3f040 0.0s done
+#6 naming to docker.io/library/codeless-vue-build:d05
+#6 naming to docker.io/library/codeless-vue-build:d05 done
+#6 unpacking to docker.io/library/codeless-vue-build:d05 0.0s done
+#6 DONE 0.2s
+✔ root host identity cannot be passed to the build container (1.6454ms)
+
+> @codeless/generated-vue@0.1.0 build
+> vue-tsc --noEmit && vite build --configLoader runner
+
+[36mvite v6.2.3 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 30 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                 [39m[1m[2m 0.36 kB[22m[1m[22m[2m │ gzip:  0.28 kB[22m
+[2mdist/[22m[32mai-component-catalog.json  [39m[1m[2m 0.59 kB[22m[1m[22m[2m │ gzip:  0.31 kB[22m
+[2mdist/[22m[2massets/[22m[35mindex-D-nVVYb8.css  [39m[1m[2m 0.44 kB[22m[1m[22m[2m │ gzip:  0.29 kB[22m
+[2mdist/[22m[2massets/[22m[36mindex-BnIS_X2P.js   [39m[1m[2m84.88 kB[22m[1m[22m[2m │ gzip: 33.90 kB[22m
+[32m✓ built in 1.25s[39m
+showcase: production artifact produced
+
+> @codeless/generated-vue@0.1.0 build
+> vue-tsc --noEmit && vite build --configLoader runner
+
+[36mvite v6.2.3 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 30 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                 [39m[1m[2m 0.36 kB[22m[1m[22m[2m │ gzip:  0.28 kB[22m
+[2mdist/[22m[32mai-component-catalog.json  [39m[1m[2m 0.59 kB[22m[1m[22m[2m │ gzip:  0.31 kB[22m
+[2mdist/[22m[2massets/[22m[35mindex-BZA4o68T.css  [39m[1m[2m 0.49 kB[22m[1m[22m[2m │ gzip:  0.28 kB[22m
+[2mdist/[22m[2massets/[22m[36mindex-Ca2944pl.js   [39m[1m[2m88.42 kB[22m[1m[22m[2m │ gzip: 35.15 kB[22m
+[32m✓ built in 2.48s[39m
+tasks: production artifact produced
+
+> @codeless/generated-vue@0.1.0 build
+> vue-tsc --noEmit && vite build --configLoader runner
+
+[36mvite v6.2.3 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 30 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                 [39m[1m[2m 0.36 kB[22m[1m[22m[2m │ gzip:  0.28 kB[22m
+[2mdist/[22m[32mai-component-catalog.json  [39m[1m[2m 0.59 kB[22m[1m[22m[2m │ gzip:  0.31 kB[22m
+[2mdist/[22m[2massets/[22m[35mindex-C18aGUV5.css  [39m[1m[2m 0.74 kB[22m[1m[22m[2m │ gzip:  0.38 kB[22m
+[2mdist/[22m[2massets/[22m[36mindex-VhmTv2r8.js   [39m[1m[2m86.69 kB[22m[1m[22m[2m │ gzip: 34.65 kB[22m
+[32m✓ built in 2.13s[39m
+catalog: production artifact produced
+✔ D05-B-T1: three fixtures build in the preinstalled image (23550.4352ms)
+✔ D05-B-T2: lockfile, package changes, and unknown paths are rejected (49.1724ms)
+✔ build refuses to reuse an existing output directory (20.7325ms)
+✔ D05-B-T3: build image cannot reach package registry with network disabled (735.0422ms)
+
+> @codeless/generated-vue@0.1.0 build
+> vue-tsc --noEmit && vite build --configLoader runner
+
+[36mvite v6.2.3 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 30 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                 [39m[1m[2m 0.36 kB[22m[1m[22m[2m │ gzip:  0.28 kB[22m
+[2mdist/[22m[32mai-component-catalog.json  [39m[1m[2m 0.59 kB[22m[1m[22m[2m │ gzip:  0.31 kB[22m
+[2mdist/[22m[2massets/[22m[35mindex-D-nVVYb8.css  [39m[1m[2m 0.44 kB[22m[1m[22m[2m │ gzip:  0.29 kB[22m
+[2mdist/[22m[2massets/[22m[36mindex-BnIS_X2P.js   [39m[1m[2m84.88 kB[22m[1m[22m[2m │ gzip: 33.90 kB[22m
+[32m✓ built in 2.04s[39m
+✔ D05-B-T4: host development key is absent from production artifacts (8849.7262ms)
+ℹ tests 101
+ℹ suites 0
+ℹ pass 101
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 48564.4148
