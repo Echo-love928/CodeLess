@@ -24,7 +24,7 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
   detailAuthor = true, nameOnly = true, nameControl = 'heading', categoryLabel = null, descriptionLabel = '简介', detailLayout = 'text',
   itemTag = 'article', sparse = false, namedDetail = false, cardLabelSeparator = '：', detailRating = '4.5', allLabel = '全部', brokenReset = false,
   combinedFields = false, inlineDetail = false, categorySelect = false, detailLicense = 'MIT', missingDescription = false, nameOverlap = false,
-  wrapperTag = null, countOverride = null, detailDescription = true, fieldSeparator = ' · ' } = {}) {
+  wrapperTag = null, countOverride = null, detailDescription = true, fieldSeparator = ' · ', categorySpan = false, detailNameParagraph = false } = {}) {
   const count = countOverride ?? { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
   const categories = id === 'CAT-01' ? ['小说', '科技', '历史'] : id === 'CAT-02' ? ['西湖区', '上城区', '拱墅区'] : ['构建', '测试', '文档']
   return `<!doctype html><html lang="zh"><meta charset="utf-8"><body><h1>独立目录实现</h1>
@@ -38,7 +38,7 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
     let category='全部', selectedName='';
     function show(item){selectedName=item.name;detail.hidden=false;if(${inlineDetail})main.querySelectorAll('${itemTag}')[items.indexOf(item)%main.children.length]?.append(detail);const values=[item.name,${detailAuthor ? 'item.author' : "'错误作者'"},item.category,${detailDescription ? 'item.description' : "'错误饮品'"},${JSON.stringify(detailRating)},${JSON.stringify(detailLicense)}],body=detail.querySelector('div');body.replaceChildren();
       detail.querySelector('h2').textContent=${namedDetail} ? item.name : '详情';
-      if(${sparse}){for(const value of values.slice(1,4)){const p=document.createElement('p');p.textContent=value;body.append(p)}}
+      if(${sparse}||${JSON.stringify(detailLayout)}==='paragraphs'){for(const value of values.slice(1,4)){const p=document.createElement('p');p.textContent=value;body.append(p)}if(${detailNameParagraph}){const p=document.createElement('p');p.textContent=item.name;body.append(p)}}
       else if(${JSON.stringify(detailLayout)}==='dl'){const dl=document.createElement('dl');values.forEach((value,i)=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=['名称','作者','所在城区','一句简介','评分','许可证'][i];dd.textContent=value;dl.append(dt,dd)});body.append(dl)}else body.textContent=values.join(' ')}
     function render(){main.replaceChildren();const visible=items.filter(item=>(category==='全部'||${combine ? 'item.category===category' : 'search.value||item.category===category'})&&(item.name.includes(search.value)||item.author.includes(search.value)));
       for(const item of visible){const card=document.createElement(${JSON.stringify(itemTag)}),heading=document.createElement('h3');heading.textContent=item.name;
@@ -48,7 +48,7 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
         const fields=[author,(${JSON.stringify(categoryLabel)}||(id==='CAT-02'?'城区':id==='CAT-03'?'类别':'分类'))+'：'+item.category,${JSON.stringify(descriptionLabel)}+'：'+item.description];
         if(${missingDescription})fields.pop();if(${categoryFirst})fields.unshift(fields.splice(1,1)[0]);if(!authorFirst)fields.reverse();
         const display=fields.map(raw=>labels?raw.replace('：',${JSON.stringify(cardLabelSeparator)}):raw.replace(/^[^：]+：/,''));
-        for(const raw of ${combinedFields}?[display.join(${JSON.stringify(fieldSeparator)})]:display){const p=document.createElement('p');p.textContent=raw;card.append(p)}if(${JSON.stringify(wrapperTag)}){const wrapper=document.createElement(${JSON.stringify(wrapperTag)});wrapper.append(card);main.append(wrapper)}else main.append(card)}
+        for(const raw of ${combinedFields}?[display.join(${JSON.stringify(fieldSeparator)})]:display){const p=document.createElement(${categorySpan}&&raw.includes(item.category)?'span':'p');p.textContent=raw;card.append(p)}if(${JSON.stringify(wrapperTag)}){const wrapper=document.createElement(${JSON.stringify(wrapperTag)});wrapper.append(card);main.append(wrapper)}else main.append(card)}
       document.querySelector('#empty').hidden=visible.length>0;
       if(${inlineDetail}&&selectedName)[...main.children].find(node=>node.querySelector('h3')?.textContent===selectedName)?.append(detail);
     }
@@ -342,4 +342,12 @@ for(const persistentPanel of ['div','section'])test('D24 review SHOW-03: persist
 for(const variant of ['about-article','retain-about','retain-about-aria'])test('D24 review SHOW-03: distinguish actual panel content '+variant,async()=>{
   const result=await check('SHOW-03',photography({headings:variant==='about-article',aboutArticle:variant==='about-article',retainAbout:variant!=='about-article',aboutAria:variant==='retain-about-aria'}),'actual-panel-'+variant)
   assert.equal(result.status,variant==='about-article'?'PASSED':'FAILED',JSON.stringify(result))
+})
+for(const variant of ['valid','wrong-author','wrong-combination'])test('D24 metadata CAT-01: title heading before category span '+variant,async()=>{
+  const result=await check('CAT-01',catalog('CAT-01',{itemTag:'button',wrapperTag:'li',categorySpan:true,labels:true,namedDetail:true,detailLayout:'paragraphs',detailAuthor:variant!=='wrong-author',combine:variant!=='wrong-combination'}),'category-tag-'+variant)
+  assert.equal(result.status,variant==='valid'?'PASSED':'FAILED',JSON.stringify(result))
+})
+test('D24 metadata CAT-01: compact title survives a later inline detail heading',async()=>{
+  const result=await check('CAT-01',catalog('CAT-01',{itemTag:'li',sparse:true,inlineDetail:true,detailNameParagraph:true}),'compact-inline-title')
+  assert.equal(result.status,'PASSED',JSON.stringify(result))
 })

@@ -182,6 +182,8 @@ export async function behavior(page, id, expect) {
       // Inline details may add their own heading later; retain the card's first title/control.
       const title = card.locator('h1,h2,h3,h4,h5,h6,button').first()
       if (await title.evaluate(node => /^H[1-6]$/.test(node.tagName))) return (await title.innerText()).trim()
+      const nestedHeading = title.getByRole('heading').first()
+      if (await nestedHeading.count()) return (await nestedHeading.innerText()).trim()
       const spans = title.locator('span')
       return (await spans.count() ? await spans.first().innerText() : (await title.innerText()).split('\n')[0]).trim()
     }
