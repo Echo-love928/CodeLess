@@ -1,0 +1,177 @@
+{
+  "schemaVersion" : 1,
+  "sampleId" : "FAULT-ENV-01",
+  "kind" : "ENV_FAULT",
+  "batchId" : "2026-10-23T14-16-43Z-real-545bbebf",
+  "mode" : "REAL",
+  "attempt" : 1,
+  "harness" : {
+    "java" : "21.0.12.1",
+    "os" : "Windows 11",
+    "runtimeBudget" : {
+      "outputTokensPerRequest" : 4096,
+      "framingTokensPerRequest" : 512,
+      "toolSlots" : 20,
+      "repairRounds" : 3,
+      "chargedTokens" : 50000,
+      "modelRequests" : 12
+    },
+    "environment" : {
+      "containerCliOnPath" : false
+    },
+    "provider" : {
+      "model" : "deepseek-flash",
+      "transport" : "DeepSeekModelProvider",
+      "id" : "deepseek"
+    },
+    "taskId" : "31f9feb1-1b0f-4580-b29b-32f5e0374114",
+    "startedAt" : "2026-10-23T14:21:57.495540700Z",
+    "finishedAt" : "2026-10-23T14:21:57.942581200Z",
+    "wallClockMs" : 447
+  },
+  "injection" : null,
+  "application" : {
+    "id" : "86c24f16-572e-4da5-8cc6-7a5b2ae4ac24",
+    "name" : "杭州前端大会活动页",
+    "dataMode" : "STATIC",
+    "status" : "ACTIVE",
+    "latestReadyVersionId" : null,
+    "createdAt" : "2026-10-23T14:21:57.531050Z",
+    "updatedAt" : "2026-10-23T14:21:57.531050Z"
+  },
+  "task" : {
+    "id" : "31f9feb1-1b0f-4580-b29b-32f5e0374114",
+    "applicationId" : "86c24f16-572e-4da5-8cc6-7a5b2ae4ac24",
+    "prompt" : "生成“2026 杭州前端开发者大会”活动页：显示活动名称、日期“2026年11月20日”、地点“杭州国际博览中心”；用列表展示三个日程：09:00 开幕致辞、10:30 Vue 性能优化实战、14:00 无障碍设计实践，每项显示时间和标题；页面有“我要报名”按钮，点击后在按钮下方显示“报名意向已记录（演示）”。只在页面内展示，不需要后端。使用静态数据。",
+    "status" : "FAILED",
+    "repairAttempts" : 0,
+    "failureCode" : "MODEL_NETWORK",
+    "eventSequence" : 2,
+    "queueState" : "FINISHED",
+    "deadlineAt" : "2026-10-23T14:33:57.541376Z",
+    "createdAt" : "2026-10-23T14:21:57.541376Z",
+    "updatedAt" : "2026-10-23T14:21:57.932767Z"
+  },
+  "taskEvents" : [ {
+    "id" : "19d18f28-87ba-40d1-ac8d-5a47d46f4cb6",
+    "sequence" : 1,
+    "type" : "STAGE_STARTED",
+    "stage" : "PLAN",
+    "message" : "Task accepted in PLAN",
+    "occurredAt" : "2026-10-23T14:21:57.541376Z"
+  }, {
+    "id" : "dd87d21a-75e3-4b72-98e1-91af749d1e6d",
+    "sequence" : 2,
+    "type" : "TASK_FAILED",
+    "stage" : "FAILED",
+    "message" : "Generation stopped; recovery information retained",
+    "occurredAt" : "2026-10-23T14:21:57.934057Z"
+  } ],
+  "versions" : [ ],
+  "builds" : [ ],
+  "modelCalls" : [ {
+    "id" : "30de5c9f-c6a6-4647-ba0f-d13061271633",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "FAILED",
+    "inputTokens" : null,
+    "outputTokens" : null,
+    "errorCode" : "MODEL_NETWORK",
+    "createdAt" : "2026-10-23T14:21:57.641857Z",
+    "completedAt" : "2026-10-23T14:21:57.901732Z"
+  } ],
+  "modelAudit" : [ {
+    "callId" : "30de5c9f-c6a6-4647-ba0f-d13061271633",
+    "taskId" : "31f9feb1-1b0f-4580-b29b-32f5e0374114",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : null,
+    "requestId" : null,
+    "responseId" : null,
+    "status" : "FAILED",
+    "durationMs" : 240,
+    "usage" : {
+      "inputTokens" : null,
+      "outputTokens" : null,
+      "totalTokens" : null,
+      "raw" : null
+    },
+    "errorCode" : "MODEL_NETWORK",
+    "createdAt" : "2026-10-23T14:21:57.641857Z",
+    "completedAt" : "2026-10-23T14:21:57.894411600Z"
+  } ],
+  "journal" : [ {
+    "at" : "2026-10-23T14:21:57.631451Z",
+    "taskId" : "31f9feb1-1b0f-4580-b29b-32f5e0374114",
+    "kind" : "model.request",
+    "sequence" : 1,
+    "stage" : "PLAN",
+    "payload" : {
+      "slots" : 1,
+      "reservedTokens" : 9676
+    }
+  }, {
+    "at" : "2026-10-23T14:21:57.683162500Z",
+    "taskId" : "31f9feb1-1b0f-4580-b29b-32f5e0374114",
+    "kind" : "model.input",
+    "sequence" : 2,
+    "stage" : "PLAN",
+    "payload" : {
+      "inputDigest" : "sha256:8d3d025a8a4e180983dc0cdd01e8d217bb2e06cdd7a149985108c7ad3ac92261",
+      "transport" : {
+        "stream" : false,
+        "bodyBytes" : 5686,
+        "thinking" : "disabled",
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "responseFormat" : "json_object",
+        "bodyDigest" : "sha256:c63907f5e12f12b1daec5502d17a69796395c722dcefd65530e9e86d52c35b03",
+        "maxOutputTokens" : 4096
+      },
+      "callId" : "30de5c9f-c6a6-4647-ba0f-d13061271633",
+      "policyDigest" : "sha256:8f30c489856194854ea9aac7c80a858f868a15ed814b9265a6b49a40aa94fa0e",
+      "policyBytes" : 4562,
+      "inputBytes" : 506,
+      "roles" : [ "system", "user" ]
+    }
+  }, {
+    "at" : "2026-10-23T14:21:57.884528600Z",
+    "taskId" : "31f9feb1-1b0f-4580-b29b-32f5e0374114",
+    "kind" : "model.usage",
+    "sequence" : 3,
+    "stage" : "PLAN",
+    "payload" : {
+      "releasedTokens" : 0,
+      "usage" : {
+        "inputTokens" : null,
+        "outputTokens" : null,
+        "totalTokens" : null,
+        "raw" : null
+      },
+      "reservationTokens" : 9676,
+      "estimated" : true,
+      "chargedTokens" : 9676,
+      "meteringSource" : "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT"
+    }
+  }, {
+    "at" : "2026-10-23T14:21:57.917824600Z",
+    "taskId" : "31f9feb1-1b0f-4580-b29b-32f5e0374114",
+    "kind" : "failure",
+    "sequence" : 4,
+    "stage" : "PLAN",
+    "payload" : {
+      "code" : "MODEL_NETWORK",
+      "category" : "MODEL_INTERFACE",
+      "recovery" : "MANUAL_REVIEW_NO_AUTOMATIC_RETRY"
+    }
+  } ],
+  "platformMeter" : {
+    "models" : 1,
+    "tools" : 0,
+    "chargedTokens" : 9676
+  },
+  "sources" : [ ],
+  "screenshots" : [ ],
+  "harnessError" : null
+}

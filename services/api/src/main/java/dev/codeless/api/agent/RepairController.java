@@ -17,6 +17,10 @@ public final class RepairController {
         if(reason.isBlank() || !reason.matches("[A-Z][A-Z0-9_]{1,80}")) reason="RUNNER_UNAVAILABLE";
         boolean browserFailed=build.path("status").asText().equals("SUCCEEDED") && !browser.isMissingNode() && !browser.isNull();
         String diagnostic=browserFailed?browser.path("error").asText(""):build.path("log").path("text").asText("");
+        var errors=browser.path("diagnostics");
+        // An action error alone (e.g. a locator wait) hides the application exception that caused it.
+        if(browserFailed && !diagnostic.isBlank() && errors.path("pageErrors").size()+errors.path("consoleErrors").size()>0)
+            diagnostic+="\npageErrors: "+errors.path("pageErrors")+"\nconsoleErrors: "+errors.path("consoleErrors");
         if(diagnostic.isBlank()) diagnostic=browserFailed?browser.path("diagnostics").toString():build.path("diagnostic").asText("");
         diagnostic=normalize(diagnostic);
         boolean compiler=reason.equals("BUILD_EXIT") && build.path("exitCode").isIntegralNumber()
@@ -28,10 +32,24 @@ public final class RepairController {
                 && build.path("exitCode").asInt()==0 && !browser.path("timedOut").asBoolean(true)
                 && cleanBuild(build) && browser.path("cleanup").path("browserClosed").asBoolean(false)
                 && browser.path("status").asText().equals("FAILED") && browser.path("workerExitCode").asInt(-1)==1
-                && Set.of("ACTION_FAILED","PAGE_EXCEPTION","CONSOLE_ERROR","BLANK_PAGE").contains(reason);
+                && (Set.of("ACTION_FAILED","PAGE_EXCEPTION","CONSOLE_ERROR","BLANK_PAGE").contains(reason) || locatorTimeout(reason,browser));
         String signature=diagnostic.lines().filter(line->line.matches(".*(?:error TS[0-9]+|\\[vite:|SyntaxError|VueCompilerError|Could not resolve|Failed to resolve).*"))
                 .limit(10).reduce((a,b)->a+"\n"+b).orElse(diagnostic);
         return new Failure(compiler || page?Category.CODE:Category.INFRASTRUCTURE,"AGENT_"+reason,hash(reason+"\n"+signature),diagnostic);
+    }
+    /**
+     * ACTION_TIMEOUT is a source fault only with page evidence (D21-A F1): the worker timed out waiting for a locator
+     * (not a navigation), the page rendered visible content or raised application errors, and no request was blocked,
+     * failed or dropped from truncated diagnostics. A slow or broken environment keeps INFRASTRUCTURE.
+     */
+    private static boolean locatorTimeout(String reason,JsonNode browser) {
+        if(!reason.equals("ACTION_TIMEOUT")) return false;
+        var d=browser.path("diagnostics");
+        boolean network=d.path("blockedRequests").size()+d.path("failedRequests").size()>0 || d.path("truncated").asBoolean(true);
+        boolean evidence=d.path("visibleContent").asBoolean(false) || d.path("pageErrors").size()+d.path("consoleErrors").size()>0;
+        boolean locator=browser.path("error").asText("").matches(
+                "(?s)locator\\.(?:click|fill|selectOption|check|waitFor): Timeout [0-9]+ms exceeded\\..*waiting for (?:getBy|locator).*");
+        return locator && evidence && !network;
     }
     private static boolean cleanBuild(JsonNode build) {
         var cleanup=build.path("cleanup");return cleanup.path("containerRemoved").asBoolean(false)

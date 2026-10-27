@@ -1,0 +1,154 @@
+{
+  "oldRuntime": "d2b20a70bac8518ec58c863b2b11b4a3f81d036f",
+  "repairedRuntime": "b56013178f1c624db3d44020edfd91363c923e74",
+  "testFiles": [
+    {
+      "path": "services/api/src/test/java/dev/codeless/api/agent/RoundFiveContextTest.java",
+      "sha256": "sha256:c879903465a8e9de0aafcd7469361401f0fc08251032fbcf2546401cadb86d05",
+      "identicalBothTrees": true
+    },
+    {
+      "path": "services/api/src/test/java/dev/codeless/api/agent/RoundFiveRegressionTest.java",
+      "sha256": "sha256:679e4b4f3b7f09b20b65752f3fb6b42f40265156c447586c4b74be144e96939a",
+      "identicalBothTrees": true
+    },
+    {
+      "path": "tests/agent/repair/fixtures/d24-r5-syntax-shape.json",
+      "sha256": "sha256:1a86412942357441715de44b5acd2e2bb5f9dc6a461940af63e31f7a6d5723a8",
+      "identicalBothTrees": true
+    }
+  ],
+  "old": {
+    "tests": 11,
+    "failures": 6,
+    "errors": 0
+  },
+  "repairedFocused": {
+    "tests": 44,
+    "failures": 0,
+    "errors": 0
+  },
+  "comparison": [
+    {
+      "tree": "old",
+      "scenario": "BASE",
+      "status": "READY",
+      "failureCode": null,
+      "repairAttempts": 0
+    },
+    {
+      "tree": "old",
+      "scenario": "CAT02",
+      "status": "FAILED",
+      "failureCode": "AGENT_REPAIR_LIMIT_EXCEEDED",
+      "repairAttempts": 3
+    },
+    {
+      "tree": "old",
+      "scenario": "EDIT02",
+      "status": "FAILED",
+      "failureCode": "AGENT_REPAIR_NO_PROGRESS",
+      "repairAttempts": 2
+    },
+    {
+      "tree": "old",
+      "scenario": "SYNTAX",
+      "status": "FAILED",
+      "failureCode": "MODEL_INVALID_RESPONSE",
+      "repairAttempts": 0
+    },
+    {
+      "tree": "old",
+      "scenario": "BARE",
+      "status": "FAILED",
+      "failureCode": "AGENT_REPAIR_NO_PROGRESS",
+      "repairAttempts": 1
+    },
+    {
+      "tree": "repaired",
+      "scenario": "BASE",
+      "status": "READY",
+      "failureCode": null,
+      "repairAttempts": 0
+    },
+    {
+      "tree": "repaired",
+      "scenario": "CAT02",
+      "status": "READY",
+      "failureCode": null,
+      "repairAttempts": 2
+    },
+    {
+      "tree": "repaired",
+      "scenario": "EDIT02",
+      "status": "READY",
+      "failureCode": null,
+      "repairAttempts": 1
+    },
+    {
+      "tree": "repaired",
+      "scenario": "SYNTAX",
+      "status": "FAILED",
+      "failureCode": "MODEL_INVALID_RESPONSE",
+      "repairAttempts": 0
+    },
+    {
+      "tree": "repaired",
+      "scenario": "BARE",
+      "status": "FAILED",
+      "failureCode": "AGENT_REPAIR_NO_PROGRESS",
+      "repairAttempts": 1
+    },
+    {
+      "tree": "first-api",
+      "scenario": "BASE",
+      "status": "READY",
+      "failureCode": null,
+      "repairAttempts": 0
+    },
+    {
+      "tree": "first-api",
+      "scenario": "CAT02",
+      "status": "READY",
+      "failureCode": null,
+      "repairAttempts": 2
+    },
+    {
+      "tree": "first-api",
+      "scenario": "EDIT02",
+      "status": "PLAN",
+      "failureCode": null,
+      "repairAttempts": 0
+    },
+    {
+      "tree": "first-api",
+      "scenario": "SYNTAX",
+      "status": "FAILED",
+      "failureCode": "MODEL_INVALID_RESPONSE",
+      "repairAttempts": 0
+    },
+    {
+      "tree": "first-api",
+      "scenario": "BARE",
+      "status": "FAILED",
+      "failureCode": "AGENT_REPAIR_NO_PROGRESS",
+      "repairAttempts": 1
+    }
+  ],
+  "fixtureFix": "Each run orders only its selected task before queued work, validates the original claim task ID, delegates real atomic advance and cancels only its own unfinished fixture tasks. EDIT02 explicitly queues another task and verifies it remains unclaimed with zero model calls before fixture teardown.",
+  "firstApiFailure": "364 tests, 2 failures: EDIT02 fixture left PLAN while five wire calls served another task, plus pre-existing preview CSRF HTTP 502. Runtime production code unchanged by the fixture correction.",
+  "logs": [
+    {
+      "path": ".local-data/d24-a/round5/logs/old-r5-final-fixture.log",
+      "sha256": "sha256:28484517e273b5556116ed31591ab3534319675268d5783ca3d5fe82676f9164"
+    },
+    {
+      "path": ".local-data/d24-a/round5/logs/focused-fixture-final.log",
+      "sha256": "sha256:b7293a3f5ee0365f94105c079f4f8d982c7519a0fd82dad0e0c18c5c2067818e"
+    }
+  ],
+  "initialEvidence": "../d24-a-round5/manifest.json preserves the earlier b560131 test-file hashes and outcomes.",
+  "paidCalls": 0,
+  "modelQualityEvidence": false,
+  "usage": "SYNTHETIC_DECLARED_0_3_TOKEN_PER_UTF8_BYTE_ESTIMATE_NOT_MEASURED"
+}

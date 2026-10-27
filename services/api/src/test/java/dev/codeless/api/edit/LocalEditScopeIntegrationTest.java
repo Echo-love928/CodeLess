@@ -77,6 +77,7 @@ class LocalEditScopeIntegrationTest extends PostgresTestBase {
     AgentLoop fixture(String mode,String phase) {
         ModelProvider provider=new ModelProvider() {
             final MockModelProvider delegate=new MockModelProvider();
+            String repeatedContent;
             public String id(){return "deterministic-mock";}public String model(){return "d13-local-scope-"+mode+"-fixture";}
             public Reply call(Prompt prompt,int max,java.time.Duration timeout) {
                 var input=json.readTree(prompt.getUserMessage().getText());inputs.add(input);
@@ -97,17 +98,24 @@ class LocalEditScopeIntegrationTest extends PostgresTestBase {
                         String tool=mode.equals("read-outside")?"files.read":mode.equals("create")?"files.create":mode.equals("delete")?"files.delete":"files.update";
                         String content=input.path("editContext").path("sourceFiles").get(0).path("content").asText()
                                 .replace("Ada Lovelace","Hedy Lamarr")+"<style scoped>section { color: #3344aa; padding: 16px; }</style>";
+                        if(mode.endsWith("repeat")) content=content.replaceAll("Hedy Lamarr|Katherine Johnson",mode.equals("bad-repeat")?"Unexpected candidate":"Katherine Johnson");
+                        repeatedContent=content;
                         var args=new LinkedHashMap<String,Object>();args.put("path",path);
                         if(!tool.equals("files.create") && !tool.equals("files.read")) args.put("expectedDigest",input.path("editContext").path("sourceFiles").get(0).path("digest").asText());
                         if(!tool.equals("files.delete") && !tool.equals("files.read")) args.put("content",content);
                         out=Map.of("type","tool","name",tool,"arguments",args);
                     }
-                } else out=Map.of("type","done","actions",List.of(Map.of("type","navigate","path","/"),Map.of("type","expectText","target",Map.of("testId","profile-name"),"value","Hedy Lamarr")));
+                } else if(mode.endsWith("repeat") && !input.path("completionOnly").asBoolean()) {
+                    var receipts=input.path("observations");
+                    out=receipts.size()>2?Map.of("type","json_object"):
+                            Map.of("type","tool","name","files.update","arguments",Map.of("path",TARGET,"content",repeatedContent,
+                                    "expectedDigest",receipts.get(receipts.size()-1).path("afterDigest").asText()));
+                } else out=Map.of("type","done","actions",List.of(Map.of("type","navigate","path","/"),Map.of("type","expectText","target",Map.of("testId","profile-name"),"value",mode.endsWith("repeat")?"Katherine Johnson":"Hedy Lamarr")));
                 // Explicit synthetic fixture accounting; never measured provider tokens.
                 return new Reply(json.writeValueAsString(out),new Evidence(model(),"scope-fixture","scope-fixture",new Usage(31,17,48,null)));
             }
         };
-        return new AgentLoop(store,new AgentModel(provider,calls,audit,store),plans,registry,files,gateway,evidence,true);
+        return new AgentLoop(store,new AgentModel(provider,calls,audit,store),plans,registry,files,gateway,evidence,!mode.equals("bad-repeat"));
     }
     @BeforeAll void baseline() throws Exception {
         var p=new ProcessBuilder("node","../../tests/agent/prepare-runtime.mjs").inheritIO().start();assertThat(p.waitFor(300,TimeUnit.SECONDS)).isTrue();assertThat(p.exitValue()).isZero();
@@ -211,5 +219,25 @@ class LocalEditScopeIntegrationTest extends PostgresTestBase {
         var usage=jdbc.sql("SELECT m.provider,count(*) AS requests FROM model_calls m JOIN generation_tasks t ON t.id=m.task_id WHERE t.application_id=? GROUP BY m.provider")
                 .param(app).query((r,n)->Map.of("provider",r.getString(1),"requests",r.getInt(2))).list();
         report("runtime-usage",Map.of("providers",usage,"paidModelRequests",0,"actualInputTokens","UNKNOWN","actualOutputTokens","UNKNOWN","fixtureTokens","31/17/48 synthetic per call; not measured"));
+    }
+    @Test @Order(9) void repeatedCommittedLocalWriteRequestsCompletionAndStillBuildsAndVerifies() throws Exception {
+        inputs.clear();UUID task=task(edit(selection("profile-card")));var c=claim(task);var executor=fixture("repeat","GENERATE");
+        run(executor,c,TaskStatus.PLAN,TaskStatus.GENERATE);run(executor,c,TaskStatus.GENERATE,TaskStatus.VERIFY);
+        assertThat(inputs).hasSize(3);
+        var last=inputs.getLast();assertThat(last.path("completionOnly").asBoolean()).isTrue();assertThat(last.path("tools").isEmpty()).isTrue();
+        assertThat(last.path("editContext").path("sourceFiles").get(0).has("content")).isFalse();
+        assertThat(last.path("editProgress").path("currentDigest").asText()).isNotEqualTo(last.path("editContext").path("sourceFiles").get(0).path("digest").asText());
+        assertThat(last.path("observations").valueStream().filter(o -> o.has("committedContent")).count()).isEqualTo(1);
+        run(executor,c,TaskStatus.VERIFY,TaskStatus.READY);
+        base=UUID.fromString(draft(task).path("versionId").asText());digest=draft(task).path("sourceDigest").asText();
+        assertThat(snapshots.readSource(base,digest,TARGET)).contains("Katherine Johnson");
+    }
+    @Test @Order(10) void repeatedLocalWriteCannotTurnAnIncorrectCandidateIntoReady() throws Exception {
+        inputs.clear();UUID task=task(edit(selection("profile-card")));var c=claim(task);var executor=fixture("bad-repeat","GENERATE");
+        run(executor,c,TaskStatus.PLAN,TaskStatus.GENERATE);run(executor,c,TaskStatus.GENERATE,TaskStatus.VERIFY);
+        assertThat(inputs.getLast().path("completionOnly").asBoolean()).isTrue();
+        run(executor,c,TaskStatus.VERIFY,TaskStatus.FAILED);
+        assertThat(apps.find(owner,app).orElseThrow().latestReadyVersionId()).isEqualTo(base);
+        assertThat(AgentJournal.latest(journal.read(task),"runner.result").path("status").asText()).isNotEqualTo("VERIFIED");
     }
 }

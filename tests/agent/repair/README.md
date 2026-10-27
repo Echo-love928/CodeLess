@@ -202,9 +202,17 @@ Reproduce without credentials, with the D01 environment and Docker:
 Remove-Item Env:CODELESS_MODEL_API_KEY,Env:CODELESS_MODEL_NAME,Env:CODELESS_M1_REAL_APPROVED -ErrorAction SilentlyContinue
 $env:CODELESS_MODEL_PROVIDER='deterministic-mock'
 services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RepairContextTest,RepairPolicyTest,DeepSeekModelProviderTest' test
-services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RepairLoopIntegrationTest#capturedWrappedDoneStopsAfterActualPatchWithoutUnwrappingOrRetry+capturedPatchAndSyntheticExactCompletionRebuildWithinOriginalBudget,ProtocolRepairPreviewIT' '-DreuseForks=false' '-DforkCount=1' test
+services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RepairLoopIntegrationTest#capturedWrappedDoneStopsWithoutUnwrappingOrRetry+capturedPatchIsVerifiedWithoutACompletionRequestWithinOriginalBudget,ProtocolRepairPreviewIT' '-DreuseForks=false' '-DforkCount=1' test
 pnpm ci:gate
 ```
+
+D24-A round 2 renamed these two cases (formerly
+`capturedWrappedDoneStopsAfterActualPatchWithoutUnwrappingOrRetry` and
+`capturedPatchAndSyntheticExactCompletionRebuildWithinOriginalBudget`, the names in the
+2026-10-11 evidence) because no request now follows an actual patch: the wrapped
+reply is replayed at the first REPAIR request, and the recorded patch is verified
+by the host without the synthetic completion. The paragraph below describes the
+2026-10-11 behaviour; see the round-2 section at the end.
 
 The negative case replays the complete invalid application reply and stops after
 the real patch without unwrapping it, accepting it, or issuing a thirteenth call.
@@ -258,3 +266,220 @@ was explicitly authorized and applied to the shared preview test; it binds both
 additional signatures to the gateway's injected clock without changing any
 production rule or assertion. Both prior failed full gates remain in the closure
 command evidence; the final gate result is recorded separately.
+
+## D24-A round 2: CAT-01, CAT-03 and FAULT-CODE-02 of batch 1ff42488 (2026-10-26)
+
+`RepairBudgetRegressionTest` reproduces the three paid REPAIR failures that B
+reviewed in `2026-10-26T00-56-31Z-real-1ff42488`. A single fixed synthetic policy
+reads the files it wants while a request offers reads, writes one whole-file patch
+of the failing page, and answers any further request with the task's recorded reply
+type. Requests cross the production DeepSeek wire (`MaxTokensWireFixture`) to a
+loopback server that cuts a reply at `max_tokens` with `finish_reason=length`, as
+the provider does. Usage is declared synthetic: 0.3 token per UTF-8 byte, an
+estimate that is never measured. No paid model is called. PostgreSQL, file tools,
+the failed and fixed Docker builds and the browser are real.
+
+The same two files, byte-identical, run on the pre-fix tree `f208767` and on the
+fix:
+
+```powershell
+Remove-Item Env:CODELESS_MODEL_API_KEY,Env:CODELESS_MODEL_NAME -ErrorAction SilentlyContinue
+$env:CODELESS_MODEL_PROVIDER='deterministic-mock'
+$env:CODELESS_REGRESSION_TREE='<label>'; $env:CODELESS_REPAIR_EVIDENCE_DIR='<directory>'
+services/api/mvnw.cmd -f services/api/pom.xml '-Dtest=RepairBudgetRegressionTest' test
+```
+
+On `f208767`: CAT-01 fails with AGENT_MODEL_BUDGET_EXCEEDED after three legal reads,
+CAT-03 with MODEL_INVALID_RESPONSE / FINISH_REASON_LENGTH at a 1,104-token allowance
+below the 1,361-token patch, and FAULT-CODE-02 with AGENT_MODEL_PROTOCOL_INVALID on
+the json_object reply after its successful write. On the fix all three are READY
+after one REPAIR request with the full 4,096 allowance and a real rebuild/browser
+pass. Both controls (json_object before any write; a patch above 4,096) fail the
+same way on both trees. CAT-01 and CAT-03 enter REPAIR at a synthetic 28,500 and
+33,600 charged tokens. Content-free results and file digests are in
+`evidence/2026-10-26/d24-a-round2/`. This is not model-quality evidence.
+
+The opt-in preview ITs with a REPAIR fixture no longer see a request after the
+patch: `ProtocolRepairPreviewIT` expects 8 model calls (was 10),
+`RecordedRepairPreviewIT` 9 (was 12), and `FaultAtFreezePreviewAcceptanceIT`, which
+`ApplicationHttpDiagnosticsIT` extends, 6 (was 7). Three of these ITs fail on
+`f208767` and on the fix at the same file, line and value, so the cause is not this
+change:
+
+- `RealSourcePreviewReplayIT`: the deployment-name pattern in
+  `tests/e2e/generation/platform-cleanup.mjs:17` rejects `preview-platform-replay-…`.
+- `RecordedRepairPreviewIT`: the recorded `ProfileCard.vue` has no
+  `data-ai-component` (`MISSING_COMPONENT_ID`). As a result `profile-card` is not
+  selectable in the component-selection check that the default acceptance script
+  runs (`tests/runner/mapping/platform-checks.mjs:14`). The IT stops before its Java
+  assertions, but the journal of the fixed run matches them.
+- `RepairPreviewPlatformAcceptanceIT`: line 37 expects one generation task, but
+  that check's component edit adds a second one.
+
+## D24-A round 3: read-gate tests no longer depend on prompt line endings (2026-10-26)
+
+B's review of `f35bea1` found that CI (`verify:api` on ubuntu-24.04) failed two round-2
+tests in `RepairLoopIntegrationTest` that pass on a Windows checkout:
+`repairReadThatTheRequestDoesNotOfferCannotConsumeAFileTool` and
+`capturedPatchIsVerifiedWithoutACompletionRequestWithinOriginalBudget`. The cause:
+
+- The repository has no `.gitattributes`. With `core.autocrlf=true` Windows checks
+  the prompts out as CRLF, so the 20-line REPAIR prompt is 20 bytes longer there.
+- The input reservation counts UTF-8 bytes, and the read rule counts the input
+  twice (this request and the next). Every REPAIR read decision therefore has 40
+  more tokens of margin on LF.
+- In the 720f replay, the second REPAIR request missed the read by 30 tokens as CRLF
+  and funded it with 10 to spare as LF, so CI replayed the recorded read 7.
+
+Both decisions follow the production rule. The tests had pinned a margin smaller
+than the line-ending shift.
+
+Both tests now reserve six tool slots at GENERATE's recorded done, before the
+failed build, so REPAIR starts with 15 of the 20 slots used:
+
+- The first REPAIR request has five left and offers the recorded read 6.
+- After that read four are left, below the five the read rule needs, so the second
+  request offers no read on either line ending.
+
+The tests assert those counts (`toolCallsRemaining` 5, 4) and offers directly. Every
+earlier assertion stays. Only the tool-slot totals move by six, to 16 and 20. No
+production code changed.
+
+A test that depends on whether a read is offered should pin the decision with an
+exact count (tool slots, model calls), not with a token margin within 40 tokens of
+the rule. Where usage is declared per byte, as in `RepairBudgetRegressionTest`, the
+shift is larger.
+
+A temporary print (never committed) logged every REPAIR read decision on both line
+endings. The content-free numbers are in
+`evidence/2026-10-26/d24-a-round3/read-gate-margins.json`.
+
+`evidence/2026-10-26/d24-a-round3/pre-fix-f208767-lf.json` reruns the round-2
+regression class on the pre-fix tree with LF resources. CAT-01, CAT-03 and
+FAULT-CODE-02 fail with the same codes as on CRLF, and both controls fail the same
+way, as their tests expect. So that evidence holds on CI's line endings too. Only
+the numbers move a little; for example, CAT-03's last allowance goes from 1,104 to
+1,137, still below its 1,361-token patch.
+
+To check on LF from a Windows checkout, as B did, in Git Bash:
+
+1. Check that the text resources the API build copies have no local changes.
+   Step 4 restores them from Git and would discard any, so the snippet stops
+   without touching anything if `git status` lists one of them.
+2. Convert only those files to LF.
+3. Run the tests.
+4. Delete and check out the converted files again. Under autocrlf, `git diff`
+   shows no change for a CRLF-to-LF edit, and a plain checkout may keep LF;
+   deleting first makes the checkout rewrite them.
+
+If a run stops before step 4, the converted files differ only in line endings, and
+`git status` lists them, so the next run would stop at step 1. Run the snippet's
+`files=...` line and its `rm ... && git checkout ...` line by hand to restore them.
+To check files that do have local changes, commit or stash those changes first, or
+run the snippet in a separate checkout from `git worktree add --detach`; there
+`prepare-runtime.mjs` installs the pnpm dependencies on the first run.
+
+The shell `mvnw` is itself checked out as CRLF, so the snippet calls `mvnw.cmd`
+through cmd:
+
+```bash
+unset CODELESS_MODEL_API_KEY CODELESS_MODEL_NAME; export CODELESS_MODEL_PROVIDER=deterministic-mock
+files=$(git ls-files 'prompts/runtime/*.txt' contracts/tools/registry.json 'contracts/plan/*.json' services/api/src/main/resources/model/prompts/agent-proposal-protocol-v1.txt)
+if [ -n "$(git status --porcelain -- $files)" ]; then
+  git status --short -- $files
+  echo 'Stopped: these files have local changes that the restore step would discard.' >&2
+else
+  sed -i 's/\r$//' $files
+  cmd.exe //d //c "services\api\mvnw.cmd -f services/api/pom.xml \"-Dtest=RepairLoopIntegrationTest,RepairBudgetRegressionTest\" test"
+  rm $files && git checkout -- $files
+fi
+```
+
+## D24-A round 5: dba59d9d action context and owner priority (2026-10-27)
+
+The delivery at PR #70, fixed commit `231ea3dbcf10da6161cafe06ee5243bef34676cd`,
+was independently checked: ZIP/README outer checksums, 203 manifest-covered files
+(204 archive entries including the manifest), 163 journal events and 17 correlated
+calls. Only content-free counts and synthetic regressions are committed here;
+the package, original source, patches and journals remain private local inputs.
+
+Two A-side context gaps are addressed: compacting the completion proposal lost
+the interactions preceding a conditional target, and route-first source seeding
+could omit the component owning that target. REPAIR also lacked GENERATE's
+unique-target and exact-inner-text semantics. The fix supplies a correlated
+`failure.actionContext`, preserves it during compaction, and prioritizes an
+existing static target/component owner among already-planned frozen files that are
+reachable through relative imports from the failed route. A component outside
+that graph with the same marker must leave the route page first.
+
+`RoundFiveContextTest` (7 cases) and `RoundFiveRegressionTest` (4 cases) are identical
+on the old d2b20a7 tree and the repaired tree. The two Java files and synthetic
+syntax fixture have matching SHA256 on both trees. The initial b560131 pair is in
+`d24-a-round5/manifest.json`; the final queue-safe fixture pair is in the adjacent
+`d24-a-round5-queue-fixture/manifest.json`.
+
+| Scenario | d2b20a7 | Repaired tree |
+| --- | --- | --- |
+| CAT-02 shape: missing title target, entire-container text mismatch, missing conditional detail | Four builds exit 0, all browser checks fail; three repairs, `AGENT_REPAIR_LIMIT_EXCEEDED` | Two repairs; all three builds exit 0, final browser PASSED; original actions unchanged |
+| EDIT-02 shape through real component edit: absent marker, three shared matches, then unchanged bare done | Three builds exit 0; `AGENT_REPAIR_NO_PROGRESS` after two repairs | One repair; both builds exit 0, final browser PASSED, all three original heading assertions pass; only selected source file changes |
+| TASK-03 strict-rejection control | `MODEL_INVALID_RESPONSE / SYNTAX`, 488 UTF-8 bytes, UTF-16 column 423, no retry/freeze/build | Identical strict rejection |
+| Unchanged bare done control | `AGENT_REPAIR_NO_PROGRESS`, same candidate digest and original actions | Identical strict rejection |
+
+Old suite: 11 tests, 6 expected failures (4 context assertions plus CAT-02 and
+EDIT-02), no errors. Repaired suite: 11/11 pass. The additional unmounted-owner
+case is a negative control. The initial Docker-unavailable
+attempt is an environment failure, not a regression reproduction; its private
+log hash is retained separately from the successful old-tree execution.
+
+The syntax fixture is synthesized from redacted punctuation/key spans and string
+lengths, including eight synthetic BMP characters to preserve UTF-8 byte length.
+No original string values are copied. It reproduces the parser failure position,
+not the original reply digest or a recoverable response. The provider had already
+been asked for a JSON object; strict rejection is correct. No code change claims
+to repair TASK-03's provider violation.
+
+The fixed model policy reacts to actual action semantics/prerequisite fields and
+the first seeded owner. Usage is declared at 0.3 token/UTF-8 byte (an estimate,
+not a measurement); every response crosses the production DeepSeek wire to a
+loopback fixture. PostgreSQL, digest-checked file tools, immutable component edit
+scope, Docker/Vue builds and Chromium are real. The synthetic CAT-02 holds both
+files in context; it covers owner priority and original browser failure shapes,
+not B's exact token amounts or omitted-file count. These tests do not establish
+that a real model will follow the new context. Paid calls: 0. The original failed
+batch is unchanged; any new real-model validation requires separate authorization.
+
+Run both test classes with JDK 21/Node 24.22.1 and a running local Docker engine:
+
+```bash
+unset CODELESS_MODEL_API_KEY CODELESS_MODEL_NAME
+export CODELESS_MODEL_PROVIDER=deterministic-mock
+cmd.exe //d //c "services\api\mvnw.cmd -f services/api/pom.xml \"-Dtest=RoundFiveContextTest,RoundFiveRegressionTest\" test"
+```
+
+Optional `CODELESS_REPAIR_EVIDENCE_DIR` and `CODELESS_REGRESSION_TREE` label private
+run outputs. Public aggregate results are in
+`evidence/2026-10-27/d24-a-round5/`; raw source, wire bodies and browser captures
+must not be copied into that directory.
+
+The first full API gate exposed a fixture ordering issue: the edited task stayed
+PLAN while the global scheduler served another queued task with this test's wire
+policy. This is not an edit-repair outcome. The final fixture moves only its own
+selected task ahead of queued work, checks the original claim's task ID, delegates
+the real atomic advance, and cleans up only its own unfinished fixtures. EDIT-02
+also deliberately queues another task and asserts it remains QUEUED/unleased with
+zero model calls before teardown. No queue reset, extra Spring property set or
+production scheduler change is used. The final unchanged old-tree pair still has
+11 tests / 6 expected failures, while the repaired focused suite passes 44/44.
+The initial API reports, including PLAN, remain in the adjacent queue-fixture
+evidence directory; the b560131 gate record remains FAILED.
+
+The separately recorded full API follow-up at fixture commit `25e859b` passes
+364/364 (zero failures/errors/skips), including both round-five classes. Runtime
+code remains `b560131`. The original eight gate records and both follow-ups,
+verified log digests and fresh synthetic scenario summaries are in
+`d24-a-round5/gates.json`. Both e2e attempts stop before browser tests: the inherited
+proxy environment makes Playwright's readiness URL return HTTP 400 (treated as
+available), while direct localhost HTTP is refused and an exclusive TCP bind
+succeeds. No proxy/config change or additional blind retry is made; e2e remains
+FAILED. A passing API follow-up does not erase the first run's two failures or
+establish that its intermittent preview HTTP 502 is fixed.

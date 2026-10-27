@@ -22,14 +22,19 @@ class RecordedRepairPreviewIT extends PreviewPlatformIntegrationTest {
         super.realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures();
         var acceptance=json.readTree(Files.readString(ROOT.resolve("evidence/acceptance.json")));UUID task=UUID.fromString(acceptance.path("taskId").asText());
         var events=new AgentJournal(ROOT.resolve("private/journal")).read(task);var meter=RuntimeBudget.meter(events);
-        assertThat(meter.models()).isEqualTo(12);assertThat(meter.tools()).isEqualTo(17);assertThat(meter.chargedTokens()).isLessThanOrEqualTo(50000);assertThat(fixture.count).isEqualTo(12);
+        // D24-A round 2: the recorded reads 6 and 7 are still offered, 8 and 9 are not and are skipped, and the synthetic patch
+        // is verified as soon as it is committed, so no completion request follows it (formerly 12 calls and 17 tool slots).
+        assertThat(fixture.skipped).containsExactly(8,9);
+        assertThat(meter.models()).isEqualTo(9);assertThat(meter.tools()).isEqualTo(15);assertThat(meter.chargedTokens()).isLessThanOrEqualTo(50000);assertThat(fixture.count).isEqualTo(9);
         var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();var results=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
         assertThat(drafts).hasSize(2);assertThat(results).hasSize(2);assertThat(drafts.getFirst().path("actions")).isEqualTo(drafts.getLast().path("actions"));
         assertThat(results.getFirst().path("build").path("exitCode").asInt(-1)).isEqualTo(2);assertThat(results.getFirst().path("build").path("log").path("text").asText()).contains("M1MissingCard.vue");
         assertThat(results.getLast().path("build").path("exitCode").asInt(-1)).isZero();assertThat(results.getLast().path("verification").path("status").asText()).isEqualTo("PASSED");
         assertThat(drafts.getFirst().path("sourceDigest")).isNotEqualTo(drafts.getLast().path("sourceDigest"));assertThat(acceptance.path("versionId")).isEqualTo(drafts.getLast().path("versionId"));
         assertThat(jdbc.sql("SELECT count(*) FROM generation_tasks").query(Integer.class).single()).isEqualTo(1);assertThat(jdbc.sql("SELECT repair_attempts FROM generation_tasks WHERE id=?").param(task).query(Integer.class).single()).isEqualTo(1);
-        var usage=AgentJournal.latest(events,"model.usage");assertThat(usage.path("estimated").asBoolean()).isTrue();assertThat(usage.path("chargedTokens")).isEqualTo(usage.path("reservationTokens"));
+        // The latest usage is now the declared synthetic patch usage, no longer an unknown-usage completion.
+        var usage=AgentJournal.latest(events,"model.usage");assertThat(usage.path("estimated").asBoolean()).isFalse();assertThat(usage.path("chargedTokens").asInt()).isEqualTo(5180);
+        assertThat(AgentJournal.latest(events,"repair.done").path("origin").asText()).isEqualTo("HOST_COMMITTED_PATCH");
         assertThat(acceptance.path("modelQualityAccepted").asBoolean()).isFalse();
         Files.writeString(ROOT.resolve("evidence/D10-A-recorded-context.json"),json.writeValueAsString(Map.of("taskId",task,"events",events,"budget",meter,"acceptance",acceptance,
                 "originPaidTask","45d37a80-c152-4672-9c0c-1fcf425fa014","modelProvider","deterministic-mock","measurement","REPLAY_AND_SYNTHETIC_FUTURE_NOT_PROVIDER_EVALUATION","paidCalls",0,"outerRetries",0,"modelQualityEvidence",false)));

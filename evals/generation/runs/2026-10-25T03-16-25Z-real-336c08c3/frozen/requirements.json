@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "setId": "D21-generation-requirements-v1",
+  "frozenBy": "D21-A",
+  "frozenOn": "2026-10-23",
+  "policy": {
+    "denominator": 9,
+    "perCategory": 3,
+    "initialAttemptsPerRequirement": 1,
+    "maxRepairRoundsInsideTask": 3,
+    "rerun": "A rerun is a new batch with its own record; it never replaces or deletes an earlier sample.",
+    "promptIsRawInput": "prompt is sent byte-for-byte as the task request; nothing is appended or rewritten by the harness."
+  },
+  "categories": [
+    { "id": "SHOWCASE", "label": "个人/活动展示页", "conventionalRoute": "/" },
+    { "id": "TASKS", "label": "LocalStorage 任务工具", "conventionalRoute": "/tasks" },
+    { "id": "CATALOG", "label": "搜索分类详情列表", "conventionalRoute": "/catalog" }
+  ],
+  "requirements": [
+    {
+      "id": "SHOW-01",
+      "category": "SHOWCASE",
+      "applicationName": "Grace Hopper 个人展示",
+      "dataMode": "STATIC",
+      "prompt": "生成 Grace Hopper 的个人展示页：顶部显示姓名“Grace Hopper”和一句简介“计算机科学先驱，COBOL 语言的推动者”；中间用三张卡片展示代表作品：“Harvard Mark I 编程”“A-0 编译器”“COBOL 标准化”，每张卡片有标题和一句说明；底部显示联系邮箱 grace.hopper@example.com（纯文本，不需要发送邮件）。使用静态数据。",
+      "statedBehaviors": [
+        "显示姓名 Grace Hopper 与简介",
+        "三张作品卡片，各有标题与一句说明",
+        "底部显示联系邮箱 grace.hopper@example.com"
+      ]
+    },
+    {
+      "id": "SHOW-02",
+      "category": "SHOWCASE",
+      "applicationName": "杭州前端大会活动页",
+      "dataMode": "STATIC",
+      "prompt": "生成“2026 杭州前端开发者大会”活动页：显示活动名称、日期“2026年11月20日”、地点“杭州国际博览中心”；用列表展示三个日程：09:00 开幕致辞、10:30 Vue 性能优化实战、14:00 无障碍设计实践，每项显示时间和标题；页面有“我要报名”按钮，点击后在按钮下方显示“报名意向已记录（演示）”。只在页面内展示，不需要后端。使用静态数据。",
+      "statedBehaviors": [
+        "显示活动名称、日期与地点",
+        "日程列表三项，各有时间与标题",
+        "点击“我要报名”后显示“报名意向已记录（演示）”"
+      ]
+    },
+    {
+      "id": "SHOW-03",
+      "category": "SHOWCASE",
+      "applicationName": "林夏摄影作品集",
+      "dataMode": "MOCK",
+      "prompt": "生成摄影师林夏的作品集展示页：页面顶部有“关于我”“作品集”“联系方式”三个导航按钮，点击后切换显示对应区块，默认显示“关于我”；“作品集”区块展示四件作品卡片，每张显示作品标题和拍摄地点，用纯色色块代替图片，不加载任何外部图片；“联系方式”区块显示邮箱 linxia@example.com。使用 Mock 数据。",
+      "statedBehaviors": [
+        "三个导航按钮切换区块，默认显示“关于我”",
+        "作品集区块四张作品卡片（标题与拍摄地点），无外部图片",
+        "联系方式区块显示邮箱 linxia@example.com"
+      ]
+    },
+    {
+      "id": "TASK-01",
+      "category": "TASKS",
+      "applicationName": "个人待办清单",
+      "dataMode": "LOCAL_STORAGE",
+      "prompt": "生成一个个人待办清单页：可以在输入框输入任务标题，点击“添加”按钮新增任务；每个任务可以勾选完成、可以点击“删除”移除；页面显示“未完成：N”的未完成任务数量。任务数据保存在 LocalStorage，刷新页面后任务和完成状态仍然保留。",
+      "statedBehaviors": [
+        "输入标题并点击“添加”新增任务",
+        "勾选完成；点击“删除”移除任务",
+        "显示“未完成：N”",
+        "刷新后任务与完成状态保留（LocalStorage）"
+      ]
+    },
+    {
+      "id": "TASK-02",
+      "category": "TASKS",
+      "applicationName": "学习计划看板",
+      "dataMode": "LOCAL_STORAGE",
+      "prompt": "生成一个学习计划看板：任务分为“待开始”“进行中”“已完成”三列；可以输入标题新建任务，新任务默认在“待开始”列；每个任务有“下一步”按钮把它移动到下一列，并有“删除”按钮；所有任务及所在列保存在 LocalStorage，刷新页面后保持不变。",
+      "statedBehaviors": [
+        "三列：待开始、进行中、已完成",
+        "新建任务默认进入“待开始”",
+        "“下一步”移动到下一列；“删除”移除任务",
+        "刷新后任务及所在列保持（LocalStorage）"
+      ]
+    },
+    {
+      "id": "TASK-03",
+      "category": "TASKS",
+      "applicationName": "家庭购物清单",
+      "dataMode": "LOCAL_STORAGE",
+      "prompt": "生成一个家庭购物清单：输入商品名称和数量后点击“加入清单”添加；每个商品可以标记“已购买”或删除；提供“清除已购买”按钮一次移除所有已购买商品；清单保存在 LocalStorage，刷新页面后恢复。",
+      "statedBehaviors": [
+        "输入名称与数量后点击“加入清单”添加",
+        "标记“已购买”；删除商品",
+        "“清除已购买”一次移除全部已购买商品",
+        "刷新后清单恢复（LocalStorage）"
+      ]
+    },
+    {
+      "id": "CAT-01",
+      "category": "CATALOG",
+      "applicationName": "图书目录",
+      "dataMode": "STATIC",
+      "prompt": "生成一个图书目录页：内置 8 本图书的静态数据（书名、作者、分类：小说/科技/历史、一句简介）；提供搜索框按书名或作者实时过滤，提供“全部/小说/科技/历史”分类筛选按钮；点击某本书后显示它的详情区域（书名、作者、分类、简介）。",
+      "statedBehaviors": [
+        "列出 8 本图书",
+        "搜索框按书名或作者过滤",
+        "“全部/小说/科技/历史”分类筛选",
+        "点击图书显示详情（书名、作者、分类、简介）"
+      ]
+    },
+    {
+      "id": "CAT-02",
+      "category": "CATALOG",
+      "applicationName": "城市咖啡馆目录",
+      "dataMode": "MOCK",
+      "prompt": "生成一个城市咖啡馆目录：使用 Mock 数据列出 6 家咖啡馆（名称、所在城区、评分、招牌饮品）；可以通过下拉框按城区筛选，也可以按名称搜索；点击咖啡馆卡片后在列表下方显示该咖啡馆的详情。",
+      "statedBehaviors": [
+        "列出 6 家咖啡馆（名称、城区、评分、招牌饮品）",
+        "下拉框按城区筛选",
+        "按名称搜索",
+        "点击卡片后在列表下方显示详情"
+      ]
+    },
+    {
+      "id": "CAT-03",
+      "category": "CATALOG",
+      "applicationName": "开源工具目录",
+      "dataMode": "STATIC",
+      "prompt": "生成一个开源工具目录页：静态数据包含 9 个工具（名称、类别：构建/测试/文档、许可证、一句简介）；支持关键字搜索与类别筛选同时生效，没有匹配结果时显示“没有匹配的工具”；点击工具名称查看该工具的详情。",
+      "statedBehaviors": [
+        "列出 9 个工具",
+        "关键字搜索与类别筛选同时生效",
+        "无结果时显示“没有匹配的工具”",
+        "点击工具名称查看详情"
+      ]
+    }
+  ]
+}

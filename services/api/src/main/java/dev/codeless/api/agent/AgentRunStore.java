@@ -85,6 +85,22 @@ public final class AgentRunStore {
                 WHERE t.id=? AND v.id=? AND v.status='VERIFIED'
                 """).params(claim.taskId(),base).query(String.class).optional().orElseThrow(() -> new AgentFailure("EDIT_BASE_UNAVAILABLE"));
     }
+    /**
+     * REPAIR context from the failed candidate's own immutable source: every manifest file re-read and re-hashed, with
+     * no model call or file tool spent (D24-A round 2). The lease is checked first; the read happens outside the row
+     * lock so the heartbeat is never kept waiting on file I/O.
+     */
+    public Map<String,String> repairSources(TaskQueueService.Claim claim, JsonNode draft) {
+        tx.executeWithoutResult(s -> lock(claim,TaskStatus.REPAIR));
+        try {
+            var text=new LinkedHashMap<String,String>();
+            snapshots.sourceBytes(UUID.fromString(draft.path("versionId").asText()),draft.path("sourceDigest").asText())
+                    .forEach((path,bytes) -> text.put(path,new String(bytes,java.nio.charset.StandardCharsets.UTF_8)));
+            return text;
+        } catch(dev.codeless.api.versions.SnapshotFailure | IllegalArgumentException unavailable) {
+            throw new AgentFailure("AGENT_CHECKPOINT_INVALID");
+        }
+    }
     public List<JsonNode> read(TaskQueueService.Claim claim, TaskStatus stage) {
         return tx.execute(s -> { lock(claim,stage); return journal.read(claim.taskId()); });
     }
@@ -93,6 +109,20 @@ public final class AgentRunStore {
     }
     public void reserve(TaskQueueService.Claim claim, TaskStatus stage, String kind, int tokens) {
         reserve(claim,stage,kind,tokens,1);
+    }
+    /**
+     * Reserve one model request: the conservative input bound plus the largest output allowance the remaining
+     * token cap permits. A request that cannot fund the provider minimum is refused here, before invocation.
+     */
+    public int reserveModel(TaskQueueService.Claim claim, TaskStatus stage, int inputReservation) {
+        return tx.execute(s -> {
+            lock(claim,stage);
+            Integer output=RuntimeBudget.outputAllowance(RuntimeBudget.meter(journal.read(claim.taskId())),inputReservation);
+            if(output==null) throw new AgentFailure("AGENT_MODEL_BUDGET_EXCEEDED");
+            journal.append(claim.taskId(),stage.name(),"model.request",Map.of("reservedTokens",Math.addExact(inputReservation,output),
+                    "slots",1,"outputTokens",output));
+            return output;
+        });
     }
     public void reserveVerification(TaskQueueService.Claim claim) {
         // Reserve both fixed operations before launch, even if the build later prevents the browser.

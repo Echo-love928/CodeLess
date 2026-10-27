@@ -3,6 +3,7 @@ package dev.codeless.api.data;
 import java.nio.file.Path;
 import java.util.UUID;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -11,8 +12,11 @@ import org.testcontainers.utility.DockerImageName;
 
 @SpringBootTest
 @ActiveProfiles("test")
+// Contexts use distinct test properties but share one PostgreSQL server. Release each class's pool
+// instead of retaining default-sized idle pools until the Spring context cache is evicted.
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class PostgresTestBase {
-    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse(
+    protected static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse(
             "postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94")
             .asCompatibleSubstituteFor("postgres"))
             .withDatabaseName("codeless_test")

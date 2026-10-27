@@ -298,7 +298,17 @@ class AgentLoopIntegrationTest extends PostgresTestBase {
         assertThat(received.get(1).path("tools").size()).isEqualTo(5);
         assertThat(received.get(2).path("observations").size()).isEqualTo(1);
         JsonNode actual=journal.read(seed.task()).stream().filter(e -> e.path("kind").asText().equals("tool.result")).findFirst().orElseThrow().path("payload");
-        assertThat(received.get(2).path("observations").get(0)).isEqualTo(actual);
+        // D24-A: the actual receipt plus only the digest-checked bytes of the write, so no read-back is needed.
+        var fed=(tools.jackson.databind.node.ObjectNode)received.get(2).path("observations").get(0).deepCopy();
+        String committed=fed.remove("committedContent").asText();
+        assertThat(fed.remove("contentOrigin").asText()).isEqualTo("COMMITTED_WRITE_DIGEST_MATCHED");
+        assertThat(fed.remove("tool").asText()).isEqualTo("files.create");
+        assertThat(fed.remove("path").asText()).isEqualTo(actual.path("source").path("files").get(0).path("path").asText());
+        assertThat(fed).isEqualTo(actual);
+        assertThat(committed).isEqualTo(json.readTree(mock.call(new Prompt(List.of(new org.springframework.ai.chat.messages.SystemMessage("p"),
+                new org.springframework.ai.chat.messages.UserMessage(received.get(1).toString()))),4096,Duration.ofSeconds(1)).content()).path("arguments").path("content").asText());
+        assertThat("sha256:"+HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(committed.getBytes(java.nio.charset.StandardCharsets.UTF_8))))
+                .isEqualTo(actual.path("afterDigest").asText());
         assertThat(received.get(3).path("observations").size()).isEqualTo(2);queue.cancel(seed.owner(),seed.task());
 
         var cancelSeed=seed();var cancelClaim=claim(cancelSeed);

@@ -24,8 +24,11 @@ class ProtocolRepairPreviewIT extends PreviewPlatformIntegrationTest {
         runOriginalM1Acceptance();wire.assertHealthy();
         var acceptance=json.readTree(Files.readString(ROOT.resolve("evidence/acceptance.json")));UUID task=UUID.fromString(acceptance.path("taskId").asText());
         var events=new AgentJournal(ROOT.resolve("private/journal")).read(task);var meter=RuntimeBudget.meter(events);
-        assertThat(meter.models()).isEqualTo(10);assertThat(meter.tools()).isEqualTo(15);assertThat(meter.chargedTokens()).isLessThanOrEqualTo(50000);
-        assertThat(fixture.count).isEqualTo(10);assertThat(wire.requests).hasSize(10);
+        // D24-A round 2: the recorded read 6 is still offered, 7 is not and is skipped, and the synthetic patch is verified as
+        // soon as it is committed, so no completion request follows it (formerly 10 calls and 15 tool slots).
+        assertThat(fixture.skipped).containsExactly(7);
+        assertThat(meter.models()).isEqualTo(8);assertThat(meter.tools()).isEqualTo(14);assertThat(meter.chargedTokens()).isLessThanOrEqualTo(50000);
+        assertThat(fixture.count).isEqualTo(8);assertThat(wire.requests).hasSize(8);
         var drafts=events.stream().filter(e->e.path("kind").asText().equals("draft")).map(e->e.path("payload")).toList();
         var runs=events.stream().filter(e->e.path("kind").asText().equals("runner.result")).map(e->e.path("payload")).toList();
         assertThat(drafts).hasSize(2);assertThat(runs).hasSize(2);assertThat(drafts.getFirst().path("actions")).isEqualTo(drafts.getLast().path("actions"));
@@ -37,8 +40,10 @@ class ProtocolRepairPreviewIT extends PreviewPlatformIntegrationTest {
         assertThat(acceptance.path("platformApiFixture").asBoolean()).isFalse();assertThat(acceptance.path("signingFixture").asBoolean()).isFalse();
         assertThat(acceptance.path("modelProvider").asText()).isEqualTo("recorded-source-replay");
         var fingerprints=events.stream().filter(e->e.path("kind").asText().equals("model.input")).map(e->e.path("payload")).toList();
-        assertThat(fingerprints).hasSize(10);for(int i=0;i<10;i++)assertThat(fingerprints.get(i).path("transport").path("bodyDigest").asText()).isEqualTo(wire.digests.get(i));
-        var usage=AgentJournal.latest(events,"model.usage");assertThat(usage.path("estimated").asBoolean()).isTrue();assertThat(usage.path("chargedTokens")).isEqualTo(usage.path("reservationTokens"));
+        assertThat(fingerprints).hasSize(8);for(int i=0;i<8;i++)assertThat(fingerprints.get(i).path("transport").path("bodyDigest").asText()).isEqualTo(wire.digests.get(i));
+        // The latest usage is now the declared synthetic patch usage, no longer an unknown-usage completion.
+        var usage=AgentJournal.latest(events,"model.usage");assertThat(usage.path("estimated").asBoolean()).isFalse();assertThat(usage.path("chargedTokens").asInt()).isEqualTo(5180);
+        assertThat(AgentJournal.latest(events,"repair.done").path("origin").asText()).isEqualTo("HOST_COMMITTED_PATCH");
         assertThat(acceptance.path("modelQualityAccepted").asBoolean()).isFalse();
         var report=new LinkedHashMap<String,Object>();report.put("taskId",task);report.put("events",events);report.put("budget",meter);report.put("acceptance",acceptance);
         report.put("originPaidTask","17f440cf-7970-46cc-b598-dd2d91a20ade");report.put("offlineWireRequests",wire.requests);report.put("wireDigests",wire.digests);
