@@ -472,3 +472,14 @@ production scheduler change is used. The final unchanged old-tree pair still has
 11 tests / 6 expected failures, while the repaired focused suite passes 44/44.
 The initial API reports, including PLAN, remain in the adjacent queue-fixture
 evidence directory; the b560131 gate record remains FAILED.
+
+The separately recorded full API follow-up at fixture commit `25e859b` passes
+364/364 (zero failures/errors/skips), including both round-five classes. Runtime
+code remains `b560131`. The original eight gate records and both follow-ups,
+verified log digests and fresh synthetic scenario summaries are in
+`d24-a-round5/gates.json`. Both e2e attempts stop before browser tests: the inherited
+proxy environment makes Playwright's readiness URL return HTTP 400 (treated as
+available), while direct localhost HTTP is refused and an exclusive TCP bind
+succeeds. No proxy/config change or additional blind retry is made; e2e remains
+FAILED. A passing API follow-up does not erase the first run's two failures or
+establish that its intermittent preview HTTP 502 is fixed.
