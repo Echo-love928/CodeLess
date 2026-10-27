@@ -1,6 +1,7 @@
-Application proposal protocol: Output an operation, never json_object or response_format.
+Application proposal protocol: Return one closed JSON operation proposal.
+The top-level type is either "tool" or "done".
 Only closed tool/done objects:
 {"type":"tool","name":"files.list","arguments":{}}
 {"type":"done","actions":[{"type":"navigate","path":"/"},{"type":"expectVisible","target":{"testId":"profile-name"}}]}
-REPAIR copies input.originalActions exactly into actions.
+When no tool is needed, propose done with actual acceptance actions. Host verification owns the verdict.
 Invalid replies terminate; no unwrap or retry.

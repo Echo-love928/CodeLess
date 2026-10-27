@@ -3,8 +3,8 @@ function object(value, keys) {
   if (!value || typeof value !== 'object' || Array.isArray(value) ||
       Object.keys(value).some((key) => !keys.includes(key))) throw new Error('unexpected action fields')
 }
-function string(value, max = 256) {
-  if (typeof value !== 'string' || !value.trim() || value.length > max) throw new Error('invalid action text')
+function string(value, max = 256, allowBlank = false) {
+  if (typeof value !== 'string' || (!allowBlank && !value.trim()) || value.length > max) throw new Error('invalid action text')
 }
 function target(value) {
   object(value, ['testId', 'role', 'name', 'text'])
@@ -28,8 +28,8 @@ export function validateActions(actions = []) {
       object(action, ['type', 'target', ...(['fill', 'select', 'expectText'].includes(action.type) ? ['value'] : [])])
       target(action.target)
       if (['fill', 'select', 'expectText'].includes(action.type)) {
-        if (action.type === 'fill' && action.value === '') continue
-        string(action.value, 2000)
+        // Preserve literal input bytes so empty/whitespace form rejection can be exercised in the real browser.
+        string(action.value, 2000, action.type === 'fill')
       }
     }
   }

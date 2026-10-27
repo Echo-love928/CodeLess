@@ -13,6 +13,29 @@ import tools.jackson.databind.json.JsonMapper;
 
 /** Recorded paid data is read-only. Future patch/done charges below are explicit synthetic scenarios. */
 class RepairContextTest {
+    @Test void compactCompletionFundsARequestWithoutChangingOriginalActionsOrAnySourceEvidence() {
+        var actions=json.createArrayNode();
+        actions.addObject().put("type","navigate").put("path","/");
+        for(int i=0;i<16;i++) actions.addObject().put("type","expectText").put("value","独立完整行为断言".repeat(25));
+        var original=actions.deepCopy();
+        var input=json.valueToTree(Map.of("completionProposal",Map.of("type","done","actions",actions),
+                "failure",Map.of("failedAction",Map.of("index",3,"action",actions.get(3))),
+                "observations",List.of(Map.of("content","real dependency content","afterDigest","observed")),
+                "sourceFiles",List.of(Map.of("path","src/pages/HomePage.vue","digest","current")),"tools",List.of("files.update")));
+        var saved=input.deepCopy();var compact=RepairContext.compactCompletion(input,actions);
+        var meter=new RuntimeBudget.Meter(9,11,40050);
+        assertThat(RuntimeBudget.outputAllowance(meter,RuntimeBudget.inputReservation("policy",input.toString()))).isNull();
+        assertThat(RuntimeBudget.outputAllowance(meter,RuntimeBudget.inputReservation("policy",compact.toString()))).isEqualTo(4096);
+        for(String field:List.of("failure","observations","sourceFiles","tools")) assertThat(compact.path(field)).isEqualTo(input.path(field));
+        assertThat(compact.path("completionProposal")).isEqualTo(json.valueToTree(Map.of("type","done")));
+        assertThat(compact.path("originalAcceptance").path("actionCount").asInt()).isEqualTo(17);
+        assertThat(compact.path("originalAcceptance").path("digest").asText()).startsWith("sha256:");
+        assertThat(actions).isEqualTo(original);assertThat(input).isEqualTo(saved);
+    }
+    @Test void compactProjectionNeverInflatesAnAlreadySmallCompletionProposal() {
+        var actions=json.createArrayNode();var input=json.valueToTree(Map.of("completionProposal",Map.of("type","done","actions",actions)));
+        assertThat(RepairContext.compactCompletion(input,actions)).isEqualTo(input);
+    }
     static final Path RECORD=Path.of("../../docs/evidence/D10/M1/45d37a80-c152-4672-9c0c-1fcf425fa014");
     final JsonMapper json=JsonMapper.builder().build();
     JsonNode doc() throws Exception{return json.readTree(Files.readString(RECORD.resolve("event-replay.json")));}
@@ -25,6 +48,8 @@ class RepairContextTest {
     }
     JsonNode input(JsonNode doc,List<JsonNode> observed,RepairContext context,RuntimeBudget.Meter meter) {
         var draft=latest(doc,"draft");var in=new LinkedHashMap<String,Object>();in.put("phase","REPAIR");in.put("request",doc.path("task").path("prompt").asText());in.put("dataMode","STATIC");
+        // Pre-D24-A-round-2 request shape, kept for these historical budget calculations: production no longer sends a REPAIR
+        // completion-only request, since the host verifies the first actual patch without soliciting another reply.
         boolean completionOnly=context!=null&&Boolean.TRUE.equals(context.progress().get("sourceChanged"))&&12-meter.models()==1;
         in.put("plan",context==null?latest(doc,"plan"):RepairContext.planProjection(latest(doc,"plan")));in.put("tools",completionOnly?List.of():new FileToolRegistry().definitions().path("tools"));in.put("observations",context==null?observed:context.observations());
         in.put("failure",latest(doc,"repair.failure"));
@@ -43,6 +68,17 @@ class RepairContextTest {
         catch(Exception failure){throw new IllegalStateException(failure);}
         var source=(tools.jackson.databind.node.ObjectNode)actual.path("source");source.put("sourceDigest","sha256:"+"b".repeat(64));
         for(var file:source.path("files"))if(file.path("path").asText().equals("src/pages/HomePage.vue"))((tools.jackson.databind.node.ObjectNode)file).put("digest",actual.path("afterDigest").asText());return actual;
+    }
+    @Test void committedNoOpIsNotASourceChangeButTheFirstChangingWriteIs() throws Exception {
+        // D24-A round 2: the host verifies right after the first actual change, so no repeated candidate can follow it;
+        // what stays decisive is that an unchanged original never counts as a patch.
+        var doc=doc();var read=results(doc).getFirst();var context=new RepairContext(latest(doc,"draft"));
+        var unchanged=(tools.jackson.databind.node.ObjectNode)read.deepCopy();unchanged.putNull("content");
+        context.observe("files.update",json.valueToTree(Map.of("path","src/pages/HomePage.vue","content",read.path("content").asText())),unchanged);
+        assertThat(context.changed()).isFalse();assertThat(context.progress().get("sourceChanged")).isEqualTo(false);
+        var first=writeResult(read);String content=read.path("content").asText().replace("M1MissingCard.vue","ProfileCard.vue");
+        context.observe("files.update",json.valueToTree(Map.of("path","src/pages/HomePage.vue","content",content)),first);
+        assertThat(context.changed()).isTrue();assertThat(context.progress().get("sourceChanged")).isEqualTo(true);
     }
     @Test void oldRecordingExactlyReproducesAllReservationsAndTheCorrectStop() throws Exception {
         var doc=doc();String old=Files.readString(Path.of("../../tests/agent/repair/fixtures/m1-repair-policy-before.txt"));var observations=new ArrayList<JsonNode>();var reservations=new ArrayList<Integer>();
@@ -65,6 +101,7 @@ class RepairContextTest {
         String content=results(doc).getLast().path("content").asText().replace("M1MissingCard.vue","ProfileCard.vue");
         context.observe("files.update",json.valueToTree(Map.of("path","src/pages/HomePage.vue","content",content)),writeResult(results(doc).getLast()));
         var afterPatch=new RuntimeBudget.Meter(11,14,31596+patchCharge.chargedTokens());
+        // Counterfactual since D24-A round 2 (no done request follows a patch); it still bounds the old flow's worst case.
         int doneReservation=reservation(doc,context,afterPatch);var doneCharge=RuntimeBudget.charge(Usage.unknown(),doneReservation-4096);
         var lastInput=input(doc,List.of(),context,afterPatch);assertThat(lastInput.path("completionOnly").asBoolean()).isTrue();assertThat(lastInput.path("tools")).isEmpty();
         assertThat(context.observations().getLast().path("committedContent").asText()).isEqualTo(content);
@@ -74,6 +111,7 @@ class RepairContextTest {
         Files.createDirectories(Path.of("target/repair-context"));Files.writeString(Path.of("target/repair-context/recorded-budget.json"),json.writeValueAsString(report));
         assertThat(31596+patchCharge.chargedTokens()+doneReservation).isLessThanOrEqualTo(50000);
     }
+    // Why D24-A round 2 verifies the committed patch itself: after an unknown-usage patch the old done could not be funded.
     @Test void unknownPatchUsageKeepsItsFullReservationAndMayCorrectlyPreventDone() throws Exception {
         var doc=doc();var context=replay(doc);int reserve=reservation(doc,context);var charge=RuntimeBudget.charge(Usage.unknown(),reserve-4096);
         assertThat(charge.estimated()).isTrue();assertThat(charge.chargedTokens()).isEqualTo(reserve);
@@ -133,5 +171,81 @@ class RepairContextTest {
         var doc=doc();var context=new RepairContext(latest(doc,"draft"));var huge=(tools.jackson.databind.node.ObjectNode)results(doc).getFirst().deepCopy();huge.put("content","x".repeat(131072));
         for(String path:List.of("src/pages/HomePage.vue","src/components/ProfileCard.vue"))context.observe("files.read",json.valueToTree(Map.of("path",path)),huge);
         assertThat(context.observations()).hasSize(2);assertThat(context.observations()).allSatisfy(o->assertThat(o.path("content").asText()).hasSize(131072));assertThat(reservation(doc,context)).isGreaterThan(50000);
+    }
+    // D24-A round 2: frozen failed-candidate sources, failure-first seeding and the read-growth bound (synthetic sources).
+    static String sha(String content) {
+        try {return "sha256:"+HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(content.getBytes(StandardCharsets.UTF_8)));}
+        catch(Exception failure) {throw new IllegalStateException(failure);}
+    }
+    JsonNode draft(Map<String,String> sources) {
+        var files=new ArrayList<Map<String,Object>>();sources.forEach((path,content)->files.add(Map.of("path",path,"digest",sha(content))));
+        return json.valueToTree(Map.of("files",files,"sourceDigest","sha256:"+"a".repeat(64),"versionId",UUID.randomUUID().toString()));
+    }
+    JsonNode receipt(JsonNode draft,String content) {
+        var actual=new LinkedHashMap<String,Object>();actual.put("callId",UUID.randomUUID().toString());actual.put("status","SUCCEEDED");actual.put("errorCode",null);
+        actual.put("content",content);actual.put("beforeDigest",sha(content));actual.put("afterDigest",sha(content));
+        actual.put("source",Map.of("sourceDigest",draft.path("sourceDigest").asText(),"files",draft.path("files")));return json.valueToTree(actual);
+    }
+    @Test void frozenSourcesMustMatchEveryRecordedPathAndDigest() {
+        var sources=new LinkedHashMap<String,String>();sources.put("src/pages/HomePage.vue","<template><main/></template>");sources.put("src/data/works.ts","export const works = [];");
+        var context=new RepairContext(draft(sources));context.frozen(sources);assertThat(context.frozenPaths()).containsExactlyElementsOf(sources.keySet());
+        var altered=new LinkedHashMap<>(sources);altered.put("src/data/works.ts","export const works = ['tampered'];");
+        var missing=new LinkedHashMap<>(sources);missing.remove("src/data/works.ts");
+        var extra=new LinkedHashMap<>(sources);extra.put("src/data/extra.ts","export {};");
+        for(var candidate:List.of(altered,missing,extra))
+            assertThatThrownBy(()->new RepairContext(draft(sources)).frozen(candidate)).isInstanceOf(AgentFailure.class).hasMessage("AGENT_CHECKPOINT_INVALID");
+    }
+    @Test void seedOrderIsFailureFirstAndDiagnosticTextGrantsNoPath() {
+        var sources=new LinkedHashMap<String,String>();
+        sources.put("src/pages/HomePage.vue","<script setup lang=\"ts\">import ProfileCard from '../components/ProfileCard.vue';import { profile } from '../data/profile';</script>");
+        sources.put("src/pages/WorksPage.vue","<script setup lang=\"ts\">import WorkList from '../components/WorkList.vue';</script>");
+        sources.put("src/components/ProfileCard.vue","<template><section/></template>");
+        sources.put("src/components/WorkList.vue","<script setup lang=\"ts\">import { works } from \"../data/works\";</script>");
+        sources.put("src/data/works.ts","export const works = [];");sources.put("src/data/profile.ts","export const profile = {};");
+        sources.put("index.html","<div id=\"app\"></div>"); // Frozen template file outside the plan.
+        var plan=json.valueToTree(Map.of("pages",List.of(Map.of("route","/","file","src/pages/HomePage.vue"),Map.of("route","/works","file","src/pages/WorksPage.vue")),
+                "files",sources.keySet().stream().filter(path->path.startsWith("src/")).map(path->Map.of("path",path)).toList()));
+        var actions=json.valueToTree(List.of(Map.of("type","navigate","path","/"),Map.of("type","expectText"),Map.of("type","navigate","path","/works"),Map.of("type","expectVisible")));
+        var failure=json.valueToTree(Map.of("diagnostic","index.html; package.json; src/components/WorkList.vue:3 render failed","failedAction",Map.of("index",3)));
+        // The named planned file, the failing route's page, their imports, then the rest; unplanned names are ignored.
+        assertThat(RepairContext.seedOrder(plan,failure,actions,sources)).containsExactly("src/components/WorkList.vue","src/pages/WorksPage.vue","src/data/works.ts",
+                "src/pages/HomePage.vue","src/components/ProfileCard.vue","src/data/profile.ts");
+        assertThat(RepairContext.seedOrder(plan,json.valueToTree(Map.of("diagnostic","")),actions,sources)).containsExactly("src/pages/HomePage.vue",
+                "src/components/ProfileCard.vue","src/data/profile.ts","src/pages/WorksPage.vue","src/components/WorkList.vue","src/data/works.ts");
+    }
+    @Test void relativeImportsResolveOnlyToKnownPaths() {
+        var paths=Set.of("src/components/A.vue","src/data/b.ts","src/pages/C.vue");
+        String content="import A from '../components/A.vue';import { b } from \"../data/b\";import { ref } from 'vue';import C from './C.vue';"
+                +"import outside from '../../outside';import up from '../../../x';import '../data/b';";
+        assertThat(RepairContext.imports("src/pages/P.vue",content,paths)).containsExactly("src/components/A.vue","src/data/b.ts","src/pages/C.vue","src/data/b.ts");
+        assertThat(RepairContext.imports("src/pages/P.vue",null,paths)).isEmpty();
+    }
+    @Test void seededSourcesAreCarriedUntilAGenuineReadOfTheSameBytesSupersedesThem() {
+        var sources=new LinkedHashMap<String,String>();String page="<template><main>broken</main></template>";
+        sources.put("src/pages/HomePage.vue",page);sources.put("src/data/works.ts","export const works = [];");
+        var draft=draft(sources);var context=new RepairContext(draft);context.frozen(sources);
+        assertThat(context.repairSources()).isNull();assertThat(context.progress(true).get("next")).isEqualTo("READ_REQUIRED_DEPENDENCIES_ONCE");
+        assertThat(context.progress(false).get("next")).isEqualTo("PATCH_WITHOUT_FURTHER_READS"); // Never a read the request does not offer.
+        assertThat(context.seed("src/pages/Unknown.vue")).isFalse();assertThat(context.seed("src/pages/HomePage.vue")).isTrue();assertThat(context.seed("src/pages/HomePage.vue")).isFalse();
+        assertThat(context.seeded()).isEqualTo(1);assertThat(context.unseeded()).containsExactly("src/data/works.ts");
+        assertThat(context.seedSummary()).containsExactly(Map.of("path","src/pages/HomePage.vue","digest",sha(page),"bytes",page.getBytes(StandardCharsets.UTF_8).length));
+        var carried=context.repairSources();assertThat(carried.path("origin").asText()).isEqualTo(RepairContext.SOURCE_ORIGIN);
+        assertThat(carried.path("files")).hasSize(1);assertThat(carried.path("files").get(0).path("content").asText()).isEqualTo(page);
+        assertThat(carried.path("files").get(0).path("digest").asText()).isEqualTo(sha(page));
+        assertThat(context.progress(true).get("next")).isEqualTo("PATCH_FROM_REPAIR_SOURCES");
+        context.observe("files.read",json.valueToTree(Map.of("path","src/pages/HomePage.vue")),receipt(draft,page));
+        assertThat(context.repairSources()).isNull(); // The same bytes are never sent twice.
+        context.unseed("src/pages/HomePage.vue");assertThat(context.seeded()).isZero();
+    }
+    @Test void readGrowthIsTheExactReceiptOfTheLargestReadableUnseededFilePlusFraming() {
+        var sources=new LinkedHashMap<String,String>();String small="<template><main/></template>",large="export const works = ['"+"作品".repeat(900)+"'];\n// \"quoted\"";
+        sources.put("src/pages/HomePage.vue",small);sources.put("src/data/works.ts",large);sources.put("src/data/private.ts","x".repeat(9000));
+        var draft=draft(sources);var context=new RepairContext(draft);context.frozen(sources);var readable=Set.of("src/pages/HomePage.vue","src/data/works.ts");
+        var probe=new RepairContext(draft);probe.observe("files.read",json.valueToTree(Map.of("path","src/data/works.ts")),receipt(draft,large));
+        int receipt=probe.observations().getFirst().toString().getBytes(StandardCharsets.UTF_8).length,growth=context.readGrowth(readable);
+        assertThat(growth).isEqualTo(receipt+RuntimeBudget.FRAMING_TOKENS); // Unreadable private.ts is larger but never counts.
+        context.seed("src/data/works.ts");assertThat(context.readGrowth(readable)).isLessThan(growth).isGreaterThan(context.readGrowth(Set.of()));
+        context.seed("src/pages/HomePage.vue");assertThat(context.readGrowth(readable)).isEqualTo(context.readGrowth(Set.of()));
+        assertThat(context.readGrowth(Set.of("src/data/private.ts"))).isGreaterThan(9000);
     }
 }

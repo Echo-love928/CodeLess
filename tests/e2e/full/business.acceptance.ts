@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { verify, sha } from '../../export/verify-export.mjs'
 import { readZip } from '../../export/zip-reader.mjs'
+import { openInitialLogin } from './initial-navigation.mjs'
 
 const output = process.env.CODELESS_FULL_OUTPUT!
 const frame = (page: Page) => page.frameLocator('iframe[title="当前版本预览"]')
@@ -36,7 +37,7 @@ async function terminal(page: Page, id: string, expected = 'READY') {
 type Actor = { page: Page; context: BrowserContext; app: string; generation: string; original: string; edited?: string; edit?: string; publication?: any; downloadDigest?: string }
 
 test('D20-B T1–T4: two isolated users generate, reconnect, edit, publish, download and retain a usable version after real failure', async ({ browser }, info) => {
-  const actors: Actor[] = [], ids: Record<string, unknown> = { task: 'D20-B', test: info.title, retry: info.retry, actors: [] }
+  const actors: Actor[] = [], ids: Record<string, unknown> = { task: 'D20-B', test: info.title, retry: info.retry, actors: [], initialNavigations: [] }
   const contexts: BrowserContext[] = []
   let primaryError: unknown
   const persist = async () => {
@@ -59,7 +60,9 @@ test('D20-B T1–T4: two isolated users generate, reconnect, edit, publish, down
       })
       // Playwright's runner traces every browser.newContext, including both users.
       const page = await context.newPage()
-      await page.goto('/login')
+      const navigation = { user: index + 1, attempts: [] }
+      ;(ids.initialNavigations as unknown[]).push(navigation)
+      try { await openInitialLogin(page, navigation.attempts) } finally { await persist() }
       await page.getByLabel('邮箱').fill(email); await page.getByLabel('密码').fill('demo-password-for-test-only')
       await page.getByRole('button', { name: '登录', exact: true }).click(); await expect(page).toHaveURL(/\/apps$/)
       await expect(page.locator('.project-card')).toHaveCount(0)

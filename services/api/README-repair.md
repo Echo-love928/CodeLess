@@ -42,11 +42,12 @@ or a necessary patch; it does not encourage rereading already current source.
 | --- | --- |
 | Confirmed compiler diagnostic with nonzero exit, no OOM/timeout and confirmed cleanup | Request REPAIR if limits permit. |
 | Completed browser ACTION_FAILED/PAGE_EXCEPTION/CONSOLE_ERROR/BLANK_PAGE after successful build and confirmed cleanup | Request REPAIR; original actions cannot be weakened. |
+| ACTION_TIMEOUT of a locator wait (not a navigation) on a page with visible content or application errors, no blocked/failed request and complete diagnostics (D24-A) | Request REPAIR with `failedAction`; otherwise INFRASTRUCTURE as before. |
 | Same diagnostic fingerprint and same sourceDigest on next verification | FAILED / AGENT_REPAIR_NO_PROGRESS. |
 | Three completed repair rounds still fail | FAILED / AGENT_REPAIR_LIMIT_EXCEEDED. |
 | Docker, image, filesystem, worker/browser launch, network/resource error, timeout, cleanup or unknown failure | FAILED with original safe error; no model repair/retry. |
 | Model transport/auth/rate limit/invalid response/protocol failure | FAILED with original safe error; no model retry. |
-| Next request would exceed 12 model calls or 50,000 reserved/charged tokens | FAILED / AGENT_MODEL_BUDGET_EXCEEDED, before provider invocation. |
+| Next request would exceed 12 model calls, or its input reservation plus the 256-token minimum output exceeds the 50,000 remaining | FAILED / AGENT_MODEL_BUDGET_EXCEEDED, before provider invocation. In REPAIR after an actual digest-checked source change, the host instead submits the patch to verification (`repair.done` origin `HOST_BUDGET_EXHAUSTED`). |
 | Next operation would exceed 20 tool slots | FAILED / AGENT_TOOL_BUDGET_EXCEEDED, before file/runner operation. |
 | Authenticated cancellation | Existing FAILED / CANCELLED; late writes/commit are fenced. |
 | Existing 12-minute SQL deadline or lease expires | Existing queue recovers FAILED / INTERRUPTED; no late commit. |
@@ -59,8 +60,11 @@ count. Reservations persist under the task row lock in the shared private journa
 new service instances cannot reset them. The journal has 160 bounded checkpoints to
 hold all 12 calls/20 tools/three repairs with their audit records.
 
-Every model request reserves UTF-8 input bytes plus 512 framing tokens and 4096 max
-output tokens. Provider total usage, if present, is checked against known input+
+Every model request reserves UTF-8 input bytes plus 512 framing tokens and an output
+allowance: 4096 when the remaining cap allows it, otherwise what remains (at least 256),
+sent to the provider as max_tokens (D24-A). The caps are unchanged; a request that fits
+is no longer refused for 4096 output tokens it would not use, and unknown output is
+charged at that allowance. Provider total usage, if present, is checked against known input+
 output; otherwise missing parts retain the corresponding conservative reservation.
 `model.usage` stores original nullable counters, `chargedTokens`, `releasedTokens`,
 `estimated` and `meteringSource`. Unknown usage is never zero. Received usage survives
@@ -87,3 +91,92 @@ AGENT_REPAIR_ACCEPTANCE_CHANGED; AGENT_BUILD_EXIT remains the actual compiler co
 The final enabling integration PR must test real authenticated UI -> queue ->
 repair -> build/browser -> immutable version -> signed isolated preview. Backend
 fixtures alone do not constitute M1 real-model or UI integration acceptance.
+
+## D24-A additions
+
+- GENERATE observations of a successful create/update carry `committedContent`
+  (`COMMITTED_WRITE_DIGEST_MATCHED`) like REPAIR, so the model no longer spends a
+  request reading back its own write; the prompt no longer asks for that read.
+- A GENERATE done whose actions break the runner grammar, the three document routes,
+  route coverage, the 20-action limit, or a testId with `{{`/`${` (an unresolved template) gets one
+  `done.rejected` observation with a fixed reason; a second invalid done stops with
+  the original AGENT_ACCEPTANCE_INVALID/INCOMPLETE code.
+- REPAIR completes with `{"type":"done"}`; an included actions array must still equal
+  the original exactly. After a source change, a request that cannot fund a full 4096
+  output is completion-only. (Round 2 below: no request follows a source change.)
+- GENERATE input carries `componentIds` (kebab-case file names) for planned pages and
+  components (a name nobody else shares keeps its kebab-case file name; collisions try a
+  page-/component- prefix, then a stable digest of the full path, so every ID is unique);
+  the trusted build catalog still decides selectability.
+- A refused reply records a content-free `model.invalid` event (parser reason and
+  position, root shape, byte count and digest, or the provider check that refused it).
+
+## D24-A round 2 (B's batch 1ff42488: CAT-01, CAT-03, FAULT-CODE-02)
+
+- REPAIR starts from the failed candidate's own frozen bytes (`repairSources`, origin
+  `FROZEN_FAILED_CANDIDATE_DIGEST_MATCHED`); every file must hash to the digest its draft
+  recorded, otherwise AGENT_CHECKPOINT_INVALID. Files are seeded failure-first (planned files
+  the diagnostic names, the failing route's page, their relative imports, then the rest)
+  while the request still funds a full 4096 output; below that only the first one stays, and
+  only while the compacted write-only request can be funded. A content-free `repair.context`
+  event records seeded paths (digest, bytes) and omitted ones. Diagnostic text only orders
+  host-owned bytes; it grants no path. A genuine read of the same bytes supersedes a seed.
+- `files.read`/`files.list` are offered only while a read and a full-size write after it can
+  both be funded: at least 2 model calls and 5 tool slots left, and tokens left covering this
+  request, its 4096 output, the next request and the exact receipt of the largest readable
+  unseeded file plus 512. Otherwise only the write tools are offered; a reply naming a tool the
+  request did not offer stops with AGENT_TOOL_NOT_ALLOWED, and `repairProgress.next` never
+  points at a read the request does not offer.
+- The first digest-checked source change ends the proposal: the host appends `repair.done`
+  with the unchanged original actions (origin `HOST_COMMITTED_PATCH`) and runs the real
+  build/browser verification. No reply is solicited after a write. A `{"type":"done"}` before
+  any change is handled as before (origin `MODEL`). A fix spanning several files takes one
+  patch per repair attempt; the 3-attempt cap is unchanged.
+- Unchanged: 50,000 tokens, 12 model calls, 20 tool slots and 4096 output per task, strict
+  protocol checks (an unknown root type still stops with AGENT_MODEL_PROTOCOL_INVALID, a
+  `length` finish with MODEL_INVALID_RESPONSE), the original acceptance actions and every
+  recorded failure.
+- `RepairBudgetRegressionTest` replays the three task shapes with one fixed synthetic policy
+  through the production DeepSeek wire to a loopback server that cuts replies at max_tokens.
+  Usage is declared synthetic (0.3 token per UTF-8 byte, an estimate, never measured); no paid
+  model is called. The same class fails on the pre-fix tree f208767 with each paid task's
+  code and passes here; its two controls (json_object before any write, a patch above 4096)
+  fail identically on both trees.
+
+## D24-A round 3 (B's review of f35bea1)
+
+- No production change.
+- Prompt files are checked out as CRLF on Windows (`core.autocrlf=true`, no
+  `.gitattributes`) and as LF on CI. The input reservation counts UTF-8 bytes, so
+  every REPAIR read decision has 40 more tokens of margin on LF: 20 for the 20-line
+  REPAIR prompt, counted twice by the read rule. Where usage is declared per byte, the
+  shift is larger.
+- The two round-2 read-gate tests in `RepairLoopIntegrationTest` had pinned a margin
+  within that shift (−30 as CRLF, +10 as LF), so CI took a read that Windows refused.
+- They now pin the offers with an exact tool-slot count instead (`takeToolSlots`): five
+  slots left offer the read, four do not.
+
+## D24-A round 5 (batch dba59d9d)
+
+- A targeted failure's static `data-testid` or `data-ai-component` owner, reachable
+  from the failed route through relative imports, is seeded before the route page.
+  A component outside that import graph does not displace that page. Only planned, digest-matched frozen files
+  participate; component edit scope still limits the seed/read/write to its target.
+- Every targeted failure carries `failure.actionContext`: `targetCardinality=1`,
+  exact normalized inner-text comparison for `expectText`, and all preceding
+  navigation/reload/interaction actions in their original order. Observation-only
+  assertions are omitted from this trace. The full frozen action array stays with
+  the host. Compacting its duplicate no longer loses the state that made a
+  conditional target appear. An invalid/mismatched failed-action index gets no
+  invented trace.
+- REPAIR now states the same unique-target and exact-text rules as GENERATE.
+  A shared component ID does not make a shared test ID a unique browser target.
+- Strict parsing and no retries are unchanged. TASK-03's redacted lexical shape
+  still fails with `MODEL_INVALID_RESPONSE / SYNTAX` at column 423; accepting that
+  provider output would violate the protocol. Its real-model failure is retained,
+  not reported as repaired by these context changes.
+- `RoundFiveContextTest` and `RoundFiveRegressionTest` run unchanged on d2b20a7 and
+  the fix. Their synthetic policy is explicitly conditional on supplied semantics,
+  prerequisite steps and first seeded owner. Real file tools, component editing,
+  builds and browser checks validate the proposed result. This is mechanism
+  coverage, not evidence of real-model quality; see the repair test README.

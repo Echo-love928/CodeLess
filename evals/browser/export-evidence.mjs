@@ -1,0 +1,71 @@
+import { readdir, mkdir, readFile, writeFile, copyFile } from 'node:fs/promises'
+import { resolve, join, basename, isAbsolute, win32 } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { sha, readJSON } from './core.mjs'
+const root = fileURLToPath(new URL('../../', import.meta.url))
+const destination = join(root, 'evals/browser/evidence')
+await mkdir(destination, { recursive: true })
+const strip = value => typeof value === 'string' ? value.replaceAll(root, '<repo>').replaceAll(root.replaceAll('\\', '/'), '<repo>') : value
+const argument = value => {
+  const cleaned = strip(value)
+  return cleaned === value && (isAbsolute(value) || win32.isAbsolute(value))
+    ? '<external-input>/' + value.split(/[\\/]/).at(-1) : cleaned
+}
+const browser = value => value ? { status: value.status, failure: value.failure, error: strip(value.error ?? null),
+  readiness: value.readiness ?? null,
+  pageErrors: value.pageErrors, consoleErrors: value.consoleErrors, blockedRequests: value.blockedRequests, failedRequests: value.failedRequests,
+  screenshot: value.screenshot, trace: value.trace } : null
+const build = value => value ? { status: value.status, exitCode: value.exitCode, failure: value.failure,
+  imageId: value.imageId, artifactDigest: value.artifact?.digest ?? null, cleanup: value.cleanup } : null
+const args = process.argv.slice(2)
+let label = ''
+if (args[0] === '--label') {
+  args.shift(); label = args.shift()
+  if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(label ?? '')) throw new Error('Invalid evidence label')
+}
+for (const path of args) {
+  const full = resolve(path), report = await readJSON(full), directory = resolve(full, '..')
+  const name = (report.mode === 'MOCK' ? 'fixture' : 'real-batch') + (label ? '-' + label : '')
+  const rows = report.rows.map(row => ({ sampleId: row.sampleId, mode: row.mode, taskId: row.taskId ?? null,
+    versionId: row.versionId ?? null, sourceDigest: row.sourceDigest, rawDigest: row.rawDigest ?? null,
+    platform: row.platform ?? 'FIXTURE', platformFailureCode: row.platformFailureCode ?? null,
+    originalVerification: row.originalVerification ?? null, build: build(row.build), browser: browser(row.browser), passed: row.passed, failure: row.failure }))
+  const edits = report.edits.map(row => ({ sampleId: row.sampleId, mode: row.mode, passed: row.passed,
+    status: row.status ?? (row.passed ? 'PASSED' : 'FAILED'), failure: row.failure,
+    blockedBy: row.blockedBy ?? null, mappingReason: row.mappingReason ?? null, baseFailureCode: row.baseFailureCode ?? null,
+    selection: row.selection ?? null, componentId: row.componentId ?? null, targetFile: row.targetFile ?? null,
+    baselineAlreadyMatches: row.baselineAlreadyMatches ?? null, baseline: row.baseline ?? null,
+    taskId: row.taskId ?? null, beforeVersionId: row.beforeVersionId ?? null, afterVersionId: row.afterVersionId ?? null,
+    rawDigest: row.rawDigest ?? null, usage: row.usage ?? null, platformFailureCode: row.platformFailureCode ?? null,
+    mapping: row.mapping ?? null, scope: row.scope ?? null, beforeDigest: row.beforeDigest ?? null, afterDigest: row.afterDigest ?? null,
+    build: build(row.build), baselineBrowser: browser(row.baselineBrowser), browser: browser(row.browser) }))
+  const exported = { schemaVersion: 1, originalReportDigest: sha(await readFile(full)), runId: basename(directory),
+    revision: report.revision, changes: report.changes, startedAt: report.startedAt, completedAt: report.completedAt,
+    status: report.status, mode: report.mode, statistics: report.statistics, batchId: report.batchId ?? null,
+    batchDigest: report.batchDigest ?? null, runnerImage: report.runnerImage, fixtureBuild: build(report.fixtureBuild),
+    additionalModelRequests: report.additionalModelRequests, additionalRuntimeTokens: report.additionalRuntimeTokens,
+    rows, edits, controls: report.controls.map(control => ({ ...control, browser: browser(control.browser) })),
+    requirements: { denominator: 9, real: report.requirements.real, mock: report.requirements.mock, unknown: report.requirements.unknown },
+    editSummary: { denominator: 6, real: report.editSummary.real, mock: report.editSummary.mock, unknown: report.editSummary.unknown }, targets: report.targets }
+  const shots = report.mode === 'MOCK'
+    ? ['SHOW-03/page.png', 'TASK-01/page.png', 'CAT-03/page.png', 'EDIT-05/before/page.png', 'EDIT-05/after/page.png', 'controls/white-screen/page.png', 'controls/lost-persistence/page.png']
+    : [...report.rows.filter(row => /^(?:SHOW|TASK|CAT)-0[1-3]$/.test(row.sampleId) && row.browser?.screenshot?.path === 'page.png')
+      .map(row => row.sampleId + '/page.png'),
+    ...report.edits.filter(row => /^EDIT-0[1-6]$/.test(row.sampleId)).flatMap(row =>
+      [['before', row.baselineBrowser], ['after', row.browser]].filter(([, result]) => result?.screenshot?.path === 'page.png')
+        .map(([phase]) => row.sampleId + '/' + phase + '/page.png'))]
+  exported.publicScreenshots = shots.map(path => name + '-' + path.replaceAll('/', '-'))
+  await writeFile(join(destination, name + '.json'), JSON.stringify(exported, null, 2) + '\n')
+  for (const path of shots) await copyFile(join(directory, path), join(destination, name + '-' + path.replaceAll('/', '-')))
+}
+const commandRoot = join(root, '.local-data/d21-b/commands'), commands = []
+try {
+  for (const directory of await readdir(commandRoot)) {
+    const record = await readJSON(join(commandRoot, directory, 'command.json'))
+    commands.push({ ...record, command: record.command.map((value, index) => index === 0 ? value.split(/[\\/]/).at(-1) : argument(value)), output: '.local-data/d21-b/commands/' + directory })
+  }
+} catch (error) { if (error.code !== 'ENOENT') throw error }
+await writeFile(join(destination, 'commands.json'), JSON.stringify(commands, null, 2) + '\n')
+const digests = {}
+for (const name of await readdir(destination)) if (name !== 'digests.json') digests[name] = sha(await readFile(join(destination, name)))
+await writeFile(join(destination, 'digests.json'), JSON.stringify(digests, null, 2) + '\n')

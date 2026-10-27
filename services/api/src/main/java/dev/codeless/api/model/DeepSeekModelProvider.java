@@ -68,7 +68,7 @@ public final class DeepSeekModelProvider implements ModelProvider {
                 || timeout.toMillis() < 1 || timeout.compareTo(Duration.ofSeconds(120)) > 0)
             throw new ModelFailure("MODEL_INVALID_INPUT");
         String body=requestBody(prompt,maxOutputTokens);
-        var received = new AtomicReference<>(new ResponseHead(null, Evidence.unknown()));
+        var received = new AtomicReference<>(new ResponseHead(null, Evidence.unknown(), 0));
         CompletableFuture<HttpResponse<byte[]>> pending;
         try {
             HttpRequest request = HttpRequest.newBuilder(endpoint).timeout(timeout)
@@ -76,7 +76,7 @@ public final class DeepSeekModelProvider implements ModelProvider {
                     .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8)).build();
             pending = client.sendAsync(request, info -> {
                 String requestId = info.headers().firstValue("x-request-id").filter(DeepSeekModelProvider::safeId).orElse(null);
-                var head = new ResponseHead(httpError(info.statusCode()), new Evidence(null, requestId, null, Usage.unknown()));
+                var head = new ResponseHead(httpError(info.statusCode()), new Evidence(null, requestId, null, Usage.unknown()), info.statusCode());
                 received.set(head);
                 return new BoundedBody(head.errorCode() == null ? null : head.failure(head.errorCode()));
             });
@@ -105,16 +105,21 @@ public final class DeepSeekModelProvider implements ModelProvider {
             evidence = new Evidence(actualModel, requestId == null ? responseId : requestId, responseId, Usage.unknown());
             evidence = new Evidence(actualModel, evidence.requestId(), responseId, Usage.from(root.get("usage")));
             JsonNode choices = root.get("choices");
-            if (choices == null || !choices.isArray() || choices.size() != 1
-                    || !"stop".equals(choices.get(0).path("finish_reason").asText())
-                    || choices.get(0).path("message").has("tool_calls"))
-                throw new ModelFailure("MODEL_INVALID_RESPONSE", evidence);
+            // The code stays MODEL_INVALID_RESPONSE; the fixed detail word only says which check refused it.
+            if (choices == null || !choices.isArray() || choices.size() != 1)
+                throw new ModelFailure("MODEL_INVALID_RESPONSE", evidence, "CHOICES_INVALID");
+            String finish = choices.get(0).path("finish_reason").asText();
+            if (!"stop".equals(finish))
+                throw new ModelFailure("MODEL_INVALID_RESPONSE", evidence,
+                        finish.matches("[a-z_]{1,40}") ? "FINISH_REASON_" + finish.toUpperCase(java.util.Locale.ROOT) : "FINISH_REASON_OTHER");
+            if (choices.get(0).path("message").has("tool_calls"))
+                throw new ModelFailure("MODEL_INVALID_RESPONSE", evidence, "TOOL_CALLS_PRESENT");
             JsonNode content = choices.get(0).path("message").get("content");
             if (content == null || !content.isString() || content.asText().isBlank())
-                throw new ModelFailure("MODEL_INVALID_RESPONSE", evidence);
+                throw new ModelFailure("MODEL_INVALID_RESPONSE", evidence, "CONTENT_EMPTY");
             return new Reply(content.asText(), evidence);
-        } catch (ModelFailure failure) { throw new ModelFailure(failure.code(), evidence); }
-        catch (RuntimeException exception) { throw new ModelFailure("MODEL_INVALID_RESPONSE", evidence); }
+        } catch (ModelFailure failure) { throw new ModelFailure(failure.code(), evidence, failure.detail()); }
+        catch (RuntimeException exception) { throw new ModelFailure("MODEL_INVALID_RESPONSE", evidence, "BODY_INVALID"); }
     }
 
     private static String httpError(int status) {
@@ -125,9 +130,10 @@ public final class DeepSeekModelProvider implements ModelProvider {
             default -> status >= 500 ? "MODEL_UNAVAILABLE" : "MODEL_HTTP_ERROR";
         };
     }
-    private record ResponseHead(String errorCode, Evidence evidence) {
+    private record ResponseHead(String errorCode, Evidence evidence, int status) {
         ModelFailure failure(String transportCode) {
-            return new ModelFailure(errorCode == null ? transportCode : errorCode, evidence);
+            return new ModelFailure(errorCode == null ? transportCode : errorCode, evidence,
+                    errorCode != null && status > 0 ? "HTTP_STATUS_" + status : null);
         }
     }
 

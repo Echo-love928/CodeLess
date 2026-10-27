@@ -1,0 +1,334 @@
+{
+  "card": "D24-A round 2",
+  "date": "2026-10-26",
+  "reviewedBatch": "2026-10-26T00-56-31Z-real-1ff42488 (B; CAT-01, CAT-03, FAULT-CODE-02)",
+  "testClass": {
+    "path": "services/api/src/test/java/dev/codeless/api/agent/RepairBudgetRegressionTest.java",
+    "sha256": "602023c7c938715ddbb01e77e7ae9d86c1673665890a9c7fe1b508d8eabc5c54"
+  },
+  "wireFixture": {
+    "path": "services/api/src/test/java/dev/codeless/api/model/MaxTokensWireFixture.java",
+    "sha256": "231237d745878ddeec93f1a11e2b301bff89917990bba8cbf88ad747cc83ea40"
+  },
+  "trees": {
+    "preFix": "f208767 with only the two files above added (byte-identical)",
+    "fixed": "the commit adding this manifest"
+  },
+  "hashes": "sha256 of the committed bytes (LF line endings, no BOM), i.e. git show <commit>:<path> | sha256sum. A core.autocrlf=true checkout rewrites the two .java files to CRLF, which hashes differently. The scenario JSON files contain no line breaks.",
+  "command": "CODELESS_MODEL_PROVIDER=deterministic-mock CODELESS_REGRESSION_TREE=<label> CODELESS_REPAIR_EVIDENCE_DIR=<dir> services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RepairBudgetRegressionTest test",
+  "surefire": {
+    "preFix": "5 run, 3 failures (CAT-01, CAT-03, FAULT-CODE-02), both controls passed",
+    "fixed": "5 run, 0 failures"
+  },
+  "usage": "SYNTHETIC_DECLARED_0_3_TOKEN_PER_UTF8_BYTE_ESTIMATE_NOT_MEASURED",
+  "paidModelCalls": 0,
+  "modelQualityEvidence": false,
+  "caps": {
+    "tokens": 50000,
+    "models": 12,
+    "tools": 20,
+    "outputTokens": 4096
+  },
+  "preFix": [
+    {
+      "scenario": "CAT-01",
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_BUDGET_EXCEEDED",
+      "repairRequests": 3,
+      "repairReplies": [
+        "files.read",
+        "files.read",
+        "files.read"
+      ],
+      "repairMaxTokens": [
+        4096,
+        4096,
+        2615
+      ],
+      "lastRequest": {
+        "maxTokens": 2615,
+        "completionTokens": 23,
+        "finishReason": "stop"
+      },
+      "invalid": [],
+      "repairDoneOrigins": [],
+      "seeded": [],
+      "models": 9,
+      "tools": 10,
+      "chargedTokens": 38292,
+      "file": "pre-fix-f208767/D24-A-r2-CAT-01.json",
+      "sha256": "4e51cc073ae7794c8c5b77d37f5de113756bd62b17183a2878373da910e9aed5"
+    },
+    {
+      "scenario": "CAT-03",
+      "status": "FAILED",
+      "failureCode": "MODEL_INVALID_RESPONSE",
+      "repairRequests": 3,
+      "repairReplies": [
+        "files.read",
+        "files.read",
+        "files.update"
+      ],
+      "repairMaxTokens": [
+        4096,
+        4096,
+        1104
+      ],
+      "lastRequest": {
+        "maxTokens": 1104,
+        "completionTokens": 1104,
+        "finishReason": "length"
+      },
+      "invalid": [
+        "FINISH_REASON_LENGTH"
+      ],
+      "repairDoneOrigins": [],
+      "seeded": [],
+      "models": 9,
+      "tools": 9,
+      "chargedTokens": 42936,
+      "file": "pre-fix-f208767/D24-A-r2-CAT-03.json",
+      "sha256": "c34984c3d4a96155e94393e527d4c2bc6d8cf163e58c079af25ede4d15002a6a"
+    },
+    {
+      "scenario": "FAULT-CODE-02",
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_PROTOCOL_INVALID",
+      "repairRequests": 3,
+      "repairReplies": [
+        "files.read",
+        "files.update",
+        "json_object"
+      ],
+      "repairMaxTokens": [
+        4096,
+        4096,
+        4096
+      ],
+      "lastRequest": {
+        "maxTokens": 4096,
+        "completionTokens": 7,
+        "finishReason": "stop"
+      },
+      "invalid": [],
+      "repairDoneOrigins": [],
+      "seeded": [],
+      "models": 9,
+      "tools": 9,
+      "chargedTokens": 26558,
+      "file": "pre-fix-f208767/D24-A-r2-FAULT-CODE-02.json",
+      "sha256": "494425a6eeec07c4bc6635b9b12c9027c6d93e5d9a3bdd3c66f5e6cc4158f5e5"
+    },
+    {
+      "scenario": "control-json-object-before-write",
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_PROTOCOL_INVALID",
+      "repairRequests": 1,
+      "repairReplies": [
+        "json_object"
+      ],
+      "repairMaxTokens": [
+        4096
+      ],
+      "lastRequest": {
+        "maxTokens": 4096,
+        "completionTokens": 7,
+        "finishReason": "stop"
+      },
+      "invalid": [],
+      "repairDoneOrigins": [],
+      "seeded": [],
+      "models": 7,
+      "tools": 7,
+      "chargedTokens": 21465,
+      "file": "pre-fix-f208767/D24-A-r2-control-json-object-before-write.json",
+      "sha256": "0745a666ecb76115a0bf766a9ea137529fbfe2ff6005120b57e28c342ac0157f"
+    },
+    {
+      "scenario": "control-patch-over-output-cap",
+      "status": "FAILED",
+      "failureCode": "MODEL_INVALID_RESPONSE",
+      "repairRequests": 2,
+      "repairReplies": [
+        "files.read",
+        "files.update"
+      ],
+      "repairMaxTokens": [
+        4096,
+        4096
+      ],
+      "lastRequest": {
+        "maxTokens": 4096,
+        "completionTokens": 4096,
+        "finishReason": "length"
+      },
+      "invalid": [
+        "FINISH_REASON_LENGTH"
+      ],
+      "repairDoneOrigins": [],
+      "seeded": [],
+      "models": 8,
+      "tools": 8,
+      "chargedTokens": 27974,
+      "file": "pre-fix-f208767/D24-A-r2-control-patch-over-output-cap.json",
+      "sha256": "de23e37a427685742bf2a8f4e2ff36bc9085f4a718a05bd3e7edede6ca6070bf"
+    }
+  ],
+  "fixed": [
+    {
+      "scenario": "CAT-01",
+      "status": "READY",
+      "failureCode": null,
+      "repairRequests": 1,
+      "repairReplies": [
+        "files.update"
+      ],
+      "repairMaxTokens": [
+        4096
+      ],
+      "lastRequest": {
+        "maxTokens": 4096,
+        "completionTokens": 1361,
+        "finishReason": "stop"
+      },
+      "invalid": [],
+      "repairDoneOrigins": [
+        "HOST_COMMITTED_PATCH"
+      ],
+      "seeded": [
+        "src/pages/HomePage.vue",
+        "src/data/profile.ts"
+      ],
+      "models": 7,
+      "tools": 11,
+      "chargedTokens": 34121,
+      "file": "fixed/D24-A-r2-CAT-01.json",
+      "sha256": "1893da77382dd59ebd474ca1a8483077ce1afdac96dda465aa215c6da490b569"
+    },
+    {
+      "scenario": "CAT-03",
+      "status": "READY",
+      "failureCode": null,
+      "repairRequests": 1,
+      "repairReplies": [
+        "files.update"
+      ],
+      "repairMaxTokens": [
+        4096
+      ],
+      "lastRequest": {
+        "maxTokens": 4096,
+        "completionTokens": 1361,
+        "finishReason": "stop"
+      },
+      "invalid": [],
+      "repairDoneOrigins": [
+        "HOST_COMMITTED_PATCH"
+      ],
+      "seeded": [
+        "src/pages/HomePage.vue",
+        "src/data/profile.ts",
+        "src/data/works.ts"
+      ],
+      "models": 7,
+      "tools": 11,
+      "chargedTokens": 38361,
+      "file": "fixed/D24-A-r2-CAT-03.json",
+      "sha256": "29fde0d6bed3d4ab323d10589ef286f49201e878b0c55acf606fa9ffe0fce306"
+    },
+    {
+      "scenario": "FAULT-CODE-02",
+      "status": "READY",
+      "failureCode": null,
+      "repairRequests": 1,
+      "repairReplies": [
+        "files.update"
+      ],
+      "repairMaxTokens": [
+        4096
+      ],
+      "lastRequest": {
+        "maxTokens": 4096,
+        "completionTokens": 150,
+        "finishReason": "stop"
+      },
+      "invalid": [],
+      "repairDoneOrigins": [
+        "HOST_COMMITTED_PATCH"
+      ],
+      "seeded": [
+        "src/pages/HomePage.vue",
+        "src/data/profile.ts",
+        "src/data/works.ts",
+        "src/components/ProfileCard.vue"
+      ],
+      "models": 7,
+      "tools": 11,
+      "chargedTokens": 21922,
+      "file": "fixed/D24-A-r2-FAULT-CODE-02.json",
+      "sha256": "197bad924d467187df519b4a65baf9df9927d807125544818131fcb9bc7c73aa"
+    },
+    {
+      "scenario": "control-json-object-before-write",
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_PROTOCOL_INVALID",
+      "repairRequests": 1,
+      "repairReplies": [
+        "json_object"
+      ],
+      "repairMaxTokens": [
+        4096
+      ],
+      "lastRequest": {
+        "maxTokens": 4096,
+        "completionTokens": 7,
+        "finishReason": "stop"
+      },
+      "invalid": [],
+      "repairDoneOrigins": [],
+      "seeded": [
+        "src/pages/HomePage.vue",
+        "src/data/profile.ts",
+        "src/data/works.ts",
+        "src/components/ProfileCard.vue"
+      ],
+      "models": 7,
+      "tools": 7,
+      "chargedTokens": 21779,
+      "file": "fixed/D24-A-r2-control-json-object-before-write.json",
+      "sha256": "fc3af96ae5c70f0d8122be82f2e1fee6249aba0cf5e3eb69c4aa3890f5a127fe"
+    },
+    {
+      "scenario": "control-patch-over-output-cap",
+      "status": "FAILED",
+      "failureCode": "MODEL_INVALID_RESPONSE",
+      "repairRequests": 1,
+      "repairReplies": [
+        "files.update"
+      ],
+      "repairMaxTokens": [
+        4096
+      ],
+      "lastRequest": {
+        "maxTokens": 4096,
+        "completionTokens": 4096,
+        "finishReason": "length"
+      },
+      "invalid": [
+        "FINISH_REASON_LENGTH"
+      ],
+      "repairDoneOrigins": [],
+      "seeded": [
+        "src/pages/HomePage.vue",
+        "src/data/profile.ts",
+        "src/data/works.ts",
+        "src/components/ProfileCard.vue"
+      ],
+      "models": 7,
+      "tools": 7,
+      "chargedTokens": 25868,
+      "file": "fixed/D24-A-r2-control-patch-over-output-cap.json",
+      "sha256": "4a81d3da245463a0688a71504b4fb96aef07b6c433eeb6f37511060c79b536d3"
+    }
+  ]
+}

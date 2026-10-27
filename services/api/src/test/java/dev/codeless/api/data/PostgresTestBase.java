@@ -12,7 +12,7 @@ import org.testcontainers.utility.DockerImageName;
 @SpringBootTest
 @ActiveProfiles("test")
 public abstract class PostgresTestBase {
-    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse(
+    protected static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse(
             "postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94")
             .asCompatibleSubstituteFor("postgres"))
             .withDatabaseName("codeless_test")

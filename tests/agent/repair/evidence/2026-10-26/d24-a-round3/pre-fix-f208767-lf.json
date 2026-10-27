@@ -1,0 +1,23 @@
+{
+  "card": "D24-A round 3",
+  "date": "2026-10-26",
+  "purpose": "The round-2 pre-fix regression evidence was measured on a Windows (CRLF) checkout; CI checks out LF. This reruns the same class on the same pre-fix tree with LF resources.",
+  "tree": "f208767 with only RepairBudgetRegressionTest.java and MaxTokensWireFixture.java added, byte-identical to round 2 (sha256 602023c7c938715ddbb01e77e7ae9d86c1673665890a9c7fe1b508d8eabc5c54 and 231237d745878ddeec93f1a11e2b301bff89917990bba8cbf88ad747cc83ea40 of the LF bytes)",
+  "method": "The text resources the API build copies were converted to LF and restored from git afterwards (the same file list as read-gate-margins.json). That tree has a 21-line REPAIR prompt, so each REPAIR input reservation is 21 tokens smaller on LF; the declared usage is per byte and moves too.",
+  "command": "CODELESS_MODEL_PROVIDER=deterministic-mock CODELESS_REGRESSION_TREE=pre-fix-f208767-lf CODELESS_REPAIR_EVIDENCE_DIR=<dir> services/api/mvnw.cmd -f services/api/pom.xml -Dtest=RepairBudgetRegressionTest test",
+  "surefire": {
+    "crlfRound2": "5 run, 3 failures (CAT-01, CAT-03, FAULT-CODE-02), both controls passed",
+    "lfRound3": "5 run, 3 failures (CAT-01, CAT-03, FAULT-CODE-02), both controls passed"
+  },
+  "pairs": "every array below is [CRLF round 2, LF round 3]; CRLF files: ../d24-a-round2/pre-fix-f208767/",
+  "usage": "SYNTHETIC_DECLARED_0_3_TOKEN_PER_UTF8_BYTE_ESTIMATE_NOT_MEASURED",
+  "scenarios": [
+    {"scenario":"CAT-01","status":["FAILED","FAILED"],"failureCode":["AGENT_MODEL_BUDGET_EXCEEDED","AGENT_MODEL_BUDGET_EXCEEDED"],"repairReplies":[["files.read","files.read","files.read"],["files.read","files.read","files.read"]],"repairMaxTokens":[[4096,4096,2615],[4096,4096,2650]],"repairInputReservation":[[7347,12024,13023],[7326,12003,13002]],"lastRequest":[{"maxTokens":2615,"completionTokens":23,"finishReason":"stop"},{"maxTokens":2650,"completionTokens":23,"finishReason":"stop"}],"chargedTokens":[38292,38272],"models":[9,9],"tools":[10,10]},
+    {"scenario":"CAT-03","status":["FAILED","FAILED"],"failureCode":["MODEL_INVALID_RESPONSE","MODEL_INVALID_RESPONSE"],"repairReplies":[["files.read","files.read","files.update"],["files.read","files.read","files.update"]],"repairMaxTokens":[[4096,4096,1104],[4096,4096,1137]],"repairInputReservation":[[7343,9830,10092],[7322,9809,10071]],"lastRequest":[{"maxTokens":1104,"completionTokens":1104,"finishReason":"length"},{"maxTokens":1137,"completionTokens":1137,"finishReason":"length"}],"chargedTokens":[42936,42951],"models":[9,9],"tools":[9,9]},
+    {"scenario":"FAULT-CODE-02","status":["FAILED","FAILED"],"failureCode":["AGENT_MODEL_PROTOCOL_INVALID","AGENT_MODEL_PROTOCOL_INVALID"],"repairReplies":[["files.read","files.update","json_object"],["files.read","files.update","json_object"]],"repairMaxTokens":[[4096,4096,4096],[4096,4096,4096]],"repairInputReservation":[[7342,7983,8407],[7321,7962,8386]],"lastRequest":[{"maxTokens":4096,"completionTokens":7,"finishReason":"stop"},{"maxTokens":4096,"completionTokens":7,"finishReason":"stop"}],"chargedTokens":[26558,26507],"models":[9,9],"tools":[9,9]},
+    {"scenario":"control-json-object-before-write","status":["FAILED","FAILED"],"failureCode":["AGENT_MODEL_PROTOCOL_INVALID","AGENT_MODEL_PROTOCOL_INVALID"],"repairReplies":[["json_object"],["json_object"]],"repairMaxTokens":[[4096],[4096]],"repairInputReservation":[[7342],[7321]],"lastRequest":[{"maxTokens":4096,"completionTokens":7,"finishReason":"stop"},{"maxTokens":4096,"completionTokens":7,"finishReason":"stop"}],"chargedTokens":[21465,21427],"models":[7,7],"tools":[7,7]},
+    {"scenario":"control-patch-over-output-cap","status":["FAILED","FAILED"],"failureCode":["MODEL_INVALID_RESPONSE","MODEL_INVALID_RESPONSE"],"repairReplies":[["files.read","files.update"],["files.read","files.update"]],"repairMaxTokens":[[4096,4096],[4096,4096]],"repairInputReservation":[[7342,7983],[7321,7962]],"lastRequest":[{"maxTokens":4096,"completionTokens":4096,"finishReason":"length"},{"maxTokens":4096,"completionTokens":4096,"finishReason":"length"}],"chargedTokens":[27974,27930],"models":[8,8],"tools":[8,8]}
+  ],
+  "paidModelCalls": 0,
+  "modelQualityEvidence": false
+}
