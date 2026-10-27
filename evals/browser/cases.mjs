@@ -49,20 +49,60 @@ export async function behavior(page, id, expect) {
     const signup = await button('我要报名').boundingBox(), message = await text('报名意向已记录（演示）').boundingBox()
     expect(message.y).toBeGreaterThanOrEqual(signup.y + signup.height)
   } else if (id === 'SHOW-03') {
-    const section = page.locator('section').filter({ has: page.getByRole('heading', { name: namePattern('关于我') }) }).last()
-    await expect(section).toBeVisible()
-    await button('作品集').click()
-    await expect(section).not.toBeVisible()
+    // Identify the default state by selecting About, not by requiring a heading or p tag.
+    // Compare the full visible content so a fixed banner cannot become the selected panel.
+    const body = await page.locator('main').count() ? page.locator('main').first() : page.locator('body')
     const cards = page.locator('article, li, [role="listitem"]').filter({ has: page.getByRole('heading') })
+    const contact = page.getByText(/(?:^|[^A-Za-z0-9._%+-])linxia@example\.com(?:$|[^A-Za-z0-9.-])/u)
+    const normalized = value => value.replace(/\s+/gu, ' ').trim()
+    const visibleCardSignatures = async () => Promise.all((await cards.filter({ visible: true }).all()).map(async card =>
+      JSON.stringify([await card.getByRole('heading').allTextContents(), await card.locator('p').allTextContents()].map(values => values.map(normalized)))))
+    const initialCards = await visibleCardSignatures()
+    const aboutText = await body.innerText()
+    await button('关于我').click(); await expect(body).toHaveText(aboutText, { useInnerText: true })
+    const namedAbout = page.locator('section, [role="tabpanel"]').filter({ has: page.getByRole('heading', { name: namePattern('关于我') }) }).last()
+    const hasNamedAbout = await namedAbout.count() > 0
+    let aboutPanel = namedAbout
+    if (!hasNamedAbout) {
+      const labelled = page.getByRole('tabpanel', { name: namePattern('关于我') }).or(page.getByRole('region', { name: namePattern('关于我') }))
+      if (await labelled.count() === 1) aboutPanel = labelled
+      else {
+        const nav = page.getByRole('button', { name: new RegExp(['关于我', '作品集', '联系方式'].map(name => namePattern(name).source).join('|'), 'u') })
+        let candidates = page.locator('section, [role="tabpanel"]').filter({ visible: true }).filter({ hasNot: nav })
+        if (!await candidates.count()) candidates = page.locator('main > div').filter({ visible: true }).filter({ hasNot: nav })
+        await expect(candidates).toHaveCount(1)
+        aboutPanel = candidates.first()
+      }
+    }
+    const aboutPanelText = normalized(await aboutPanel.innerText())
+    expect(aboutPanelText).toMatch(/\S/)
+    const aboutAbsent = async () => {
+      if (hasNamedAbout) await expect(namedAbout).not.toBeVisible()
+      else await expect.poll(async () => !await aboutPanel.isVisible() || !normalized(await aboutPanel.innerText()).includes(aboutPanelText)).toBe(true)
+    }
+    await button('作品集').click()
+    await expect(body).not.toHaveText(aboutText, { useInnerText: true })
+    await aboutAbsent()
     await expect(cards).toHaveCount(4)
     for (const card of await cards.all()) {
+      await expect(card).toBeVisible()
       await expect(card.getByRole('heading')).toContainText(/\S/)
       await expect(card.locator('p')).toContainText(/\S/)
     }
+    // An About article is not a work. Freeze the actual gallery's title/location
+    // signatures before checking exclusivity in the other navigation states.
+    const gallery = new Set(await visibleCardSignatures())
+    expect(initialCards.some(signature => gallery.has(signature))).toBe(false)
+    const galleryAbsent = async () => expect((await visibleCardSignatures()).some(signature => gallery.has(signature))).toBe(false)
     expect(await page.locator('img[src^="http"]').count()).toBe(0)
     await button('联系方式').click()
-    await expect(page.getByText(/(?:^|[^A-Za-z0-9._%+-])linxia@example\.com(?:$|[^A-Za-z0-9.-])/u)).toBeVisible()
-    await button('关于我').click(); await expect(section).toBeVisible()
+    await expect(contact).toBeVisible()
+    await galleryAbsent(); await aboutAbsent()
+    // Contact must be distinct from the default About state; a no-op About button cannot pass.
+    await expect(body).not.toHaveText(aboutText, { useInnerText: true })
+    await button('关于我').click(); await expect(body).toHaveText(aboutText, { useInnerText: true })
+    await galleryAbsent(); await expect(aboutPanel).toBeVisible()
+    await expect(aboutPanel).toHaveText(aboutPanelText, { useInnerText: true })
   } else if (id === 'TASK-01') {
     const pending = page.getByText(/未完成\s*[：:]\s*\d+/).first()
     const count = Number((await pending.innerText()).match(/\d+/)[0])
@@ -74,9 +114,10 @@ export async function behavior(page, id, expect) {
     await remove(other); await reload(); await expect(row(other)).toHaveCount(0); await remove(title)
   } else if (id === 'TASK-02') {
     const columns = new Map(), names = ['待开始', '进行中', '已完成']
-    const columnHeading = new RegExp(names.map(name => namePattern(name).source).join('|'), 'u')
+    const statusName = name => new RegExp(namePattern(name).source.replace(/\$$/, '') + '(?:[（(]\\s*\\d+\\s*[)）]\\s*)?$', 'u')
+    const columnHeading = new RegExp(names.map(name => statusName(name).source).join('|'), 'u')
     for (const name of names) {
-      let candidate = page.getByRole('heading', { name: namePattern(name) }).locator('..')
+      let candidate = page.getByRole('heading', { name: statusName(name) }).locator('..')
       // Use the complete single-column ancestor, regardless of div/section or a nested flex header.
       // Stop before the board ancestor that contains multiple status headings.
       for (let depth = 0; depth < 32; depth++) {
@@ -127,9 +168,12 @@ export async function behavior(page, id, expect) {
   } else if (/^CAT-/.test(id)) {
     // These semantic selectors are fixed before a run, never generated by the model.
     // A card may be a button or an article inside a list item. Count the innermost card once.
-    const cardCandidates = page.locator('article, li, [role="listitem"], button:has(h1,h2,h3,h4,h5,h6):not(article button, li button, [role="listitem"] button)')
+    const cardCandidates = page.locator('article, li, [role="listitem"]')
       .filter({ has: page.locator('h1,h2,h3,h4,h5,h6,button') })
-    const cards = cardCandidates.filter({ hasNot: cardCandidates })
+    // Keep the ancestor exclusion outside the relative hasNot query: scoping it inside
+    // a list item would make that item's own heading button appear to be another card.
+    const cards = cardCandidates.filter({ hasNot: cardCandidates }).or(page.locator(
+      'button:has(h1,h2,h3,h4,h5,h6):not(article button, li button, [role="listitem"] button)'))
     const size = { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
     await expect(cards).toHaveCount(size)
     // Labels are presentation: compare the field values even when cards/details label them differently.
@@ -147,7 +191,7 @@ export async function behavior(page, id, expect) {
     for (const card of await cards.all()) {
       const name = await cardName(card)
       let rawFields = await card.locator('p, dd').allTextContents()
-      if (id === 'CAT-03') rawFields = rawFields.flatMap(value => value.split(/\s+[·•|]\s+/u))
+      if (id === 'CAT-03') rawFields = rawFields.flatMap(value => value.split(/\s+[·•|｜]\s+/u))
       // The requirement permits compact title/author lists with the remaining fields in details.
       // Read the real UI, then prove search/category behaviour against this initial inventory.
       if (id === 'CAT-01' && rawFields.length < 3) {

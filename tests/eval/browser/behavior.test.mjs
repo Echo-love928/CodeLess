@@ -24,7 +24,7 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
   detailAuthor = true, nameOnly = true, nameControl = 'heading', categoryLabel = null, descriptionLabel = '简介', detailLayout = 'text',
   itemTag = 'article', sparse = false, namedDetail = false, cardLabelSeparator = '：', detailRating = '4.5', allLabel = '全部', brokenReset = false,
   combinedFields = false, inlineDetail = false, categorySelect = false, detailLicense = 'MIT', missingDescription = false, nameOverlap = false,
-  wrapperTag = null, countOverride = null, detailDescription = true } = {}) {
+  wrapperTag = null, countOverride = null, detailDescription = true, fieldSeparator = ' · ' } = {}) {
   const count = countOverride ?? { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
   const categories = id === 'CAT-01' ? ['小说', '科技', '历史'] : id === 'CAT-02' ? ['西湖区', '上城区', '拱墅区'] : ['构建', '测试', '文档']
   return `<!doctype html><html lang="zh"><meta charset="utf-8"><body><h1>独立目录实现</h1>
@@ -48,7 +48,7 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
         const fields=[author,(${JSON.stringify(categoryLabel)}||(id==='CAT-02'?'城区':id==='CAT-03'?'类别':'分类'))+'：'+item.category,${JSON.stringify(descriptionLabel)}+'：'+item.description];
         if(${missingDescription})fields.pop();if(${categoryFirst})fields.unshift(fields.splice(1,1)[0]);if(!authorFirst)fields.reverse();
         const display=fields.map(raw=>labels?raw.replace('：',${JSON.stringify(cardLabelSeparator)}):raw.replace(/^[^：]+：/,''));
-        for(const raw of ${combinedFields}?[display.join(' · ')]:display){const p=document.createElement('p');p.textContent=raw;card.append(p)}if(${JSON.stringify(wrapperTag)}){const wrapper=document.createElement(${JSON.stringify(wrapperTag)});wrapper.append(card);main.append(wrapper)}else main.append(card)}
+        for(const raw of ${combinedFields}?[display.join(${JSON.stringify(fieldSeparator)})]:display){const p=document.createElement('p');p.textContent=raw;card.append(p)}if(${JSON.stringify(wrapperTag)}){const wrapper=document.createElement(${JSON.stringify(wrapperTag)});wrapper.append(card);main.append(wrapper)}else main.append(card)}
       document.querySelector('#empty').hidden=visible.length>0;
       if(${inlineDetail}&&selectedName)[...main.children].find(node=>node.querySelector('h3')?.textContent===selectedName)?.append(detail);
     }
@@ -59,13 +59,13 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
     </script></body></html>`
 }
 
-function tasks(label, { split = false, wrongNext = false, divColumns = false, stationary = false } = {}) {
+function tasks(label, { split = false, wrongNext = false, divColumns = false, stationary = false, countedHeadings = false, wrongHeading = false } = {}) {
   return `<!doctype html><html lang="zh"><meta charset="utf-8"><body><h1>独立看板实现</h1><input aria-label="标题"/><button id="create">${label}</button><main></main><script>
     let items=JSON.parse(localStorage.getItem('independent-board')||'[]');
     const input=document.querySelector('input'),main=document.querySelector('main');
     function render(){localStorage.setItem('independent-board',JSON.stringify(items));main.replaceChildren();
       const board=${divColumns}?document.createElement('section'):main;if(board!==main)main.append(board);
-      ['待开始','进行中','已完成'].forEach((name,index)=>{const section=document.createElement(${divColumns}?'div':'section'),header=document.createElement('div'),heading=document.createElement('h2'),list=document.createElement('ul');heading.textContent=name;header.append(heading);section.append(header,list);board.append(section);
+      ['待开始','进行中','已完成'].forEach((name,index)=>{const section=document.createElement(${divColumns}?'div':'section'),header=document.createElement('div'),heading=document.createElement('h2'),list=document.createElement('ul');heading.textContent=name+(${wrongHeading}?'全部':'')+(${countedHeadings}?' ('+items.filter(item=>item.stage===index).length+')':'');header.append(heading);section.append(header,list);board.append(section);
         for(const item of items.filter(item=>item.stage===index)){const row=document.createElement('li'),title=document.createElement('span'),next=document.createElement('button'),remove=document.createElement('button');title.textContent=item.title;next.textContent='下一步';remove.textContent='删除';next.onclick=()=>{if(!${stationary})item.stage=Math.min(2,item.stage+1);render()};remove.onclick=()=>{items=items.filter(other=>other!==item);render()};row.append(title,next,remove);list.append(row)}})}
     function splitNames(){if(!${split})return;for(const node of document.querySelectorAll('button,h2')){if(node.dataset.split)continue;node.dataset.split='yes';node.style.display='flex';const text=node.textContent;node.replaceChildren(...[...text].map(c=>{const span=document.createElement('span');span.textContent=c;return span}))}}
     const originalRender=render;render=()=>{originalRender();if(${wrongNext})for(const b of document.querySelectorAll('main button'))if(b.textContent==='下一步')b.textContent='下一步全部';splitNames()};
@@ -249,12 +249,14 @@ for (const broken of ['author', 'combination']) test('CAT-01: compact lists stil
   assert.equal(result.status, 'FAILED'); assert.equal(result.failure, 'BEHAVIOR_ERROR')
 })
 
-function photography({ count = 4, blankLocation = false, email = 'linxia@example.com', labelledEmail = false, hiddenEmail = false } = {}) {
+function photography({ count = 4, blankLocation = false, email = 'linxia@example.com', labelledEmail = false, hiddenEmail = false, headings = true, stationary = false, banner = false, aboutTag = 'p', initialTab = 0, brokenAbout = false, allPanels = false, persistentPanel = null, aboutArticle = false, retainAbout = false, aboutAria = false } = {}) {
   return '<html><meta charset="utf-8"><body><button onclick="show(0)">关于我</button><button onclick="show(1)">作品集</button>' +
-    '<button onclick="show(2)">联系方式</button><main></main><script>' +
-    'function show(tab){document.querySelector("main").innerHTML=tab===0?\'<section><h2>关于我</h2><p>摄影师</p></section>\':' +
-    'tab===1?\'<section><h2>作品集</h2><ul>' + Array.from({ length: count }, (_, i) => '<li><div style="background:blue;height:10px"></div><h3>作品' + i + '</h3><p>' + (blankLocation ? '' : '地点' + i) + '</p></li>').join('') +
-    '</ul></section>\':\'<section><h2>联系方式</h2><p' + (hiddenEmail ? ' hidden' : '') + '>' + (labelledEmail ? '邮箱：' : '') + email + '</p></section>\'}show(0)</script></body></html>'
+    '<button onclick="show(2)">联系方式</button><main>'+(banner?'<p>固定摄影标语</p>':'')+((banner||persistentPanel)?'<'+(persistentPanel||'div')+' id="panels"></'+(persistentPanel||'div')+'>':'')+'</main><script>' +
+    'function show(tab){if(('+stationary+'&&tab!==0)||('+brokenAbout+'&&tab===0))return;document.querySelector("'+((banner||persistentPanel)?'#panels':'main')+'").innerHTML=tab===0?\'<section'+(aboutAria?' role="tabpanel" aria-label="关于我"':'')+'>'+(aboutArticle?'<article>':'')+(headings?'<h2>关于我</h2>':'')+'<'+aboutTag+'>摄影师</'+aboutTag+'>'+(aboutArticle?'</article>':'')+'</section>\':' +
+    'tab===1?\'<section>'+(headings?'<h2>作品集</h2>':'')+'<ul>' + Array.from({ length: count }, (_, i) => '<li><div style="background:blue;height:10px"></div><h3>作品' + i + '</h3><p>' + (blankLocation ? '' : '地点' + i) + '</p></li>').join('') +
+    '</ul></section>\':\'<section>'+(headings?'<h2>联系方式</h2>':'')+'<p' + (hiddenEmail ? ' hidden' : '') + '>' + (labelledEmail ? '邮箱：' : '') + email + '</p></section>\';'+(persistentPanel?'const panel=document.querySelector("#panels");panel.innerHTML=panel.firstElementChild.innerHTML;':'')+'}'+
+    ((allPanels||retainAbout)?'const originalShow=show,root=document.querySelector("'+((banner||persistentPanel)?'#panels':'main')+'"),views=[0,1,2].map(tab=>{originalShow(tab);return root.innerHTML});show=tab=>{root.innerHTML='+(allPanels?'"<p>当前区块："+tab+"</p>"+views.join("")':'tab===0?views[0]:views[0]+views[tab]')+'};':'')+
+    'show('+initialTab+')</script></body></html>'
 }
 function shopping({ checkbox = false, persist = true, brokenClear = false } = {}) {
   return `<html><meta charset="utf-8"><body><h1>购物工具</h1><input aria-label="商品"><input type="number" aria-label="数量"><button id="add">加入清单</button><button id="clear">清除已购买</button><ul></ul><script>
@@ -307,4 +309,37 @@ for (const variant of ['valid','missing','extra','wrong-drink','wrong-rating','b
   assert.equal(result.status,variant==='valid'?'PASSED':'FAILED',JSON.stringify(result))
   assert.deepEqual(result.pageErrors,[])
   if(variant!=='valid')assert.equal(result.failure,'BEHAVIOR_ERROR')
+})
+
+for(const variant of ['valid','stationary','wrong-email'])test('D24 semantic SHOW-03: panels without headings '+variant,async()=>{
+  const result=await check('SHOW-03',photography({headings:false,stationary:variant==='stationary',email:variant==='wrong-email'?'other@example.com':'linxia@example.com'}),'headingless-'+variant)
+  assert.equal(result.status,variant==='valid'?'PASSED':'FAILED',JSON.stringify(result))
+})
+for(const variant of ['valid','wrong-heading','stationary'])test('D24 semantic TASK-02: status headings with counts '+variant,async()=>{
+  const result=await check('TASK-02',tasks('新建',{countedHeadings:true,wrongHeading:variant==='wrong-heading',stationary:variant==='stationary'}),'counted-heading-'+variant)
+  assert.equal(result.status,variant==='valid'?'PASSED':'FAILED',JSON.stringify(result))
+})
+for(const variant of ['valid','missing','extra','wrong-author','wrong-combination'])test('D24 semantic CAT-01: heading button nested in list item '+variant,async()=>{
+  const result=await check('CAT-01',catalog('CAT-01',{itemTag:'button',wrapperTag:'li',labels:true,countOverride:variant==='missing'?7:variant==='extra'?9:null,detailAuthor:variant!=='wrong-author',combine:variant!=='wrong-combination'}),'nested-book-button-'+variant)
+  assert.equal(result.status,variant==='valid'?'PASSED':'FAILED',JSON.stringify(result))
+})
+for(const variant of ['valid','wrong-license','wrong-combination'])test('D24 semantic CAT-03: fullwidth metadata separator '+variant,async()=>{
+  const result=await check('CAT-03',catalog('CAT-03',{combinedFields:true,fieldSeparator:' ｜ ',detailLicense:variant==='wrong-license'?'Wrong license':'MIT',combine:variant!=='wrong-combination'}),'fullwidth-metadata-'+variant)
+  assert.equal(result.status,variant==='valid'?'PASSED':'FAILED',JSON.stringify(result))
+})
+for(const variant of ['fixed-banner','div-about','contact-default-no-about'])test('D24 review SHOW-03: independent About state '+variant,async()=>{
+  const result=await check('SHOW-03',photography({headings:variant==='div-about',banner:variant==='fixed-banner',aboutTag:variant==='div-about'?'div':'p',initialTab:variant==='contact-default-no-about'?2:0,brokenAbout:variant==='contact-default-no-about'}),'review-about-'+variant)
+  assert.equal(result.status,variant==='contact-default-no-about'?'FAILED':'PASSED',JSON.stringify(result))
+})
+test('D24 review SHOW-03: all panels stay visible despite status text changes',async()=>{
+  const result=await check('SHOW-03',photography({headings:false,allPanels:true}),'all-panels-visible')
+  assert.equal(result.status,'FAILED',JSON.stringify(result))
+})
+for(const persistentPanel of ['div','section'])test('D24 review SHOW-03: persistent panel '+persistentPanel,async()=>{
+  const result=await check('SHOW-03',photography({persistentPanel}),'persistent-panel-'+persistentPanel)
+  assert.equal(result.status,'PASSED',JSON.stringify(result))
+})
+for(const variant of ['about-article','retain-about','retain-about-aria'])test('D24 review SHOW-03: distinguish actual panel content '+variant,async()=>{
+  const result=await check('SHOW-03',photography({headings:variant==='about-article',aboutArticle:variant==='about-article',retainAbout:variant!=='about-article',aboutAria:variant==='retain-about-aria'}),'actual-panel-'+variant)
+  assert.equal(result.status,variant==='about-article'?'PASSED':'FAILED',JSON.stringify(result))
 })
