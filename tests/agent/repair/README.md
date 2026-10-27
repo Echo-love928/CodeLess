@@ -394,3 +394,67 @@ else
   rm $files && git checkout -- $files
 fi
 ```
+
+## D24-A round 5: dba59d9d action context and owner priority (2026-10-27)
+
+The delivery at PR #70, fixed commit `231ea3dbcf10da6161cafe06ee5243bef34676cd`,
+was independently checked: ZIP/README outer checksums, 203 manifest-covered files
+(204 archive entries including the manifest), 163 journal events and 17 correlated
+calls. Only content-free counts and synthetic regressions are committed here;
+the package, original source, patches and journals remain private local inputs.
+
+Two A-side context gaps are addressed: compacting the completion proposal lost
+the interactions preceding a conditional target, and route-first source seeding
+could omit the component owning that target. REPAIR also lacked GENERATE's
+unique-target and exact-inner-text semantics. The fix supplies a correlated
+`failure.actionContext`, preserves it during compaction, and prioritizes an
+existing static target/component owner among already-planned frozen files that are
+reachable through relative imports from the failed route. An unmounted component
+with the same marker must leave the route page first.
+
+`RoundFiveContextTest` (7 cases) and `RoundFiveRegressionTest` (4 cases) are identical
+on the old d2b20a7 tree and the repaired tree. The two Java files and synthetic
+syntax fixture have matching SHA256 on both trees (see `manifest.json`).
+
+| Scenario | d2b20a7 | Repaired tree |
+| --- | --- | --- |
+| CAT-02 shape: missing title target, entire-container text mismatch, missing conditional detail | Four builds exit 0, all browser checks fail; three repairs, `AGENT_REPAIR_LIMIT_EXCEEDED` | Two repairs; all three builds exit 0, final browser PASSED; original actions unchanged |
+| EDIT-02 shape through real component edit: absent marker, three shared matches, then unchanged bare done | Three builds exit 0; `AGENT_REPAIR_NO_PROGRESS` after two repairs | One repair; both builds exit 0, final browser PASSED, all three original heading assertions pass; only selected source file changes |
+| TASK-03 strict-rejection control | `MODEL_INVALID_RESPONSE / SYNTAX`, 488 UTF-8 bytes, UTF-16 column 423, no retry/freeze/build | Identical strict rejection |
+| Unchanged bare done control | `AGENT_REPAIR_NO_PROGRESS`, same candidate digest and original actions | Identical strict rejection |
+
+Old suite: 11 tests, 6 expected failures (4 context assertions plus CAT-02 and
+EDIT-02), no errors. Repaired suite: 11/11 pass. The additional unmounted-owner
+case is a negative control. The initial Docker-unavailable
+attempt is an environment failure, not a regression reproduction; its private
+log hash is retained separately from the successful old-tree execution.
+
+The syntax fixture is synthesized from redacted punctuation/key spans and string
+lengths, including eight synthetic BMP characters to preserve UTF-8 byte length.
+No original string values are copied. It reproduces the parser failure position,
+not the original reply digest or a recoverable response. The provider had already
+been asked for a JSON object; strict rejection is correct. No code change claims
+to repair TASK-03's provider violation.
+
+The fixed model policy reacts to actual action semantics/prerequisite fields and
+the first seeded owner. Usage is declared at 0.3 token/UTF-8 byte (an estimate,
+not a measurement); every response crosses the production DeepSeek wire to a
+loopback fixture. PostgreSQL, digest-checked file tools, immutable component edit
+scope, Docker/Vue builds and Chromium are real. The synthetic CAT-02 holds both
+files in context; it covers owner priority and original browser failure shapes,
+not B's exact token amounts or omitted-file count. These tests do not establish
+that a real model will follow the new context. Paid calls: 0. The original failed
+batch is unchanged; any new real-model validation requires separate authorization.
+
+Run both test classes with JDK 21/Node 24.22.1 and a running local Docker engine:
+
+```bash
+unset CODELESS_MODEL_API_KEY CODELESS_MODEL_NAME
+export CODELESS_MODEL_PROVIDER=deterministic-mock
+cmd.exe //d //c "services\api\mvnw.cmd -f services/api/pom.xml \"-Dtest=RoundFiveContextTest,RoundFiveRegressionTest\" test"
+```
+
+Optional `CODELESS_REPAIR_EVIDENCE_DIR` and `CODELESS_REGRESSION_TREE` label private
+run outputs. Public aggregate results are in
+`evidence/2026-10-27/d24-a-round5/`; raw source, wire bodies and browser captures
+must not be copied into that directory.

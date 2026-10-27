@@ -86,7 +86,22 @@ final class RepairContext {
         if(failure.path("failedAction").path("index").isInt())
             for(int i=0;i<=failure.path("failedAction").path("index").asInt()&&i<actions.size();i++)
                 if(actions.get(i).path("type").asText().equals("navigate"))route=actions.get(i).path("path").asText();
-        for(var page:plan.path("pages"))if(page.path("route").asText().equals(route)&&planned.contains(page.path("file").asText()))targets.add(page.path("file").asText());
+        var routePages=new ArrayList<String>();
+        for(var page:plan.path("pages"))if(page.path("route").asText().equals(route)&&planned.contains(page.path("file").asText()))routePages.add(page.path("file").asText());
+        // A missing test ID can name a reachable component whose definition must precede its call site (CAT-02).
+        // An unrelated/unmounted component with the same marker must not displace the failed page. Both attribute
+        // and import text are only ordering hints over already-planned frozen files, never path permissions.
+        var reachable=new HashSet<String>();var pending=new ArrayDeque<>(routePages);
+        while(!pending.isEmpty()) {
+            String path=pending.poll();
+            if(reachable.add(path))pending.addAll(imports(path,sources.get(path),sources.keySet()));
+        }
+        String testId=failure.path("failedAction").path("action").path("target").path("testId").asText("");
+        if(!testId.isBlank()) {
+            var owner=Pattern.compile("(?<![\\w:-])(?:data-testid|data-ai-component)\\s*=\\s*([\"'])"+Pattern.quote(testId)+"\\1");
+            planned.stream().filter(reachable::contains).filter(path->owner.matcher(sources.get(path)).find()).forEach(targets::add);
+        }
+        routePages.forEach(targets::add);
         var rest=new ArrayDeque<String>();
         for(String prefix:List.of("src/pages/","src/components/","src/data/"))for(String path:planned)if(path.startsWith(prefix))rest.add(path);
         for(String path:planned)if(!rest.contains(path))rest.add(path);
@@ -130,11 +145,34 @@ final class RepairContext {
     /** Drop only the duplicate model-facing action copy; the host's immutable draft is unchanged. */
     static JsonNode compactCompletion(JsonNode input,JsonNode originalActions) {
         var json=JsonMapper.builder().build();
-        var compact=(tools.jackson.databind.node.ObjectNode)input.deepCopy();
+        JsonNode complete=withActionContext(input,originalActions);
+        var compact=(tools.jackson.databind.node.ObjectNode)complete.deepCopy();
         compact.set("completionProposal",json.valueToTree(Map.of("type","done")));
         compact.set("originalAcceptance",json.valueToTree(Map.of("retainedByHost",true,"actionCount",originalActions.size(),
                 "digest",hash(originalActions.toString()))));
-        return compact.toString().getBytes(StandardCharsets.UTF_8).length<input.toString().getBytes(StandardCharsets.UTF_8).length?compact:input;
+        return compact.toString().getBytes(StandardCharsets.UTF_8).length<complete.toString().getBytes(StandardCharsets.UTF_8).length?compact:complete;
+    }
+    /**
+     * REPAIR must know the state reached by the original actions, even when their large duplicate copy is omitted.
+     * Assertions observe without changing state; retain every preceding navigation, reload and interaction in order.
+     * The original failed action and host-owned actions are never edited. Uncorrelated failure data gets no invented trace.
+     */
+    static JsonNode withActionContext(JsonNode input,JsonNode originalActions) {
+        var failure=input.path("failure");var failed=failure.path("failedAction");var action=failed.path("action");
+        int index=failed.path("index").asInt(-1);
+        if(!failure.isObject()||!failed.path("index").isInt()||index<0||index>=originalActions.size()
+                ||!action.equals(originalActions.get(index))||!action.path("target").isObject()) return input;
+        var json=JsonMapper.builder().build();var context=json.createObjectNode();
+        context.put("targetCardinality",1);
+        if(action.path("type").asText().equals("expectText"))context.put("textComparison","EXACT_NORMALIZED_INNER_TEXT");
+        var preceding=context.putArray("precedingActions");
+        for(int i=0;i<index;i++) {
+            var prior=originalActions.get(i);
+            if(Set.of("navigate","reload","click","fill","select","check").contains(prior.path("type").asText()))preceding.add(prior.deepCopy());
+        }
+        var complete=(tools.jackson.databind.node.ObjectNode)input.deepCopy();
+        ((tools.jackson.databind.node.ObjectNode)complete.path("failure")).set("actionContext",context);
+        return complete;
     }
     /** Lossless validation signatures and receipt de-duplication for a budget-constrained repair request.
      * Only the model projection changes: the registry, immutable actions and durable journal stay intact. */

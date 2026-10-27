@@ -279,7 +279,8 @@ public final class AgentLoop implements TaskStageRunner {
             if(sources!=null) input.put("repairSources",sources);
             input.put("budget",Map.of("modelCallsRemaining",RuntimeBudget.MODEL_CALLS-meter.models(),
                     "toolCallsRemaining",RuntimeBudget.TOOL_CALLS-meter.tools(),"tokensRemaining",RuntimeBudget.TOKENS-meter.chargedTokens()));}
-        return json.valueToTree(input);
+        JsonNode projected=json.valueToTree(input);
+        return repair?RepairContext.withActionContext(projected,originalActions):projected;
     }
     /**
      * A successful GENERATE write is fed back with its own bytes, once they match both the actual afterDigest and

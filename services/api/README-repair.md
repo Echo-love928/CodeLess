@@ -155,3 +155,28 @@ fixtures alone do not constitute M1 real-model or UI integration acceptance.
   within that shift (−30 as CRLF, +10 as LF), so CI took a read that Windows refused.
 - They now pin the offers with an exact tool-slot count instead (`takeToolSlots`): five
   slots left offer the read, four do not.
+
+## D24-A round 5 (batch dba59d9d)
+
+- A targeted failure's static `data-testid` or `data-ai-component` owner, reachable
+  from the failed route through relative imports, is seeded before the route page.
+  An unmounted/unreferenced component does not displace that page. Only planned, digest-matched frozen files
+  participate; component edit scope still limits the seed/read/write to its target.
+- Every targeted failure carries `failure.actionContext`: `targetCardinality=1`,
+  exact normalized inner-text comparison for `expectText`, and all preceding
+  navigation/reload/interaction actions in their original order. Observation-only
+  assertions are omitted from this trace. The full frozen action array stays with
+  the host. Compacting its duplicate no longer loses the state that made a
+  conditional target appear. An invalid/mismatched failed-action index gets no
+  invented trace.
+- REPAIR now states the same unique-target and exact-text rules as GENERATE.
+  A shared component ID does not make a shared test ID a unique browser target.
+- Strict parsing and no retries are unchanged. TASK-03's redacted lexical shape
+  still fails with `MODEL_INVALID_RESPONSE / SYNTAX` at column 423; accepting that
+  provider output would violate the protocol. Its real-model failure is retained,
+  not reported as repaired by these context changes.
+- `RoundFiveContextTest` and `RoundFiveRegressionTest` run unchanged on d2b20a7 and
+  the fix. Their synthetic policy is explicitly conditional on supplied semantics,
+  prerequisite steps and first seeded owner. Real file tools, component editing,
+  builds and browser checks validate the proposed result. This is mechanism
+  coverage, not evidence of real-model quality; see the repair test README.
