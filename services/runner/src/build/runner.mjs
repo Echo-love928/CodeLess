@@ -2,12 +2,13 @@ import { spawn } from 'node:child_process'
 import { createHash, randomUUID } from 'node:crypto'
 import { constants } from 'node:fs'
 import { chmod, lstat, mkdir, mkdtemp, open, readFile, readdir, realpath, rename, rm, writeFile } from 'node:fs/promises'
-import { dirname, join, relative, resolve, sep } from 'node:path'
+import { basename, dirname, join, relative, resolve, sep } from 'node:path'
 import { tmpdir } from 'node:os'
 import { pathToFileURL } from 'node:url'
 import { StringDecoder } from 'node:string_decoder'
 import { containerUser, validateSource } from '../template/build.mjs'
-import { IMAGE, policy } from '../../../../infra/runner/policy.mjs'
+import { IMAGE } from '../../../../infra/runner/policy.mjs'
+import { workerPolicy } from '../../../../infra/runner/profiles.mjs'
 import { readSnapshot } from '../artifacts/snapshot.mjs'
 import { oomEventEvidence } from './oom-evidence.mjs'
 
@@ -184,10 +185,10 @@ export async function promoteArtifacts(output, artifacts, id, summary, limits, m
 
 // This factory belongs to the trusted host worker. Request data contains only a source directory.
 // Tests use a separately built trusted fault image; production defaults to the D05 image.
-export async function createBuildRunner({ workRoot, artifactRoot, imageId, limits: overrides, onContainerCreated } = {}) {
+export async function createBuildRunner({ workRoot, artifactRoot, imageId, profile, limits: overrides, onContainerCreated } = {}) {
   // Trusted host instrumentation only, never sourced from generated task data.
   if (onContainerCreated !== undefined && typeof onContainerCreated !== 'function') throw new Error('invalid host container observer')
-  const limits = policy(overrides)
+  const limits = workerPolicy(profile, overrides)
   const user = containerUser()
   if (!workRoot || !artifactRoot) throw new Error('worker workRoot and artifactRoot are required')
   for (const path of [workRoot, artifactRoot]) await mkdir(resolve(path), { recursive: true })
@@ -209,7 +210,7 @@ export async function createBuildRunner({ workRoot, artifactRoot, imageId, limit
     const scratch = await mkdtemp(join(staging, 'codeless-build-'))
     const input = join(scratch, 'input')
     const output = join(scratch, 'output')
-    const result = { id, imageId: pinned, containerName: name, status: 'FAILED', failure: null,
+    const result = { id, imageId: pinned, containerName: name, workspaceName: basename(scratch), status: 'FAILED', failure: null,
       exitCode: null, oomKilled: null, timedOut: false, log: capture(limits.logBytes).result(),
       artifact: null, cleanup: { containerRemoved: false, workspaceRemoved: false, errors: [] },
       createdAt: new Date().toISOString(), completedAt: null }
@@ -302,7 +303,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
     console.error('Usage: node runner.mjs <source> <worker-scratch-root> <artifact-root>')
     process.exitCode = 2
   } else {
-    createBuildRunner({ workRoot: process.argv[3], artifactRoot: process.argv[4] })
+    createBuildRunner({ workRoot: process.argv[3], artifactRoot: process.argv[4], profile: process.env.CODELESS_RUNNER_PROFILE })
       .then((run) => run(process.argv[2]))
       .then((result) => { console.log(JSON.stringify(result, null, 2)); process.exitCode = result.status === 'SUCCEEDED' ? 0 : 1 })
       .catch((error) => { console.error(error.message); process.exitCode = 1 })
