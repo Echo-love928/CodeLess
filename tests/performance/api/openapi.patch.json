@@ -1,0 +1,140 @@
+[
+  {
+    "op": "add",
+    "path": "/paths/~1api~1v0~1tasks/post/responses/429",
+    "value": {
+      "description": "APPLICATION_TASK_LIMIT or USER_TASK_LIMIT; no task/event inserted. Matching idempotent replay remains accepted.",
+      "headers": {
+        "Retry-After": {
+          "description": "Retry delay in seconds; clients must preserve the original Idempotency-Key.",
+          "schema": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "./schemas/v0/error.schema.json"
+          }
+        }
+      }
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api~1v0~1tasks/post/responses/503",
+    "value": {
+      "description": "TASK_QUEUE_FULL or TASK_ADMISSION_BUSY; no task/event inserted. Admission lock wait is bounded to 1 second.",
+      "headers": {
+        "Retry-After": {
+          "description": "Retry delay in seconds; clients must preserve the original Idempotency-Key.",
+          "schema": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "./schemas/v0/error.schema.json"
+          }
+        }
+      }
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api~1v0~1applications~1{applicationId}~1edits/post/responses/429",
+    "value": {
+      "description": "APPLICATION_TASK_LIMIT or USER_TASK_LIMIT; no task/event inserted. Matching idempotent replay remains accepted.",
+      "headers": {
+        "Retry-After": {
+          "description": "Retry delay in seconds; clients must preserve the original Idempotency-Key.",
+          "schema": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "./schemas/v0/error.schema.json"
+          }
+        }
+      }
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api~1v0~1applications~1{applicationId}~1edits/post/responses/503",
+    "value": {
+      "description": "TASK_QUEUE_FULL or TASK_ADMISSION_BUSY; no task/event inserted. Admission lock wait is bounded to 1 second.",
+      "headers": {
+        "Retry-After": {
+          "description": "Retry delay in seconds; clients must preserve the original Idempotency-Key.",
+          "schema": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "./schemas/v0/error.schema.json"
+          }
+        }
+      }
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api~1v0~1applications~1{applicationId}~1component-edits/post/responses/429",
+    "value": {
+      "description": "APPLICATION_TASK_LIMIT or USER_TASK_LIMIT; no task/event inserted. Matching idempotent replay remains accepted.",
+      "headers": {
+        "Retry-After": {
+          "description": "Retry delay in seconds; clients must preserve the original Idempotency-Key.",
+          "schema": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "./schemas/v0/error.schema.json"
+          }
+        }
+      }
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api~1v0~1applications~1{applicationId}~1component-edits/post/responses/503",
+    "value": {
+      "description": "TASK_QUEUE_FULL or TASK_ADMISSION_BUSY; no task/event inserted. Admission lock wait is bounded to 1 second.",
+      "headers": {
+        "Retry-After": {
+          "description": "Retry delay in seconds; clients must preserve the original Idempotency-Key.",
+          "schema": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "./schemas/v0/error.schema.json"
+          }
+        }
+      }
+    }
+  }
+]

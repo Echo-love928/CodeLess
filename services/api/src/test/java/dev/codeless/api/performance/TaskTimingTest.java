@@ -10,6 +10,8 @@ class TaskTimingTest {
         assertThat(known.buildMs()).isEqualTo(2000);assertThat(known.browserMs()).isNull();
         var invalid=TaskTiming.runnerDurations(json.readTree("{\"build\":{\"createdAt\":\"bad\",\"completedAt\":\"bad\"}}"));
         assertThat(invalid.buildMs()).isNull();assertThat(invalid.browserMs()).isNull();
+        var overflow=TaskTiming.runnerDurations(json.readTree("{\"build\":{\"createdAt\":\"-1000000000-01-01T00:00:00Z\",\"completedAt\":\"+1000000000-12-31T23:59:59Z\"}}"));
+        assertThat(overflow.buildMs()).isNull();
     }
     @Test void failingCallsRemainMeasuredAndNextTaskCannotInheritThreadState() throws Exception {
         try(var task=TaskTiming.begin(UUID.randomUUID())) {

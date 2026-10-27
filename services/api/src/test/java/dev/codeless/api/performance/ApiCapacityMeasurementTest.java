@@ -96,14 +96,21 @@ class ApiCapacityMeasurementTest extends PostgresTestBase {
                     long start=System.nanoTime(); assertThat(browser.get("/tasks/"+task).statusCode()).isEqualTo(200); queries.add(ms(start));
                     assertThat(model.isDone()).as("query must finish while provider is still blocked").isFalse();
                 }
+                var resumeResponse=browser.create(app);assertThat(resumeResponse.statusCode()).isEqualTo(202);
+                UUID resumed=UUID.fromString(JSON.readTree(resumeResponse.body()).path("id").asText());
+                assertThat(browser.post("/tasks/"+resumed+"/cancel",Map.of()).statusCode()).isEqualTo(200);
                 for (int i=0;i<10;i++) {
                     long start=System.nanoTime();
-                    var response=browser.client.send(browser.request("/tasks/"+task+"/events").header("Accept","text/event-stream")
-                            .header("Last-Event-ID","0").GET().build(),HttpResponse.BodyHandlers.ofInputStream());
+                    var response=browser.client.send(browser.request("/tasks/"+resumed+"/events").header("Accept","text/event-stream")
+                            .header("Last-Event-ID","1").GET().build(),HttpResponse.BodyHandlers.ofInputStream());
                     assertThat(response.statusCode()).isEqualTo(200);
                     try (var reader=new BufferedReader(new InputStreamReader(response.body(),java.nio.charset.StandardCharsets.UTF_8))) {
-                        String line; boolean received=false;
-                        while ((line=reader.readLine())!=null) if(line.startsWith("id:") && line.substring(3).strip().equals("1")) { received=true; break; }
+                        String line,frameId=null; boolean received=false,data=false;
+                        while ((line=reader.readLine())!=null) {
+                            if(line.startsWith("id:")) {frameId=line.substring(3).strip();assertThat(frameId).isEqualTo("2");}
+                            if(line.startsWith("data:")) {assertThat(JSON.readTree(line.substring(5).strip()).path("sequence").asInt()).isEqualTo(2);data=true;}
+                            if(line.isEmpty() && frameId!=null && data) {received=true;break;}
+                        }
                         assertThat(received).isTrue(); resumes.add(ms(start));
                     }
                 }
@@ -117,7 +124,7 @@ class ApiCapacityMeasurementTest extends PostgresTestBase {
                 samples.put("queueResidenceMsAtClaim",queueMs); samples.put("queueDepthWhileBlocked",depth);
                 queue.cancel(owner(app),waiting);
             } finally { gate.release.countDown(); }
-            // Cancellation fences late writes but cannot turn provider completion into READY.
+            // A late provider reply cannot turn the authoritative cancelled task into READY.
             try { model.get(10,TimeUnit.SECONDS); } catch(ExecutionException expected) {
                 assertThat(expected.getCause()).isInstanceOf(ModelFailure.class);
             }
@@ -126,6 +133,7 @@ class ApiCapacityMeasurementTest extends PostgresTestBase {
             samples.put("provider",gate.id()); samples.put("buildMs",null); // no build executed
             samples.put("nonModelQueryMs",queries); samples.put("sseReconnectToFirstEventMs",resumes);
             samples.put("warmupQueries",5); samples.put("querySamples",30); samples.put("sseSamples",10);
+            samples.put("sseExclusiveCursor",1);samples.put("sseFirstNewSequence",2);
             samples.put("modelUsage","UNKNOWN"); samples.put("modelQualityEvidence",false);
             evidence("read-paths",samples);
         } finally { gate.release.countDown(); }

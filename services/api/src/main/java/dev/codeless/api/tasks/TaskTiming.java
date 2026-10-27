@@ -30,7 +30,7 @@ public final class TaskTiming implements AutoCloseable {
             long millis=java.time.Duration.between(java.time.Instant.parse(part.path(start).asText()),
                     java.time.Instant.parse(part.path("completedAt").asText())).toMillis();
             return millis<0?null:millis;
-        } catch(java.time.DateTimeException invalid) { return null; }
+        } catch(java.time.DateTimeException | ArithmeticException invalid) { return null; }
     }
     /** Only called after the runner receipt and evidence were validated; absence is unknown. */
     public static void recordRunnerReceipt(UUID task,tools.jackson.databind.JsonNode receipt) {
