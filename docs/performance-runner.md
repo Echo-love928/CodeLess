@@ -79,6 +79,8 @@ node tests/performance/runner/export-evidence.mjs
 
 完整原始样本、机器、结果、隔离inspect、清理、源码SHA256及canonical标志在各 `report.json`；私有原日志位于 `.local-data/d22-b/`，公开副本及命令/退出码/日志hash汇总由export脚本生成。未提交开发轮保持canonical=false，不能当成某个旧提交的干净验收。门禁具体结果见 `docs/handoffs/D22-B.md`。
 
+公开证据目录使用局部 `.gitattributes` 禁止JSON换行归一化；`evidence.test.mjs` 独立核验7份原始字节的SHA256与记录状态。实际在Windows新worktree中复现过CRLF导致的exit1；保留原始字节后同一测试exit0。不通过重写清单hash来接受变更后的样本。
+
 已保留的失败：首次队列fixture根目录ENOENT（已显式创建）；首次API轮的共享fault标签在另一套件重建时导致旧image ID不存在，exitCode/oomKilled保持null（改为每轮独有标签固定ID，未重试失败业务）。该轮CPU下20个GET观测不被提升成整轮成功。无模型付费请求；开发agent token环境未提供实测计量，保持UNKNOWN。
 
 cb04df4与a518d3b两个精确候选远端六项门禁均成功（前者API365/365）；本地独立runner原生1（244 pass/4 fail/1 cancel）、E2E原生1（67 pass/4 fail/4未运行）。本地额外聚合在API阶段运行32分钟后主动中断，保留原生1与中断原因，不报全绿；Windows路径校验热点只做只读诊断，未证实根因，未改API。宿主中断留下一个已退出构建容器及staging，经输入manifest与本轮journal匹配后人工精确回收；这不能替代生产崩溃reaper。具体文件、命令、失败及远端快照见交接记录，最终PR HEAD状态需独立读取。
