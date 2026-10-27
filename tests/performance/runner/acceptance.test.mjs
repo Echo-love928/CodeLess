@@ -45,12 +45,16 @@ after(async () => {
     }
     for (const tag of imageTags) docker(['image', 'rm', tag])
     report.imageAliasesRemoved = true
+  } catch (error) {
+    report.cleanupError = error.stack
+    throw error
   } finally {
     report.completedAt = new Date().toISOString(); report.revision = revision; report.revisionRole = 'checkout-reference'
     report.sources = startSources; report.endSources = await codeIdentity()
     report.canonical = startChanges === '' && command('git', ['status', '--porcelain']) === '' &&
       revision === command('git', ['rev-parse', 'HEAD']) && JSON.stringify(startSources) === JSON.stringify(report.endSources)
-    report.status = report.samples.length === 4 && report.resources.length === 3 && report.queue?.passed && report.ownedRootRemoved &&
+    report.status = report.samples.length === 4 && report.resources.length === 3 && report.queue?.passed && report.queue?.closed &&
+      report.profileValidationPassed && report.imageAliasesRemoved && !report.cleanupError && report.ownedRootRemoved &&
       report.samples.every(s => s.passed) && report.resources.every(s => s.passed) ? 'PASSED' : 'FAILED'
     if (output) await writeFile(join(output, 'report.json'), JSON.stringify(report, null, 2) + '\n')
   }
@@ -135,6 +139,7 @@ test('D22 calibrated profile only tightens reviewed host limits', () => {
   for (const [profile, limits] of [['unknown', {}], ['trial', { timeoutMs: 60001 }], ['trial', { logBytes: 16385 }],
     ['trial', { memoryMiB: 513 }], ['trial', { shell: 1 }]]) assert.throws(() => workerPolicy(profile, limits))
   assert.equal(workerPolicy('trial', { timeoutMs: 1000 }).timeoutMs, 1000)
+  report.profileValidationPassed = true
 })
 
 test('D22 T1/T2: concurrency one retains cgroup/timeout/log limits and reclaims CPU/OOM jobs', { timeout: 90000 }, async () => {
@@ -179,5 +184,5 @@ test('D22 T2: screenshot queue bounds admission at 100 and coalesces concurrent 
     await queue.enqueue(ids[100]); assert.equal(queue.get(ids[0]), null); assert.equal(queue.get(ids[100]).status, 'QUEUED')
     report.queue = { passed: true, admitted: 100, rejected: 'QUEUE_FULL', rejectMs, peakActive: peak, retries: 0,
       boundary: 'production screenshot queue; API generation admission is owned by D22-A' }
-  } finally { release(); await queue.close() }
+  } finally { release(); await queue.close(); if (report.queue) report.queue.closed = true }
 })
