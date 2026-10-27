@@ -24,7 +24,8 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
   detailAuthor = true, nameOnly = true, nameControl = 'heading', categoryLabel = null, descriptionLabel = '简介', detailLayout = 'text',
   itemTag = 'article', sparse = false, namedDetail = false, cardLabelSeparator = '：', detailRating = '4.5', allLabel = '全部', brokenReset = false,
   combinedFields = false, inlineDetail = false, categorySelect = false, detailLicense = 'MIT', missingDescription = false, nameOverlap = false,
-  wrapperTag = null, countOverride = null, detailDescription = true, fieldSeparator = ' · ', categorySpan = false, detailNameParagraph = false } = {}) {
+  wrapperTag = null, countOverride = null, detailDescription = true, fieldSeparator = ' · ', categorySpan = false, detailNameParagraph = false,
+  coffeeMetaSeparator = null, coffeeMissingRating = false, coffeeExtraAddress = false, coffeeAddressInsteadOfDrink = false } = {}) {
   const count = countOverride ?? { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
   const categories = id === 'CAT-01' ? ['小说', '科技', '历史'] : id === 'CAT-02' ? ['西湖区', '上城区', '拱墅区'] : ['构建', '测试', '文档']
   return `<!doctype html><html lang="zh"><meta charset="utf-8"><body><h1>独立目录实现</h1>
@@ -36,7 +37,7 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
     const items=Array.from({length:${count}},(_,i)=>({name:${nameOverlap}?names[i]:'名称'+i,author:'作者值'+i,category:categories[i%3],description:${nameOverlap}&&i===4?'Atlas compatible utilities':'简介值'+i}));
     const main=document.querySelector('main'), search=document.querySelector('input'), nav=document.querySelector('nav');let detail=document.querySelector('section');
     let category='全部', selectedName='';
-    function show(item){selectedName=item.name;detail.hidden=false;if(${inlineDetail})main.querySelectorAll('${itemTag}')[items.indexOf(item)%main.children.length]?.append(detail);const values=[item.name,${detailAuthor ? 'item.author' : "'错误作者'"},item.category,${detailDescription ? 'item.description' : "'错误饮品'"},${JSON.stringify(detailRating)},${JSON.stringify(detailLicense)}],body=detail.querySelector('div');body.replaceChildren();
+    function show(item){selectedName=item.name;detail.hidden=false;if(${inlineDetail})main.querySelectorAll('${itemTag}')[items.indexOf(item)%main.children.length]?.append(detail);const values=[item.name,${detailAuthor ? 'item.author' : "'错误作者'"},item.category,${detailDescription ? 'item.description' : "'错误饮品'"},${JSON.stringify(detailRating)},${JSON.stringify(detailLicense)}],body=detail.querySelector('div');if(${coffeeExtraAddress||coffeeAddressInsteadOfDrink})values.push('地址：地址'+items.indexOf(item));body.replaceChildren();
       detail.querySelector('h2').textContent=${namedDetail} ? item.name : '详情';
       if(${sparse}||${JSON.stringify(detailLayout)}==='paragraphs'){for(const value of values.slice(1,4)){const p=document.createElement('p');p.textContent=value;body.append(p)}if(${detailNameParagraph}){const p=document.createElement('p');p.textContent=item.name;body.append(p)}}
       else if(${JSON.stringify(detailLayout)}==='dl'){const dl=document.createElement('dl');values.forEach((value,i)=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=['名称','作者','所在城区','一句简介','评分','许可证'][i];dd.textContent=value;dl.append(dt,dd)});body.append(dl)}else body.textContent=values.join(' ')}
@@ -48,7 +49,8 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
         const fields=[author,(${JSON.stringify(categoryLabel)}||(id==='CAT-02'?'城区':id==='CAT-03'?'类别':'分类'))+'：'+item.category,${JSON.stringify(descriptionLabel)}+'：'+item.description];
         if(${missingDescription})fields.pop();if(${categoryFirst})fields.unshift(fields.splice(1,1)[0]);if(!authorFirst)fields.reverse();
         const display=fields.map(raw=>labels?raw.replace('：',${JSON.stringify(cardLabelSeparator)}):raw.replace(/^[^：]+：/,''));
-        for(const raw of ${combinedFields}?[display.join(${JSON.stringify(fieldSeparator)})]:display){const p=document.createElement(${categorySpan}&&raw.includes(item.category)?'span':'p');p.textContent=raw;card.append(p)}if(${JSON.stringify(wrapperTag)}){const wrapper=document.createElement(${JSON.stringify(wrapperTag)});wrapper.append(card);main.append(wrapper)}else main.append(card)}
+        const coffeeFields=${JSON.stringify(coffeeMetaSeparator)}&&id==='CAT-02'?[item.category+(${coffeeMissingRating}?'':${JSON.stringify(coffeeMetaSeparator)}+'评分 4.5')+(${coffeeExtraAddress}?${JSON.stringify(coffeeMetaSeparator)}+'地址：地址'+items.indexOf(item):''),...(${missingDescription}?[]:[${coffeeAddressInsteadOfDrink}?'地址：地址'+items.indexOf(item):'招牌饮品：'+item.description])]:display;
+        for(const raw of ${combinedFields}?[display.join(${JSON.stringify(fieldSeparator)})]:coffeeFields){const p=document.createElement(${categorySpan}&&raw.includes(item.category)?'span':'p');p.textContent=raw;card.append(p)}if(${JSON.stringify(wrapperTag)}){const wrapper=document.createElement(${JSON.stringify(wrapperTag)});wrapper.append(card);main.append(wrapper)}else main.append(card)}
       document.querySelector('#empty').hidden=visible.length>0;
       if(${inlineDetail}&&selectedName)[...main.children].find(node=>node.querySelector('h3')?.textContent===selectedName)?.append(detail);
     }
@@ -350,4 +352,17 @@ for(const variant of ['valid','wrong-author','wrong-combination'])test('D24 meta
 test('D24 metadata CAT-01: compact title survives a later inline detail heading',async()=>{
   const result=await check('CAT-01',catalog('CAT-01',{itemTag:'li',sparse:true,inlineDetail:true,detailNameParagraph:true}),'compact-inline-title')
   assert.equal(result.status,'PASSED',JSON.stringify(result))
+})
+
+for(const variant of ['valid','wrong-rating','wrong-drink','broken-combination','missing-rating','missing-drink'])test('CAT-02: joined district-rating metadata '+variant,async()=>{
+  const result=await check('CAT-02',catalog('CAT-02',{coffeeMetaSeparator:' · ',coffeeMissingRating:variant==='missing-rating',missingDescription:variant==='missing-drink',detailRating:variant==='wrong-rating'?'4.0':'4.5',detailDescription:variant!=='wrong-drink',combine:variant!=='broken-combination'}),'joined-coffee-'+variant)
+  assert.equal(result.status,variant==='valid'?'PASSED':'FAILED',JSON.stringify(result))
+})
+for(const separator of [' ｜ ','·'])test('CAT-02: joined district-rating metadata separator '+separator,async()=>{
+  const result=await check('CAT-02',catalog('CAT-02',{coffeeMetaSeparator:separator}),'joined-coffee-separator-'+separator.codePointAt(separator.trim()?separator.indexOf(separator.trim()):0))
+  assert.equal(result.status,'PASSED',JSON.stringify(result))
+})
+for(const variant of ['extra-address','address-instead-of-drink'])test('CAT-02: joined district-rating must not manufacture a drink '+variant,async()=>{
+  const result=await check('CAT-02',catalog('CAT-02',{coffeeMetaSeparator:' · ',coffeeExtraAddress:variant==='extra-address',missingDescription:variant==='extra-address',coffeeAddressInsteadOfDrink:variant==='address-instead-of-drink'}),'joined-coffee-no-drink-'+variant)
+  assert.equal(result.status,'FAILED',JSON.stringify(result))
 })

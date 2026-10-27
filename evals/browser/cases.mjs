@@ -194,6 +194,15 @@ export async function behavior(page, id, expect) {
       const name = await cardName(card)
       let rawFields = await card.locator('p, dd').allTextContents()
       if (id === 'CAT-03') rawFields = rawFields.flatMap(value => value.split(/\s+[·•|｜]\s+/u))
+      // Normalize only a district/rating pair backed by a separate named drink.
+      // Additional metadata such as an address must not manufacture a missing drink.
+      if (id === 'CAT-02' && rawFields.some(value => /^\s*(?:招牌饮品|招牌|推荐饮品)(?:\s*[：:]\s*|\s+)\S/u.test(value))) {
+        rawFields = rawFields.flatMap(value => {
+          const parts = value.split(/\s*[·•|｜]\s*/u)
+          return parts.length === 2 && parts.filter(part => /^评分(?:\s*[：:]\s*|\s+)\d/u.test(part)).length === 1 &&
+            !parts.some(part => /^(?:招牌饮品|招牌|推荐饮品)/u.test(part)) ? parts : [value]
+        })
+      }
       // The requirement permits compact title/author lists with the remaining fields in details.
       // Read the real UI, then prove search/category behaviour against this initial inventory.
       if (id === 'CAT-01' && rawFields.length < 3) {
