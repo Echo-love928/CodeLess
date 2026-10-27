@@ -160,7 +160,7 @@ fixtures alone do not constitute M1 real-model or UI integration acceptance.
 
 - A targeted failure's static `data-testid` or `data-ai-component` owner, reachable
   from the failed route through relative imports, is seeded before the route page.
-  An unmounted/unreferenced component does not displace that page. Only planned, digest-matched frozen files
+  A component outside that import graph does not displace that page. Only planned, digest-matched frozen files
   participate; component edit scope still limits the seed/read/write to its target.
 - Every targeted failure carries `failure.actionContext`: `targetCardinality=1`,
   exact normalized inner-text comparison for `expectText`, and all preceding

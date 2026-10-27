@@ -409,12 +409,14 @@ could omit the component owning that target. REPAIR also lacked GENERATE's
 unique-target and exact-inner-text semantics. The fix supplies a correlated
 `failure.actionContext`, preserves it during compaction, and prioritizes an
 existing static target/component owner among already-planned frozen files that are
-reachable through relative imports from the failed route. An unmounted component
-with the same marker must leave the route page first.
+reachable through relative imports from the failed route. A component outside
+that graph with the same marker must leave the route page first.
 
 `RoundFiveContextTest` (7 cases) and `RoundFiveRegressionTest` (4 cases) are identical
 on the old d2b20a7 tree and the repaired tree. The two Java files and synthetic
-syntax fixture have matching SHA256 on both trees (see `manifest.json`).
+syntax fixture have matching SHA256 on both trees. The initial b560131 pair is in
+`d24-a-round5/manifest.json`; the final queue-safe fixture pair is in the adjacent
+`d24-a-round5-queue-fixture/manifest.json`.
 
 | Scenario | d2b20a7 | Repaired tree |
 | --- | --- | --- |
@@ -458,3 +460,15 @@ Optional `CODELESS_REPAIR_EVIDENCE_DIR` and `CODELESS_REGRESSION_TREE` label pri
 run outputs. Public aggregate results are in
 `evidence/2026-10-27/d24-a-round5/`; raw source, wire bodies and browser captures
 must not be copied into that directory.
+
+The first full API gate exposed a fixture ordering issue: the edited task stayed
+PLAN while the global scheduler served another queued task with this test's wire
+policy. This is not an edit-repair outcome. The final fixture moves only its own
+selected task ahead of queued work, checks the original claim's task ID, delegates
+the real atomic advance, and cleans up only its own unfinished fixtures. EDIT-02
+also deliberately queues another task and asserts it remains QUEUED/unleased with
+zero model calls before teardown. No queue reset, extra Spring property set or
+production scheduler change is used. The final unchanged old-tree pair still has
+11 tests / 6 expected failures, while the repaired focused suite passes 44/44.
+The initial API reports, including PLAN, remain in the adjacent queue-fixture
+evidence directory; the b560131 gate record remains FAILED.

@@ -52,12 +52,29 @@ class RoundFiveRegressionTest extends PostgresTestBase {
         jdbc.sql("UPDATE generation_tasks SET created_at='2000-01-01' WHERE id=?").param(task).update();return new Seed(owner,app,task);
     }
     Outcome run(Seed seed,String mode) throws Exception {
+        // The shared test database can contain another class's intentionally queued work. This fixture may run only
+        // its selected task, including component edits created after the baseline. Do not drain or reset other work.
+        jdbc.sql("UPDATE generation_tasks SET created_at=(SELECT min(created_at)-interval '1 second' FROM generation_tasks) WHERE id=?")
+                .param(seed.task()).update();
         var policy=new Policy(mode);
         try(var wire=new MaxTokensWireFixture(policy)) {
             var loop=new AgentLoop(store,new AgentModel(wire,calls,audit,store),validator,registry,files,gateway,evidence);
-            new TaskScheduler(queue,loop).tick();
+            TaskStageRunner selected=new TaskStageRunner() {
+                public StageResult execute(UUID task,TaskStatus stage){throw new AssertionError("Original claim required");}
+                public StageResult execute(TaskQueueService.Claim claim,TaskStatus stage){
+                    assertThat(claim.taskId()).as("fixture must not execute another task").isEqualTo(seed.task());
+                    return loop.execute(claim,stage);
+                }
+                public TaskQueueService.TaskView advance(TaskQueueService q,TaskQueueService.Claim claim,StageResult result,EventType type){
+                    return loop.advance(q,claim,result,type);
+                }
+            };
+            new TaskScheduler(queue,selected).tick();
             var result=new Outcome(seed,policy,queue.find(seed.owner(),seed.task()).orElseThrow(),journal.read(seed.task()),List.copyOf(wire.exchanges));
             report(mode,result);return result;
+        } finally {
+            var task=queue.find(seed.owner(),seed.task()).orElseThrow();
+            if(!Set.of(TaskStatus.READY,TaskStatus.FAILED).contains(task.status()))queue.cancel(seed.owner(),seed.task());
         }
     }
     @Test void cat02ExactTitleAndConditionalDetailPassTheUnchangedOriginalActions() throws Exception {
@@ -77,8 +94,12 @@ class RoundFiveRegressionTest extends PostgresTestBase {
         var selected=new EditMetadata.Source("COMPONENT",null,"work-card",version,digest,null);
         UUID task=edits.create(baseline.seed().owner(),baseline.seed().app(),version,
                 "Change body color to #1d4ed8 for every shared instance; only edit the selected source file",selected,null).task().id();
+        var other=seed(); // Deliberately older queued work: the fixture must neither claim nor execute it.
+        try {
         var o=run(new Seed(baseline.seed().owner(),baseline.seed().app(),task),"EDIT02");
         assertThat(o.task().status()).as(o.task().failureCode()).isEqualTo(TaskStatus.READY);assertThat(o.task().repairAttempts()).isEqualTo(1);
+        assertThat(jdbc.sql("SELECT queue_state='QUEUED' AND lease_token IS NULL FROM generation_tasks WHERE id=?").param(other.task()).query(Boolean.class).single()).isTrue();
+        assertThat(jdbc.sql("SELECT count(*) FROM model_calls WHERE task_id=?").param(other.task()).query(Integer.class).single()).isZero();
         assertUnchangedActions(o);
         var repaired=AgentJournal.latest(o.events(),"draft");UUID after=UUID.fromString(repaired.path("versionId").asText());
         for(var f:base.path("files"))if(!f.path("path").asText().equals(WORK))
@@ -93,6 +114,7 @@ class RoundFiveRegressionTest extends PostgresTestBase {
         });
         // These three original heading assertions execute after the unique marker assertion in real Chromium.
         assertThat(repaired.path("actions")).hasSize(5);
+        } finally {queue.cancel(other.owner(),other.task());}
     }
     @Test void task03SameLexicalSyntaxShapeStillStopsWithoutRetryOrFreeze() throws Exception {
         var o=run(seed(),"SYNTAX");assertThat(o.task().status()).isEqualTo(TaskStatus.FAILED);
