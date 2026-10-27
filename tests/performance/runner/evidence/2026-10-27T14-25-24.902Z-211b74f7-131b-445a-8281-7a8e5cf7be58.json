@@ -1,0 +1,1412 @@
+{
+  "task": "D22-B",
+  "status": "FAILED",
+  "startedAt": "2026-10-27T14:25:24.899Z",
+  "coldDefinition": "first fresh container in this run; immutable dependencies already installed; host/VM page cache NOT flushed",
+  "warmDefinition": "subsequent fresh containers using the identical pinned image; no shared writable source or Vite cache",
+  "samples": [
+    {
+      "index": 0,
+      "owner": "A",
+      "temperature": "first-container",
+      "passed": true,
+      "buildMs": 5879.517599999999,
+      "build": {
+        "id": "3b2a2671-bc6c-4f8e-8c21-db99a531bca5",
+        "imageId": "sha256:29dced8e4f08ca43b5ea2e6189f845dbe87e1829707e2fd06a88cd79a4b6ac50",
+        "containerName": "codeless-build-3b2a2671-bc6c-4f8e-8c21-db99a531bca5",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 28 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[32mai-component-catalog.json  \u001b[39m\u001b[1m\u001b[2m 0.60 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.34 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-DLcdeGaP.js   \u001b[39m\u001b[1m\u001b[2m83.32 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.00 kB\u001b[22m\n\u001b[32m✓ built in 927ms\u001b[39m\n",
+          "bytes": 619,
+          "observedBytes": 619,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:9755d2f5d141fbd49dff17ff3c03caa2e2566690e1e619575c6ed67a09e270bb",
+          "bytes": 84207,
+          "files": [
+            {
+              "path": "ai-component-catalog.json",
+              "bytes": 598,
+              "digest": "sha256:acae74ef12217a74b12669ea2c6db421c2c73e172c51f294bf325123b7d3b7a2"
+            },
+            {
+              "path": "assets/index-DLcdeGaP.js",
+              "bytes": 83318,
+              "digest": "sha256:d07111c3e3dde30c12f26441564975ff2bd1ad99dbcaabc482baa8d6a568a956"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:a5cc45af4ca4d53772e52db51509a1273abbf11c90876636f24c388a277a3daf"
+            }
+          ],
+          "directory": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-gXF4hN\\artifacts\\3b2a2671-bc6c-4f8e-8c21-db99a531bca5"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-27T14:25:30.639Z",
+        "completedAt": "2026-10-27T14:25:36.516Z"
+      },
+      "isolation": {
+        "hostConfig": {
+          "Binds": null,
+          "ContainerIDFile": "",
+          "LogConfig": {
+            "Type": "none",
+            "Config": {}
+          },
+          "NetworkMode": "none",
+          "PortBindings": {},
+          "RestartPolicy": {
+            "Name": "no",
+            "MaximumRetryCount": 0
+          },
+          "AutoRemove": false,
+          "VolumeDriver": "",
+          "VolumesFrom": null,
+          "ConsoleSize": [
+            0,
+            0
+          ],
+          "CapAdd": null,
+          "CapDrop": [
+            "ALL"
+          ],
+          "CgroupnsMode": "private",
+          "Dns": null,
+          "DnsOptions": [],
+          "DnsSearch": [],
+          "ExtraHosts": null,
+          "GroupAdd": null,
+          "IpcMode": "private",
+          "Cgroup": "",
+          "Links": null,
+          "OomScoreAdj": 0,
+          "PidMode": "",
+          "Privileged": false,
+          "PublishAllPorts": false,
+          "ReadonlyRootfs": true,
+          "SecurityOpt": [
+            "no-new-privileges"
+          ],
+          "Tmpfs": {
+            "/tmp": "rw,nosuid,nodev,size=256m,mode=1777"
+          },
+          "UTSMode": "",
+          "UsernsMode": "",
+          "ShmSize": 67108864,
+          "Runtime": "runc",
+          "Isolation": "",
+          "CpuShares": 0,
+          "Memory": 536870912,
+          "NanoCpus": 1000000000,
+          "CgroupParent": "",
+          "BlkioWeight": 0,
+          "BlkioWeightDevice": [],
+          "BlkioDeviceReadBps": [],
+          "BlkioDeviceWriteBps": [],
+          "BlkioDeviceReadIOps": [],
+          "BlkioDeviceWriteIOps": [],
+          "CpuPeriod": 0,
+          "CpuQuota": 0,
+          "CpuRealtimePeriod": 0,
+          "CpuRealtimeRuntime": 0,
+          "CpusetCpus": "",
+          "CpusetMems": "",
+          "Devices": [],
+          "DeviceCgroupRules": null,
+          "DeviceRequests": null,
+          "MemoryReservation": 0,
+          "MemorySwap": 536870912,
+          "MemorySwappiness": null,
+          "OomKillDisable": false,
+          "PidsLimit": 128,
+          "Ulimits": [
+            {
+              "Name": "nofile",
+              "Hard": 1024,
+              "Soft": 1024
+            }
+          ],
+          "CpuCount": 0,
+          "CpuPercent": 0,
+          "IOMaximumIOps": 0,
+          "IOMaximumBandwidth": 0,
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-m7Siyx\\input",
+              "Target": "/input",
+              "ReadOnly": true
+            },
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-m7Siyx\\output",
+              "Target": "/output"
+            }
+          ],
+          "MaskedPaths": [
+            "/proc/acpi",
+            "/proc/asound",
+            "/proc/interrupts",
+            "/proc/kcore",
+            "/proc/keys",
+            "/proc/latency_stats",
+            "/proc/sched_debug",
+            "/proc/scsi",
+            "/proc/timer_list",
+            "/proc/timer_stats",
+            "/sys/devices/virtual/powercap",
+            "/sys/firmware"
+          ],
+          "ReadonlyPaths": [
+            "/proc/bus",
+            "/proc/fs",
+            "/proc/irq",
+            "/proc/sys",
+            "/proc/sysrq-trigger"
+          ]
+        },
+        "user": "1000:1000",
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-m7Siyx\\input",
+            "Destination": "/input",
+            "Mode": "",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-m7Siyx\\output",
+            "Destination": "/output",
+            "Mode": "",
+            "RW": true,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      "browserIncludingScreenshotMs": 1648.1353,
+      "browser": {
+        "id": "25594261-081a-42ed-bebd-467bf9a69617",
+        "buildId": "3b2a2671-bc6c-4f8e-8c21-db99a531bca5",
+        "sourceDigest": "sha256:baba6f7f772c57495e49a375236caf32eb2d57667e6a4e708b151f8e64395a13",
+        "artifactDigest": "sha256:9755d2f5d141fbd49dff17ff3c03caa2e2566690e1e619575c6ed67a09e270bb",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-27T14:25:36.817Z",
+        "completedAt": "2026-10-27T14:25:38.457Z",
+        "workerPid": 261440,
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1",
+          "timingsMs": {
+            "LAUNCH": 462.2007,
+            "PAGE_OPEN": 301.4746,
+            "CONTENT": 13.17939999999976,
+            "ACTION": 24.864299999999957,
+            "OBSERVE": 251.72950000000014,
+            "SCREENSHOT": 43.526800000000094,
+            "CLEANUP": 160.11380000000008
+          },
+          "browserPid": 272808
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-gXF4hN\\browser\\25594261-081a-42ed-bebd-467bf9a69617\\page.png",
+          "digest": "sha256:a572945450c1a7ce2ec5ced89faba6188a17f4a6276bd6cc41897677d48423bc",
+          "bytes": 13708,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-gXF4hN\\browser\\25594261-081a-42ed-bebd-467bf9a69617\\result.json"
+      },
+      "exitedPids": [
+        261440,
+        272808
+      ],
+      "screenshotMs": 43.526800000000094,
+      "persistedArtifact": {
+        "bytes": 84207,
+        "files": 3
+      },
+      "after": {
+        "work": {
+          "bytes": 0,
+          "files": 0
+        },
+        "artifacts": {
+          "bytes": 0,
+          "files": 0
+        },
+        "evidence": {
+          "bytes": 0,
+          "files": 0
+        },
+        "newStaging": []
+      }
+    },
+    {
+      "index": 1,
+      "owner": "A",
+      "temperature": "warm-image",
+      "passed": true,
+      "buildMs": 5636.394899999999,
+      "build": {
+        "id": "12b08b73-e4c6-4d5f-ace2-cc99d969a935",
+        "imageId": "sha256:29dced8e4f08ca43b5ea2e6189f845dbe87e1829707e2fd06a88cd79a4b6ac50",
+        "containerName": "codeless-build-12b08b73-e4c6-4d5f-ace2-cc99d969a935",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 28 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[32mai-component-catalog.json  \u001b[39m\u001b[1m\u001b[2m 0.60 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.34 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-DLcdeGaP.js   \u001b[39m\u001b[1m\u001b[2m83.32 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.00 kB\u001b[22m\n\u001b[32m✓ built in 873ms\u001b[39m\n",
+          "bytes": 619,
+          "observedBytes": 619,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:9755d2f5d141fbd49dff17ff3c03caa2e2566690e1e619575c6ed67a09e270bb",
+          "bytes": 84207,
+          "files": [
+            {
+              "path": "ai-component-catalog.json",
+              "bytes": 598,
+              "digest": "sha256:acae74ef12217a74b12669ea2c6db421c2c73e172c51f294bf325123b7d3b7a2"
+            },
+            {
+              "path": "assets/index-DLcdeGaP.js",
+              "bytes": 83318,
+              "digest": "sha256:d07111c3e3dde30c12f26441564975ff2bd1ad99dbcaabc482baa8d6a568a956"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:a5cc45af4ca4d53772e52db51509a1273abbf11c90876636f24c388a277a3daf"
+            }
+          ],
+          "directory": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-gXF4hN\\artifacts\\12b08b73-e4c6-4d5f-ace2-cc99d969a935"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-27T14:25:38.526Z",
+        "completedAt": "2026-10-27T14:25:44.160Z"
+      },
+      "isolation": {
+        "hostConfig": {
+          "Binds": null,
+          "ContainerIDFile": "",
+          "LogConfig": {
+            "Type": "none",
+            "Config": {}
+          },
+          "NetworkMode": "none",
+          "PortBindings": {},
+          "RestartPolicy": {
+            "Name": "no",
+            "MaximumRetryCount": 0
+          },
+          "AutoRemove": false,
+          "VolumeDriver": "",
+          "VolumesFrom": null,
+          "ConsoleSize": [
+            0,
+            0
+          ],
+          "CapAdd": null,
+          "CapDrop": [
+            "ALL"
+          ],
+          "CgroupnsMode": "private",
+          "Dns": null,
+          "DnsOptions": [],
+          "DnsSearch": [],
+          "ExtraHosts": null,
+          "GroupAdd": null,
+          "IpcMode": "private",
+          "Cgroup": "",
+          "Links": null,
+          "OomScoreAdj": 0,
+          "PidMode": "",
+          "Privileged": false,
+          "PublishAllPorts": false,
+          "ReadonlyRootfs": true,
+          "SecurityOpt": [
+            "no-new-privileges"
+          ],
+          "Tmpfs": {
+            "/tmp": "rw,nosuid,nodev,size=256m,mode=1777"
+          },
+          "UTSMode": "",
+          "UsernsMode": "",
+          "ShmSize": 67108864,
+          "Runtime": "runc",
+          "Isolation": "",
+          "CpuShares": 0,
+          "Memory": 536870912,
+          "NanoCpus": 1000000000,
+          "CgroupParent": "",
+          "BlkioWeight": 0,
+          "BlkioWeightDevice": [],
+          "BlkioDeviceReadBps": [],
+          "BlkioDeviceWriteBps": [],
+          "BlkioDeviceReadIOps": [],
+          "BlkioDeviceWriteIOps": [],
+          "CpuPeriod": 0,
+          "CpuQuota": 0,
+          "CpuRealtimePeriod": 0,
+          "CpuRealtimeRuntime": 0,
+          "CpusetCpus": "",
+          "CpusetMems": "",
+          "Devices": [],
+          "DeviceCgroupRules": null,
+          "DeviceRequests": null,
+          "MemoryReservation": 0,
+          "MemorySwap": 536870912,
+          "MemorySwappiness": null,
+          "OomKillDisable": false,
+          "PidsLimit": 128,
+          "Ulimits": [
+            {
+              "Name": "nofile",
+              "Hard": 1024,
+              "Soft": 1024
+            }
+          ],
+          "CpuCount": 0,
+          "CpuPercent": 0,
+          "IOMaximumIOps": 0,
+          "IOMaximumBandwidth": 0,
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-jMDl9R\\input",
+              "Target": "/input",
+              "ReadOnly": true
+            },
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-jMDl9R\\output",
+              "Target": "/output"
+            }
+          ],
+          "MaskedPaths": [
+            "/proc/acpi",
+            "/proc/asound",
+            "/proc/interrupts",
+            "/proc/kcore",
+            "/proc/keys",
+            "/proc/latency_stats",
+            "/proc/sched_debug",
+            "/proc/scsi",
+            "/proc/timer_list",
+            "/proc/timer_stats",
+            "/sys/devices/virtual/powercap",
+            "/sys/firmware"
+          ],
+          "ReadonlyPaths": [
+            "/proc/bus",
+            "/proc/fs",
+            "/proc/irq",
+            "/proc/sys",
+            "/proc/sysrq-trigger"
+          ]
+        },
+        "user": "1000:1000",
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-jMDl9R\\input",
+            "Destination": "/input",
+            "Mode": "",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-jMDl9R\\output",
+            "Destination": "/output",
+            "Mode": "",
+            "RW": true,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      "browserIncludingScreenshotMs": 1632.3853999999992,
+      "browser": {
+        "id": "4c365b68-ea6c-42be-a3a1-cb4e23d6c8ee",
+        "buildId": "12b08b73-e4c6-4d5f-ace2-cc99d969a935",
+        "sourceDigest": "sha256:baba6f7f772c57495e49a375236caf32eb2d57667e6a4e708b151f8e64395a13",
+        "artifactDigest": "sha256:9755d2f5d141fbd49dff17ff3c03caa2e2566690e1e619575c6ed67a09e270bb",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-27T14:25:44.448Z",
+        "completedAt": "2026-10-27T14:25:46.073Z",
+        "workerPid": 255192,
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1",
+          "timingsMs": {
+            "LAUNCH": 394.1603000000001,
+            "PAGE_OPEN": 336.63560000000007,
+            "CONTENT": 11.939599999999928,
+            "ACTION": 26.670700000000124,
+            "OBSERVE": 250.4629,
+            "SCREENSHOT": 24.775100000000066,
+            "CLEANUP": 169.4634000000001
+          },
+          "browserPid": 251848
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-gXF4hN\\browser\\4c365b68-ea6c-42be-a3a1-cb4e23d6c8ee\\page.png",
+          "digest": "sha256:a572945450c1a7ce2ec5ced89faba6188a17f4a6276bd6cc41897677d48423bc",
+          "bytes": 13708,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-gXF4hN\\browser\\4c365b68-ea6c-42be-a3a1-cb4e23d6c8ee\\result.json"
+      },
+      "exitedPids": [
+        255192,
+        251848
+      ],
+      "screenshotMs": 24.775100000000066,
+      "persistedArtifact": {
+        "bytes": 84207,
+        "files": 3
+      },
+      "after": {
+        "work": {
+          "bytes": 0,
+          "files": 0
+        },
+        "artifacts": {
+          "bytes": 0,
+          "files": 0
+        },
+        "evidence": {
+          "bytes": 0,
+          "files": 0
+        },
+        "newStaging": []
+      }
+    },
+    {
+      "index": 2,
+      "owner": "B",
+      "temperature": "warm-image",
+      "passed": true,
+      "buildMs": 5769.275699999998,
+      "build": {
+        "id": "2a76c6e9-62b6-4d61-8e9f-56a00a60a4c3",
+        "imageId": "sha256:29dced8e4f08ca43b5ea2e6189f845dbe87e1829707e2fd06a88cd79a4b6ac50",
+        "containerName": "codeless-build-2a76c6e9-62b6-4d61-8e9f-56a00a60a4c3",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 28 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[32mai-component-catalog.json  \u001b[39m\u001b[1m\u001b[2m 0.60 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.33 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-BKQ6pviD.js   \u001b[39m\u001b[1m\u001b[2m83.32 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.00 kB\u001b[22m\n\u001b[32m✓ built in 980ms\u001b[39m\n",
+          "bytes": 619,
+          "observedBytes": 619,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:e2bea302566d463b661b9105dd92b9fb1f33324df8ced17d4a9253060f96734b",
+          "bytes": 84207,
+          "files": [
+            {
+              "path": "ai-component-catalog.json",
+              "bytes": 598,
+              "digest": "sha256:d8a26bd9d66a49ce779b0aaaa378b21fa26a16f5198e17161abddef5e0058726"
+            },
+            {
+              "path": "assets/index-BKQ6pviD.js",
+              "bytes": 83318,
+              "digest": "sha256:b57f1cd4234547f0ce2699f8e53e6ee9655c3dc06d3f438542a622c2ca4ec283"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:1f832b27ecf1352a9b755d5eee497e25b69fef5c5ce4473dd043f7217a45f5af"
+            }
+          ],
+          "directory": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-gXF4hN\\artifacts\\2a76c6e9-62b6-4d61-8e9f-56a00a60a4c3"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-27T14:25:46.140Z",
+        "completedAt": "2026-10-27T14:25:51.907Z"
+      },
+      "isolation": {
+        "hostConfig": {
+          "Binds": null,
+          "ContainerIDFile": "",
+          "LogConfig": {
+            "Type": "none",
+            "Config": {}
+          },
+          "NetworkMode": "none",
+          "PortBindings": {},
+          "RestartPolicy": {
+            "Name": "no",
+            "MaximumRetryCount": 0
+          },
+          "AutoRemove": false,
+          "VolumeDriver": "",
+          "VolumesFrom": null,
+          "ConsoleSize": [
+            0,
+            0
+          ],
+          "CapAdd": null,
+          "CapDrop": [
+            "ALL"
+          ],
+          "CgroupnsMode": "private",
+          "Dns": null,
+          "DnsOptions": [],
+          "DnsSearch": [],
+          "ExtraHosts": null,
+          "GroupAdd": null,
+          "IpcMode": "private",
+          "Cgroup": "",
+          "Links": null,
+          "OomScoreAdj": 0,
+          "PidMode": "",
+          "Privileged": false,
+          "PublishAllPorts": false,
+          "ReadonlyRootfs": true,
+          "SecurityOpt": [
+            "no-new-privileges"
+          ],
+          "Tmpfs": {
+            "/tmp": "rw,nosuid,nodev,size=256m,mode=1777"
+          },
+          "UTSMode": "",
+          "UsernsMode": "",
+          "ShmSize": 67108864,
+          "Runtime": "runc",
+          "Isolation": "",
+          "CpuShares": 0,
+          "Memory": 536870912,
+          "NanoCpus": 1000000000,
+          "CgroupParent": "",
+          "BlkioWeight": 0,
+          "BlkioWeightDevice": [],
+          "BlkioDeviceReadBps": [],
+          "BlkioDeviceWriteBps": [],
+          "BlkioDeviceReadIOps": [],
+          "BlkioDeviceWriteIOps": [],
+          "CpuPeriod": 0,
+          "CpuQuota": 0,
+          "CpuRealtimePeriod": 0,
+          "CpuRealtimeRuntime": 0,
+          "CpusetCpus": "",
+          "CpusetMems": "",
+          "Devices": [],
+          "DeviceCgroupRules": null,
+          "DeviceRequests": null,
+          "MemoryReservation": 0,
+          "MemorySwap": 536870912,
+          "MemorySwappiness": null,
+          "OomKillDisable": false,
+          "PidsLimit": 128,
+          "Ulimits": [
+            {
+              "Name": "nofile",
+              "Hard": 1024,
+              "Soft": 1024
+            }
+          ],
+          "CpuCount": 0,
+          "CpuPercent": 0,
+          "IOMaximumIOps": 0,
+          "IOMaximumBandwidth": 0,
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-8upKmR\\input",
+              "Target": "/input",
+              "ReadOnly": true
+            },
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-8upKmR\\output",
+              "Target": "/output"
+            }
+          ],
+          "MaskedPaths": [
+            "/proc/acpi",
+            "/proc/asound",
+            "/proc/interrupts",
+            "/proc/kcore",
+            "/proc/keys",
+            "/proc/latency_stats",
+            "/proc/sched_debug",
+            "/proc/scsi",
+            "/proc/timer_list",
+            "/proc/timer_stats",
+            "/sys/devices/virtual/powercap",
+            "/sys/firmware"
+          ],
+          "ReadonlyPaths": [
+            "/proc/bus",
+            "/proc/fs",
+            "/proc/irq",
+            "/proc/sys",
+            "/proc/sysrq-trigger"
+          ]
+        },
+        "user": "1000:1000",
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-8upKmR\\input",
+            "Destination": "/input",
+            "Mode": "",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-8upKmR\\output",
+            "Destination": "/output",
+            "Mode": "",
+            "RW": true,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      "browserIncludingScreenshotMs": 1534.105599999999,
+      "browser": {
+        "id": "4478156f-2a56-49f8-b470-0ec7aee84c52",
+        "buildId": "2a76c6e9-62b6-4d61-8e9f-56a00a60a4c3",
+        "sourceDigest": "sha256:a44ebb58615a921c7ee277a82e567f65c53fae9f39d671942db74be36b44415b",
+        "artifactDigest": "sha256:e2bea302566d463b661b9105dd92b9fb1f33324df8ced17d4a9253060f96734b",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-27T14:25:52.148Z",
+        "completedAt": "2026-10-27T14:25:53.680Z",
+        "workerPid": 257188,
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1",
+          "timingsMs": {
+            "LAUNCH": 415.1746000000001,
+            "PAGE_OPEN": 280.42060000000004,
+            "CONTENT": 11.476899999999887,
+            "ACTION": 25.196300000000065,
+            "OBSERVE": 251.1722000000001,
+            "SCREENSHOT": 25.789999999999964,
+            "CLEANUP": 144.19880000000012
+          },
+          "browserPid": 230868
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-gXF4hN\\browser\\4478156f-2a56-49f8-b470-0ec7aee84c52\\page.png",
+          "digest": "sha256:b321fdf4a7ce70bbd98d79adb98b60b538ce1e1e37de0bb03dc2f3e2ce35c11b",
+          "bytes": 14304,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-gXF4hN\\browser\\4478156f-2a56-49f8-b470-0ec7aee84c52\\result.json"
+      },
+      "exitedPids": [
+        257188,
+        230868
+      ],
+      "screenshotMs": 25.789999999999964,
+      "persistedArtifact": {
+        "bytes": 84207,
+        "files": 3
+      },
+      "after": {
+        "work": {
+          "bytes": 0,
+          "files": 0
+        },
+        "artifacts": {
+          "bytes": 0,
+          "files": 0
+        },
+        "evidence": {
+          "bytes": 0,
+          "files": 0
+        },
+        "newStaging": []
+      }
+    },
+    {
+      "index": 3,
+      "owner": "A",
+      "temperature": "warm-image",
+      "passed": true,
+      "buildMs": 5753.909599999999,
+      "build": {
+        "id": "15f2b7b5-4388-4eeb-986c-e5a8cca193b3",
+        "imageId": "sha256:29dced8e4f08ca43b5ea2e6189f845dbe87e1829707e2fd06a88cd79a4b6ac50",
+        "containerName": "codeless-build-15f2b7b5-4388-4eeb-986c-e5a8cca193b3",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 28 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[32mai-component-catalog.json  \u001b[39m\u001b[1m\u001b[2m 0.60 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.34 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-DLcdeGaP.js   \u001b[39m\u001b[1m\u001b[2m83.32 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.00 kB\u001b[22m\n\u001b[32m✓ built in 874ms\u001b[39m\n",
+          "bytes": 619,
+          "observedBytes": 619,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:9755d2f5d141fbd49dff17ff3c03caa2e2566690e1e619575c6ed67a09e270bb",
+          "bytes": 84207,
+          "files": [
+            {
+              "path": "ai-component-catalog.json",
+              "bytes": 598,
+              "digest": "sha256:acae74ef12217a74b12669ea2c6db421c2c73e172c51f294bf325123b7d3b7a2"
+            },
+            {
+              "path": "assets/index-DLcdeGaP.js",
+              "bytes": 83318,
+              "digest": "sha256:d07111c3e3dde30c12f26441564975ff2bd1ad99dbcaabc482baa8d6a568a956"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:a5cc45af4ca4d53772e52db51509a1273abbf11c90876636f24c388a277a3daf"
+            }
+          ],
+          "directory": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-gXF4hN\\artifacts\\15f2b7b5-4388-4eeb-986c-e5a8cca193b3"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-27T14:25:53.708Z",
+        "completedAt": "2026-10-27T14:25:59.461Z"
+      },
+      "isolation": {
+        "hostConfig": {
+          "Binds": null,
+          "ContainerIDFile": "",
+          "LogConfig": {
+            "Type": "none",
+            "Config": {}
+          },
+          "NetworkMode": "none",
+          "PortBindings": {},
+          "RestartPolicy": {
+            "Name": "no",
+            "MaximumRetryCount": 0
+          },
+          "AutoRemove": false,
+          "VolumeDriver": "",
+          "VolumesFrom": null,
+          "ConsoleSize": [
+            0,
+            0
+          ],
+          "CapAdd": null,
+          "CapDrop": [
+            "ALL"
+          ],
+          "CgroupnsMode": "private",
+          "Dns": null,
+          "DnsOptions": [],
+          "DnsSearch": [],
+          "ExtraHosts": null,
+          "GroupAdd": null,
+          "IpcMode": "private",
+          "Cgroup": "",
+          "Links": null,
+          "OomScoreAdj": 0,
+          "PidMode": "",
+          "Privileged": false,
+          "PublishAllPorts": false,
+          "ReadonlyRootfs": true,
+          "SecurityOpt": [
+            "no-new-privileges"
+          ],
+          "Tmpfs": {
+            "/tmp": "rw,nosuid,nodev,size=256m,mode=1777"
+          },
+          "UTSMode": "",
+          "UsernsMode": "",
+          "ShmSize": 67108864,
+          "Runtime": "runc",
+          "Isolation": "",
+          "CpuShares": 0,
+          "Memory": 536870912,
+          "NanoCpus": 1000000000,
+          "CgroupParent": "",
+          "BlkioWeight": 0,
+          "BlkioWeightDevice": [],
+          "BlkioDeviceReadBps": [],
+          "BlkioDeviceWriteBps": [],
+          "BlkioDeviceReadIOps": [],
+          "BlkioDeviceWriteIOps": [],
+          "CpuPeriod": 0,
+          "CpuQuota": 0,
+          "CpuRealtimePeriod": 0,
+          "CpuRealtimeRuntime": 0,
+          "CpusetCpus": "",
+          "CpusetMems": "",
+          "Devices": [],
+          "DeviceCgroupRules": null,
+          "DeviceRequests": null,
+          "MemoryReservation": 0,
+          "MemorySwap": 536870912,
+          "MemorySwappiness": null,
+          "OomKillDisable": false,
+          "PidsLimit": 128,
+          "Ulimits": [
+            {
+              "Name": "nofile",
+              "Hard": 1024,
+              "Soft": 1024
+            }
+          ],
+          "CpuCount": 0,
+          "CpuPercent": 0,
+          "IOMaximumIOps": 0,
+          "IOMaximumBandwidth": 0,
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-X4g8g0\\input",
+              "Target": "/input",
+              "ReadOnly": true
+            },
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-X4g8g0\\output",
+              "Target": "/output"
+            }
+          ],
+          "MaskedPaths": [
+            "/proc/acpi",
+            "/proc/asound",
+            "/proc/interrupts",
+            "/proc/kcore",
+            "/proc/keys",
+            "/proc/latency_stats",
+            "/proc/sched_debug",
+            "/proc/scsi",
+            "/proc/timer_list",
+            "/proc/timer_stats",
+            "/sys/devices/virtual/powercap",
+            "/sys/firmware"
+          ],
+          "ReadonlyPaths": [
+            "/proc/bus",
+            "/proc/fs",
+            "/proc/irq",
+            "/proc/sys",
+            "/proc/sysrq-trigger"
+          ]
+        },
+        "user": "1000:1000",
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-X4g8g0\\input",
+            "Destination": "/input",
+            "Mode": "",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-X4g8g0\\output",
+            "Destination": "/output",
+            "Mode": "",
+            "RW": true,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      "browserIncludingScreenshotMs": 1598.2275999999983,
+      "browser": {
+        "id": "e26d9b7d-5251-4e27-b266-7b1315f1c495",
+        "buildId": "15f2b7b5-4388-4eeb-986c-e5a8cca193b3",
+        "sourceDigest": "sha256:baba6f7f772c57495e49a375236caf32eb2d57667e6a4e708b151f8e64395a13",
+        "artifactDigest": "sha256:9755d2f5d141fbd49dff17ff3c03caa2e2566690e1e619575c6ed67a09e270bb",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-27T14:25:59.732Z",
+        "completedAt": "2026-10-27T14:26:01.323Z",
+        "workerPid": 269120,
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1",
+          "timingsMs": {
+            "LAUNCH": 387.84360000000004,
+            "PAGE_OPEN": 367.43319999999994,
+            "CONTENT": 10.78020000000015,
+            "ACTION": 24.814300000000003,
+            "OBSERVE": 255.08429999999998,
+            "SCREENSHOT": 23.17190000000005,
+            "CLEANUP": 134.25350000000003
+          },
+          "browserPid": 271008
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-gXF4hN\\browser\\e26d9b7d-5251-4e27-b266-7b1315f1c495\\page.png",
+          "digest": "sha256:a572945450c1a7ce2ec5ced89faba6188a17f4a6276bd6cc41897677d48423bc",
+          "bytes": 13708,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-gXF4hN\\browser\\e26d9b7d-5251-4e27-b266-7b1315f1c495\\result.json"
+      },
+      "exitedPids": [
+        269120,
+        271008
+      ],
+      "screenshotMs": 23.17190000000005,
+      "persistedArtifact": {
+        "bytes": 84207,
+        "files": 3
+      },
+      "after": {
+        "work": {
+          "bytes": 0,
+          "files": 0
+        },
+        "artifacts": {
+          "bytes": 0,
+          "files": 0
+        },
+        "evidence": {
+          "bytes": 0,
+          "files": 0
+        },
+        "newStaging": []
+      }
+    }
+  ],
+  "resources": [
+    {
+      "mode": "timeout",
+      "limits": {
+        "timeoutMs": 5000
+      },
+      "passed": true,
+      "elapsedMs": 6585.920899999997,
+      "result": {
+        "id": "0a1352f9-6ae1-4409-903a-f98801148293",
+        "imageId": "sha256:8863452d8a7bd01d6c826bf2333428b2ed22561fc79511aad2d3c56b6681b3a8",
+        "containerName": "codeless-build-0a1352f9-6ae1-4409-903a-f98801148293",
+        "status": "FAILED",
+        "failure": "TIMEOUT",
+        "exitCode": 137,
+        "oomKilled": false,
+        "timedOut": true,
+        "log": {
+          "text": "loop child started\n",
+          "bytes": 19,
+          "observedBytes": 19,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-27T14:26:01.388Z",
+        "completedAt": "2026-10-27T14:26:07.972Z"
+      }
+    },
+    {
+      "mode": "logs",
+      "limits": {
+        "logBytes": 16384
+      },
+      "passed": true,
+      "elapsedMs": 1728.8875999999946,
+      "result": {
+        "id": "a9a71099-e380-437f-bb83-8705f706d73c",
+        "imageId": "sha256:8863452d8a7bd01d6c826bf2333428b2ed22561fc79511aad2d3c56b6681b3a8",
+        "containerName": "codeless-build-a9a71099-e380-437f-bb83-8705f706d73c",
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 7,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+          "bytes": 16384,
+          "observedBytes": 400000,
+          "truncated": true
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-27T14:26:08.229Z",
+        "completedAt": "2026-10-27T14:26:09.956Z"
+      }
+    },
+    {
+      "mode": "memory",
+      "limits": {
+        "memoryMiB": 96,
+        "timeoutMs": 15000
+      },
+      "passed": true,
+      "elapsedMs": 2092.1549000000014,
+      "result": {
+        "id": "74b87ed9-23c6-489f-929f-47a280b25154",
+        "imageId": "sha256:8863452d8a7bd01d6c826bf2333428b2ed22561fc79511aad2d3c56b6681b3a8",
+        "containerName": "codeless-build-74b87ed9-23c6-489f-929f-47a280b25154",
+        "status": "FAILED",
+        "failure": "OOM",
+        "exitCode": 137,
+        "oomKilled": true,
+        "timedOut": false,
+        "log": {
+          "text": "MEMORY_CGROUP_OOM {\"signal\":\"SIGKILL\",\"memoryMax\":100663296,\"swapMax\":0,\"oomKillBefore\":0,\"oomKillAfter\":1}\n",
+          "bytes": 108,
+          "observedBytes": 108,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-27T14:26:10.213Z",
+        "completedAt": "2026-10-27T14:26:12.303Z"
+      },
+      "liveOOM": {
+        "value": {
+          "Status": "running",
+          "Running": true,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": true,
+          "Dead": false,
+          "Pid": 40747,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-27T14:26:10.836435282Z",
+          "FinishedAt": "0001-01-01T00:00:00Z"
+        }
+      }
+    }
+  ],
+  "queue": null,
+  "apiIsolation": "separate api-isolation.mjs required",
+  "paidModelRequests": 0,
+  "machine": {
+    "node": "v24.22.1",
+    "platform": "win32",
+    "release": "10.0.26200",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "logicalCpus": 20,
+    "memoryBytes": 25551560704,
+    "docker": {
+      "version": "29.9.2",
+      "os": "Docker Desktop",
+      "cpus": 20,
+      "memoryBytes": 12428419072,
+      "driver": "overlayfs",
+      "cgroupVersion": "2"
+    },
+    "imageId": "sha256:29dced8e4f08ca43b5ea2e6189f845dbe87e1829707e2fd06a88cd79a4b6ac50"
+  },
+  "limits": {
+    "timeoutMs": 120000,
+    "memoryMiB": 512,
+    "cpus": 1,
+    "pids": 128,
+    "tmpMiB": 256,
+    "logBytes": 65536,
+    "artifactBytes": 33554432,
+    "artifactFiles": 2000
+  },
+  "baseline": {
+    "disk": {
+      "bytes": 0,
+      "files": 0
+    },
+    "staging": []
+  },
+  "after": {
+    "disk": {
+      "bytes": 0,
+      "files": 0
+    },
+    "staging": []
+  },
+  "ownedRootRemoved": true,
+  "completedAt": "2026-10-27T14:26:12.599Z",
+  "revision": "dcb3866d2ca52a3a595e5167bfefa60bb6e862c1",
+  "revisionRole": "checkout-reference",
+  "sources": {
+    "tests/performance/runner/acceptance.test.mjs": "sha256:2399e5b91f0912fca3ca106abb0f4f214f615dfb52a15d11136fc1f196136e37",
+    "tests/performance/runner/support.mjs": "sha256:ac96351dce5d2c6786f852057cde629c971934d9c43c4d8af0261ca5124b429e",
+    "infra/build-image/Dockerfile": "sha256:371149e8a7050822db05aa8bdbbc303259fc9b1a2072c5062a9d066b68ac1ff1",
+    "infra/build-image/Dockerfile.dockerignore": "sha256:daa6d06520d2a756bb0ee80a45d470d2b71ec14aa2b63129c63ccde13fa15e77",
+    "infra/build-image/build-image.ps1": "sha256:0b307eeee7607d2d593a62b47dbd95a501108710b56a6a945cbe20ed663b5033",
+    "infra/build-image/container-build.mjs": "sha256:a5b9e62315be8f3431b35429e329bc9bc0f15bf98f325c1f05a0858702ff5f19",
+    "infra/build-image/verify-dependencies.mjs": "sha256:1dca26ce02f251eaa2490905c271d169184fd48028ca783ef8b06fdf3d9d3d4c",
+    "infra/runner/README.md": "sha256:45bbbf7ca94610be9d9d9f35db7b57a00d1fc6985d4b14ee88613898c04ddb74",
+    "infra/runner/policy.mjs": "sha256:bab2471781cd75317c17f0f3e4b168169bbb41f9d2e93b85c28ccae7d392d9c2",
+    "services/runner/.gitkeep": "sha256:7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "services/runner/build-contract.mjs": "sha256:f1896c6a70be210147ba9b9bf41e541a5738ccc077a14210d54788b31d3c666d",
+    "services/runner/health.mjs": "sha256:25b682d1761e62ec61a3e54b8e2aa84111bedd6906b2a2a4d717af4c98f91bbe",
+    "services/runner/main.mjs": "sha256:4177a2ba046ec76d898bdf5091638ea6ce163c20969f508804c5af08ed9e91d8",
+    "services/runner/src/artifacts/routes.mjs": "sha256:320749cc9b32799a447c0ae771a14e95d82dcf544058225fcac00865dc8f7f74",
+    "services/runner/src/artifacts/service.mjs": "sha256:077c56c4c35c9c13393a4cba551925c3594ac748dd5aa71042af268c7728b08c",
+    "services/runner/src/artifacts/snapshot.mjs": "sha256:b804933c5242102272fc1b1951b16c35f371c8fcdadb427408af8e1134dd2427",
+    "services/runner/src/build/oom-evidence.mjs": "sha256:9d6f28c4cd97061113ef166c6d6e691914107773f261f63f230769575f2a92bd",
+    "services/runner/src/build/runner.mjs": "sha256:04d57147206a533d5002079ae27ee207f63006c58c613cecf6f387cdbcf377b3",
+    "services/runner/src/mapping/manifest.mjs": "sha256:6ee63f194442d57f96c2c7f78ad38a41a6355f24179da74d68631222bc3f7ac9",
+    "services/runner/src/preview/credentials.mjs": "sha256:bfba4aef951271b8c81600174b52f496fb96c8e6daf08633c6359f34762d9533",
+    "services/runner/src/preview/gateway.mjs": "sha256:881cd7b1f575f3151cfc70434c074bbce33a46378d949c199f27900fd4ebb1e2",
+    "services/runner/src/preview/main.mjs": "sha256:5076e9c4412ba4d5da86a9a2f71310dd178abf9d40ce5ee2a20b2f65f1f6f4a5",
+    "services/runner/src/preview/registry.mjs": "sha256:eaba8cce71ecf39358797e9e3f35065b76801b296ca16d8f93b5377a85c2d156",
+    "services/runner/src/preview/site-policy.mjs": "sha256:671a877fa60652aeebaa70649ace3f171815c95de74d8a7719c3059dd20b3815",
+    "services/runner/src/publish/frozen-gateway.mjs": "sha256:356dafb6df0108c892de65d1115a6aa6c77eb2892c0de1974c759c988a0436c0",
+    "services/runner/src/publish/gateway-cli.mjs": "sha256:562602d992557551c251889b779c335604f74709829d3de7e052511c8b0d8e4a",
+    "services/runner/src/publish/java/NodeDeploymentGateway.java": "sha256:d323aba9066071556f32392676d9778418fdfc08f3de26fa7ccf37aa88d0c659",
+    "services/runner/src/publish/policy.mjs": "sha256:d35411c8fc602e8aa0a06b8cdbc23a9aeaa7f54372b2b148dd83779dd8279945",
+    "services/runner/src/publish/probe-policy.mjs": "sha256:889ac84e0b3a70dec14f48e76781953e182b9938619e684a180929109827b4ec",
+    "services/runner/src/publish/probe-worker.mjs": "sha256:50d573de4a20f7a7dd055f7e2d9ecc745b13c89e5d95daf5491ce0e53030c777",
+    "services/runner/src/publish/probe.mjs": "sha256:c8cdc7f6c8082d872a5e45509a7912c6a05aef0490ee4d5b78f959117a4ee71e",
+    "services/runner/src/publish/publisher.mjs": "sha256:48df394e0e3d201a669204f521bc40e0b88a2060debd85d94551e1cf435721f1",
+    "services/runner/src/publish/store.mjs": "sha256:52c273dfdc845e47a3e7c1de99e59318d44d050b2f0325c51fd01a3f8ef43538",
+    "services/runner/src/publish/workflow.mjs": "sha256:bd735cc469d3baee0b1fbb460cfa252665e39974c661248192ddc8bcb569f310",
+    "services/runner/src/screenshot/README.md": "sha256:e0fdd89aa8061b88b8df641ad2d0fd8f0a2ac56000321db4a8ce1c778102c97c",
+    "services/runner/src/screenshot/adapter.mjs": "sha256:6b83dde330a5976409547334a156f776e8ce4aaa36abc5a500abaa90236ca663",
+    "services/runner/src/screenshot/capture.mjs": "sha256:d63cdb74a44c36786b1a39dacbef128b75da43dc4a1fa10ad259905cfb247a2f",
+    "services/runner/src/screenshot/network.mjs": "sha256:e6ad36db6a4ea71a3f11c10c0fe57f9ac331f9ce35329bf014c3f4ad2d7d48c8",
+    "services/runner/src/screenshot/owner.mjs": "sha256:792d95fa701263db2123ebc024bb1302243c46032351f8259d7aebba3c7d49e6",
+    "services/runner/src/screenshot/queue.mjs": "sha256:31cc3f95db15acc12e602aef632a17825f28967d0e42f54c307adec9fd77f76a",
+    "services/runner/src/screenshot/recover-lock.mjs": "sha256:e265306ed9e321f04378247f1f00f16c7ecaacf713724f16d6ef2e1b9144a839",
+    "services/runner/src/screenshot/target.mjs": "sha256:38b6e1dce48535e7bf0673033104f7bffe7d3f6bdefcb317e4b4616cee44e590",
+    "services/runner/src/screenshot/worker.mjs": "sha256:fbae2005d7af40e41d8f621327e0d1f3bf764884f363400aa91f2749829624d5",
+    "services/runner/src/template/build.mjs": "sha256:ab564e2ef1b8e23faf3ed7dc1b8f2ca156f471c28d436d762544b255cd6e9d4a",
+    "services/runner/src/verify/README.md": "sha256:6b57d294b8de81013a7f775ff005415142bfd6bfb6889260986b8b6ab4aa0e53",
+    "services/runner/src/verify/actions.mjs": "sha256:6476eaef58f59197caf6bf6db7148493482eaf17aac0601bd5bcecef6c464186",
+    "services/runner/src/verify/verifier.mjs": "sha256:4e0cdbf56db2a4b9e304db12335c7f3e7d699325935a5e14f1943235dc0531ec",
+    "services/runner/src/verify/worker.mjs": "sha256:ffe12c9aeccbad7f20a01bc2b23518726f182a4288e76638d86a540a1365006c",
+    "services/runner/src/verify/workflow.mjs": "sha256:eeddd32b437cab19569364d59b96c017234f087d8dc68e02e44330ec63284cec",
+    "templates/vue/.gitkeep": "sha256:7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "templates/vue/README.md": "sha256:d0cda80bced1759a0ae9595998783ccdf59b59ba39a9794866eb576b2e7a50df",
+    "templates/vue/allowed-dependencies.json": "sha256:4a6144fa3596bb9e06898e0a6b968e0f8007615fd44165a3f93e9fad13015a4d",
+    "templates/vue/fixtures/catalog/src/pages/CatalogPage.vue": "sha256:ea53dc0e51d715e30e8d9e09d85f5b75ae2808dbc8eb9e80a2ff23be5e184926",
+    "templates/vue/fixtures/mapping/src/components/SharedCard.vue": "sha256:65ec81b23ac6f84dd1df0b45740be29545c8c5e008d0591d2f788457daa12dc9",
+    "templates/vue/fixtures/mapping/src/pages/HomePage.vue": "sha256:33f1ce80bc0ed5b7f6fde7685fb346f92b083182723fe1935562f17fad137a3a",
+    "templates/vue/fixtures/showcase/src/pages/HomePage.vue": "sha256:97e89389a1b60c2ba5dfded5c8a339ac0f298e95011e07c43bd47613d8644c37",
+    "templates/vue/fixtures/tasks/src/pages/TasksPage.vue": "sha256:2a3e7d147b8f077000600e82efcb85bb30a47f64653371c4d3bf53de382115f8",
+    "templates/vue/index.html": "sha256:84eff9c259555bd0b3c78312ce4c9f72b85ff2a0b74dc69d757043c66aa7df87",
+    "templates/vue/package.json": "sha256:7d011ea866bf56006fdc25ee81d7e19a47ab523b57b70133466b6605aee601f4",
+    "templates/vue/pnpm-lock.yaml": "sha256:874081f812956eb4bb2c052551a50b3cae617132ccc0fe97e4f1ca024132cdd5",
+    "templates/vue/pnpm-workspace.yaml": "sha256:7bb91bb52adad825af75ce5492864b101167572c982ff37a0d3f080d8d6fcc53",
+    "templates/vue/preview-bridge/README.md": "sha256:2749bb607186e2d3349c7a723c4bda0ae80f59158fdaee5a9b64c652685e5608",
+    "templates/vue/preview-bridge/selector.mjs": "sha256:0e3a0249c3b88bb86b63274d14abef3ea60dc15a6b5c68baac9f1cac025d2aa3",
+    "templates/vue/src/App.vue": "sha256:a24602d6e7518244319bbd01d899c582c14a20074f4c24a110130b6580ea6355",
+    "templates/vue/src/build-node.d.ts": "sha256:56014a76d9104d45f2f90c887f2c33d0714258486518ec2d346e180e95cb1ba0",
+    "templates/vue/src/main.ts": "sha256:fad878badc626d8609bb70fcf3815164faa52c7269e46922a8f166e58297d079",
+    "templates/vue/src/pages/CatalogPage.vue": "sha256:5efc1c4c9216449341b90c1c2919b0966db437d0291e7f8bd1feb07147294b5b",
+    "templates/vue/src/pages/HomePage.vue": "sha256:5629ad4797b6c262cfd77dc0d2a27ed0337645a6a926d7bd8f0266c190d44b5b",
+    "templates/vue/src/pages/TasksPage.vue": "sha256:f20450a12e04f974d54fcb327a37fe97575b9dd14a37ef9e43ef4eec9953cfa2",
+    "templates/vue/src/router.ts": "sha256:a37dd921ede8553748398499eb0e2ca53b3ec839bcb46c2a6b39130c687cb932",
+    "templates/vue/tsconfig.json": "sha256:fb6b94f16fc0db3d6895ce4e6a5ff5fdb451a51576bca833ae6563a33b3f32e5",
+    "templates/vue/vite.config.ts": "sha256:cd0f31eb449367f9b99e816780f2fa50a5e43e74e94ee11fbfc5e3e3a09e709a"
+  },
+  "endSources": {
+    "tests/performance/runner/acceptance.test.mjs": "sha256:2399e5b91f0912fca3ca106abb0f4f214f615dfb52a15d11136fc1f196136e37",
+    "tests/performance/runner/support.mjs": "sha256:ac96351dce5d2c6786f852057cde629c971934d9c43c4d8af0261ca5124b429e",
+    "infra/build-image/Dockerfile": "sha256:371149e8a7050822db05aa8bdbbc303259fc9b1a2072c5062a9d066b68ac1ff1",
+    "infra/build-image/Dockerfile.dockerignore": "sha256:daa6d06520d2a756bb0ee80a45d470d2b71ec14aa2b63129c63ccde13fa15e77",
+    "infra/build-image/build-image.ps1": "sha256:0b307eeee7607d2d593a62b47dbd95a501108710b56a6a945cbe20ed663b5033",
+    "infra/build-image/container-build.mjs": "sha256:a5b9e62315be8f3431b35429e329bc9bc0f15bf98f325c1f05a0858702ff5f19",
+    "infra/build-image/verify-dependencies.mjs": "sha256:1dca26ce02f251eaa2490905c271d169184fd48028ca783ef8b06fdf3d9d3d4c",
+    "infra/runner/README.md": "sha256:45bbbf7ca94610be9d9d9f35db7b57a00d1fc6985d4b14ee88613898c04ddb74",
+    "infra/runner/policy.mjs": "sha256:bab2471781cd75317c17f0f3e4b168169bbb41f9d2e93b85c28ccae7d392d9c2",
+    "services/runner/.gitkeep": "sha256:7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "services/runner/build-contract.mjs": "sha256:f1896c6a70be210147ba9b9bf41e541a5738ccc077a14210d54788b31d3c666d",
+    "services/runner/health.mjs": "sha256:25b682d1761e62ec61a3e54b8e2aa84111bedd6906b2a2a4d717af4c98f91bbe",
+    "services/runner/main.mjs": "sha256:4177a2ba046ec76d898bdf5091638ea6ce163c20969f508804c5af08ed9e91d8",
+    "services/runner/src/artifacts/routes.mjs": "sha256:320749cc9b32799a447c0ae771a14e95d82dcf544058225fcac00865dc8f7f74",
+    "services/runner/src/artifacts/service.mjs": "sha256:077c56c4c35c9c13393a4cba551925c3594ac748dd5aa71042af268c7728b08c",
+    "services/runner/src/artifacts/snapshot.mjs": "sha256:b804933c5242102272fc1b1951b16c35f371c8fcdadb427408af8e1134dd2427",
+    "services/runner/src/build/oom-evidence.mjs": "sha256:9d6f28c4cd97061113ef166c6d6e691914107773f261f63f230769575f2a92bd",
+    "services/runner/src/build/runner.mjs": "sha256:04d57147206a533d5002079ae27ee207f63006c58c613cecf6f387cdbcf377b3",
+    "services/runner/src/mapping/manifest.mjs": "sha256:6ee63f194442d57f96c2c7f78ad38a41a6355f24179da74d68631222bc3f7ac9",
+    "services/runner/src/preview/credentials.mjs": "sha256:bfba4aef951271b8c81600174b52f496fb96c8e6daf08633c6359f34762d9533",
+    "services/runner/src/preview/gateway.mjs": "sha256:881cd7b1f575f3151cfc70434c074bbce33a46378d949c199f27900fd4ebb1e2",
+    "services/runner/src/preview/main.mjs": "sha256:5076e9c4412ba4d5da86a9a2f71310dd178abf9d40ce5ee2a20b2f65f1f6f4a5",
+    "services/runner/src/preview/registry.mjs": "sha256:eaba8cce71ecf39358797e9e3f35065b76801b296ca16d8f93b5377a85c2d156",
+    "services/runner/src/preview/site-policy.mjs": "sha256:671a877fa60652aeebaa70649ace3f171815c95de74d8a7719c3059dd20b3815",
+    "services/runner/src/publish/frozen-gateway.mjs": "sha256:356dafb6df0108c892de65d1115a6aa6c77eb2892c0de1974c759c988a0436c0",
+    "services/runner/src/publish/gateway-cli.mjs": "sha256:562602d992557551c251889b779c335604f74709829d3de7e052511c8b0d8e4a",
+    "services/runner/src/publish/java/NodeDeploymentGateway.java": "sha256:d323aba9066071556f32392676d9778418fdfc08f3de26fa7ccf37aa88d0c659",
+    "services/runner/src/publish/policy.mjs": "sha256:d35411c8fc602e8aa0a06b8cdbc23a9aeaa7f54372b2b148dd83779dd8279945",
+    "services/runner/src/publish/probe-policy.mjs": "sha256:889ac84e0b3a70dec14f48e76781953e182b9938619e684a180929109827b4ec",
+    "services/runner/src/publish/probe-worker.mjs": "sha256:50d573de4a20f7a7dd055f7e2d9ecc745b13c89e5d95daf5491ce0e53030c777",
+    "services/runner/src/publish/probe.mjs": "sha256:c8cdc7f6c8082d872a5e45509a7912c6a05aef0490ee4d5b78f959117a4ee71e",
+    "services/runner/src/publish/publisher.mjs": "sha256:48df394e0e3d201a669204f521bc40e0b88a2060debd85d94551e1cf435721f1",
+    "services/runner/src/publish/store.mjs": "sha256:52c273dfdc845e47a3e7c1de99e59318d44d050b2f0325c51fd01a3f8ef43538",
+    "services/runner/src/publish/workflow.mjs": "sha256:bd735cc469d3baee0b1fbb460cfa252665e39974c661248192ddc8bcb569f310",
+    "services/runner/src/screenshot/README.md": "sha256:e0fdd89aa8061b88b8df641ad2d0fd8f0a2ac56000321db4a8ce1c778102c97c",
+    "services/runner/src/screenshot/adapter.mjs": "sha256:6b83dde330a5976409547334a156f776e8ce4aaa36abc5a500abaa90236ca663",
+    "services/runner/src/screenshot/capture.mjs": "sha256:d63cdb74a44c36786b1a39dacbef128b75da43dc4a1fa10ad259905cfb247a2f",
+    "services/runner/src/screenshot/network.mjs": "sha256:e6ad36db6a4ea71a3f11c10c0fe57f9ac331f9ce35329bf014c3f4ad2d7d48c8",
+    "services/runner/src/screenshot/owner.mjs": "sha256:792d95fa701263db2123ebc024bb1302243c46032351f8259d7aebba3c7d49e6",
+    "services/runner/src/screenshot/queue.mjs": "sha256:31cc3f95db15acc12e602aef632a17825f28967d0e42f54c307adec9fd77f76a",
+    "services/runner/src/screenshot/recover-lock.mjs": "sha256:e265306ed9e321f04378247f1f00f16c7ecaacf713724f16d6ef2e1b9144a839",
+    "services/runner/src/screenshot/target.mjs": "sha256:38b6e1dce48535e7bf0673033104f7bffe7d3f6bdefcb317e4b4616cee44e590",
+    "services/runner/src/screenshot/worker.mjs": "sha256:fbae2005d7af40e41d8f621327e0d1f3bf764884f363400aa91f2749829624d5",
+    "services/runner/src/template/build.mjs": "sha256:ab564e2ef1b8e23faf3ed7dc1b8f2ca156f471c28d436d762544b255cd6e9d4a",
+    "services/runner/src/verify/README.md": "sha256:6b57d294b8de81013a7f775ff005415142bfd6bfb6889260986b8b6ab4aa0e53",
+    "services/runner/src/verify/actions.mjs": "sha256:6476eaef58f59197caf6bf6db7148493482eaf17aac0601bd5bcecef6c464186",
+    "services/runner/src/verify/verifier.mjs": "sha256:4e0cdbf56db2a4b9e304db12335c7f3e7d699325935a5e14f1943235dc0531ec",
+    "services/runner/src/verify/worker.mjs": "sha256:ffe12c9aeccbad7f20a01bc2b23518726f182a4288e76638d86a540a1365006c",
+    "services/runner/src/verify/workflow.mjs": "sha256:eeddd32b437cab19569364d59b96c017234f087d8dc68e02e44330ec63284cec",
+    "templates/vue/.gitkeep": "sha256:7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "templates/vue/README.md": "sha256:d0cda80bced1759a0ae9595998783ccdf59b59ba39a9794866eb576b2e7a50df",
+    "templates/vue/allowed-dependencies.json": "sha256:4a6144fa3596bb9e06898e0a6b968e0f8007615fd44165a3f93e9fad13015a4d",
+    "templates/vue/fixtures/catalog/src/pages/CatalogPage.vue": "sha256:ea53dc0e51d715e30e8d9e09d85f5b75ae2808dbc8eb9e80a2ff23be5e184926",
+    "templates/vue/fixtures/mapping/src/components/SharedCard.vue": "sha256:65ec81b23ac6f84dd1df0b45740be29545c8c5e008d0591d2f788457daa12dc9",
+    "templates/vue/fixtures/mapping/src/pages/HomePage.vue": "sha256:33f1ce80bc0ed5b7f6fde7685fb346f92b083182723fe1935562f17fad137a3a",
+    "templates/vue/fixtures/showcase/src/pages/HomePage.vue": "sha256:97e89389a1b60c2ba5dfded5c8a339ac0f298e95011e07c43bd47613d8644c37",
+    "templates/vue/fixtures/tasks/src/pages/TasksPage.vue": "sha256:2a3e7d147b8f077000600e82efcb85bb30a47f64653371c4d3bf53de382115f8",
+    "templates/vue/index.html": "sha256:84eff9c259555bd0b3c78312ce4c9f72b85ff2a0b74dc69d757043c66aa7df87",
+    "templates/vue/package.json": "sha256:7d011ea866bf56006fdc25ee81d7e19a47ab523b57b70133466b6605aee601f4",
+    "templates/vue/pnpm-lock.yaml": "sha256:874081f812956eb4bb2c052551a50b3cae617132ccc0fe97e4f1ca024132cdd5",
+    "templates/vue/pnpm-workspace.yaml": "sha256:7bb91bb52adad825af75ce5492864b101167572c982ff37a0d3f080d8d6fcc53",
+    "templates/vue/preview-bridge/README.md": "sha256:2749bb607186e2d3349c7a723c4bda0ae80f59158fdaee5a9b64c652685e5608",
+    "templates/vue/preview-bridge/selector.mjs": "sha256:0e3a0249c3b88bb86b63274d14abef3ea60dc15a6b5c68baac9f1cac025d2aa3",
+    "templates/vue/src/App.vue": "sha256:a24602d6e7518244319bbd01d899c582c14a20074f4c24a110130b6580ea6355",
+    "templates/vue/src/build-node.d.ts": "sha256:56014a76d9104d45f2f90c887f2c33d0714258486518ec2d346e180e95cb1ba0",
+    "templates/vue/src/main.ts": "sha256:fad878badc626d8609bb70fcf3815164faa52c7269e46922a8f166e58297d079",
+    "templates/vue/src/pages/CatalogPage.vue": "sha256:5efc1c4c9216449341b90c1c2919b0966db437d0291e7f8bd1feb07147294b5b",
+    "templates/vue/src/pages/HomePage.vue": "sha256:5629ad4797b6c262cfd77dc0d2a27ed0337645a6a926d7bd8f0266c190d44b5b",
+    "templates/vue/src/pages/TasksPage.vue": "sha256:f20450a12e04f974d54fcb327a37fe97575b9dd14a37ef9e43ef4eec9953cfa2",
+    "templates/vue/src/router.ts": "sha256:a37dd921ede8553748398499eb0e2ca53b3ec839bcb46c2a6b39130c687cb932",
+    "templates/vue/tsconfig.json": "sha256:fb6b94f16fc0db3d6895ce4e6a5ff5fdb451a51576bca833ae6563a33b3f32e5",
+    "templates/vue/vite.config.ts": "sha256:cd0f31eb449367f9b99e816780f2fa50a5e43e74e94ee11fbfc5e3e3a09e709a"
+  },
+  "canonical": false
+}

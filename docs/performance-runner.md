@@ -35,6 +35,17 @@ node tests/performance/runner/export-evidence.mjs
 
 这是一个首样本、三个后续样本的校准，样本数不足以推出生产P95/P99或冷暖差异显著性。后续最终轮及门禁内负载环境的完整观测保存到 `tests/performance/runner/evidence/`，以其原始退出码和源码身份为准。
 
+代码候选 `cb04df4` 的干净专项 native0、4/4、canonical=true；同轮实际样本如下。trial的含义是更短的失败截止与更低日志保留，正常成功路径不会等待这些上限，不能据此声称它加快了编译。
+
+| 样本 | 配置 | 构建ms | 浏览器含截图ms | 截图ms |
+| --- | --- | ---: | ---: | ---: |
+| A first-container | default | 5609.22 | 1438.74 | 18.82 |
+| A warm-image | default | 5916.95 | 1901.95 | 20.19 |
+| B warm-image | default | 5779.63 | 1599.06 | 24.00 |
+| A warm-image | trial | 5691.99 | 1655.30 | 24.88 |
+
+该轮第101项QUEUE_FULL拒绝耗时0.5321ms，peakActive=1；配置work以及消费后的artifact/evidence均0字节/0文件，确切worker/browser PID均已消失。报告 `evidence/2026-10-27T14-37-20.486Z-c8d6a06d-29fe-41ff-9583-435b693bc90d.json` 保留全部原始数据。后续a518d3b报告失败关闭断言专项亦4/4通过；其canonical=false原样保留。
+
 ## 配置调整
 
 新增可信宿主可选 `trial` profile（`infra/runner/profiles.mjs`）：执行上限120秒→60秒，保留日志64KiB→16KiB。60秒约为首轮最大完整构建耗时的10倍；16KiB约为619字节正常日志的26倍。CPU、内存、swap、PID、tmpfs、产物和浏览器deadline均不放宽。此校准仅针对当前固定受控模板，未证明更大合法源码的吞吐，不替代部署机再次测量。
@@ -69,3 +80,5 @@ node tests/performance/runner/export-evidence.mjs
 完整原始样本、机器、结果、隔离inspect、清理、源码SHA256及canonical标志在各 `report.json`；私有原日志位于 `.local-data/d22-b/`，公开副本及命令/退出码/日志hash汇总由export脚本生成。未提交开发轮保持canonical=false，不能当成某个旧提交的干净验收。门禁具体结果见 `docs/handoffs/D22-B.md`。
 
 已保留的失败：首次队列fixture根目录ENOENT（已显式创建）；首次API轮的共享fault标签在另一套件重建时导致旧image ID不存在，exitCode/oomKilled保持null（改为每轮独有标签固定ID，未重试失败业务）。该轮CPU下20个GET观测不被提升成整轮成功。无模型付费请求；开发agent token环境未提供实测计量，保持UNKNOWN。
+
+cb04df4与a518d3b两个精确候选远端六项门禁均成功（前者API365/365）；本地独立runner原生1（244 pass/4 fail/1 cancel）、E2E原生1（67 pass/4 fail/4未运行）。本地额外聚合在API阶段运行32分钟后主动中断，保留原生1与中断原因，不报全绿；Windows路径校验热点只做只读诊断，未证实根因，未改API。宿主中断留下一个已退出构建容器及staging，经输入manifest与本轮journal匹配后人工精确回收；这不能替代生产崩溃reaper。具体文件、命令、失败及远端快照见交接记录，最终PR HEAD状态需独立读取。
