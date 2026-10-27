@@ -387,9 +387,13 @@ public final class AgentLoop implements TaskStageRunner {
     }
     private StageResult verify(TaskQueueService.Claim claim,AgentRunStore.Context context,JsonNode draft) {
         store.reserveVerification(claim);
-        JsonNode actual=runner.run(claim.taskId(),draft,context.deadline());
+        JsonNode actual;
+        long runnerStart=System.nanoTime();
+        try { actual=runner.run(claim.taskId(),draft,context.deadline()); }
+        finally { dev.codeless.api.tasks.TaskTiming.recordRunner(System.nanoTime()-runnerStart); }
         store.append(claim,TaskStatus.VERIFY,"runner.result",actual);
         evidence.validate(draft,actual);
+        dev.codeless.api.tasks.TaskTiming.recordRunnerReceipt(claim.taskId(),actual);
         if(!actual.path("status").asText().equals("VERIFIED")) {
             store.failedBuild(claim,draft,actual);
             var failure=repairs.classify(actual);

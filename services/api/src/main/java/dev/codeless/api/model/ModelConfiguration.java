@@ -10,12 +10,13 @@ public class ModelConfiguration {
     @Bean
     ModelProvider modelProvider(Environment environment) {
         String selected = environment.getProperty("codeless.model.provider", "deterministic-mock");
-        return switch (selected) {
+        ModelProvider provider = switch (selected) {
             case "deterministic-mock" -> new MockModelProvider();
             case "deepseek" -> new DeepSeekModelProvider(environment.getProperty("CODELESS_MODEL_API_KEY"),
                     environment.getProperty("CODELESS_MODEL_NAME"));
             default -> throw new ModelFailure("MODEL_CONFIGURATION");
         };
+        return new BoundedModelProvider(provider,dev.codeless.api.tasks.CapacityPolicy.limit(environment,"model-concurrency",2));
     }
     @Bean
     ModelCallAudit modelCallAudit(Environment environment) {

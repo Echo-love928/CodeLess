@@ -21,6 +21,11 @@ server:
         secure: ${CODELESS_COOKIE_SECURE:true}
         same-site: lax
 codeless:
+  capacity:
+    queue: ${CODELESS_TASK_QUEUE_LIMIT:32}
+    user-active: ${CODELESS_USER_ACTIVE_TASK_LIMIT:16}
+    app-active: ${CODELESS_APP_ACTIVE_TASK_LIMIT:8}
+    model-concurrency: ${CODELESS_MODEL_CONCURRENCY:2}
   deploy:
     hosting-enabled: ${CODELESS_PUBLICATION_ENABLED:false}
     node-executable: ${CODELESS_NODE_EXECUTABLE:}

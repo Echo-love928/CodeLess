@@ -98,6 +98,12 @@ public class TaskScheduler {
     }
 
     private void run(TaskQueueService.Claim claim, AtomicBoolean lost) {
+        try (var timing=TaskTiming.begin(claim.taskId())) {
+            runMeasured(claim,lost);
+        }
+    }
+
+    private void runMeasured(TaskQueueService.Claim claim, AtomicBoolean lost) {
         TaskStatus stage = claim.stage();
         for (int i = 0; i < 12; i++) {
             // Cancelled or expired: never start another model call or build for a lease this worker no longer holds.

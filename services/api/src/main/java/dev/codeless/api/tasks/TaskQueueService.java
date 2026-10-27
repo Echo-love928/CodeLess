@@ -146,6 +146,9 @@ public class TaskQueueService {
         if (lease != null) update = update.param(seconds(lease));
         int changed = update.param(candidate.get()).update();
         if (changed != 1) return Optional.empty();
+        Double queueMs=jdbc.sql("SELECT EXTRACT(EPOCH FROM (clock_timestamp()-created_at))*1000 FROM generation_tasks WHERE id=?")
+                .param(candidate.get()).query(Double.class).single();
+        org.slf4j.LoggerFactory.getLogger(TaskQueueService.class).info("API_QUEUE_TIMING taskId={} queueMs={}",candidate.get(),queueMs);
         return Optional.of(new Claim(candidate.get(), token, TaskStatus.PLAN));
     }
 

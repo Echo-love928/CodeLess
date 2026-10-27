@@ -62,7 +62,13 @@ class ProcessRestartRecoveryTest {
         Flyway.configure().dataSource(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword()).load().migrate();
         var dataSource = new DriverManagerDataSource(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
         jdbc = JdbcClient.create(dataSource);
-        var repository = new PlatformRepository(jdbc);
+        // Match the production repository proxy: capacity count + insert must be one transaction.
+        var repositoryProxy = new org.springframework.aop.framework.ProxyFactory(new PlatformRepository(jdbc));
+        repositoryProxy.setProxyTargetClass(true);
+        repositoryProxy.addAdvice(new org.springframework.transaction.interceptor.TransactionInterceptor(
+                new org.springframework.jdbc.datasource.DataSourceTransactionManager(dataSource),
+                new org.springframework.transaction.annotation.AnnotationTransactionAttributeSource()));
+        var repository = (PlatformRepository) repositoryProxy.getProxy();
         var store = new LocalVolumeSnapshotStore(root.resolve("agent/versions"));
         var records = new DeploymentRecords(root.resolve("agent/deployments"));
 
