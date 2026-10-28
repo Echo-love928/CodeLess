@@ -219,8 +219,12 @@ try {
     const version=await who.call('versions/'+who.ready);assert.equal(version.status,200)
     const appVersions=await who.call('applications/'+who.app+'/versions');assert.equal(appVersions.status,200)
     const row=appVersions.body.items.find(v=>v.id===who.ready),buildId=row.buildId??version.body.buildId
-    const buildResponse=await who.call('builds/'+buildId);assert.equal(buildResponse.status,200)
-    const publication=await who.call('publications','POST',{applicationId:who.app,versionId:who.ready,artifactDigest:buildResponse.body.artifactDigest},{'Idempotency-Key':randomUUID()});assert.equal(publication.status,202)
+    const snapshot=await who.call('versions/'+who.ready+'/snapshot');assert.equal(snapshot.status,200)
+    const validation=snapshot.body.validation
+    assert.equal(validation.status,'VERIFIED');assert.equal(validation.sourceDigest,version.body.sourceDigest)
+    assert.equal(validation.report.buildId,buildId);assert.equal(validation.report.buildStatus,'SUCCEEDED');assert.equal(validation.report.exitCode,0)
+    assert.equal(validation.report.verificationStatus,'PASSED');assert.equal(validation.report.artifactDigest,validation.artifactDigest)
+    const publication=await who.call('publications','POST',{applicationId:who.app,versionId:who.ready,artifactDigest:validation.artifactDigest},{'Idempotency-Key':randomUUID()});assert.equal(publication.status,202)
     const observations=[];const deployed=await awaitDeployment(async()=>{const r=await who.call('publications/'+publication.body.id+'/deployment');assert.equal(r.status,200);return r.body},publication.body.id,observations)
     const record=await who.call('publications/'+publication.body.id);assert.equal(record.status,200)
     const context=await browser.newContext({ignoreHTTPSErrors:true});const page=await context.newPage();assert.equal((await page.goto(record.body.url)).status(),200)
