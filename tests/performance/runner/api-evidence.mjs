@@ -21,6 +21,15 @@ export function validateInterference(report) {
   for (const s of controls) assert.ok(s.monotonicEndMs < controlObserved.release.monotonicMs, 'negative control is explicitly pre-pressure')
   assert.ok(controlObserved.release.monotonicMs < controlObserved.barrier.monotonicMs)
   assert.equal(cpu.observed.value.barrier.kind, 'CPU_USAGE_AND_LOOP_CHILD')
+  const cpuBarrier = cpu.observed.value.barrier
+  assert.match(cpuBarrier.top, /node\s+-e\s+while\(true\)/)
+  const usage = text => Number(text.match(/^usage_usec (\d+)$/m)?.[1])
+  assert.ok(usage(cpuBarrier.after) - usage(cpuBarrier.before) > 100000)
+  if (cpuBarrier.startupObservations) {
+    assert.ok(cpuBarrier.startupObservations.length > 0)
+    assert.equal(cpuBarrier.startupObservations.at(-1).top, cpuBarrier.top)
+    for (const observation of cpuBarrier.startupObservations) assert.ok(observation.monotonicMs <= cpuBarrier.monotonicMs)
+  }
   assert.equal(cpu.observed.value.afterQueries.Running, true)
   const cpuSamples = report.samples.filter(s => s.phase === 'timeout-after-cpu-barrier')
   assert.equal(cpuSamples.length, 10)

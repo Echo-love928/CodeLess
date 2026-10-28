@@ -16,6 +16,17 @@ export function command(cmd, args, timeout = 180000) {
 }
 export const docker = args => command('docker', args)
 export const sleep = ms => new Promise(done => setTimeout(done, ms))
+export async function waitForCPULoop(readTop, { timeoutMs = 5000, now = () => performance.now(), pause = sleep, observations = [] } = {}) {
+  const deadline = now() + timeoutMs
+  while (now() < deadline) {
+    const top = await readTop()
+    observations.push({ monotonicMs: now(), observedAt: new Date().toISOString(), top })
+    assert.ok(now() < deadline, 'CPU-loop startup deadline')
+    if (/node\s+-e\s+while\(true\)/.test(top)) return top
+    await pause(Math.min(50, Math.max(0, deadline - now())))
+  }
+  throw new Error('CPU-loop startup deadline: real busy-loop child never appeared')
+}
 export async function dockerAsync(args) {
   return new Promise((done, reject) => {
     const child = spawn('docker', args, { cwd: root, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] })

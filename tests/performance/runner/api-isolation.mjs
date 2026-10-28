@@ -11,7 +11,7 @@ import { performance } from 'node:perf_hooks'
 import { prepare } from '../../e2e/full/prepare.mjs'
 import { start, stop, windows } from '../../e2e/full/support.mjs'
 import { createBuildRunner } from '../../../services/runner/src/build/runner.mjs'
-import { root, sha, command, docker, dockerAsync, machine, codeIdentity, sleep, ownedPath, waitForOOM } from './support.mjs'
+import { root, sha, command, docker, dockerAsync, machine, codeIdentity, sleep, ownedPath, waitForOOM, waitForCPULoop } from './support.mjs'
 
 const output = join(root, '.local-data/d22-b/api-' + new Date().toISOString().replaceAll(':', '-') + '-' + randomUUID())
 await mkdir(output, { recursive: true }); console.log('D22-B API evidence: ' + output)
@@ -99,12 +99,14 @@ try {
             assert.ok(Date.now() < end, 'fault startup deadline'); await sleep(30)
           }
           if (mode === 'timeout') {
-            const top = await dockerAsync(['top', id, '-eo', 'pid,ppid,args'])
-            assert.match(top, /node\s+-e\s+while\(true\)/, 'real CPU-loop child must have started')
+            const startupObservations = []
+            report.cpuStartupObservations = startupObservations
+            const top = await waitForCPULoop(() => dockerAsync(['top', id, '-eo', 'pid,ppid,args']),
+              { timeoutMs: Math.max(1, end - Date.now()), observations: startupObservations })
             const before = await cgroup(id, 'cpu.stat'); await sleep(250)
             const after = await cgroup(id, 'cpu.stat')
             assert.ok(counter(after, 'usage_usec') - counter(before, 'usage_usec') > 100000, 'CPU usage must actually grow before HTTP samples')
-            const barrier = { kind: 'CPU_USAGE_AND_LOOP_CHILD', monotonicMs: performance.now(), observedAt: new Date().toISOString(), top, before, after }
+            const barrier = { kind: 'CPU_USAGE_AND_LOOP_CHILD', monotonicMs: performance.now(), observedAt: new Date().toISOString(), top, startupObservations, before, after }
             await probe('timeout-after-cpu-barrier', id, barrier)
             const afterQueries = await state(id)
             assert.equal(afterQueries.Running, true)

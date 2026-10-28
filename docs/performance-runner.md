@@ -2,7 +2,7 @@
 
 2026-10-28发布联调补充：SQL的PUBLISHED与afterCommit追加的终态账本是两个可观察完成点。`PublicationIntegrationTest#sqlCommitBeforeTerminalLedgerIsUnknownUntilLedgerCompletes`用真实事务屏障验证窗口，成功和失败均覆盖。全链验收通过`awaitDeployment`在原30秒预算内等待PUBLISHED+SUCCEEDED+末尾成功账本，并保存全部观察；UNKNOWN不能直接作为成功，持续UNKNOWN、FAILED、账本/身份不符及HTTP错误均失败。新本地A+B完整链路原生0，两次发布中实际记录一次PUBLISHED/UNKNOWN后收敛成功。原FAILED报告保留，新原始证据位于 `tests/performance/runner/evidence/deployment-convergence-2026-10-28/`。没有修改API生产状态映射或成功条件。
 
-真实部署机已只读盘点为2核/4,106,088,448字节RAM，但候选压力和容量测试尚未执行，不将本地样本外推为该部署容量。该机当前仅配置deterministic-mock；真实模型吞吐必须另有受保护配置与请求/费用预算。具体状态见D22-B交接最新小节。
+用户授权后已在真实部署机独占目录完成候选运行，完整原始归档在本地私有 `.local-data/d22-b/deploy-calibration/`；匿名指标向PR发布的许可另行确认。此次使用deterministic-mock，不能替代真实模型吞吐。CPU测量现与OOM一样要求实际压力证据：在原5秒启动预算内等待真实忙循环子进程出现并记录快照，再确认cpu.stat用量增长，之后才发GET。缺少进程或检查失败不会变成成功。具体状态见D22-B交接最新小节。
 
 基线为远端 main `dcb3866d2ca52a3a595e5167bfefa60bb6e862c1`。任务分支 `codex/d22-b-runner-performance`，工作区 `.worktrees/d22-b`。main 原有未提交工作保留。
 
