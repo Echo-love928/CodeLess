@@ -2,7 +2,9 @@
 
 2026-10-28（Asia/Tokyo）。适用对象：已有 `infra/public` 的单机 Linux/systemd、单 API、PostgreSQL 17.6、受限 worker 部署。其他部署拓扑先登记写入者、存储映射和停写方式，再验收；不能直接套用此手册。此文与 `docs/scope.md`、`docs/architecture.md`、D18-A/D22-A 契约一起使用。
 
-本卡备份工具与确定性测试已建立；**本机没有 Docker daemon，真实数据库恢复、恢复后登录打开版本/源码包和 D23-B 全新安装组合验收尚未通过**。M4 目前不是已验收状态。具体命令、原生退出码与证据见 `docs/handoffs/D23-A.md`。
+2026-10-29 补验：Docker 已可用，真实双 PG 恢复与恢复后的原账号登录、既有版本预览/刷新、历史发布、源码包下载及独立构建均已有 native0 证据；源码包还精确复现原 artifactDigest。新测试先停源服务、移走原目录并销毁源 PG，再从备份恢复到独立空 cluster 和新 JVM/preview，原绝对路径下的数据目录都是新建。B `37688c8` 的安装/导出也已只读复核。原本机 Docker 缺失失败完整保留，具体命令与证据见 `docs/handoffs/D23-A.md`。
+
+上述应用恢复是同一宿主上的隔离集成环境；生产 Linux/systemd 停写、跨主机账号/ACL、异机存储和 RTO 仍由上线环境演练。M4 的完整运营启用与批准不由这份应用恢复证据自动解除。
 
 ## 1. 配置与备份集合
 
@@ -20,7 +22,7 @@
 
 `release` 目录建议结构为 `api.jar`、`web/`、`repository/`、`release.json`。后者由构建交付者记录 commit、jar/web/模板摘要、镜像摘要、工具链和固定配置的非敏感项。repository 是精确提交的干净发布源码，**不能拷贝含 `.local-data`、`.git`、node_modules、`.env` 的开发 checkout**。用 Git archive 准备源码，再加入该提交真实构建的 jar/web；核对它们与当前部署字节相同后封存。不要在备份时临时升级/重新生成模板。当前安装器的 `/srv/codeless/api.jar` 和 repository 分散布局需先整理到此发布包；该步骤由发布/安装维护者核对，工具不会猜测文件。
 
-例如在全新 release/repository 目录用 `git archive --format=tar --output=<受保护临时tar> <精确commit> templates/vue services/runner infra scripts contracts prompts docs/generated-project-readme.md package.json pnpm-lock.yaml pnpm-workspace.yaml` 生成仅含运行时依赖的源码包，再逐条执行解包和摘要核对。不要直接打包整仓，仓库中示例 `.env.example` 和测试密钥 fixture 也不属于此运行时包。保留 tar/文件摘要和原生退出码；jar 与 web 必须来自同一已验证发布流水线，不可把新构建字节冒称当前部署。
+例如在全新 release/repository 目录用 `git archive --format=tar --output=<受保护临时tar> <精确commit> templates/vue services/runner services/api/agent-runner.mjs services/api/src/main/resources/network infra scripts contracts prompts docs/generated-project-readme.md package.json pnpm-lock.yaml pnpm-workspace.yaml` 生成仅含运行时依赖的源码包，再逐条执行解包和摘要核对。runner 的 preview/site-policy.mjs 会跨目录读取 API 的 network/site-policy.json，不能只打包 runner 目录；启用前先解析真实 preview 入口的 import 图。不要直接打包整仓，仓库中示例 `.env.example` 和测试密钥 fixture 也不属于此运行时包。保留 tar/文件摘要和原生退出码；jar 与 web 必须来自同一已验证发布流水线，不可把新构建字节冒称当前部署。
 
 操作员将 `infra/backup/backup.example.json` 复制到受保护位置，逐项对应实际配置：`codeless.agent.private-root`、`codeless.versions.root`、`codeless.deploy.root`、`CODELESS_FILE_WORKSPACE_ROOT`、`CODELESS_MODEL_AUDIT_ROOT`、`CODELESS_FILE_AUDIT_ROOT`、`codeless.admin.audit-root`、`CODELESS_HOSTING_ROOT`。可选根在 agent 内时不要重复列。未曾使用的审计根也先由对应服务账号建立真实空目录，不能忽略缺失的必选根。
 
@@ -88,7 +90,7 @@ python3 scripts/backup/backup.py restore \
 | T3 失败可见 | 同一专项注入 dump 失败、ENOSPC 预检、文件变化/篡改；原生/函数退出 1、STARTED 与 FAILED 同 operationId、无可用完成标志，上次备份字节不变 |
 | T4 版本/源码包可用 | **真实恢复环境**登录原所有者，GET `/api/v0/versions/{versionId}/files`、`/files/content?path=...`、`/snapshot`；打开相同 versionId 的 preview（重新获取票据），真实 Chromium 截图/断言；下载 `/api/v0/versions/{versionId}/export`，核对导出 manifest 的版本和摘要，按固定 pnpm lock 独立安装/构建，保存 ZIP 摘要及退出码。查看历史发布详情/账本并核对产物字节；新发布仍只能由用户显式点击 |
 
-先核对真实路由，操作时按 `contracts/openapi.v0.json` / `contracts/export` 提供认证及 CSRF。不要把 fixture 文件读取或静态网页可达当作平台恢复验收。当前 `test_live.py` 只提供双真实 PostgreSQL 的备份恢复和文件一致性测试，**没有覆盖 T4，也未在本机跑通**；T4 必须由 D23-B/最后启用 PR 在独立安装环境补证。
+先核对真实路由，操作时按 `contracts/openapi.v0.json` / `contracts/export` 提供认证及 CSRF。不要把 fixture 文件读取或静态网页可达当作平台恢复验收。`test_live.py` 的范围仍仅为双真实 PostgreSQL 恢复/文件一致性，输出 T4=NOT_RUN；T4 由新增 `test_application.mjs` 单独真实执行。复现：`python -B tests/backup/record.py application`，随后 `python -B tests/backup/export_application.py` 取得白名单证据。完整备份/会话/API 原日志始终留私有目录。
 
 下载 ZIP 的独立构建复用现有真实隔离测试器：`node tests/export/clean-build.mjs <恢复环境下载的zip> <新的空工作目录> --expect-artifact-digest <原version的artifactDigest>`。必须 exit 0；exit 3 表示构建了但摘要不重现，也不通过。它使用固定 Node 镜像和受控锁文件，不借用宿主 node_modules。操作员保留浏览器截图、ZIP 与生成的 clean-build.json/log 在受保护证据目录。
 
@@ -128,8 +130,8 @@ python3 scripts/backup/backup.py health --config /etc/codeless/backup.json
 
 | 未解决项 | 优先级/负责人 | 当前证据与解除条件 |
 | --- | --- | --- |
-| D23 T1/T4 独立空环境真实恢复 | P0 交付阻塞，A + 安装环境维护者 | 本机 Docker 不可用；双 PG 演练及平台真实登录/预览/导出/构建必须通过，未通过前 M4 不完成 |
-| D23-B 全新安装、README/环境/版本/导出独立构建 | P0 集成阻塞，B/最后启用 PR | 当前未发现 D23-B 分支、交接或 PR 材料，不能审查/假定通过；需精确提交及原始报告 |
+| D23 T1/T4 独立空环境真实恢复 | 应用层缺证已解除，A | 双 PG native0；新增真实应用恢复 native0，原 owner/旧版本/发布/源码 ZIP 均可用，独立构建精确复现；同宿主独立 cluster/新进程，不扩大为 Linux 跨主机演练 |
+| D23-B 全新安装、README/环境/版本/导出独立构建 | 本方复核通过，B/最后启用 PR | PR #77 @37688c8，5/5专项、独立再构建native0、真实请求报告与六项CI核验；本方没有重跑付费请求，组合启用仍核对最终精确 HEAD |
 | 最终 HEAD 必需门禁与独立批准 | P0 合并阻塞，作者+另一成员 | 本卡新 HEAD 的真实检查；旧 D22 success 不继承；作者不自批、不合 main |
 | 发布包布局/外置根/权限映射 | P0 启用阻塞，安装维护者 | 将既有分散部署对应到固定 release 与根映射，真实服务账号验证；不同拓扑先补守卫 |
 | 真实模型 REPAIR 分支、完整前端交互 | P1 扩大试用前补齐，最后启用 PR | D22-AB-joint 已记录两用户真实自动 READY、压力屏障、SSE/取消/HTTP 发布和旧版本保留；本卡只读取该证据，没有重跑。REPAIR 为 NOT_ENCOUNTERED，HTTP 驱动不等于完整前端交互或公网验收 |

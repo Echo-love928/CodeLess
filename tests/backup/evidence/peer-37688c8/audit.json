@@ -1,0 +1,97 @@
+{
+  "task": "D23-A read-only peer review",
+  "peerRevision": "37688c82da25d0ec1184108a53fd3cbd719426ac",
+  "startedAt": "2026-10-28T14:55:50.797951+00:00",
+  "finishedAt": "2026-10-28T14:55:51.006530+00:00",
+  "status": "PASSED",
+  "sourceByteAttribution": {
+    "scripts/backup/backup.py": {
+      "reported": "sha256:b79857004e6dc01135a1838fc9beb6ca060964a62e61356907ac79141fb986c9",
+      "gitBlob": "sha256:4462dc99e6458dc4a087cc7a9a1a968dbb7782431ff844abda0aca2af74b3980",
+      "CRLFCheckout": "sha256:b79857004e6dc01135a1838fc9beb6ca060964a62e61356907ac79141fb986c9",
+      "match": "ONLY_LF_TO_CRLF_CONVERSION"
+    },
+    "tests/backup/test_backup.py": {
+      "reported": "sha256:1519d16d7de29c75d21cf9a68959838f47f8db3e7da71369723060393004e33b",
+      "gitBlob": "sha256:a4e0b8e7973f99cfcfcc1f950dbe03c992805cbc751f95631294115778cf9371",
+      "CRLFCheckout": "sha256:1519d16d7de29c75d21cf9a68959838f47f8db3e7da71369723060393004e33b",
+      "match": "ONLY_LF_TO_CRLF_CONVERSION"
+    },
+    "tests/backup/test_live.py": {
+      "reported": "sha256:0e18a26327e61c64028a6f3231b5c358d5beed5c41a359f12293be35538624d1",
+      "gitBlob": "sha256:26691e4f9bb138cf11a80f3f9ca599f1981b5f1f9610744ab3e7aa2012e5f9f5",
+      "CRLFCheckout": "sha256:0e18a26327e61c64028a6f3231b5c358d5beed5c41a359f12293be35538624d1",
+      "match": "ONLY_LF_TO_CRLF_CONVERSION"
+    }
+  },
+  "AUnitAndLiveOriginalLogDigestsVerified": true,
+  "independentInstallTests": {
+    "command": [
+      "node",
+      "--test",
+      "tests/install/install.test.mjs"
+    ],
+    "exitCode": 0,
+    "tests": 5,
+    "logDigest": "sha256:34b9d3fee0a39a5a4b9bf06efb36eca1336adca5f54dfa68678475adc778ff0c"
+  },
+  "independentExportBuild": {
+    "exitCode": 0,
+    "archiveDigest": "sha256:1f3d2dc7fa750e46991b1522a94b8a1c5dfca52f12a773c40d710577280df3dc",
+    "logDigest": "sha256:dee6b7d7a486054e33d86aeb79296dc55067d789f6da2fd989f6d432df28fe8e",
+    "reproduction": "NOT_REQUESTED"
+  },
+  "reportedRealRequest": {
+    "source": "B committed provider evidence; not independently re-issued",
+    "requests": 1,
+    "actualModel": "deepseek-flash",
+    "usage": {
+      "inputTokens": 1298,
+      "outputTokens": 199,
+      "totalTokens": 1497,
+      "raw": {
+        "prompt_tokens": 1298,
+        "completion_tokens": 199,
+        "total_tokens": 1497,
+        "prompt_tokens_details": {
+          "cached_tokens": 1024
+        },
+        "prompt_cache_hit_tokens": 1024,
+        "prompt_cache_miss_tokens": 274
+      }
+    }
+  },
+  "newPaidRequestsByA": 0,
+  "remoteChecks": [
+    {
+      "name": "ci-gate",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "verify:runner",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "verify:api",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "verify:e2e",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "infra-preflight",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "verify:static",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ]
+}

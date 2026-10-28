@@ -12,6 +12,7 @@ mode = sys.argv[1]
 commands = {
     'unit': [sys.executable, '-B', '-m', 'unittest', 'discover', '-s', 'tests/backup', '-p', 'test_backup.py', '-v'],
     'live': [sys.executable, '-B', 'tests/backup/test_live.py'],
+    'application': ['node', 'tests/backup/test_application.mjs'],
     'gate': ['node', 'scripts/ci-gate.mjs'],
 }
 command = commands[mode]
@@ -22,6 +23,7 @@ public = root / 'tests/backup/evidence' / (now + '-' + mode)
 public.mkdir(parents=True)
 env = dict(os.environ)
 env['CODELESS_MODEL_PROVIDER'] = 'deterministic-mock'
+env['CODELESS_BACKUP_PYTHON'] = sys.executable
 env['NO_PROXY'] = env['no_proxy'] = '127.0.0.1,localhost,::1'
 for key in ('CODELESS_MODEL_API_KEY', 'CODELESS_MODEL_NAME', 'CODELESS_PLAYWRIGHT_CHANNEL'):
     env.pop(key, None)
@@ -69,7 +71,7 @@ if mode == 'gate':
                             'afterSha256': hashlib.sha256(current).hexdigest(), 'restored': p.read_bytes() == original})
     metadata['screenshotsPreserved'] = changed
 (public / 'command.json').write_text(json.dumps(metadata, indent=2) + '\n', encoding='utf-8')
-if mode != 'gate':
+if mode in ('unit', 'live'):
     (public / 'command.log').write_bytes(raw)
 print(json.dumps({'exitCode': r.returncode, 'evidence': str(public)}, ensure_ascii=False))
 sys.exit(r.returncode if r.returncode >= 0 else 1)

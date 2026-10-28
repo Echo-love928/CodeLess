@@ -1,28 +1,26 @@
 任务ID：D23-A｜运维配置、备份与恢复流程
 
-目前数据库与私有卷没有成组的备份/恢复流程，恢复时改动绝对数据路径还会导致现有预览证据被拒绝。本 PR 增加停写备份、校验、独立空集群恢复和启用前核验，并把路径约束、P0 清单和未通过验收明确写入运维手册。
+数据库与私有卷原先没有成组备份/恢复流程，改变绝对数据路径还会使已冻结预览证据被拒绝。本 PR 实现停写备份、完整性校验、独立空集群恢复与启用前核验，并用真实应用恢复补齐原 owner 登录、既有版本预览、历史发布和源码包独立构建证据。
 
-- 范围：`scripts/backup/**`、`infra/backup/**`、`docs/operations.md`、`tests/backup/**`、`docs/handoffs/D23-A.md`。无 API 行为、迁移、依赖、根锁、CI、公共契约变化。
-- D23-A-01：全库 dump + agent（不可变版本/构建/部署账本/证据/审计）+ workspaces + 外置审计 + hosting + 精确 release；SHA-256 与原绝对根映射。
-- D23-A-02：停写服务/worker/数据库会话守卫、前后源一致性校验；目标须为独立 PG17 cluster、空数据库和新目录。pg_restore 单事务；无自动清库/覆盖/上线。绝对路径在独立主机原位恢复，禁止改写不可变 receipt。
-- D23-A-03：操作员数据库/卷检查、operationId/backupId、空间预检、失败非零/稳定错误码和最后写入的完成标志。真实 ENOSPC/工具故障不吞掉；旧备份不覆盖。
-- D23-A-04：P0 冻结及问题优先级，README/环境/版本/运营手册纳入 M4。
+- 范围：backup、operations、对应测试和handoff；无生产API/runner、HTTP/数据库公共契约、迁移、依赖、根锁或CI变化。
+- D23-A-01：全库dump、不可变版本/构建/账本/证据、工作区/审计、托管产物和固定release，逐文件摘要及原绝对根映射。
+- D23-A-02：停写守卫、源前后比对；独立PG17 cluster、空库、新目录、单事务恢复。新T4先停源、封存原目录并销毁源库，再从备份jar/web/模板/runner恢复原路径。手册最小发布集合补齐runner跨目录读取的API network/site-policy.json，并先验证import图。
+- D23-A-03：DB/卷健康、operationId/backupId、空间/ENOSPC、非零失败和最后完成标志；不自动清库、覆盖、删除备份或上线。
+- D23-A-04：P0范围及问题优先级冻结，README/环境/版本/运营手册纳入M4。
 
-验证（精确命令/源码摘要/原生退出码见 `tests/backup/evidence` 与 handoff）：
+验证与精确源码/命令/退出码见 candidate.json、evidence 和 D23-A handoff：
 
-- 实现提交 `0fffaee` 的 Python 文件/故障/秘密哨兵专项 **native0、20/20、无跳过**；源码工作字节摘要已复核。数据库适配器明确 MockPg，不作为真实 PG 验收。
-- 双真实 PostgreSQL 恢复测试已提供，执行因 Docker daemon 缺失退出 1；T1 未通过，T4 未执行。
-- 最新 main `26b95e3` 上四阶段真实执行：static 0（52 Node / 199 web）；api 1（270 tests、103 errors）；runner 1（66 pass / 34 fail）；e2e 1（68 pass / 4 fail / 3 did not run）；ci-gate 1。Docker 不可用；完整原始日志在本地受保护目录，公开记录摘要/退出码。首轮沙盒权限失败独立保留，未改写。
-- E2E 生成的已有截图先保存本轮字节，再恢复起始字节，摘要在门禁记录中；未带入越范围更改。
+- 既有20项确定性/秘密哨兵/失败边界保留；双真实PG native0，B同提交补验原日志也已独立核对。
+- 新真实应用恢复native0：原owner新登录，同一version/build/source/artifact/发布引用；预览刷新、托管内容和源码导出成功，ZIP与备份前逐字节一致；新固定Node容器/新store构建native0、精确复现原artifactDigest。缺index负向检查拒绝，归回原字节后才启用。原offline marker保持NOT_RUN，应用成功另有真实报告。
+- 原4次fixture/打包/代理失败和初始Docker/权限门禁失败保留；未删断言、放宽隔离/超时或重试付费模型。只清自有资源，原镜像引用先保留后还原。
+- A旧HEAD6fb9836与B37688c8各六项CI success已核验；本次新HEAD独立查询，不继承旧结果。新增专项独立执行，公共CI登记交维护者。
 
-失败路径：服务仍运行/未知、活动数据库客户端、同源 cluster/非空库/既有目录、根重叠、路径/链接/硬链接、密钥文件、dump/restore 非零、源变化、缺件/篡改、磁盘不足、恢复引用不一致、绝对路径搬迁均失败关闭。应用验收始终独立标记 NOT_RUN。
+失败路径：写入者仍运行/未知、活动DB客户端、同源cluster/非空库/既有目录、重叠根、路径/链接/hardlink、密钥文件、dump/restore非零、源变化、缺件/篡改、磁盘不足、引用不一致和绝对路径搬迁均失败。证据导出拒绝最后一轮失败/未完成或被测源改变，不能借旧成功回填。
 
-数据/配置：无迁移。JSON 不接受密码/任意命令；真实数据备份机密保存、异机加密、ACL/来源校验由运维负责。恢复后按原安装器重新授予 uid/gid/ACL，单独提供模型/TLS/签名配置。回退为保持原生产环境，不自动替换服务或 DNS。
+数据/配置：无迁移；真实备份机密保存，仅公开固定fixture ZIP、iframe截图、构建日志与白名单摘要，不公开数据库dump/完整备份、会话/key或API原日志。恢复后按安装器恢复uid/gid/ACL，环境凭据独立提供。测试为同宿主独立cluster/新JVM/preview/新数据目录；生产Linux/systemd、跨主机ACL、异机存储/告警与RTO仍待运营环境实测。
 
-模型来源：本卡不发起真实付费模型请求；门禁固定 deterministic-mock，协议 fixture 不证明模型效果。开发 token I/O 未知，平台 Mock usage 未知，另账。
+模型：命名deterministic-mock只提出文件，实际DB/build/Chromium/export决定状态；新增付费请求0，Mock总usage/开发累计token未知。B的1次真实PLAN证据只核验，不重复调用。
 
-剩余事项：T1/T4 独立环境演练、systemd/Linux 守卫与异机备份告警实测、B 安装/导出组合验收、当前候选精确远端 CI 和另一成员批准。新增 Python 专项目前独立运行，CI 维护者需决定登记入口，本卡未越界修改 CI。RTO 未测。
+同伴复审：B PR #77 @37688c8，本方安装5/5、独立导出构建native0，来源/日志摘要与真实请求正负报告核对；B范围无阻塞，Bash插值边界为非阻塞建议。三类结论见review-D23-B.md。A新补验仍需B按精确新HEAD复审，作者不自批。
 
-审查者：另一成员。D23-B 材料当前缺失，见 `tests/backup/review-D23-B.md`。作者不自批，不合并；保持 draft。
-
-合并条件：最新 main 组合、所有必需检查真实 success、真实恢复报告、无未解决阻塞讨论和同伴批准。旧 D22 success 不继承，远端 CI 即使通过也不能解除本卡 T1/T4 缺证。
+剩余限制与合并条件：生产运营演练/独立批准仍待完成；最新main组合、当前HEAD全部必需检查真实success、无未解决阻塞讨论才具备合并条件。保持draft，不合并或切生产。
