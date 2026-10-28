@@ -10,7 +10,7 @@
 
 验证（精确命令/源码摘要/原生退出码见 `tests/backup/evidence` 与 handoff）：
 
-- Python 文件/故障/秘密哨兵专项通过；数据库适配器明确 MockPg，不作为真实 PG 验收。
+- 实现提交 `0fffaee` 的 Python 文件/故障/秘密哨兵专项 **native0、20/20、无跳过**；源码工作字节摘要已复核。数据库适配器明确 MockPg，不作为真实 PG 验收。
 - 双真实 PostgreSQL 恢复测试已提供，执行因 Docker daemon 缺失退出 1；T1 未通过，T4 未执行。
 - 最新 main `26b95e3` 上四阶段真实执行：static 0（52 Node / 199 web）；api 1（270 tests、103 errors）；runner 1（66 pass / 34 fail）；e2e 1（68 pass / 4 fail / 3 did not run）；ci-gate 1。Docker 不可用；完整原始日志在本地受保护目录，公开记录摘要/退出码。首轮沙盒权限失败独立保留，未改写。
 - E2E 生成的已有截图先保存本轮字节，再恢复起始字节，摘要在门禁记录中；未带入越范围更改。
