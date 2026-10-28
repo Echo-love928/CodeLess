@@ -11,6 +11,45 @@ const api = read('contracts/openapi.v0.json');
 const ajv = new Ajv2020({ strict: true, allErrors: true });
 addFormats(ajv);
 
+test('D22 capacity responses cover exactly task-creating endpoints and preserve other 503 failures', () => {
+  const paths = ['/api/v0/tasks', '/api/v0/applications/{applicationId}/edits', '/api/v0/applications/{applicationId}/component-edits'];
+  const error = read('contracts/schemas/v0/error.schema.json');
+  const validator = new Ajv2020({strict: true, allErrors: true}); addFormats(validator);
+  validator.addSchema(error, 'schemas/v0/error.schema.json');
+  let total = 0;
+  for (const [path, item] of Object.entries(api.paths)) for (const [method, operation] of Object.entries(item)) {
+    for (const [status, response] of Object.entries(operation?.responses ?? {})) {
+      if (!response['x-codeless-capacity-codes']) continue;
+      total++;
+      assert.equal(method, 'post'); assert.ok(paths.includes(path));
+      const codes = status === '429' ? ['APPLICATION_TASK_LIMIT', 'USER_TASK_LIMIT'] : ['TASK_QUEUE_FULL', 'TASK_ADMISSION_BUSY'];
+      assert.ok(['429', '503'].includes(status));
+      assert.deepEqual(response['x-codeless-capacity-codes'], codes);
+      assert.deepEqual(response.headers['Retry-After'].schema, {type: 'string', const: '1'});
+      const validate = validator.compile(response.content['application/json'].schema);
+      for (const code of codes) {
+        const example = response.content['application/json'].examples[code].value;
+        assert.equal(example.path, path); assert.equal(example.code, code);
+        assert.equal(validate(example), true, validator.errorsText(validate.errors));
+        assert.equal(validate({...example, traceId: undefined}), false);
+      }
+      const example = response.content['application/json'].examples[codes[0]].value;
+      assert.equal(validate({...example, code: 'SNAPSHOT_INVALID'}), path !== '/api/v0/tasks' && status === '503');
+      assert.equal(validate({...example, code: 'MODEL_CAPACITY_EXCEEDED'}), path !== '/api/v0/tasks' && status === '503');
+    }
+  }
+  assert.equal(total, 6);
+  for (const [file, path] of [['contracts/edit/openapi.patch.json', paths[1]], ['contracts/mapping/openapi.patch.json', paths[2]]]) {
+    for (const status of ['429', '503']) assert.deepEqual(read(file).paths[path].post.responses[status], api.paths[path].post.responses[status]);
+  }
+  const patch = read('tests/performance/api/openapi.patch.json');
+  assert.equal(patch.length, 6);
+  for (const entry of patch) {
+    const keys = entry.path.slice(1).split('/').map(x => x.replaceAll('~1', '/').replaceAll('~0', '~'));
+    assert.deepEqual(keys.reduce((value, key) => value[key], api), entry.value);
+  }
+});
+
 test('shared task create contract preserves CSRF and bounds application-scoped idempotency keys', () => {
   const create = api.paths['/api/v0/tasks'].post;
   assert.ok(create.parameters.some(item => item.$ref === '#/components/parameters/CsrfToken'));

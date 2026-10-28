@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import { verify, sha } from '../../export/verify-export.mjs'
 import { readZip } from '../../export/zip-reader.mjs'
 import { openInitialLogin } from './initial-navigation.mjs'
+import { awaitDeployment } from './deployment-terminal.mjs'
 
 const output = process.env.CODELESS_FULL_OUTPUT!
 const frame = (page: Page) => page.frameLocator('iframe[title="当前版本预览"]')
@@ -123,11 +124,17 @@ test('D20-B T1–T4: two isolated users generate, reconnect, edit, publish, down
       await page.getByRole('button', { name: '确认发布', exact: true }).click()
       const publishResponse = await publishing; expect(publishResponse.status()).toBe(202)
       actor.publication = await publishResponse.json(); await persist()
-      await expect.poll(async () => (await get(page, 'publications/' + actor.publication.id)).status, { timeout: 30_000 }).toBe('PUBLISHED')
+      const observations: unknown[] = []
+      ids.deploymentObservations ??= {}
+      ;(ids.deploymentObservations as Record<string, unknown[]>)[actor.publication.id] = observations
+      let deployed: any
+      try {
+        deployed = await awaitDeployment(() => get(page, 'publications/' + actor.publication.id + '/deployment'),
+          actor.publication.id, observations)
+      } finally { await persist() }
       await page.getByRole('button', { name: '刷新发布状态', exact: true }).click()
       await expect(panel.getByRole('link')).toBeVisible()
       actor.publication = await get(page, 'publications/' + actor.publication.id)
-      const deployed = await get(page, 'publications/' + actor.publication.id + '/deployment')
       expect(deployed.phase).toBe('SUCCEEDED'); expect(actor.publication.versionId).toBe(actor.edited)
       const publicPage = await context.newPage()
       expect((await publicPage.goto(actor.publication.url)).status()).toBe(200)

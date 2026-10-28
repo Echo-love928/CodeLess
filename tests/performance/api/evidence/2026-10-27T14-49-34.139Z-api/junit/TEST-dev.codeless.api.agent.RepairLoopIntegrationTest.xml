@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="dev.codeless.api.agent.RepairLoopIntegrationTest" time="365.481" tests="30" errors="0" skipped="0" failures="0" flakes="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="GBK"/>
+    <property name="java.class.path" value="F:\JAVA\CodeLess\CodeLess\services\api\target\test-classes;F:\JAVA\CodeLess\CodeLess\services\api\target\classes;C:\Users\yuanqi\.m2\repository\org\springframework\ai\spring-ai-model\2.0.1\spring-ai-model-2.0.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\ai\spring-ai-commons\2.0.1\spring-ai-commons-2.0.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-context\7.0.9\spring-context-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-aop\7.0.9\spring-aop-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-expression\7.0.9\spring-expression-7.0.9.jar;C:\Users\yuanqi\.m2\repository\io\micrometer\micrometer-core\1.17.1\micrometer-core-1.17.1.jar;C:\Users\yuanqi\.m2\repository\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\yuanqi\.m2\repository\io\micrometer\context-propagation\1.2.1\context-propagation-1.2.1.jar;C:\Users\yuanqi\.m2\repository\com\knuddels\jtokkit\1.1.0\jtokkit-1.1.0.jar;C:\Users\yuanqi\.m2\repository\org\springframework\ai\spring-ai-template-st\2.0.1\spring-ai-template-st-2.0.1.jar;C:\Users\yuanqi\.m2\repository\org\antlr\ST4\4.3.4\ST4-4.3.4.jar;C:\Users\yuanqi\.m2\repository\org\antlr\antlr-runtime\3.5.3\antlr-runtime-3.5.3.jar;C:\Users\yuanqi\.m2\repository\io\micrometer\micrometer-observation\1.17.1\micrometer-observation-1.17.1.jar;C:\Users\yuanqi\.m2\repository\org\jspecify\jspecify\1.0.1\jspecify-1.0.1.jar;C:\Users\yuanqi\.m2\repository\io\micrometer\micrometer-commons\1.17.1\micrometer-commons-1.17.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-messaging\7.0.9\spring-messaging-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-beans\7.0.9\spring-beans-7.0.9.jar;C:\Users\yuanqi\.m2\repository\io\projectreactor\reactor-core\3.8.7\reactor-core-3.8.7.jar;C:\Users\yuanqi\.m2\repository\org\reactivestreams\reactive-streams\1.0.4\reactive-streams-1.0.4.jar;C:\Users\yuanqi\.m2\repository\org\antlr\antlr4-runtime\4.13.1\antlr4-runtime-4.13.1.jar;C:\Users\yuanqi\.m2\repository\com\github\victools\jsonschema-generator\5.0.0\jsonschema-generator-5.0.0.jar;C:\Users\yuanqi\.m2\repository\com\fasterxml\classmate\1.7.3\classmate-1.7.3.jar;C:\Users\yuanqi\.m2\repository\tools\jackson\core\jackson-core\3.1.5\jackson-core-3.1.5.jar;C:\Users\yuanqi\.m2\repository\org\slf4j\slf4j-api\2.0.18\slf4j-api-2.0.18.jar;C:\Users\yuanqi\.m2\repository\com\github\victools\jsonschema-module-jackson\5.0.0\jsonschema-module-jackson-5.0.0.jar;C:\Users\yuanqi\.m2\repository\tools\jackson\core\jackson-databind\3.1.5\jackson-databind-3.1.5.jar;C:\Users\yuanqi\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.21\jackson-annotations-2.21.jar;C:\Users\yuanqi\.m2\repository\com\github\victools\jsonschema-module-swagger-2\5.0.0\jsonschema-module-swagger-2-5.0.0.jar;C:\Users\yuanqi\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.38\swagger-annotations-jakarta-2.2.38.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-web\4.1.1\spring-boot-starter-web-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-jackson\4.1.1\spring-boot-starter-jackson-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-jackson\4.1.1\spring-boot-jackson-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\4.1.1\spring-boot-starter-tomcat-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat-runtime\4.1.1\spring-boot-starter-tomcat-runtime-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-web-server\4.1.1\spring-boot-web-server-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\11.0.24\tomcat-embed-core-11.0.24.jar;C:\Users\yuanqi\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\11.0.24\tomcat-embed-websocket-11.0.24.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-tomcat\4.1.1\spring-boot-tomcat-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-http-converter\4.1.1\spring-boot-http-converter-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot\4.1.1\spring-boot-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-web\7.0.9\spring-web-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-webmvc\4.1.1\spring-boot-webmvc-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-servlet\4.1.1\spring-boot-servlet-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-webmvc\7.0.9\spring-webmvc-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-validation\4.1.1\spring-boot-starter-validation-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter\4.1.1\spring-boot-starter-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-logging\4.1.1\spring-boot-starter-logging-4.1.1.jar;C:\Users\yuanqi\.m2\repository\ch\qos\logback\logback-classic\1.5.38\logback-classic-1.5.38.jar;C:\Users\yuanqi\.m2\repository\ch\qos\logback\logback-core\1.5.38\logback-core-1.5.38.jar;C:\Users\yuanqi\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.25.5\log4j-to-slf4j-2.25.5.jar;C:\Users\yuanqi\.m2\repository\org\apache\logging\log4j\log4j-api\2.25.5\log4j-api-2.25.5.jar;C:\Users\yuanqi\.m2\repository\org\slf4j\jul-to-slf4j\2.0.18\jul-to-slf4j-2.0.18.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\4.1.1\spring-boot-autoconfigure-4.1.1.jar;C:\Users\yuanqi\.m2\repository\jakarta\annotation\jakarta.annotation-api\3.0.0\jakarta.annotation-api-3.0.0.jar;C:\Users\yuanqi\.m2\repository\org\yaml\snakeyaml\2.6\snakeyaml-2.6.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-validation\4.1.1\spring-boot-validation-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\11.0.24\tomcat-embed-el-11.0.24.jar;C:\Users\yuanqi\.m2\repository\org\hibernate\validator\hibernate-validator\9.1.3.Final\hibernate-validator-9.1.3.Final.jar;C:\Users\yuanqi\.m2\repository\jakarta\validation\jakarta.validation-api\3.1.1\jakarta.validation-api-3.1.1.jar;C:\Users\yuanqi\.m2\repository\org\jboss\logging\jboss-logging\3.6.3.Final\jboss-logging-3.6.3.Final.jar;C:\Users\yuanqi\.m2\repository\org\springframework\security\spring-security-crypto\7.1.1\spring-security-crypto-7.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\4.1.1\spring-boot-starter-jdbc-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-jdbc\4.1.1\spring-boot-jdbc-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-sql\4.1.1\spring-boot-sql-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-transaction\4.1.1\spring-boot-transaction-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-persistence\4.1.1\spring-boot-persistence-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-tx\7.0.9\spring-tx-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-jdbc\7.0.9\spring-jdbc-7.0.9.jar;C:\Users\yuanqi\.m2\repository\com\zaxxer\HikariCP\7.0.2\HikariCP-7.0.2.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-flyway\4.1.1\spring-boot-starter-flyway-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-flyway\4.1.1\spring-boot-flyway-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\flywaydb\flyway-database-postgresql\12.4.0\flyway-database-postgresql-12.4.0.jar;C:\Users\yuanqi\.m2\repository\org\flywaydb\flyway-core\12.4.0\flyway-core-12.4.0.jar;C:\Users\yuanqi\.m2\repository\org\postgresql\postgresql\42.7.13\postgresql-42.7.13.jar;C:\Users\yuanqi\.m2\repository\org\checkerframework\checker-qual\3.55.1\checker-qual-3.55.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-test\4.1.1\spring-boot-starter-test-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-test\4.1.1\spring-boot-test-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\4.1.1\spring-boot-test-autoconfigure-4.1.1.jar;C:\Users\yuanqi\.m2\repository\com\jayway\jsonpath\json-path\2.10.0\json-path-2.10.0.jar;C:\Users\yuanqi\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.5\jakarta.xml.bind-api-4.0.5.jar;C:\Users\yuanqi\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.4\jakarta.activation-api-2.1.4.jar;C:\Users\yuanqi\.m2\repository\net\minidev\json-smart\2.6.0\json-smart-2.6.0.jar;C:\Users\yuanqi\.m2\repository\net\minidev\accessors-smart\2.6.0\accessors-smart-2.6.0.jar;C:\Users\yuanqi\.m2\repository\org\ow2\asm\asm\9.7.1\asm-9.7.1.jar;C:\Users\yuanqi\.m2\repository\org\assertj\assertj-core\3.27.7\assertj-core-3.27.7.jar;C:\Users\yuanqi\.m2\repository\net\bytebuddy\byte-buddy\1.18.11\byte-buddy-1.18.11.jar;C:\Users\yuanqi\.m2\repository\org\awaitility\awaitility\4.3.0\awaitility-4.3.0.jar;C:\Users\yuanqi\.m2\repository\org\hamcrest\hamcrest\3.0\hamcrest-3.0.jar;C:\Users\yuanqi\.m2\repository\org\junit\jupiter\junit-jupiter\6.0.3\junit-jupiter-6.0.3.jar;C:\Users\yuanqi\.m2\repository\org\junit\jupiter\junit-jupiter-api\6.0.3\junit-jupiter-api-6.0.3.jar;C:\Users\yuanqi\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\yuanqi\.m2\repository\org\junit\platform\junit-platform-commons\6.0.3\junit-platform-commons-6.0.3.jar;C:\Users\yuanqi\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\yuanqi\.m2\repository\org\junit\jupiter\junit-jupiter-params\6.0.3\junit-jupiter-params-6.0.3.jar;C:\Users\yuanqi\.m2\repository\org\junit\jupiter\junit-jupiter-engine\6.0.3\junit-jupiter-engine-6.0.3.jar;C:\Users\yuanqi\.m2\repository\org\junit\platform\junit-platform-engine\6.0.3\junit-platform-engine-6.0.3.jar;C:\Users\yuanqi\.m2\repository\org\mockito\mockito-core\5.23.0\mockito-core-5.23.0.jar;C:\Users\yuanqi\.m2\repository\net\bytebuddy\byte-buddy-agent\1.18.11\byte-buddy-agent-1.18.11.jar;C:\Users\yuanqi\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\yuanqi\.m2\repository\org\mockito\mockito-junit-jupiter\5.23.0\mockito-junit-jupiter-5.23.0.jar;C:\Users\yuanqi\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\yuanqi\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-core\7.0.9\spring-core-7.0.9.jar;C:\Users\yuanqi\.m2\repository\commons-logging\commons-logging\1.3.6\commons-logging-1.3.6.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-test\7.0.9\spring-test-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\xmlunit\xmlunit-core\2.11.0\xmlunit-core-2.11.0.jar;C:\Users\yuanqi\.m2\repository\org\testcontainers\testcontainers-postgresql\2.0.5\testcontainers-postgresql-2.0.5.jar;C:\Users\yuanqi\.m2\repository\org\testcontainers\testcontainers-jdbc\2.0.5\testcontainers-jdbc-2.0.5.jar;C:\Users\yuanqi\.m2\repository\org\testcontainers\testcontainers-database-commons\2.0.5\testcontainers-database-commons-2.0.5.jar;C:\Users\yuanqi\.m2\repository\org\testcontainers\testcontainers\2.0.5\testcontainers-2.0.5.jar;C:\Users\yuanqi\.m2\repository\org\apache\commons\commons-compress\1.28.0\commons-compress-1.28.0.jar;C:\Users\yuanqi\.m2\repository\commons-codec\commons-codec\1.21.0\commons-codec-1.21.0.jar;C:\Users\yuanqi\.m2\repository\commons-io\commons-io\2.20.0\commons-io-2.20.0.jar;C:\Users\yuanqi\.m2\repository\org\apache\commons\commons-lang3\3.20.0\commons-lang3-3.20.0.jar;C:\Users\yuanqi\.m2\repository\org\rnorth\duct-tape\duct-tape\1.0.8\duct-tape-1.0.8.jar;C:\Users\yuanqi\.m2\repository\org\jetbrains\annotations\17.0.0\annotations-17.0.0.jar;C:\Users\yuanqi\.m2\repository\com\github\docker-java\docker-java-api\3.7.1\docker-java-api-3.7.1.jar;C:\Users\yuanqi\.m2\repository\com\github\docker-java\docker-java-transport-zerodep\3.7.1\docker-java-transport-zerodep-3.7.1.jar;C:\Users\yuanqi\.m2\repository\com\github\docker-java\docker-java-transport\3.7.1\docker-java-transport-3.7.1.jar;C:\Users\yuanqi\.m2\repository\net\java\dev\jna\jna\5.18.1\jna-5.18.1.jar;"/>
+    <property name="java.vm.vendor" value="Eclipse Adoptium"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://adoptium.net/"/>
+    <property name="catalina.useNaming" value="false"/>
+    <property name="user.timezone" value="Asia/Tokyo"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="user.country.format" value="JP"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="APPLICATION_NAME" value="codeless-api"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="CN"/>
+    <property name="sun.boot.library.path" value="F:\JAVA\CodeLess\CodeLess\.local-data\d07-a\tools\java21\jdk-21.0.12.1+1\bin"/>
+    <property name="sun.java.command" value="C:\Users\yuanqi\AppData\Local\Temp\surefire7150601915186073345\surefirebooter-20261027234947732_3.jar C:\Users\yuanqi\AppData\Local\Temp\surefire7150601915186073345 2026-10-27T23-49-47_577-jvmRun1 surefire-20261027234947732_1tmp surefire_0-20261027234947732_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="F:\JAVA\CodeLess\CodeLess\services\api\target\test-classes;F:\JAVA\CodeLess\CodeLess\services\api\target\classes;C:\Users\yuanqi\.m2\repository\org\springframework\ai\spring-ai-model\2.0.1\spring-ai-model-2.0.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\ai\spring-ai-commons\2.0.1\spring-ai-commons-2.0.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-context\7.0.9\spring-context-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-aop\7.0.9\spring-aop-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-expression\7.0.9\spring-expression-7.0.9.jar;C:\Users\yuanqi\.m2\repository\io\micrometer\micrometer-core\1.17.1\micrometer-core-1.17.1.jar;C:\Users\yuanqi\.m2\repository\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\yuanqi\.m2\repository\io\micrometer\context-propagation\1.2.1\context-propagation-1.2.1.jar;C:\Users\yuanqi\.m2\repository\com\knuddels\jtokkit\1.1.0\jtokkit-1.1.0.jar;C:\Users\yuanqi\.m2\repository\org\springframework\ai\spring-ai-template-st\2.0.1\spring-ai-template-st-2.0.1.jar;C:\Users\yuanqi\.m2\repository\org\antlr\ST4\4.3.4\ST4-4.3.4.jar;C:\Users\yuanqi\.m2\repository\org\antlr\antlr-runtime\3.5.3\antlr-runtime-3.5.3.jar;C:\Users\yuanqi\.m2\repository\io\micrometer\micrometer-observation\1.17.1\micrometer-observation-1.17.1.jar;C:\Users\yuanqi\.m2\repository\org\jspecify\jspecify\1.0.1\jspecify-1.0.1.jar;C:\Users\yuanqi\.m2\repository\io\micrometer\micrometer-commons\1.17.1\micrometer-commons-1.17.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-messaging\7.0.9\spring-messaging-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-beans\7.0.9\spring-beans-7.0.9.jar;C:\Users\yuanqi\.m2\repository\io\projectreactor\reactor-core\3.8.7\reactor-core-3.8.7.jar;C:\Users\yuanqi\.m2\repository\org\reactivestreams\reactive-streams\1.0.4\reactive-streams-1.0.4.jar;C:\Users\yuanqi\.m2\repository\org\antlr\antlr4-runtime\4.13.1\antlr4-runtime-4.13.1.jar;C:\Users\yuanqi\.m2\repository\com\github\victools\jsonschema-generator\5.0.0\jsonschema-generator-5.0.0.jar;C:\Users\yuanqi\.m2\repository\com\fasterxml\classmate\1.7.3\classmate-1.7.3.jar;C:\Users\yuanqi\.m2\repository\tools\jackson\core\jackson-core\3.1.5\jackson-core-3.1.5.jar;C:\Users\yuanqi\.m2\repository\org\slf4j\slf4j-api\2.0.18\slf4j-api-2.0.18.jar;C:\Users\yuanqi\.m2\repository\com\github\victools\jsonschema-module-jackson\5.0.0\jsonschema-module-jackson-5.0.0.jar;C:\Users\yuanqi\.m2\repository\tools\jackson\core\jackson-databind\3.1.5\jackson-databind-3.1.5.jar;C:\Users\yuanqi\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.21\jackson-annotations-2.21.jar;C:\Users\yuanqi\.m2\repository\com\github\victools\jsonschema-module-swagger-2\5.0.0\jsonschema-module-swagger-2-5.0.0.jar;C:\Users\yuanqi\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.38\swagger-annotations-jakarta-2.2.38.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-web\4.1.1\spring-boot-starter-web-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-jackson\4.1.1\spring-boot-starter-jackson-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-jackson\4.1.1\spring-boot-jackson-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\4.1.1\spring-boot-starter-tomcat-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat-runtime\4.1.1\spring-boot-starter-tomcat-runtime-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-web-server\4.1.1\spring-boot-web-server-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\11.0.24\tomcat-embed-core-11.0.24.jar;C:\Users\yuanqi\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\11.0.24\tomcat-embed-websocket-11.0.24.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-tomcat\4.1.1\spring-boot-tomcat-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-http-converter\4.1.1\spring-boot-http-converter-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot\4.1.1\spring-boot-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-web\7.0.9\spring-web-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-webmvc\4.1.1\spring-boot-webmvc-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-servlet\4.1.1\spring-boot-servlet-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-webmvc\7.0.9\spring-webmvc-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-validation\4.1.1\spring-boot-starter-validation-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter\4.1.1\spring-boot-starter-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-logging\4.1.1\spring-boot-starter-logging-4.1.1.jar;C:\Users\yuanqi\.m2\repository\ch\qos\logback\logback-classic\1.5.38\logback-classic-1.5.38.jar;C:\Users\yuanqi\.m2\repository\ch\qos\logback\logback-core\1.5.38\logback-core-1.5.38.jar;C:\Users\yuanqi\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.25.5\log4j-to-slf4j-2.25.5.jar;C:\Users\yuanqi\.m2\repository\org\apache\logging\log4j\log4j-api\2.25.5\log4j-api-2.25.5.jar;C:\Users\yuanqi\.m2\repository\org\slf4j\jul-to-slf4j\2.0.18\jul-to-slf4j-2.0.18.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\4.1.1\spring-boot-autoconfigure-4.1.1.jar;C:\Users\yuanqi\.m2\repository\jakarta\annotation\jakarta.annotation-api\3.0.0\jakarta.annotation-api-3.0.0.jar;C:\Users\yuanqi\.m2\repository\org\yaml\snakeyaml\2.6\snakeyaml-2.6.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-validation\4.1.1\spring-boot-validation-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\11.0.24\tomcat-embed-el-11.0.24.jar;C:\Users\yuanqi\.m2\repository\org\hibernate\validator\hibernate-validator\9.1.3.Final\hibernate-validator-9.1.3.Final.jar;C:\Users\yuanqi\.m2\repository\jakarta\validation\jakarta.validation-api\3.1.1\jakarta.validation-api-3.1.1.jar;C:\Users\yuanqi\.m2\repository\org\jboss\logging\jboss-logging\3.6.3.Final\jboss-logging-3.6.3.Final.jar;C:\Users\yuanqi\.m2\repository\org\springframework\security\spring-security-crypto\7.1.1\spring-security-crypto-7.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\4.1.1\spring-boot-starter-jdbc-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-jdbc\4.1.1\spring-boot-jdbc-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-sql\4.1.1\spring-boot-sql-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-transaction\4.1.1\spring-boot-transaction-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-persistence\4.1.1\spring-boot-persistence-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-tx\7.0.9\spring-tx-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-jdbc\7.0.9\spring-jdbc-7.0.9.jar;C:\Users\yuanqi\.m2\repository\com\zaxxer\HikariCP\7.0.2\HikariCP-7.0.2.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-flyway\4.1.1\spring-boot-starter-flyway-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-flyway\4.1.1\spring-boot-flyway-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\flywaydb\flyway-database-postgresql\12.4.0\flyway-database-postgresql-12.4.0.jar;C:\Users\yuanqi\.m2\repository\org\flywaydb\flyway-core\12.4.0\flyway-core-12.4.0.jar;C:\Users\yuanqi\.m2\repository\org\postgresql\postgresql\42.7.13\postgresql-42.7.13.jar;C:\Users\yuanqi\.m2\repository\org\checkerframework\checker-qual\3.55.1\checker-qual-3.55.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-starter-test\4.1.1\spring-boot-starter-test-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-test\4.1.1\spring-boot-test-4.1.1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\4.1.1\spring-boot-test-autoconfigure-4.1.1.jar;C:\Users\yuanqi\.m2\repository\com\jayway\jsonpath\json-path\2.10.0\json-path-2.10.0.jar;C:\Users\yuanqi\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.5\jakarta.xml.bind-api-4.0.5.jar;C:\Users\yuanqi\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.4\jakarta.activation-api-2.1.4.jar;C:\Users\yuanqi\.m2\repository\net\minidev\json-smart\2.6.0\json-smart-2.6.0.jar;C:\Users\yuanqi\.m2\repository\net\minidev\accessors-smart\2.6.0\accessors-smart-2.6.0.jar;C:\Users\yuanqi\.m2\repository\org\ow2\asm\asm\9.7.1\asm-9.7.1.jar;C:\Users\yuanqi\.m2\repository\org\assertj\assertj-core\3.27.7\assertj-core-3.27.7.jar;C:\Users\yuanqi\.m2\repository\net\bytebuddy\byte-buddy\1.18.11\byte-buddy-1.18.11.jar;C:\Users\yuanqi\.m2\repository\org\awaitility\awaitility\4.3.0\awaitility-4.3.0.jar;C:\Users\yuanqi\.m2\repository\org\hamcrest\hamcrest\3.0\hamcrest-3.0.jar;C:\Users\yuanqi\.m2\repository\org\junit\jupiter\junit-jupiter\6.0.3\junit-jupiter-6.0.3.jar;C:\Users\yuanqi\.m2\repository\org\junit\jupiter\junit-jupiter-api\6.0.3\junit-jupiter-api-6.0.3.jar;C:\Users\yuanqi\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\yuanqi\.m2\repository\org\junit\platform\junit-platform-commons\6.0.3\junit-platform-commons-6.0.3.jar;C:\Users\yuanqi\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\yuanqi\.m2\repository\org\junit\jupiter\junit-jupiter-params\6.0.3\junit-jupiter-params-6.0.3.jar;C:\Users\yuanqi\.m2\repository\org\junit\jupiter\junit-jupiter-engine\6.0.3\junit-jupiter-engine-6.0.3.jar;C:\Users\yuanqi\.m2\repository\org\junit\platform\junit-platform-engine\6.0.3\junit-platform-engine-6.0.3.jar;C:\Users\yuanqi\.m2\repository\org\mockito\mockito-core\5.23.0\mockito-core-5.23.0.jar;C:\Users\yuanqi\.m2\repository\net\bytebuddy\byte-buddy-agent\1.18.11\byte-buddy-agent-1.18.11.jar;C:\Users\yuanqi\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\yuanqi\.m2\repository\org\mockito\mockito-junit-jupiter\5.23.0\mockito-junit-jupiter-5.23.0.jar;C:\Users\yuanqi\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\yuanqi\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-core\7.0.9\spring-core-7.0.9.jar;C:\Users\yuanqi\.m2\repository\commons-logging\commons-logging\1.3.6\commons-logging-1.3.6.jar;C:\Users\yuanqi\.m2\repository\org\springframework\spring-test\7.0.9\spring-test-7.0.9.jar;C:\Users\yuanqi\.m2\repository\org\xmlunit\xmlunit-core\2.11.0\xmlunit-core-2.11.0.jar;C:\Users\yuanqi\.m2\repository\org\testcontainers\testcontainers-postgresql\2.0.5\testcontainers-postgresql-2.0.5.jar;C:\Users\yuanqi\.m2\repository\org\testcontainers\testcontainers-jdbc\2.0.5\testcontainers-jdbc-2.0.5.jar;C:\Users\yuanqi\.m2\repository\org\testcontainers\testcontainers-database-commons\2.0.5\testcontainers-database-commons-2.0.5.jar;C:\Users\yuanqi\.m2\repository\org\testcontainers\testcontainers\2.0.5\testcontainers-2.0.5.jar;C:\Users\yuanqi\.m2\repository\org\apache\commons\commons-compress\1.28.0\commons-compress-1.28.0.jar;C:\Users\yuanqi\.m2\repository\commons-codec\commons-codec\1.21.0\commons-codec-1.21.0.jar;C:\Users\yuanqi\.m2\repository\commons-io\commons-io\2.20.0\commons-io-2.20.0.jar;C:\Users\yuanqi\.m2\repository\org\apache\commons\commons-lang3\3.20.0\commons-lang3-3.20.0.jar;C:\Users\yuanqi\.m2\repository\org\rnorth\duct-tape\duct-tape\1.0.8\duct-tape-1.0.8.jar;C:\Users\yuanqi\.m2\repository\org\jetbrains\annotations\17.0.0\annotations-17.0.0.jar;C:\Users\yuanqi\.m2\repository\com\github\docker-java\docker-java-api\3.7.1\docker-java-api-3.7.1.jar;C:\Users\yuanqi\.m2\repository\com\github\docker-java\docker-java-transport-zerodep\3.7.1\docker-java-transport-zerodep-3.7.1.jar;C:\Users\yuanqi\.m2\repository\com\github\docker-java\docker-java-transport\3.7.1\docker-java-transport-3.7.1.jar;C:\Users\yuanqi\.m2\repository\net\java\dev\jna\jna\5.18.1\jna-5.18.1.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\yuanqi"/>
+    <property name="user.language" value="zh"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-08-18"/>
+    <property name="java.home" value="F:\JAVA\CodeLess\CodeLess\.local-data\d07-a\tools\java21\jdk-21.0.12.1+1"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="F:\JAVA\CodeLess\CodeLess\services\api"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="C:\Users\yuanqi\AppData\Local\Temp\surefire7150601915186073345\surefirebooter-20261027234947732_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="polyglot.engine.WarnInterpreterOnly" value="false"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.12.1+1-LTS"/>
+    <property name="user.name" value="yuanqi"/>
+    <property name="stdout.encoding" value="GBK"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Temurin-21.0.12.1+1"/>
+    <property name="localRepository" value="C:\Users\yuanqi\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
+    <property name="java.io.tmpdir" value="C:\Users\yuanqi\AppData\Local\Temp\"/>
+    <property name="catalina.home" value="C:\Users\yuanqi\AppData\Local\Temp\tomcat.0.2009418693232077005"/>
+    <property name="com.zaxxer.hikari.pool_number" value="5"/>
+    <property name="java.version" value="21.0.12.1"/>
+    <property name="user.dir" value="F:\JAVA\CodeLess\CodeLess\services\api"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="70016"/>
+    <property name="user.language.format" value="ja"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
+    <property name="catalina.base" value="C:\Users\yuanqi\AppData\Local\Temp\tomcat.0.17881391437720032483"/>
+    <property name="native.encoding" value="GBK"/>
+    <property name="java.library.path" value="F:\JAVA\CodeLess\CodeLess\.local-data\d07-a\tools\java21\jdk-21.0.12.1+1\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;F:\JAVA\CodeLess\CodeLess\node_modules\.bin;C:\Users\yuanqi\AppData\Local\node\corepack\v1\pnpm\12.6.0\dist\node-gyp-bin;F:\JAVA\CodeLess\CodeLess\node_modules\.bin;F:\JAVA\CodeLess\CodeLess\.local-data\d07-a\tools\java21\jdk-21.0.12.1+1\bin;C:\Users\yuanqi\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;C:\Users\yuanqi\.codex\tmp\arg0-windows\codex-arg0Q0kK6s;C:\Users\yuanqi\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\libheif\libheif\bin;C:\Users\yuanqi\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\jxrlib\jxrlib\bin;C:\Users\yuanqi\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\poppler\Library\bin;C:\Users\yuanqi\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\override;C:\Program Files (x86)\Common Files\Oracle\Java\java8path;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;F:\jdk17\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;D:\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\dotnet\;C:\Program Files\NVIDIA Corporation\NVIDIA app\NvDLISR;F:\jdk17\bin;F:\MySQL\MySQL Server 8.0\bin;C:\Program Files\Microsoft SQL Server\120\DTS\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\110\Tools\Binn\;F:\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;F:\Microsoft SQL Server\120\Tools\Binn\ManagementStudio\;F:\Microsoft SQL Server\120\DTS\Binn\;C:\Program Files\Git\cmd;C:\Program Files\Sunshine;C:\Program Files\Sunshine\tools;C:\Program Files\PowerToys\DSCModules\;F:\nodejs\;C:\Users\yuanqi\AppData\Local\Programs\OpenAI\Codex\bin;C:\Program Files\MySQL\MySQL Shell 8.0\bin\;F:\python314\Scripts\;F:\python314\;C:\Users\yuanqi\AppData\Local\Programs\Python\Launcher\;C:\Users\yuanqi\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;C:\Users\yuanqi\AppData\Local\Microsoft\WindowsApps;C:\Users\yuanqi\AppData\Local\Programs\Ollama;F:\Microsoft VS Code\bin;F:\computer\Dev-Cpp\MinGW64\bin;F:\Antigravity\bin;F:\nodejs\node_global;F:\DevEco Studio\bin;F:\PyCharm 2026.2.1\bin;F:\DataGrip 2026.2.4\bin;F:\DRadar\tools\uv;C:\Users\yuanqi\AppData\Local\Programs\Antigravity IDE\bin;C:\Users\yuanqi\AppData\Local\GitHubDesktop\bin;F:\python314\Graphviz\bin;C:\Users\yuanqi\AppData\Roaming\npm;C:\Users\yuanqi\AppData\Local\Programs\DockerDesktop\resources\bin;C:\Users\yuanqi\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\fallback;C:\Users\yuanqi\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;C:\Users\yuanqi\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\cmd;C:\Users\yuanqi\AppData\Local\OpenAI\Codex\bin\c602dfdab3808440;C:\Users\yuanqi\AppData\Local\OpenAI\Codex\bin\2993767bd1dfb009;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="GBK"/>
+    <property name="java.vendor" value="Eclipse Adoptium"/>
+    <property name="java.vm.version" value="21.0.12.1+1-LTS"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[codeless-api] "/>
+  </properties>
+  <testcase name="D10AT3_expiredDeadlineRecoversAsFailedAndCannotCommitLateResult" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="6.001">
+    <system-out><![CDATA[2026-10-27T23:52:30.653+09:00  INFO 70016 --- [codeless-api] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.codeless.api.agent.RepairLoopIntegrationTest]: RepairLoopIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-27T23:52:30.654+09:00  INFO 70016 --- [codeless-api] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration dev.codeless.api.CodeLessApiApplication for test class dev.codeless.api.agent.RepairLoopIntegrationTest
+2026-10-27T23:52:30.654+09:00  INFO 70016 --- [codeless-api] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.codeless.api.agent.RepairLoopIntegrationTest]: RepairLoopIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-27T23:52:30.654+09:00  INFO 70016 --- [codeless-api] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.codeless.api.data.PostgresTestBase]: PostgresTestBase does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-27T23:52:30.655+09:00  INFO 70016 --- [codeless-api] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration dev.codeless.api.CodeLessApiApplication for test class dev.codeless.api.agent.RepairLoopIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-27T23:52:32.291+09:00  INFO 70016 --- [codeless-api] [           main] d.c.api.agent.RepairLoopIntegrationTest  : Starting RepairLoopIntegrationTest using Java 21.0.12.1 with PID 70016 (started by yuanqi in F:\JAVA\CodeLess\CodeLess\services\api)
+2026-10-27T23:52:32.291+09:00  INFO 70016 --- [codeless-api] [           main] d.c.api.agent.RepairLoopIntegrationTest  : The following 1 profile is active: "test"
+2026-10-27T23:52:32.504+09:00  INFO 70016 --- [codeless-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Starting...
+2026-10-27T23:52:32.530+09:00  INFO 70016 --- [codeless-api] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-5 - Added connection org.postgresql.jdbc.PgConnection@2463a9ec
+2026-10-27T23:52:32.530+09:00  INFO 70016 --- [codeless-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Start completed.
+2026-10-27T23:52:32.532+09:00  INFO 70016 --- [codeless-api] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:65292/codeless_test?loggerLevel=OFF (PostgreSQL 17.6)
+2026-10-27T23:52:32.566+09:00  INFO 70016 --- [codeless-api] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.011s)
+2026-10-27T23:52:32.593+09:00  INFO 70016 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 5
+2026-10-27T23:52:32.594+09:00  INFO 70016 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-10-27T23:52:32.734+09:00  INFO 70016 --- [codeless-api] [           main] d.c.api.agent.RepairLoopIntegrationTest  : Started RepairLoopIntegrationTest in 0.462 seconds (process running for 164.828)
+2026-10-27T23:52:32.782+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=1bea9ebd-aa97-4317-a289-6c0bbc2f73a9 queueMs=8.46460352783057E11
+2026-10-27T23:52:38.047+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=1bea9ebd-aa97-4317-a289-6c0bbc2f73a9 executionId=de4178f6-6c10-431f-9a5b-73d7b60e774b buildMs=3446 browserMs=null
+2026-10-27T23:52:38.690+09:00  WARN 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskScheduler     : Task 1bea9ebd-aa97-4317-a289-6c0bbc2f73a9 stopped at REPAIR as INVALID_STAGE_RESULT (lease no longer held; cancellation or expiry recovery decides)
+
+java.lang.IllegalStateException: Lease is no longer active
+	at dev.codeless.api.data.TaskProgressService.transitionLocked(TaskProgressService.java:38) ~[classes/:na]
+	at dev.codeless.api.data.TaskProgressService.transitionLeased(TaskProgressService.java:30) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:158) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719) ~[spring-aop-7.0.9.jar:7.0.9]
+	at dev.codeless.api.data.TaskProgressService$$SpringCGLIB$$0.transitionLeased(<generated>) ~[classes/:na]
+	at dev.codeless.api.tasks.TaskQueueService.advance(TaskQueueService.java:172) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:158) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719) ~[spring-aop-7.0.9.jar:7.0.9]
+	at dev.codeless.api.tasks.TaskQueueService$$SpringCGLIB$$0.advance(<generated>) ~[classes/:na]
+	at dev.codeless.api.tasks.TaskStageRunner.advance(TaskStageRunner.java:17) ~[classes/:na]
+	at dev.codeless.api.agent.AgentLoop.advance(AgentLoop.java:420) ~[classes/:na]
+	at dev.codeless.api.tasks.TaskScheduler.runMeasured(TaskScheduler.java:125) ~[classes/:na]
+	at dev.codeless.api.tasks.TaskScheduler.run(TaskScheduler.java:102) ~[classes/:na]
+	at dev.codeless.api.tasks.TaskScheduler.tick(TaskScheduler.java:69) ~[classes/:na]
+	at dev.codeless.api.agent.RepairLoopIntegrationTest.run(RepairLoopIntegrationTest.java:59) ~[test-classes/:na]
+	at dev.codeless.api.agent.RepairLoopIntegrationTest.D10AT3_expiredDeadlineRecoversAsFailedAndCannotCommitLateResult(RepairLoopIntegrationTest.java:368) ~[test-classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+	at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:502) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.support.MethodReflectionUtils.invoke(MethodReflectionUtils.java:45) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:61) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:124) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:163) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:148) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:123) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:105) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:99) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:66) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:47) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:39) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:104) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:98) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invokeVoid(InterceptingExecutableInvoker.java:71) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$0(TestMethodTestDescriptor.java:219) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:215) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:157) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:70) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:52) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:58) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:246) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:218) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:179) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:66) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:157) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:65) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:125) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$2(InterceptingLauncher.java:57) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:56) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.apache.maven.surefire.api.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:125) ~[surefire-api-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.junitplatform.LauncherAdapter.executeWithCancellationToken(LauncherAdapter.java:68) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.junitplatform.LauncherAdapter.execute(LauncherAdapter.java:54) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:203) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:168) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:136) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.6.jar:3.5.6]
+
+2026-10-27T23:52:38.692+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=1bea9ebd-aa97-4317-a289-6c0bbc2f73a9 executionMs=5908.2726 businessMs=2111.3753 modelMs=0.0 buildVerifyMs=3796.8973 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="hostVerifiesAnActualPatchWhenNoFurtherRequestCanBeFunded" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="14.536">
+    <system-out><![CDATA[2026-10-27T23:52:38.758+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=b6d2a76f-4907-4c57-8f36-17d2ea092e20 queueMs=8.46460358757357E11
+2026-10-27T23:52:44.059+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=b6d2a76f-4907-4c57-8f36-17d2ea092e20 executionId=8331ba07-30dc-48ea-aa83-96be211fe62c buildMs=3431 browserMs=null
+2026-10-27T23:52:52.529+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=b6d2a76f-4907-4c57-8f36-17d2ea092e20 executionId=128edc28-c201-4a11-8fc5-c489bd81d166 buildMs=4805 browserMs=1031
+2026-10-27T23:52:53.186+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=b6d2a76f-4907-4c57-8f36-17d2ea092e20 executionMs=14428.1111 businessMs=4445.1146 modelMs=0.0 buildVerifyMs=9982.9965 modelCalls=0 runnerCalls=2
+]]></system-out>
+  </testcase>
+  <testcase name="lowBudgetRepairPatchesFromSeededSourcesWithoutWeakeningActionsOrExceedingCaps" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="42.477">
+    <system-out><![CDATA[2026-10-27T23:52:53.298+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=f9386d53-d1a6-49f4-9dde-8175b39edb7c queueMs=8.4646037329943E11
+2026-10-27T23:53:01.206+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=f9386d53-d1a6-49f4-9dde-8175b39edb7c executionId=85bb1fd0-5663-40b7-b4ed-01e0b06b6843 buildMs=5914 browserMs=null
+2026-10-27T23:53:09.598+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=f9386d53-d1a6-49f4-9dde-8175b39edb7c executionId=9b8d6a25-4fbb-4c71-866f-e234966edafc buildMs=5104 browserMs=1050
+2026-10-27T23:53:10.249+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=f9386d53-d1a6-49f4-9dde-8175b39edb7c executionMs=16950.1362 businessMs=4113.0215 modelMs=0.0 buildVerifyMs=12837.1147 modelCalls=0 runnerCalls=2
+2026-10-27T23:53:10.358+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=b207c2e5-92bb-4e86-b664-ab5f337cfa44 queueMs=8.4646039035754E11
+2026-10-27T23:53:15.875+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=b207c2e5-92bb-4e86-b664-ab5f337cfa44 executionId=4a4f0088-5fa4-466f-a3c8-47b2dcb336a0 buildMs=3478 browserMs=null
+2026-10-27T23:53:25.593+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=b207c2e5-92bb-4e86-b664-ab5f337cfa44 executionId=1436688f-6b01-45a1-91e5-2c3dcc479a66 buildMs=4841 browserMs=2768
+2026-10-27T23:53:35.249+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=b207c2e5-92bb-4e86-b664-ab5f337cfa44 executionId=3218a135-b157-47da-b08e-ab90923b0ecc buildMs=4770 browserMs=2733
+2026-10-27T23:53:35.648+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=b207c2e5-92bb-4e86-b664-ab5f337cfa44 executionMs=25289.4871 businessMs=5668.3042 modelMs=0.0 buildVerifyMs=19621.1829 modelCalls=0 runnerCalls=3
+]]></system-out>
+  </testcase>
+  <testcase name="completePaidProtocolErrorSurvivesRealWireParsingAndStopsWithoutRepairOrRetry" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="7.833">
+    <system-out><![CDATA[2026-10-27T23:53:35.783+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=fbb87400-a625-47ea-b185-f60ee4678604 queueMs=8.46460415784118E11
+2026-10-27T23:53:42.097+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=fbb87400-a625-47ea-b185-f60ee4678604 executionId=7c50791d-f866-49d6-bf11-d0455fd5a6d1 buildMs=3361 browserMs=null
+2026-10-27T23:53:43.488+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=fbb87400-a625-47ea-b185-f60ee4678604 executionMs=7704.2434 businessMs=4022.2557 modelMs=0.0 buildVerifyMs=3681.9877 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="locatorTimeoutOnARenderedPageIsRepairedInsteadOfStoppingAsInfrastructure" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="20.55">
+    <system-out><![CDATA[2026-10-27T23:53:43.604+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=081e76c4-b72d-4b3b-bc3e-b660a4dcb3cd queueMs=8.4646042360477E11
+2026-10-27T23:53:52.832+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=081e76c4-b72d-4b3b-bc3e-b660a4dcb3cd executionId=57db35f7-5129-486d-a74d-5391ec2a498b buildMs=4729 browserMs=2728
+2026-10-27T23:54:03.366+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=081e76c4-b72d-4b3b-bc3e-b660a4dcb3cd executionId=60ffddcc-1288-4f4e-88c6-1e6a041be94c buildMs=6938 browserMs=1050
+2026-10-27T23:54:04.047+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=081e76c4-b72d-4b3b-bc3e-b660a4dcb3cd executionMs=20441.7423 businessMs=4279.3782 modelMs=0.0 buildVerifyMs=16162.3641 modelCalls=0 runnerCalls=2
+]]></system-out>
+  </testcase>
+  <testcase name="capturedWrappedDoneStopsWithoutUnwrappingOrRetry" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="7.69">
+    <system-out><![CDATA[2026-10-27T23:54:04.179+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=aeedace7-4a90-440d-9ada-7d53c45cd426 queueMs=8.46460444179773E11
+2026-10-27T23:54:10.853+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=aeedace7-4a90-440d-9ada-7d53c45cd426 executionId=dc918eef-f0a2-4bc0-a756-cc1b9a9fd939 buildMs=3717 browserMs=null
+2026-10-27T23:54:11.737+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=aeedace7-4a90-440d-9ada-7d53c45cd426 executionMs=7558.2013 businessMs=3513.868 modelMs=0.0 buildVerifyMs=4044.3333 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="repairReadThatTheRequestDoesNotOfferCannotConsumeAFileTool" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="8.807">
+    <system-out><![CDATA[2026-10-27T23:54:11.856+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=62aa66fd-b29b-422c-9306-8c74fbbea51d queueMs=8.4646045185552E11
+2026-10-27T23:54:18.912+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=62aa66fd-b29b-422c-9306-8c74fbbea51d executionId=b25dd771-fbe2-4f15-9192-64f12b6a5187 buildMs=3673 browserMs=null
+2026-10-27T23:54:20.520+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=62aa66fd-b29b-422c-9306-8c74fbbea51d executionMs=8662.7304 businessMs=4667.9919 modelMs=0.0 buildVerifyMs=3994.7385 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="verificationNeedsTwoBudgetSlotsBeforeLaunchingAnyRunner" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="3.27">
+    <system-out><![CDATA[2026-10-27T23:54:20.659+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=12b7d083-e44e-4c93-999d-0d979ef3d06c queueMs=8.46460460659065E11
+]]></system-out>
+  </testcase>
+  <testcase name="modelNetworkFailureDuringRepairNeverBecomesMoreCodeEdits" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="5.838">
+    <system-out><![CDATA[2026-10-27T23:54:23.926+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=af0db30b-e661-4591-ad07-e1f159a5677d queueMs=8.46460463926654E11
+2026-10-27T23:54:29.018+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=af0db30b-e661-4591-ad07-e1f159a5677d executionId=07fce903-9d2a-4d41-b6f1-121e3a1a9b83 buildMs=3350 browserMs=null
+2026-10-27T23:54:29.712+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=af0db30b-e661-4591-ad07-e1f159a5677d executionMs=5785.3176 businessMs=2102.2884 modelMs=0.0 buildVerifyMs=3683.0292 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="capturedPatchIsVerifiedWithoutACompletionRequestWithinOriginalBudget" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="16.66">
+    <system-out><![CDATA[2026-10-27T23:54:29.771+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=a96a9906-266c-456d-b5fc-03dd77e87a70 queueMs=8.46460469772268E11
+2026-10-27T23:54:36.475+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=a96a9906-266c-456d-b5fc-03dd77e87a70 executionId=4c4c6e2e-88cf-4595-bb73-acfab909acba buildMs=3358 browserMs=null
+2026-10-27T23:54:45.524+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=a96a9906-266c-456d-b5fc-03dd77e87a70 executionId=3bbd5e5f-08ee-4b16-a14e-9f4e0f63c79e buildMs=4910 browserMs=1083
+2026-10-27T23:54:46.285+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=a96a9906-266c-456d-b5fc-03dd77e87a70 executionMs=16513.189 businessMs=6479.3915 modelMs=0.0 buildVerifyMs=10033.7975 modelCalls=0 runnerCalls=2
+]]></system-out>
+  </testcase>
+  <testcase name="repeatedCommittedPatchIsReallyVerifiedInsteadOfSpendingTheRemainingCallsOnRewrites" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="15.74">
+    <system-out><![CDATA[2026-10-27T23:54:46.425+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=cd0c2efc-d2eb-4b11-bf7b-badf872ac4be queueMs=8.46460486425603E11
+2026-10-27T23:54:51.404+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=cd0c2efc-d2eb-4b11-bf7b-badf872ac4be executionId=4c601885-1e06-4eae-a990-a1ea5b082a1f buildMs=3281 browserMs=null
+2026-10-27T23:55:01.280+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=cd0c2efc-d2eb-4b11-bf7b-badf872ac4be executionId=58bb8b4d-bda1-4e9c-a1dd-2fcb1872a34c buildMs=6178 browserMs=1163
+2026-10-27T23:55:02.091+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=cd0c2efc-d2eb-4b11-bf7b-badf872ac4be executionMs=15665.1682 businessMs=4365.7993 modelMs=0.0 buildVerifyMs=11299.3689 modelCalls=0 runnerCalls=2
+]]></system-out>
+  </testcase>
+  <testcase name="duplicateRootAndArgumentKeysStopBeforeProposedUpdatesThroughProductionWire" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="21.745">
+    <system-out><![CDATA[2026-10-27T23:55:02.278+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=62823646-b87d-4529-ab58-a0e206c5e393 queueMs=8.4646050227927E11
+2026-10-27T23:55:09.451+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=62823646-b87d-4529-ab58-a0e206c5e393 executionId=2af901bc-7481-4e77-9d14-9ac847e38698 buildMs=4891 browserMs=null
+2026-10-27T23:55:10.721+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=62823646-b87d-4529-ab58-a0e206c5e393 executionMs=8441.3774 businessMs=3010.7316 modelMs=0.0 buildVerifyMs=5430.6458 modelCalls=0 runnerCalls=1
+2026-10-27T23:55:10.897+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=b6761389-aaad-411f-b172-68be1e424968 queueMs=8.4646051089584E11
+2026-10-27T23:55:16.394+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=b6761389-aaad-411f-b172-68be1e424968 executionId=34e808a5-f9ed-45ca-86a1-9402248c9a4c buildMs=3546 browserMs=null
+2026-10-27T23:55:17.523+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=b6761389-aaad-411f-b172-68be1e424968 executionMs=6625.3111 businessMs=2724.6438 modelMs=0.0 buildVerifyMs=3900.6673 modelCalls=0 runnerCalls=1
+2026-10-27T23:55:17.629+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=02251b63-17f3-4748-b283-a161293a42f1 queueMs=8.46460517628484E11
+2026-10-27T23:55:22.701+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=02251b63-17f3-4748-b283-a161293a42f1 executionId=c7d8d0b1-59d3-480f-ba95-5cbb2da77c8f buildMs=3343 browserMs=null
+2026-10-27T23:55:23.823+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=02251b63-17f3-4748-b283-a161293a42f1 executionMs=6193.2906 businessMs=2516.2391 modelMs=0.0 buildVerifyMs=3677.0515 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="recordedUnknownPatchUsageKeepsItsFullReservationAndTheHostVerifiesThePatch" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="16.821">
+    <system-out><![CDATA[2026-10-27T23:55:23.913+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=5ffb8d15-e162-4bc0-ae5f-c458d8c845ed queueMs=8.46460523913002E11
+2026-10-27T23:55:30.148+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=5ffb8d15-e162-4bc0-ae5f-c458d8c845ed executionId=568b238d-d6b9-471a-a290-b7034315d4fb buildMs=3418 browserMs=null
+2026-10-27T23:55:39.815+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=5ffb8d15-e162-4bc0-ae5f-c458d8c845ed executionId=7c1d3d75-d1e4-4f2d-8b1a-6409629107d7 buildMs=5054 browserMs=1077
+2026-10-27T23:55:40.597+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=5ffb8d15-e162-4bc0-ae5f-c458d8c845ed executionMs=16683.5947 businessMs=6459.599 modelMs=0.0 buildVerifyMs=10223.9957 modelCalls=0 runnerCalls=2
+]]></system-out>
+  </testcase>
+  <testcase name="invalidDoneGetsOneCorrectiveObservationAndThenVerifies" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="8.749">
+    <system-out><![CDATA[2026-10-27T23:55:40.745+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=2205268c-c787-4afc-b9ca-7ece788ae04e queueMs=8.46460540745056E11
+2026-10-27T23:55:48.800+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=2205268c-c787-4afc-b9ca-7ece788ae04e executionId=0c7a88f7-2e46-4f33-95a2-b369360cbff4 buildMs=4914 browserMs=1051
+2026-10-27T23:55:49.407+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=2205268c-c787-4afc-b9ca-7ece788ae04e executionMs=8661.437 businessMs=2314.479 modelMs=0.0 buildVerifyMs=6346.958 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="D10AT3_eachBudgetStopsBeforeTheNextUnfundedOperation" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="2.065">
+    <system-out><![CDATA[2026-10-27T23:55:49.483+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=1038c66c-df9b-4bbb-8ead-01397e427d2f queueMs=8.46460549484195E11
+2026-10-27T23:55:50.078+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=5f8d82df-bfe9-4589-9300-7320c0d4905a queueMs=8.46460550079035E11
+2026-10-27T23:55:50.325+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=f3cba619-837d-4c06-a22a-b545fd438276 queueMs=8.4646055032549E11
+]]></system-out>
+  </testcase>
+  <testcase name="secondInvalidDoneStopsWithTheOriginalCodeBeforeAnyRunner" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="1.167">
+    <system-out><![CDATA[2026-10-27T23:55:51.550+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=3ed8b1ea-9d9e-47b7-9a62-62c4f4c50db3 queueMs=8.46460551550682E11
+2026-10-27T23:55:52.673+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=3ed8b1ea-9d9e-47b7-9a62-62c4f4c50db3 executionMs=1122.6897 businessMs=1122.6897 modelMs=0.0 buildVerifyMs=0.0 modelCalls=0 runnerCalls=0
+]]></system-out>
+  </testcase>
+  <testcase name="exact17ccDuplicateReplyIsRejectedBeforePatchAndKeepsCompleteMeasuredUsage" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="9.318">
+    <system-out><![CDATA[2026-10-27T23:55:52.728+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=e92f0b4c-78a6-4e31-b956-13cbb38c2b3c queueMs=8.46460552728674E11
+2026-10-27T23:56:00.473+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=e92f0b4c-78a6-4e31-b956-13cbb38c2b3c executionId=bdfcda39-219e-461d-b707-52305b490775 buildMs=4685 browserMs=null
+2026-10-27T23:56:01.914+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=e92f0b4c-78a6-4e31-b956-13cbb38c2b3c executionMs=9185.5776 businessMs=4175.6356 modelMs=0.0 buildVerifyMs=5009.942 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="unchangedReadLoopWithReadsOfferedStillStopsBeforeAnotherModelOrBuild" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="9.263">
+    <system-out><![CDATA[2026-10-27T23:56:02.043+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=bbf66b90-6eca-47c8-8b86-9ce585bc27b0 queueMs=8.46460562044729E11
+2026-10-27T23:56:08.792+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=bbf66b90-6eca-47c8-8b86-9ce585bc27b0 executionId=32bfaae3-112a-4933-8b57-ad37600f0788 buildMs=4605 browserMs=null
+2026-10-27T23:56:11.193+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=bbf66b90-6eca-47c8-8b86-9ce585bc27b0 executionMs=9148.2206 businessMs=3852.6908 modelMs=0.0 buildVerifyMs=5295.5298 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="repeatedBadPatchStillFailsTheOriginalBrowserAcceptance" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="16.859">
+    <system-out><![CDATA[2026-10-27T23:56:11.306+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=ffb4204e-bd50-43d5-aa3b-bb9461c5ae7c queueMs=8.46460571305079E11
+2026-10-27T23:56:16.667+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=ffb4204e-bd50-43d5-aa3b-bb9461c5ae7c executionId=b591cbf4-d152-4283-b0a2-02e5e3c6f1ae buildMs=3503 browserMs=null
+2026-10-27T23:56:27.204+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=ffb4204e-bd50-43d5-aa3b-bb9461c5ae7c executionId=b03eb6d3-88f0-4e83-bd03-3f5debe73026 buildMs=5240 browserMs=2822
+2026-10-27T23:56:28.096+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=ffb4204e-bd50-43d5-aa3b-bb9461c5ae7c executionMs=16789.6794 businessMs=4541.628 modelMs=0.0 buildVerifyMs=12248.0514 modelCalls=0 runnerCalls=2
+]]></system-out>
+  </testcase>
+  <testcase name="infrastructureFailureStopsWithoutCallingRepairModel" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="1.657">
+    <system-out><![CDATA[2026-10-27T23:56:28.166+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=115acfbf-491e-4d9d-a9c8-4e05a0547c7b queueMs=8.46460588166533E11
+2026-10-27T23:56:29.773+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=115acfbf-491e-4d9d-a9c8-4e05a0547c7b executionMs=1606.0199 businessMs=1605.8578 modelMs=0.0 buildVerifyMs=0.1621 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="D10AT1_missingComponentRepairRebuildsAndPassesRealBrowserWithRecordedDiff" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="16.026">
+    <system-out><![CDATA[2026-10-27T23:56:29.819+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=858dcd5f-43f6-438f-8c2b-542f9a2c768d queueMs=8.46460589819939E11
+2026-10-27T23:56:36.054+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=858dcd5f-43f6-438f-8c2b-542f9a2c768d executionId=85c3a26b-d3c6-475f-ad95-360219e38989 buildMs=4097 browserMs=null
+2026-10-27T23:56:45.106+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=858dcd5f-43f6-438f-8c2b-542f9a2c768d executionId=71799872-9792-4bca-94b0-37460f53d901 buildMs=5088 browserMs=1056
+2026-10-27T23:56:45.744+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=858dcd5f-43f6-438f-8c2b-542f9a2c768d executionMs=15924.15 businessMs=4618.0984 modelMs=0.0 buildVerifyMs=11306.0516 modelCalls=0 runnerCalls=2
+]]></system-out>
+  </testcase>
+  <testcase name="D10AT2_changingButUnrepairableSourceStopsAfterThreeRounds" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="27.27">
+    <system-out><![CDATA[2026-10-27T23:56:45.845+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=b429ee17-8774-40fd-af80-5b4a6233c677 queueMs=8.46460605845496E11
+2026-10-27T23:56:50.931+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=b429ee17-8774-40fd-af80-5b4a6233c677 executionId=27901ea0-ce91-4d5a-b26a-ce48cf6ecda1 buildMs=3366 browserMs=null
+2026-10-27T23:56:56.332+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=b429ee17-8774-40fd-af80-5b4a6233c677 executionId=b8cdaef7-1842-4d5c-b007-d8a5104e98d9 buildMs=3369 browserMs=null
+2026-10-27T23:57:04.461+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=b429ee17-8774-40fd-af80-5b4a6233c677 executionId=bc4cb7c0-2825-41ee-9769-946e6af6919a buildMs=5798 browserMs=null
+2026-10-27T23:57:12.367+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=b429ee17-8774-40fd-af80-5b4a6233c677 executionId=dafea549-460a-4278-9c4d-8e2f3f414821 buildMs=4760 browserMs=null
+2026-10-27T23:57:12.965+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=b429ee17-8774-40fd-af80-5b4a6233c677 executionMs=27118.4762 businessMs=8309.0703 modelMs=0.0 buildVerifyMs=18809.4059 modelCalls=0 runnerCalls=4
+]]></system-out>
+  </testcase>
+  <testcase name="recordedJsonObjectReplyStopsGenerateBeforeAnyRunnerOrRepair" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="1.058">
+    <system-out><![CDATA[2026-10-27T23:57:13.126+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=ab4cbb6d-1cc3-47fa-8993-1fcb97dc43fd queueMs=8.46460633123585E11
+2026-10-27T23:57:14.078+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=ab4cbb6d-1cc3-47fa-8993-1fcb97dc43fd executionMs=951.0349 businessMs=951.0349 modelMs=0.0 buildVerifyMs=0.0 modelCalls=0 runnerCalls=0
+]]></system-out>
+  </testcase>
+  <testcase name="bareDoneFinishesRepairWithTheUnchangedOriginalActions" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="13.37">
+    <system-out><![CDATA[2026-10-27T23:57:14.176+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=d22030ce-4986-439e-8d2b-c942306a8aab queueMs=8.46460634174781E11
+2026-10-27T23:57:20.860+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=d22030ce-4986-439e-8d2b-c942306a8aab executionId=0b353244-0383-4a1f-8396-48e601a67c89 buildMs=4608 browserMs=null
+2026-10-27T23:57:27.044+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=d22030ce-4986-439e-8d2b-c942306a8aab executionId=005752d9-4337-4b88-bd64-774d3dfd1960 buildMs=3976 browserMs=null
+2026-10-27T23:57:27.442+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=d22030ce-4986-439e-8d2b-c942306a8aab executionMs=13264.9845 businessMs=3703.6968 modelMs=0.0 buildVerifyMs=9561.2877 modelCalls=0 runnerCalls=2
+]]></system-out>
+  </testcase>
+  <testcase name="recordedJsonObjectReplyStopsRepairWithoutFurtherEditsOrRetries" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="7.043">
+    <system-out><![CDATA[2026-10-27T23:57:27.553+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=d3fc0e6d-9fdf-4d84-bc4f-a7d11c274ef1 queueMs=8.46460647552755E11
+2026-10-27T23:57:33.591+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=d3fc0e6d-9fdf-4d84-bc4f-a7d11c274ef1 executionId=cc27a3b8-c902-41d3-9c2e-a9e41a905984 buildMs=3894 browserMs=null
+2026-10-27T23:57:34.440+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=d3fc0e6d-9fdf-4d84-bc4f-a7d11c274ef1 executionMs=6885.6569 businessMs=2336.8647 modelMs=0.0 buildVerifyMs=4548.7922 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="realBrowserPageExceptionRepairsWithoutChangingOriginalAcceptance" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="23.493">
+    <system-out><![CDATA[2026-10-27T23:57:34.593+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=e3380ecf-95f6-4e38-9ca4-93dbc5b88a37 queueMs=8.46460654593467E11
+2026-10-27T23:57:45.692+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=e3380ecf-95f6-4e38-9ca4-93dbc5b88a37 executionId=30b1ace7-052a-4983-93e9-61613a8fe00d buildMs=7172 browserMs=1725
+2026-10-27T23:57:57.033+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=e3380ecf-95f6-4e38-9ca4-93dbc5b88a37 executionId=062750bb-bb55-4a5a-920a-3fed919933ae buildMs=6456 browserMs=1743
+2026-10-27T23:57:57.934+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=e3380ecf-95f6-4e38-9ca4-93dbc5b88a37 executionMs=23340.2528 businessMs=5062.4542 modelMs=0.0 buildVerifyMs=18277.7986 modelCalls=0 runnerCalls=2
+]]></system-out>
+  </testcase>
+  <testcase name="recordedUnchangedReadLoopStopsBeforeAnotherModelOrBuild" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="13.223">
+    <system-out><![CDATA[2026-10-27T23:57:58.085+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=fdb3fdb3-fcf2-4870-b97f-f25dc2c501bc queueMs=8.46460678085736E11
+2026-10-27T23:58:08.841+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=fdb3fdb3-fcf2-4870-b97f-f25dc2c501bc executionId=8f740771-eae9-4e29-83a0-9dcd20472519 buildMs=6653 browserMs=null
+2026-10-27T23:58:11.157+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=fdb3fdb3-fcf2-4870-b97f-f25dc2c501bc executionMs=13071.8891 businessMs=5681.7541 modelMs=0.0 buildVerifyMs=7390.135 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="originalBrowserAcceptanceCannotBeWeakenedByRepairProposal" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="7.017">
+    <system-out><![CDATA[2026-10-27T23:58:11.315+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=d4276b4f-f090-4298-8e8a-2343daa26195 queueMs=8.46460691313975E11
+2026-10-27T23:58:17.313+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=d4276b4f-f090-4298-8e8a-2343daa26195 executionId=b23eec12-e5d4-46b5-966b-892a71f5c888 buildMs=3943 browserMs=null
+2026-10-27T23:58:18.266+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=d4276b4f-f090-4298-8e8a-2343daa26195 executionMs=6949.1363 businessMs=2656.4882 modelMs=0.0 buildVerifyMs=4292.6481 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="D10AT3_cancelDuringRepairRetainsUsageAndRejectsLateMutation" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="6.964">
+    <system-out><![CDATA[2026-10-27T23:58:18.333+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=1b096ac7-4712-4b29-8917-e317fe8c51f1 queueMs=8.46460698333666E11
+2026-10-27T23:58:24.511+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=1b096ac7-4712-4b29-8917-e317fe8c51f1 executionId=de44a5b6-7712-4723-85ed-681ce75426c5 buildMs=4105 browserMs=null
+2026-10-27T23:58:25.231+09:00  WARN 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskScheduler     : Task 1b096ac7-4712-4b29-8917-e317fe8c51f1 stopped at REPAIR as INVALID_STAGE_RESULT (lease no longer held; cancellation or expiry recovery decides)
+
+java.lang.IllegalStateException: Lease is no longer active
+	at dev.codeless.api.data.TaskProgressService.transitionLocked(TaskProgressService.java:38) ~[classes/:na]
+	at dev.codeless.api.data.TaskProgressService.transitionLeased(TaskProgressService.java:30) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:158) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719) ~[spring-aop-7.0.9.jar:7.0.9]
+	at dev.codeless.api.data.TaskProgressService$$SpringCGLIB$$0.transitionLeased(<generated>) ~[classes/:na]
+	at dev.codeless.api.tasks.TaskQueueService.advance(TaskQueueService.java:172) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:158) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719) ~[spring-aop-7.0.9.jar:7.0.9]
+	at dev.codeless.api.tasks.TaskQueueService$$SpringCGLIB$$0.advance(<generated>) ~[classes/:na]
+	at dev.codeless.api.tasks.TaskStageRunner.advance(TaskStageRunner.java:17) ~[classes/:na]
+	at dev.codeless.api.agent.AgentLoop.advance(AgentLoop.java:420) ~[classes/:na]
+	at dev.codeless.api.tasks.TaskScheduler.runMeasured(TaskScheduler.java:125) ~[classes/:na]
+	at dev.codeless.api.tasks.TaskScheduler.run(TaskScheduler.java:102) ~[classes/:na]
+	at dev.codeless.api.tasks.TaskScheduler.tick(TaskScheduler.java:69) ~[classes/:na]
+	at dev.codeless.api.agent.RepairLoopIntegrationTest.run(RepairLoopIntegrationTest.java:59) ~[test-classes/:na]
+	at dev.codeless.api.agent.RepairLoopIntegrationTest.D10AT3_cancelDuringRepairRetainsUsageAndRejectsLateMutation(RepairLoopIntegrationTest.java:362) ~[test-classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+	at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:502) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.support.MethodReflectionUtils.invoke(MethodReflectionUtils.java:45) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:61) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:124) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:163) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:148) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:123) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:105) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:99) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:66) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:47) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:39) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:104) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:98) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invokeVoid(InterceptingExecutableInvoker.java:71) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$0(TestMethodTestDescriptor.java:219) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:215) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:157) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:70) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:52) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:58) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:246) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:218) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:179) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:66) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:157) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:65) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:125) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$2(InterceptingLauncher.java:57) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:56) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.apache.maven.surefire.api.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:125) ~[surefire-api-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.junitplatform.LauncherAdapter.executeWithCancellationToken(LauncherAdapter.java:68) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.junitplatform.LauncherAdapter.execute(LauncherAdapter.java:54) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:203) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:168) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:136) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.6.jar:3.5.6]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.6.jar:3.5.6]
+
+2026-10-27T23:58:25.235+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=1b096ac7-4712-4b29-8917-e317fe8c51f1 executionMs=6900.1393 businessMs=2449.5556 modelMs=0.0 buildVerifyMs=4450.5837 modelCalls=0 runnerCalls=1
+]]></system-out>
+  </testcase>
+  <testcase name="D10AT2_sameFailureAndUnchangedSourceStopsEarly" classname="dev.codeless.api.agent.RepairLoopIntegrationTest" time="10.847">
+    <system-out><![CDATA[2026-10-27T23:58:25.290+09:00  INFO 70016 --- [codeless-api] [           main] d.codeless.api.tasks.TaskQueueService    : API_QUEUE_TIMING taskId=54100ccf-88ee-4d9d-b22e-0bccfbbbc97d queueMs=8.4646070328179E11
+2026-10-27T23:58:30.643+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=54100ccf-88ee-4d9d-b22e-0bccfbbbc97d executionId=b47e9ad3-1fd8-4f69-928b-df993ff3f206 buildMs=3569 browserMs=null
+2026-10-27T23:58:35.727+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_BUILD_TIMING taskId=54100ccf-88ee-4d9d-b22e-0bccfbbbc97d executionId=8fa205e4-2caf-4a3d-94ab-68be8c0887f6 buildMs=3277 browserMs=null
+2026-10-27T23:58:36.080+09:00  INFO 70016 --- [codeless-api] [           main] dev.codeless.api.tasks.TaskTiming        : API_TASK_TIMING taskId=54100ccf-88ee-4d9d-b22e-0bccfbbbc97d executionMs=10788.682 businessMs=3288.9599 modelMs=0.0 buildVerifyMs=7499.7221 modelCalls=0 runnerCalls=2
+]]></system-out>
+  </testcase>
+</testsuite>

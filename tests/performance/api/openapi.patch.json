@@ -1,0 +1,356 @@
+[
+  {
+    "op": "add",
+    "path": "/paths/~1api~1v0~1tasks/post/responses/429",
+    "value": {
+      "description": "APPLICATION_TASK_LIMIT or USER_TASK_LIMIT: active QUEUED + RUNNING limit reached; no task/event inserted. A matching idempotent replay returns the original task without another admission.",
+      "x-codeless-capacity-codes": [
+        "APPLICATION_TASK_LIMIT",
+        "USER_TASK_LIMIT"
+      ],
+      "headers": {
+        "Retry-After": {
+          "description": "For the listed capacity codes only: 1 second. Optional for other 503 errors. Preserve the same Idempotency-Key and payload when retrying; retry does not guarantee admission.",
+          "schema": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "allOf": [
+              {
+                "$ref": "./schemas/v0/error.schema.json"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "enum": [
+                      "APPLICATION_TASK_LIMIT",
+                      "USER_TASK_LIMIT"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "examples": {
+            "APPLICATION_TASK_LIMIT": {
+              "value": {
+                "code": "APPLICATION_TASK_LIMIT",
+                "message": "Task admission limit reached",
+                "timestamp": "2026-10-28T00:00:00Z",
+                "path": "/api/v0/tasks",
+                "traceId": "capacity-example",
+                "details": {}
+              }
+            },
+            "USER_TASK_LIMIT": {
+              "value": {
+                "code": "USER_TASK_LIMIT",
+                "message": "Task admission limit reached",
+                "timestamp": "2026-10-28T00:00:00Z",
+                "path": "/api/v0/tasks",
+                "traceId": "capacity-example",
+                "details": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api~1v0~1tasks/post/responses/503",
+    "value": {
+      "description": "TASK_QUEUE_FULL (global QUEUED limit) or TASK_ADMISSION_BUSY (admission lock timeout, at most 1 second): no task/event inserted.",
+      "x-codeless-capacity-codes": [
+        "TASK_QUEUE_FULL",
+        "TASK_ADMISSION_BUSY"
+      ],
+      "headers": {
+        "Retry-After": {
+          "description": "For the listed capacity codes only: 1 second. Optional for other 503 errors. Preserve the same Idempotency-Key and payload when retrying; retry does not guarantee admission.",
+          "schema": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "allOf": [
+              {
+                "$ref": "./schemas/v0/error.schema.json"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "enum": [
+                      "TASK_QUEUE_FULL",
+                      "TASK_ADMISSION_BUSY"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "examples": {
+            "TASK_QUEUE_FULL": {
+              "value": {
+                "code": "TASK_QUEUE_FULL",
+                "message": "Task admission limit reached",
+                "timestamp": "2026-10-28T00:00:00Z",
+                "path": "/api/v0/tasks",
+                "traceId": "capacity-example",
+                "details": {}
+              }
+            },
+            "TASK_ADMISSION_BUSY": {
+              "value": {
+                "code": "TASK_ADMISSION_BUSY",
+                "message": "Task admission limit reached",
+                "timestamp": "2026-10-28T00:00:00Z",
+                "path": "/api/v0/tasks",
+                "traceId": "capacity-example",
+                "details": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api~1v0~1applications~1{applicationId}~1edits/post/responses/429",
+    "value": {
+      "description": "APPLICATION_TASK_LIMIT or USER_TASK_LIMIT: active QUEUED + RUNNING limit reached; no task/event inserted. A matching idempotent replay returns the original task without another admission.",
+      "x-codeless-capacity-codes": [
+        "APPLICATION_TASK_LIMIT",
+        "USER_TASK_LIMIT"
+      ],
+      "headers": {
+        "Retry-After": {
+          "description": "For the listed capacity codes only: 1 second. Optional for other 503 errors. Preserve the same Idempotency-Key and payload when retrying; retry does not guarantee admission.",
+          "schema": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "allOf": [
+              {
+                "$ref": "./schemas/v0/error.schema.json"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "enum": [
+                      "APPLICATION_TASK_LIMIT",
+                      "USER_TASK_LIMIT"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "examples": {
+            "APPLICATION_TASK_LIMIT": {
+              "value": {
+                "code": "APPLICATION_TASK_LIMIT",
+                "message": "Task admission limit reached",
+                "timestamp": "2026-10-28T00:00:00Z",
+                "path": "/api/v0/applications/{applicationId}/edits",
+                "traceId": "capacity-example",
+                "details": {}
+              }
+            },
+            "USER_TASK_LIMIT": {
+              "value": {
+                "code": "USER_TASK_LIMIT",
+                "message": "Task admission limit reached",
+                "timestamp": "2026-10-28T00:00:00Z",
+                "path": "/api/v0/applications/{applicationId}/edits",
+                "traceId": "capacity-example",
+                "details": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api~1v0~1applications~1{applicationId}~1edits/post/responses/503",
+    "value": {
+      "description": "TASK_QUEUE_FULL (global QUEUED limit) or TASK_ADMISSION_BUSY (admission lock timeout, at most 1 second): no task/event inserted. Existing snapshot/storage failures also use 503 and retain their error codes; they do not carry the capacity retry header.",
+      "x-codeless-capacity-codes": [
+        "TASK_QUEUE_FULL",
+        "TASK_ADMISSION_BUSY"
+      ],
+      "headers": {
+        "Retry-After": {
+          "description": "For the listed capacity codes only: 1 second. Optional for other 503 errors. Preserve the same Idempotency-Key and payload when retrying; retry does not guarantee admission.",
+          "schema": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "./schemas/v0/error.schema.json"
+          },
+          "examples": {
+            "TASK_QUEUE_FULL": {
+              "value": {
+                "code": "TASK_QUEUE_FULL",
+                "message": "Task admission limit reached",
+                "timestamp": "2026-10-28T00:00:00Z",
+                "path": "/api/v0/applications/{applicationId}/edits",
+                "traceId": "capacity-example",
+                "details": {}
+              }
+            },
+            "TASK_ADMISSION_BUSY": {
+              "value": {
+                "code": "TASK_ADMISSION_BUSY",
+                "message": "Task admission limit reached",
+                "timestamp": "2026-10-28T00:00:00Z",
+                "path": "/api/v0/applications/{applicationId}/edits",
+                "traceId": "capacity-example",
+                "details": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api~1v0~1applications~1{applicationId}~1component-edits/post/responses/429",
+    "value": {
+      "description": "APPLICATION_TASK_LIMIT or USER_TASK_LIMIT: active QUEUED + RUNNING limit reached; no task/event inserted. A matching idempotent replay returns the original task without another admission.",
+      "x-codeless-capacity-codes": [
+        "APPLICATION_TASK_LIMIT",
+        "USER_TASK_LIMIT"
+      ],
+      "headers": {
+        "Retry-After": {
+          "description": "For the listed capacity codes only: 1 second. Optional for other 503 errors. Preserve the same Idempotency-Key and payload when retrying; retry does not guarantee admission.",
+          "schema": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "allOf": [
+              {
+                "$ref": "./schemas/v0/error.schema.json"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "enum": [
+                      "APPLICATION_TASK_LIMIT",
+                      "USER_TASK_LIMIT"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "examples": {
+            "APPLICATION_TASK_LIMIT": {
+              "value": {
+                "code": "APPLICATION_TASK_LIMIT",
+                "message": "Task admission limit reached",
+                "timestamp": "2026-10-28T00:00:00Z",
+                "path": "/api/v0/applications/{applicationId}/component-edits",
+                "traceId": "capacity-example",
+                "details": {}
+              }
+            },
+            "USER_TASK_LIMIT": {
+              "value": {
+                "code": "USER_TASK_LIMIT",
+                "message": "Task admission limit reached",
+                "timestamp": "2026-10-28T00:00:00Z",
+                "path": "/api/v0/applications/{applicationId}/component-edits",
+                "traceId": "capacity-example",
+                "details": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api~1v0~1applications~1{applicationId}~1component-edits/post/responses/503",
+    "value": {
+      "description": "TASK_QUEUE_FULL (global QUEUED limit) or TASK_ADMISSION_BUSY (admission lock timeout, at most 1 second): no task/event inserted. Existing snapshot/storage failures also use 503 and retain their error codes; they do not carry the capacity retry header.",
+      "x-codeless-capacity-codes": [
+        "TASK_QUEUE_FULL",
+        "TASK_ADMISSION_BUSY"
+      ],
+      "headers": {
+        "Retry-After": {
+          "description": "For the listed capacity codes only: 1 second. Optional for other 503 errors. Preserve the same Idempotency-Key and payload when retrying; retry does not guarantee admission.",
+          "schema": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "./schemas/v0/error.schema.json"
+          },
+          "examples": {
+            "TASK_QUEUE_FULL": {
+              "value": {
+                "code": "TASK_QUEUE_FULL",
+                "message": "Task admission limit reached",
+                "timestamp": "2026-10-28T00:00:00Z",
+                "path": "/api/v0/applications/{applicationId}/component-edits",
+                "traceId": "capacity-example",
+                "details": {}
+              }
+            },
+            "TASK_ADMISSION_BUSY": {
+              "value": {
+                "code": "TASK_ADMISSION_BUSY",
+                "message": "Task admission limit reached",
+                "timestamp": "2026-10-28T00:00:00Z",
+                "path": "/api/v0/applications/{applicationId}/component-edits",
+                "traceId": "capacity-example",
+                "details": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+]

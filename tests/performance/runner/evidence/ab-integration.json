@@ -1,0 +1,65 @@
+{
+  "task": "D22-A+B",
+  "composition": "ab-composition.json",
+  "resource": {
+    "report": "api-ab-2026-10-28T02-43-18.301Z-eb2d330c-367d-4d82-bfd3-cc2519a2ad8b.json",
+    "digest": "sha256:63132b733d3a7fef43dbf23947851f1dfa1f192ab6f75986f126a015a8d22806",
+    "status": "PASSED",
+    "samples": 80,
+    "apiSourceChanges": false,
+    "apiProductionFiles": 113
+  },
+  "full": {
+    "command": "ab-full-command.json",
+    "rawResult": "ab-full-result.json",
+    "exitCode": 1,
+    "status": "FAILED",
+    "browserExitCode": 1,
+    "expectedPhase": "SUCCEEDED",
+    "observedPhase": "UNKNOWN",
+    "readyTasks": 2,
+    "succeededBuilds": 2,
+    "publishedRows": 1,
+    "terminalEvents": [
+      {
+        "phase": "PREPARING",
+        "at": "2026-10-28T02:47:06.789509200Z",
+        "failureCode": null
+      },
+      {
+        "phase": "PUBLISHING",
+        "at": "2026-10-28T02:47:15.063516200Z",
+        "failureCode": null
+      },
+      {
+        "phase": "PROBING",
+        "at": "2026-10-28T02:47:16.047587400Z",
+        "failureCode": null
+      },
+      {
+        "phase": "SUCCEEDED",
+        "at": "2026-10-28T02:47:17.256278400Z",
+        "failureCode": null
+      }
+    ],
+    "cleanupErrors": [],
+    "databaseRemoved": true,
+    "hostingRemoved": true,
+    "browserLog": "\nRunning 1 test using 1 worker\n\n(node:284996) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:284996) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n  x  1 tests\\e2e\\full\\business.acceptance.ts:39:1 › D20-B T1–T4: two isolated users generate, reconnect, edit, publish, download and retain a usable version after real failure (1.2m)\n\n\n  1) tests\\e2e\\full\\business.acceptance.ts:39:1 › D20-B T1–T4: two isolated users generate, reconnect, edit, publish, download and retain a usable version after real failure \n\n    Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\n    Expected: \u001b[32m\"SUCCEEDED\"\u001b[39m\n    Received: \u001b[31m\"UNKNOWN\"\u001b[39m\n\n      129 |       actor.publication = await get(page, 'publications/' + actor.publication.id)\n      130 |       const deployed = await get(page, 'publications/' + actor.publication.id + '/deployment')\n    > 131 |       expect(deployed.phase).toBe('SUCCEEDED'); expect(actor.publication.versionId).toBe(actor.edited)\n          |                              ^\n      132 |       const publicPage = await context.newPage()\n      133 |       expect((await publicPage.goto(actor.publication.url)).status()).toBe(200)\n      134 |       await expect(publicPage.getByTestId('profile-name')).toHaveText('Hedy Lamarr')\n        at C:\\Users\\12058\\.codex\\worktrees\\d22-b-runner-performance\\CodeLess\\.local-data\\d22-ab-integration\\tests\\e2e\\full\\business.acceptance.ts:131:30\n\n    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────\n    .local-data\\d20-b\\runs\\2026-10-28T02-45-35.589Z-673e6146-cf96-46d2-8e42-cd79676097b3\\browser\\business.acceptance.ts-D20-75b0e--version-after-real-failure\\test-failed-1.png\n    ────────────────────────────────────────────────────────────────────────────────────────────────\n\n    Error Context: .local-data\\d20-b\\runs\\2026-10-28T02-45-35.589Z-673e6146-cf96-46d2-8e42-cd79676097b3\\browser\\business.acceptance.ts-D20-75b0e--version-after-real-failure\\error-context.md\n\n    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────\n    .local-data\\d20-b\\runs\\2026-10-28T02-45-35.589Z-673e6146-cf96-46d2-8e42-cd79676097b3\\browser\\business.acceptance.ts-D20-75b0e--version-after-real-failure\\trace.zip\n    Usage:\n\n        npx playwright show-trace .local-data\\d20-b\\runs\\2026-10-28T02-45-35.589Z-673e6146-cf96-46d2-8e42-cd79676097b3\\browser\\business.acceptance.ts-D20-75b0e--version-after-real-failure\\trace.zip\n\n    ────────────────────────────────────────────────────────────────────────────────────────────────\n\n  1 failed\n    tests\\e2e\\full\\business.acceptance.ts:39:1 › D20-B T1–T4: two isolated users generate, reconnect, edit, publish, download and retain a usable version after real failure \n",
+    "artifacts": [
+      {
+        "path": "C:\\Users\\12058\\.codex\\worktrees\\d22-b-runner-performance\\CodeLess\\.local-data\\d22-ab-integration\\.local-data\\d20-b\\runs\\2026-10-28T02-45-35.589Z-673e6146-cf96-46d2-8e42-cd79676097b3\\browser\\business.acceptance.ts-D20-75b0e--version-after-real-failure\\test-failed-1.png",
+        "bytes": 130156,
+        "digest": "sha256:a6b6aa6ef7c9bfa5ca3e0ef0bef4a254c41892a055d7d446ffa46bddc13b9065",
+        "signatureValid": true
+      },
+      {
+        "path": "C:\\Users\\12058\\.codex\\worktrees\\d22-b-runner-performance\\CodeLess\\.local-data\\d22-ab-integration\\.local-data\\d20-b\\runs\\2026-10-28T02-45-35.589Z-673e6146-cf96-46d2-8e42-cd79676097b3\\browser\\business.acceptance.ts-D20-75b0e--version-after-real-failure\\trace.zip",
+        "bytes": 3935691,
+        "digest": "sha256:e185b09d2581a83e2385cdd76414d8470205b90400b81c0f198da3ca7309511a",
+        "signatureValid": true
+      }
+    ]
+  },
+  "conclusion": "Resource/HTTP combination PASSED; original full product test FAILED. Later SUCCEEDED ledger is consistent with the documented SQL-commit/afterCommit ledger window, not proof that the original assertion passed or that A/B caused a persistent deployment defect. No retry, timeout relaxation or cross-module fix."
+}

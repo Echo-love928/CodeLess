@@ -1,0 +1,175 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< dev.codeless:codeless-api >----------------------
+[INFO] Building codeless-api 0.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.2:enforce (enforce-toolchain) @ codeless-api ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireJavaVersion passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.version.RequireMavenVersion passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ codeless-api ---
+[INFO] Copying 8 resources from src\main\resources to target\classes
+[INFO] Copying 1 resource from ..\..\contracts\tools to target\classes\tools
+[INFO] Copying 2 resources from ..\..\contracts\plan to target\classes\model\plan
+[INFO] Copying 6 resources from ..\..\prompts\runtime to target\classes\model\prompts
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ codeless-api ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ codeless-api ---
+[INFO] Copying 3 resources from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ codeless-api ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 107 source files with javac [debug parameters release 21] to target\test-classes
+[INFO] /C:/Users/12058/.codex/worktrees/d22-b-runner-performance/CodeLess/services/api/src/test/java/dev/codeless/api/admin/AdminIntegrationTest.java: 某些输入文件使用或覆盖了已过时的 API。
+[INFO] /C:/Users/12058/.codex/worktrees/d22-b-runner-performance/CodeLess/services/api/src/test/java/dev/codeless/api/admin/AdminIntegrationTest.java: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ codeless-api ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running dev.codeless.api.deploy.PublicationIntegrationTest
+15:23:22.227 [main] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+15:23:22.230 [main] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+15:23:22.288 [main] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 2.0.5
+15:23:22.587 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.NpipeSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+15:23:23.065 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Npipe socket (npipe:////./pipe/docker_engine)
+15:23:23.066 [main] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+15:23:23.085 [main] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
+  Server Version: 29.9.2
+  API Version: 1.56
+  Operating System: Docker Desktop
+  Total Memory: 11852 MB
+  Labels: 
+    com.docker.desktop.address=npipe://\\.\pipe\docker_cli
+15:23:23.089 [main] WARN org.testcontainers.utility.ConfigurationFileImageNameSubstitutor -- Image name testcontainers/ryuk:0.14.0 was substituted by configuration to testcontainers/ryuk:0.14.0@sha256:7c1a8a9a47c780ed0f983770a662f80deb115d95cce3e2daa3d12115b8cd28f0. This approach is deprecated and will be removed in the future
+15:23:23.089 [main] INFO org.testcontainers.utility.ImageNameSubstitutor -- Using testcontainers/ryuk:0.14.0@sha256:7c1a8a9a47c780ed0f983770a662f80deb115d95cce3e2daa3d12115b8cd28f0 as a substitute image for testcontainers/ryuk:0.14.0 (using image substitutor: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor'))
+15:23:23.228 [main] INFO tc.testcontainers/ryuk:0.14.0@sha256:7c1a8a... -- Creating container for image: testcontainers/ryuk:0.14.0@sha256:7c1a8a9a47c780ed0f983770a662f80deb115d95cce3e2daa3d12115b8cd28f0
+15:23:23.637 [main] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-desktop) does not have credentials for https://index.docker.io/v1/
+15:23:23.819 [main] INFO tc.testcontainers/ryuk:0.14.0@sha256:7c1a8a... -- Container testcontainers/ryuk:0.14.0@sha256:7c1a8a9a47c780ed0f983770a662f80deb115d95cce3e2daa3d12115b8cd28f0 is starting: afa6a31d148b22593e9cc3498cbc3b6b074da6e24ed9d19ae7b9c8d00d556a82
+15:23:24.279 [main] INFO tc.testcontainers/ryuk:0.14.0@sha256:7c1a8a... -- Container testcontainers/ryuk:0.14.0@sha256:7c1a8a9a47c780ed0f983770a662f80deb115d95cce3e2daa3d12115b8cd28f0 started in PT1.0503641S
+15:23:24.288 [main] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+15:23:24.288 [main] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+15:23:24.288 [main] INFO org.testcontainers.DockerClientFactory -- ?? Docker server version should be at least 1.6.0
+15:23:24.328 [main] INFO tc.postgres:17.6-alpine@sha256:ef257d... -- Creating container for image: postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+15:23:24.452 [main] INFO tc.postgres:17.6-alpine@sha256:ef257d... -- Container postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94 is starting: e913d98bd6208cfe9a59e6d212ee8fd75c35691b56e6271bfaeec2bc215796d1
+15:23:26.712 [main] INFO tc.postgres:17.6-alpine@sha256:ef257d... -- Container postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94 started in PT2.3840681S
+15:23:26.713 [main] INFO tc.postgres:17.6-alpine@sha256:ef257d... -- Container is started (JDBC URL: jdbc:postgresql://localhost:59938/codeless_deploy_test?loggerLevel=OFF)
+15:23:27.247 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration dev.codeless.api.CodeLessApiApplication for test class dev.codeless.api.deploy.PublicationIntegrationTest
+15:23:27.386 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration dev.codeless.api.CodeLessApiApplication for test class dev.codeless.api.deploy.PublicationIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-28T15:23:27.979+09:00  INFO 254928 --- [codeless-api] [           main] d.c.a.deploy.PublicationIntegrationTest  : Starting PublicationIntegrationTest using Java 21.0.12.1 with PID 254928 (started by 12058 in C:\Users\12058\.codex\worktrees\d22-b-runner-performance\CodeLess\services\api)
+2026-10-28T15:23:27.981+09:00  INFO 254928 --- [codeless-api] [           main] d.c.a.deploy.PublicationIntegrationTest  : The following 1 profile is active: "test"
+2026-10-28T15:23:30.073+09:00  INFO 254928 --- [codeless-api] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-28T15:23:30.095+09:00  INFO 254928 --- [codeless-api] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-28T15:23:30.096+09:00  INFO 254928 --- [codeless-api] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-28T15:23:30.162+09:00  INFO 254928 --- [codeless-api] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2163 ms
+2026-10-28T15:23:30.412+09:00  INFO 254928 --- [codeless-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-28T15:23:30.579+09:00  INFO 254928 --- [codeless-api] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@96c840a
+2026-10-28T15:23:30.582+09:00  INFO 254928 --- [codeless-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-28T15:23:30.624+09:00  INFO 254928 --- [codeless-api] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:59938/codeless_deploy_test?loggerLevel=OFF (PostgreSQL 17.6)
+2026-10-28T15:23:30.692+09:00  INFO 254928 --- [codeless-api] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-28T15:23:30.698+09:00  INFO 254928 --- [codeless-api] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.025s)
+2026-10-28T15:23:30.717+09:00  INFO 254928 --- [codeless-api] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-28T15:23:30.771+09:00  INFO 254928 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-28T15:23:30.792+09:00  INFO 254928 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - platform data"
+2026-10-28T15:23:30.879+09:00  INFO 254928 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - authentication"
+2026-10-28T15:23:30.899+09:00  INFO 254928 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - task queue"
+2026-10-28T15:23:30.925+09:00  INFO 254928 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - task file snapshots"
+2026-10-28T15:23:30.947+09:00  INFO 254928 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "5 - version source tasks"
+2026-10-28T15:23:30.970+09:00  INFO 254928 --- [codeless-api] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 5 migrations to schema "public", now at version v5 (execution time 00:00.105s)
+2026-10-28T15:23:31.753+09:00  INFO 254928 --- [codeless-api] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 62709 (http) with context path '/'
+2026-10-28T15:23:31.760+09:00  INFO 254928 --- [codeless-api] [           main] d.c.a.deploy.PublicationIntegrationTest  : Started PublicationIntegrationTest in 4.3 seconds (process running for 10.337)
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.30kB 0.0s done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for docker.io/library/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+#2 DONE 0.1s
+
+#3 [ 1/10] FROM docker.io/library/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+#3 resolve docker.io/library/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 0.0s done
+#3 DONE 0.1s
+
+#4 [internal] load build context
+#4 transferring context: 44.32kB 0.1s done
+#4 DONE 0.1s
+
+#5 [ 8/10] COPY templates/vue/index.html templates/vue/tsconfig.json templates/vue/vite.config.ts ./
+#5 CACHED
+
+#6 [ 5/10] COPY infra/build-image/verify-dependencies.mjs /opt/codeless/verify-dependencies.mjs
+#6 CACHED
+
+#7 [ 7/10] RUN corepack enable && corepack prepare pnpm@12.6.0 --activate && corepack pnpm install --frozen-lockfile
+#7 CACHED
+
+#8 [ 3/10] COPY templates/vue/package.json templates/vue/pnpm-lock.yaml templates/vue/pnpm-workspace.yaml ./
+#8 CACHED
+
+#9 [ 6/10] RUN node /opt/codeless/verify-dependencies.mjs
+#9 CACHED
+
+#10 [ 9/10] COPY templates/vue/src ./src
+#10 CACHED
+
+#11 [ 2/10] WORKDIR /opt/codeless/template
+#11 CACHED
+
+#12 [ 4/10] COPY templates/vue/allowed-dependencies.json ./
+#12 CACHED
+
+#13 [10/10] COPY infra/build-image/container-build.mjs /opt/codeless/container-build.mjs
+#13 CACHED
+
+#14 exporting to image
+#14 exporting layers done
+#14 exporting manifest sha256:325c21634b79c06331ceb076716370f7158c4bc163175e714fa5d4e1198ac9cb done
+#14 exporting config sha256:df9159e97bcbb70b282258f9d65dfe60527f750d7cc36f14c8a7c4d4edc1524b done
+#14 exporting attestation manifest sha256:f2e5609024fe5448c0ffa29b2c751a43e0ad0a86865adc64260f102dd79f9e96 0.0s done
+#14 exporting manifest list sha256:c13a6a847a21004422858228a06c37277d9e66643eed84dc91528f540508603f
+#14 exporting manifest list sha256:c13a6a847a21004422858228a06c37277d9e66643eed84dc91528f540508603f 0.0s done
+#14 naming to docker.io/library/codeless-vue-build:d05 done
+#14 unpacking to docker.io/library/codeless-vue-build:d05 0.0s done
+#14 DONE 0.2s
+2026-10-28T15:23:35.988+09:00  INFO 254928 --- [codeless-api] [o-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-28T15:23:35.988+09:00  INFO 254928 --- [codeless-api] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-28T15:23:35.989+09:00  INFO 254928 --- [codeless-api] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (C:\Users\12058\.m2\repository\net\bytebuddy\byte-buddy-agent\1.18.11\byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-10-28T15:24:18.292+09:00  INFO 254928 --- [codeless-api] [           main] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-10-28T15:24:18.310+09:00  INFO 254928 --- [codeless-api] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-10-28T15:24:18.314+09:00  INFO 254928 --- [codeless-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-10-28T15:24:18.317+09:00  INFO 254928 --- [codeless-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 56.25 s -- in dev.codeless.api.deploy.PublicationIntegrationTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:08 min
+[INFO] Finished at: 2026-10-28T15:24:18+09:00
+[INFO] ------------------------------------------------------------------------

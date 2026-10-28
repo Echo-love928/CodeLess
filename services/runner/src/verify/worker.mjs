@@ -13,7 +13,7 @@ const actions = validateActions(job.actions)
 const limits = validateLimits(job.limits)
 const allowed = new Set(job.paths)
 const diagnostics = { pageErrors: [], consoleErrors: [], blockedRequests: [], failedRequests: [], actions: [],
-  truncated: false, freshContext: null, visibleContent: null, controlHost: null }
+  truncated: false, freshContext: null, visibleContent: null, controlHost: null, timingsMs: {}, browserPid: null }
 function record(key, value) {
   if (diagnostics[key].length < limits.diagnostics) diagnostics[key].push(value)
   else diagnostics.truncated = true
@@ -21,7 +21,12 @@ function record(key, value) {
 const short = (value) => String(value).slice(0, 512)
 let phase = 'LAUNCH', server, browser, context, page, screenshot = null
 const result = { status: 'FAILED', failure: null, phase, diagnostics, browserClosed: false }
-function enter(value) { phase = value; sendPhase(value) }
+let phaseStarted = performance.now()
+function finishPhase() {
+  diagnostics.timingsMs[phase] = (diagnostics.timingsMs[phase] ?? 0) + performance.now() - phaseStarted
+  phaseStarted = performance.now()
+}
+function enter(value) { finishPhase(); phase = value; sendPhase(value) }
 try {
   enter('LAUNCH')
   server = await chromium.launchServer({ host: '127.0.0.1', headless: true, timeout: limits.launchTimeoutMs,
@@ -32,6 +37,7 @@ try {
       '--disable-features=WebTransport,Prerender2,SpeculationRulesPrefetch',
       '--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1'] })
   process.send?.({ browserPid: server.process().pid })
+  diagnostics.browserPid = server.process().pid
   diagnostics.controlHost = new URL(server.wsEndpoint()).hostname
   browser = await chromium.connect(server.wsEndpoint(), { timeout: limits.launchTimeoutMs })
   context = await browser.newContext({ viewport: { width: 1280, height: 720 },
@@ -158,6 +164,7 @@ try {
     } catch (error) { result.failure = 'CLEANUP_FAILED'; result.status = 'FAILED'; result.error = short(error.message) }
   }
 }
+finishPhase()
 process.stdout.write(JSON.stringify({ ...result, screenshot }))
 // Parent validates the real exit code independently from the browser's verdict.
 process.exitCode = result.status === 'PASSED' ? 0 : 1

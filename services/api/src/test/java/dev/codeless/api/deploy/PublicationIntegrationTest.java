@@ -59,8 +59,21 @@ class PublicationIntegrationTest {
         volatile String mode="PASS";
         volatile DeploymentGateway actualGateway;
         volatile CountDownLatch entered,release;
+        volatile CountDownLatch committed,finishLedger;
         public String publish(Payload payload,Instant deadline) {
             publishes.merge(payload.publicationId(),1,Integer::sum);payloads.put(payload.publicationId(),payload);
+            if(committed!=null) {
+                var observed=committed;var finish=finishLedger;
+                org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                    new org.springframework.transaction.support.TransactionSynchronization() {
+                        public int getOrder() {return org.springframework.core.Ordered.HIGHEST_PRECEDENCE;}
+                        public void afterCommit() {
+                            observed.countDown();
+                            try {if(!finish.await(20,TimeUnit.SECONDS)) throw new IllegalStateException("Ledger test barrier timed out");}
+                            catch(InterruptedException failure) {Thread.currentThread().interrupt();throw new IllegalStateException(failure);}
+                        }
+                    });
+            }
             if(actualGateway!=null) return actualGateway.publish(payload,deadline);
             if(entered!=null) {
                 entered.countDown();
@@ -310,5 +323,37 @@ class PublicationIntegrationTest {
         assertThat(json.readTree(listing.body()).path("latestSuccessful").path("id").asText()).isEqualTo(successful.toString());
         report("installed-A-B-gateway",Map.of("deployment",d,"elapsedMs",elapsedMs,"actualFrozenBytes",true,
                 "productionAdapterInstalled",true,"publicMilestoneReached",false,"previousSuccessProvider","explicit A fixture"));
+    }
+    @Test @Order(8) void sqlCommitBeforeTerminalLedgerIsUnknownUntilLedgerCompletes() throws Exception {
+        hosting.actualGateway=null;hosting.entered=null;hosting.release=null;
+        var evidence=new ArrayList<Object>();
+        for(String mode:List.of("PASS","UNAVAILABLE")) {
+            hosting.mode=mode;hosting.committed=new CountDownLatch(1);hosting.finishLedger=new CountDownLatch(1);
+            UUID id=request();
+            try(var pool=Executors.newSingleThreadExecutor()) {
+                var work=pool.submit(()->publications.process(id));
+                try {
+                    assertThat(hosting.committed.await(10,TimeUnit.SECONDS)).isTrue();
+                    String status="PASS".equals(mode)?"PUBLISHED":"FAILED";
+                    assertThat(artifacts.findPublication(id).orElseThrow().status().name()).isEqualTo(status);
+                    // This is a real committed SQL row, while the real terminal append is held back.
+                    var response=get("publications/"+id+"/deployment",login);
+                    assertThat(response.statusCode()).isEqualTo(200);
+                    var during=json.readTree(response.body());
+                    assertThat(during.path("publication").path("status").asText()).isEqualTo(status);
+                    assertThat(during.path("phase").asText()).isEqualTo("UNKNOWN");
+                    assertThat(during.path("history").get(during.path("history").size()-1).path("phase").asText())
+                        .isEqualTo("PASS".equals(mode)?"PROBING":"PUBLISHING");
+                    evidence.add(Map.of("fixture",mode,"barrier","SQL committed; terminal afterCommit not released","observedAt",Instant.now(),"response",during));
+                } finally {hosting.finishLedger.countDown();}
+                work.get(30,TimeUnit.SECONDS);
+            } finally {hosting.committed=null;hosting.finishLedger=null;}
+            var after=publications.deployment(owner,id);
+            assertThat(after.phase()).isEqualTo("PASS".equals(mode)?"SUCCEEDED":"FAILED");
+            assertThat(after.history().getLast().phase()).isEqualTo(after.phase());
+            if("UNAVAILABLE".equals(mode)) assertThat(after.failureCode()).isEqualTo("HOSTING_UNAVAILABLE");
+            evidence.add(Map.of("fixture",mode,"barrier","terminal append completed","observedAt",Instant.now(),"response",after));
+        }
+        report("D22-commit-ledger-barrier",evidence);
     }
 }

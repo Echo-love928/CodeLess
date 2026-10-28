@@ -1,0 +1,1462 @@
+{
+  "task": "D22-B",
+  "status": "PASSED",
+  "startedAt": "2026-10-28T02:57:09.781Z",
+  "coldDefinition": "first fresh container in this run; immutable dependencies already installed; host/VM page cache NOT flushed",
+  "warmDefinition": "subsequent fresh containers using the identical pinned image; no shared writable source or Vite cache",
+  "samples": [
+    {
+      "index": 0,
+      "owner": "A",
+      "temperature": "first-container",
+      "passed": true,
+      "profile": "default",
+      "buildMs": 5865.626200000001,
+      "build": {
+        "id": "39b1e208-6831-4895-87b1-88720e08e5a1",
+        "imageId": "sha256:4562298b86b8f0af6a9341e5970cf0d42404619b0f436ceeed9f5e66359c35a6",
+        "containerName": "codeless-build-39b1e208-6831-4895-87b1-88720e08e5a1",
+        "workspaceName": "codeless-build-OwIB5m",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 28 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[32mai-component-catalog.json  \u001b[39m\u001b[1m\u001b[2m 0.60 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.34 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-CVLDEkzx.js   \u001b[39m\u001b[1m\u001b[2m83.32 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.00 kB\u001b[22m\n\u001b[32m✓ built in 920ms\u001b[39m\n",
+          "bytes": 619,
+          "observedBytes": 619,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:fd982a4734c37d180b8436acfaeb91879c7558dd1259ee63a8930cb13936980e",
+          "bytes": 84207,
+          "files": [
+            {
+              "path": "ai-component-catalog.json",
+              "bytes": 598,
+              "digest": "sha256:21977a8ae236be4f91bf25539eab5d15fbdf3e1eae61ad6934ba92aee8256791"
+            },
+            {
+              "path": "assets/index-CVLDEkzx.js",
+              "bytes": 83318,
+              "digest": "sha256:29aa14d8236ed2cd014bd3d98e05e88ca363f50774cfc90643447ab19f8970de"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:451aad26b985dc0beb2f61b5deff2b7839b3bee54bb140a7e1650dd7af85204f"
+            }
+          ],
+          "directory": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-34tuVs\\artifacts\\39b1e208-6831-4895-87b1-88720e08e5a1"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-28T02:57:14.989Z",
+        "completedAt": "2026-10-28T02:57:20.854Z"
+      },
+      "isolation": {
+        "hostConfig": {
+          "Binds": null,
+          "ContainerIDFile": "",
+          "LogConfig": {
+            "Type": "none",
+            "Config": {}
+          },
+          "NetworkMode": "none",
+          "PortBindings": {},
+          "RestartPolicy": {
+            "Name": "no",
+            "MaximumRetryCount": 0
+          },
+          "AutoRemove": false,
+          "VolumeDriver": "",
+          "VolumesFrom": null,
+          "ConsoleSize": [
+            0,
+            0
+          ],
+          "CapAdd": null,
+          "CapDrop": [
+            "ALL"
+          ],
+          "CgroupnsMode": "private",
+          "Dns": null,
+          "DnsOptions": [],
+          "DnsSearch": [],
+          "ExtraHosts": null,
+          "GroupAdd": null,
+          "IpcMode": "private",
+          "Cgroup": "",
+          "Links": null,
+          "OomScoreAdj": 0,
+          "PidMode": "",
+          "Privileged": false,
+          "PublishAllPorts": false,
+          "ReadonlyRootfs": true,
+          "SecurityOpt": [
+            "no-new-privileges"
+          ],
+          "Tmpfs": {
+            "/tmp": "rw,nosuid,nodev,size=256m,mode=1777"
+          },
+          "UTSMode": "",
+          "UsernsMode": "",
+          "ShmSize": 67108864,
+          "Runtime": "runc",
+          "Isolation": "",
+          "CpuShares": 0,
+          "Memory": 536870912,
+          "NanoCpus": 1000000000,
+          "CgroupParent": "",
+          "BlkioWeight": 0,
+          "BlkioWeightDevice": [],
+          "BlkioDeviceReadBps": [],
+          "BlkioDeviceWriteBps": [],
+          "BlkioDeviceReadIOps": [],
+          "BlkioDeviceWriteIOps": [],
+          "CpuPeriod": 0,
+          "CpuQuota": 0,
+          "CpuRealtimePeriod": 0,
+          "CpuRealtimeRuntime": 0,
+          "CpusetCpus": "",
+          "CpusetMems": "",
+          "Devices": [],
+          "DeviceCgroupRules": null,
+          "DeviceRequests": null,
+          "MemoryReservation": 0,
+          "MemorySwap": 536870912,
+          "MemorySwappiness": null,
+          "OomKillDisable": false,
+          "PidsLimit": 128,
+          "Ulimits": [
+            {
+              "Name": "nofile",
+              "Hard": 1024,
+              "Soft": 1024
+            }
+          ],
+          "CpuCount": 0,
+          "CpuPercent": 0,
+          "IOMaximumIOps": 0,
+          "IOMaximumBandwidth": 0,
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-OwIB5m\\input",
+              "Target": "/input",
+              "ReadOnly": true
+            },
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-OwIB5m\\output",
+              "Target": "/output"
+            }
+          ],
+          "MaskedPaths": [
+            "/proc/acpi",
+            "/proc/asound",
+            "/proc/interrupts",
+            "/proc/kcore",
+            "/proc/keys",
+            "/proc/latency_stats",
+            "/proc/sched_debug",
+            "/proc/scsi",
+            "/proc/timer_list",
+            "/proc/timer_stats",
+            "/sys/devices/virtual/powercap",
+            "/sys/firmware"
+          ],
+          "ReadonlyPaths": [
+            "/proc/bus",
+            "/proc/fs",
+            "/proc/irq",
+            "/proc/sys",
+            "/proc/sysrq-trigger"
+          ]
+        },
+        "user": "1000:1000",
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-OwIB5m\\input",
+            "Destination": "/input",
+            "Mode": "",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-OwIB5m\\output",
+            "Destination": "/output",
+            "Mode": "",
+            "RW": true,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      "sourceDigest": "sha256:2d2d0735ccb4df122ba11bfbdbef36eced87f2006baeb11ace479591eae23e54",
+      "browserIncludingScreenshotMs": 4098.874899999999,
+      "browser": {
+        "id": "11c283f3-1e9f-40dc-a21d-94120ed93b10",
+        "buildId": "39b1e208-6831-4895-87b1-88720e08e5a1",
+        "sourceDigest": "sha256:2d2d0735ccb4df122ba11bfbdbef36eced87f2006baeb11ace479591eae23e54",
+        "artifactDigest": "sha256:fd982a4734c37d180b8436acfaeb91879c7558dd1259ee63a8930cb13936980e",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-28T02:57:21.084Z",
+        "completedAt": "2026-10-28T02:57:25.180Z",
+        "workerPid": 275212,
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1",
+          "timingsMs": {
+            "LAUNCH": 649.3566000000001,
+            "PAGE_OPEN": 218.14239999999972,
+            "CONTENT": 11.85069999999996,
+            "ACTION": 24.17119999999977,
+            "OBSERVE": 251.44750000000022,
+            "SCREENSHOT": 21.304599999999937,
+            "CLEANUP": 112.36030000000028
+          },
+          "browserPid": 262380
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-34tuVs\\browser\\11c283f3-1e9f-40dc-a21d-94120ed93b10\\page.png",
+          "digest": "sha256:a147623574dd79a577a5d72af126d62a637a3085bd1bf1292baa9222194703b0",
+          "bytes": 15037,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-34tuVs\\browser\\11c283f3-1e9f-40dc-a21d-94120ed93b10\\result.json"
+      },
+      "exitedPids": [
+        275212,
+        262380
+      ],
+      "screenshotMs": 21.304599999999937,
+      "persistedArtifact": {
+        "bytes": 84207,
+        "files": 3
+      },
+      "after": {
+        "work": {
+          "bytes": 0,
+          "files": 0
+        },
+        "artifacts": {
+          "bytes": 0,
+          "files": 0
+        },
+        "evidence": {
+          "bytes": 0,
+          "files": 0
+        },
+        "newStaging": []
+      }
+    },
+    {
+      "index": 1,
+      "owner": "A",
+      "temperature": "warm-image",
+      "passed": true,
+      "profile": "default",
+      "buildMs": 5336.767099999999,
+      "build": {
+        "id": "c19f4948-17e3-42c8-9b77-a1452cacc4cd",
+        "imageId": "sha256:4562298b86b8f0af6a9341e5970cf0d42404619b0f436ceeed9f5e66359c35a6",
+        "containerName": "codeless-build-c19f4948-17e3-42c8-9b77-a1452cacc4cd",
+        "workspaceName": "codeless-build-K9c0TP",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 28 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[32mai-component-catalog.json  \u001b[39m\u001b[1m\u001b[2m 0.60 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.34 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-CVLDEkzx.js   \u001b[39m\u001b[1m\u001b[2m83.32 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.00 kB\u001b[22m\n\u001b[32m✓ built in 901ms\u001b[39m\n",
+          "bytes": 619,
+          "observedBytes": 619,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:fd982a4734c37d180b8436acfaeb91879c7558dd1259ee63a8930cb13936980e",
+          "bytes": 84207,
+          "files": [
+            {
+              "path": "ai-component-catalog.json",
+              "bytes": 598,
+              "digest": "sha256:21977a8ae236be4f91bf25539eab5d15fbdf3e1eae61ad6934ba92aee8256791"
+            },
+            {
+              "path": "assets/index-CVLDEkzx.js",
+              "bytes": 83318,
+              "digest": "sha256:29aa14d8236ed2cd014bd3d98e05e88ca363f50774cfc90643447ab19f8970de"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:451aad26b985dc0beb2f61b5deff2b7839b3bee54bb140a7e1650dd7af85204f"
+            }
+          ],
+          "directory": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-34tuVs\\artifacts\\c19f4948-17e3-42c8-9b77-a1452cacc4cd"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-28T02:57:25.206Z",
+        "completedAt": "2026-10-28T02:57:30.542Z"
+      },
+      "isolation": {
+        "hostConfig": {
+          "Binds": null,
+          "ContainerIDFile": "",
+          "LogConfig": {
+            "Type": "none",
+            "Config": {}
+          },
+          "NetworkMode": "none",
+          "PortBindings": {},
+          "RestartPolicy": {
+            "Name": "no",
+            "MaximumRetryCount": 0
+          },
+          "AutoRemove": false,
+          "VolumeDriver": "",
+          "VolumesFrom": null,
+          "ConsoleSize": [
+            0,
+            0
+          ],
+          "CapAdd": null,
+          "CapDrop": [
+            "ALL"
+          ],
+          "CgroupnsMode": "private",
+          "Dns": null,
+          "DnsOptions": [],
+          "DnsSearch": [],
+          "ExtraHosts": null,
+          "GroupAdd": null,
+          "IpcMode": "private",
+          "Cgroup": "",
+          "Links": null,
+          "OomScoreAdj": 0,
+          "PidMode": "",
+          "Privileged": false,
+          "PublishAllPorts": false,
+          "ReadonlyRootfs": true,
+          "SecurityOpt": [
+            "no-new-privileges"
+          ],
+          "Tmpfs": {
+            "/tmp": "rw,nosuid,nodev,size=256m,mode=1777"
+          },
+          "UTSMode": "",
+          "UsernsMode": "",
+          "ShmSize": 67108864,
+          "Runtime": "runc",
+          "Isolation": "",
+          "CpuShares": 0,
+          "Memory": 536870912,
+          "NanoCpus": 1000000000,
+          "CgroupParent": "",
+          "BlkioWeight": 0,
+          "BlkioWeightDevice": [],
+          "BlkioDeviceReadBps": [],
+          "BlkioDeviceWriteBps": [],
+          "BlkioDeviceReadIOps": [],
+          "BlkioDeviceWriteIOps": [],
+          "CpuPeriod": 0,
+          "CpuQuota": 0,
+          "CpuRealtimePeriod": 0,
+          "CpuRealtimeRuntime": 0,
+          "CpusetCpus": "",
+          "CpusetMems": "",
+          "Devices": [],
+          "DeviceCgroupRules": null,
+          "DeviceRequests": null,
+          "MemoryReservation": 0,
+          "MemorySwap": 536870912,
+          "MemorySwappiness": null,
+          "OomKillDisable": false,
+          "PidsLimit": 128,
+          "Ulimits": [
+            {
+              "Name": "nofile",
+              "Hard": 1024,
+              "Soft": 1024
+            }
+          ],
+          "CpuCount": 0,
+          "CpuPercent": 0,
+          "IOMaximumIOps": 0,
+          "IOMaximumBandwidth": 0,
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-K9c0TP\\input",
+              "Target": "/input",
+              "ReadOnly": true
+            },
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-K9c0TP\\output",
+              "Target": "/output"
+            }
+          ],
+          "MaskedPaths": [
+            "/proc/acpi",
+            "/proc/asound",
+            "/proc/interrupts",
+            "/proc/kcore",
+            "/proc/keys",
+            "/proc/latency_stats",
+            "/proc/sched_debug",
+            "/proc/scsi",
+            "/proc/timer_list",
+            "/proc/timer_stats",
+            "/sys/devices/virtual/powercap",
+            "/sys/firmware"
+          ],
+          "ReadonlyPaths": [
+            "/proc/bus",
+            "/proc/fs",
+            "/proc/irq",
+            "/proc/sys",
+            "/proc/sysrq-trigger"
+          ]
+        },
+        "user": "1000:1000",
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-K9c0TP\\input",
+            "Destination": "/input",
+            "Mode": "",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-K9c0TP\\output",
+            "Destination": "/output",
+            "Mode": "",
+            "RW": true,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      "sourceDigest": "sha256:2d2d0735ccb4df122ba11bfbdbef36eced87f2006baeb11ace479591eae23e54",
+      "browserIncludingScreenshotMs": 1304.5918999999994,
+      "browser": {
+        "id": "bc3d3b5a-5086-4b40-b638-fa2d7fde73cd",
+        "buildId": "c19f4948-17e3-42c8-9b77-a1452cacc4cd",
+        "sourceDigest": "sha256:2d2d0735ccb4df122ba11bfbdbef36eced87f2006baeb11ace479591eae23e54",
+        "artifactDigest": "sha256:fd982a4734c37d180b8436acfaeb91879c7558dd1259ee63a8930cb13936980e",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-28T02:57:30.771Z",
+        "completedAt": "2026-10-28T02:57:32.074Z",
+        "workerPid": 281196,
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1",
+          "timingsMs": {
+            "LAUNCH": 320.63690000000014,
+            "PAGE_OPEN": 203.99440000000004,
+            "CONTENT": 10.87299999999982,
+            "ACTION": 22.801699999999983,
+            "OBSERVE": 251.17589999999996,
+            "SCREENSHOT": 23.59140000000002,
+            "CLEANUP": 126.5351999999998
+          },
+          "browserPid": 239620
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-34tuVs\\browser\\bc3d3b5a-5086-4b40-b638-fa2d7fde73cd\\page.png",
+          "digest": "sha256:a147623574dd79a577a5d72af126d62a637a3085bd1bf1292baa9222194703b0",
+          "bytes": 15037,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-34tuVs\\browser\\bc3d3b5a-5086-4b40-b638-fa2d7fde73cd\\result.json"
+      },
+      "exitedPids": [
+        281196,
+        239620
+      ],
+      "screenshotMs": 23.59140000000002,
+      "persistedArtifact": {
+        "bytes": 84207,
+        "files": 3
+      },
+      "after": {
+        "work": {
+          "bytes": 0,
+          "files": 0
+        },
+        "artifacts": {
+          "bytes": 0,
+          "files": 0
+        },
+        "evidence": {
+          "bytes": 0,
+          "files": 0
+        },
+        "newStaging": []
+      }
+    },
+    {
+      "index": 2,
+      "owner": "B",
+      "temperature": "warm-image",
+      "passed": true,
+      "profile": "default",
+      "buildMs": 5297.993699999999,
+      "build": {
+        "id": "74e1662a-660b-49b5-8961-27a9ccc54611",
+        "imageId": "sha256:4562298b86b8f0af6a9341e5970cf0d42404619b0f436ceeed9f5e66359c35a6",
+        "containerName": "codeless-build-74e1662a-660b-49b5-8961-27a9ccc54611",
+        "workspaceName": "codeless-build-HFv8gz",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 28 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[32mai-component-catalog.json  \u001b[39m\u001b[1m\u001b[2m 0.60 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.34 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-CUrBGWNx.js   \u001b[39m\u001b[1m\u001b[2m83.32 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.00 kB\u001b[22m\n\u001b[32m✓ built in 888ms\u001b[39m\n",
+          "bytes": 619,
+          "observedBytes": 619,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:b56baed3ec1302b9a38ccbdd619cde316581005f16659d02ffd79fabf50a67b2",
+          "bytes": 84207,
+          "files": [
+            {
+              "path": "ai-component-catalog.json",
+              "bytes": 598,
+              "digest": "sha256:513b0624844af328709641dca9870fdf08060c804f7bc8904babf8f61a597da3"
+            },
+            {
+              "path": "assets/index-CUrBGWNx.js",
+              "bytes": 83318,
+              "digest": "sha256:b165abf4fa262a52aa221d257a8f0abd2e30a6e5583a997e64993d15fa9028b6"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:41b1315c12f0a999205ef9dfb66c6009ba4a7f6bef2fe6f672f3beffb8823f9b"
+            }
+          ],
+          "directory": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-34tuVs\\artifacts\\74e1662a-660b-49b5-8961-27a9ccc54611"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-28T02:57:32.099Z",
+        "completedAt": "2026-10-28T02:57:37.396Z"
+      },
+      "isolation": {
+        "hostConfig": {
+          "Binds": null,
+          "ContainerIDFile": "",
+          "LogConfig": {
+            "Type": "none",
+            "Config": {}
+          },
+          "NetworkMode": "none",
+          "PortBindings": {},
+          "RestartPolicy": {
+            "Name": "no",
+            "MaximumRetryCount": 0
+          },
+          "AutoRemove": false,
+          "VolumeDriver": "",
+          "VolumesFrom": null,
+          "ConsoleSize": [
+            0,
+            0
+          ],
+          "CapAdd": null,
+          "CapDrop": [
+            "ALL"
+          ],
+          "CgroupnsMode": "private",
+          "Dns": null,
+          "DnsOptions": [],
+          "DnsSearch": [],
+          "ExtraHosts": null,
+          "GroupAdd": null,
+          "IpcMode": "private",
+          "Cgroup": "",
+          "Links": null,
+          "OomScoreAdj": 0,
+          "PidMode": "",
+          "Privileged": false,
+          "PublishAllPorts": false,
+          "ReadonlyRootfs": true,
+          "SecurityOpt": [
+            "no-new-privileges"
+          ],
+          "Tmpfs": {
+            "/tmp": "rw,nosuid,nodev,size=256m,mode=1777"
+          },
+          "UTSMode": "",
+          "UsernsMode": "",
+          "ShmSize": 67108864,
+          "Runtime": "runc",
+          "Isolation": "",
+          "CpuShares": 0,
+          "Memory": 536870912,
+          "NanoCpus": 1000000000,
+          "CgroupParent": "",
+          "BlkioWeight": 0,
+          "BlkioWeightDevice": [],
+          "BlkioDeviceReadBps": [],
+          "BlkioDeviceWriteBps": [],
+          "BlkioDeviceReadIOps": [],
+          "BlkioDeviceWriteIOps": [],
+          "CpuPeriod": 0,
+          "CpuQuota": 0,
+          "CpuRealtimePeriod": 0,
+          "CpuRealtimeRuntime": 0,
+          "CpusetCpus": "",
+          "CpusetMems": "",
+          "Devices": [],
+          "DeviceCgroupRules": null,
+          "DeviceRequests": null,
+          "MemoryReservation": 0,
+          "MemorySwap": 536870912,
+          "MemorySwappiness": null,
+          "OomKillDisable": false,
+          "PidsLimit": 128,
+          "Ulimits": [
+            {
+              "Name": "nofile",
+              "Hard": 1024,
+              "Soft": 1024
+            }
+          ],
+          "CpuCount": 0,
+          "CpuPercent": 0,
+          "IOMaximumIOps": 0,
+          "IOMaximumBandwidth": 0,
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-HFv8gz\\input",
+              "Target": "/input",
+              "ReadOnly": true
+            },
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-HFv8gz\\output",
+              "Target": "/output"
+            }
+          ],
+          "MaskedPaths": [
+            "/proc/acpi",
+            "/proc/asound",
+            "/proc/interrupts",
+            "/proc/kcore",
+            "/proc/keys",
+            "/proc/latency_stats",
+            "/proc/sched_debug",
+            "/proc/scsi",
+            "/proc/timer_list",
+            "/proc/timer_stats",
+            "/sys/devices/virtual/powercap",
+            "/sys/firmware"
+          ],
+          "ReadonlyPaths": [
+            "/proc/bus",
+            "/proc/fs",
+            "/proc/irq",
+            "/proc/sys",
+            "/proc/sysrq-trigger"
+          ]
+        },
+        "user": "1000:1000",
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-HFv8gz\\input",
+            "Destination": "/input",
+            "Mode": "",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-HFv8gz\\output",
+            "Destination": "/output",
+            "Mode": "",
+            "RW": true,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      "sourceDigest": "sha256:7b6ed426ce7cd2cb27c05c625334a218e8dbd692d2e03b1b66c1a3385a6ab3b1",
+      "browserIncludingScreenshotMs": 1326.5812000000005,
+      "browser": {
+        "id": "4de97cc9-8546-41e5-9503-e6665202cf03",
+        "buildId": "74e1662a-660b-49b5-8961-27a9ccc54611",
+        "sourceDigest": "sha256:7b6ed426ce7cd2cb27c05c625334a218e8dbd692d2e03b1b66c1a3385a6ab3b1",
+        "artifactDigest": "sha256:b56baed3ec1302b9a38ccbdd619cde316581005f16659d02ffd79fabf50a67b2",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-28T02:57:37.617Z",
+        "completedAt": "2026-10-28T02:57:38.941Z",
+        "workerPid": 268556,
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1",
+          "timingsMs": {
+            "LAUNCH": 327.00520000000006,
+            "PAGE_OPEN": 186.2749,
+            "CONTENT": 10.233099999999922,
+            "ACTION": 21.70079999999996,
+            "OBSERVE": 254.0886999999999,
+            "SCREENSHOT": 21.710399999999936,
+            "CLEANUP": 160.80539999999996
+          },
+          "browserPid": 276368
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-34tuVs\\browser\\4de97cc9-8546-41e5-9503-e6665202cf03\\page.png",
+          "digest": "sha256:fad6987c71d4339275e959503b1701b91aefdd69719d988e381fbbc4b23c7256",
+          "bytes": 14650,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-34tuVs\\browser\\4de97cc9-8546-41e5-9503-e6665202cf03\\result.json"
+      },
+      "exitedPids": [
+        268556,
+        276368
+      ],
+      "screenshotMs": 21.710399999999936,
+      "persistedArtifact": {
+        "bytes": 84207,
+        "files": 3
+      },
+      "after": {
+        "work": {
+          "bytes": 0,
+          "files": 0
+        },
+        "artifacts": {
+          "bytes": 0,
+          "files": 0
+        },
+        "evidence": {
+          "bytes": 0,
+          "files": 0
+        },
+        "newStaging": []
+      }
+    },
+    {
+      "index": 3,
+      "owner": "A",
+      "temperature": "warm-image",
+      "passed": true,
+      "profile": "trial",
+      "buildMs": 5283.235900000003,
+      "build": {
+        "id": "b0793f4e-cbdc-4925-966d-bfa8d8522471",
+        "imageId": "sha256:4562298b86b8f0af6a9341e5970cf0d42404619b0f436ceeed9f5e66359c35a6",
+        "containerName": "codeless-build-b0793f4e-cbdc-4925-966d-bfa8d8522471",
+        "workspaceName": "codeless-build-L3SnJd",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 28 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.29 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[32mai-component-catalog.json  \u001b[39m\u001b[1m\u001b[2m 0.60 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.34 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-CVLDEkzx.js   \u001b[39m\u001b[1m\u001b[2m83.32 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.00 kB\u001b[22m\n\u001b[32m✓ built in 902ms\u001b[39m\n",
+          "bytes": 619,
+          "observedBytes": 619,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:fd982a4734c37d180b8436acfaeb91879c7558dd1259ee63a8930cb13936980e",
+          "bytes": 84207,
+          "files": [
+            {
+              "path": "ai-component-catalog.json",
+              "bytes": 598,
+              "digest": "sha256:21977a8ae236be4f91bf25539eab5d15fbdf3e1eae61ad6934ba92aee8256791"
+            },
+            {
+              "path": "assets/index-CVLDEkzx.js",
+              "bytes": 83318,
+              "digest": "sha256:29aa14d8236ed2cd014bd3d98e05e88ca363f50774cfc90643447ab19f8970de"
+            },
+            {
+              "path": "index.html",
+              "bytes": 291,
+              "digest": "sha256:451aad26b985dc0beb2f61b5deff2b7839b3bee54bb140a7e1650dd7af85204f"
+            }
+          ],
+          "directory": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-34tuVs\\artifacts\\b0793f4e-cbdc-4925-966d-bfa8d8522471"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-28T02:57:38.960Z",
+        "completedAt": "2026-10-28T02:57:44.243Z"
+      },
+      "isolation": {
+        "hostConfig": {
+          "Binds": null,
+          "ContainerIDFile": "",
+          "LogConfig": {
+            "Type": "none",
+            "Config": {}
+          },
+          "NetworkMode": "none",
+          "PortBindings": {},
+          "RestartPolicy": {
+            "Name": "no",
+            "MaximumRetryCount": 0
+          },
+          "AutoRemove": false,
+          "VolumeDriver": "",
+          "VolumesFrom": null,
+          "ConsoleSize": [
+            0,
+            0
+          ],
+          "CapAdd": null,
+          "CapDrop": [
+            "ALL"
+          ],
+          "CgroupnsMode": "private",
+          "Dns": null,
+          "DnsOptions": [],
+          "DnsSearch": [],
+          "ExtraHosts": null,
+          "GroupAdd": null,
+          "IpcMode": "private",
+          "Cgroup": "",
+          "Links": null,
+          "OomScoreAdj": 0,
+          "PidMode": "",
+          "Privileged": false,
+          "PublishAllPorts": false,
+          "ReadonlyRootfs": true,
+          "SecurityOpt": [
+            "no-new-privileges"
+          ],
+          "Tmpfs": {
+            "/tmp": "rw,nosuid,nodev,size=256m,mode=1777"
+          },
+          "UTSMode": "",
+          "UsernsMode": "",
+          "ShmSize": 67108864,
+          "Runtime": "runc",
+          "Isolation": "",
+          "CpuShares": 0,
+          "Memory": 536870912,
+          "NanoCpus": 1000000000,
+          "CgroupParent": "",
+          "BlkioWeight": 0,
+          "BlkioWeightDevice": [],
+          "BlkioDeviceReadBps": [],
+          "BlkioDeviceWriteBps": [],
+          "BlkioDeviceReadIOps": [],
+          "BlkioDeviceWriteIOps": [],
+          "CpuPeriod": 0,
+          "CpuQuota": 0,
+          "CpuRealtimePeriod": 0,
+          "CpuRealtimeRuntime": 0,
+          "CpusetCpus": "",
+          "CpusetMems": "",
+          "Devices": [],
+          "DeviceCgroupRules": null,
+          "DeviceRequests": null,
+          "MemoryReservation": 0,
+          "MemorySwap": 536870912,
+          "MemorySwappiness": null,
+          "OomKillDisable": false,
+          "PidsLimit": 128,
+          "Ulimits": [
+            {
+              "Name": "nofile",
+              "Hard": 1024,
+              "Soft": 1024
+            }
+          ],
+          "CpuCount": 0,
+          "CpuPercent": 0,
+          "IOMaximumIOps": 0,
+          "IOMaximumBandwidth": 0,
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-L3SnJd\\input",
+              "Target": "/input",
+              "ReadOnly": true
+            },
+            {
+              "Type": "bind",
+              "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-L3SnJd\\output",
+              "Target": "/output"
+            }
+          ],
+          "MaskedPaths": [
+            "/proc/acpi",
+            "/proc/asound",
+            "/proc/interrupts",
+            "/proc/kcore",
+            "/proc/keys",
+            "/proc/latency_stats",
+            "/proc/sched_debug",
+            "/proc/scsi",
+            "/proc/timer_list",
+            "/proc/timer_stats",
+            "/sys/devices/virtual/powercap",
+            "/sys/firmware"
+          ],
+          "ReadonlyPaths": [
+            "/proc/bus",
+            "/proc/fs",
+            "/proc/irq",
+            "/proc/sys",
+            "/proc/sysrq-trigger"
+          ]
+        },
+        "user": "1000:1000",
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-L3SnJd\\input",
+            "Destination": "/input",
+            "Mode": "",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "bind",
+            "Source": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-build-L3SnJd\\output",
+            "Destination": "/output",
+            "Mode": "",
+            "RW": true,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      "sourceDigest": "sha256:2d2d0735ccb4df122ba11bfbdbef36eced87f2006baeb11ace479591eae23e54",
+      "browserIncludingScreenshotMs": 1295.6034,
+      "browser": {
+        "id": "fb4694ec-ea88-4ada-a968-27a37c290ec7",
+        "buildId": "b0793f4e-cbdc-4925-966d-bfa8d8522471",
+        "sourceDigest": "sha256:2d2d0735ccb4df122ba11bfbdbef36eced87f2006baeb11ace479591eae23e54",
+        "artifactDigest": "sha256:fd982a4734c37d180b8436acfaeb91879c7558dd1259ee63a8930cb13936980e",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-28T02:57:44.467Z",
+        "completedAt": "2026-10-28T02:57:45.760Z",
+        "workerPid": 273568,
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1",
+          "timingsMs": {
+            "LAUNCH": 320.7642,
+            "PAGE_OPEN": 193.3537,
+            "CONTENT": 10.423600000000079,
+            "ACTION": 22.170100000000048,
+            "OBSERVE": 252.9022,
+            "SCREENSHOT": 21.916600000000017,
+            "CLEANUP": 130.5408
+          },
+          "browserPid": 275204
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-34tuVs\\browser\\fb4694ec-ea88-4ada-a968-27a37c290ec7\\page.png",
+          "digest": "sha256:a147623574dd79a577a5d72af126d62a637a3085bd1bf1292baa9222194703b0",
+          "bytes": 15037,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "C:\\Users\\12058\\AppData\\Local\\Temp\\codeless-d22-34tuVs\\browser\\fb4694ec-ea88-4ada-a968-27a37c290ec7\\result.json"
+      },
+      "exitedPids": [
+        273568,
+        275204
+      ],
+      "screenshotMs": 21.916600000000017,
+      "persistedArtifact": {
+        "bytes": 84207,
+        "files": 3
+      },
+      "after": {
+        "work": {
+          "bytes": 0,
+          "files": 0
+        },
+        "artifacts": {
+          "bytes": 0,
+          "files": 0
+        },
+        "evidence": {
+          "bytes": 0,
+          "files": 0
+        },
+        "newStaging": []
+      }
+    }
+  ],
+  "resources": [
+    {
+      "mode": "timeout",
+      "limits": {
+        "timeoutMs": 5000
+      },
+      "passed": true,
+      "elapsedMs": 6434.5412,
+      "result": {
+        "id": "6810d25f-5188-4a95-b2c5-53e764aad806",
+        "imageId": "sha256:3c45d5ec68ad52fd25a0cb020d181c0cfd19dbc59fee80e6728674ceab85fc40",
+        "containerName": "codeless-build-6810d25f-5188-4a95-b2c5-53e764aad806",
+        "workspaceName": "codeless-build-pzBLQB",
+        "status": "FAILED",
+        "failure": "TIMEOUT",
+        "exitCode": 137,
+        "oomKilled": false,
+        "timedOut": true,
+        "log": {
+          "text": "loop child started\n",
+          "bytes": 19,
+          "observedBytes": 19,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-28T02:57:45.786Z",
+        "completedAt": "2026-10-28T02:57:52.220Z"
+      }
+    },
+    {
+      "mode": "logs",
+      "limits": {
+        "logBytes": 16384
+      },
+      "passed": true,
+      "elapsedMs": 1523.9976000000024,
+      "result": {
+        "id": "3a1607c6-718b-4584-8857-a8e19a5b1e02",
+        "imageId": "sha256:3c45d5ec68ad52fd25a0cb020d181c0cfd19dbc59fee80e6728674ceab85fc40",
+        "containerName": "codeless-build-3a1607c6-718b-4584-8857-a8e19a5b1e02",
+        "workspaceName": "codeless-build-f3hnWj",
+        "status": "FAILED",
+        "failure": "BUILD_EXIT",
+        "exitCode": 7,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "bytes": 16384,
+          "observedBytes": 400000,
+          "truncated": true
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-28T02:57:52.445Z",
+        "completedAt": "2026-10-28T02:57:53.968Z"
+      }
+    },
+    {
+      "mode": "memory",
+      "limits": {
+        "memoryMiB": 96,
+        "timeoutMs": 15000
+      },
+      "passed": true,
+      "elapsedMs": 2126.0732999999964,
+      "result": {
+        "id": "c4159d0e-22af-4625-83a1-fd9809a9521f",
+        "imageId": "sha256:3c45d5ec68ad52fd25a0cb020d181c0cfd19dbc59fee80e6728674ceab85fc40",
+        "containerName": "codeless-build-c4159d0e-22af-4625-83a1-fd9809a9521f",
+        "workspaceName": "codeless-build-y63Rzh",
+        "status": "FAILED",
+        "failure": "OOM",
+        "exitCode": 137,
+        "oomKilled": true,
+        "timedOut": false,
+        "log": {
+          "text": "MEMORY_CGROUP_OOM {\"signal\":\"SIGKILL\",\"memoryMax\":100663296,\"swapMax\":0,\"oomKillBefore\":0,\"oomKillAfter\":1}\n",
+          "bytes": 108,
+          "observedBytes": 108,
+          "truncated": false
+        },
+        "artifact": null,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-28T02:57:54.202Z",
+        "completedAt": "2026-10-28T02:57:56.327Z"
+      },
+      "liveOOM": {
+        "value": {
+          "Status": "running",
+          "Running": true,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": true,
+          "Dead": false,
+          "Pid": 2720,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-28T02:57:54.728638925Z",
+          "FinishedAt": "0001-01-01T00:00:00Z"
+        }
+      }
+    }
+  ],
+  "queue": {
+    "passed": true,
+    "admitted": 100,
+    "rejected": "QUEUE_FULL",
+    "rejectMs": 0.266299999995681,
+    "peakActive": 1,
+    "retries": 0,
+    "boundary": "production screenshot queue; API generation admission is owned by D22-A",
+    "closed": true
+  },
+  "apiIsolation": "separate api-isolation.mjs required",
+  "paidModelRequests": 0,
+  "machine": {
+    "node": "v24.22.1",
+    "platform": "win32",
+    "release": "10.0.26200",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "logicalCpus": 20,
+    "memoryBytes": 25551560704,
+    "docker": {
+      "version": "29.9.2",
+      "os": "Docker Desktop",
+      "cpus": 20,
+      "memoryBytes": 12428419072,
+      "driver": "overlayfs",
+      "cgroupVersion": "2"
+    },
+    "imageId": "sha256:4562298b86b8f0af6a9341e5970cf0d42404619b0f436ceeed9f5e66359c35a6"
+  },
+  "limits": {
+    "timeoutMs": 120000,
+    "memoryMiB": 512,
+    "cpus": 1,
+    "pids": 128,
+    "tmpMiB": 256,
+    "logBytes": 65536,
+    "artifactBytes": 33554432,
+    "artifactFiles": 2000
+  },
+  "imageTags": [
+    "codeless-d22-vue:40044824-83f0-4e75-8af5-a2ead4723069",
+    "codeless-d22-fault:d6e76fe6-d6ac-4a2a-8d2f-6651fcd60392"
+  ],
+  "baseline": {
+    "disk": {
+      "bytes": 0,
+      "files": 0
+    },
+    "staging": []
+  },
+  "profileValidationPassed": true,
+  "after": {
+    "disk": {
+      "bytes": 0,
+      "files": 0
+    },
+    "staging": []
+  },
+  "ownedRootRemoved": true,
+  "imageAliasesRemoved": true,
+  "completedAt": "2026-10-28T02:57:57.488Z",
+  "revision": "ffc689085ac107d31262308448c9f31f38ec8f06",
+  "revisionRole": "checkout-reference",
+  "sources": {
+    "tests/performance/runner/api-evidence.mjs": "sha256:f4346397292a951a212117af156f990fa6cc6479b31b57516627e947fe22b6e4",
+    "tests/performance/runner/api-evidence.test.mjs": "sha256:10efedf420756c6e302854dbeb52fb9ab098fc82926a6f729d941625a92c183b",
+    "tests/performance/runner/fixtures/Dockerfile": "sha256:9f24b4c046156177d4bdbd135308f29785875f9603a00b897628fb3ce974e364",
+    "tests/performance/runner/fixtures/pressure-entry.mjs": "sha256:856cd0f0687df00569b60cbe32c9831852a9620c1ce934c4716d1de8882236c6",
+    "tests/performance/runner/review-D22-A.md": "sha256:4e7af0a844a01c36a2f49babeeebe3ce6d5b4d0ebb9d3993c9f71e5909989176",
+    "infra/build-image/Dockerfile": "sha256:371149e8a7050822db05aa8bdbbc303259fc9b1a2072c5062a9d066b68ac1ff1",
+    "infra/build-image/Dockerfile.dockerignore": "sha256:daa6d06520d2a756bb0ee80a45d470d2b71ec14aa2b63129c63ccde13fa15e77",
+    "infra/build-image/build-image.ps1": "sha256:0b307eeee7607d2d593a62b47dbd95a501108710b56a6a945cbe20ed663b5033",
+    "infra/build-image/container-build.mjs": "sha256:a5b9e62315be8f3431b35429e329bc9bc0f15bf98f325c1f05a0858702ff5f19",
+    "infra/build-image/verify-dependencies.mjs": "sha256:1dca26ce02f251eaa2490905c271d169184fd48028ca783ef8b06fdf3d9d3d4c",
+    "infra/runner/README.md": "sha256:45bbbf7ca94610be9d9d9f35db7b57a00d1fc6985d4b14ee88613898c04ddb74",
+    "infra/runner/policy.mjs": "sha256:bab2471781cd75317c17f0f3e4b168169bbb41f9d2e93b85c28ccae7d392d9c2",
+    "infra/runner/profiles.mjs": "sha256:1fa1599bf9a34dd2dbe7b88358864739a5532bb307501cfe85af279ada119a26",
+    "services/runner/.gitkeep": "sha256:7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "services/runner/build-contract.mjs": "sha256:f1896c6a70be210147ba9b9bf41e541a5738ccc077a14210d54788b31d3c666d",
+    "services/runner/health.mjs": "sha256:25b682d1761e62ec61a3e54b8e2aa84111bedd6906b2a2a4d717af4c98f91bbe",
+    "services/runner/main.mjs": "sha256:4177a2ba046ec76d898bdf5091638ea6ce163c20969f508804c5af08ed9e91d8",
+    "services/runner/src/artifacts/routes.mjs": "sha256:320749cc9b32799a447c0ae771a14e95d82dcf544058225fcac00865dc8f7f74",
+    "services/runner/src/artifacts/service.mjs": "sha256:077c56c4c35c9c13393a4cba551925c3594ac748dd5aa71042af268c7728b08c",
+    "services/runner/src/artifacts/snapshot.mjs": "sha256:b804933c5242102272fc1b1951b16c35f371c8fcdadb427408af8e1134dd2427",
+    "services/runner/src/build/oom-evidence.mjs": "sha256:9d6f28c4cd97061113ef166c6d6e691914107773f261f63f230769575f2a92bd",
+    "services/runner/src/build/runner.mjs": "sha256:ef369fdca230951645459ad8fa85454f46f7b53535ff984d5aef9063045c0ad3",
+    "services/runner/src/mapping/manifest.mjs": "sha256:6ee63f194442d57f96c2c7f78ad38a41a6355f24179da74d68631222bc3f7ac9",
+    "services/runner/src/preview/credentials.mjs": "sha256:bfba4aef951271b8c81600174b52f496fb96c8e6daf08633c6359f34762d9533",
+    "services/runner/src/preview/gateway.mjs": "sha256:881cd7b1f575f3151cfc70434c074bbce33a46378d949c199f27900fd4ebb1e2",
+    "services/runner/src/preview/main.mjs": "sha256:5076e9c4412ba4d5da86a9a2f71310dd178abf9d40ce5ee2a20b2f65f1f6f4a5",
+    "services/runner/src/preview/registry.mjs": "sha256:eaba8cce71ecf39358797e9e3f35065b76801b296ca16d8f93b5377a85c2d156",
+    "services/runner/src/preview/site-policy.mjs": "sha256:671a877fa60652aeebaa70649ace3f171815c95de74d8a7719c3059dd20b3815",
+    "services/runner/src/publish/frozen-gateway.mjs": "sha256:356dafb6df0108c892de65d1115a6aa6c77eb2892c0de1974c759c988a0436c0",
+    "services/runner/src/publish/gateway-cli.mjs": "sha256:562602d992557551c251889b779c335604f74709829d3de7e052511c8b0d8e4a",
+    "services/runner/src/publish/java/NodeDeploymentGateway.java": "sha256:d323aba9066071556f32392676d9778418fdfc08f3de26fa7ccf37aa88d0c659",
+    "services/runner/src/publish/policy.mjs": "sha256:d35411c8fc602e8aa0a06b8cdbc23a9aeaa7f54372b2b148dd83779dd8279945",
+    "services/runner/src/publish/probe-policy.mjs": "sha256:889ac84e0b3a70dec14f48e76781953e182b9938619e684a180929109827b4ec",
+    "services/runner/src/publish/probe-worker.mjs": "sha256:50d573de4a20f7a7dd055f7e2d9ecc745b13c89e5d95daf5491ce0e53030c777",
+    "services/runner/src/publish/probe.mjs": "sha256:c8cdc7f6c8082d872a5e45509a7912c6a05aef0490ee4d5b78f959117a4ee71e",
+    "services/runner/src/publish/publisher.mjs": "sha256:48df394e0e3d201a669204f521bc40e0b88a2060debd85d94551e1cf435721f1",
+    "services/runner/src/publish/store.mjs": "sha256:52c273dfdc845e47a3e7c1de99e59318d44d050b2f0325c51fd01a3f8ef43538",
+    "services/runner/src/publish/workflow.mjs": "sha256:bd735cc469d3baee0b1fbb460cfa252665e39974c661248192ddc8bcb569f310",
+    "services/runner/src/screenshot/README.md": "sha256:e0fdd89aa8061b88b8df641ad2d0fd8f0a2ac56000321db4a8ce1c778102c97c",
+    "services/runner/src/screenshot/adapter.mjs": "sha256:6b83dde330a5976409547334a156f776e8ce4aaa36abc5a500abaa90236ca663",
+    "services/runner/src/screenshot/capture.mjs": "sha256:d63cdb74a44c36786b1a39dacbef128b75da43dc4a1fa10ad259905cfb247a2f",
+    "services/runner/src/screenshot/network.mjs": "sha256:e6ad36db6a4ea71a3f11c10c0fe57f9ac331f9ce35329bf014c3f4ad2d7d48c8",
+    "services/runner/src/screenshot/owner.mjs": "sha256:792d95fa701263db2123ebc024bb1302243c46032351f8259d7aebba3c7d49e6",
+    "services/runner/src/screenshot/queue.mjs": "sha256:31cc3f95db15acc12e602aef632a17825f28967d0e42f54c307adec9fd77f76a",
+    "services/runner/src/screenshot/recover-lock.mjs": "sha256:e265306ed9e321f04378247f1f00f16c7ecaacf713724f16d6ef2e1b9144a839",
+    "services/runner/src/screenshot/target.mjs": "sha256:38b6e1dce48535e7bf0673033104f7bffe7d3f6bdefcb317e4b4616cee44e590",
+    "services/runner/src/screenshot/worker.mjs": "sha256:fbae2005d7af40e41d8f621327e0d1f3bf764884f363400aa91f2749829624d5",
+    "services/runner/src/template/build.mjs": "sha256:ab564e2ef1b8e23faf3ed7dc1b8f2ca156f471c28d436d762544b255cd6e9d4a",
+    "services/runner/src/verify/README.md": "sha256:6b57d294b8de81013a7f775ff005415142bfd6bfb6889260986b8b6ab4aa0e53",
+    "services/runner/src/verify/actions.mjs": "sha256:6476eaef58f59197caf6bf6db7148493482eaf17aac0601bd5bcecef6c464186",
+    "services/runner/src/verify/verifier.mjs": "sha256:4e0cdbf56db2a4b9e304db12335c7f3e7d699325935a5e14f1943235dc0531ec",
+    "services/runner/src/verify/worker.mjs": "sha256:ffe12c9aeccbad7f20a01bc2b23518726f182a4288e76638d86a540a1365006c",
+    "services/runner/src/verify/workflow.mjs": "sha256:eeddd32b437cab19569364d59b96c017234f087d8dc68e02e44330ec63284cec",
+    "templates/vue/.gitkeep": "sha256:7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "templates/vue/README.md": "sha256:d0cda80bced1759a0ae9595998783ccdf59b59ba39a9794866eb576b2e7a50df",
+    "templates/vue/allowed-dependencies.json": "sha256:4a6144fa3596bb9e06898e0a6b968e0f8007615fd44165a3f93e9fad13015a4d",
+    "templates/vue/fixtures/catalog/src/pages/CatalogPage.vue": "sha256:ea53dc0e51d715e30e8d9e09d85f5b75ae2808dbc8eb9e80a2ff23be5e184926",
+    "templates/vue/fixtures/mapping/src/components/SharedCard.vue": "sha256:65ec81b23ac6f84dd1df0b45740be29545c8c5e008d0591d2f788457daa12dc9",
+    "templates/vue/fixtures/mapping/src/pages/HomePage.vue": "sha256:33f1ce80bc0ed5b7f6fde7685fb346f92b083182723fe1935562f17fad137a3a",
+    "templates/vue/fixtures/showcase/src/pages/HomePage.vue": "sha256:97e89389a1b60c2ba5dfded5c8a339ac0f298e95011e07c43bd47613d8644c37",
+    "templates/vue/fixtures/tasks/src/pages/TasksPage.vue": "sha256:2a3e7d147b8f077000600e82efcb85bb30a47f64653371c4d3bf53de382115f8",
+    "templates/vue/index.html": "sha256:84eff9c259555bd0b3c78312ce4c9f72b85ff2a0b74dc69d757043c66aa7df87",
+    "templates/vue/package.json": "sha256:7d011ea866bf56006fdc25ee81d7e19a47ab523b57b70133466b6605aee601f4",
+    "templates/vue/pnpm-lock.yaml": "sha256:874081f812956eb4bb2c052551a50b3cae617132ccc0fe97e4f1ca024132cdd5",
+    "templates/vue/pnpm-workspace.yaml": "sha256:7bb91bb52adad825af75ce5492864b101167572c982ff37a0d3f080d8d6fcc53",
+    "templates/vue/preview-bridge/README.md": "sha256:2749bb607186e2d3349c7a723c4bda0ae80f59158fdaee5a9b64c652685e5608",
+    "templates/vue/preview-bridge/selector.mjs": "sha256:0e3a0249c3b88bb86b63274d14abef3ea60dc15a6b5c68baac9f1cac025d2aa3",
+    "templates/vue/src/App.vue": "sha256:a24602d6e7518244319bbd01d899c582c14a20074f4c24a110130b6580ea6355",
+    "templates/vue/src/build-node.d.ts": "sha256:56014a76d9104d45f2f90c887f2c33d0714258486518ec2d346e180e95cb1ba0",
+    "templates/vue/src/main.ts": "sha256:fad878badc626d8609bb70fcf3815164faa52c7269e46922a8f166e58297d079",
+    "templates/vue/src/pages/CatalogPage.vue": "sha256:5efc1c4c9216449341b90c1c2919b0966db437d0291e7f8bd1feb07147294b5b",
+    "templates/vue/src/pages/HomePage.vue": "sha256:5629ad4797b6c262cfd77dc0d2a27ed0337645a6a926d7bd8f0266c190d44b5b",
+    "templates/vue/src/pages/TasksPage.vue": "sha256:f20450a12e04f974d54fcb327a37fe97575b9dd14a37ef9e43ef4eec9953cfa2",
+    "templates/vue/src/router.ts": "sha256:a37dd921ede8553748398499eb0e2ca53b3ec839bcb46c2a6b39130c687cb932",
+    "templates/vue/tsconfig.json": "sha256:fb6b94f16fc0db3d6895ce4e6a5ff5fdb451a51576bca833ae6563a33b3f32e5",
+    "templates/vue/vite.config.ts": "sha256:cd0f31eb449367f9b99e816780f2fa50a5e43e74e94ee11fbfc5e3e3a09e709a",
+    "tests/performance/runner/acceptance.test.mjs": "sha256:624e0d9a251ae38e6e82d7b1a8b16c437df404a9c00ae79401f92d3dd64029e4",
+    "tests/performance/runner/api-isolation.mjs": "sha256:3b760271aa6f1018215e76d857889234f9533d0b39ff958eac439e8506d4510a",
+    "tests/performance/runner/evidence.test.mjs": "sha256:96e51d3944787830b29c1af2f533a4ee37d550dbd8b04af447d90ed0f75dc05d",
+    "tests/performance/runner/export-evidence.mjs": "sha256:4b560bc79dcdbccfe4f997982ac1b695781330b395b5b2d8290cc48fac0e5f25",
+    "tests/performance/runner/record-command.mjs": "sha256:55cd0e58ffa732622f6ae3539f517f42f7adc58ace599b7c9d3b00724541d1df",
+    "tests/performance/runner/support.mjs": "sha256:60fa7ca4ef79e3223f6596f5e0f0a9d7188f1e1c98d2bb1aa9f245964370788b"
+  },
+  "endSources": {
+    "tests/performance/runner/api-evidence.mjs": "sha256:f4346397292a951a212117af156f990fa6cc6479b31b57516627e947fe22b6e4",
+    "tests/performance/runner/api-evidence.test.mjs": "sha256:10efedf420756c6e302854dbeb52fb9ab098fc82926a6f729d941625a92c183b",
+    "tests/performance/runner/fixtures/Dockerfile": "sha256:9f24b4c046156177d4bdbd135308f29785875f9603a00b897628fb3ce974e364",
+    "tests/performance/runner/fixtures/pressure-entry.mjs": "sha256:856cd0f0687df00569b60cbe32c9831852a9620c1ce934c4716d1de8882236c6",
+    "tests/performance/runner/review-D22-A.md": "sha256:4e7af0a844a01c36a2f49babeeebe3ce6d5b4d0ebb9d3993c9f71e5909989176",
+    "infra/build-image/Dockerfile": "sha256:371149e8a7050822db05aa8bdbbc303259fc9b1a2072c5062a9d066b68ac1ff1",
+    "infra/build-image/Dockerfile.dockerignore": "sha256:daa6d06520d2a756bb0ee80a45d470d2b71ec14aa2b63129c63ccde13fa15e77",
+    "infra/build-image/build-image.ps1": "sha256:0b307eeee7607d2d593a62b47dbd95a501108710b56a6a945cbe20ed663b5033",
+    "infra/build-image/container-build.mjs": "sha256:a5b9e62315be8f3431b35429e329bc9bc0f15bf98f325c1f05a0858702ff5f19",
+    "infra/build-image/verify-dependencies.mjs": "sha256:1dca26ce02f251eaa2490905c271d169184fd48028ca783ef8b06fdf3d9d3d4c",
+    "infra/runner/README.md": "sha256:45bbbf7ca94610be9d9d9f35db7b57a00d1fc6985d4b14ee88613898c04ddb74",
+    "infra/runner/policy.mjs": "sha256:bab2471781cd75317c17f0f3e4b168169bbb41f9d2e93b85c28ccae7d392d9c2",
+    "infra/runner/profiles.mjs": "sha256:1fa1599bf9a34dd2dbe7b88358864739a5532bb307501cfe85af279ada119a26",
+    "services/runner/.gitkeep": "sha256:7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "services/runner/build-contract.mjs": "sha256:f1896c6a70be210147ba9b9bf41e541a5738ccc077a14210d54788b31d3c666d",
+    "services/runner/health.mjs": "sha256:25b682d1761e62ec61a3e54b8e2aa84111bedd6906b2a2a4d717af4c98f91bbe",
+    "services/runner/main.mjs": "sha256:4177a2ba046ec76d898bdf5091638ea6ce163c20969f508804c5af08ed9e91d8",
+    "services/runner/src/artifacts/routes.mjs": "sha256:320749cc9b32799a447c0ae771a14e95d82dcf544058225fcac00865dc8f7f74",
+    "services/runner/src/artifacts/service.mjs": "sha256:077c56c4c35c9c13393a4cba551925c3594ac748dd5aa71042af268c7728b08c",
+    "services/runner/src/artifacts/snapshot.mjs": "sha256:b804933c5242102272fc1b1951b16c35f371c8fcdadb427408af8e1134dd2427",
+    "services/runner/src/build/oom-evidence.mjs": "sha256:9d6f28c4cd97061113ef166c6d6e691914107773f261f63f230769575f2a92bd",
+    "services/runner/src/build/runner.mjs": "sha256:ef369fdca230951645459ad8fa85454f46f7b53535ff984d5aef9063045c0ad3",
+    "services/runner/src/mapping/manifest.mjs": "sha256:6ee63f194442d57f96c2c7f78ad38a41a6355f24179da74d68631222bc3f7ac9",
+    "services/runner/src/preview/credentials.mjs": "sha256:bfba4aef951271b8c81600174b52f496fb96c8e6daf08633c6359f34762d9533",
+    "services/runner/src/preview/gateway.mjs": "sha256:881cd7b1f575f3151cfc70434c074bbce33a46378d949c199f27900fd4ebb1e2",
+    "services/runner/src/preview/main.mjs": "sha256:5076e9c4412ba4d5da86a9a2f71310dd178abf9d40ce5ee2a20b2f65f1f6f4a5",
+    "services/runner/src/preview/registry.mjs": "sha256:eaba8cce71ecf39358797e9e3f35065b76801b296ca16d8f93b5377a85c2d156",
+    "services/runner/src/preview/site-policy.mjs": "sha256:671a877fa60652aeebaa70649ace3f171815c95de74d8a7719c3059dd20b3815",
+    "services/runner/src/publish/frozen-gateway.mjs": "sha256:356dafb6df0108c892de65d1115a6aa6c77eb2892c0de1974c759c988a0436c0",
+    "services/runner/src/publish/gateway-cli.mjs": "sha256:562602d992557551c251889b779c335604f74709829d3de7e052511c8b0d8e4a",
+    "services/runner/src/publish/java/NodeDeploymentGateway.java": "sha256:d323aba9066071556f32392676d9778418fdfc08f3de26fa7ccf37aa88d0c659",
+    "services/runner/src/publish/policy.mjs": "sha256:d35411c8fc602e8aa0a06b8cdbc23a9aeaa7f54372b2b148dd83779dd8279945",
+    "services/runner/src/publish/probe-policy.mjs": "sha256:889ac84e0b3a70dec14f48e76781953e182b9938619e684a180929109827b4ec",
+    "services/runner/src/publish/probe-worker.mjs": "sha256:50d573de4a20f7a7dd055f7e2d9ecc745b13c89e5d95daf5491ce0e53030c777",
+    "services/runner/src/publish/probe.mjs": "sha256:c8cdc7f6c8082d872a5e45509a7912c6a05aef0490ee4d5b78f959117a4ee71e",
+    "services/runner/src/publish/publisher.mjs": "sha256:48df394e0e3d201a669204f521bc40e0b88a2060debd85d94551e1cf435721f1",
+    "services/runner/src/publish/store.mjs": "sha256:52c273dfdc845e47a3e7c1de99e59318d44d050b2f0325c51fd01a3f8ef43538",
+    "services/runner/src/publish/workflow.mjs": "sha256:bd735cc469d3baee0b1fbb460cfa252665e39974c661248192ddc8bcb569f310",
+    "services/runner/src/screenshot/README.md": "sha256:e0fdd89aa8061b88b8df641ad2d0fd8f0a2ac56000321db4a8ce1c778102c97c",
+    "services/runner/src/screenshot/adapter.mjs": "sha256:6b83dde330a5976409547334a156f776e8ce4aaa36abc5a500abaa90236ca663",
+    "services/runner/src/screenshot/capture.mjs": "sha256:d63cdb74a44c36786b1a39dacbef128b75da43dc4a1fa10ad259905cfb247a2f",
+    "services/runner/src/screenshot/network.mjs": "sha256:e6ad36db6a4ea71a3f11c10c0fe57f9ac331f9ce35329bf014c3f4ad2d7d48c8",
+    "services/runner/src/screenshot/owner.mjs": "sha256:792d95fa701263db2123ebc024bb1302243c46032351f8259d7aebba3c7d49e6",
+    "services/runner/src/screenshot/queue.mjs": "sha256:31cc3f95db15acc12e602aef632a17825f28967d0e42f54c307adec9fd77f76a",
+    "services/runner/src/screenshot/recover-lock.mjs": "sha256:e265306ed9e321f04378247f1f00f16c7ecaacf713724f16d6ef2e1b9144a839",
+    "services/runner/src/screenshot/target.mjs": "sha256:38b6e1dce48535e7bf0673033104f7bffe7d3f6bdefcb317e4b4616cee44e590",
+    "services/runner/src/screenshot/worker.mjs": "sha256:fbae2005d7af40e41d8f621327e0d1f3bf764884f363400aa91f2749829624d5",
+    "services/runner/src/template/build.mjs": "sha256:ab564e2ef1b8e23faf3ed7dc1b8f2ca156f471c28d436d762544b255cd6e9d4a",
+    "services/runner/src/verify/README.md": "sha256:6b57d294b8de81013a7f775ff005415142bfd6bfb6889260986b8b6ab4aa0e53",
+    "services/runner/src/verify/actions.mjs": "sha256:6476eaef58f59197caf6bf6db7148493482eaf17aac0601bd5bcecef6c464186",
+    "services/runner/src/verify/verifier.mjs": "sha256:4e0cdbf56db2a4b9e304db12335c7f3e7d699325935a5e14f1943235dc0531ec",
+    "services/runner/src/verify/worker.mjs": "sha256:ffe12c9aeccbad7f20a01bc2b23518726f182a4288e76638d86a540a1365006c",
+    "services/runner/src/verify/workflow.mjs": "sha256:eeddd32b437cab19569364d59b96c017234f087d8dc68e02e44330ec63284cec",
+    "templates/vue/.gitkeep": "sha256:7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "templates/vue/README.md": "sha256:d0cda80bced1759a0ae9595998783ccdf59b59ba39a9794866eb576b2e7a50df",
+    "templates/vue/allowed-dependencies.json": "sha256:4a6144fa3596bb9e06898e0a6b968e0f8007615fd44165a3f93e9fad13015a4d",
+    "templates/vue/fixtures/catalog/src/pages/CatalogPage.vue": "sha256:ea53dc0e51d715e30e8d9e09d85f5b75ae2808dbc8eb9e80a2ff23be5e184926",
+    "templates/vue/fixtures/mapping/src/components/SharedCard.vue": "sha256:65ec81b23ac6f84dd1df0b45740be29545c8c5e008d0591d2f788457daa12dc9",
+    "templates/vue/fixtures/mapping/src/pages/HomePage.vue": "sha256:33f1ce80bc0ed5b7f6fde7685fb346f92b083182723fe1935562f17fad137a3a",
+    "templates/vue/fixtures/showcase/src/pages/HomePage.vue": "sha256:97e89389a1b60c2ba5dfded5c8a339ac0f298e95011e07c43bd47613d8644c37",
+    "templates/vue/fixtures/tasks/src/pages/TasksPage.vue": "sha256:2a3e7d147b8f077000600e82efcb85bb30a47f64653371c4d3bf53de382115f8",
+    "templates/vue/index.html": "sha256:84eff9c259555bd0b3c78312ce4c9f72b85ff2a0b74dc69d757043c66aa7df87",
+    "templates/vue/package.json": "sha256:7d011ea866bf56006fdc25ee81d7e19a47ab523b57b70133466b6605aee601f4",
+    "templates/vue/pnpm-lock.yaml": "sha256:874081f812956eb4bb2c052551a50b3cae617132ccc0fe97e4f1ca024132cdd5",
+    "templates/vue/pnpm-workspace.yaml": "sha256:7bb91bb52adad825af75ce5492864b101167572c982ff37a0d3f080d8d6fcc53",
+    "templates/vue/preview-bridge/README.md": "sha256:2749bb607186e2d3349c7a723c4bda0ae80f59158fdaee5a9b64c652685e5608",
+    "templates/vue/preview-bridge/selector.mjs": "sha256:0e3a0249c3b88bb86b63274d14abef3ea60dc15a6b5c68baac9f1cac025d2aa3",
+    "templates/vue/src/App.vue": "sha256:a24602d6e7518244319bbd01d899c582c14a20074f4c24a110130b6580ea6355",
+    "templates/vue/src/build-node.d.ts": "sha256:56014a76d9104d45f2f90c887f2c33d0714258486518ec2d346e180e95cb1ba0",
+    "templates/vue/src/main.ts": "sha256:fad878badc626d8609bb70fcf3815164faa52c7269e46922a8f166e58297d079",
+    "templates/vue/src/pages/CatalogPage.vue": "sha256:5efc1c4c9216449341b90c1c2919b0966db437d0291e7f8bd1feb07147294b5b",
+    "templates/vue/src/pages/HomePage.vue": "sha256:5629ad4797b6c262cfd77dc0d2a27ed0337645a6a926d7bd8f0266c190d44b5b",
+    "templates/vue/src/pages/TasksPage.vue": "sha256:f20450a12e04f974d54fcb327a37fe97575b9dd14a37ef9e43ef4eec9953cfa2",
+    "templates/vue/src/router.ts": "sha256:a37dd921ede8553748398499eb0e2ca53b3ec839bcb46c2a6b39130c687cb932",
+    "templates/vue/tsconfig.json": "sha256:fb6b94f16fc0db3d6895ce4e6a5ff5fdb451a51576bca833ae6563a33b3f32e5",
+    "templates/vue/vite.config.ts": "sha256:cd0f31eb449367f9b99e816780f2fa50a5e43e74e94ee11fbfc5e3e3a09e709a",
+    "tests/performance/runner/acceptance.test.mjs": "sha256:624e0d9a251ae38e6e82d7b1a8b16c437df404a9c00ae79401f92d3dd64029e4",
+    "tests/performance/runner/api-isolation.mjs": "sha256:3b760271aa6f1018215e76d857889234f9533d0b39ff958eac439e8506d4510a",
+    "tests/performance/runner/evidence.test.mjs": "sha256:96e51d3944787830b29c1af2f533a4ee37d550dbd8b04af447d90ed0f75dc05d",
+    "tests/performance/runner/export-evidence.mjs": "sha256:4b560bc79dcdbccfe4f997982ac1b695781330b395b5b2d8290cc48fac0e5f25",
+    "tests/performance/runner/record-command.mjs": "sha256:55cd0e58ffa732622f6ae3539f517f42f7adc58ace599b7c9d3b00724541d1df",
+    "tests/performance/runner/support.mjs": "sha256:60fa7ca4ef79e3223f6596f5e0f0a9d7188f1e1c98d2bb1aa9f245964370788b"
+  },
+  "canonical": false
+}

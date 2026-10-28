@@ -34,9 +34,16 @@ public class GlobalExceptionHandler {
             case "UNAUTHENTICATED" -> "Authentication required";
             case "NOT_FOUND" -> "Resource was not found";
             case "FORBIDDEN" -> "Access denied";
+            case "APPLICATION_TASK_LIMIT" -> "Application active task limit reached";
+            case "USER_TASK_LIMIT" -> "User active task limit reached";
+            case "TASK_QUEUE_FULL" -> "Task queue is full";
+            case "TASK_ADMISSION_BUSY" -> "Task admission is busy; retry later";
             default -> "Request is invalid";
         };
-        return response(exception.status(), exception.code(), message, request, Map.of());
+        var headers=new HttpHeaders();
+        if(java.util.Set.of("APPLICATION_TASK_LIMIT","USER_TASK_LIMIT","TASK_QUEUE_FULL","TASK_ADMISSION_BUSY").contains(exception.code()))
+            headers.set("Retry-After","1");
+        return response(exception.status(), exception.code(), message, request, Map.of(),headers);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> validation(MethodArgumentNotValidException exception, HttpServletRequest request) {

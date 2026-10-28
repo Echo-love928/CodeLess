@@ -77,7 +77,7 @@ async function execute(job, timeoutMs) {
       const terminated = await killed
       let observed = null
       try { observed = JSON.parse(Buffer.concat(stdout).toString('utf8')) } catch {}
-      done({ exitCode, signal, timedOut, terminated, overflow, phase, error, stderr, observed })
+      done({ workerPid: child.pid, exitCode, signal, timedOut, terminated, overflow, phase, error, stderr, observed })
     })
   })
 }
@@ -98,7 +98,7 @@ export async function createBrowserVerifier({ evidenceRoot, limits: overrides } 
     const observed = await execute({ ...target, actions, limits }, limits.runTimeoutMs)
     const result = { id, buildId: handle.buildId, sourceDigest: handle.sourceDigest, artifactDigest: handle.artifactDigest,
       status: 'FAILED', failure: null, startedAt, completedAt: new Date().toISOString(),
-      workerExitCode: observed.exitCode, timedOut: observed.timedOut, phase: observed.phase,
+      workerPid: observed.workerPid ?? null, workerExitCode: observed.exitCode, timedOut: observed.timedOut, phase: observed.phase,
       diagnostics: observed.observed?.diagnostics ?? null,
       cleanup: { browserClosed: observed.observed?.browserClosed === true, processTreeTerminated: observed.terminated },
       screenshot: null, reportPath: join(directory, 'result.json') }

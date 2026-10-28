@@ -1,0 +1,17 @@
+{
+  "task": "D22-B-T4",
+  "cause": "Windows core.autocrlf changed raw JSON bytes on checkout",
+  "fix": "evidence/.gitattributes preserves raw JSON bytes; original files copied without changing manifest hashes",
+  "before": {
+    "command": "node --test tests/performance/runner/evidence.test.mjs",
+    "exitCode": 1,
+    "logDigest": "sha256:59c4d6bdf27ae5ff2fc4b8f53f1a00e65e212477180cd1f0de3b4faa1650d23b",
+    "log": "✖ D22 T4: committed raw samples preserve manifest SHA256 after checkout (5.9767ms)\r\nℹ tests 1\r\nℹ suites 0\r\nℹ pass 0\r\nℹ fail 1\r\nℹ cancelled 0\r\nℹ skipped 0\r\nℹ todo 0\r\nℹ duration_ms 108.2999\r\n\r\n✖ failing tests:\r\n\r\ntest at tests\\performance\\runner\\evidence.test.mjs:6:1\r\n✖ D22 T4: committed raw samples preserve manifest SHA256 after checkout (5.9767ms)\r\n  AssertionError [ERR_ASSERTION]: 2026-10-27T14-25-24.902Z-211b74f7-131b-445a-8281-7a8e5cf7be58.json\r\n  + actual - expected\r\n  \r\n  + 'sha256:3227b15364e1511be31e7665d41d1557e4b9a955044b44d9b02c4966984e9307'\r\n  - 'sha256:a34f82f06cc3e6faa5a1e9cf3837330917d8baa6dfe7ec172a494268369e754d'\r\n  \r\n      at TestContext.<anonymous> (file:///C:/Users/12058/.codex/worktrees/d22-b-runner-performance/CodeLess/tests/performance/runner/evidence.test.mjs:13:12)\r\n      at async Test.run (node:internal/test_runner/test:1409:7)\r\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {\r\n    generatedMessage: false,\r\n    code: 'ERR_ASSERTION',\r\n    actual: 'sha256:3227b15364e1511be31e7665d41d1557e4b9a955044b44d9b02c4966984e9307',\r\n    expected: 'sha256:a34f82f06cc3e6faa5a1e9cf3837330917d8baa6dfe7ec172a494268369e754d',\r\n    operator: 'strictEqual',\r\n    diff: 'simple'\r\n  }\r\n"
+  },
+  "after": {
+    "command": "node --test tests/performance/runner/evidence.test.mjs",
+    "exitCode": 0,
+    "logDigest": "sha256:40897f387774dbbac183eeed927773cf26e4f99e8d914e819de8dd722d1a24e7",
+    "log": "✔ D22 T4: committed raw samples preserve manifest SHA256 after checkout (8.6851ms)\r\nℹ tests 1\r\nℹ suites 0\r\nℹ pass 1\r\nℹ fail 0\r\nℹ cancelled 0\r\nℹ skipped 0\r\nℹ todo 0\r\nℹ duration_ms 106.1943\r\n"
+  }
+}

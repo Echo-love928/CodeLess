@@ -21,9 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public class PlatformRepository {
     private final JdbcClient jdbc;
+    private final dev.codeless.api.tasks.CapacityPolicy capacity;
 
     public PlatformRepository(JdbcClient jdbc) {
-        this.jdbc = jdbc;
+        this(jdbc,new dev.codeless.api.tasks.CapacityPolicy(jdbc,new org.springframework.core.env.StandardEnvironment()));
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public PlatformRepository(JdbcClient jdbc, dev.codeless.api.tasks.CapacityPolicy capacity) {
+        this.jdbc = jdbc; this.capacity=capacity;
     }
 
     public User createUser(UUID id, String email, String displayName) {
@@ -73,6 +79,7 @@ public class PlatformRepository {
 
     private Task insertTask(UUID id, UUID applicationId, String prompt, String idempotencyKey,
                             String queueState, String acceptanceMessage) {
+        if ("QUEUED".equals(queueState)) capacity.admit(applicationId);
         jdbc.sql("""
                 INSERT INTO generation_tasks(id, application_id, prompt, event_sequence,
                                              idempotency_key, queue_state, deadline_at)
