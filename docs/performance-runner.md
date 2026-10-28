@@ -64,6 +64,8 @@ node tests/performance/runner/export-evidence.mjs
 
 ## API干扰测量
 
+**当前T2证据以带时间屏障的修正轮为准。** 同伴在D22-A #75发现旧轮只等Running就查询，真实OOM发生在查询之后也可能通过；这一审查成立。以下旧40条原生成功样本保持原样，但OOM干扰结论撤回，不修改它们的PASSED/canonical字段。
+
 真实API+新PostgreSQL的成功开发轮：baseline、CPU超时、真实OOM、负载后各10次GET（用户/应用列表各5），共40次均200，无业务重试；每个负载组开始前独立inspect确认故障容器正在运行。
 
 | 阶段 | n | 最小ms | 最大ms |
@@ -73,7 +75,11 @@ node tests/performance/runner/export-evidence.mjs
 | 96MiB真实OOM | 10 | 6.79 | 11.24 |
 | 负载后 | 10 | 6.15 | 11.14 |
 
-这些结果证明本机单个受限worker故障负载没有拖死真实API读请求；不是平台并发准入/多实例部署容量保证。API侧任务队列、慢模型不阻塞普通查询及同日组合联调由D22-A负责。当前未找到开放D22-A PR，不能宣称已完成其互审或最后启用联调。
+这些旧记录只能证明容器Running后API返回200，不能证明覆盖OOM压力。修正后的可信fault image在宿主释放前不开始分配，释放后再延迟500ms；实际Docker OOMKilled及cgroup oom_kill均确认后才进行10个GET，guardian在整个组结束后才获SIGUSR2退出。另有压力前负向对照、CPU真实子进程/用量屏障及每种故障清理后的直接查询。每条记录保留单调钟开始/结束与屏障关联，`api-evidence.mjs`独立核验因果顺序，旧记录及将GET挪至OOM前的损坏副本均被拒绝。
+
+修正B轮80/80 HTTP200：实际CPU屏障后max6.5595ms，OOM确认后max5.7829ms；CPU、内存对照及内存实测故障清理后的查询各10个，另含20基线/收尾及10个压力前对照。该结论是确认OOM后仍可响应，不是分配器峰值期间的连续观测，也不推广为多实例/宿主全内存耗尽保证。
+
+已读取A的#75精确候选9c5cf47、完成10/10独立专项及只读互审。本地A+B资源组合另80/80通过，API生产源码113个文件起止不变；组合D20全链实际native1，发布phase被即时读为UNKNOWN，尽管之后账本为SUCCEEDED。已保留原断言失败、SQL、PNG与trace，不把后来的终态回填为通过。资源组合与完整产品联调分别报告；部署机/公网模型容量仍需最后启用PR校准。
 
 ## 证据、失败与门禁
 

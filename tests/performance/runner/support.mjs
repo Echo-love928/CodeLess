@@ -55,15 +55,20 @@ export function ownedPath(parent, child) {
   assert.equal(dirname(resolve(child)), resolve(parent), 'cleanup must stay in the exact owned parent')
   return child
 }
-export async function observeOOM(id) {
+export async function waitForOOM(id) {
   const deadline = Date.now() + 10000
   while (Date.now() < deadline) {
     const state = JSON.parse(await dockerAsync(['inspect', id, '--format', '{{json .State}}']))
     if (state.Running && state.OOMKilled === true) {
-      await dockerAsync(['kill', '--signal', 'USR2', id]); return state
+      return { state, observedAt: new Date().toISOString(), monotonicMs: performance.now() }
     }
     assert.notEqual(state.Status, 'exited', 'OOM guardian exited before daemon acknowledgement')
     await sleep(50)
   }
   throw new Error('OOM acknowledgement deadline')
+}
+export async function observeOOM(id) {
+  const observed = await waitForOOM(id)
+  await dockerAsync(['kill', '--signal', 'USR2', id])
+  return observed.state
 }
