@@ -1,0 +1,153 @@
+version check passed: Node 24.22.1, pnpm 12.6.0; Java/Spring/Maven locks consistent
+application: valid accepted; invalid rejected
+task: valid accepted; invalid rejected
+event: valid accepted; invalid rejected
+build: valid accepted; invalid rejected
+version: valid accepted; invalid rejected
+publication: valid accepted; invalid rejected
+task-diagnostics: valid accepted; invalid rejected
+preview-credential: valid accepted; invalid rejected
+OpenAPI surface and authentication boundary passed
+build: valid accepted; invalid rejected
+version: valid accepted; invalid rejected
+runner contract boundary passed
+application: valid accepted; invalid rejected
+task: valid accepted; invalid rejected
+event: valid accepted; invalid rejected
+build: valid accepted; invalid rejected
+version: valid accepted; invalid rejected
+publication: valid accepted; invalid rejected
+task-diagnostics: valid accepted; invalid rejected
+preview-credential: valid accepted; invalid rejected
+cross-resource READY/publication flow passed
+✔ scoped patch preserves authentication, path identity and every unrelated operation (7.346ms)
+✔ wire cursor schema rejects UUIDs, padding, signs and int32 overflow; page limits are bounded (4.9371ms)
+✔ documented wire examples match the existing event schema and separate comments/errors from persisted IDs (10.6716ms)
+✔ pre-stream errors remain JSON and validate their actual codes with the shared error envelope (16.3053ms)
+✔ shared task create contract preserves CSRF and bounds application-scoped idempotency keys (31.9405ms)
+✔ shared cancel contract has owner identity, CSRF and real terminal task response (0.9179ms)
+✔ structured diagnostics contract distinguishes absent, empty and actual metadata and rejects unsafe paths/false build success (21.4839ms)
+✔ OpenAPI fragment: 7 admin GETs + 1 audited CSRF cancel, session auth, no-store, strict errors (21.3663ms)
+✔ enum drift guard: every filter value in the fragment is accepted by the Java controller/queries (29.1159ms)
+✔ schema invariants reject unknown-as-zero, prompt leakage and impossible states (79.8603ms)
+✔ real HTTP evidence matches the schema and proves T1–T4 and 04 (39.1044ms)
+✔ shared OpenAPI registers every deployment route and the strict request (17.0935ms)
+✔ strict request, key and owner-publication contract (51.4458ms)
+✔ actual deployment state and HTTP panel evidence match schemas; hosting fixture is explicit (57.8624ms)
+✔ REAL network gate requires fresh complete normal TLS and JVM evidence (1.926ms)
+✔ REAL batches need explicit approval, a credential and a committed scope before anything is created (14.9456ms)
+✔ D21-A-04: every sample runs exactly once; a failed sample is kept and the batch continues (744.4244ms)
+✔ D21-A-04: resume never restarts a sample that already started, even one that failed (615.3012ms)
+✔ mock batches cannot be written as real evidence, and resuming a finished batch starts nothing (440.5036ms)
+✔ the credential reaches only REAL sample JVMs and is never written to batch files (1224.3406ms)
+✔ the container-CLI fault removes exactly the PATH entries that hold a docker executable (0.5079ms)
+✔ P1 repro: the unchanged real SHOW-01 record never counts after a failed, timed-out or missing JVM result (24.4232ms)
+✔ P1: only a JVM that ran to the end by itself with exit 0 is OK; anything malformed is not (0.2885ms)
+✔ P1: a failed process lowers the summary, and a platform FAILED keeps its own failure category (4.955ms)
+✔ P1: every fault result needs a clean JVM exit and no harness error before its own expectations count (0.988ms)
+✔ P1: a failed sample JVM is a valid failed sample; a report or process result rewritten afterwards is caught (527.614ms)
+✔ P1: a record that appeared after its process finished without one is rejected (377.4086ms)
+✔ P2 repro: the real SHOW-01 record without its call rows keeps usage unknown per sample and in aggregate (1.1403ms)
+✔ P2: a failed call collection keeps the batch report unknown and still verifies as a failed sample (497.6371ms)
+✔ P2: an unreadable journal leaves charges, tool slots and first verification unknown instead of 0 (0.7958ms)
+✔ T3: a call is KNOWN only when the provider reported both counts; a real 0 stays 0 (1.0005ms)
+✔ T3: one unknown call makes exact totals null instead of 0, and known sums stay lower bounds (0.7085ms)
+✔ T3: a sample without a task record keeps the aggregate unknown even if every recorded call is known (0.2013ms)
+✔ failure types keep model, code, budget and environment failures apart (0.1744ms)
+✔ first pass needs a verified first candidate; a repaired READY is final success but not first pass (3.2009ms)
+✔ a harness error never counts as success even when the task row says READY (0.4008ms)
+✔ T1: the requirement denominator stays 9 when records are missing; missing samples are failures (1.7697ms)
+✔ median and max durations use known samples only (0.1856ms)
+✔ T2: a code fault passes only if it failed as CODE first and was repaired within 3 rounds with unchanged actions (1.3103ms)
+✔ T2: an environment fault fails if the platform sent it to REPAIR or changed code (0.8822ms)
+✔ T4: the written report equals a fresh recomputation, and any raw-record change is detected (457.4322ms)
+✔ T4: recomputation is byte-stable and tolerates CRLF checkouts of the report (141.3757ms)
+✔ T1 + T3: a missing record stays in the denominator and makes usage unknown, never 0 (139.3107ms)
+✔ T3: the dead-route fault keeps its single failed call unknown; its charge is a separate estimate (109.5834ms)
+✔ T1: verification passes a complete batch and names every broken invariant (226.7007ms)
+✔ T1: a changed frozen set or a moved batch is rejected (383.8472ms)
+✔ mock statistics are labelled and mock calls inside a REAL batch void the real-evidence flag (722.691ms)
+✔ additive OpenAPI paths preserve the existing detail and public error contract (13.203ms)
+✔ version source tasks are optional valid UUIDs, never inferred arbitrary identifiers (7.7682ms)
+✔ closed file response, text scripts, traversal and false status fixtures (11.248ms)
+✔ actual Java/PostgreSQL/Docker/Chromium acceptance responses conform (51.5413ms)
+ℹ tests 51
+ℹ suites 0
+ℹ pass 51
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3267.7428
+No configurations were provided -- using built in recommended configuration by default.
+
+validating contracts\openapi.v0.json...
+[1] contracts\openapi.v0.json:172:19 at #/paths/~1api~1v0~1tasks~1{taskId}~1edit/get/responses/200/content/application~1json/schema/oneOf
+
+Schemas in `oneOf` must be mutually exclusive. Found overlapping schemas: `./edit/edit.schema.json#/$defs/response` and `./mapping/component-edit.schema.json#/$defs/response`. Both schemas define `task`, `source` without constraints that exclude each other. Add a discriminator, or constrain the shared properties to different values.
+
+170 | "application/json": {
+171 |   "schema": {
+172 |     "oneOf": [
+    |     ^^^^^^^
+173 |       {
+174 |         "$ref": "./edit/edit.schema.json#/$defs/response"
+
+Warning was generated by the no-illogical-composition-keywords rule.
+
+
+contracts\openapi.v0.json: validated in 79ms
+
+Woohoo! Your API description is valid. 🎉
+You have 1 warning.
+
+$ pnpm lint && pnpm test && pnpm build
+$ eslint src vite.config.ts vitest.config.ts playwright.config.ts playwright.real-auth.config.ts
+$ vitest run
+
+ RUN  v3.0.9 C:/Users/12058/.codex/worktrees/d22-b-runner-performance/CodeLess/apps/web
+
+ ✓ src/features/visual-edit/selector-session.test.ts (3 tests) 7ms
+ ✓ src/features/workbench/feature-request.test.ts (4 tests) 13ms
+ ✓ src/features/preview/preview-api.test.ts (4 tests) 15ms
+ ✓ src/features/versions/version-api.test.ts (6 tests) 17ms
+ ✓ src/features/source/source-api.test.ts (18 tests) 22ms
+ ✓ src/features/source/export-api.test.ts (27 tests) 103ms
+ ✓ src/features/admin/admin-api.test.ts (22 tests) 26ms
+ ✓ src/features/workbench/use-workbench-task.test.ts (13 tests) 22ms
+ ✓ src/features/deploy/deploy-api.test.ts (8 tests) 26ms
+ ✓ src/features/visual-edit/edit-flow.test.ts (11 tests) 18ms
+ ✓ src/features/mapping/ComponentEditor.test.ts (2 tests) 46ms
+ ✓ src/features/source/SourceDownload.test.ts (4 tests) 59ms
+ ✓ src/features/workbench/TaskStatus.test.ts (18 tests) 70ms
+ ✓ src/lib/events/task-events.test.ts (6 tests) 199ms
+ ✓ src/features/visual-edit/VisualComponentEditor.test.ts (3 tests) 74ms
+ ✓ src/features/preview/PreviewPanel.test.ts (6 tests) 111ms
+ ✓ src/features/deploy/DeployPanel.test.ts (9 tests) 193ms
+ ✓ src/features/versions/VersionWorkspace.test.ts (3 tests) 90ms
+ ✓ src/features/admin/AdminPage.test.ts (13 tests) 396ms
+ ✓ src/features/mapping/component-api.test.ts (2 tests) 5ms
+ ✓ src/features/deploy/DeploymentCover.test.ts (2 tests) 35ms
+ ✓ src/features/workbench/task-diagnostics.test.ts (2 tests) 4ms
+ ✓ src/features/deploy/site-policy.test.ts (1 test) 2ms
+ ✓ src/features/deploy/cover-api.test.ts (8 tests) 8ms
+ ✓ src/components/StatePanel.test.ts (3 tests) 33ms
+ ✓ src/features/admin/AdminMetrics.test.ts (1 test) 22ms
+
+ Test Files  26 passed (26)
+      Tests  199 passed (199)
+   Start at  15:35:22
+   Duration  19.84s (transform 5.67s, setup 0ms, collect 16.23s, tests 1.62s, environment 311.78s, prepare 19.07s)
+
+$ vue-tsc --noEmit && vite build
+vite v6.2.3 building for production...
+transforming...
+✓ 1507 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                       0.54 kB │ gzip:  0.36 kB
+dist/assets/AdminPage-Bf4vwQWg.css    5.74 kB │ gzip:  1.62 kB
+dist/assets/index-thRdBSjx.css       58.89 kB │ gzip: 11.15 kB
+dist/assets/AdminPage-Cyu-UwUC.js    19.08 kB │ gzip:  7.47 kB
+dist/assets/index-Yi1-sPzt.js       227.63 kB │ gzip: 82.55 kB
+✓ built in 3.21s
