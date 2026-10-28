@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {spawnSync} from 'node:child_process';
+import {resolve,join,dirname} from 'node:path';
+import {createHash} from 'node:crypto';
+import {connection} from './remote.mjs';
+const state=JSON.parse(readFileSync(process.argv[2],'utf8')),id=process.argv[3];
+assert.match(state.id,/^codeless-d22-a-[a-f0-9-]+$/);assert.equal(state.remote,'/var/tmp/'+state.id);assert.match(id,/^real-[a-f0-9-]+$/);
+const script=`import pathlib,subprocess,json,base64,xml.etree.ElementTree as ET\nroot=pathlib.Path(${JSON.stringify(state.remote)})\nrows=[json.loads(l) for l in subprocess.check_output(['docker','ps','-a','--format','{{json .}}'],text=True).splitlines()]\nexpected={'codeless-public-platform-1','codeless-public-hosting-1','codeless-public-edge-1','codeless-public-postgres-1'}\ncredentials=sum(len(list(p.glob('*-env.json'))) for p in pathlib.Path('/var/tmp').glob('codeless-d22-a-*/private'))\np=root/'services/api/target/surefire-reports/TEST-dev.codeless.api.performance.RealModelCapacityIT.xml'\nxml=p.read_bytes();suite=ET.fromstring(xml)\nprint(json.dumps(dict(containerCount=len(rows),onlyBaselineContainers=set(r['Names'] for r in rows)==expected,allBaselineRunning=all(r['State']=='running' for r in rows),temporaryCredentialFiles=credentials,junit=dict(tests=int(suite.get('tests')),failures=int(suite.get('failures')),errors=int(suite.get('errors')),skipped=int(suite.get('skipped'))),junitBase64=base64.b64encode(xml).decode())))\n`;
+const r=spawnSync('ssh',[...connection(process.env.CODELESS_CAPACITY_SSH_CONFIG_FILE),"python3 -c \"import base64;exec(base64.b64decode('"+Buffer.from(script).toString('base64')+"'))\""],{windowsHide:true,encoding:'utf8',timeout:20000,maxBuffer:5000000});
+assert.equal(r.status,0,'Cleanup check transport failed');const data=JSON.parse(r.stdout),bytes=Buffer.from(data.junitBase64,'base64');delete data.junitBase64;
+assert.equal(data.onlyBaselineContainers,true);assert.equal(data.allBaselineRunning,true);assert.equal(data.temporaryCredentialFiles,0);assert.deepEqual(data.junit,{tests:1,failures:0,errors:0,skipped:0});
+const local=resolve(process.env.CODELESS_CAPACITY_LOCAL_PRIVATE??'.local-data/d22-a-real'),path=join(local,state.id,id,'final-junit.xml');mkdirSync(dirname(path),{recursive:true});writeFileSync(path,bytes,{flag:'wx',mode:0o600});
+const report={checkedAt:new Date().toISOString(),...data,junitSha256:createHash('sha256').update(bytes).digest('hex'),junitPublished:false,onlineServiceChanged:false};
+writeFileSync('tests/performance/api/evidence/'+id+'/cleanup.json',JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));

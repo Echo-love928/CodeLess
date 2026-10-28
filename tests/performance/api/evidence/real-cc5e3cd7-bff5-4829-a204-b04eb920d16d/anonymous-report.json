@@ -1,0 +1,355 @@
+{
+  "schemaVersion": 1,
+  "mode": "REAL",
+  "status": "PASSED",
+  "scope": "One API JVM isolated candidate on deployment hardware; production provider + PLAN, manual task claims. Not complete-generation or multi-instance capacity.",
+  "configuredModel": "deepseek-flash",
+  "machine": {
+    "cpu": "Intel(R) Xeon(R) Gold 6234 CPU @ 3.30GHz",
+    "logicalCpus": 2,
+    "memoryBytes": 4106088448,
+    "kernel": "6.8.0-138-generic",
+    "node": "v24.22.1",
+    "processGroup": {
+      "cpuQuota": 1,
+      "memoryMaxBytes": 1610612736,
+      "memorySwapMaxBytes": 0,
+      "source": "actual cgroup v2 files"
+    },
+    "postgres": {
+      "cpuQuota": 0.5,
+      "memoryMaxBytes": 402653184,
+      "memorySwapMaxBytes": 402653184
+    }
+  },
+  "configuration": {
+    "maxAttempts": 8,
+    "queue": 32,
+    "budgetRmb": 2,
+    "instances": 1,
+    "userActive": 16,
+    "applicationActive": 8,
+    "modelConcurrencyPerProcess": 2
+  },
+  "command": {
+    "exitCode": 0,
+    "signal": null
+  },
+  "budget": {
+    "currency": "CNY",
+    "authorizedRmb": 2,
+    "maxAttempts": 8,
+    "maxInputTokenReservation": 33280,
+    "maxOutputTokens": 4096,
+    "peakInputRmbPerMillion": 2,
+    "peakOutputRmbPerMillion": 8
+  },
+  "financial": {
+    "currency": "CNY",
+    "reservedUpperRmb": 0.14172,
+    "knownUsageCostUpperRmb": 0.021248,
+    "unknownUsageCalls": 1,
+    "actualDebitedRmb": null,
+    "note": "Peak cache-miss tariff estimate; unknown usage retains reservation. Not a provider invoice. MOCK is not paid usage."
+  },
+  "provider": {
+    "attempted": 8,
+    "localRejections": 2,
+    "rejectionRate": 0.25,
+    "dispatched": 6,
+    "completed": 6,
+    "returned": 5,
+    "timeouts": 1,
+    "intervalSeconds": 7.391766452,
+    "completedInvocationsPerSecond": 0.8117139575448264,
+    "latencyMs": {
+      "n": 6,
+      "p50": 1813.332287,
+      "p95": 2609.02043,
+      "max": 2609.02043
+    },
+    "calls": [
+      {
+        "index": 1,
+        "outcome": "RETURNED",
+        "latencyMs": 2486.169196,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": "deepseek-flash",
+        "inputTokens": 1312,
+        "outputTokens": 163,
+        "totalTokens": 1475
+      },
+      {
+        "index": 2,
+        "outcome": "RETURNED",
+        "latencyMs": 2609.02043,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": "deepseek-flash",
+        "inputTokens": 1312,
+        "outputTokens": 189,
+        "totalTokens": 1501
+      },
+      {
+        "index": 3,
+        "outcome": "MODEL_CAPACITY_EXCEEDED",
+        "latencyMs": 0.162963,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null
+      },
+      {
+        "index": 4,
+        "outcome": "MODEL_CAPACITY_EXCEEDED",
+        "latencyMs": 0.085284,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null
+      },
+      {
+        "index": 5,
+        "outcome": "RETURNED",
+        "latencyMs": 1788.106749,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": "deepseek-flash",
+        "inputTokens": 1312,
+        "outputTokens": 225,
+        "totalTokens": 1537
+      },
+      {
+        "index": 6,
+        "outcome": "MODEL_TIMEOUT",
+        "latencyMs": 1.852297,
+        "inputReservation": 556,
+        "maxOutputTokens": 256,
+        "timeoutMs": 1,
+        "actualModel": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null
+      },
+      {
+        "index": 7,
+        "outcome": "RETURNED",
+        "latencyMs": 1813.332287,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": "deepseek-flash",
+        "inputTokens": 1312,
+        "outputTokens": 199,
+        "totalTokens": 1511
+      },
+      {
+        "index": 8,
+        "outcome": "RETURNED",
+        "latencyMs": 1910.662307,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": "deepseek-flash",
+        "inputTokens": 1312,
+        "outputTokens": 240,
+        "totalTokens": 1552
+      }
+    ]
+  },
+  "http": {
+    "samples": [
+      {
+        "status": 200,
+        "latencyMs": 67.575777,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 28.491217,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 78.398065,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 14.602911,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 25.835788,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 41.110423,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 19.487752,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 12.381844,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 7.930955,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 6.959102,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 60.503457,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 9.355748,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 10.854613,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 17.867211,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 54.582205,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 19.330621,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 15.117874,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 9.956891,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 60.619513,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 9.9354,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 6.708711,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 6.538468,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 5.707205,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 4.584462,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 7.462612,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 6.53438,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 43.603483,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 11.5172,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 5.537964,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 6.627565,
+        "overlapsOutstandingProvider": true
+      }
+    ],
+    "latencyMs": {
+      "n": 30,
+      "p50": 11.5172,
+      "p95": 67.575777,
+      "max": 78.398065
+    },
+    "overlapSamples": 30
+  },
+  "assertions": {
+    "modelRejectionMs-3": 33.926674,
+    "modelRejectionMs-4": 18.242436,
+    "cancelledAtNanos": 942202678071877,
+    "initialAResult": "PLAN_RETURNED",
+    "initialBResult": "PLAN_RETURNED",
+    "lateReplyCannotReviveCancelledTask": true,
+    "queuedTaskClaimedAfterCancellation": true,
+    "queue": {
+      "rejected": 1,
+      "accepted": 32,
+      "retryAfter": "1",
+      "status": 503,
+      "code": "TASK_QUEUE_FULL"
+    },
+    "afterCancellationCallOutcome": "PLAN_RETURNED",
+    "shortTimeoutOutcome": "MODEL_TIMEOUT",
+    "afterTimeoutCallOutcome": "PLAN_RETURNED",
+    "afterTimeoutParallelOutcome": "PLAN_RETURNED",
+    "completed": true
+  },
+  "failureClass": null,
+  "realModelQualityEvaluated": false,
+  "multiInstanceResult": "NOT_EXECUTED"
+}

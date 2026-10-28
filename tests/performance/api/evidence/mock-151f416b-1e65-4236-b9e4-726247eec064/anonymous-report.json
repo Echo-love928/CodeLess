@@ -1,0 +1,355 @@
+{
+  "schemaVersion": 1,
+  "mode": "MOCK",
+  "status": "PASSED",
+  "scope": "One API JVM isolated candidate on deployment hardware; production provider + PLAN, manual task claims. Not complete-generation or multi-instance capacity.",
+  "configuredModel": "plan-fixture-v1",
+  "machine": {
+    "cpu": "Intel(R) Xeon(R) Gold 6234 CPU @ 3.30GHz",
+    "logicalCpus": 2,
+    "memoryBytes": 4106088448,
+    "kernel": "6.8.0-138-generic",
+    "node": "v24.22.1",
+    "processGroup": {
+      "cpuQuota": 1,
+      "memoryMaxBytes": 1610612736,
+      "memorySwapMaxBytes": 0,
+      "source": "actual cgroup v2 files"
+    },
+    "postgres": {
+      "cpuQuota": 0.5,
+      "memoryMaxBytes": 402653184,
+      "memorySwapMaxBytes": 402653184
+    }
+  },
+  "configuration": {
+    "maxAttempts": 8,
+    "queue": 32,
+    "budgetRmb": 2,
+    "instances": 1,
+    "userActive": 16,
+    "applicationActive": 8,
+    "modelConcurrencyPerProcess": 2
+  },
+  "command": {
+    "exitCode": 0,
+    "signal": null
+  },
+  "budget": {
+    "currency": "CNY",
+    "authorizedRmb": 2,
+    "maxAttempts": 8,
+    "maxInputTokenReservation": 33280,
+    "maxOutputTokens": 4096,
+    "peakInputRmbPerMillion": 2,
+    "peakOutputRmbPerMillion": 8
+  },
+  "financial": {
+    "currency": "CNY",
+    "reservedUpperRmb": 0.14172,
+    "knownUsageCostUpperRmb": null,
+    "unknownUsageCalls": 6,
+    "actualDebitedRmb": null,
+    "note": "Peak cache-miss tariff estimate; unknown usage retains reservation. Not a provider invoice. MOCK is not paid usage."
+  },
+  "provider": {
+    "attempted": 8,
+    "localRejections": 2,
+    "rejectionRate": 0.25,
+    "dispatched": 6,
+    "completed": 6,
+    "returned": 5,
+    "timeouts": 1,
+    "intervalSeconds": 8.490445535,
+    "completedInvocationsPerSecond": 0.7066766962070855,
+    "latencyMs": {
+      "n": 6,
+      "p50": 2502.130423,
+      "p95": 2506.812479,
+      "max": 2506.812479
+    },
+    "calls": [
+      {
+        "index": 1,
+        "outcome": "RETURNED",
+        "latencyMs": 2506.812479,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": "plan-fixture-v1",
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null
+      },
+      {
+        "index": 2,
+        "outcome": "RETURNED",
+        "latencyMs": 2504.657153,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": "plan-fixture-v1",
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null
+      },
+      {
+        "index": 3,
+        "outcome": "MODEL_CAPACITY_EXCEEDED",
+        "latencyMs": 0.145928,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null
+      },
+      {
+        "index": 4,
+        "outcome": "MODEL_CAPACITY_EXCEEDED",
+        "latencyMs": 0.051621,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null
+      },
+      {
+        "index": 5,
+        "outcome": "RETURNED",
+        "latencyMs": 2501.572653,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": "plan-fixture-v1",
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null
+      },
+      {
+        "index": 6,
+        "outcome": "MODEL_TIMEOUT",
+        "latencyMs": 0.109395,
+        "inputReservation": 556,
+        "maxOutputTokens": 256,
+        "timeoutMs": 1,
+        "actualModel": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null
+      },
+      {
+        "index": 7,
+        "outcome": "RETURNED",
+        "latencyMs": 2502.130423,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": "plan-fixture-v1",
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null
+      },
+      {
+        "index": 8,
+        "outcome": "RETURNED",
+        "latencyMs": 2503.276889,
+        "inputReservation": 5664,
+        "maxOutputTokens": 2048,
+        "timeoutMs": 60000,
+        "actualModel": "plan-fixture-v1",
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null
+      }
+    ]
+  },
+  "http": {
+    "samples": [
+      {
+        "status": 200,
+        "latencyMs": 58.18966,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 27.021771,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 10.909902,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 8.075658,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 49.692171,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 9.428988,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 7.589417,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 6.393314,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 6.506009,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 7.29866,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 50.57744,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 14.125266,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 7.614024,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 7.15102,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 8.133378,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 6.439682,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 6.077903,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 6.944379,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 4.577935,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 49.651407,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 7.404936,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 4.669985,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 4.79612,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 4.260481,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 3.095884,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 4.560549,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 5.739748,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 3.468999,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 4.3487,
+        "overlapsOutstandingProvider": true
+      },
+      {
+        "status": 200,
+        "latencyMs": 43.184048,
+        "overlapsOutstandingProvider": true
+      }
+    ],
+    "latencyMs": {
+      "n": 30,
+      "p50": 7.15102,
+      "p95": 50.57744,
+      "max": 58.18966
+    },
+    "overlapSamples": 30
+  },
+  "assertions": {
+    "modelRejectionMs-3": 26.549301,
+    "modelRejectionMs-4": 9.656623,
+    "cancelledAtNanos": 942043621438751,
+    "initialAResult": "PLAN_RETURNED",
+    "initialBResult": "PLAN_RETURNED",
+    "lateReplyCannotReviveCancelledTask": true,
+    "queuedTaskClaimedAfterCancellation": true,
+    "queue": {
+      "rejected": 1,
+      "accepted": 32,
+      "retryAfter": "1",
+      "status": 503,
+      "code": "TASK_QUEUE_FULL"
+    },
+    "afterCancellationCallOutcome": "PLAN_RETURNED",
+    "shortTimeoutOutcome": "MODEL_TIMEOUT",
+    "afterTimeoutCallOutcome": "PLAN_RETURNED",
+    "afterTimeoutParallelOutcome": "PLAN_RETURNED",
+    "completed": true
+  },
+  "failureClass": null,
+  "realModelQualityEvaluated": false,
+  "multiInstanceResult": "NOT_EXECUTED"
+}

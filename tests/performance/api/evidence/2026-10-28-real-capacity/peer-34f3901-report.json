@@ -1,0 +1,1877 @@
+{
+  "scope": "A+B candidate on actual deployment hardware, isolated directory/database; no live cutover or public acceptance",
+  "modelProvider": "deterministic-mock",
+  "realModelThroughputVerified": false,
+  "paidModelRequests": 0,
+  "machine": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "release": "6.8.0-138-generic",
+    "cpu": "Intel(R) Xeon(R) Gold 6234 CPU @ 3.30GHz",
+    "logicalCpus": 2,
+    "memoryBytes": 4106088448,
+    "docker": {
+      "version": "29.9.2",
+      "os": "Ubuntu 24.04.5 LTS",
+      "cpus": 2,
+      "memoryBytes": 4106088448,
+      "driver": "overlayfs",
+      "cgroupVersion": "2"
+    }
+  },
+  "calibrationProcessBudget": {
+    "cpuQuotaCores": 1,
+    "memoryMaxBytes": 1610612736,
+    "note": "Docker jobs have separate unchanged limits; not a total-host memory limit"
+  },
+  "sources": {
+    "aProduction": "9c5cf47143810b27eee9666a13e1ba609d2698e3",
+    "aLatestReview": "f1c9be7d2b529ccd87e82c90c6a8039420787aaa",
+    "aProductionDiffToLatest": [],
+    "bProduction": "01aa4f944be469e8ceae87713f1e3d15d8769a77",
+    "publicationHarnessCommit": "43e30a5d0c8e7b25f0568105933a39a7c748638c",
+    "cpuStartupOverlay": {
+      "tests/performance/runner/support.mjs": "190db6311e0c43dc21da8d28f7c29ee704a008e6f6ca79243dea06bdf7cb24c7",
+      "tests/performance/runner/api-isolation.mjs": "0c27871b3ceb9665032d7cc0bf6d10b0c2a591d9c16006bcd5dd86fa55f72ef3"
+    },
+    "canonical": false,
+    "cpuStartupOverlayCommit": "32267bf66009260eb0c30db71c3ed07c98b1b5ac"
+  },
+  "capacity": {
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "defaultQueueLimit": 32,
+    "userActiveLimit": 16,
+    "appActiveLimit": 8,
+    "modelCallsPerProcessLimit": 2,
+    "admitted": 32,
+    "rejected": 1,
+    "querySamplesAtFullQueue": 100,
+    "queryPath": "repository/service with real PostgreSQL, not HTTP latency",
+    "queryP95MsAtFullQueue": 0.719355,
+    "slowModelHttpSamples": 30,
+    "slowModelHttpP95Ms": 40.578166,
+    "sseSamples": 10,
+    "sseP95Ms": 74.380322,
+    "samples": {
+      "admissionMsAtDefaultQueue": [
+        7.413521,
+        5.345509,
+        4.013638,
+        4.232401,
+        4.839117,
+        3.871817,
+        3.141697,
+        25.68792,
+        8.337572,
+        4.324356,
+        2.488079,
+        2.490192,
+        2.454497,
+        2.304355,
+        2.408379,
+        2.347097,
+        2.552004,
+        2.242275,
+        2.331839,
+        2.18787,
+        2.376753,
+        2.399403,
+        2.388617,
+        2.305753,
+        2.234759,
+        2.338681,
+        2.270207,
+        3.158739,
+        2.885916,
+        2.383846,
+        2.230475,
+        2.404937
+      ],
+      "queryMsAtQueueDepth32": [
+        1.249866,
+        0.746449,
+        0.738366,
+        0.719355,
+        0.754932,
+        0.698639,
+        0.655873,
+        0.71567,
+        0.695054,
+        0.636742,
+        0.508845,
+        0.542194,
+        0.564099,
+        0.468441,
+        0.478442,
+        0.483156,
+        0.555208,
+        0.550195,
+        0.519958,
+        0.464163,
+        0.531816,
+        0.486345,
+        0.506825,
+        0.466345,
+        0.528442,
+        0.448192,
+        0.513416,
+        0.424693,
+        0.496955,
+        0.466203,
+        0.48275,
+        0.455395,
+        0.615127,
+        0.486521,
+        0.533114,
+        0.461031,
+        0.527022,
+        0.466462,
+        0.500054,
+        0.616635,
+        0.520035,
+        0.459875,
+        0.498104,
+        0.533067,
+        0.585384,
+        0.4668,
+        0.488454,
+        0.462453,
+        0.505238,
+        0.465987,
+        0.525754,
+        0.47265,
+        0.555265,
+        0.542673,
+        0.594436,
+        0.490742,
+        0.463288,
+        0.445491,
+        0.4778,
+        0.436728,
+        0.471812,
+        0.429985,
+        0.498883,
+        0.470715,
+        0.504974,
+        0.468621,
+        0.540772,
+        0.444425,
+        0.444481,
+        0.419312,
+        0.409607,
+        0.462998,
+        0.518509,
+        0.480604,
+        0.445298,
+        0.47915,
+        0.443538,
+        0.469398,
+        0.547932,
+        0.804178,
+        0.537349,
+        0.455785,
+        0.461263,
+        0.443911,
+        0.450833,
+        0.512175,
+        0.46803,
+        0.474462,
+        0.458641,
+        0.46784,
+        0.439487,
+        0.706361,
+        0.44,
+        0.520381,
+        0.416391,
+        0.452781,
+        0.464173,
+        0.479941,
+        0.466153,
+        0.492009
+      ],
+      "nonModelHttpQueryMs": [
+        9.515,
+        12.225713,
+        6.936306,
+        8.263677,
+        7.63908,
+        4.759381,
+        9.994358,
+        9.378044,
+        4.95715,
+        3.970266,
+        31.475201,
+        11.295092,
+        6.070258,
+        4.470879,
+        6.401861,
+        5.184502,
+        4.504395,
+        5.419344,
+        9.683154,
+        5.883323,
+        40.578166,
+        9.865442,
+        11.628188,
+        6.692136,
+        7.01697,
+        6.708543,
+        9.052519,
+        6.642273,
+        43.536836,
+        9.922372
+      ],
+      "sseReconnectToFirstEventMs": [
+        74.380322,
+        20.019018,
+        10.481347,
+        63.859515,
+        22.586073,
+        8.618798,
+        10.843803,
+        61.044865,
+        12.675719,
+        12.582152
+      ]
+    }
+  },
+  "worker": {
+    "tests": 4,
+    "samples": [
+      {
+        "owner": "A",
+        "temperature": "first-container",
+        "profile": "default",
+        "buildMs": 7395.2844239999995,
+        "browserIncludingScreenshotMs": 1898.5308870000008,
+        "screenshotMs": 53.97044499999993,
+        "passed": true
+      },
+      {
+        "owner": "A",
+        "temperature": "warm-image",
+        "profile": "default",
+        "buildMs": 7415.372038000001,
+        "browserIncludingScreenshotMs": 1561.772119000001,
+        "screenshotMs": 60.85723400000006,
+        "passed": true
+      },
+      {
+        "owner": "B",
+        "temperature": "warm-image",
+        "profile": "default",
+        "buildMs": 6804.246651999998,
+        "browserIncludingScreenshotMs": 1510.2751070000013,
+        "screenshotMs": 51.72022500000003,
+        "passed": true
+      },
+      {
+        "owner": "A",
+        "temperature": "warm-image",
+        "profile": "trial",
+        "buildMs": 7042.481754,
+        "browserIncludingScreenshotMs": 1576.097544999997,
+        "screenshotMs": 48.70904500000006,
+        "passed": true
+      }
+    ],
+    "resources": [
+      {
+        "mode": "timeout",
+        "passed": true
+      },
+      {
+        "mode": "logs",
+        "passed": true
+      },
+      {
+        "mode": "memory",
+        "passed": true
+      }
+    ],
+    "profileValidationPassed": true,
+    "ownedRootRemoved": true
+  },
+  "apiIsolation": {
+    "httpSamples": 80,
+    "http200": 80,
+    "oomConfirmedSamples": 10,
+    "cpuBarrierSamples": 10,
+    "cleanupErrors": [],
+    "apiProductionSourceChanged": false,
+    "samples": [
+      {
+        "phase": "baseline",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 30.62205299999914,
+        "startedAt": "2026-10-28T07:12:33.440Z",
+        "completedAt": "2026-10-28T07:12:33.472Z",
+        "monotonicStartMs": 28865.020744,
+        "monotonicEndMs": 28897.414215,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "baseline",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 23.283479000001535,
+        "startedAt": "2026-10-28T07:12:33.472Z",
+        "completedAt": "2026-10-28T07:12:33.495Z",
+        "monotonicStartMs": 28897.465482,
+        "monotonicEndMs": 28920.769623,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "baseline",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 6.766478999998071,
+        "startedAt": "2026-10-28T07:12:33.495Z",
+        "completedAt": "2026-10-28T07:12:33.502Z",
+        "monotonicStartMs": 28920.782079,
+        "monotonicEndMs": 28927.565694,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "baseline",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 8.060957999998209,
+        "startedAt": "2026-10-28T07:12:33.502Z",
+        "completedAt": "2026-10-28T07:12:33.510Z",
+        "monotonicStartMs": 28927.575073,
+        "monotonicEndMs": 28935.652505,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "baseline",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 3.6363210000017716,
+        "startedAt": "2026-10-28T07:12:33.510Z",
+        "completedAt": "2026-10-28T07:12:33.514Z",
+        "monotonicStartMs": 28935.662254,
+        "monotonicEndMs": 28939.313159,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "baseline",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 61.58440200000041,
+        "startedAt": "2026-10-28T07:12:33.514Z",
+        "completedAt": "2026-10-28T07:12:33.575Z",
+        "monotonicStartMs": 28939.319954,
+        "monotonicEndMs": 29000.926738,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "baseline",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 4.933566000003339,
+        "startedAt": "2026-10-28T07:12:33.575Z",
+        "completedAt": "2026-10-28T07:12:33.580Z",
+        "monotonicStartMs": 29000.943427,
+        "monotonicEndMs": 29005.910635,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "baseline",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 8.937801000000036,
+        "startedAt": "2026-10-28T07:12:33.580Z",
+        "completedAt": "2026-10-28T07:12:33.589Z",
+        "monotonicStartMs": 29005.920765,
+        "monotonicEndMs": 29014.877232,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "baseline",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 5.588335999997071,
+        "startedAt": "2026-10-28T07:12:33.589Z",
+        "completedAt": "2026-10-28T07:12:33.595Z",
+        "monotonicStartMs": 29014.88531,
+        "monotonicEndMs": 29020.488754,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "baseline",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 7.399961999999505,
+        "startedAt": "2026-10-28T07:12:33.595Z",
+        "completedAt": "2026-10-28T07:12:33.602Z",
+        "monotonicStartMs": 29020.495866,
+        "monotonicEndMs": 29027.927075,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "timeout-after-cpu-barrier",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 6.49002499999915,
+        "startedAt": "2026-10-28T07:12:34.936Z",
+        "completedAt": "2026-10-28T07:12:34.943Z",
+        "monotonicStartMs": 30361.731203,
+        "monotonicEndMs": 30368.248183,
+        "barrierKind": "CPU_USAGE_AND_LOOP_CHILD",
+        "barrierMonotonicMs": 30340.269484,
+        "containerId": "11b081058ad5b3eeaf851c6eea37b06e7b62d848221dde5f5e30583a6720e75e",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "timeout-after-cpu-barrier",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 8.881492000000435,
+        "startedAt": "2026-10-28T07:12:34.943Z",
+        "completedAt": "2026-10-28T07:12:34.952Z",
+        "monotonicStartMs": 30368.262945,
+        "monotonicEndMs": 30377.159088,
+        "barrierKind": "CPU_USAGE_AND_LOOP_CHILD",
+        "barrierMonotonicMs": 30340.269484,
+        "containerId": "11b081058ad5b3eeaf851c6eea37b06e7b62d848221dde5f5e30583a6720e75e",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "timeout-after-cpu-barrier",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 6.881875999999465,
+        "startedAt": "2026-10-28T07:12:34.952Z",
+        "completedAt": "2026-10-28T07:12:34.959Z",
+        "monotonicStartMs": 30377.166607,
+        "monotonicEndMs": 30384.05686,
+        "barrierKind": "CPU_USAGE_AND_LOOP_CHILD",
+        "barrierMonotonicMs": 30340.269484,
+        "containerId": "11b081058ad5b3eeaf851c6eea37b06e7b62d848221dde5f5e30583a6720e75e",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "timeout-after-cpu-barrier",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 7.958824999997887,
+        "startedAt": "2026-10-28T07:12:34.959Z",
+        "completedAt": "2026-10-28T07:12:34.967Z",
+        "monotonicStartMs": 30384.062019,
+        "monotonicEndMs": 30392.028301,
+        "barrierKind": "CPU_USAGE_AND_LOOP_CHILD",
+        "barrierMonotonicMs": 30340.269484,
+        "containerId": "11b081058ad5b3eeaf851c6eea37b06e7b62d848221dde5f5e30583a6720e75e",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "timeout-after-cpu-barrier",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 10.637975999998162,
+        "startedAt": "2026-10-28T07:12:34.967Z",
+        "completedAt": "2026-10-28T07:12:34.977Z",
+        "monotonicStartMs": 30392.033134,
+        "monotonicEndMs": 30402.679672,
+        "barrierKind": "CPU_USAGE_AND_LOOP_CHILD",
+        "barrierMonotonicMs": 30340.269484,
+        "containerId": "11b081058ad5b3eeaf851c6eea37b06e7b62d848221dde5f5e30583a6720e75e",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "timeout-after-cpu-barrier",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 9.453484000001481,
+        "startedAt": "2026-10-28T07:12:34.977Z",
+        "completedAt": "2026-10-28T07:12:34.987Z",
+        "monotonicStartMs": 30402.684798,
+        "monotonicEndMs": 30412.14667,
+        "barrierKind": "CPU_USAGE_AND_LOOP_CHILD",
+        "barrierMonotonicMs": 30340.269484,
+        "containerId": "11b081058ad5b3eeaf851c6eea37b06e7b62d848221dde5f5e30583a6720e75e",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "timeout-after-cpu-barrier",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 5.887082000001101,
+        "startedAt": "2026-10-28T07:12:34.987Z",
+        "completedAt": "2026-10-28T07:12:34.993Z",
+        "monotonicStartMs": 30412.15249,
+        "monotonicEndMs": 30418.047536,
+        "barrierKind": "CPU_USAGE_AND_LOOP_CHILD",
+        "barrierMonotonicMs": 30340.269484,
+        "containerId": "11b081058ad5b3eeaf851c6eea37b06e7b62d848221dde5f5e30583a6720e75e",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "timeout-after-cpu-barrier",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 3.996791999998095,
+        "startedAt": "2026-10-28T07:12:34.993Z",
+        "completedAt": "2026-10-28T07:12:34.997Z",
+        "monotonicStartMs": 30418.052293,
+        "monotonicEndMs": 30422.056554,
+        "barrierKind": "CPU_USAGE_AND_LOOP_CHILD",
+        "barrierMonotonicMs": 30340.269484,
+        "containerId": "11b081058ad5b3eeaf851c6eea37b06e7b62d848221dde5f5e30583a6720e75e",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "timeout-after-cpu-barrier",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 5.363016999999672,
+        "startedAt": "2026-10-28T07:12:34.997Z",
+        "completedAt": "2026-10-28T07:12:35.002Z",
+        "monotonicStartMs": 30422.062094,
+        "monotonicEndMs": 30427.432045,
+        "barrierKind": "CPU_USAGE_AND_LOOP_CHILD",
+        "barrierMonotonicMs": 30340.269484,
+        "containerId": "11b081058ad5b3eeaf851c6eea37b06e7b62d848221dde5f5e30583a6720e75e",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "timeout-after-cpu-barrier",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 8.049277000001894,
+        "startedAt": "2026-10-28T07:12:35.002Z",
+        "completedAt": "2026-10-28T07:12:35.010Z",
+        "monotonicStartMs": 30427.437142,
+        "monotonicEndMs": 30435.493415,
+        "barrierKind": "CPU_USAGE_AND_LOOP_CHILD",
+        "barrierMonotonicMs": 30340.269484,
+        "containerId": "11b081058ad5b3eeaf851c6eea37b06e7b62d848221dde5f5e30583a6720e75e",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "timeout-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 8.101532999993651,
+        "startedAt": "2026-10-28T07:12:42.002Z",
+        "completedAt": "2026-10-28T07:12:42.010Z",
+        "monotonicStartMs": 37427.272813,
+        "monotonicEndMs": 37435.388666,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "timeout-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 6.106112999994366,
+        "startedAt": "2026-10-28T07:12:42.010Z",
+        "completedAt": "2026-10-28T07:12:42.016Z",
+        "monotonicStartMs": 37435.398457,
+        "monotonicEndMs": 37441.519426,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "timeout-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 4.055116999996244,
+        "startedAt": "2026-10-28T07:12:42.016Z",
+        "completedAt": "2026-10-28T07:12:42.020Z",
+        "monotonicStartMs": 37441.530014,
+        "monotonicEndMs": 37445.596178,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "timeout-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 3.998794999999518,
+        "startedAt": "2026-10-28T07:12:42.020Z",
+        "completedAt": "2026-10-28T07:12:42.024Z",
+        "monotonicStartMs": 37445.604608,
+        "monotonicEndMs": 37449.613782,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "timeout-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 2.754855999999563,
+        "startedAt": "2026-10-28T07:12:42.024Z",
+        "completedAt": "2026-10-28T07:12:42.027Z",
+        "monotonicStartMs": 37449.620322,
+        "monotonicEndMs": 37452.382181,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "timeout-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 3.2853610000020126,
+        "startedAt": "2026-10-28T07:12:42.027Z",
+        "completedAt": "2026-10-28T07:12:42.030Z",
+        "monotonicStartMs": 37452.3868,
+        "monotonicEndMs": 37455.679237,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "timeout-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 2.2770149999996647,
+        "startedAt": "2026-10-28T07:12:42.030Z",
+        "completedAt": "2026-10-28T07:12:42.032Z",
+        "monotonicStartMs": 37455.68348,
+        "monotonicEndMs": 37457.967406,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "timeout-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 6.055995999995503,
+        "startedAt": "2026-10-28T07:12:42.032Z",
+        "completedAt": "2026-10-28T07:12:42.039Z",
+        "monotonicStartMs": 37457.971704,
+        "monotonicEndMs": 37464.035064,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "timeout-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 2.495203999998921,
+        "startedAt": "2026-10-28T07:12:42.039Z",
+        "completedAt": "2026-10-28T07:12:42.041Z",
+        "monotonicStartMs": 37464.039607,
+        "monotonicEndMs": 37466.546476,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "timeout-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 26.415268999997352,
+        "startedAt": "2026-10-28T07:12:42.041Z",
+        "completedAt": "2026-10-28T07:12:42.067Z",
+        "monotonicStartMs": 37466.553396,
+        "monotonicEndMs": 37492.983252,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-control-before-pressure-release",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 5.289134999999078,
+        "startedAt": "2026-10-28T07:12:42.349Z",
+        "completedAt": "2026-10-28T07:12:42.354Z",
+        "monotonicStartMs": 37774.060215,
+        "monotonicEndMs": 37779.362306,
+        "barrierKind": "PRESSURE_HELD_NEGATIVE_CONTROL",
+        "barrierMonotonicMs": 37752.208285,
+        "containerId": "d0ab2e5db7a6aac23d893a2987e8d5a78c2139e3d50c3132888df8abd06c72a2",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-control-before-pressure-release",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 6.155022999999346,
+        "startedAt": "2026-10-28T07:12:42.354Z",
+        "completedAt": "2026-10-28T07:12:42.360Z",
+        "monotonicStartMs": 37779.37842,
+        "monotonicEndMs": 37785.542244,
+        "barrierKind": "PRESSURE_HELD_NEGATIVE_CONTROL",
+        "barrierMonotonicMs": 37752.208285,
+        "containerId": "d0ab2e5db7a6aac23d893a2987e8d5a78c2139e3d50c3132888df8abd06c72a2",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-control-before-pressure-release",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 3.0380129999975907,
+        "startedAt": "2026-10-28T07:12:42.360Z",
+        "completedAt": "2026-10-28T07:12:42.363Z",
+        "monotonicStartMs": 37785.548948,
+        "monotonicEndMs": 37788.594814,
+        "barrierKind": "PRESSURE_HELD_NEGATIVE_CONTROL",
+        "barrierMonotonicMs": 37752.208285,
+        "containerId": "d0ab2e5db7a6aac23d893a2987e8d5a78c2139e3d50c3132888df8abd06c72a2",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-control-before-pressure-release",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 3.4069759999983944,
+        "startedAt": "2026-10-28T07:12:42.363Z",
+        "completedAt": "2026-10-28T07:12:42.366Z",
+        "monotonicStartMs": 37788.600264,
+        "monotonicEndMs": 37792.014053,
+        "barrierKind": "PRESSURE_HELD_NEGATIVE_CONTROL",
+        "barrierMonotonicMs": 37752.208285,
+        "containerId": "d0ab2e5db7a6aac23d893a2987e8d5a78c2139e3d50c3132888df8abd06c72a2",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-control-before-pressure-release",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 1.9859890000006999,
+        "startedAt": "2026-10-28T07:12:42.366Z",
+        "completedAt": "2026-10-28T07:12:42.368Z",
+        "monotonicStartMs": 37792.018455,
+        "monotonicEndMs": 37794.012571,
+        "barrierKind": "PRESSURE_HELD_NEGATIVE_CONTROL",
+        "barrierMonotonicMs": 37752.208285,
+        "containerId": "d0ab2e5db7a6aac23d893a2987e8d5a78c2139e3d50c3132888df8abd06c72a2",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-control-before-pressure-release",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 3.971113999999943,
+        "startedAt": "2026-10-28T07:12:42.368Z",
+        "completedAt": "2026-10-28T07:12:42.372Z",
+        "monotonicStartMs": 37794.01764,
+        "monotonicEndMs": 37797.995383,
+        "barrierKind": "PRESSURE_HELD_NEGATIVE_CONTROL",
+        "barrierMonotonicMs": 37752.208285,
+        "containerId": "d0ab2e5db7a6aac23d893a2987e8d5a78c2139e3d50c3132888df8abd06c72a2",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-control-before-pressure-release",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 5.357523999999103,
+        "startedAt": "2026-10-28T07:12:42.372Z",
+        "completedAt": "2026-10-28T07:12:42.378Z",
+        "monotonicStartMs": 37797.999556,
+        "monotonicEndMs": 37803.36402,
+        "barrierKind": "PRESSURE_HELD_NEGATIVE_CONTROL",
+        "barrierMonotonicMs": 37752.208285,
+        "containerId": "d0ab2e5db7a6aac23d893a2987e8d5a78c2139e3d50c3132888df8abd06c72a2",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-control-before-pressure-release",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 5.078237000001536,
+        "startedAt": "2026-10-28T07:12:42.378Z",
+        "completedAt": "2026-10-28T07:12:42.383Z",
+        "monotonicStartMs": 37803.368591,
+        "monotonicEndMs": 37808.453814,
+        "barrierKind": "PRESSURE_HELD_NEGATIVE_CONTROL",
+        "barrierMonotonicMs": 37752.208285,
+        "containerId": "d0ab2e5db7a6aac23d893a2987e8d5a78c2139e3d50c3132888df8abd06c72a2",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-control-before-pressure-release",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 2.7056270000030054,
+        "startedAt": "2026-10-28T07:12:42.383Z",
+        "completedAt": "2026-10-28T07:12:42.386Z",
+        "monotonicStartMs": 37808.458043,
+        "monotonicEndMs": 37811.170449,
+        "barrierKind": "PRESSURE_HELD_NEGATIVE_CONTROL",
+        "barrierMonotonicMs": 37752.208285,
+        "containerId": "d0ab2e5db7a6aac23d893a2987e8d5a78c2139e3d50c3132888df8abd06c72a2",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-control-before-pressure-release",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 4.201591999997618,
+        "startedAt": "2026-10-28T07:12:42.386Z",
+        "completedAt": "2026-10-28T07:12:42.390Z",
+        "monotonicStartMs": 37811.174674,
+        "monotonicEndMs": 37815.382838,
+        "barrierKind": "PRESSURE_HELD_NEGATIVE_CONTROL",
+        "barrierMonotonicMs": 37752.208285,
+        "containerId": "d0ab2e5db7a6aac23d893a2987e8d5a78c2139e3d50c3132888df8abd06c72a2",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-control-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 7.0053010000046925,
+        "startedAt": "2026-10-28T07:12:43.641Z",
+        "completedAt": "2026-10-28T07:12:43.648Z",
+        "monotonicStartMs": 39066.804648,
+        "monotonicEndMs": 39073.833874,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-control-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 5.003905000005034,
+        "startedAt": "2026-10-28T07:12:43.648Z",
+        "completedAt": "2026-10-28T07:12:43.653Z",
+        "monotonicStartMs": 39073.84454,
+        "monotonicEndMs": 39078.858692,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-control-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 2.5812999999980093,
+        "startedAt": "2026-10-28T07:12:43.653Z",
+        "completedAt": "2026-10-28T07:12:43.656Z",
+        "monotonicStartMs": 39078.86505,
+        "monotonicEndMs": 39081.454189,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-control-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 7.183811000002606,
+        "startedAt": "2026-10-28T07:12:43.656Z",
+        "completedAt": "2026-10-28T07:12:43.663Z",
+        "monotonicStartMs": 39081.459704,
+        "monotonicEndMs": 39088.651745,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-control-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 2.9390330000023823,
+        "startedAt": "2026-10-28T07:12:43.663Z",
+        "completedAt": "2026-10-28T07:12:43.666Z",
+        "monotonicStartMs": 39088.661901,
+        "monotonicEndMs": 39091.608029,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-control-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 4.943465999996988,
+        "startedAt": "2026-10-28T07:12:43.666Z",
+        "completedAt": "2026-10-28T07:12:43.671Z",
+        "monotonicStartMs": 39091.612232,
+        "monotonicEndMs": 39096.573227,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-control-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 3.742721000002348,
+        "startedAt": "2026-10-28T07:12:43.671Z",
+        "completedAt": "2026-10-28T07:12:43.675Z",
+        "monotonicStartMs": 39096.584631,
+        "monotonicEndMs": 39100.344517,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-control-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 7.756590000004508,
+        "startedAt": "2026-10-28T07:12:43.675Z",
+        "completedAt": "2026-10-28T07:12:43.683Z",
+        "monotonicStartMs": 39100.35483,
+        "monotonicEndMs": 39108.129289,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-control-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 3.523801999996067,
+        "startedAt": "2026-10-28T07:12:43.683Z",
+        "completedAt": "2026-10-28T07:12:43.686Z",
+        "monotonicStartMs": 39108.140696,
+        "monotonicEndMs": 39111.675076,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-control-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 5.395140000000538,
+        "startedAt": "2026-10-28T07:12:43.686Z",
+        "completedAt": "2026-10-28T07:12:43.692Z",
+        "monotonicStartMs": 39111.681802,
+        "monotonicEndMs": 39117.087915,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-after-oom-confirmation",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 5.558240000005753,
+        "startedAt": "2026-10-28T07:12:44.939Z",
+        "completedAt": "2026-10-28T07:12:44.944Z",
+        "monotonicStartMs": 40364.30338,
+        "monotonicEndMs": 40369.875849,
+        "barrierKind": "RUNNING_OOMKILLED_AND_CGROUP_OOM_KILL",
+        "barrierMonotonicMs": 40118.266934,
+        "containerId": "a6b75a0ef5912039614270852db1202f916d1c919bf845e90a5b2e343d0a6efb",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-after-oom-confirmation",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 5.650408999994397,
+        "startedAt": "2026-10-28T07:12:44.944Z",
+        "completedAt": "2026-10-28T07:12:44.950Z",
+        "monotonicStartMs": 40369.889967,
+        "monotonicEndMs": 40375.549516,
+        "barrierKind": "RUNNING_OOMKILLED_AND_CGROUP_OOM_KILL",
+        "barrierMonotonicMs": 40118.266934,
+        "containerId": "a6b75a0ef5912039614270852db1202f916d1c919bf845e90a5b2e343d0a6efb",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-after-oom-confirmation",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 2.625863000001118,
+        "startedAt": "2026-10-28T07:12:44.950Z",
+        "completedAt": "2026-10-28T07:12:44.953Z",
+        "monotonicStartMs": 40375.557516,
+        "monotonicEndMs": 40378.191392,
+        "barrierKind": "RUNNING_OOMKILLED_AND_CGROUP_OOM_KILL",
+        "barrierMonotonicMs": 40118.266934,
+        "containerId": "a6b75a0ef5912039614270852db1202f916d1c919bf845e90a5b2e343d0a6efb",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-after-oom-confirmation",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 3.3345699999990757,
+        "startedAt": "2026-10-28T07:12:44.953Z",
+        "completedAt": "2026-10-28T07:12:44.956Z",
+        "monotonicStartMs": 40378.196479,
+        "monotonicEndMs": 40381.53868,
+        "barrierKind": "RUNNING_OOMKILLED_AND_CGROUP_OOM_KILL",
+        "barrierMonotonicMs": 40118.266934,
+        "containerId": "a6b75a0ef5912039614270852db1202f916d1c919bf845e90a5b2e343d0a6efb",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-after-oom-confirmation",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 2.603320000001986,
+        "startedAt": "2026-10-28T07:12:44.956Z",
+        "completedAt": "2026-10-28T07:12:44.959Z",
+        "monotonicStartMs": 40381.543589,
+        "monotonicEndMs": 40384.155225,
+        "barrierKind": "RUNNING_OOMKILLED_AND_CGROUP_OOM_KILL",
+        "barrierMonotonicMs": 40118.266934,
+        "containerId": "a6b75a0ef5912039614270852db1202f916d1c919bf845e90a5b2e343d0a6efb",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-after-oom-confirmation",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 3.817760999998427,
+        "startedAt": "2026-10-28T07:12:44.959Z",
+        "completedAt": "2026-10-28T07:12:44.962Z",
+        "monotonicStartMs": 40384.160547,
+        "monotonicEndMs": 40387.985448,
+        "barrierKind": "RUNNING_OOMKILLED_AND_CGROUP_OOM_KILL",
+        "barrierMonotonicMs": 40118.266934,
+        "containerId": "a6b75a0ef5912039614270852db1202f916d1c919bf845e90a5b2e343d0a6efb",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-after-oom-confirmation",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 5.166360000002896,
+        "startedAt": "2026-10-28T07:12:44.962Z",
+        "completedAt": "2026-10-28T07:12:44.968Z",
+        "monotonicStartMs": 40387.990094,
+        "monotonicEndMs": 40393.163486,
+        "barrierKind": "RUNNING_OOMKILLED_AND_CGROUP_OOM_KILL",
+        "barrierMonotonicMs": 40118.266934,
+        "containerId": "a6b75a0ef5912039614270852db1202f916d1c919bf845e90a5b2e343d0a6efb",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-after-oom-confirmation",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 7.04621600000246,
+        "startedAt": "2026-10-28T07:12:44.968Z",
+        "completedAt": "2026-10-28T07:12:44.975Z",
+        "monotonicStartMs": 40393.168762,
+        "monotonicEndMs": 40400.221891,
+        "barrierKind": "RUNNING_OOMKILLED_AND_CGROUP_OOM_KILL",
+        "barrierMonotonicMs": 40118.266934,
+        "containerId": "a6b75a0ef5912039614270852db1202f916d1c919bf845e90a5b2e343d0a6efb",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-after-oom-confirmation",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 2.7915540000030887,
+        "startedAt": "2026-10-28T07:12:44.975Z",
+        "completedAt": "2026-10-28T07:12:44.977Z",
+        "monotonicStartMs": 40400.226768,
+        "monotonicEndMs": 40403.025098,
+        "barrierKind": "RUNNING_OOMKILLED_AND_CGROUP_OOM_KILL",
+        "barrierMonotonicMs": 40118.266934,
+        "containerId": "a6b75a0ef5912039614270852db1202f916d1c919bf845e90a5b2e343d0a6efb",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-after-oom-confirmation",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 4.515142999996897,
+        "startedAt": "2026-10-28T07:12:44.978Z",
+        "completedAt": "2026-10-28T07:12:44.982Z",
+        "monotonicStartMs": 40403.029623,
+        "monotonicEndMs": 40407.551455,
+        "barrierKind": "RUNNING_OOMKILLED_AND_CGROUP_OOM_KILL",
+        "barrierMonotonicMs": 40118.266934,
+        "containerId": "a6b75a0ef5912039614270852db1202f916d1c919bf845e90a5b2e343d0a6efb",
+        "runningAtGroupStart": true
+      },
+      {
+        "phase": "memory-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 5.7511150000063935,
+        "startedAt": "2026-10-28T07:12:45.213Z",
+        "completedAt": "2026-10-28T07:12:45.218Z",
+        "monotonicStartMs": 40638.126797,
+        "monotonicEndMs": 40643.891246,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 6.544485999998869,
+        "startedAt": "2026-10-28T07:12:45.218Z",
+        "completedAt": "2026-10-28T07:12:45.225Z",
+        "monotonicStartMs": 40643.90215,
+        "monotonicEndMs": 40650.45467,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 3.1842040000046836,
+        "startedAt": "2026-10-28T07:12:45.225Z",
+        "completedAt": "2026-10-28T07:12:45.228Z",
+        "monotonicStartMs": 40650.460429,
+        "monotonicEndMs": 40653.652416,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 3.4383529999977327,
+        "startedAt": "2026-10-28T07:12:45.228Z",
+        "completedAt": "2026-10-28T07:12:45.232Z",
+        "monotonicStartMs": 40653.656858,
+        "monotonicEndMs": 40657.102786,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 2.9029410000002827,
+        "startedAt": "2026-10-28T07:12:45.232Z",
+        "completedAt": "2026-10-28T07:12:45.234Z",
+        "monotonicStartMs": 40657.106877,
+        "monotonicEndMs": 40660.016828,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 2.8394739999930607,
+        "startedAt": "2026-10-28T07:12:45.235Z",
+        "completedAt": "2026-10-28T07:12:45.237Z",
+        "monotonicStartMs": 40660.024813,
+        "monotonicEndMs": 40662.871395,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 1.8297769999990123,
+        "startedAt": "2026-10-28T07:12:45.237Z",
+        "completedAt": "2026-10-28T07:12:45.239Z",
+        "monotonicStartMs": 40662.878131,
+        "monotonicEndMs": 40664.715511,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 3.4623500000016065,
+        "startedAt": "2026-10-28T07:12:45.239Z",
+        "completedAt": "2026-10-28T07:12:45.243Z",
+        "monotonicStartMs": 40664.720267,
+        "monotonicEndMs": 40668.189242,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-after-cleanup",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 2.15281299999333,
+        "startedAt": "2026-10-28T07:12:45.243Z",
+        "completedAt": "2026-10-28T07:12:45.245Z",
+        "monotonicStartMs": 40668.19327,
+        "monotonicEndMs": 40670.352406,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "memory-after-cleanup",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 5.362495000001218,
+        "startedAt": "2026-10-28T07:12:45.245Z",
+        "completedAt": "2026-10-28T07:12:45.250Z",
+        "monotonicStartMs": 40670.356584,
+        "monotonicEndMs": 40675.726112,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "after",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 1.9499920000016573,
+        "startedAt": "2026-10-28T07:12:45.250Z",
+        "completedAt": "2026-10-28T07:12:45.252Z",
+        "monotonicStartMs": 40675.737923,
+        "monotonicEndMs": 40677.711303,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "after",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 11.62093399999867,
+        "startedAt": "2026-10-28T07:12:45.252Z",
+        "completedAt": "2026-10-28T07:12:45.264Z",
+        "monotonicStartMs": 40677.715513,
+        "monotonicEndMs": 40689.345004,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "after",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 3.2702659999995376,
+        "startedAt": "2026-10-28T07:12:45.264Z",
+        "completedAt": "2026-10-28T07:12:45.267Z",
+        "monotonicStartMs": 40689.350503,
+        "monotonicEndMs": 40692.628869,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "after",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 4.529686999994738,
+        "startedAt": "2026-10-28T07:12:45.267Z",
+        "completedAt": "2026-10-28T07:12:45.272Z",
+        "monotonicStartMs": 40692.634376,
+        "monotonicEndMs": 40697.171725,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "after",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 1.9109820000012405,
+        "startedAt": "2026-10-28T07:12:45.272Z",
+        "completedAt": "2026-10-28T07:12:45.274Z",
+        "monotonicStartMs": 40697.177265,
+        "monotonicEndMs": 40699.094688,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "after",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 2.5544149999986985,
+        "startedAt": "2026-10-28T07:12:45.274Z",
+        "completedAt": "2026-10-28T07:12:45.276Z",
+        "monotonicStartMs": 40699.098616,
+        "monotonicEndMs": 40701.65959,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "after",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 2.3110390000001644,
+        "startedAt": "2026-10-28T07:12:45.276Z",
+        "completedAt": "2026-10-28T07:12:45.278Z",
+        "monotonicStartMs": 40701.6641,
+        "monotonicEndMs": 40703.981695,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "after",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 3.231940999998187,
+        "startedAt": "2026-10-28T07:12:45.278Z",
+        "completedAt": "2026-10-28T07:12:45.282Z",
+        "monotonicStartMs": 40703.985799,
+        "monotonicEndMs": 40707.225376,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "after",
+        "path": "/api/v0/auth/me",
+        "status": 200,
+        "elapsedMs": 2.080797000002349,
+        "startedAt": "2026-10-28T07:12:45.282Z",
+        "completedAt": "2026-10-28T07:12:45.284Z",
+        "monotonicStartMs": 40707.229873,
+        "monotonicEndMs": 40709.317321,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      },
+      {
+        "phase": "after",
+        "path": "/api/v0/applications",
+        "status": 200,
+        "elapsedMs": 3.6957469999979367,
+        "startedAt": "2026-10-28T07:12:45.284Z",
+        "completedAt": "2026-10-28T07:12:45.287Z",
+        "monotonicStartMs": 40709.321463,
+        "monotonicEndMs": 40713.023931,
+        "barrierKind": null,
+        "barrierMonotonicMs": null,
+        "containerId": null,
+        "runningAtGroupStart": null
+      }
+    ],
+    "status": "PASSED",
+    "reportKind": "ANONYMIZED_DERIVATIVE",
+    "faults": [
+      {
+        "mode": "timeout",
+        "observed": {
+          "value": {
+            "barrier": {
+              "kind": "CPU_USAGE_AND_LOOP_CHILD",
+              "monotonicMs": 30340.269484,
+              "observedAt": "2026-10-28T07:12:34.915Z",
+              "top": "PID                 PPID                COMMAND\n3758960             3758931             node /opt/codeless/pressure-entry.mjs\n3758993             3758960             node -e while(true) {}",
+              "startupObservations": [
+                {
+                  "monotonicMs": 29349.540011,
+                  "observedAt": "2026-10-28T07:12:33.924Z",
+                  "top": "PID                 PPID                COMMAND\n3758960             3758931             node /opt/codeless/pressure-entry.mjs"
+                },
+                {
+                  "monotonicMs": 29459.010713,
+                  "observedAt": "2026-10-28T07:12:34.033Z",
+                  "top": "PID                 PPID                COMMAND\n3758960             3758931             node /opt/codeless/pressure-entry.mjs\n3758993             3758960             node -e while(true) {}"
+                }
+              ],
+              "before": "usage_usec 495076\nuser_usec 443893\nsystem_usec 51183\ncore_sched.force_idle_usec 0\nnr_periods 5\nnr_throttled 3\nthrottled_usec 225224\nnr_bursts 0\nburst_usec 0\n",
+              "after": "usage_usec 1095932\nuser_usec 1025424\nsystem_usec 70507\ncore_sched.force_idle_usec 0\nnr_periods 11\nnr_throttled 9\nthrottled_usec 771458\nnr_bursts 0\nburst_usec 0\n"
+            },
+            "afterQueries": {
+              "Status": "running",
+              "Running": true,
+              "Paused": false,
+              "Restarting": false,
+              "OOMKilled": false,
+              "Dead": false,
+              "Pid": 3758960,
+              "ExitCode": 0,
+              "Error": "",
+              "StartedAt": "2026-10-28T07:12:33.791746051Z",
+              "FinishedAt": "0001-01-01T00:00:00Z"
+            }
+          }
+        },
+        "result": {
+          "status": "FAILED",
+          "failure": "TIMEOUT",
+          "exitCode": 137,
+          "artifact": null,
+          "cleanup": {
+            "containerRemoved": true,
+            "workspaceRemoved": true,
+            "errors": []
+          },
+          "completedAt": "2026-10-28T07:12:41.976Z"
+        }
+      },
+      {
+        "mode": "memory-control",
+        "observed": {
+          "value": {
+            "held": {
+              "kind": "PRESSURE_HELD_NEGATIVE_CONTROL",
+              "monotonicMs": 37752.208285,
+              "observedAt": "2026-10-28T07:12:42.327Z"
+            },
+            "release": {
+              "monotonicMs": 37839.789374,
+              "observedAt": "2026-10-28T07:12:42.414Z"
+            },
+            "barrier": {
+              "state": {
+                "Status": "running",
+                "Running": true,
+                "Paused": false,
+                "Restarting": false,
+                "OOMKilled": true,
+                "Dead": false,
+                "Pid": 3759252,
+                "ExitCode": 0,
+                "Error": "",
+                "StartedAt": "2026-10-28T07:12:42.20971759Z",
+                "FinishedAt": "0001-01-01T00:00:00Z"
+              },
+              "observedAt": "2026-10-28T07:12:43.126Z",
+              "monotonicMs": 38551.300792,
+              "kind": "RUNNING_OOMKILLED_AND_CGROUP_OOM_KILL",
+              "events": "low 0\nhigh 0\nmax 18\noom 1\noom_kill 1\noom_group_kill 0\n",
+              "memoryMax": "100663296\n"
+            },
+            "afterQueries": {
+              "Status": "running",
+              "Running": true,
+              "Paused": false,
+              "Restarting": false,
+              "OOMKilled": true,
+              "Dead": false,
+              "Pid": 3759252,
+              "ExitCode": 0,
+              "Error": "",
+              "StartedAt": "2026-10-28T07:12:42.20971759Z",
+              "FinishedAt": "0001-01-01T00:00:00Z"
+            },
+            "controlOnly": true
+          }
+        },
+        "result": {
+          "status": "FAILED",
+          "failure": "OOM",
+          "exitCode": 137,
+          "artifact": null,
+          "cleanup": {
+            "containerRemoved": true,
+            "workspaceRemoved": true,
+            "errors": []
+          },
+          "completedAt": "2026-10-28T07:12:43.614Z"
+        }
+      },
+      {
+        "mode": "memory",
+        "observed": {
+          "value": {
+            "held": {
+              "kind": "PRESSURE_HELD_NEGATIVE_CONTROL",
+              "monotonicMs": 39417.335593,
+              "observedAt": "2026-10-28T07:12:43.992Z"
+            },
+            "release": {
+              "monotonicMs": 39417.644023,
+              "observedAt": "2026-10-28T07:12:43.992Z"
+            },
+            "barrier": {
+              "state": {
+                "Status": "running",
+                "Running": true,
+                "Paused": false,
+                "Restarting": false,
+                "OOMKilled": true,
+                "Dead": false,
+                "Pid": 3759561,
+                "ExitCode": 0,
+                "Error": "",
+                "StartedAt": "2026-10-28T07:12:43.819339936Z",
+                "FinishedAt": "0001-01-01T00:00:00Z"
+              },
+              "observedAt": "2026-10-28T07:12:44.693Z",
+              "monotonicMs": 40118.266934,
+              "kind": "RUNNING_OOMKILLED_AND_CGROUP_OOM_KILL",
+              "events": "low 0\nhigh 0\nmax 18\noom 1\noom_kill 1\noom_group_kill 0\n",
+              "memoryMax": "100663296\n"
+            },
+            "afterQueries": {
+              "Status": "running",
+              "Running": true,
+              "Paused": false,
+              "Restarting": false,
+              "OOMKilled": true,
+              "Dead": false,
+              "Pid": 3759561,
+              "ExitCode": 0,
+              "Error": "",
+              "StartedAt": "2026-10-28T07:12:43.819339936Z",
+              "FinishedAt": "0001-01-01T00:00:00Z"
+            },
+            "controlOnly": false
+          }
+        },
+        "result": {
+          "status": "FAILED",
+          "failure": "OOM",
+          "exitCode": 137,
+          "artifact": null,
+          "cleanup": {
+            "containerRemoved": true,
+            "workspaceRemoved": true,
+            "errors": []
+          },
+          "completedAt": "2026-10-28T07:12:45.193Z"
+        }
+      }
+    ]
+  },
+  "fullProduct": {
+    "nativeExitCode": 0,
+    "browserExitCode": 0,
+    "status": "PASSED",
+    "readyTasks": 4,
+    "successfulBuilds": 4,
+    "failedBuilds": 1,
+    "publishedRows": 2,
+    "cleanupErrors": [],
+    "databaseRemoved": true,
+    "hostingRemoved": true,
+    "changedSources": [],
+    "deploymentObservations": {
+      "83b13d7d-afc9-8fe0-8c59-7c9af586eddb": [
+        {
+          "at": "2026-10-28T07:13:58.501Z",
+          "elapsedMs": 188.45807599999898,
+          "publicationId": "83b13d7d-afc9-8fe0-8c59-7c9af586eddb",
+          "status": "REQUESTED",
+          "phase": "PUBLISHING",
+          "failureCode": null,
+          "history": [
+            {
+              "phase": "PREPARING",
+              "at": "2026-10-28T07:13:58.214110376Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PUBLISHING",
+              "at": "2026-10-28T07:13:58.384310759Z",
+              "failureCode": null
+            }
+          ]
+        },
+        {
+          "at": "2026-10-28T07:13:58.707Z",
+          "elapsedMs": 394.3475809999982,
+          "publicationId": "83b13d7d-afc9-8fe0-8c59-7c9af586eddb",
+          "status": "REQUESTED",
+          "phase": "PUBLISHING",
+          "failureCode": null,
+          "history": [
+            {
+              "phase": "PREPARING",
+              "at": "2026-10-28T07:13:58.214110376Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PUBLISHING",
+              "at": "2026-10-28T07:13:58.384310759Z",
+              "failureCode": null
+            }
+          ]
+        },
+        {
+          "at": "2026-10-28T07:13:58.973Z",
+          "elapsedMs": 660.0163479999974,
+          "publicationId": "83b13d7d-afc9-8fe0-8c59-7c9af586eddb",
+          "status": "REQUESTED",
+          "phase": "PROBING",
+          "failureCode": null,
+          "history": [
+            {
+              "phase": "PREPARING",
+              "at": "2026-10-28T07:13:58.214110376Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PUBLISHING",
+              "at": "2026-10-28T07:13:58.384310759Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PROBING",
+              "at": "2026-10-28T07:13:58.796326711Z",
+              "failureCode": null
+            }
+          ]
+        },
+        {
+          "at": "2026-10-28T07:13:59.109Z",
+          "elapsedMs": 796.2406510000001,
+          "publicationId": "83b13d7d-afc9-8fe0-8c59-7c9af586eddb",
+          "status": "REQUESTED",
+          "phase": "PROBING",
+          "failureCode": null,
+          "history": [
+            {
+              "phase": "PREPARING",
+              "at": "2026-10-28T07:13:58.214110376Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PUBLISHING",
+              "at": "2026-10-28T07:13:58.384310759Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PROBING",
+              "at": "2026-10-28T07:13:58.796326711Z",
+              "failureCode": null
+            }
+          ]
+        },
+        {
+          "at": "2026-10-28T07:13:59.256Z",
+          "elapsedMs": 943.8188789999986,
+          "publicationId": "83b13d7d-afc9-8fe0-8c59-7c9af586eddb",
+          "status": "PUBLISHED",
+          "phase": "SUCCEEDED",
+          "failureCode": null,
+          "history": [
+            {
+              "phase": "PREPARING",
+              "at": "2026-10-28T07:13:58.214110376Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PUBLISHING",
+              "at": "2026-10-28T07:13:58.384310759Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PROBING",
+              "at": "2026-10-28T07:13:58.796326711Z",
+              "failureCode": null
+            },
+            {
+              "phase": "SUCCEEDED",
+              "at": "2026-10-28T07:13:59.099291728Z",
+              "failureCode": null
+            }
+          ]
+        }
+      ],
+      "9edfc258-4738-8829-80c6-31a48f7abff6": [
+        {
+          "at": "2026-10-28T07:14:27.506Z",
+          "elapsedMs": 127.04275000000052,
+          "publicationId": "9edfc258-4738-8829-80c6-31a48f7abff6",
+          "status": "REQUESTED",
+          "phase": "PUBLISHING",
+          "failureCode": null,
+          "history": [
+            {
+              "phase": "PREPARING",
+              "at": "2026-10-28T07:14:27.299131010Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PUBLISHING",
+              "at": "2026-10-28T07:14:27.416156936Z",
+              "failureCode": null
+            }
+          ]
+        },
+        {
+          "at": "2026-10-28T07:14:27.701Z",
+          "elapsedMs": 322.018544999999,
+          "publicationId": "9edfc258-4738-8829-80c6-31a48f7abff6",
+          "status": "REQUESTED",
+          "phase": "PUBLISHING",
+          "failureCode": null,
+          "history": [
+            {
+              "phase": "PREPARING",
+              "at": "2026-10-28T07:14:27.299131010Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PUBLISHING",
+              "at": "2026-10-28T07:14:27.416156936Z",
+              "failureCode": null
+            }
+          ]
+        },
+        {
+          "at": "2026-10-28T07:14:27.883Z",
+          "elapsedMs": 503.67897199999425,
+          "publicationId": "9edfc258-4738-8829-80c6-31a48f7abff6",
+          "status": "REQUESTED",
+          "phase": "PROBING",
+          "failureCode": null,
+          "history": [
+            {
+              "phase": "PREPARING",
+              "at": "2026-10-28T07:14:27.299131010Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PUBLISHING",
+              "at": "2026-10-28T07:14:27.416156936Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PROBING",
+              "at": "2026-10-28T07:14:27.705290842Z",
+              "failureCode": null
+            }
+          ]
+        },
+        {
+          "at": "2026-10-28T07:14:28.021Z",
+          "elapsedMs": 641.533034,
+          "publicationId": "9edfc258-4738-8829-80c6-31a48f7abff6",
+          "status": "PUBLISHED",
+          "phase": "SUCCEEDED",
+          "failureCode": null,
+          "history": [
+            {
+              "phase": "PREPARING",
+              "at": "2026-10-28T07:14:27.299131010Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PUBLISHING",
+              "at": "2026-10-28T07:14:27.416156936Z",
+              "failureCode": null
+            },
+            {
+              "phase": "PROBING",
+              "at": "2026-10-28T07:14:27.705290842Z",
+              "failureCode": null
+            },
+            {
+              "phase": "SUCCEEDED",
+              "at": "2026-10-28T07:14:27.910767345Z",
+              "failureCode": null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "ledgerRegression": {
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "retainedFailures": [
+    "missing A recorder: capacity not executed",
+    "wrong JAVA_HOME: Maven tests not executed",
+    "instant CPU lookup after Running: isolation FAILED, only10 baseline GETs; not T2 success",
+    "first diagnostic referenced an already-cleaned image; no running-container observation"
+  ],
+  "privateRawArchiveSha256": "ecef77cecf9bc7d740479f5ec0809b963ddc509248f61b0997b7e22834915ec5",
+  "verifiedRawFileCount": 62,
+  "limitations": [
+    "Single host/API process; no multi-instance, sustained throughput or SLA claim",
+    "OOM-confirmed responsiveness, not continuous allocator-peak coverage",
+    "First-container/warm-image, no host cache flush",
+    "Real model throughput/quality not measured; no configured model key found",
+    "No deployment cutover; live jar/release matched and services remained active",
+    "No same-host main-versus-candidate benchmark; no causal speedup claim"
+  ],
+  "privateRawReportSha256": {
+    "apiIsolation": "fa6f089107d96aaa9c8fb3199e7ad4c59af1c2fcff838baa9035332c7c04f506",
+    "fullCommandLog": "e3fffceff2be65755706fdf060d98677accabc428b5d828c481d659d0b645fc6",
+    "cpuStartupDiagnosis": "2b52ef47ccd3c953b88df65797ee5a8035af1520555d09511892ccef47da913e"
+  },
+  "finalApproval": "Human user decides approval and merge; peer A may perform read-only verification; no automated approval or merge.",
+  "reportKind": "ANONYMIZED_DERIVATIVE; copied numeric samples and barrier observations, not a byte-identical raw report",
+  "liveDeploymentVerification": {
+    "liveJarMatchesRecordedRelease": true,
+    "releaseMetadataUnchanged": true,
+    "servicesActiveAfterCalibration": true,
+    "ownedTestContainersRemaining": 0
+  }
+}
