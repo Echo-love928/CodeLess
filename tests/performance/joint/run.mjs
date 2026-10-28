@@ -203,8 +203,10 @@ try {
   }
   let first,second
   await pressure('timeout',async barrier=>{first=await submit(a,'FIRST');await awaitProvider('FIRST');await query('cpu-with-real-provider',barrier);report.sse=[await sse(a,first,0)];report.sse.push(await sse(a,first,report.sse[0].sequences[0]))})
+  // Preserve the production single automatic task worker; do not add a test worker to bypass its queue.
+  await terminal(a,first)
   await pressure('memory',async barrier=>{second=await submit(b,'SECOND');await awaitProvider('SECOND');await query('oom-confirmed-with-real-provider',barrier)})
-  await terminal(a,first);await terminal(b,second)
+  await terminal(b,second)
   for(const who of [a,b]){const app=await who.call('applications/'+who.app);assert.equal(app.status,200);who.ready=app.body.latestReadyVersionId;assert.ok(who.ready)}
   report.crossUser=[(await a.call('tasks/'+second)).status,(await b.call('tasks/'+first)).status];assert.deepEqual(report.crossUser,[404,404])
   const allEvents=await a.call('tasks/'+first+'/events');assert.equal(allEvents.status,200);report.firstTaskEvents=allEvents.body
