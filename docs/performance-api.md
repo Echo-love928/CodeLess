@@ -24,7 +24,7 @@
 
 上述错误复用 v0 Error JSON，附 `Retry-After: 1`；应用、用户、全局按表中顺序判定，不泄露其他用户计数。1 秒只约束容量锁等待，不是包括连接池、应用行锁和网络在内的整体 HTTP SLA。公共 OpenAPI 已实际同步至 `contracts/openapi.v0.json`，适用 POST `/api/v0/tasks`、`/api/v0/applications/{applicationId}/edits` 和 `/api/v0/applications/{applicationId}/component-edits`。编辑端点既有快照/存储类 503 保留，不能要求这些非容量错误也带 Retry-After。模型槽位满是在异步执行中记录 MODEL_CAPACITY_EXCEEDED，不虚构成任务创建 HTTP 429/503。
 
-用户指定 A 推进本次契约同步；仓库未登记独占维护者，B 增量没有修改公共 OpenAPI，本轮由 A 单一写入六个响应，不改认证、CSRF、成功资源或其他端点。`sync-openapi.mjs` 仅替换三个 responses 对象，并输出可复用 RFC6902 补丁；`contracts/tasks/openapi.test.mjs` 已在既有 static 门禁中校验端点、错误枚举、header、正反样本及补丁与落地内容一致。落地于候选 PR 不等于已合并 main。
+用户指定 A 推进本次契约同步；仓库未登记独占维护者，B 增量没有修改公共 OpenAPI，本轮由 A 单一写入六个响应，不改认证、CSRF、成功资源或其他端点。`sync-openapi.mjs` 仅替换三个 responses 对象、同步edit/mapping两份源片段，并输出可复用RFC6902补丁；旧mapping集成生成器保留已发布容量增量。既有runner完整相等断言曾检出漏同步（fef5286、244pass/1fail），修正后16项受影响回归及私有副本生成一致性通过，失败保留。`contracts/tasks/openapi.test.mjs` 在既有static门禁校验端点、错误枚举、header、正反样本、源片段及补丁与落地内容一致。落地于候选PR不等于已合并main。
 
 `BoundedModelProvider` 包装生产配置选择出的 provider，PLAN 与 AgentModel 共用同一组槽位。满时立即抛 `MODEL_CAPACITY_EXCEEDED`，由原有失败路径记账；不会排入第二条内存队列、自动重试或宣称 READY。未到达 provider 的失败 usage 保持未知。任务取消不会让尚未返回的 HTTP provider 调用提前释放槽位；正常返回、超时或异常退出都释放。
 

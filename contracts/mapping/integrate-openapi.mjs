@@ -37,6 +37,11 @@ const paths = {
   '/api/v0/applications/{applicationId}/component-edits': { parameters: [pathParameter('applicationId')], post: operation('createComponentEdit', 'Create a new draft task with an owner/base lock and server-resolved component source', { 202: response('Component modification queued; never publishes', { $ref: './mapping/component-edit.schema.json#/$defs/response' }) }, { $ref: './mapping/component-edit.schema.json#/$defs/request' }) },
 }
 paths['/api/v0/applications/{applicationId}/component-edits'].post.parameters.push({ name: 'Idempotency-Key', in: 'header', required: false, schema: { type: 'string', pattern: '^[A-Za-z0-9._:-]{1,128}$' } })
+// Keep reviewed additive admission responses when regenerating an already-enabled contract.
+for (const [path, route] of Object.entries(paths)) for (const status of ['429', '503']) {
+  const published = base.paths[path]?.post?.responses?.[status]
+  if (route.post && published?.['x-codeless-capacity-codes']) route.post.responses[status] = structuredClone(published)
+}
 for (const [path, route] of Object.entries(edit.paths)) {
   const value = structuredClone(route)
   if (value.post) value.post.parameters = value.post.parameters.map(p => p.name === 'X-CSRF-Token' ? { $ref: '#/components/parameters/CsrfToken' } : p)

@@ -39,6 +39,9 @@ test('D22 capacity responses cover exactly task-creating endpoints and preserve 
     }
   }
   assert.equal(total, 6);
+  for (const [file, path] of [['contracts/edit/openapi.patch.json', paths[1]], ['contracts/mapping/openapi.patch.json', paths[2]]]) {
+    for (const status of ['429', '503']) assert.deepEqual(read(file).paths[path].post.responses[status], api.paths[path].post.responses[status]);
+  }
   const patch = read('tests/performance/api/openapi.patch.json');
   assert.equal(patch.length, 6);
   for (const entry of patch) {

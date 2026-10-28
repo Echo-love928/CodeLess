@@ -51,5 +51,11 @@ for (const path of endpoints) {
 }
 assert.deepEqual(JSON.parse(text), api);
 writeFileSync(file, text);
+for (const [fragment, path] of [['contracts/edit/openapi.patch.json', endpoints[1]], ['contracts/mapping/openapi.patch.json', endpoints[2]]]) {
+  const doc = JSON.parse(readFileSync(fragment, 'utf8'));
+  assert.ok(doc.paths[path].post.responses['202']);
+  for (const status of ['429', '503']) doc.paths[path].post.responses[status] = structuredClone(api.paths[path].post.responses[status]);
+  writeFileSync(fragment, JSON.stringify(doc, null, 2) + '\n');
+}
 writeFileSync('tests/performance/api/openapi.patch.json', JSON.stringify(patch, null, 2) + '\n');
 console.log('D22 capacity responses integrated into public OpenAPI: 3 endpoints, 6 responses.');

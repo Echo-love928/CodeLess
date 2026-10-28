@@ -3,6 +3,7 @@
 增加排队、业务、provider、runner包络及验真回执构建/浏览器计时；缺失、非法或溢出仍为未知。没有增加worker、缓存或中间件。
 
 - **公共契约已落地到本PR**：按用户本轮授权由A单一写入 `contracts/openapi.v0.json`，同步三个任务创建POST的六个429/503响应、实际错误码及容量Retry-After=1。编辑原有快照/存储503及其错误码保留，非容量503不强制该header。既有static入口新增契约正反断言，补丁与公共文件一致，不再仅保留提案。未改成功资源、认证或CSRF。
+- **契约源片段与生成器也同步**：fef5286的runner完整相等断言检出组件源片段遗漏（244pass/1fail，后接ownership步骤SKIPPED），原始失败保留；现同步edit/mapping片段并让旧集成生成器保留容量增量。没有修改/削弱原断言，16项受影响回归和独占副本生成一致性均native0。新HEAD门禁独立执行，不将旧failure回填为成功，也未重复付费请求。
 - **真实模型一次补验通过**：在既有部署机独占候选环境，使用生产BoundedModelProvider/DeepSeek/PLAN与真实HTTP/PG；single API JVM，手动claim控制并发，未切线上。`real-cc5e3cd7-bff5-4829-a204-b04eb920d16d` Maven/单元/SSH原生0、JUnit1/1。8次尝试中2次本地MODEL_CAPACITY_EXCEEDED，6次进入真实transport尝试（5返回、1计划内1ms超时）；取消后尚未结束的调用保留槽位，迟到回复不复活任务，超时后双槽并发复用。32个排队HTTP接受后第33个明确503。未为追绿重复真实批次。
 - **样本与口径**：2逻辑CPU/4,106,088,448字节RAM；候选实读cgroup为1CPU/1.5GiB/swap0，PG0.5CPU/384MiB。真实30/30 HTTP查询都在provider包络内完成，p95=67.575777ms；6个包络p95=2609.020430ms，观察窗口7.391766452s，完成包络0.811714次/s，不能当完整应用生成吞吐或长期SLA。配置/响应model均deepseek-flash，官网当日映射V4.1-Flash-1017，响应未给不可变权重revision。明确MOCK准备批次另列，真实模型质量、多实例均未据此证明。
 - **费用与隐私**：用户授权2元，最多8尝试的保守最坏预留<0.80元；本批尺寸预留0.14172元。5个已知回复input6560/output1016/total7576 tokens，按高峰价估算上界0.021248元；超时用量、真实总量与实际扣费UNKNOWN。密钥只经内存/SSH stdin/0600临时配置，结束删除；公开白名单派生数据与摘要，完整17文件原始归档及JUnit仅私有保存。测试容器回收，4个原线上容器仍running。
