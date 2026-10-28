@@ -116,6 +116,8 @@ try {
   await wait(async()=>{assert.equal(api.exitCode,null,'API exited');try{return (await fetch(origin+'/api/v0/auth/csrf',{signal:AbortSignal.timeout(1000)})).status===200}catch{return false}},60000,'API startup')
   runtime=await startPreviewRuntime(env)
   await writeFile(join(out,'nginx.conf'),await hostingConfig({publicOrigin,platformOrigin,previewOrigin}))
+  await chmod(join(out,'nginx.conf'),0o644)
+  await chmod(join(out,'tls/test-cert.pem'),0o644)
   await chmod(join(out,'tls/test-key.pem'),0o644) // disposable loopback fixture certificate only
   // Hosting container uses uid 101; only the disposable hosting/TLS parents are traversable.
   await chmod(join(out,'sites'),0o755);await chmod(join(out,'tls'),0o755)
@@ -124,7 +126,7 @@ try {
     '--tmpfs','/var/cache/nginx:uid=101,gid=101,mode=0700','--tmpfs','/var/run:uid=101,gid=101,mode=0700','-p',`127.0.0.1:${hostingPort}:8443`,
     '--mount',`type=bind,source=${env.CODELESS_HOSTING_ROOT},target=/sites,readonly`,'--mount',`type=bind,source=${join(out,'nginx.conf')},target=/etc/nginx/conf.d/default.conf,readonly`,
     '--mount',`type=bind,source=${join(out,'tls/test-cert.pem')},target=/certs/server.pem,readonly`,'--mount',`type=bind,source=${join(out,'tls/test-key.pem')},target=/certs/server.key,readonly`,'nginx:1.27.5-alpine'])
-  docker(['exec',hosting,'nginx','-t'])
+  try{docker(['exec',hosting,'nginx','-t'])}catch(error){await writeFile(join(out,'hosting-startup.log'),run('docker',['logs',hosting],{env}));throw error}
   const sql=text=>JSON.parse(docker(['exec',database,'psql','-U','d22_joint','-d','d22_joint','-At','-v','ON_ERROR_STOP=1','-c',text]))
   report.emptyDatabase=sql("SELECT json_build_object('tasks',(SELECT count(*) FROM generation_tasks),'versions',(SELECT count(*) FROM application_versions),'publications',(SELECT count(*) FROM publications))")
   assert.deepEqual(report.emptyDatabase,{tasks:0,versions:0,publications:0})
