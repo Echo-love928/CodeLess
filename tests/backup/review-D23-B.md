@@ -26,6 +26,8 @@
 
 复现：`python -B tests/backup/review_peer.py` native0。独立5项测试、独立 clean-build 原样日志/摘要、B 补验原样日志及来源归属在 `tests/backup/evidence/peer-37688c8/`。真实请求费用/usage 属于 B 的平台账，本方新增付费请求0。
 
+正式结论：已用非作者账号在精确37688c8提交 [APPROVED](https://github.com/Echo-love928/CodeLess/pull/77#pullrequestreview-5685190954)，API读回一致；提交前重查六项success、HEAD未变且无既有inline讨论。批准只适用该B提交，未批准A、未合并或宣称M4整体完成。状态与精确提交见 `evidence/peer-37688c8/github-review.json`。
+
 ## 历史：初次查无材料
 
 本轮查询：GitHub REST `GET /repos/Echo-love928/CodeLess/pulls?state=open&per_page=100` 返回 open PR 0；D23 PR 0。`git ls-remote --heads origin '*d23*'` native 0、空结果；最新 main `26b95e3` 中无 D23-B 交接、契约差异或测试报告。此登记早于本卡草稿 PR 创建，不把后续 D23-A PR 算作 B。

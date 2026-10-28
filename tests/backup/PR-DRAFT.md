@@ -12,6 +12,7 @@
 
 - 既有20项确定性/秘密哨兵/失败边界保留；双真实PG native0，B同提交补验原日志也已独立核对。
 - 新真实应用恢复native0：原owner新登录，同一version/build/source/artifact/发布引用；预览刷新、托管内容和源码导出成功，ZIP与备份前逐字节一致；新固定Node容器/新store构建native0、精确复现原artifactDigest。缺index负向检查拒绝，归回原字节后才启用。原offline marker保持NOT_RUN，应用成功另有真实报告。
+- 冻结实现b139757上规范复跑：unit20/20、双PG、真实应用恢复、白名单导出均native0；规范T4为 `evidence/2026-10-28T15-24-05.683508+00-00-application/`。后续仅证据/交接，不改被测逻辑，精确新HEAD CI独立刷新。
 - 原4次fixture/打包/代理失败和初始Docker/权限门禁失败保留；未删断言、放宽隔离/超时或重试付费模型。只清自有资源，原镜像引用先保留后还原。
 - A旧HEAD6fb9836与B37688c8各六项CI success已核验；本次新HEAD独立查询，不继承旧结果。新增专项独立执行，公共CI登记交维护者。
 
@@ -21,6 +22,6 @@
 
 模型：命名deterministic-mock只提出文件，实际DB/build/Chromium/export决定状态；新增付费请求0，Mock总usage/开发累计token未知。B的1次真实PLAN证据只核验，不重复调用。
 
-同伴复审：B PR #77 @37688c8，本方安装5/5、独立导出构建native0，来源/日志摘要与真实请求正负报告核对；B范围无阻塞，Bash插值边界为非阻塞建议。三类结论见review-D23-B.md。A新补验仍需B按精确新HEAD复审，作者不自批。
+同伴复审：B PR #77 @37688c8，本方安装5/5、独立导出构建native0，来源/日志摘要与真实请求正负报告核对；B范围无阻塞，Bash插值边界为非阻塞建议，已由非作者账号正式APPROVED。三类结论见review-D23-B.md。A新补验仍需B按精确新HEAD复审，作者不自批。
 
 剩余限制与合并条件：生产运营演练/独立批准仍待完成；最新main组合、当前HEAD全部必需检查真实success、无未解决阻塞讨论才具备合并条件。保持draft，不合并或切生产。
