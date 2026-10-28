@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
 import { test } from 'node:test'
+import { validateInterference } from './api-evidence.mjs'
 
 test('D22 T4: committed raw samples preserve manifest SHA256 after checkout', async () => {
   const base = new URL('./evidence/', import.meta.url)
@@ -39,4 +40,29 @@ test('D22 A+B: convergence evidence preserves raw verdicts and the original UNKN
     assert.equal(observations.at(-1).status, 'PUBLISHED')
     assert.equal(observations.at(-1).phase, 'SUCCEEDED')
   }
+})
+
+test('D22 deployment calibration: authorized anonymous samples retain timing, saturation and full-chain outcomes', async () => {
+  const base = new URL('./evidence/deployment-calibration-2026-10-28/', import.meta.url)
+  const manifest = JSON.parse(await readFile(new URL('manifest.json', base)))
+  const bytes = await readFile(new URL(manifest.file, base))
+  assert.equal(createHash('sha256').update(bytes).digest('hex'), manifest.sha256)
+  assert.equal(manifest.publicReportAuthorizedByUser, true)
+  assert.equal(manifest.publicRawArchive, false)
+  const report = JSON.parse(bytes)
+  assert.equal(report.sources.canonical, false)
+  assert.equal(report.realModelThroughputVerified, false)
+  assert.equal(report.paidModelRequests, 0)
+  assert.equal(report.capacity.admitted, 32)
+  assert.equal(report.capacity.rejected, 1)
+  const samples = report.capacity.samples.queryMsAtQueueDepth32.toSorted((a, b) => a - b)
+  assert.equal(samples.length, 100)
+  assert.equal(samples[Math.ceil(samples.length * .95) - 1], report.capacity.queryP95MsAtFullQueue)
+  assert.deepEqual(validateInterference(report.apiIsolation), { qualifiedOOM: 10, qualifiedCPU: 10, negativeControl: 10, total: 80 })
+  assert.equal(report.fullProduct.nativeExitCode, 0)
+  assert.equal(report.fullProduct.browserExitCode, 0)
+  assert.equal(report.fullProduct.publishedRows, 2)
+  assert.deepEqual(report.fullProduct.cleanupErrors, [])
+  assert.deepEqual(report.fullProduct.changedSources, [])
+  assert.equal(report.retainedFailures.length, 4)
 })
