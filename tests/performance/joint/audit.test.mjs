@@ -1,6 +1,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { qualify } from './audit.mjs'
+import { readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 const point=n=>({monotonicNs:String(n)})
 function fixture(){
   const phases=['baseline','cpu-with-real-provider','timeout-after-cleanup','pre-pressure-negative-control','oom-confirmed-with-real-provider','memory-after-cleanup','final-after-faults']
@@ -24,4 +26,18 @@ test('Running-only OOM, early pressure queries and queries after provider comple
 })
 test('late cancellation, missing ledger terminal, budget overrun and incomplete cleanup are rejected',()=>{
   for(const mutate of [r=>r.cancellation.completed=point(2100),r=>r.publications[0].observations[0].history=[],r=>r.financial.reservedUpperRmb=2.01,r=>r.newRemainingContainers=['owned-container'],r=>r.collectorExitCode=1]){const r=fixture();mutate(r);assert.throws(()=>qualify(r))}
+})
+test('frozen real/mock evidence binds digests and pressure/provider intervals through cleanup',()=>{
+  const root=new URL('./evidence/2026-10-28/',import.meta.url),manifest=JSON.parse(readFileSync(new URL('manifest.json',root)))
+  for(const [name,digest] of Object.entries(manifest.publicFiles)){
+    const bytes=readFileSync(new URL(name,root));assert.equal(createHash('sha256').update(bytes).digest('hex'),digest)
+    const r=JSON.parse(bytes);assert.equal(qualify(r).qualified,true);assert.equal(r.native.exitCode,0);assert.equal(r.native.signal,null)
+    for(const f of r.faults){
+      const v=f.observed.value,phase=f.mode==='memory'?'oom-confirmed-with-real-provider':'cpu-with-real-provider'
+      for(const q of r.http.filter(x=>x.phase===phase))assert.ok(BigInt(q.end.monotonicNs)<BigInt(v.release.monotonicNs))
+      if(f.mode==='memory'){assert.equal(v.barrier.memoryMax,96*1024*1024);assert.ok(Number(v.barrier.events.match(/^oom_kill (\d+)$/m)[1])>0)}
+      else {const cpu=text=>Number(text.match(/^usage_usec (\d+)$/m)[1]);assert.ok(cpu(v.barrier.after)-cpu(v.barrier.before)>100000)}
+    }
+  }
+  assert.equal(manifest.privateRawFiles,724);assert.equal(manifest.paidRuns,1);assert.equal(manifest.temporaryCredentialFiles,0)
 })
