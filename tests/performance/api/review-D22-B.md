@@ -1,30 +1,27 @@
 # D22-B 只读互审
 
-检查时间：2026-10-27～28（Asia/Tokyo）。首审 [PR #74](https://github.com/Echo-love928/CodeLess/pull/74) `a518d3bb7dbd2e5a3012c28ba09a54ac5043d0b3`，随后只复查至 `e1db36ab7bf04029ea6ee5cae15cd6885bdb5d4b` 的差异，base `dcb3866`。只读审查，不修改 B 分支、不代替独立批准。
+2026-10-28（Asia/Tokyo）复审 [PR #74](https://github.com/Echo-love928/CodeLess/pull/74) 精确候选 `01aa4f944be469e8ceae87713f1e3d15d8769a77`，base `dcb3866`。首审 a518d3b，原始报告补证审至 e1db36a，历史导出增量审至 ffc6890；本次只检查 ffc6890..01aa4f9 及受影响 T2。没有切换/修改 B 分支，没有执行 B 的 Docker 压力脚本或提交批准。
 
 ## 阻塞问题
 
-**[P2，测量覆盖，复查仍存在] OOM 组的 API 样本没有保证覆盖 OOM 压力或确认 OOM 后。** `tests/performance/runner/api-isolation.mjs:65–75,85–94` 只在整组开始确认容器 Running，然后先完成 10 个请求，之后才 `observeOOM(id)`；`runningAtStart` 对 10 条样本重复同一次布尔值。容器已启动并不证明分配器已开始耗尽内存；若在故障 fixture 的内存分配前插入 500ms 延迟，这 10 个快速请求仍可全在无内存压力时完成，而稍后的真实 OOM 依然使整轮通过。这样不能用这些样本证明“真实 OOM 期间 API 未被拖死”。最小修复：按独立 cgroup/内存事件或明确开始压力信号建立测量屏障，并保留 API 样本与压力/事件的时间关系；在 OOM 确认及故障清理后各补直接查询。此项阻塞该 T2 结论，其他安全隔离未因此被否定。`a518d3b..e1db36a` 未修改该文件。
+**原 P2（OOM 测量屏障）已解除，限于“OOM 确认后 API 可响应”的结论。** `api-isolation.mjs:130–140` 先释放分配器，等待 Docker Running+OOMKilled，再读取 cgroup memory.events 的 oom_kill>0 和 96MiB 上限，之后才查询；查询结束确认 guardian 仍 Running/OOMKilled，最后发 SIGUSR2。`fixtures/pressure-entry.mjs:5–13` 在宿主释放前不分配，释放后再延迟 500ms。负向对照发生在释放前，不能归入 OOM 样本。故障清理后另发直接查询（`:151`）。未声称覆盖分配器峰值的每个瞬间。
 
-首审的 **P1 缺原始报告已解除**：e1db36a 新增 7 份原样报告、manifest、命令与远端快照。独立对 Git blob 字节计算 SHA256，7/7 与 manifest 完全匹配，状态/canonical 一致；cb04df4 的 measure 为 PASSED/canonical=true，两个 FAILED 原始轮仍保留。新增 evidence.test 与 scoped -text 防止 checkout 换行破坏字节。未继续将已补齐证据写成缺失。
+**原 P1（缺原始报告）保持解除。** 当前 manifest 共 10 份报告，独立按 Git blob 字节核对 SHA256、status、canonical，10/10 一致，失败历史仍保留。历史 Running-only 原报告保持原生 PASSED，但新审计明确拒绝其 T2 资格。
 
-门禁仍作为合并限制：B 明确保留本地 runner 1、E2E 1、API 聚合主动中断 1；cb04df4/a518d3b 的远端 success 不转移至 e1db36a。精确最终候选检查与未解决问题需由维护者按仓库规则处理，本轮没有批准。
+**剩余集成阻塞未解除：** B 提交的 `evidence/ab-integration.json` 保留 A+B 全产品 native1/browser1；`tests/e2e/full/business.acceptance.ts:131` 期待 SUCCEEDED、实际 UNKNOWN，尽管已有 2 READY、2 成功构建、1 PUBLISHED，事后账本有 SUCCEEDED。本方只读定位 `services/api/.../deploy/PublicationService.java:117–123,167–169`：SQL 状态与 afterCommit 账本分别读取，失配时明确 UNKNOWN；与该时序窗口相容，但尚未独立复现因果，不能据此宣称根因已证实、原测试通过或修复完成。发布/全链维护者需保留原断言，针对提交与账本追加之间的窗口建立确定性复现，再验证完整联调。此次不夹带发布实现修改。
 
-首审材料在 `tests/performance/api/evidence/peer-pr.json`。复查命令：`git diff a518d3b e1db36a`、`git show e1db36a:tests/performance/runner/evidence/manifest.json`，对其 reports 的原 Git blob 做 SHA256。没有执行 B 的脚本或声称独立重跑其资源数据；上面的反例是对测量屏障的确定性控制流检查。作者修复后只重查变化和受影响的 T2。
+公共 429/503 契约同步、生产部署机器/真实公网模型/多实例总容量校准和独立批准仍待完成。T2 补证不解除这些限制。
 
 ## 建议
 
-B 的交接须保留 taskId/executionId/sourceDigest、机器与 Docker CPU/内存限额、样本数、每个冷/暖构建的原始时序、退出码和清理结果。API 已从既有 runner receipt 读取 build.createdAt/completedAt、verification.startedAt/completedAt，无需扩展 runner 权限或新增字段。
+保持报告口径：每组 80 个 HTTP 查询中，10 个在 OOM 确认后、10 个在 CPU 屏障后、10 个为压力前对照、30 个在三类故障清理后，另 20 个基线/收尾。不得把 80 个全部标为“峰值 OOM 期间”。真实部署验收仍由最后启用功能的 PR 承担，不放宽资源隔离或重试至绿。
 
 ## 已核验内容
 
-已读取 12 个改动文件的 diff、交接、方法、专项测试和 API 干扰测量。已核验代码内容：
+- 独立命令 `node tests/performance/api/review-peer.mjs`，**native0**。它从精确 B Git 对象复制已审过的 JSON/摘要/时序测试，仅执行 `node --test .../evidence.test.mjs .../api-evidence.test.mjs`，**3/3，0 fail/skip**；未运行容器、模型或发布。命令、源码摘要和日志位于本卡 `evidence/peer-01aa4f9/{command.json,audit.log,summary.json}`，原样报告/测试位于 `source/`。
+- B 与 A+B 两份报告均有 80/80 HTTP200，分别各 10 个 OOM 确认后样本，OOM 组 max=5.7829ms / 8.3266ms；检查单调钟先后、每组同容器 ID、CPU 子进程与 usage 增长、真实 exit137/OOM、artifact=null、精确容器/workspace 清理及清理后查询。原始两个报告均 canonical=false，未转成干净候选通过。
+- 三项测试独立通过：原样报告完整性；新屏障/清理时序；旧 Running-only 报告及人工提前的 GET 被拒绝。本方附加检查也验证所有 113 个 A+B API 生产文件与 A 精确 `9c5cf47` 内容相符，仅为 CRLF checkout 字节差异；AB harness 两个脚本为 CRLF 匹配、两个 fixture 为 Git 原字节匹配。原始报告与摘要未改写。B 早一轮未采集 apiSources，未追溯补造。
+- 只读差异确认 CPU/内存/PID/网络/只读挂载等生产安全限制未弱化；此次没有改生产 runner/infra、API、公共契约、锁文件或 CI，未增加构建重试。首审的精确回收、A→A→B→A 内容/摘要/回执、trial 只收紧限制的结论保持有效。
+- 2026-10-28T04:41:12Z 独立 GitHub 查询：B `01aa4f9` 与 A `9c5cf47` 各自 static/api/runner/e2e/infra-preflight/ci-gate 六项均 completed/success，快照 `evidence/peer-01aa4f9/pr-checks.json`。B [run 40624152417](https://github.com/Echo-love928/CodeLess/actions/runs/40624152417)，A [run 40532119477](https://github.com/Echo-love928/CodeLess/actions/runs/40532119477)。这些 success 不回填本地历史失败，也不替代 A+B 失败组合或后续新 HEAD 检查。
 
-- `acceptance.test.mjs` 对每个精确 container/workspace 名确认清理，并检查 worker/browser PID 消失；成功产物由 harness 显式消费删除，文档没有冒充生产自动回收已验证版本。
-- A→A→B→A 的 marker、摘要、四个 build UUID、source/build/artifact 回执绑定均有断言；只读镜像依赖复用与新 tmpfs/源码隔离的描述相符。
-- `profiles.mjs` 的 trial 只收紧 60s/16KiB，原 policy 对 CPU/内存/PID/网络等上限继续有效，未知 profile/override 有拒绝断言；Java 白名单未擅自转发该环境变量。
-- OOM 保持真实 cgroup/exit137，日志洪泛保留 exit7、400000 observed bytes 与 16384 retained bytes；失败不变成功，未增加构建重试。
-- 浏览器计时按 phase 累计，进程标识只加入内部诊断；未改公共契约、平台权限、发布流程、模型凭据、根锁文件或 CI。
-- 机器配置、原始样本、隔离 inspect、失败保留与命令退出码已在 e1db36a 核对，7 份报告摘要匹配；40 次 API 样本与压力时间屏障的缺口仍见 P2。没有把静态审查当作运行通过。
-
-接手：D22-B 补原始报告并收紧 T2 时间屏障；最后启用功能 PR 承担 A+B 真实资源组合。最初查询未发现 PR 的记录已被 14:56Z 的新 PR 查询更新，不再列为当前阻塞。
+接手：T2 屏障复审完成，无新增 T2 阻塞；发布/全链维护者接手 UNKNOWN 确定性复现和完整组合验收，部署负责人接手真实容量校准，公共契约维护者接手响应同步。当前没有执行正式批准或合并。
