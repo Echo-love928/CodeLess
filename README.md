@@ -1,100 +1,61 @@
 # CodeLess
 
-CodeLess 是面向受控试用的自然语言前端应用生成平台。首版只生成受控模板中的 Vue 前端应用；生成应用只能使用静态数据、Mock 或 LocalStorage，不生成服务端代码。
+CodeLess 是面向受控试用的自然语言前端应用生成平台。登录后描述需求，生成受控 Vue 应用，查看真实构建和浏览器验证结果，再进行组件编辑、版本查看、截图、源码导出和显式发布。生成应用只使用静态数据、Mock 或 LocalStorage。
 
-## D01 冻结基线
+## 安装与演示
 
-| 工具/框架 | 锁定版本 |
-| --- | --- |
-| Java | 21 |
-| Spring Boot | 4.1.1 |
-| Spring AI BOM | 2.0.1 |
-| Maven | 3.9.11（由 Wrapper 管理） |
-| Node.js | 24.22.1（2026-10-22 由 24.16.0 升级，见 ADR-005） |
-| pnpm | 12.6.0（由 Corepack 管理） |
+从全新目录开始请按 [安装指南](docs/install.md) 操作，包含 Windows PowerShell 与 bash、数据库、账号初始化、API/前端启动、Mock 全产品演示与真实模型请求。失败查 [排障指南](docs/troubleshooting.md)。
 
-版本与升级规则见 [docs/architecture.md](docs/architecture.md)，产品边界见 [docs/scope.md](docs/scope.md)，HTTP/JSON 契约入口见 [contracts/README.md](contracts/README.md)。D01 骨架不会加载模型 provider，也不需要模型凭据。
-
-## 从空目录启动后端
-
-前置条件：Git、Java 21，以及可访问 Maven Central 的网络。
-
-```bash
-git clone <repository-url> codeless
+```sh
+git clone https://github.com/Echo-love928/CodeLess.git codeless
 cd codeless
-./services/api/mvnw -f services/api/pom.xml spring-boot:run
+corepack pnpm install --frozen-lockfile
+node tests/e2e/full/record-command.mjs full
 ```
 
-Windows PowerShell：
+先准备下表工具、Docker Engine、Git OpenSSL（Windows），并把 Corepack pnpm shim 放在 PATH 首部，详见安装指南。该自动演示创建隔离数据库、运行迁移、启动 API/本地 HTTPS 站点并在 Chromium 执行业务，结束后清理本轮进程和容器。模型为 deterministic-mock，构建、数据库和浏览器真实执行；持续交互服务、公网部署和真实模型另行配置。
 
-```powershell
-.\services\api\mvnw.cmd -f services\api\pom.xml spring-boot:run
+## 锁定版本
+
+| 工具/框架 | 版本及来源 |
+| --- | --- |
+| Java | 21，services/api/pom.xml |
+| Spring Boot / Spring AI BOM | 4.1.1 / 2.0.1，services/api/pom.xml |
+| Maven | 3.9.11，仓库 Wrapper |
+| Node.js / pnpm | 24.22.1 / 12.6.0，根 package.json |
+| PostgreSQL | 17.6-alpine，Compose 与测试固定摘要 |
+| Playwright | 1.60.0，根锁文件；使用配套 Chromium |
+
+沿用 [ADR-005](docs/architecture.md) 与既有 Node 安全升级，不安装 latest、不重建锁文件。平台 workspace 使用根 pnpm-lock.yaml，生成项目使用 templates/vue/pnpm-lock.yaml，两者独立。
+
+## 架构与范围
+
+Vue + TypeScript 平台 UI 调用 Java/Spring API，PostgreSQL 保存账号、任务、版本与部署引用。模型提出 PLAN 与源码补丁，受限 Node/Docker runner 实际构建，Playwright 验证后才能形成 READY/VERIFIED 版本。失败保留最近可用版本，发布须由已鉴权用户显式触发。
+
+```text
+apps/web/         平台界面             services/api/       HTTP、鉴权、业务与 Agent
+services/runner/  构建、验证、预览发布 templates/vue/      受控 Vue 模板
+contracts/        HTTP/JSON 契约       tests/              集成、安全与浏览器验收
+infra/            基础设施             docs/               架构、操作与每日交接
 ```
 
-启动后访问 `GET http://localhost:8080/api/health`，应返回 `status: "UP"`。
+边界见 [scope](docs/scope.md)，决策见 [architecture](docs/architecture.md)，接口见 [contracts](contracts/README.md)。React、生成后端、支付、开放 shell、多 Agent 和任意依赖安装不在首版范围。生成容器不能得到平台密钥或宿主 Docker socket。
 
-## 启动前端
+## 验证与源码交付
 
-前置条件：Node.js **24.22.1** 与 Corepack。所有依赖由仓库根目录的 workspace 和 `pnpm-lock.yaml` 管理，`apps/web` 不再维护独立锁文件。
-
-先在仓库根目录准备 pnpm shim，再安装依赖：
-
-```bash
-corepack enable pnpm
-node --version          # v24.22.1
-pnpm --version          # 12.6.0，由 packageManager 声明选择
-pnpm install --frozen-lockfile
-pnpm --filter @codeless/web dev
-```
-
-Windows 若 Node 安装目录不可写，或 `pnpm` 被其他安装的可执行文件抢先解析，可在当前 PowerShell 会话使用用户目录中的 Corepack shim：
-
-```powershell
-$shimDir = Join-Path $env:LOCALAPPDATA 'codeless-corepack-shims'
-New-Item -ItemType Directory -Force $shimDir | Out-Null
-corepack enable --install-directory $shimDir pnpm
-$env:Path = "$shimDir;$env:Path"
-pnpm --version
-pnpm install --frozen-lockfile
-pnpm --filter @codeless/web dev
-```
-
-默认访问 `http://127.0.0.1:5173/login`。D03-B 开发服务器把同源 `/api/` 请求代理到本机 `http://127.0.0.1:8080`；先启动 D03-A（PR #5）的真实 API 和 PostgreSQL，才能使用两组演示账号登录。直连 Vite 无需另起平台网关；若使用 D02 平台网关，应按 [环境文档](docs/environment.md) 以 `vite --host 0.0.0.0` 启动前端，再访问 `http://127.0.0.1:18080/login`。本机纯 HTTP 联调时，API 进程需设置 `CODELESS_COOKIE_SECURE=false`，生产 HTTPS 保持默认安全 Cookie。真实应用 CRUD、生成和发布尚未接入；应用列表明确使用本地测试替身。启动步骤应先完成 shim 准备，因为前端脚本及 Playwright 会继续调用 `pnpm`。
-
-## 验证
-
-```bash
-corepack enable pnpm
-pnpm install --frozen-lockfile
-pnpm exec playwright install chromium
+```sh
+node --test tests/install/install.test.mjs
+pnpm verify:static
+pnpm verify:api
+pnpm verify:runner
+pnpm verify:e2e
 pnpm ci:gate
 ```
 
-阶段入口均执行真实检查：
+static 检查版本、契约和前端 lint/单测/生产构建；api 执行 Maven verify；runner 执行真实隔离构建与边界检查；e2e 包含浏览器 smoke 和全产品链路。Docker、Java、依赖及配套 Chromium 必须可用。CI 的 infra-preflight 也必须成功，本机结果与最终 PR HEAD 的远端检查分别记录。
 
-- `pnpm verify:static`：锁定工具版本、OpenAPI 与 JSON Schema/fixture，以及前端 lint、单测、类型检查和生产构建。
-- `pnpm verify:api`：Java 编译、API 测试与打包。
-- `pnpm verify:runner`：runner 安全边界所依赖的构建契约检查；真实 runner 尚未实现。
-- `pnpm verify:e2e`：跨资源生命周期契约检查，以及前端三页的 Playwright 浏览器冒烟；尚不覆盖真实生成、保存和发布。
+源码包从已验证版本下载，包含 README、锁文件和 codeless-export.json。解压到独立目录后按包内 README 安装构建；独立容器核验见 [安装指南](docs/install.md#源码包独立运行)。
 
-Linux CI 使用 Ubuntu 24.04，通过 `pnpm exec playwright install --with-deps chromium` 安装 Playwright 1.60.0 配套的 Chromium。该 Playwright 版本修复了旧安装器与 Node 24.16 的兼容问题。Windows 也可使用已安装的 Chrome：先设置 `$env:CODELESS_PLAYWRIGHT_CHANNEL='chrome'` 再执行门禁。API 门禁还要求 `JAVA_HOME` 指向 Java 21。
+## 团队与交接
 
-可用 `CODELESS_FORCE_FAIL=verify:runner pnpm ci:gate` 验证任一子检查失败时汇总门禁非零退出。该注入仅用于门禁自测。
-
-## 仓库结构
-
-```text
-apps/web/             平台界面
-services/api/         Java 业务与 Agent 服务
-services/runner/      构建、验证、预览与发布执行
-templates/vue/        受控生成模板
-contracts/            公共契约
-prompts/runtime/      平台运行时提示词
-tests/e2e/            真实浏览器业务流程测试
-tests/security/       安全测试
-evals/                生成与浏览器编辑评估
-infra/                基础设施配置
-scripts/              开发与维护脚本
-docs/                 项目文档
-.github/workflows/     CI 工作流
-```
+成员 A 主责 API、模型与运维流程，成员 B 主责前端、runner 与交付体验；具体以每日契约和 docs/handoffs 为准。使用独立分支与 PR，由另一位成员审查，不自批、不直接推送 main。必需检查成功且讨论解决后才具备合并条件。D23-B 证据与外部阻塞见 [交接](docs/handoffs/D23-B.md)。
