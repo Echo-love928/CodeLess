@@ -1,0 +1,34 @@
+{
+  "task": "D25-A",
+  "incidents": [
+    {
+      "command": "git diff --cached --check",
+      "nativeExitCode": 1,
+      "result": "Byte-preserved CRLF journals were reported as trailing whitespace; raw captured/generated evidence must not be reformatted",
+      "resolution": "Scoped results .gitattributes matches existing immutable evidence policy: -text -whitespace. Platform source/tests retain whitespace checks; model/build/browser assertions unchanged",
+      "rawEvidenceBytesChanged": false
+    },
+    {
+      "command": "git status --short; git branch --show-current",
+      "result": "Git refused repository ownership in the restricted sandbox",
+      "resolution": "Per-command safe.directory; global Git configuration unchanged",
+      "testsStarted": false
+    },
+    {
+      "command": "node scripts/eval/network-preflight.mjs evals/results/D25-A/network-preflight",
+      "nativeExitCode": 1,
+      "result": "ENOENT creating the output directory because its parent did not exist; no network probe started",
+      "resolution": "Created authorized parent and selected observed C:/Program Files/Git/bin/bash.exe; subsequent real probe passed",
+      "modelCalls": 0
+    },
+    {
+      "command": "node scripts/eval/record-final.mjs unit; node scripts/eval/record-final.mjs mutation",
+      "shellExitCode": 0,
+      "nativeRecorderExitCode": 1,
+      "result": "Both recorders failed with EPERM creating private .local-data/d25-a log directories; neither test command started; trailing git diff --check made composite shell exit 0",
+      "resolution": "Executed unchanged recorders with original-user permissions; public command.json records the actual test exits",
+      "testsStarted": false,
+      "modelCalls": 0
+    }
+  ]
+}

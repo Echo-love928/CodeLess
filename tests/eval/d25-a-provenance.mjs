@@ -16,7 +16,8 @@ const command = JSON.parse(readFileSync(join(root, 'evals/results/D25-A/commands
 const runtimeChanges = git('diff', '--name-only', original, head, '--', ...scopes).toString().trim().split('\n').filter(Boolean)
 const runtimeSourceBytes = Object.entries(command.sourceDigests).filter(([path]) => scopes.some(scope => path === scope || path.startsWith(scope + '/')))
   .map(([path, measuredSha256]) => ({ path, measuredSha256, currentSha256: sha256(readFileSync(join(root, path))) }))
-const result = { task: 'D25-A', evaluatedCommit: original, gateCommit: head, upstreamMain: '5de2e6cf995c95ee91a1f9dc40403654df0af3de',
+const result = { schemaVersion: 2, task: 'D25-A', evaluatedCommit: original, inspectedCommit: head,
+  fullGateCommit: '311a96f6e30972e88ff9d0ed49702c534a25ea52', upstreamMain: '5de2e6cf995c95ee91a1f9dc40403654df0af3de',
   originalCommitRetainedAs: 'codex/d25-a-evaluated-a863b76',
   scopes, runtimeChanges, runtimeGitContentIdentical: runtimeChanges.length === 0,
   measuredRuntimeBytesIdentical: runtimeSourceBytes.every(row => row.measuredSha256 === row.currentSha256), runtimeSourceBytes,

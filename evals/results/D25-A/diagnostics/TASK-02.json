@@ -1,0 +1,159 @@
+{
+  "task": "D25-A",
+  "sampleId": "TASK-02",
+  "batchId": "2026-10-29T10-12-17Z-real-4e8e6f51",
+  "mode": "REAL_REPLY_OFFLINE_CONTRACT_REPLAY",
+  "additionalModelRequests": 0,
+  "cases": [
+    {
+      "file": "04-result.json",
+      "wireResultSha256": "sha256:095d8544b2722435313670ba6c177ea20299d46defcf55d87d25a9abd7092645",
+      "replySha256": "sha256:a17c03cb6ad9966c265beb4d2e8647eba478505d361c3da535d6183c9c646660",
+      "type": "done",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/tasks"
+        },
+        {
+          "type": "expectVisible",
+          "target": {
+            "testId": "new-task-input"
+          }
+        },
+        {
+          "type": "expectVisible",
+          "target": {
+            "testId": "add-task"
+          }
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "role": "heading",
+            "name": "待开始（1）"
+          },
+          "value": "待开始（1）"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "role": "heading",
+            "name": "进行中（1）"
+          },
+          "value": "进行中（1）"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "role": "heading",
+            "name": "已完成（1）"
+          },
+          "value": "已完成（1）"
+        },
+        {
+          "type": "fill",
+          "target": {
+            "testId": "new-task-input"
+          },
+          "value": "复习数学"
+        },
+        {
+          "type": "click",
+          "target": {
+            "testId": "add-task"
+          }
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "title-task-",
+            "value": ""
+          }
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "role": "heading",
+            "name": "待开始（2）"
+          },
+          "value": "待开始（2）"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "task-total"
+          },
+          "value": "任务总数：4"
+        }
+      ],
+      "expected": "unexpected action fields",
+      "observed": "unexpected action fields",
+      "rejected": true
+    },
+    {
+      "file": "05-result.json",
+      "wireResultSha256": "sha256:736f1d9b5f91b70c2f175f9288e8da26dbafb19364007e7a88a82ac007c35128",
+      "replySha256": "sha256:22c1d4e68fe8920d92044f199bc747b0b798b7219eb3cad45521f416374a3d16",
+      "type": "done",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/tasks"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "column-todo"
+          },
+          "value": "待开始（1）"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "column-doing"
+          },
+          "value": "进行中（1）"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "column-done"
+          },
+          "value": "已完成（1）"
+        },
+        {
+          "type": "fill",
+          "target": {
+            "testId": "new-task-input"
+          },
+          "value": "复习数学"
+        },
+        {
+          "type": "click",
+          "target": {
+            "testId": "add-task"
+          }
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "column-todo"
+          },
+          "value": "待开始（2）"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "testId": "new-task-input"
+          },
+          "value": ""
+        }
+      ],
+      "expected": "invalid action text",
+      "observed": "invalid action text",
+      "rejected": true
+    }
+  ],
+  "conclusion": "Both actual done proposals remain rejected; original failed task is not changed into READY."
+}

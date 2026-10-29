@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "setId": "D21-generation-faults-v1",
+  "frozenBy": "D21-A",
+  "frozenOn": "2026-10-23",
+  "policy": {
+    "denominator": { "CODE": 3, "ENVIRONMENT": 2 },
+    "separateFromRequirementDenominator": true,
+    "initialAttemptsPerFault": 1,
+    "disclosure": "Every fault is injected by the evaluation host and labelled as such. A fault sample never counts as a requirement sample, and its outcome is judged against the expectation below, not against the 8/9 target."
+  },
+  "faults": [
+    {
+      "id": "FAULT-CODE-01",
+      "class": "CODE",
+      "baseRequirement": "SHOW-01",
+      "injection": "MISSING_MODULE_IMPORT",
+      "origin": "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR",
+      "timing": "AFTER_REAL_GENERATE_DONE_BEFORE_IMMUTABLE_SNAPSHOT",
+      "target": "PRIMARY_PAGE_SCRIPT_SETUP",
+      "snippet": "import D21EvalMissingPanel from '../components/D21EvalMissingPanel.vue';",
+      "placement": "FIRST_LINE_OF_SCRIPT_SETUP",
+      "expected": { "firstVerify": "FAILED", "firstFailureCategory": "CODE", "final": "READY", "maxRepairRounds": 3, "acceptanceActionsUnchanged": true }
+    },
+    {
+      "id": "FAULT-CODE-02",
+      "class": "CODE",
+      "baseRequirement": "TASK-01",
+      "injection": "STRICT_TYPE_ERROR",
+      "origin": "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR",
+      "timing": "AFTER_REAL_GENERATE_DONE_BEFORE_IMMUTABLE_SNAPSHOT",
+      "target": "PRIMARY_PAGE_SCRIPT_SETUP",
+      "snippet": "const d21EvalInjectedCount: number = 'D21 injected type fault';",
+      "placement": "LAST_LINE_OF_SCRIPT_SETUP",
+      "expected": { "firstVerify": "FAILED", "firstFailureCategory": "CODE", "final": "READY", "maxRepairRounds": 3, "acceptanceActionsUnchanged": true }
+    },
+    {
+      "id": "FAULT-CODE-03",
+      "class": "CODE",
+      "baseRequirement": "CAT-01",
+      "injection": "RUNTIME_ASYNC_PAGE_EXCEPTION",
+      "origin": "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR",
+      "timing": "AFTER_REAL_GENERATE_DONE_BEFORE_IMMUTABLE_SNAPSHOT",
+      "target": "PRIMARY_PAGE_SCRIPT_SETUP",
+      "snippet": "setTimeout(() => { throw new Error('D21_EVAL_INJECTED_RUNTIME_FAULT'); }, 0);",
+      "placement": "LAST_LINE_OF_SCRIPT_SETUP",
+      "designNote": "Replaced a synchronous setup exception before freezing: the deterministic dry run showed that variant surfaces as ACTION_TIMEOUT, which RepairController classifies as INFRASTRUCTURE, so it could never test repair. That classifier gap is recorded separately as a finding.",
+      "expected": { "firstVerify": "FAILED", "firstFailureCategory": "CODE", "final": "READY", "maxRepairRounds": 3, "acceptanceActionsUnchanged": true }
+    },
+    {
+      "id": "FAULT-ENV-01",
+      "class": "ENVIRONMENT",
+      "baseRequirement": "SHOW-02",
+      "injection": "CONTAINER_CLI_UNAVAILABLE",
+      "origin": "HOST_ENVIRONMENT_FAULT",
+      "timing": "WHOLE_SAMPLE_JVM",
+      "mechanism": "The driver starts this sample's JVM with every PATH entry that contains a docker executable removed. PLAN and GENERATE are unaffected; the restricted runner cannot start the container CLI at VERIFY.",
+      "expected": { "final": "FAILED", "failureCategory": "INFRASTRUCTURE", "repairRounds": 0, "repairModelCalls": 0, "sourceChangesAfterFailure": 0 }
+    },
+    {
+      "id": "FAULT-ENV-02",
+      "class": "ENVIRONMENT",
+      "baseRequirement": "TASK-02",
+      "injection": "MODEL_ENDPOINT_UNREACHABLE",
+      "origin": "HOST_ENVIRONMENT_FAULT",
+      "timing": "WHOLE_SAMPLE_JVM",
+      "mechanism": "The harness points the JVM HTTPS proxy at a closed loopback port before the provider is used and proves the route is refused before the task starts. The request never reaches the provider.",
+      "expected": { "final": "FAILED", "failureCode": "MODEL_NETWORK", "failureCategory": "MODEL_INTERFACE", "modelCalls": 1, "usage": "UNKNOWN", "toolCalls": 0, "repairRounds": 0 }
+    }
+  ]
+}

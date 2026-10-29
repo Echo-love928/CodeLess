@@ -1,0 +1,774 @@
+{
+  "schemaVersion" : 1,
+  "sampleId" : "FAULT-ENV-01",
+  "kind" : "ENV_FAULT",
+  "batchId" : "2026-10-29T10-12-17Z-real-4e8e6f51",
+  "mode" : "REAL",
+  "attempt" : 1,
+  "harness" : {
+    "java" : "21.0.12.1",
+    "os" : "Windows 11",
+    "runtimeBudget" : {
+      "chargedTokens" : 50000,
+      "repairRounds" : 3,
+      "toolSlots" : 20,
+      "framingTokensPerRequest" : 512,
+      "outputTokensPerRequest" : 4096,
+      "modelRequests" : 12
+    },
+    "environment" : {
+      "containerCliOnPath" : false
+    },
+    "provider" : {
+      "privateCapture" : true,
+      "id" : "deepseek",
+      "transport" : "DeepSeekModelProvider",
+      "model" : "deepseek-flash"
+    },
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "startedAt" : "2026-10-29T10:21:01.135630Z",
+    "finishedAt" : "2026-10-29T10:21:09.146518Z",
+    "wallClockMs" : 8010
+  },
+  "injection" : null,
+  "application" : {
+    "id" : "c7cfdc0a-d8b8-47a6-a515-685cf9033785",
+    "name" : "杭州前端大会活动页",
+    "dataMode" : "STATIC",
+    "status" : "ACTIVE",
+    "latestReadyVersionId" : null,
+    "createdAt" : "2026-10-29T10:21:01.180265Z",
+    "updatedAt" : "2026-10-29T10:21:01.180265Z"
+  },
+  "task" : {
+    "id" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "applicationId" : "c7cfdc0a-d8b8-47a6-a515-685cf9033785",
+    "prompt" : "生成“2026 杭州前端开发者大会”活动页：显示活动名称、日期“2026年11月20日”、地点“杭州国际博览中心”；用列表展示三个日程：09:00 开幕致辞、10:30 Vue 性能优化实战、14:00 无障碍设计实践，每项显示时间和标题；页面有“我要报名”按钮，点击后在按钮下方显示“报名意向已记录（演示）”。只在页面内展示，不需要后端。使用静态数据。",
+    "status" : "FAILED",
+    "repairAttempts" : 0,
+    "failureCode" : "AGENT_RUNNER_UNAVAILABLE",
+    "eventSequence" : 6,
+    "queueState" : "FINISHED",
+    "deadlineAt" : "2026-10-29T10:33:01.193183Z",
+    "createdAt" : "2026-10-29T10:21:01.193183Z",
+    "updatedAt" : "2026-10-29T10:21:09.137934Z"
+  },
+  "taskEvents" : [ {
+    "id" : "83530e62-ac34-4b4a-9b6d-8a3b673e81bb",
+    "sequence" : 1,
+    "type" : "STAGE_STARTED",
+    "stage" : "PLAN",
+    "message" : "Task accepted in PLAN",
+    "occurredAt" : "2026-10-29T10:21:01.193183Z"
+  }, {
+    "id" : "cc572bf4-30dd-4d18-902a-65f98fd47d0e",
+    "sequence" : 2,
+    "type" : "STAGE_STARTED",
+    "stage" : "GENERATE",
+    "message" : "Validated plan saved",
+    "occurredAt" : "2026-10-29T10:21:03.237584Z"
+  }, {
+    "id" : "1028d233-8ac2-46a3-b319-ef105ee77767",
+    "sequence" : 3,
+    "type" : "TOOL_RESULT",
+    "stage" : "GENERATE",
+    "message" : "File change metadata recorded",
+    "occurredAt" : "2026-10-29T10:21:06.875363Z"
+  }, {
+    "id" : "1a61187d-0f24-444b-b0c7-448eef55cc93",
+    "sequence" : 4,
+    "type" : "TOOL_RESULT",
+    "stage" : "GENERATE",
+    "message" : "File tool 734af7dd-8d0a-4bcd-9e0e-b9b44f01a00c SUCCEEDED",
+    "occurredAt" : "2026-10-29T10:21:06.877963Z"
+  }, {
+    "id" : "86196661-efcf-4104-9b13-2c0c0a483749",
+    "sequence" : 5,
+    "type" : "STAGE_STARTED",
+    "stage" : "VERIFY",
+    "message" : "Immutable source candidate saved",
+    "occurredAt" : "2026-10-29T10:21:08.469128Z"
+  }, {
+    "id" : "e68b68f9-360d-4904-9714-5b2028779335",
+    "sequence" : 6,
+    "type" : "TASK_FAILED",
+    "stage" : "FAILED",
+    "message" : "Generation stopped; recovery information retained",
+    "occurredAt" : "2026-10-29T10:21:09.138777Z"
+  } ],
+  "versions" : [ {
+    "id" : "3021ad18-cc3a-4ba3-beb6-fac734a7cc18",
+    "number" : 1,
+    "sourceDigest" : "sha256:2bc366a464cd0db97aeb3041b99b99f2577ff2fe2fb3c057c32d66b15d43331d",
+    "status" : "FAILED",
+    "buildId" : null,
+    "sourceTaskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "createdAt" : "2026-10-29T10:21:08.376861Z",
+    "updatedAt" : "2026-10-29T10:21:09.002565Z"
+  } ],
+  "builds" : [ ],
+  "modelCalls" : [ {
+    "id" : "22cf65e3-224e-4ec2-8f0f-2afe02d30ae6",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "SUCCEEDED",
+    "inputTokens" : 1388,
+    "outputTokens" : 259,
+    "errorCode" : null,
+    "createdAt" : "2026-10-29T10:21:01.314812Z",
+    "completedAt" : "2026-10-29T10:21:03.189057Z"
+  }, {
+    "id" : "9b5c7a64-6fa3-4fa2-ac37-9e9c7611ed61",
+    "stage" : "GENERATE",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "SUCCEEDED",
+    "inputTokens" : 2744,
+    "outputTokens" : 946,
+    "errorCode" : null,
+    "createdAt" : "2026-10-29T10:21:03.314015Z",
+    "completedAt" : "2026-10-29T10:21:06.687450Z"
+  }, {
+    "id" : "574ac051-5772-476e-aa20-4d89d7cfaef4",
+    "stage" : "GENERATE",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "SUCCEEDED",
+    "inputTokens" : 3911,
+    "outputTokens" : 210,
+    "errorCode" : null,
+    "createdAt" : "2026-10-29T10:21:06.976164Z",
+    "completedAt" : "2026-10-29T10:21:08.058444Z"
+  } ],
+  "modelAudit" : [ {
+    "callId" : "22cf65e3-224e-4ec2-8f0f-2afe02d30ae6",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : "deepseek-flash",
+    "requestId" : "198efce6-45cf-40b0-accc-615d32f25a8a",
+    "responseId" : "198efce6-45cf-40b0-accc-615d32f25a8a",
+    "status" : "SUCCEEDED",
+    "durationMs" : 1856,
+    "usage" : {
+      "inputTokens" : 1388,
+      "outputTokens" : 259,
+      "totalTokens" : 1647,
+      "raw" : {
+        "prompt_tokens" : 1388,
+        "completion_tokens" : 259,
+        "total_tokens" : 1647,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 1152
+        },
+        "prompt_cache_hit_tokens" : 1152,
+        "prompt_cache_miss_tokens" : 236
+      }
+    },
+    "errorCode" : null,
+    "createdAt" : "2026-10-29T10:21:01.314812Z",
+    "completedAt" : "2026-10-29T10:21:03.182358100Z"
+  }, {
+    "callId" : "9b5c7a64-6fa3-4fa2-ac37-9e9c7611ed61",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "stage" : "GENERATE",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : "deepseek-flash",
+    "requestId" : "05d6ba1f-976a-4a65-89e3-bf7ef25c4f5f",
+    "responseId" : "05d6ba1f-976a-4a65-89e3-bf7ef25c4f5f",
+    "status" : "SUCCEEDED",
+    "durationMs" : 3363,
+    "usage" : {
+      "inputTokens" : 2744,
+      "outputTokens" : 946,
+      "totalTokens" : 3690,
+      "raw" : {
+        "prompt_tokens" : 2744,
+        "completion_tokens" : 946,
+        "total_tokens" : 3690,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 1280
+        },
+        "prompt_cache_hit_tokens" : 1280,
+        "prompt_cache_miss_tokens" : 1464
+      }
+    },
+    "errorCode" : null,
+    "createdAt" : "2026-10-29T10:21:03.314015Z",
+    "completedAt" : "2026-10-29T10:21:06.682908800Z"
+  }, {
+    "callId" : "574ac051-5772-476e-aa20-4d89d7cfaef4",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "stage" : "GENERATE",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : "deepseek-flash",
+    "requestId" : "c5aab0f4-87c7-4e28-8690-0ff833289c55",
+    "responseId" : "c5aab0f4-87c7-4e28-8690-0ff833289c55",
+    "status" : "SUCCEEDED",
+    "durationMs" : 1072,
+    "usage" : {
+      "inputTokens" : 3911,
+      "outputTokens" : 210,
+      "totalTokens" : 4121,
+      "raw" : {
+        "prompt_tokens" : 3911,
+        "completion_tokens" : 210,
+        "total_tokens" : 4121,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 2688
+        },
+        "prompt_cache_hit_tokens" : 2688,
+        "prompt_cache_miss_tokens" : 1223
+      }
+    },
+    "errorCode" : null,
+    "createdAt" : "2026-10-29T10:21:06.976164Z",
+    "completedAt" : "2026-10-29T10:21:08.053543700Z"
+  } ],
+  "journal" : [ {
+    "stage" : "PLAN",
+    "sequence" : 1,
+    "kind" : "model.request",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:01.294004200Z",
+    "payload" : {
+      "reservedTokens" : 10067,
+      "outputTokens" : 4096,
+      "slots" : 1
+    }
+  }, {
+    "stage" : "PLAN",
+    "sequence" : 2,
+    "kind" : "model.input",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:01.354209200Z",
+    "payload" : {
+      "policyBytes" : 4953,
+      "policyDigest" : "sha256:91c22b35ef271e0d1de63df8c1388d6065fc8ac17a786fb859e36173ec925860",
+      "callId" : "22cf65e3-224e-4ec2-8f0f-2afe02d30ae6",
+      "transport" : {
+        "bodyDigest" : "sha256:31482cf5524e67149c84e3d9438d78cbf4b7963e604b72bc683f959dd7c136a3",
+        "responseFormat" : "json_object",
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "thinking" : "disabled",
+        "bodyBytes" : 6079,
+        "stream" : false,
+        "maxOutputTokens" : 4096
+      },
+      "inputDigest" : "sha256:8d3d025a8a4e180983dc0cdd01e8d217bb2e06cdd7a149985108c7ad3ac92261",
+      "roles" : [ "system", "user" ],
+      "inputBytes" : 506
+    }
+  }, {
+    "stage" : "PLAN",
+    "sequence" : 3,
+    "kind" : "model.response",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:03.146989700Z",
+    "payload" : {
+      "schemaVersion" : 1,
+      "template" : "VUE",
+      "dataMode" : "STATIC",
+      "pages" : [ {
+        "route" : "/",
+        "file" : "src/pages/HomePage.vue",
+        "title" : "2026 杭州前端开发者大会",
+        "purpose" : "展示活动名称、日期、地点、三个日程及报名演示按钮。"
+      } ],
+      "components" : [ ],
+      "files" : [ {
+        "path" : "src/pages/HomePage.vue",
+        "purpose" : "活动信息、日程列表与本地报名提示交互。"
+      } ],
+      "acceptance" : [ {
+        "id" : "A1",
+        "route" : "/",
+        "action" : "打开首页",
+        "expected" : "显示活动名称“2026 杭州前端开发者大会”、日期“2026年11月20日”和地点“杭州国际博览中心”。"
+      }, {
+        "id" : "A2",
+        "route" : "/",
+        "action" : "查看日程列表",
+        "expected" : "依次显示 09:00 开幕致辞、10:30 Vue 性能优化实战、14:00 无障碍设计实践，每项均含时间和标题。"
+      }, {
+        "id" : "A3",
+        "route" : "/",
+        "action" : "点击“我要报名”按钮",
+        "expected" : "按钮下方显示“报名意向已记录（演示）”。"
+      } ],
+      "capabilities" : {
+        "backend" : false,
+        "payments" : false,
+        "externalServices" : [ ],
+        "dependencies" : [ ]
+      }
+    }
+  }, {
+    "stage" : "PLAN",
+    "sequence" : 4,
+    "kind" : "model.usage",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:03.173632200Z",
+    "payload" : {
+      "chargedTokens" : 1647,
+      "estimated" : false,
+      "reservationTokens" : 10067,
+      "usage" : {
+        "inputTokens" : 1388,
+        "outputTokens" : 259,
+        "totalTokens" : 1647,
+        "raw" : {
+          "prompt_tokens" : 1388,
+          "completion_tokens" : 259,
+          "total_tokens" : 1647,
+          "prompt_tokens_details" : {
+            "cached_tokens" : 1152
+          },
+          "prompt_cache_hit_tokens" : 1152,
+          "prompt_cache_miss_tokens" : 236
+        }
+      },
+      "releasedTokens" : 8420,
+      "meteringSource" : "PROVIDER_USAGE"
+    }
+  }, {
+    "stage" : "PLAN",
+    "sequence" : 5,
+    "kind" : "plan",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:03.201726600Z",
+    "payload" : {
+      "schemaVersion" : 1,
+      "template" : "VUE",
+      "dataMode" : "STATIC",
+      "pages" : [ {
+        "route" : "/",
+        "file" : "src/pages/HomePage.vue",
+        "title" : "2026 杭州前端开发者大会",
+        "purpose" : "展示活动名称、日期、地点、三个日程及报名演示按钮。"
+      } ],
+      "components" : [ ],
+      "files" : [ {
+        "path" : "src/pages/HomePage.vue",
+        "purpose" : "活动信息、日程列表与本地报名提示交互。"
+      } ],
+      "acceptance" : [ {
+        "id" : "A1",
+        "route" : "/",
+        "action" : "打开首页",
+        "expected" : "显示活动名称“2026 杭州前端开发者大会”、日期“2026年11月20日”和地点“杭州国际博览中心”。"
+      }, {
+        "id" : "A2",
+        "route" : "/",
+        "action" : "查看日程列表",
+        "expected" : "依次显示 09:00 开幕致辞、10:30 Vue 性能优化实战、14:00 无障碍设计实践，每项均含时间和标题。"
+      }, {
+        "id" : "A3",
+        "route" : "/",
+        "action" : "点击“我要报名”按钮",
+        "expected" : "按钮下方显示“报名意向已记录（演示）”。"
+      } ],
+      "capabilities" : {
+        "backend" : false,
+        "payments" : false,
+        "externalServices" : [ ],
+        "dependencies" : [ ]
+      }
+    }
+  }, {
+    "stage" : "PLAN",
+    "sequence" : 6,
+    "kind" : "stage.finished",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:03.218922200Z",
+    "payload" : {
+      "next" : "GENERATE"
+    }
+  }, {
+    "stage" : "GENERATE",
+    "sequence" : 7,
+    "kind" : "model.request",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:03.306450400Z",
+    "payload" : {
+      "reservedTokens" : 14872,
+      "outputTokens" : 4096,
+      "slots" : 1
+    }
+  }, {
+    "stage" : "GENERATE",
+    "sequence" : 8,
+    "kind" : "model.input",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:03.339621900Z",
+    "payload" : {
+      "policyBytes" : 5833,
+      "policyDigest" : "sha256:81399225eea350a5a2c0ecee2ffffd3e78fb2f8c9b0d1db865a34ee26fd93629",
+      "callId" : "9b5c7a64-6fa3-4fa2-ac37-9e9c7611ed61",
+      "transport" : {
+        "bodyDigest" : "sha256:14c3b7f42bdc2016aa835c56ead80c1d20d4b7fbc6ce89c438ba789611539528",
+        "responseFormat" : "json_object",
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "thinking" : "disabled",
+        "bodyBytes" : 10985,
+        "stream" : false,
+        "maxOutputTokens" : 4096
+      },
+      "inputDigest" : "sha256:4784ab4e12bf7135fac250a2465bcbe0ec23c6c86a6444dccfd8f2ff1687f01f",
+      "roles" : [ "system", "user" ],
+      "inputBytes" : 4431
+    }
+  }, {
+    "stage" : "GENERATE",
+    "sequence" : 9,
+    "kind" : "model.response",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:06.651126400Z",
+    "payload" : {
+      "type" : "tool",
+      "name" : "files.create",
+      "arguments" : {
+        "path" : "src/pages/HomePage.vue",
+        "content" : "<template>\n  <main class=\"page\" data-ai-component=\"home-page\">\n    <header class=\"hero\">\n      <h1 class=\"title\">2026 杭州前端开发者大会</h1>\n      <p class=\"meta\">日期：2026年11月20日</p>\n      <p class=\"meta\">地点：杭州国际博览中心</p>\n    </header>\n\n    <section class=\"schedule\">\n      <h2 class=\"section-title\">活动日程</h2>\n      <ul class=\"list\">\n        <li v-for=\"item in schedule\" :key=\"item.time\" class=\"item\">\n          <span class=\"time\">{{ item.time }}</span>\n          <span class=\"name\">{{ item.title }}</span>\n        </li>\n      </ul>\n    </section>\n\n    <section class=\"signup\">\n      <button type=\"button\" class=\"btn\" @click=\"handleSignup\">我要报名</button>\n      <p v-if=\"registered\" class=\"notice\">报名意向已记录（演示）</p>\n    </section>\n  </main>\n</template>\n\n<script setup lang=\"ts\">\nimport { ref } from 'vue';\n\ninterface ScheduleItem {\n  time: string;\n  title: string;\n}\n\nconst schedule: ScheduleItem[] = [\n  { time: '09:00', title: '开幕致辞' },\n  { time: '10:30', title: 'Vue 性能优化实战' },\n  { time: '14:00', title: '无障碍设计实践' }\n];\n\nconst registered = ref(false);\n\nfunction handleSignup(): void {\n  registered.value = true;\n}\n</script>\n\n<style scoped>\n.page {\n  max-width: 720px;\n  margin: 0 auto;\n  padding: 32px 20px 48px;\n  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;\n  color: #1f2933;\n}\n\n.hero {\n  border-bottom: 1px solid #e4e7eb;\n  padding-bottom: 20px;\n  margin-bottom: 28px;\n}\n\n.title {\n  font-size: 28px;\n  margin: 0 0 12px;\n  color: #1a3d7c;\n}\n\n.meta {\n  margin: 4px 0;\n  font-size: 16px;\n  color: #52606d;\n}\n\n.section-title {\n  font-size: 20px;\n  margin: 0 0 12px;\n}\n\n.list {\n  list-style: none;\n  margin: 0;\n  padding: 0;\n}\n\n.item {\n  display: flex;\n  gap: 16px;\n  align-items: center;\n  padding: 12px 16px;\n  margin-bottom: 8px;\n  background: #f5f7fa;\n  border-radius: 8px;\n}\n\n.time {\n  font-weight: 600;\n  color: #1a3d7c;\n  min-width: 56px;\n}\n\n.name {\n  font-size: 16px;\n}\n\n.signup {\n  margin-top: 32px;\n}\n\n.btn {\n  padding: 10px 24px;\n  font-size: 16px;\n  color: #fff;\n  background: #1a3d7c;\n  border: none;\n  border-radius: 6px;\n  cursor: pointer;\n}\n\n.btn:hover {\n  background: #15316a;\n}\n\n.notice {\n  margin-top: 12px;\n  color: #0b7a3b;\n  font-size: 15px;\n}\n</style>\n"
+      }
+    }
+  }, {
+    "stage" : "GENERATE",
+    "sequence" : 10,
+    "kind" : "model.usage",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:06.674280Z",
+    "payload" : {
+      "chargedTokens" : 3690,
+      "estimated" : false,
+      "reservationTokens" : 14872,
+      "usage" : {
+        "inputTokens" : 2744,
+        "outputTokens" : 946,
+        "totalTokens" : 3690,
+        "raw" : {
+          "prompt_tokens" : 2744,
+          "completion_tokens" : 946,
+          "total_tokens" : 3690,
+          "prompt_tokens_details" : {
+            "cached_tokens" : 1280
+          },
+          "prompt_cache_hit_tokens" : 1280,
+          "prompt_cache_miss_tokens" : 1464
+        }
+      },
+      "releasedTokens" : 11182,
+      "meteringSource" : "PROVIDER_USAGE"
+    }
+  }, {
+    "stage" : "GENERATE",
+    "sequence" : 11,
+    "kind" : "tool.request",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:06.717815300Z",
+    "payload" : {
+      "reservedTokens" : 0,
+      "slots" : 1
+    }
+  }, {
+    "stage" : "GENERATE",
+    "sequence" : 12,
+    "kind" : "tool.result",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:06.906840100Z",
+    "payload" : {
+      "callId" : "734af7dd-8d0a-4bcd-9e0e-b9b44f01a00c",
+      "status" : "SUCCEEDED",
+      "errorCode" : null,
+      "content" : null,
+      "beforeDigest" : null,
+      "afterDigest" : "sha256:105ed3fe3f019604965627c23b83cf86093c29cc81a400fe8050b74fb8565d81",
+      "source" : {
+        "files" : [ {
+          "path" : "src/pages/HomePage.vue",
+          "bytes" : 2303,
+          "digest" : "sha256:105ed3fe3f019604965627c23b83cf86093c29cc81a400fe8050b74fb8565d81"
+        } ],
+        "totalBytes" : 2303,
+        "sourceDigest" : "sha256:2bc366a464cd0db97aeb3041b99b99f2577ff2fe2fb3c057c32d66b15d43331d"
+      }
+    }
+  }, {
+    "stage" : "GENERATE",
+    "sequence" : 13,
+    "kind" : "model.request",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:06.967460200Z",
+    "payload" : {
+      "reservedTokens" : 17938,
+      "outputTokens" : 4096,
+      "slots" : 1
+    }
+  }, {
+    "stage" : "GENERATE",
+    "sequence" : 14,
+    "kind" : "model.input",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:07.005516200Z",
+    "payload" : {
+      "policyBytes" : 5833,
+      "policyDigest" : "sha256:81399225eea350a5a2c0ecee2ffffd3e78fb2f8c9b0d1db865a34ee26fd93629",
+      "callId" : "574ac051-5772-476e-aa20-4d89d7cfaef4",
+      "transport" : {
+        "bodyDigest" : "sha256:e0d97cda286c22dac83ccbae750e24126b654f7b60ab01e788f834a3b19f8376",
+        "responseFormat" : "json_object",
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "thinking" : "disabled",
+        "bodyBytes" : 14317,
+        "stream" : false,
+        "maxOutputTokens" : 4096
+      },
+      "inputDigest" : "sha256:2a717e213083402f33fcf77a56ea82e9de0f7a59a23d50413c4f69071d7c0434",
+      "roles" : [ "system", "user" ],
+      "inputBytes" : 7497
+    }
+  }, {
+    "stage" : "GENERATE",
+    "sequence" : 15,
+    "kind" : "model.response",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:08.009084300Z",
+    "payload" : {
+      "type" : "done",
+      "actions" : [ {
+        "type" : "navigate",
+        "path" : "/"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "2026 杭州前端开发者大会"
+        },
+        "value" : "2026 杭州前端开发者大会"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "日期：2026年11月20日"
+        },
+        "value" : "日期：2026年11月20日"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "地点：杭州国际博览中心"
+        },
+        "value" : "地点：杭州国际博览中心"
+      }, {
+        "type" : "expectVisible",
+        "target" : {
+          "text" : "09:00 开幕致辞"
+        }
+      }, {
+        "type" : "expectVisible",
+        "target" : {
+          "text" : "10:30 Vue 性能优化实战"
+        }
+      }, {
+        "type" : "expectVisible",
+        "target" : {
+          "text" : "14:00 无障碍设计实践"
+        }
+      }, {
+        "type" : "click",
+        "target" : {
+          "role" : "button",
+          "name" : "我要报名"
+        }
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "报名意向已记录（演示）"
+        },
+        "value" : "报名意向已记录（演示）"
+      } ]
+    }
+  }, {
+    "stage" : "GENERATE",
+    "sequence" : 16,
+    "kind" : "model.usage",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:08.045455500Z",
+    "payload" : {
+      "chargedTokens" : 4121,
+      "estimated" : false,
+      "reservationTokens" : 17938,
+      "usage" : {
+        "inputTokens" : 3911,
+        "outputTokens" : 210,
+        "totalTokens" : 4121,
+        "raw" : {
+          "prompt_tokens" : 3911,
+          "completion_tokens" : 210,
+          "total_tokens" : 4121,
+          "prompt_tokens_details" : {
+            "cached_tokens" : 2688
+          },
+          "prompt_cache_hit_tokens" : 2688,
+          "prompt_cache_miss_tokens" : 1223
+        }
+      },
+      "releasedTokens" : 13817,
+      "meteringSource" : "PROVIDER_USAGE"
+    }
+  }, {
+    "stage" : "GENERATE",
+    "sequence" : 17,
+    "kind" : "tool.request",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:08.096668Z",
+    "payload" : {
+      "reservedTokens" : 0,
+      "slots" : 1
+    }
+  }, {
+    "stage" : "GENERATE",
+    "sequence" : 18,
+    "kind" : "draft",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:08.403058700Z",
+    "payload" : {
+      "actions" : [ {
+        "type" : "navigate",
+        "path" : "/"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "2026 杭州前端开发者大会"
+        },
+        "value" : "2026 杭州前端开发者大会"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "日期：2026年11月20日"
+        },
+        "value" : "日期：2026年11月20日"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "地点：杭州国际博览中心"
+        },
+        "value" : "地点：杭州国际博览中心"
+      }, {
+        "type" : "expectVisible",
+        "target" : {
+          "text" : "09:00 开幕致辞"
+        }
+      }, {
+        "type" : "expectVisible",
+        "target" : {
+          "text" : "10:30 Vue 性能优化实战"
+        }
+      }, {
+        "type" : "expectVisible",
+        "target" : {
+          "text" : "14:00 无障碍设计实践"
+        }
+      }, {
+        "type" : "click",
+        "target" : {
+          "role" : "button",
+          "name" : "我要报名"
+        }
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "报名意向已记录（演示）"
+        },
+        "value" : "报名意向已记录（演示）"
+      } ],
+      "sourceDirectory" : "<run-root>\\workspaces\\346cbadc-6e42-4c6f-91fe-201ddf1df05a\\snapshots\\03f48171-60d4-42c0-8002-a8fbf8f3152b",
+      "files" : [ {
+        "path" : "src/pages/HomePage.vue",
+        "bytes" : 2303,
+        "digest" : "sha256:105ed3fe3f019604965627c23b83cf86093c29cc81a400fe8050b74fb8565d81"
+      } ],
+      "sourceDigest" : "sha256:2bc366a464cd0db97aeb3041b99b99f2577ff2fe2fb3c057c32d66b15d43331d",
+      "versionId" : "3021ad18-cc3a-4ba3-beb6-fac734a7cc18",
+      "frozenSourceDirectory" : "<run-root>\\private\\versions\\3021ad18-cc3a-4ba3-beb6-fac734a7cc18\\source"
+    }
+  }, {
+    "stage" : "GENERATE",
+    "sequence" : 19,
+    "kind" : "stage.finished",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:08.455647100Z",
+    "payload" : {
+      "next" : "VERIFY"
+    }
+  }, {
+    "stage" : "VERIFY",
+    "sequence" : 20,
+    "kind" : "tool.request",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:08.539712Z",
+    "payload" : {
+      "reservedTokens" : 0,
+      "slots" : 2
+    }
+  }, {
+    "stage" : "VERIFY",
+    "sequence" : 21,
+    "kind" : "runner.result",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:08.762151700Z",
+    "payload" : {
+      "status" : "FAILED",
+      "sourceDigest" : "sha256:2bc366a464cd0db97aeb3041b99b99f2577ff2fe2fb3c057c32d66b15d43331d",
+      "build" : null,
+      "verification" : null,
+      "failure" : "RUNNER_UNAVAILABLE",
+      "executionId" : "4740deda-5c78-46c9-8c77-e8e8028bb77f"
+    }
+  }, {
+    "stage" : "VERIFY",
+    "sequence" : 22,
+    "kind" : "repair.failure",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:09.056427200Z",
+    "payload" : {
+      "code" : "AGENT_RUNNER_UNAVAILABLE",
+      "category" : "INFRASTRUCTURE",
+      "fingerprint" : "sha256:5a8d7faaa3f332d16279ba0655dd46091dee1053825f8f363afd288eeb4bad17",
+      "diagnostic" : "",
+      "sourceDigest" : "sha256:2bc366a464cd0db97aeb3041b99b99f2577ff2fe2fb3c057c32d66b15d43331d",
+      "repairAttempts" : 0,
+      "decision" : "AGENT_RUNNER_UNAVAILABLE"
+    }
+  }, {
+    "stage" : "VERIFY",
+    "sequence" : 23,
+    "kind" : "failure",
+    "taskId" : "346cbadc-6e42-4c6f-91fe-201ddf1df05a",
+    "at" : "2026-10-29T10:21:09.125339500Z",
+    "payload" : {
+      "code" : "AGENT_RUNNER_UNAVAILABLE",
+      "recovery" : "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+      "category" : "INFRASTRUCTURE"
+    }
+  } ],
+  "platformMeter" : {
+    "models" : 3,
+    "tools" : 4,
+    "chargedTokens" : 9458
+  },
+  "sources" : [ {
+    "sourceDigest" : "sha256:2bc366a464cd0db97aeb3041b99b99f2577ff2fe2fb3c057c32d66b15d43331d",
+    "number" : 1,
+    "versionId" : "3021ad18-cc3a-4ba3-beb6-fac734a7cc18",
+    "files" : [ {
+      "bytes" : 2303,
+      "path" : "src/pages/HomePage.vue",
+      "sha256" : "sha256:105ed3fe3f019604965627c23b83cf86093c29cc81a400fe8050b74fb8565d81"
+    } ],
+    "directory" : "source/v1"
+  } ],
+  "screenshots" : [ ],
+  "harnessError" : null
+}

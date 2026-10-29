@@ -1,0 +1,212 @@
+{
+  "task": "D25-A",
+  "batchId": "2026-10-29T10-12-17Z-real-4e8e6f51",
+  "additionalModelRequests": 0,
+  "code02": {
+    "sampleId": "FAULT-CODE-02",
+    "expected": "original proposals remain rejected",
+    "cases": [
+      {
+        "file": "04-result.json",
+        "wireResultSha256": "sha256:fb588fd5cd35c47e31d16d6592102d31c253c59eda4b3d4fc1c2ef375ea3b56f",
+        "replySha256": "sha256:392fec5b29a3f982c74b91ebb7a64444e3be310dc784d6a82cd0c9a31bf84de2",
+        "actions": [
+          {
+            "type": "navigate",
+            "path": "/tasks"
+          },
+          {
+            "type": "expectVisible",
+            "target": {
+              "testId": "task-input"
+            }
+          },
+          {
+            "type": "fill",
+            "target": {
+              "testId": "task-input"
+            },
+            "value": "买牛奶"
+          },
+          {
+            "type": "click",
+            "target": {
+              "testId": "add-btn"
+            }
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "task-input"
+            },
+            "value": ""
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "remaining-count"
+            },
+            "value": "未完成：1"
+          },
+          {
+            "type": "fill",
+            "target": {
+              "testId": "task-input"
+            },
+            "value": "写周报"
+          },
+          {
+            "type": "click",
+            "target": {
+              "testId": "add-btn"
+            }
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "remaining-count"
+            },
+            "value": "未完成：2"
+          },
+          {
+            "type": "click",
+            "target": {
+              "role": "checkbox",
+              "name": "完成 买牛奶"
+            }
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "remaining-count"
+            },
+            "value": "未完成：1"
+          },
+          {
+            "type": "reload"
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "remaining-count"
+            },
+            "value": "未完成：1"
+          },
+          {
+            "type": "expectVisible",
+            "target": {
+              "text": "买牛奶"
+            }
+          },
+          {
+            "type": "expectVisible",
+            "target": {
+              "text": "写周报"
+            }
+          },
+          {
+            "type": "click",
+            "target": {
+              "role": "button",
+              "name": "删除"
+            }
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "remaining-count"
+            },
+            "value": "未完成：0"
+          }
+        ],
+        "observed": "invalid action text",
+        "rejected": true
+      },
+      {
+        "file": "05-result.json",
+        "wireResultSha256": "sha256:c451c50359ebcd69b9d698bc264f4521cb5dc78e1ba5b670b57d511bacc3b1c2",
+        "replySha256": "sha256:b72d759f93261a02a354484858c81c1d18e14b7241675ac445a586ecb0ec2a2c",
+        "actions": [
+          {
+            "type": "navigate",
+            "path": "/tasks"
+          },
+          {
+            "type": "fill",
+            "target": {
+              "testId": "task-input"
+            },
+            "value": "买牛奶"
+          },
+          {
+            "type": "click",
+            "target": {
+              "testId": "add-btn"
+            }
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "task-input"
+            },
+            "value": ""
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "remaining-count"
+            },
+            "value": "未完成：1"
+          },
+          {
+            "type": "fill",
+            "target": {
+              "testId": "task-input"
+            },
+            "value": "买牛奶"
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "text": "买牛奶"
+            },
+            "value": "买牛奶"
+          },
+          {
+            "type": "expectText",
+            "target": {
+              "testId": "remaining-count"
+            },
+            "value": "未完成：1"
+          }
+        ],
+        "observed": "invalid action text",
+        "rejected": true
+      }
+    ]
+  },
+  "code03": {
+    "sampleId": "FAULT-CODE-03",
+    "wireResultSha256": "sha256:be2adafa5c806be58029ee04bc1d61ecaca25d441de447aca22a7ac15d56280c",
+    "replySha256": "sha256:1bbcc50649dca40afc69fdeb8ffa231610f081e91638e11e687e2b4dd1cfad82",
+    "rawReply": "FAULT-CODE-03-reply.txt",
+    "replyBytes": 1039,
+    "jsonSyntaxRejected": true,
+    "usage": {
+      "inputTokens": 5396,
+      "outputTokens": 297,
+      "totalTokens": 5693,
+      "raw": {
+        "prompt_tokens": 5396,
+        "completion_tokens": 297,
+        "total_tokens": 5693,
+        "prompt_tokens_details": {
+          "cached_tokens": 2816
+        },
+        "prompt_cache_hit_tokens": 2816,
+        "prompt_cache_miss_tokens": 2580
+      }
+    },
+    "causeBeyondInvalidSyntax": "UNKNOWN"
+  }
+}
