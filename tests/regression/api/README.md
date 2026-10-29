@@ -22,4 +22,6 @@ node tests/regression/api/record-body-boundary.mjs gate
 
 本卡模型边界测试不需要任何模型调用，不能拿它证明 D21 的真实模型生成/修复效果。完整门禁产生的 Mock 调用总数未知时记 UNKNOWN，不填0。
 
-最终完整门禁为 `2026-10-29T02-36-31.524Z-gate`，aggregate exit1；用 `node tests/regression/api/summarize.mjs 2026-10-29T02-36-31.524Z-gate` 可核对原始日志与相关API源码摘要并复算candidate.json。汇总器exit0仅表示证据可复算，报告中的gateState仍为FAILED。本地唯一失败502的白名单入口诊断见 `evidence/preview-502.json`；完整现场与日志路径在D24-A交接。最终HEAD的GitHub检查可用 `node tests/regression/api/github.mjs status --private-receipt` 查询，不覆盖已提交的固定4052647检查快照。
+首轮完整门禁为 `2026-10-29T02-36-31.524Z-gate`，aggregate exit1；用 `node tests/regression/api/summarize.mjs 2026-10-29T02-36-31.524Z-gate` 可核对原始日志与相关API源码摘要并复算candidate.json。汇总器exit0仅表示证据可复算，报告中的gateState仍为FAILED。原失败502的白名单入口诊断见 `evidence/preview-502.json`；完整现场与日志路径在D24-A交接。最终HEAD的GitHub检查可用 `node tests/regression/api/github.mjs status --private-receipt` 查询，不覆盖已提交的固定4052647检查快照。
+
+B审查后单次完整补验为 `2026-10-29T06-29-39.894Z-gate`，四阶段及aggregate均exit0。用 `node tests/regression/api/summarize.mjs 2026-10-29T06-29-39.894Z-gate review-round2-candidate.json` 单独复算新报告，不覆盖旧FAILED。它还核对全部233份API源码/测试/资源字节及原始日志SHA256。新本地验收通过，历史502根因仍UNKNOWN，是否解除发布阻塞由B/环境维护者复审。公共输入说明在 `services/api/README.md`，建议与阻塞回应在 `review-response.md`。

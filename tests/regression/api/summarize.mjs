@@ -3,6 +3,8 @@ import { resolve, join } from 'node:path';
 import { createHash } from 'node:crypto';
 const name = process.argv[2];
 if (!/^2026-[0-9TZ.-]+-gate$/.test(name ?? '')) throw Error('Expected a recorded gate directory name');
+const outputName = process.argv[3] ?? 'candidate.json';
+if (!['candidate.json', 'review-round2-candidate.json'].includes(outputName)) throw Error('Unexpected summary output');
 const folder = join(import.meta.dirname, 'evidence', name);
 const command = JSON.parse(readFileSync(join(folder, 'command.json'), 'utf8'));
 const raw = readFileSync(command.privateLog);
@@ -20,12 +22,13 @@ const fullProduct = section('e2e').split(/\r?\n/).filter(line => line.startsWith
 const watched = ['ApiRequestBody.java', 'AuthFilter.java'].map(p => 'services/api/src/main/java/dev/codeless/api/auth/' + p)
   .concat(['ApiRequestBodyTest.java', 'RequestBodyBoundaryTest.java', 'RequestBodyBoundaryHttpTest.java'].map(p => 'services/api/src/test/java/dev/codeless/api/auth/' + p));
 const root = resolve(import.meta.dirname, '../../..');
-const unchanged = watched.every(path => hash(readFileSync(join(root, path))) === command.sourceDigests[path]);
+const apiSources = Object.keys(command.sourceDigests).filter(path => path.startsWith('services/api/src/'));
+const unchanged = apiSources.length > 0 && apiSources.every(path => hash(readFileSync(join(root, path))) === command.sourceDigests[path]);
 const selected = ['ApiRequestBodyTest', 'RequestBodyBoundaryTest', 'RequestBodyBoundaryHttpTest', 'ApiSecurityMatrixTest',
-  'AuthHttpTest', 'AuthIntegrationTest', 'VersionHttpIntegrationTest', 'PublicationIntegrationTest', 'TaskQueueIntegrationTest', 'TaskSseHttpTest'];
+  'AuthHttpTest', 'AuthIntegrationTest', 'VersionHttpIntegrationTest', 'PublicationIntegrationTest', 'TaskQueueIntegrationTest', 'TaskSseHttpTest', 'PreviewPlatformIntegrationTest'];
 const coverage = Object.fromEntries(selected.map(name => {
   const result = command.junit.find(row => row.name === 'dev.codeless.api.' + ({ ApiSecurityMatrixTest: 'security',
-    VersionHttpIntegrationTest: 'versions', PublicationIntegrationTest: 'deploy', TaskQueueIntegrationTest: 'tasks', TaskSseHttpTest: 'tasks' }[name] ?? 'auth') + '.' + name);
+    VersionHttpIntegrationTest: 'versions', PublicationIntegrationTest: 'deploy', TaskQueueIntegrationTest: 'tasks', TaskSseHttpTest: 'tasks', PreviewPlatformIntegrationTest: 'preview' }[name] ?? 'auth') + '.' + name);
   return [name, result ?? null];
 }));
 const allPhasesPassed = ['verify:static', 'verify:api', 'verify:runner', 'verify:e2e'].every(name => command.stages?.some(s => s.stage === name && s.exitCode === 0 && s.signal === null));
@@ -39,12 +42,17 @@ const result = { taskId: 'D24-A', base: '5a0f14d49690af8341ab90c1aff564392e39717
   e2eSummary: section('e2e').split(/\r?\n/).filter(line => /^\s*\d+ (passed|failed|skipped|did not run)\b/.test(line)).map(line => line.trim()),
   fullProduct: fullProduct ? { status: fullProduct.status, browserExitCode: fullProduct.browserExitCode,
     run: fullProduct.output?.replaceAll('\\', '/').split('/').at(-1) ?? null } : null,
-  targetedCoverage: coverage, integrity: { logSha256Verified: true, testedApiSourceBytesUnchanged: unchanged,
+  targetedCoverage: coverage, integrity: { logSha256Verified: true, testedApiSourceBytesUnchanged: unchanged, apiSourceFilesCompared: apiSources.length,
     restoredScreenshots: command.restoredScreenshots, sourceHashes: Object.fromEntries(watched.map(p => [p, command.sourceDigests[p]])) },
   developerTokens: { input: null, output: null, total: null, measurement: 'UNKNOWN' },
   platformModelUsage: { provider: 'deterministic-mock', paidRequests: 0, mockCalls: null, totalTokens: null, usage: 'UNKNOWN_NOT_AGGREGATED' },
   remaining: ['Independent approval of A', 'Current final-head remote checks', 'A+B real combination by enabling PR',
     'D21 real-model effect acceptance', 'D23 operational enablement'] };
 if (!unchanged) throw Error('API sources changed since gate started');
-writeFileSync(new URL('./evidence/candidate.json', import.meta.url), JSON.stringify(result, null, 2) + '\n');
+if (outputName === 'review-round2-candidate.json') {
+  result.historicalGate = { evidence: '2026-10-29T02-36-31.524Z-gate', exitCode: 1, apiFailures: 1, preserved: true };
+  result.historical502RootCause = 'UNKNOWN';
+  result.releaseState = result.gateState === 'PASSED' ? 'AWAITING_PEER_REVIEW' : 'BLOCKED';
+}
+writeFileSync(new URL('./evidence/' + outputName, import.meta.url), JSON.stringify(result, null, 2) + '\n');
 console.log(JSON.stringify({ gateState: result.gateState, api: result.api, runner: result.runner, e2eSummary: result.e2eSummary, stages: result.stages, unchanged }));
