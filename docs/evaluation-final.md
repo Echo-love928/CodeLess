@@ -98,7 +98,7 @@ Provider/model 均 `deepseek/deepseek-flash`，每任务 3 修复轮、12 模型
 | pnpm verify:api | exit 0；385/385，0 failure/error/skip；本次 PreviewPlatform 1/1，但历史 502 原因继续 UNKNOWN |
 | pnpm verify:runner | exit 0；268/268，0 fail/skip，真实 Docker/Vue/Chromium |
 | pnpm verify:e2e | exit 0；75/75，完整产品流程 PASSED/browserExitCode=0 |
-| 本地 ci:gate / 远端 ci-gate | **exit 0 / NOT_STARTED：公开推送被自动审批拒绝，远端 PR 尚未创建** |
+| 本地 ci:gate / 远端 ci-gate | **exit 0 / 用户已明确授权公开交付，最终 HEAD 的远端结果须看任务附加草稿 PR，不预填 success** |
 
 本卡自查发现新指标关联器也缺逐行 mode 守卫，先保留合成反例 `finalizer-red.json`，再于 **`b877fca`** 修复：每行必须 REAL、原平台分母/ID/行数完整为 9，CLI 定稿前必须通过批次完整性。实际本轮行均为 REAL，质量数字没有改变，原 final-metrics 逐字节复算 exit 0。受影响的 unit 44/44、mutation 12/12、原 `pnpm verify:static`（58 Node/201 前端）均在 b877fca 重跑通过，证据 `commands/2026-10-29T11-04-*`；没有生产运行时或四阶段入口改动，API/runner/e2e 无受影响变更，不重复付费或全量门禁。后续仅 provenance 标签、审计工具与证据/交接，不继承为新 HEAD 远端检查。
 
@@ -119,4 +119,4 @@ Provider/model 均 `deepseek/deepseek-flash`，每任务 3 修复轮、12 模型
 
 同伴审查：[`review-D25-B.md`](../evals/results/D25-A/review-D25-B.md) 按“阻塞问题 / 建议 / 已核验内容”记录，含精确文件位置和复现。B 的 4/4 专项由 A 独立执行，精确 HEAD 六项远端检查 success 已核对；真实证据仍缺，模式反例复现，不批准。未向对方发送消息或把私密会话写到外部服务。
 
-**远端交付未完成**：自动审批拒绝将模型输出、生成源码、截图/trace、日志摘要等具体评测载荷推送至公开 `Echo-love928/CodeLess`，要求人明确同意这批数据公开。未通过其他方式上传；本地提交/PR 草稿/发布清单已完成，等待公开授权，故远端必需检查尚未触发。该阻塞与真实质量 HOLD 分开记录。
+**公开授权与远端检查**：首次推送因自动审批要求具体载荷公开授权而未执行，未通过其他方式上传。用户随后明确同意将这批约 5.2 MB 的评测交付公开至 `Echo-love928/CodeLess` 并创建草稿 PR；据此使用正常 Git 推送和 PR 创建流程，逐文件清单见 `publication-snapshot.json`。最终 HEAD 远端检查独立产生，本报告不预填 success；公开授权不解除真实质量 HOLD。
