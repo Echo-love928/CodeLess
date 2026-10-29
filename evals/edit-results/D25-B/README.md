@@ -14,3 +14,14 @@
 真实发布页面、封面与下载当前均未采集；完整链 MOCK 另见 docs/evidence/D25-B/verification.json。所有失败和阻塞见 docs/evidence/D25-B/issues.md。
 
 结构核验：`node evals/edit-results/validate.mjs evals/edit-results/D25-B/index.json`。该命令不访问业务运行时，不能替代业务验收。
+
+## 本轮平台链（deterministic-mock）
+
+同一产品候选、真实 PG/Docker/Chromium，retries=0；本地 HTTPS 地址已随测试清理失效。封面专项不由这组完整链证明。
+
+| 用户 | 编辑任务 | 前版本 → 后版本 | 发布及下载证据 | 截图 |
+| --- | --- | --- | --- | --- |
+| 1 | bb4c16e0-eacc-4d46-8a90-0b6612e3da9e | 1ab32616-2b8e-4c2f-8d56-321799b7f4a4 → 18997358-d7d6-4831-9498-ec0f2dfc78c6 | publication=7e539785-e94a-8f49-8081-275f7749c046；[状态/地址/ZIP清单及摘要](../../../docs/evidence/D25-B/full-product.json) | [完成画面](../../../docs/evidence/D25-B/user-1-complete.png) |
+| 2 | 3d80c164-58d4-4543-ab26-5e9adf38210d | 59e05a6a-4548-4b2b-9d1d-a5f08a9a18ec → f6f2041d-2eb5-46ab-84dc-f4630848d78b | publication=af49b15f-dc4c-8b3d-b7e7-a65ca0088b4e；[状态/地址/ZIP清单及摘要](../../../docs/evidence/D25-B/full-product.json) | [完成画面](../../../docs/evidence/D25-B/user-2-complete.png) |
+
+失败任务 10a8f97c-15be-42f7-81e7-3fc5d2b8ed4b；[保留旧版本画面](../../../docs/evidence/D25-B/failed-edit-keeps-old-version.png)。发布页访问与刷新 HTTP 200、导出 ZIP 内清单/摘要核验由原验收断言执行，完整记录与原报告 SHA256 在 full-product.json；这些不是本轮 REAL 原批次成绩。
