@@ -1,0 +1,80 @@
+{
+  "task": "D24-B",
+  "base": "5a0f14d49690af8341ab90c1aff564392e397177",
+  "sourceCommit": "b98c02314c77736965cecabaa1df728dfb6c0222",
+  "sourceCommitRole": "same tested production/test bytes; docs/evidence added after gate start",
+  "reproduction": {
+    "command": "corepack pnpm --filter @codeless/web exec vitest run src/features/preview/PreviewPanel.test.ts",
+    "red": {
+      "exitCode": 1,
+      "passed": 6,
+      "failed": 2,
+      "log": "preview-red.log"
+    },
+    "green": {
+      "exitCode": 0,
+      "passed": 8,
+      "failed": 0,
+      "log": "preview-green.log"
+    },
+    "testDigest": "sha256:237a6e601e70f1b7ec34502b586f8f3b2402aeeb27c6546c09c29ffe55d1be82",
+    "baselineComponentBlob": "749dde7",
+    "modelRequests": 0,
+    "environment": "jsdom/Vue with mocked credential API"
+  },
+  "gate": {
+    "command": "node tests/e2e/full/record-command.mjs gate",
+    "actualCommand": "corepack pnpm ci:gate",
+    "startedAt": "2026-10-29T01:22:00.729Z",
+    "completedAt": "2026-10-29T02:51:17.060Z",
+    "checkoutReference": "5a0f14d49690af8341ab90c1aff564392e397177",
+    "status": "FAILED",
+    "exitCode": 1,
+    "signal": null,
+    "canonical": false,
+    "changedSources": [],
+    "logDigest": "sha256:91168cbd0adf122592991a4923059a219a41d0e926acdb8b69bee707d08367e4",
+    "excerpts": "gate-excerpts.log",
+    "stageNativeExitCodes": {
+      "static": null,
+      "api": null,
+      "runner": null,
+      "e2e": null
+    },
+    "stageNativeExitExplanation": "Existing aggregate logs do not record individual child native exit codes; null remains unknown.",
+    "testedSources": {
+      "apps/web/src/features/preview/PreviewPanel.vue": {
+        "startedDigest": "sha256:2445767138334202f24ea4151f7dd936e85c602db0c639e1a8278342d77ec3d6",
+        "currentDigest": "sha256:2445767138334202f24ea4151f7dd936e85c602db0c639e1a8278342d77ec3d6",
+        "unchanged": true
+      },
+      "apps/web/src/features/preview/PreviewPanel.test.ts": {
+        "startedDigest": "sha256:237a6e601e70f1b7ec34502b586f8f3b2402aeeb27c6546c09c29ffe55d1be82",
+        "currentDigest": "sha256:237a6e601e70f1b7ec34502b586f8f3b2402aeeb27c6546c09c29ffe55d1be82",
+        "unchanged": true
+      }
+    },
+    "api": {
+      "classes": 77,
+      "tests": 376,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "usage": {
+    "developer": {
+      "input": null,
+      "output": null,
+      "total": null,
+      "measurement": "UNKNOWN"
+    },
+    "newPaidModelRequests": 0,
+    "gateMockTokens": null
+  },
+  "publicLogs": {
+    "preview-red.log": "sha256:d52ed269c403d5527ce0688c1b1484c80b390dea1fdec300c3b7d192229f39e8",
+    "preview-green.log": "sha256:a5099161a034e066b574a388ebf225f827b1cbd2285240ce6094ea625ac19cb5",
+    "gate-excerpts.log": "sha256:4d703a778750af0994b766c78fbf78ab37c68b3b017c2c5f5848d836c216f9ae"
+  }
+}

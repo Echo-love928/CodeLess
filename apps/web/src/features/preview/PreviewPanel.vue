@@ -63,9 +63,14 @@ function message(event: MessageEvent) {
   }
 }
 async function refresh() {
-  const previous = props.versionId, current = generation
+  const previous = props.versionId
+  // Retire the previous document before awaiting version metadata: its bridge
+  // messages and expiry timer must not change the new refresh lifecycle.
+  dispose()
+  const current = generation
+  state.value = 'loading'; error.value = ''
   try {
-    if (props.refreshVersion) { state.value = 'loading'; await props.refreshVersion() }
+    if (props.refreshVersion) await props.refreshVersion()
     if (current !== generation) return
     if (previous === props.versionId) await load()
   } catch (cause) {

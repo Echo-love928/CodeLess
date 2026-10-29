@@ -1,0 +1,58 @@
+
+ RUN  v3.0.9 F:/JAVA/CodeLess/CodeLess/tests/regression/api/.private/peer-base/apps/web
+
+ ❯ src/features/preview/PreviewPanel.test.ts (8 tests | 2 failed) 88ms
+   ✓ PreviewPanel lifecycle > has an honest empty/failure state, with no credential request
+   ✓ PreviewPanel lifecycle > restricts iframe capabilities, ignores unrelated messages, expires and renews credentials
+   ✓ PreviewPanel lifecycle > does not attach a credential returned for a previous application/version after a switch
+   ✓ PreviewPanel lifecycle > an error document message cannot be treated as a successful iframe load
+   ✓ PreviewPanel lifecycle > a late refresh error after switching versions cannot remove the new iframe
+   ✓ PreviewPanel lifecycle > a stalled document remains a visible error rather than readiness
+   × PreviewPanel lifecycle > revokes the old frame immediately while refreshing the current version 15ms
+     → expected true to be false // Object.is equality
+   × PreviewPanel lifecycle > old credential expiry cannot interrupt an in-flight version refresh 7ms
+     → expected '版本 55555555-5555-4555-8555-5555555555…' to contain '正在加载'
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 6 passed (8)
+   Start at  11:40:56
+   Duration  2.16s (transform 334ms, setup 0ms, collect 687ms, tests 88ms, environment 811ms, prepare 196ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/preview/PreviewPanel.test.ts > PreviewPanel lifecycle > revokes the old frame immediately while refreshing the current version
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/features/preview/PreviewPanel.test.ts:108:45
+    106|     // A delayed bridge message from the previous document must not re…
+    107|     loaded(); await flushPromises()
+    108|     expect(wrapper.find('iframe').exists()).toBe(false)
+       |                                             ^
+    109|     expect(wrapper.text()).toContain('正在加载')
+    110|     expect(wrapper.get('button').attributes('disabled')).toBeDefined()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/features/preview/PreviewPanel.test.ts > PreviewPanel lifecycle > old credential expiry cannot interrupt an in-flight version refresh
+AssertionError: expected '版本 55555555-5555-4555-8555-5555555555…' to contain '正在加载'
+
+Expected: "正在加载"
+Received: "版本 55555555-5555-4555-8555-555555555555刷新预览预览访问已过期，请刷新预览。"
+
+ ❯ src/features/preview/PreviewPanel.test.ts:128:28
+    126|     await flushPromises(); await wrapper.get('button').trigger('click')
+    127|     await vi.advanceTimersByTimeAsync(1000)
+    128|     expect(wrapper.text()).toContain('正在加载')
+       |                            ^
+    129|     expect(wrapper.text()).not.toContain('已过期')
+    130|     expect(wrapper.get('button').attributes('disabled')).toBeDefined()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

@@ -86,12 +86,16 @@ public class AuthFilter extends OncePerRequestFilter {
             error(response, request, HttpStatus.BAD_REQUEST, "INVALID_REQUEST");
             return;
         }
-        if (publicAuth) {
-            chain.doFilter(request, response);
+        // Identity, CSRF, role and canonical-path checks retain precedence. Even JSON with a valid prefix and
+        // oversized trailing data must be rejected before a controller can produce a side effect.
+        HttpServletRequest bounded;
+        try { bounded = ApiRequestBody.bounded(request); }
+        catch (ApiRequestBody.TooLarge tooLarge) {
+            error(response, request, HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "Request body exceeds 131072 bytes");
             return;
         }
-        request.setAttribute(ACCOUNT, account);
-        chain.doFilter(request, response);
+        if (!publicAuth) bounded.setAttribute(ACCOUNT, account);
+        chain.doFilter(bounded, response);
     }
 
     private static String routed(HttpServletRequest request) {
@@ -105,16 +109,21 @@ public class AuthFilter extends OncePerRequestFilter {
 
     private void error(HttpServletResponse response, HttpServletRequest request, HttpStatus status, String code)
             throws IOException {
-        response.setStatus(status.value());
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.setHeader("Cache-Control", "no-store");
         String message = switch (code) {
             case "UNAUTHENTICATED" -> "Authentication required";
             case "CSRF_INVALID" -> "CSRF token missing or invalid";
             case "INVALID_REQUEST" -> "Request path is not canonical";
             default -> "Access denied";
         };
+        error(response, request, status, code, message);
+    }
+
+    private void error(HttpServletResponse response, HttpServletRequest request, HttpStatus status, String code,
+                       String message) throws IOException {
+        response.setStatus(status.value());
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("Cache-Control", "no-store");
         mapper.writeValue(response.getWriter(), new ApiError(code, message, Instant.now(),
                 request.getRequestURI(), UUID.randomUUID().toString(), Map.of()));
     }

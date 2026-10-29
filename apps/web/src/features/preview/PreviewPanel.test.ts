@@ -91,4 +91,47 @@ describe('PreviewPanel lifecycle', () => {
     wrapper.unmount()
   })
 
+  it('revokes the old frame immediately while refreshing the current version', async () => {
+    get.mockResolvedValue(value())
+    let finish!: () => void
+    const refreshVersion = () => new Promise<void>(resolve => { finish = resolve })
+    const wrapper = mount(PreviewPanel, { props: { applicationId: app, versionId: version, refreshVersion } })
+    await flushPromises()
+    const source = (wrapper.get('iframe').element as HTMLIFrameElement).contentWindow
+    const loaded = () => window.dispatchEvent(new MessageEvent('message', {
+      origin: new URL(value().url).origin, source, data: { type: 'codeless-preview', state: 'loaded' },
+    }))
+    loaded(); await flushPromises()
+    await wrapper.get('button').trigger('click')
+    // A delayed bridge message from the previous document must not restore editing.
+    loaded(); await flushPromises()
+    expect(wrapper.find('iframe').exists()).toBe(false)
+    expect(wrapper.text()).toContain('正在加载')
+    expect(wrapper.get('button').attributes('disabled')).toBeDefined()
+    finish(); await flushPromises()
+    expect(get).toHaveBeenCalledTimes(2)
+    expect(wrapper.find('iframe').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('old credential expiry cannot interrupt an in-flight version refresh', async () => {
+    get.mockResolvedValue({ ...value(), expiresAt: new Date(Date.now() + 1000).toISOString() })
+    let finish!: () => void
+    const refreshVersion = () => new Promise<void>(resolve => { finish = resolve })
+    const wrapper = mount(PreviewPanel, { props: { applicationId: app, versionId: version, refreshVersion } })
+    await flushPromises()
+    const source = (wrapper.get('iframe').element as HTMLIFrameElement).contentWindow
+    window.dispatchEvent(new MessageEvent('message', { origin: new URL(value().url).origin, source,
+      data: { type: 'codeless-preview', state: 'loaded' } }))
+    await flushPromises(); await wrapper.get('button').trigger('click')
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(wrapper.text()).toContain('正在加载')
+    expect(wrapper.text()).not.toContain('已过期')
+    expect(wrapper.get('button').attributes('disabled')).toBeDefined()
+    get.mockResolvedValue(value()); finish(); await flushPromises()
+    expect(get).toHaveBeenCalledTimes(2)
+    expect(wrapper.find('iframe').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
 })

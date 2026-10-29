@@ -1,0 +1,68 @@
+{
+  "task": "D24-B",
+  "status": "UNATTRIBUTED",
+  "releaseCandidate": "HOLD",
+  "command": "corepack pnpm ci:gate (through existing full recorder)",
+  "aggregateExitCode": 1,
+  "signal": null,
+  "static": {
+    "nodePassed": 52,
+    "frontendPassed": 201,
+    "failed": 0
+  },
+  "api": {
+    "classes": 77,
+    "passed": 376,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "runner": {
+    "passed": 268,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "e2e": {
+    "smokePassed": 74,
+    "smokeFailed": 1,
+    "fullProductInAggregate": "NOT_EXECUTED",
+    "failedCase": "D15-B real static publication hosting and isolated probe",
+    "assertion": {
+      "expectedHostingChildExitCode": 0,
+      "actualHostingChildExitCode": 1
+    },
+    "error": {
+      "code": "EPERM",
+      "errno": -4048,
+      "syscall": "rename",
+      "source": ".local-data/d15-b/hosting/sites-staging/<staging-id>",
+      "destination": ".local-data/d15-b/hosting/sites/<deployment-id>",
+      "location": "services/runner/src/publish/store.mjs:72",
+      "stage": "Frozen gateway publish; before the local Nginx fixture starts"
+    }
+  },
+  "relationToPreviewFix": "UNKNOWN; no unchanged-baseline control for the original EPERM was executed",
+  "attribution": "Reading the source and one valid isolated write do not identify the OS denial cause. No rename retry, permission change, fallback copy, or assertion relaxation was introduced.",
+  "diagnostics": [
+    {
+      "command": "jcmd <owned-api-jvm> Thread.print -l",
+      "exitCode": 0,
+      "logDigest": "sha256:f9c0383a6f11d4334efa4c584aae8461f61d3a576e3e3a3817e6479fab265d81",
+      "observation": "Sampled main thread RUNNABLE in WindowsPath.toRealPath / LocalVolumeSnapshotStore.check; later progress and all 376 API tests completed successfully. This is not a performance root-cause proof."
+    },
+    {
+      "evidence": "windows-store-probe-invalid-fixture.json",
+      "status": "FAILED_DEVELOPER_FIXTURE",
+      "exitCode": 1,
+      "explanation": "The initial diagnostic used app.js instead of the allowlisted assets/app.js. This is a fixture admission error, not a reproduction of EPERM."
+    },
+    {
+      "evidence": "windows-store-probe-valid-fixture.json",
+      "status": "PASSED",
+      "exitCode": 0,
+      "explanation": "One synthetic immutable store write in a fresh owned directory passed. It neither reruns the original hosting test nor clears its failure."
+    }
+  ],
+  "originalLogDigest": "sha256:91168cbd0adf122592991a4923059a219a41d0e926acdb8b69bee707d08367e4"
+}
