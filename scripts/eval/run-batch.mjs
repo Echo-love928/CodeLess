@@ -8,7 +8,7 @@ import { randomUUID } from 'node:crypto'
 import { appendFileSync, closeSync, copyFileSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { delimiter, dirname, join, relative, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { FROZEN, REAL_RUNS, canonical, loadFrozen, pathKey, plannedSamples, readJson, root, sha256, withoutContainerCli } from './lib.mjs'
+import { FROZEN, REAL_RUNS, canonical, isRealRunLocation, loadFrozen, pathKey, plannedSamples, readJson, root, sha256, withoutContainerCli } from './lib.mjs'
 import { writeReport } from './report.mjs'
 
 const windows = process.platform === 'win32'
@@ -205,8 +205,7 @@ export async function runBatch(options, deps = {}) {
     planned = planned.filter((s) => batch.samples.some((b) => b.id === s.id))
   } else {
     const parent = resolve(options.out ?? join(root, options.mode === 'REAL' ? REAL_RUNS : '.local-data/d21-a/mock-runs'))
-    const realRuns = resolve(root, REAL_RUNS)
-    if (options.mode === 'MOCK' && (parent + '/').startsWith(realRuns + '/')) throw new Error('mock batches never go under ' + REAL_RUNS)
+    if (options.mode === 'MOCK' && isRealRunLocation(parent)) throw new Error('mock batches never go under reserved REAL run directories')
     if (options.mode === 'REAL' && !git.scopedClean) throw new Error('REAL batch requires the harness and frozen set committed:\n' + git.scopedStatus)
     const id = newBatchId(options.mode, now())
     dir = join(parent, id)
