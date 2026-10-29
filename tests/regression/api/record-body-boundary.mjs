@@ -9,9 +9,10 @@ const selected = {
   red: 'RequestBodyBoundaryTest',
   'baseline-http': 'RequestBodyBoundaryHttpTest',
   green: 'RequestBodyBoundaryTest,ApiRequestBodyTest,RequestBodyBoundaryHttpTest',
+  preview: 'PreviewPlatformIntegrationTest',
   regression: 'ApiSecurityMatrixTest,AuthHttpTest,AuthIntegrationTest,VersionHttpIntegrationTest,PublicationIntegrationTest,TaskQueueIntegrationTest,GlobalExceptionHandlerTest'
 };
-if (!selected[mode] && mode !== 'gate') throw Error('Expected red, green, regression or gate');
+if (!selected[mode] && mode !== 'gate') throw Error('Expected ' + [...Object.keys(selected), 'gate'].join(', '));
 const stamp = new Date().toISOString().replaceAll(':', '-');
 const publicRoot = join(import.meta.dirname, 'evidence', `${stamp}-${mode}`);
 const privateRoot = join(import.meta.dirname, '.private', `${stamp}-${mode}`);
