@@ -4,17 +4,23 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { buildReport, loadBatch } from './report.mjs'
+import { verifyBatch } from './verify-batch.mjs'
 import { aggregateUsage } from './ledger.mjs'
 import { canonical, sha256 } from './lib.mjs'
 
 export function joinBehavior(platform, behavior) {
   assert.equal(platform.mode, 'REAL'); assert.equal(platform.realModelEvidence, true)
+  assert.equal(platform.requirements.denominator, 9, 'fixed denominator must be nine')
+  assert.equal(platform.requirements.sampleIds.length, 9)
+  assert.equal(new Set(platform.requirements.sampleIds).size, 9)
+  assert.deepEqual(platform.requirements.samples.map(row => row.sampleId), platform.requirements.sampleIds)
   assert.equal(behavior.mode, 'REAL'); assert.equal(behavior.batchId, platform.batchId)
   assert.ok(behavior.completedAt && ['PASSED', 'FAILED'].includes(behavior.status), 'behavior must have terminated')
   assert.equal(behavior.additionalModelRequests, 0)
   assert.deepEqual(behavior.rows.map(row => row.sampleId), platform.requirements.sampleIds)
   const rows = platform.requirements.samples.map((sample, index) => {
     const row = behavior.rows[index]
+    assert.equal(row.mode, 'REAL', 'MOCK rows cannot contribute to REAL behavior')
     assert.equal(row.taskId, sample.taskId)
     assert.equal(row.rawDigest, platform.inputs['samples/' + sample.sampleId + '/record.json'])
     assert.ok(typeof row.passed === 'boolean', 'unexecuted behavior remains unknown, not successful')
@@ -35,6 +41,7 @@ export function joinBehavior(platform, behavior) {
 }
 
 export function finalMetrics(batchDir, behaviorPath) {
+  assert.equal(verifyBatch(batchDir).ok, true, 'batch integrity must pass before finalization')
   const platform = buildReport(batchDir), bytes = readFileSync(behaviorPath), behavior = JSON.parse(bytes)
   const combined = joinBehavior(platform, behavior), { items } = loadBatch(batchDir)
   return { schemaVersion: 1, task: 'D25-A', batchId: platform.batchId, evaluatedCommit: platform.platformCommit,

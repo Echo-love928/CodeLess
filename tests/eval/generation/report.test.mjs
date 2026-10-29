@@ -35,16 +35,26 @@ test('D25 behavior join lowers platform success and rejects unknown, mock or mis
   const batch = syntheticBatch(); t.after(() => rmSync(batch.parent, { recursive: true, force: true }))
   const platform = buildReport(batch.dir)
   const behavior = { mode: 'REAL', batchId: platform.batchId, completedAt: '2026-10-29T10:22:00Z', status: 'FAILED', additionalModelRequests: 0,
-    rows: platform.requirements.samples.map(sample => ({ sampleId: sample.sampleId, taskId: sample.taskId, passed: true,
+    rows: platform.requirements.samples.map(sample => ({ sampleId: sample.sampleId, taskId: sample.taskId, mode: 'REAL', passed: true,
       rawDigest: platform.inputs['samples/' + sample.sampleId + '/record.json'], versionId: sample.finalVersion.id,
       sourceDigest: sample.finalVersion.sourceDigest, originalVerification: { status: 'PASSED' }, build: { status: 'SUCCEEDED', exitCode: 0 }, browser: { status: 'PASSED' } })) }
   behavior.rows[0].passed = false
   assert.equal(joinBehavior(platform, behavior).passed, 8)
-  for (const change of [r => { r.mode = 'MOCK' }, r => { r.rows[1].taskId = 'other' }, r => { r.rows[1].sourceDigest = 'other' },
+  for (const change of [r => { r.mode = 'MOCK' }, r => { r.rows[1].mode = 'MOCK' }, r => { r.rows[1].taskId = 'other' }, r => { r.rows[1].sourceDigest = 'other' },
     r => { r.rows[1].rawDigest = 'other' }, r => { r.rows[1].passed = null }, r => { r.rows[1].build.exitCode = 1 },
     r => { r.rows.pop() }, r => { r.completedAt = null }]) {
     const invalid = structuredClone(behavior); change(invalid)
     assert.throws(() => joinBehavior(platform, invalid))
+  }
+})
+
+test('D25 finalizer rejects reduced denominators and replaced platform rows', t => {
+  const batch = syntheticBatch(); t.after(() => rmSync(batch.parent, { recursive: true, force: true }))
+  const platform = buildReport(batch.dir)
+  for (const change of [r => { r.requirements.denominator = 8 }, r => { r.requirements.sampleIds.pop() },
+    r => { r.requirements.sampleIds[1] = r.requirements.sampleIds[0] }, r => { r.requirements.samples.pop() }]) {
+    const invalid = structuredClone(platform); change(invalid)
+    assert.throws(() => joinBehavior(invalid, {}))
   }
 })
 
