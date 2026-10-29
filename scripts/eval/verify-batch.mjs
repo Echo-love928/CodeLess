@@ -5,7 +5,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { CATEGORIES, REAL_RUNS, loadFrozen, plannedSamples, root, sha256 } from './lib.mjs'
+import { CATEGORIES, REAL_RUNS, REAL_RESULT_RUNS, isRealRunLocation, loadFrozen, plannedSamples, root, sha256 } from './lib.mjs'
 import { checkReport, loadBatch } from './report.mjs'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
@@ -48,9 +48,8 @@ export function verifyBatch(batchDir, { historical = false, repositoryRoot = roo
   const present = existsSync(join(dir, 'samples')) ? readdirSync(join(dir, 'samples')).sort() : []
   const extra = present.filter((id) => !expected.includes(id))
   add('no sample directory outside the plan', extra.length === 0, extra.length ? extra.join(', ') : null)
-  const realRuns = resolve(repositoryRoot, REAL_RUNS)
-  const underRuns = (resolve(dir) + '/').replaceAll('\\', '/').startsWith(realRuns.replaceAll('\\', '/') + '/')
-  add('mode matches location', batch.mode === 'REAL' ? underRuns : !underRuns, batch.mode + (underRuns ? ' under ' : ' outside ') + REAL_RUNS)
+  const underRuns = isRealRunLocation(dir, repositoryRoot)
+  add('mode matches location', batch.mode === 'REAL' ? underRuns : !underRuns, batch.mode + (underRuns ? ' under ' : ' outside ') + REAL_RUNS + ' or ' + REAL_RESULT_RUNS)
   const taskIds = []
   const appIds = []
   const logged = existsSync(join(dir, 'batch-events.jsonl'))
