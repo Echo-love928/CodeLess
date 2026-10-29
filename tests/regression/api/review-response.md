@@ -1,6 +1,19 @@
 # D24-A 回应 B 对 7a17a6b 的审查
 
-## 补充：B对0dbc999的三文件指纹复核
+## 更正：B点名的三个API文件原始指纹与LF比对
+
+上轮将比对对象误判为文档/汇总工具，未覆盖B要求，不能解除该阻塞。本轮明确核对：
+
+- `services/api/src/main/java/dev/codeless/api/data/TaskProgressService.java`
+- `services/api/src/main/java/dev/codeless/api/tasks/TaskEventReplay.java`
+- `services/api/src/test/java/dev/codeless/api/auth/AuthIntegrationTest.java`
+
+`node tests/regression/api/verify-api-site-fingerprints.mjs` exit0、3/3：原始字节副本逐字节匹配原被测门禁sourceDigests；仅CRLF→LF后逐字节匹配9cf78ef、0dbc999、b5f9ec8三个Git版本，CRLF对数分别45/91/169，无内容差异。原文件实为混合CRLF/LF，另有单LF计数，完整轮廓在comparison.json；不能把Git LF统一重构为CRLF来匹配原始哈希。当前工作区LF内容也匹配复核Git版本。原始副本是本次补存且由原记录SHA256绑定，不伪称运行时已有副本，不从Git LF重构。
+完整SHA256、Git blob OID、字节数、原始副本和复算规则在 `evidence/api-fingerprint-review-b5f9ec8/README.md`、comparison.json、site/*.raw；`-text`保护原始CRLF。API源码、门禁入口、断言、原通过/失败记录及UNKNOWN均未改动，未重跑门禁。正式批准仍待B复审。
+
+---
+
+## 历史误判：B对0dbc999的三文件指纹复核（对象非B要求）
 
 只补证据，未修改被比对的PR-DRAFT.md、README.md、summarize.mjs，也未修改API源码或重跑门禁。
 `node tests/regression/api/verify-source-fingerprints.mjs` exit0：三项历史现场SHA256逐字节匹配门禁提交9cf78ef的Git blob；三项当前现场与审查提交0dbc999的Git内容在原始字节和仅CRLF→LF归一化后均匹配。两个提交版本间存在运行后文档/报告工具改动，不能称为仅换行变化。

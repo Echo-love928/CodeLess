@@ -1,5 +1,7 @@
 # B复核：三个文件的现场指纹与Git内容关联
 
+**历史覆盖对象判断错误**：本目录核对的是文档/汇总工具，不是B要求的三个API文件，不能据此解除该阻塞。正确补证见相邻 `../api-fingerprint-review-b5f9ec8/README.md`；本目录保留追溯，不改写其原始结果。
+
 审查提交：`0dbc999cc3712d8c7cb66b032e924a9569bc284c`。
 完整本地门禁提交：`9cf78ef1f812aa8377fb7d42215650e78b05b3b9`。
 现场指纹来源：该审查提交中的 `evidence/2026-10-29T06-29-39.894Z-gate/command.json` 的 `sourceDigests`。
