@@ -77,5 +77,7 @@ if (pr) {
   const checks = await api(`commits/${pr.head.sha}/check-runs?per_page=100`);
   output.checks = checks.check_runs.map(c => ({ name: c.name, status: c.status, conclusion: c.conclusion, head: c.head_sha }));
 }
-writeFileSync(new URL('pr-status.json', folder), JSON.stringify(output, null, 2) + '\n');
+const receipt = process.argv.includes('--private-receipt') ? new URL('./.private/pr-status-current.json', import.meta.url) : new URL('pr-status.json', folder);
+if (process.argv.includes('--private-receipt')) mkdirSync(new URL('./.private/', import.meta.url), { recursive: true });
+writeFileSync(receipt, JSON.stringify(output, null, 2) + '\n');
 console.log(JSON.stringify(output));
