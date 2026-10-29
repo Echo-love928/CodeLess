@@ -1,5 +1,13 @@
 # D24-A 回应 B 对 7a17a6b 的审查
 
+## 补充：B对0dbc999的三文件指纹复核
+
+只补证据，未修改被比对的PR-DRAFT.md、README.md、summarize.mjs，也未修改API源码或重跑门禁。
+`node tests/regression/api/verify-source-fingerprints.mjs` exit0：三项历史现场SHA256逐字节匹配门禁提交9cf78ef的Git blob；三项当前现场与审查提交0dbc999的Git内容在原始字节和仅CRLF→LF归一化后均匹配。两个提交版本间存在运行后文档/报告工具改动，不能称为仅换行变化。
+完整哈希、Git对象ID、差异补丁和守卫结果见 `evidence/fingerprint-review-0dbc999/README.md` 及comparison.json。API源码、门禁入口及版本文件均无差异。已只读核验0dbc999六项远端success，快照独立保存；新证据HEAD另查，不继承旧success。是否解除最后阻塞由B复核。
+
+---
+
 审查输入来自用户转交的 B 结论：未发现新增生产代码阻塞；B 独立先红后绿及重新编译后的边界、权限、旧版本21/21通过；7a17a6b远端六项通过。该21项是B的独立结果，不记作A本轮新执行。
 
 | B 的意见 | 本轮处理 / 状态 |

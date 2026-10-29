@@ -1,0 +1,79 @@
+diff --git a/tests/regression/api/PR-DRAFT.md b/tests/regression/api/PR-DRAFT.md
+index 9ca43aa..0c39f2a 100644
+--- a/tests/regression/api/PR-DRAFT.md
++++ b/tests/regression/api/PR-DRAFT.md
+@@ -6,8 +6,9 @@ API 请求体此前在完整解析后才做字段长度校验，无法保护直
+ - 先红后绿：原过滤器4项中2失败；相同真实HTTP/PostgreSQL测试配合旧过滤器返回201（期望400），native1；修复后首轮9/9、native0。原始失败、摘要及源码指纹都保留。
+ - 兼容/失败：恰好128 KiB及最坏JSON转义的8000码点输入可提交；超限不创建应用，401/403优先级与取消终态保持；断流不进入控制器。
+ - 模型来源：专项无模型调用；完整阶段门禁为deterministic-mock。真实模型效果不由本PR证明。
+-- 完整门禁：在2dd95fb执行原始ci:gate，static=0，API=1（385项、384 pass/1 failure/0 error/0 skipped），runner=0（268/268），e2e=0（75/75及全产品验收PASSED），ci-gate=1。唯一失败为真实预览csrf 502/HTML，入口诊断为CONNECT TIMEOUT和上游504/502，其他连接错误细类仍UNKNOWN。原API失败保留，候选发布冻结，不重试至绿。见docs/defects.md的D24-A-ENV-02、白名单preview-502.json及evidence/candidate.json。首次记录器启动失败exitCode=null/ENOENT另存，修正仅涉及记录器Windows Path。
+-- 受影响回归：新增9/9、权限矩阵7/7、旧版本HTTP5/5、发布8/8、队列7/7、SSE10/10。固定远端4052647六项检查success不回填本地失败，后续HEAD独立检查。
+-- B只读审查：PR #78固定b98c023，独立相同测试字节旧组件6/8→修复组件8/8；未发现生产修复阻塞，建议补本地门禁状态/失败时unmount清理。精确B六项远端success不替代A结果或A+B组合。结论和原始独立日志见tests/regression/api/review-D24-B.md。
++- 最新完整本地门禁：回应B审查后仅执行一轮原始ci:gate，冻结HEAD9cf78ef，**static/api/runner/e2e/ci-gate均native0**。API385/385、runner268/268、e2e75/75及全产品PASSED，原失败的PreviewPlatformIntegrationTest 1/1。80份JUnit共385项、全部233份API源码字节及日志SHA256复算一致。规范新报告：tests/regression/api/evidence/review-round2-candidate.json。
++- B建议已处理：新增services/api/README.md公开128 KiB字节上限、chunked、权限检查优先级、400 INVALID_REQUEST/no-store及错误示例；示例通过现有error.schema的AJV校验，未改共享OpenAPI/schema。回应与证据见tests/regression/api/review-response.md。
++- 历史失败保留：首轮API385项中1失败、ci-gate=1仍在原candidate.json，原csrf 502/HTML及CONNECT TIMEOUT/UNKNOWN不改写。一次定向诊断及本轮完整验收未复现，生产源码/入口/超时/重试/断言均未改；历史连接故障具体根因仍UNKNOWN，D24-A-ENV-02待B/环境维护者复核，不宣称根因修复或自动解除发布冻结。原始和新报告分目录，未重跑追绿。
++- 受影响回归：边界9/9、权限矩阵7/7、旧版本HTTP5/5（与B核验的21项一致）、发布8/8、队列7/7、SSE10/10。最终文档/证据HEAD的远端检查另查，不继承旧提交success。B #78独立互审与批准记录保留在review-D24-B.md，不等于A获批准或A+B组合验收。
+ - 回退：回退本PR生产代码即可，无数据/配置迁移。无线上操作。
+ - 审查者：另一名成员；本人不自批、不合并。所有必需检查真实success、同步最新main、无阻塞讨论且独立批准后才具备合并条件。D21真实效果及D23运营启用保留其既有阻塞。
+diff --git a/tests/regression/api/README.md b/tests/regression/api/README.md
+index 1a056e4..a04a85e 100644
+--- a/tests/regression/api/README.md
++++ b/tests/regression/api/README.md
+@@ -22,4 +22,6 @@ node tests/regression/api/record-body-boundary.mjs gate
+ 
+ 本卡模型边界测试不需要任何模型调用，不能拿它证明 D21 的真实模型生成/修复效果。完整门禁产生的 Mock 调用总数未知时记 UNKNOWN，不填0。
+ 
+-最终完整门禁为 `2026-10-29T02-36-31.524Z-gate`，aggregate exit1；用 `node tests/regression/api/summarize.mjs 2026-10-29T02-36-31.524Z-gate` 可核对原始日志与相关API源码摘要并复算candidate.json。汇总器exit0仅表示证据可复算，报告中的gateState仍为FAILED。本地唯一失败502的白名单入口诊断见 `evidence/preview-502.json`；完整现场与日志路径在D24-A交接。最终HEAD的GitHub检查可用 `node tests/regression/api/github.mjs status --private-receipt` 查询，不覆盖已提交的固定4052647检查快照。
++首轮完整门禁为 `2026-10-29T02-36-31.524Z-gate`，aggregate exit1；用 `node tests/regression/api/summarize.mjs 2026-10-29T02-36-31.524Z-gate` 可核对原始日志与相关API源码摘要并复算candidate.json。汇总器exit0仅表示证据可复算，报告中的gateState仍为FAILED。原失败502的白名单入口诊断见 `evidence/preview-502.json`；完整现场与日志路径在D24-A交接。最终HEAD的GitHub检查可用 `node tests/regression/api/github.mjs status --private-receipt` 查询，不覆盖已提交的固定4052647检查快照。
++
++B审查后单次完整补验为 `2026-10-29T06-29-39.894Z-gate`，四阶段及aggregate均exit0。用 `node tests/regression/api/summarize.mjs 2026-10-29T06-29-39.894Z-gate review-round2-candidate.json` 单独复算新报告，不覆盖旧FAILED。它还核对全部233份API源码/测试/资源字节及原始日志SHA256。新本地验收通过，历史502根因仍UNKNOWN，是否解除发布阻塞由B/环境维护者复审。公共输入说明在 `services/api/README.md`，建议与阻塞回应在 `review-response.md`。
+diff --git a/tests/regression/api/summarize.mjs b/tests/regression/api/summarize.mjs
+index ace3c49..02a2679 100644
+--- a/tests/regression/api/summarize.mjs
++++ b/tests/regression/api/summarize.mjs
+@@ -3,6 +3,8 @@ import { resolve, join } from 'node:path';
+ import { createHash } from 'node:crypto';
+ const name = process.argv[2];
+ if (!/^2026-[0-9TZ.-]+-gate$/.test(name ?? '')) throw Error('Expected a recorded gate directory name');
++const outputName = process.argv[3] ?? 'candidate.json';
++if (!['candidate.json', 'review-round2-candidate.json'].includes(outputName)) throw Error('Unexpected summary output');
+ const folder = join(import.meta.dirname, 'evidence', name);
+ const command = JSON.parse(readFileSync(join(folder, 'command.json'), 'utf8'));
+ const raw = readFileSync(command.privateLog);
+@@ -20,12 +22,13 @@ const fullProduct = section('e2e').split(/\r?\n/).filter(line => line.startsWith
+ const watched = ['ApiRequestBody.java', 'AuthFilter.java'].map(p => 'services/api/src/main/java/dev/codeless/api/auth/' + p)
+   .concat(['ApiRequestBodyTest.java', 'RequestBodyBoundaryTest.java', 'RequestBodyBoundaryHttpTest.java'].map(p => 'services/api/src/test/java/dev/codeless/api/auth/' + p));
+ const root = resolve(import.meta.dirname, '../../..');
+-const unchanged = watched.every(path => hash(readFileSync(join(root, path))) === command.sourceDigests[path]);
++const apiSources = Object.keys(command.sourceDigests).filter(path => path.startsWith('services/api/src/'));
++const unchanged = apiSources.length > 0 && apiSources.every(path => hash(readFileSync(join(root, path))) === command.sourceDigests[path]);
+ const selected = ['ApiRequestBodyTest', 'RequestBodyBoundaryTest', 'RequestBodyBoundaryHttpTest', 'ApiSecurityMatrixTest',
+-  'AuthHttpTest', 'AuthIntegrationTest', 'VersionHttpIntegrationTest', 'PublicationIntegrationTest', 'TaskQueueIntegrationTest', 'TaskSseHttpTest'];
++  'AuthHttpTest', 'AuthIntegrationTest', 'VersionHttpIntegrationTest', 'PublicationIntegrationTest', 'TaskQueueIntegrationTest', 'TaskSseHttpTest', 'PreviewPlatformIntegrationTest'];
+ const coverage = Object.fromEntries(selected.map(name => {
+   const result = command.junit.find(row => row.name === 'dev.codeless.api.' + ({ ApiSecurityMatrixTest: 'security',
+-    VersionHttpIntegrationTest: 'versions', PublicationIntegrationTest: 'deploy', TaskQueueIntegrationTest: 'tasks', TaskSseHttpTest: 'tasks' }[name] ?? 'auth') + '.' + name);
++    VersionHttpIntegrationTest: 'versions', PublicationIntegrationTest: 'deploy', TaskQueueIntegrationTest: 'tasks', TaskSseHttpTest: 'tasks', PreviewPlatformIntegrationTest: 'preview' }[name] ?? 'auth') + '.' + name);
+   return [name, result ?? null];
+ }));
+ const allPhasesPassed = ['verify:static', 'verify:api', 'verify:runner', 'verify:e2e'].every(name => command.stages?.some(s => s.stage === name && s.exitCode === 0 && s.signal === null));
+@@ -39,12 +42,17 @@ const result = { taskId: 'D24-A', base: '5a0f14d49690af8341ab90c1aff564392e39717
+   e2eSummary: section('e2e').split(/\r?\n/).filter(line => /^\s*\d+ (passed|failed|skipped|did not run)\b/.test(line)).map(line => line.trim()),
+   fullProduct: fullProduct ? { status: fullProduct.status, browserExitCode: fullProduct.browserExitCode,
+     run: fullProduct.output?.replaceAll('\\', '/').split('/').at(-1) ?? null } : null,
+-  targetedCoverage: coverage, integrity: { logSha256Verified: true, testedApiSourceBytesUnchanged: unchanged,
++  targetedCoverage: coverage, integrity: { logSha256Verified: true, testedApiSourceBytesUnchanged: unchanged, apiSourceFilesCompared: apiSources.length,
+     restoredScreenshots: command.restoredScreenshots, sourceHashes: Object.fromEntries(watched.map(p => [p, command.sourceDigests[p]])) },
+   developerTokens: { input: null, output: null, total: null, measurement: 'UNKNOWN' },
+   platformModelUsage: { provider: 'deterministic-mock', paidRequests: 0, mockCalls: null, totalTokens: null, usage: 'UNKNOWN_NOT_AGGREGATED' },
+   remaining: ['Independent approval of A', 'Current final-head remote checks', 'A+B real combination by enabling PR',
+     'D21 real-model effect acceptance', 'D23 operational enablement'] };
+ if (!unchanged) throw Error('API sources changed since gate started');
+-writeFileSync(new URL('./evidence/candidate.json', import.meta.url), JSON.stringify(result, null, 2) + '\n');
++if (outputName === 'review-round2-candidate.json') {
++  result.historicalGate = { evidence: '2026-10-29T02-36-31.524Z-gate', exitCode: 1, apiFailures: 1, preserved: true };
++  result.historical502RootCause = 'UNKNOWN';
++  result.releaseState = result.gateState === 'PASSED' ? 'AWAITING_PEER_REVIEW' : 'BLOCKED';
++}
++writeFileSync(new URL('./evidence/' + outputName, import.meta.url), JSON.stringify(result, null, 2) + '\n');
+ console.log(JSON.stringify({ gateState: result.gateState, api: result.api, runner: result.runner, e2eSummary: result.e2eSummary, stages: result.stages, unchanged }));
