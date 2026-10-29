@@ -28,11 +28,12 @@ for (const key of ['CODELESS_MODEL_API_KEY', 'CODELESS_MODEL_NAME', 'CODELESS_PL
 const jdk = join(root, '.local-data/d07-a/tools/java21/jdk-21.0.12.1+1');
 if (existsSync(jdk)) {
   env.JAVA_HOME = jdk;
-  env.PATH = join(jdk, 'bin') + (process.platform === 'win32' ? ';' : ':') + env.PATH;
+  const pathKey = Object.keys(env).find(key => key.toLowerCase() === 'path') ?? 'PATH';
+  env[pathKey] = join(jdk, 'bin') + (process.platform === 'win32' ? ';' : ':') + (env[pathKey] ?? '');
 }
 const win = process.platform === 'win32';
 env.D24_STAGE_EXITS = join(privateRoot, 'stages.jsonl');
-const command = mode === 'gate' ? 'node' : win ? (env.ComSpec ?? 'cmd.exe') : './services/api/mvnw';
+const command = mode === 'gate' ? process.execPath : win ? (env.ComSpec ?? 'cmd.exe') : './services/api/mvnw';
 const args = mode === 'gate'
   ? ['--import', new URL('./stage-observer.mjs', import.meta.url).href, 'scripts/ci-gate.mjs']
   : [...(win ? ['/d', '/c', 'services\\api\\mvnw.cmd'] : []), '-f', 'services/api/pom.xml', `-Dtest=${selected[mode]}`, 'test'];
