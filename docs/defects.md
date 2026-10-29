@@ -13,3 +13,12 @@
 复现与证据入口：`tests/regression/api/README.md`。原始日志私下保存，公开 command.json 绑定源码 SHA256、原生命令/退出码和日志 SHA256；失败记录不改写。
 
 未扩大范围：登录计时差、多实例限流、每用户配额等既有条目留原维护者。此次限长不提供慢请求时间/并发配额；沿用服务器/边缘超时。D21 真实模型效果与 D23 Linux/异机运营启用仍需原负责人验收。
+
+## D24-A-ENV-02｜OPEN｜本机预览入口到 API 的连接失败，阻塞候选发布
+
+- 本轮完整 `verify:api`：385 项，384 pass / 1 failure / 0 error / 0 skipped，native1。唯一失败 `PreviewPlatformIntegrationTest.realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures`，Java :84 → `tests/runner/mapping/platform-checks.mjs:36` 获取 CSRF 时收到 502/HTML。
+- 原始入口诊断成功采集且未截断：csrf 的 CONNECT TIMEOUT 为 true，最终上游状态 `504, 502`，响应耗时 `60.049, 0.000`，连接和响应头时间仍为 `-, -`；其他连接错误细类 UNKNOWN 不改为已知原因。registryHealthy=true 不代表入口请求成功。
+- 白名单摘要：`tests/regression/api/evidence/preview-502.json`，包含原始两份诊断的 SHA256；完整现场保留 `services/api/target/preview-platform-be59fb66-e007-4368-ab41-2967c61b8d6f/` 及本卡私有日志。未导出会话、头、查询串、请求体或内部上游地址。
+- 入口的连接失败证据不能证明本卡输入限长导致异常，也不能证明宿主网络配置的具体根因；此前 D24-A 历史有同形状 502。固定代码4052647的远端六项 success单列，不能回填本地失败。
+- 接手：B/runner与环境维护者核对 Docker→宿主 API 连接，A提供上述 API/入口关联诊断。先做受控连接失败复现及正负对照，再在真实入口复验；不延长超时、关闭隔离或重试至绿。该入口/宿主环境处理不夹入本卡安全修复。
+- 状态：本地 API 与聚合门禁保留 FAILED，未重跑掩盖失败；候选发布冻结，待连接问题和必需检查/独立批准满足后再评估。

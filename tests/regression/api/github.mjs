@@ -2,9 +2,9 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 const mode = process.argv[2];
-if (!['peer', 'create', 'status'].includes(mode)) throw Error('Expected peer|create|status');
+if (!['peer', 'create', 'update', 'status', 'approve-peer'].includes(mode)) throw Error('Expected peer|create|update|status|approve-peer');
 let token;
-if (mode === 'create') {
+if (mode === 'create' || mode === 'update' || mode === 'approve-peer') {
   const credential = spawnSync('git', ['credential', 'fill'], {
     input: 'protocol=https\nhost=github.com\n\n', encoding: 'utf8',
     env: { ...process.env, GIT_TERMINAL_PROMPT: '0', GCM_INTERACTIVE: 'Never' }
@@ -25,6 +25,26 @@ const api = async (path, method = 'GET', body) => {
 const prs = await api('pulls?state=all&per_page=100');
 const folder = new URL('./evidence/', import.meta.url);
 mkdirSync(folder, { recursive: true });
+if (mode === 'approve-peer') {
+  const expected = 'b98c02314c77736965cecabaa1df728dfb6c0222';
+  const pr = await api('pulls/78');
+  const main = await api('branches/main');
+  const checks = await api(`commits/${expected}/check-runs?per_page=100`);
+  const userResponse = await fetch('https://api.github.com/user', { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } });
+  if (!userResponse.ok) throw Error('Cannot verify reviewer identity');
+  const user = await userResponse.json();
+  if (user.login === pr.user.login) throw Error('Cannot approve own PR');
+  if (pr.head.sha !== expected || pr.base.sha !== main.commit.sha || pr.state !== 'open') throw Error('Reviewed candidate/base changed');
+  const required = ['infra-preflight', 'verify:static', 'verify:api', 'verify:runner', 'verify:e2e', 'ci-gate'];
+  if (!required.every(name => checks.check_runs.some(c => c.name === name && c.status === 'completed' && c.conclusion === 'success' && c.head_sha === expected)))
+    throw Error('Required exact-head checks not successful');
+  const review = await api('pulls/78/reviews', 'POST', { commit_id: expected, event: 'APPROVE', body: readFileSync(new URL('./review-D24-B.md', import.meta.url), 'utf8') });
+  const receipt = { checkedAt: new Date().toISOString(), pr: pr.html_url, state: review.state, commit: review.commit_id, url: review.html_url,
+    reviewer: review.user.login, author: pr.user.login, main: main.commit.sha };
+  writeFileSync(new URL('peer-approval.json', folder), JSON.stringify(receipt, null, 2) + '\n');
+  console.log(JSON.stringify(receipt));
+  process.exit(0);
+}
 if (mode === 'peer') {
   const peers = prs.filter(p => /d24-b/i.test(p.head.ref + ' ' + p.title));
   const results = [];
@@ -46,6 +66,10 @@ if (!pr && mode === 'create') pr = await api('pulls', 'POST', {
   title: 'D24-A：限制 API 请求体，阻止超大 JSON 在校验前消耗资源', head: 'codex/d24-a-api-body-boundary', base: 'main', draft: true,
   body: readFileSync(new URL('./PR-DRAFT.md', import.meta.url), 'utf8')
 });
+if (mode === 'update') {
+  if (!pr) throw Error('Open task PR missing');
+  pr = await api(`pulls/${pr.number}`, 'PATCH', { body: readFileSync(new URL('./PR-DRAFT.md', import.meta.url), 'utf8') });
+}
 const output = { checkedAt: new Date().toISOString(), pr: pr ? {
   number: pr.number, url: pr.html_url, head: pr.head.sha, base: pr.base.sha, draft: pr.draft
 } : null };
