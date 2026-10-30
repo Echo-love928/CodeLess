@@ -1,6 +1,6 @@
 # D25-A / PR #83 四项最小修复与确定性回归
 
-状态：四项修改已实现，新增专项初验 10/10；固定提交完整门禁及 B 增量独立复审待补。第三轮付费完整复评暂停。确定性 fixture 不能证明真实模型会遵守提示，真实质量仍 HOLD，旧 6/9、代码故障 2/3 不改写。
+状态：四项修改已实现，新增专项初验 10/10；收窄后的实现 64a1a45ca47635ff167252f85e67bec82229b73d 上受影响测试 55/55、native0，源字节未变。完整候选门禁及 B 增量独立复审以 PR #83 当前描述与 PR #82 交接记录为准，本文不把未结束的检查计成成功。第三轮付费完整复评暂停。确定性 fixture 不能证明真实模型会遵守提示，真实质量仍 HOLD，旧 6/9、代码故障 2/3 不改写。
 
 ## 生产修改
 
@@ -44,3 +44,7 @@ baseline/four-red.json：Docker 未运行，6 项中 3 fail/1 error；启动既�
 固定 d19c4d4 的广泛依赖优先改变了既有普通渲染诊断顺序，RepairContextTest 原断言失败。已完成 162 项中观察到 1 failure/0 error；本人核对 PID 后终止该次门禁子树，gate native 1，API 终态 UNKNOWN_INTERRUPTED，runner/e2e NOT_EXECUTED，绝不计成功。完整原始日志、已完成 JUnit 和源指纹保留。修复限定为 TS2339，原断言不变；独立副本 55/55 native0（明确为未提交原型，不冒称固定候选验收）。精确新输入在隔离原基线 4c9455d 上 5 项 4 fail/1 pass，native1，见 baseline/four-policy-exact-red.json 与 policy-exact-red.log。最终候选按提交后完整门禁记录定稿。
 
 最初 gate 启动命令未设置 JAVA_HOME，启动检查 native1、未运行阶段；指定既有 JDK 后才运行 d19c4d4，未升级工具链。
+
+## 固定候选与后续证据
+
+生产实现固定于 64a1a45ca47635ff167252f85e67bec82229b73d。本提交仅补入其 55 项实测记录和索引，未再修改生产或测试逻辑。最终 HEAD 的完整本地门禁由本目录记录器在新目录执行；定稿结果随 [D25-A 评测交接 PR #82](https://github.com/Echo-love928/CodeLess/pull/82) 提交并在 [独立生产 PR #83](https://github.com/Echo-love928/CodeLess/pull/83) 描述链接，保持生产候选固定。必须区分 d19c4d4 的失败/中断、64a1a45 的 55 项通过和最终 HEAD 的阶段结果。B 确认前不启动第三轮付费复评，不自批或合并。
