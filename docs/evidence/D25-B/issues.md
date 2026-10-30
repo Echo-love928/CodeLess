@@ -1,5 +1,18 @@
 # D25-B 问题与阻塞
 
+## 最新第三轮（cf80bed8 / fb79c402，2026-10-30）
+
+| ID | 状态 | 事实与证据 |
+| --- | --- | --- |
+| THIRD-QUALITY | HOLD | 原九需求B冻结评测5/9；TASK02/CAT01非法JSON，TASK03/tasks占位，CAT03结构探针误拒。CAT03补充语义及两负对照通过，原5/9保留，补充观察6/9仍不达标。代码1/3、原环境0/2不改。见third-round-2026-10-30/README.md、behavior-report.json。 |
+| THIRD-INTEGRITY | HOLD | 原13/14，177/178/exit1；严格定稿exit1且无输出。B接受ENV02单列首次JVM补验11/11，不覆盖原拒绝/报告。metrics.json独立核对原文件摘要及费用上界1.759246，精确用量/实际费用UNKNOWN。 |
+| THIRD-PRIVATE | NOT_RECEIVED | 用户明确尚未交接密文/密钥；893文件与manifest未由B验证，未恢复/登录/真实预检。新候选真实编辑、权限/历史保护、公网页面/封面/下载和录屏均未执行，B付费也未获授权。 |
+| THIRD-DOCKER | RESOLVED_SETUP | 第一次构建器在样本运行前报Docker daemon未运行/exit1，原记录保留；启动既有29.9.2后完成真正九样本复测，没有重跑付费生成。 |
+| THIRD-AUX | ENVIRONMENT_OBSERVATION | 沙箱辅助测试23/24/exit1，junction清理unlink ENOENT；正常权限同四文件24/24/exit0。首次错误不抹除、不当产品已修证明。verification.json及aux-normal.log。 |
+| D25-MODE | CLOSED_BY_A | A已对6ecf3f5独立复审6/6、原混合模式反例拒绝，模式代码阻塞关闭；本轮新fb79索引继续executed=0、acceptance=null。 |
+
+下面表格为前期任务历史，不用于覆盖上述第三轮状态。
+
 | ID | 状态 | 影响与复现/解除条件 |
 | --- | --- | --- |
 | D25-RUNTIME | BLOCKED | 2026-10-30 已收到 A #82 / 9ad40a0 公开批次与身份交接，原执行提交 a863b76；A 保留原数据库/私有根，曾预检 6/6，旧 owner 后来 401。本机不存在交接中的 F:/JAVA/CodeLess/CodeLess 和 session.private.json；公开 PR 不含 SQL/私有根或有效会话，无法在本机凭公开源码重建原身份/刷新会话。六项真实编辑及公开页面/封面/下载仍 NOT_EXECUTED/null；先在原设备恢复登录或私密交接保留导出，再预检/执行，不造原版本。连接复核见 mode-review-fix.json。 |
