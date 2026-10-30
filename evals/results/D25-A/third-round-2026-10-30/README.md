@@ -1,4 +1,41 @@
-# D25-A｜第三轮实测交付：13/14，HOLD
+# D25-A｜第三轮最终执行交付：原13条＋单列首次补验，HOLD
+
+用户明确允许ENV-02单列首次实际执行，并允许公开本轮交付、更新草稿PR82。**原14个位置各实际执行一次，无重跑；原批次仍13/14、不完整，ENV-02补验单列，不覆盖拒绝或原报告。质量HOLD，不批准合并。**
+
+固定候选仍 `fb79c402de6b66bc849e87b6880bf955488f8032`；第一部分执行器3fabca6，补验启动时评测分支HEAD1720accd06e1852ee4a6cc5463dac62a4a08b236。补验辅助脚本当时尚未提交，原Maven/JVM、生产源码及harness在固定候选上前后均干净且HEAD不变；不把后续交付提交冒称实际生产候选。
+
+| 最终观察 | 结果 |
+| --- | --- |
+| 原九需求 | 首次6/9、平台READY7/9、A行为自测5/9，B独立行为待执行 |
+| 原故障 | 代码1/3、环境0/2；原ENV-02拒绝/缺记录保留，完整性177/178、严格定稿拒绝均仍native1 |
+| ENV-02单列首次补验 | 2026-10-30T09:01:49.208Z至09:02:08.761Z，JVM native0；原11/11故障检查通过，MODEL_NETWORK、1次UNKNOWN调用、0工具/0修复；acceptedByB=null |
+| 原始证据保护 | 补验前后原批次全部文件摘要一致；originalBatchStillIncomplete=true；不自动合并成功率 |
+| 费用/用量 | 原1.63467元上界完整保留，新增持有0.124576元，累计 **1.759246≤2元**；51调用、47已知/4未知，已知token下界172233，精确用量/实际费用UNKNOWN |
+| 交接包 | 最终包893文件，13原任务＋1单列补验身份，本地解密/摘要全部通过；没有密钥/会话/SQL公开上传 |
+
+D25-A-01的原14位置执行已按用户允许的最小例外完成；D25-A-02配置/分母/失败/用量已记录；D25-A-03具体样本变化与失败已列；D25-A-04报告/待修已交付，但完整批次原生定稿与真实质量目标仍未通过，不登记验收成功。D26继续处理JSON输出、受控路由与CAT-03探针语义核查；不能用本次补验、CI或确定性测试替代质量门槛。
+
+补验命令：`CODELESS_EVAL_ENV02_FIRST_JVM_APPROVED=1` 且固定model后，执行 `node scripts/eval/first-env02-supplement.mjs`；**已执行一次，不得再次运行**。已有私有一次性目录/标记拒绝重复。真实Maven命令、native0及原始记录在supplement-env02/invocation-result.json，候选/旧文件摘要与11项结果在其summary.json。原上界与补验上界分别保留，不把未知用量归零。
+
+补验诊断复算（不调用模型）：
+
+```powershell
+node scripts/eval/supplement-status.mjs evals/results/generation/runs/2026-10-30T08-15-32Z-real-29ffed9b evals/results/D25-A/third-round-2026-10-30/supplement-env02 evals/results/D25-A/third-round-2026-10-30/behavior/report.json evals/results/D25-A/third-round-2026-10-30/supplement-status.json --check
+```
+
+native0只证明诊断可复算；新建该HOLD诊断的native1、原完整性/严格定稿native1均保留。原环境0/2与单列补验PASSED明确分开；若B接纳补验，可另行报告其接受结论，A不代为批准。完整已知记录合计仅下界，14个真实JVM的账本为51条、47已知/4未知，原未启动记录仍在原报告中保留。
+
+最终私密包路径 `.local-data/d25-a/third-2026-10-30/handoff-original13-plus-env02/codeless-d25-originals.enc`；解密密钥仅同目录 `handoff-key.private.json`，由用户另一路私下转交，**密钥值不在报告、归档或公开仓库**。密文1,555,096字节，SHA256 `87b5073c292c7b604a5c32860cb00088241d7deb0fd6871dacbb46a326276d4b`，manifest SHA256 `4a3978260c376496311ae3b88e436328da6da9a0eea197ac43e2af86cf51aa23`。
+
+解密自检893文件/13+1身份成功；包内 `batch/retained` 继续保留原13条和ENV-02拒绝，`supplement-evidence/supplement-retained` 单列新增首次补验。原13条旧包不覆盖；最终回执见private-transfer-final-receipt.json。B先取得本轮公开脚本，在新私有目录用private-handoff.mjs unpack校验，再恢复原三应用/任务/版本并合法登录；不将A回环地址/会话跨设备使用。原三应用六项只读预检6/6，新增模型0、真实编辑0，B后续付费仍须另行确认。A保留原件/运行时至B确认终态与摘要。
+
+新辅助回归包含“补验不可覆盖原拒绝/不可虚构B接受”，合计24/24；原评测44/44与12变异此前通过，补验未改这些模块。1720acc提交后static native0，证据../commands/2026-10-30T08-56-29.414Z-static/command.json；后续受影响检查见post-supplement-checks.json。固定fb79此前全量四阶段/ci-gate与六项CI成功仍为历史事实；本轮最终HEAD远端状态以PR82实时检查为准，不继承旧评测HEAD。PR82保持草稿、质量HOLD。
+
+开发agent input_tokens/output_tokens/合计：UNKNOWN/UNKNOWN/UNKNOWN，来源UNKNOWN，无实测接口；平台运行时另账如上，不混入开发token。新数据公开授权已收到；发布审计检查点及最终审计仅为数据披露边界核查，不等于质量批准。main与固定候选源码未修改，未自批、未合并。
+
+---
+
+# 历史：补验获准前的原13/14交付与原始诊断
 
 ## 当前结果与提交
 

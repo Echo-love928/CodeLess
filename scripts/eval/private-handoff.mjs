@@ -41,6 +41,15 @@ export function validateCoverage(originalIds, unexecuted) {
   assert.equal(new Set(ids).size, IDS.length, 'Missing or overlapping original identities')
   assert.deepEqual([...ids].sort(), [...IDS].sort(), 'All fourteen original positions must remain explicit')
 }
+export function validateSupplement(summary, retained, batchId, unexecuted) {
+  assert.equal(summary.sampleId, 'FAULT-ENV-02'); assert.equal(summary.kind, 'SEPARATE_FIRST_ACTUAL_JVM')
+  assert.equal(summary.candidate, CANDIDATE); assert.equal(summary.originalBatchId, batchId)
+  assert.equal(summary.originalBatchUnchanged, true); assert.equal(summary.originalBatchStillIncomplete, true)
+  assert.equal(summary.retries, 0); assert.equal(summary.acceptedByB, null)
+  assert.equal(summary.exitCode, 0); assert.equal(summary.timedOut, false); assert.equal(summary.recordPresent, true)
+  assert.ok(unexecuted.some(row => row.sampleId === summary.sampleId && row.reason === 'CNY_BUDGET_NOT_STARTED'))
+  validateRetained(retained, summary.sampleId, batchId)
+}
 function nativeTar(args) {
   const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => /^(?:PATH|SYSTEMROOT|WINDIR|TEMP|TMP|USERPROFILE|LANG)$/i.test(k)))
   const tar = process.platform === 'win32' ? join(process.env.SystemRoot ?? 'C:/Windows', 'System32/tar.exe') : 'tar'
@@ -71,7 +80,7 @@ function copyTree(source, target) {
     else { assert.ok(e.isFile()); copyFileSync(p, q) }
   }
 }
-export function packPrivateHandoff(batchPath, retainedPath, outputPath) {
+export function packPrivateHandoff(batchPath, retainedPath, outputPath, supplement = null) {
   const batch = contained(root, batchPath), retained = contained(root, retainedPath), output = contained(root, outputPath)
   const batchInfo = json(join(batch, 'batch.json'))
   assert.equal(batchInfo.git.head, CANDIDATE); assert.equal(batchInfo.mode, 'REAL'); assert.deepEqual(batchInfo.samples.map(s => s.id), IDS)
@@ -96,13 +105,31 @@ export function packPrivateHandoff(batchPath, retainedPath, outputPath) {
     original.push({ sampleId: id, applicationId: r.application.id, taskId: r.task.id, status: r.task.status, versions: r.versions })
   }
   validateCoverage(original.map(row => row.sampleId), unexecuted)
+  const supplements = [], extraInputs = []
+  if (supplement) {
+    const evidence = contained(root, supplement.evidencePath), extraRetained = contained(root, supplement.retainedPath)
+    requireSeparateOutput(output, [evidence, extraRetained])
+    const summary = json(join(evidence, 'summary.json')), saved = json(join(extraRetained, 'FAULT-ENV-02/retained.json'))
+    validateSupplement(summary, saved, batchInfo.batchId, unexecuted)
+    for (const file of saved.files) {
+      const directory = join(extraRetained, 'FAULT-ENV-02')
+      assert.equal(sha(readFileSync(contained(directory, join(directory, file.path)))), file.sha256)
+    }
+    assert.equal(sha(readFileSync(join(evidence, 'spec.json'))), sha(readFileSync(join(batch, 'samples/FAULT-ENV-02/spec.json'))))
+    inventory(evidence, secret); inventory(extraRetained, secret)
+    supplements.push({ sampleId: saved.sampleId, applicationId: saved.application.id, taskId: saved.task.id,
+      versions: saved.versions, status: saved.task.status, acceptedByB: null, replacesOriginalRefusal: false,
+      evidenceDirectory: 'supplement-evidence', retainedDirectory: 'supplement-retained' })
+    extraInputs.push([evidence, 'supplement-evidence'], [extraRetained, 'supplement-retained'])
+  }
   inventory(batch, secret); inventory(retained, secret)
   mkdirSync(output, { recursive: false }); const stage = join(output, 'plaintext-stage.private'); mkdirSync(stage)
   copyTree(batch, join(stage, 'batch')); copyTree(retained, join(stage, 'retained'))
+  for (const [directory, name] of extraInputs) copyTree(directory, join(stage, name))
   const files = inventory(stage, secret)
   assert.ok(files.length <= 50000 && files.reduce((n, f) => n + f.bytes, 0) <= 512 * 1024 * 1024, 'Archive size outside bounded handoff scope')
   const manifest = { format: 'CodeLess private D25 handoff v1', batchId: batchInfo.batchId, platformCandidate: CANDIDATE,
-    originalTasksOnly: true, original, unexecuted, originalBatchExecutionComplete: unexecuted.length === 0,
+    originalTasksOnly: true, original, unexecuted, supplements, originalBatchExecutionComplete: unexecuted.length === 0,
     qualityStatus: 'HOLD_PENDING_INDEPENDENT_ACCEPTANCE', files, modelCredentialExcluded: true, balanceSnapshotExcluded: true,
     userTransfersCiphertextAndKeySeparately: true, bPaidWorkAuthorized: false,
     restore: 'Clone the public repo; use exact fixed candidate. Restore original DB/version exports using the existing retained-runtime helper; supply your own approved model credential. Do not import SQL before checking this manifest. A loopback URL/session from the other device is not reusable.' }
@@ -115,6 +142,7 @@ export function packPrivateHandoff(batchPath, retainedPath, outputPath) {
   writeFileSync(keyFile, JSON.stringify({ algorithm: 'AES-256-GCM', keyBase64: key.toString('base64'), transmitSeparately: true }, null, 2) + '\n', { flag: 'wx', mode: 0o600 })
   const receipt = { batchId: batchInfo.batchId, platformCandidate: CANDIDATE, encryptedFile, keyFile,
     encryptedSha256: encryptedDigest(sealed), encryptedBytes: sealed.length, originalSamples: original.length,
+    supplementSamples: supplements.length, actualPositionsWithRetainedTask: original.length + supplements.length,
     expectedSamples: IDS.length, unexecuted, originalBatchExecutionComplete: unexecuted.length === 0,
     originalFiles: files.length, manifestSha256: sha(readFileSync(join(stage, 'handoff.json'))),
     modelCredentialExcluded: true, noUploadPerformed: true, originalInputsRetained: true }
@@ -129,7 +157,7 @@ export function unpackPrivateHandoff(encryptedPath, keyPath, outputPath) {
   writeFileSync(archive, plain, { flag: 'wx', mode: 0o600 })
   for (const line of nativeTar(['-tzf', archive]).split(/\r?\n/).filter(Boolean)) {
     const name = safeMember(line)
-    assert.ok(!name || name === 'handoff.json' || name === 'batch' || name.startsWith('batch/') || name === 'retained' || name.startsWith('retained/'), 'Unexpected archive root')
+    assert.ok(!name || name === 'handoff.json' || ['batch', 'retained', 'supplement-evidence', 'supplement-retained'].some(r => name === r || name.startsWith(r + '/')), 'Unexpected archive root')
   }
   for (const line of nativeTar(['-tvzf', archive]).split(/\r?\n/).filter(Boolean)) assert.ok(/^[-d]/.test(line), 'Archive links or special files refused')
   mkdirSync(output); nativeTar(['-xzf', archive, '--no-same-owner', '-C', output])
@@ -141,13 +169,23 @@ export function unpackPrivateHandoff(encryptedPath, keyPath, outputPath) {
     const path = contained(output, join(output, file.path)); assert.equal(sha(readFileSync(path)), file.sha256)
   }
   for (const row of m.original) validateRetained(json(join(output, 'retained', row.sampleId, 'retained.json')), row.sampleId, m.batchId)
+  const supplements = m.supplements ?? [] // Earlier v1 packages explicitly contained only the original partial batch.
+  assert.ok(Array.isArray(supplements) && supplements.length <= 1)
+  for (const row of supplements) {
+    assert.equal(row.evidenceDirectory, 'supplement-evidence'); assert.equal(row.retainedDirectory, 'supplement-retained')
+    assert.equal(row.replacesOriginalRefusal, false); assert.equal(row.acceptedByB, null)
+    validateSupplement(json(join(output, 'supplement-evidence/summary.json')),
+      json(join(output, 'supplement-retained/FAULT-ENV-02/retained.json')), m.batchId, m.unexecuted)
+  }
   return { batchId: m.batchId, platformCandidate: m.platformCandidate, output, filesVerified: m.files.length,
-    samplesVerified: m.original.length, unexecuted: m.unexecuted, originalBatchExecutionComplete: m.originalBatchExecutionComplete, modelCalls: 0 }
+    samplesVerified: m.original.length, supplementSamplesVerified: supplements.length, unexecuted: m.unexecuted,
+    originalBatchExecutionComplete: m.originalBatchExecutionComplete, modelCalls: 0 }
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   try {
-    const [mode, a, b, c] = process.argv.slice(2)
+    const [mode, a, b, c, d, e] = process.argv.slice(2)
     assert.ok(['pack', 'unpack'].includes(mode) && a && b && c, 'pack|unpack <batch-or-cipher> <retained-or-key> <new-private-output>')
-    console.log(JSON.stringify(mode === 'pack' ? packPrivateHandoff(a, b, c) : unpackPrivateHandoff(a, b, c)))
+    assert.ok(!d && !e || mode === 'pack' && d && e, 'Optional supplement requires both evidence and retained paths')
+    console.log(JSON.stringify(mode === 'pack' ? packPrivateHandoff(a, b, c, d ? { evidencePath: d, retainedPath: e } : null) : unpackPrivateHandoff(a, b, c)))
   } catch (e) { console.error(e.message); process.exitCode = 1 }
 }

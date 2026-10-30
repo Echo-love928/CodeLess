@@ -1,0 +1,221 @@
+{
+  "sampleId": "FAULT-ENV-02",
+  "kind": "SEPARATE_FIRST_ACTUAL_JVM",
+  "startedAt": "2026-10-30T09:01:49.208Z",
+  "finishedAt": "2026-10-30T09:02:08.761Z",
+  "command": [
+    "services\\api\\mvnw.cmd",
+    "-B",
+    "-ntp",
+    "-f",
+    "services/api/pom.xml",
+    "-Dtest=GenerationEvalIT",
+    "-Dsurefire.failIfNoSpecifiedTests=false",
+    "test"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "launchError": null,
+  "timedOut": false,
+  "recordPresent": true,
+  "privateLogSha256": "sha256:fe148b723cf5de6ac0bea66dd86bc6858dbf8de3d3a10f805c70e46da56f4889",
+  "privateLogBytes": 12782,
+  "candidate": "fb79c402de6b66bc849e87b6880bf955488f8032",
+  "originalBatchId": "2026-10-30T08-15-32Z-real-29ffed9b",
+  "originalBatchUnchanged": true,
+  "originalBatchStillIncomplete": true,
+  "acceptedByB": null,
+  "faults": {
+    "code": {
+      "denominator": 0,
+      "passed": 0,
+      "faultIds": []
+    },
+    "environment": {
+      "denominator": 1,
+      "passed": 1,
+      "faultIds": [
+        "FAULT-ENV-02"
+      ]
+    },
+    "usage": {
+      "callRecord": "RECORDED",
+      "calls": 1,
+      "knownCalls": 0,
+      "unknownCalls": 1,
+      "pendingCalls": 0,
+      "knownInputTokens": 0,
+      "knownOutputTokens": 0,
+      "knownTotalTokens": 0,
+      "complete": false,
+      "inputTokens": null,
+      "outputTokens": null,
+      "totalTokens": null,
+      "samplesWithoutTaskRecord": 0,
+      "samplesWithoutCallRecord": 0
+    },
+    "results": [
+      {
+        "faultId": "FAULT-ENV-02",
+        "class": "ENVIRONMENT",
+        "injection": "MODEL_ENDPOINT_UNREACHABLE",
+        "baseRequirement": "TASK-02",
+        "status": "PASSED",
+        "checks": [
+          {
+            "check": "sample JVM exit",
+            "expected": "OK",
+            "actual": "OK",
+            "pass": true
+          },
+          {
+            "check": "harness error",
+            "expected": null,
+            "actual": null,
+            "pass": true
+          },
+          {
+            "check": "journal and model calls recorded",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          },
+          {
+            "check": "proxy route refused before task",
+            "expected": "REFUSED",
+            "actual": "REFUSED",
+            "pass": true
+          },
+          {
+            "check": "final",
+            "expected": "FAILED",
+            "actual": "FAILED",
+            "pass": true
+          },
+          {
+            "check": "failure code",
+            "expected": "MODEL_NETWORK",
+            "actual": "MODEL_NETWORK",
+            "pass": true
+          },
+          {
+            "check": "failure category",
+            "expected": "MODEL_INTERFACE",
+            "actual": "MODEL_INTERFACE",
+            "pass": true
+          },
+          {
+            "check": "model calls (no retry)",
+            "expected": 1,
+            "actual": 1,
+            "pass": true
+          },
+          {
+            "check": "failed call usage",
+            "expected": "UNKNOWN",
+            "actual": "UNKNOWN",
+            "pass": true
+          },
+          {
+            "check": "file tool calls",
+            "expected": 0,
+            "actual": 0,
+            "pass": true
+          },
+          {
+            "check": "repair rounds",
+            "expected": 0,
+            "actual": 0,
+            "pass": true
+          }
+        ],
+        "sample": {
+          "sampleId": "FAULT-ENV-02",
+          "kind": "ENV_FAULT",
+          "category": "TASKS",
+          "baseRequirement": "TASK-02",
+          "outcome": "FAILED",
+          "recordPresent": true,
+          "invocation": {
+            "exitCode": 0,
+            "timedOut": false
+          },
+          "execution": "OK",
+          "harnessError": null,
+          "taskId": "939d7d6e-7f2d-43ac-a2eb-b14af02308b1",
+          "applicationId": "cc9ebf7f-b168-471d-b6f3-1caa0e7b5b98",
+          "firstVerify": "NONE",
+          "firstPass": false,
+          "finalSuccess": false,
+          "repairRounds": 0,
+          "verifyRuns": 0,
+          "drafts": 0,
+          "failure": {
+            "code": "MODEL_NETWORK",
+            "stage": "PLAN",
+            "platformCategory": "MODEL_INTERFACE",
+            "verifyFailure": null,
+            "type": "MODEL_TRANSPORT"
+          },
+          "usage": {
+            "callRecord": "RECORDED",
+            "calls": 1,
+            "knownCalls": 0,
+            "unknownCalls": 1,
+            "pendingCalls": 0,
+            "knownInputTokens": 0,
+            "knownOutputTokens": 0,
+            "knownTotalTokens": 0,
+            "complete": false,
+            "inputTokens": null,
+            "outputTokens": null,
+            "totalTokens": null
+          },
+          "cache": {
+            "knownCalls": 0,
+            "reportedCalls": 0,
+            "cacheHitInputTokens": 0
+          },
+          "charged": {
+            "calls": 1,
+            "chargedTokens": 9953,
+            "estimatedCalls": 1
+          },
+          "modelCalls": {
+            "total": 1,
+            "byStage": {
+              "PLAN": 1
+            }
+          },
+          "toolSlots": 0,
+          "durationMs": 281,
+          "harnessWallClockMs": 427,
+          "finalVersion": null,
+          "plan": null,
+          "lastVerification": null,
+          "providers": [
+            "deepseek/deepseek-flash"
+          ],
+          "injection": null,
+          "environment": {
+            "containerCliOnPath": true,
+            "proxy": "127.0.0.1:53072",
+            "proxyTcpProbe": "REFUSED",
+            "providerRouteProbe": "FAILED_ConnectException"
+          }
+        }
+      }
+    ]
+  },
+  "fee": {
+    "currency": "CNY",
+    "originalUpperCny": "1.63467",
+    "supplementHeldUpperCny": "0.124576",
+    "combinedUpperCny": "1.759246",
+    "capCny": "2",
+    "actualCny": null
+  },
+  "retained": true,
+  "retries": 0,
+  "note": "This supplement never replaces the original refusal/report and is not automatically counted as original-batch success. Unknown usage stays unknown."
+}

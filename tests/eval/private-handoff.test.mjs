@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { safeMember, validateRetained, requireSeparateOutput, validateCoverage } from '../../scripts/eval/private-handoff.mjs'
+import { safeMember, validateRetained, requireSeparateOutput, validateCoverage, validateSupplement } from '../../scripts/eval/private-handoff.mjs'
 import { resolve } from 'node:path'
 import { CANDIDATE, IDS } from '../../scripts/eval/budgeted-batch.mjs'
 const original = () => ({ sampleId: 'SHOW-01', batchId: 'fixed-real-batch', mode: 'REAL', platformRevision: CANDIDATE,
@@ -35,4 +35,17 @@ test('partial handoff keeps the refused position explicit and rejects invented, 
   assert.throws(() => validateCoverage([...IDS], [refusal]))
   assert.throws(() => validateCoverage(IDS.slice(0, -1), [{ ...refusal, jvmStarted: true }]))
   assert.throws(() => validateCoverage(IDS.slice(0, -1), [{ ...refusal, reason: 'IGNORE_FAILURE' }]))
+})
+
+test('separate first ENV-02 execution cannot replace the original refusal or invent B acceptance', () => {
+  const saved = { ...original(), sampleId: 'FAULT-ENV-02' }
+  const summary = { sampleId: saved.sampleId, kind: 'SEPARATE_FIRST_ACTUAL_JVM', candidate: CANDIDATE,
+    originalBatchId: saved.batchId, originalBatchUnchanged: true, originalBatchStillIncomplete: true,
+    retries: 0, acceptedByB: null, exitCode: 0, timedOut: false, recordPresent: true }
+  const gap = [{ sampleId: saved.sampleId, reason: 'CNY_BUDGET_NOT_STARTED' }]
+  assert.doesNotThrow(() => validateSupplement(summary, saved, saved.batchId, gap))
+  for (const change of [{ originalBatchStillIncomplete: false }, { originalBatchUnchanged: false },
+    { retries: 1 }, { acceptedByB: true }, { candidate: 'another' }, { exitCode: 1 }, { recordPresent: false }])
+    assert.throws(() => validateSupplement({ ...summary, ...change }, saved, saved.batchId, gap))
+  assert.throws(() => validateSupplement(summary, saved, saved.batchId, []))
 })
