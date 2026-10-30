@@ -1,11 +1,11 @@
 // Execute the existing B consumer against finished original requirement sources, with no model credential.
 import { spawn, spawnSync } from 'node:child_process'
 import { readFileSync, writeFileSync, openSync, closeSync, mkdirSync, readdirSync, copyFileSync, existsSync } from 'node:fs'
-import { join, resolve, relative } from 'node:path'
+import { join, resolve, relative, basename } from 'node:path'
 import { root, sha256, canonical } from '../../scripts/eval/lib.mjs'
-const [batch] = process.argv.slice(2)
-const output = join(root, 'evals/results/D25-A/behavior')
-const privateDir = join(root, '.local-data/d25-a/behavior')
+const [batch, outputDirectory = 'evals/results/D25-A/behavior'] = process.argv.slice(2)
+const output = resolve(root, outputDirectory)
+const privateDir = join(root, '.local-data/d25-a/behavior', basename(outputDirectory))
 mkdirSync(output, { recursive: true }); mkdirSync(privateDir, { recursive: true })
 const env = { ...process.env }
 for (const key of Object.keys(env)) if (/CODELESS_|API_KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL/.test(key)) delete env[key]

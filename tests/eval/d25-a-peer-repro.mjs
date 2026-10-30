@@ -3,7 +3,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
-const [directory, output] = process.argv.slice(2)
+const [directory, output, reviewedCommit = 'bd6188ffef5cb1d2ab5d05a14d94f5e8e71a58ac'] = process.argv.slice(2)
 const { validate } = await import(pathToFileURL(resolve(directory, 'evals/edit-results/validate.mjs')).href)
 const original = JSON.parse(readFileSync(join(directory, 'evals/edit-results/D25-B/index.json'), 'utf8'))
 const mixed = structuredClone(original)
@@ -16,7 +16,7 @@ for (const row of mixed.rows.filter(row => row.id.startsWith('EDIT-'))) Object.a
 })
 let rejected = false, observed = null
 try { observed = validate(mixed) } catch { rejected = true }
-const result = { task: 'D25-A', reviewedCommit: 'bd6188ffef5cb1d2ab5d05a14d94f5e8e71a58ac',
+const result = { task: 'D25-A', reviewedCommit,
   original: validate(original), scenario: 'REAL index containing six explicit MOCK success rows',
   expected: 'reject mixed modes', rejected, observed, reproduced: !rejected && observed?.acceptance === true,
   limitation: 'Synthetic read-only validator counterexample; does not change B evidence or claim a real editing result.' }
