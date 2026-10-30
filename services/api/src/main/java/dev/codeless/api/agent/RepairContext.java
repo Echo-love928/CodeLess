@@ -73,7 +73,8 @@ final class RepairContext {
     }
     /**
      * Failure-first seed order over frozen planned files: files the diagnostic names, the page of the failing route, each
-     * file's planned relative imports before unrelated route files, then remaining pages, components and data. Diagnostic text
+     * file's planned relative imports, then remaining pages, components and data. For TS2339 field errors,
+     * prioritize direct dependencies before other queued files. Diagnostic text
      * only orders host-owned bytes; it grants no path.
      */
     static List<String> seedOrder(JsonNode plan,JsonNode failure,JsonNode actions,Map<String,String> sources) {
@@ -112,7 +113,9 @@ final class RepairContext {
                 // Direct frozen dependencies must precede unrelated queued pages (e.g. Cafe.signature's declaration).
                 // Reorder only planned bytes; the caller still applies the same seeding and output reservation limits.
                 var dependencies=imports(next,sources.get(next),Set.copyOf(planned));
-                for(int i=dependencies.size()-1;i>=0;i--)if(!order.contains(dependencies.get(i)))targets.addFirst(dependencies.get(i));
+                if(diagnostic.contains("error TS2339")) {
+                    for(int i=dependencies.size()-1;i>=0;i--)if(!order.contains(dependencies.get(i)))targets.addFirst(dependencies.get(i));
+                } else for(String dependency:dependencies)if(!order.contains(dependency))targets.add(dependency);
             }
         }
         return List.copyOf(order);

@@ -6,7 +6,7 @@
 
 相对 4c9455d85175a2df83aecdd399e370da3e302a73，仅改两份提示与 RepairContext.java。GEN/REPAIR 写提议要求先完成文件、一次序列化一个 arguments.content，禁止在同一提议追加替代 content；严格 AgentModel 解析和 provider 不变。新提议区分列表/详情目标和分类按钮角色，覆盖详情切换及后续列表操作；按原始数据累计搜索 AND 分类，清空搜索保留分类，跨分类打开前显式 All，刷新按真实持久化实现验证。修复优先使消费端遵守冻结导出类型，不能改字段数据凑通过。
 
-RepairContext 只将直接、已计划的冻结依赖移到无关排队页面之前，仍由既有 seed/allowance/read 规则决定能否注入，没有上下文新权限、跨文件写协议、预算或工具变化。GEN/REPAIR 的 LF 大小为 5162/1738 字节，低于原始 5338/1763 和前版 5190/1758。
+RepairContext 只针对 TS2339 字段错误将直接、已计划的冻结依赖移到其他排队文件之前；非编译诊断维持原有顺序，不修改旧断言，仍由既有 seed/allowance/read 规则决定能否注入，没有上下文新权限、跨文件写协议、预算或工具变化。GEN/REPAIR 的 LF 大小为 5162/1738 字节，低于原始 5338/1763 和前版 5190/1758。
 
 ## 新增测试与证据边界
 
@@ -24,6 +24,7 @@ RepairContext 只将直接、已计划的冻结依赖移到无关排队页面之
 使用仓库锁定的 Java 21、Node 24.22.1、pnpm 12.6 和既有 Docker/Chromium。凭据不需要。
 
 ```powershell
+# 先把 JAVA_HOME 指向本机既有的锁定 Java 21。缺少时启动检查返回 1，不启动阶段。
 node tests/agent/repair/d25-quality/record.mjs policy
 node tests/agent/repair/d25-quality/record.mjs runtime
 node tests/agent/repair/d25-quality/record.mjs affected
@@ -34,6 +35,12 @@ node tests/agent/repair/d25-quality/record.mjs gate
 
 ## 启动/夹具问题（不算产品先红证据）
 
-baseline/four-red.json：Docker 未运行，6 项中 3 fail/1 error；启动既有 Desktop 后再测，没有安装升级。four-runtime-red.json：离线 provider 错把无 phase 的 PLAN 请求当 GENERATE，5 项 2 fail/3 error，修正夹具阶段判断。four-runtime-baseline.json：5 项中 1 fail，夹具猜错原图书 ID，真实浏览器读到了加西亚·马尔克斯；改为从冻结书名提取实际 ID，没有改原数据。有效产品先红是独立 five-policy 的 4 个失败及每个旧案例 worker 的原生非零，不能把夹具问题计成产品修复。
+baseline/four-red.json：Docker 未运行，6 项中 3 fail/1 error；启动既有 Desktop 后再测，没有安装升级。four-runtime-red.json：离线 provider 错把无 phase 的 PLAN 请求当 GENERATE，5 项 2 fail/3 error，修正夹具阶段判断。four-runtime-baseline.json：5 项中 1 fail，夹具猜错原图书 ID，真实浏览器读到了加西亚·马尔克斯；改为从冻结书名提取实际 ID，没有改原数据。有效产品先红是独立 four-policy 的 4 个失败及每个旧案例 worker 的原生非零，不能把夹具问题计成产品修复。
 
 开发 agent input/output/total：UNKNOWN（无实测接口）。平台新增付费请求 0；确定性 provider 的 token 为 DECLARED_SYNTHETIC_NOT_MEASURED，不能合入个人或真实模型用量。主分支、共享契约、锁、CI、迁移、权限、严格解析、1..20 动作/单目标要求、3 轮/12 模型/20 工具/50000 token/12 分钟上限不变。未自批、未合并。
+
+## 中间门禁失败与收窄
+
+固定 d19c4d4 的广泛依赖优先改变了既有普通渲染诊断顺序，RepairContextTest 原断言失败。已完成 162 项中观察到 1 failure/0 error；本人核对 PID 后终止该次门禁子树，gate native 1，API 终态 UNKNOWN_INTERRUPTED，runner/e2e NOT_EXECUTED，绝不计成功。完整原始日志、已完成 JUnit 和源指纹保留。修复限定为 TS2339，原断言不变；独立副本 55/55 native0（明确为未提交原型，不冒称固定候选验收）。精确新输入在隔离原基线 4c9455d 上 5 项 4 fail/1 pass，native1，见 baseline/four-policy-exact-red.json 与 policy-exact-red.log。最终候选按提交后完整门禁记录定稿。
+
+最初 gate 启动命令未设置 JAVA_HOME，启动检查 native1、未运行阶段；指定既有 JDK 后才运行 d19c4d4，未升级工具链。

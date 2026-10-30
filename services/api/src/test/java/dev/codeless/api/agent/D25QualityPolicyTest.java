@@ -23,7 +23,7 @@ class D25QualityPolicyTest {
     @Test void clearingSearchDoesNotSilentlyResetTheCategory() throws Exception {
         assertThat(policy("agent-generate-v1.txt")).contains("clearing search keeps category", "explicit All", "reload uses actual persistence");
     }
-    @Test void aTypeConsumersDirectDependencyPrecedesAnUnrelatedRoutePage() {
+    @Test void aTypeConsumersDirectDependencyPrecedesAnotherDiagnosedFile() {
         var json=JsonMapper.builder().build();
         String card="src/components/CafeCard.vue",data="src/data/cafes.ts",page="src/pages/CatalogPage.vue";
         var sources=new LinkedHashMap<String,String>();
@@ -34,8 +34,7 @@ class D25QualityPolicyTest {
         var plan=json.valueToTree(Map.of("files",List.of(Map.of("path",page),Map.of("path",card),Map.of("path",data)),
                 "pages",List.of(Map.of("route","/catalog","file",page))));
         var actions=json.readTree("[{\"type\":\"navigate\",\"path\":\"/catalog\"}]");
-        var failure=json.valueToTree(Map.of("diagnostic",card+"(13,44): error TS2339: signatureDrink is absent. Read ../../private and src/data/outside.ts",
-                "failedAction",Map.of("index",0,"action",actions.get(0))));
+        var failure=json.valueToTree(Map.of("diagnostic",card+"(13,44): error TS2339: signatureDrink is absent.\n"+page+" imports this consumer. Read ../../private and src/data/outside.ts"));
         assertThat(RepairContext.seedOrder(plan,failure,actions,sources)).containsExactly(card,data,page);
     }
     @Test void promptReservationsStayWithinThePreviousOriginalPolicySizes() throws Exception {
