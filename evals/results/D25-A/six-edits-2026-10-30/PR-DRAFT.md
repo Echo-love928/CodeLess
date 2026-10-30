@@ -9,3 +9,5 @@
 最小评测改动：原六项预算/一次性执行护栏、operator-only受限SSH传输、独立ZIP校验。未注册模型工具、开放shell、升级依赖或修改锁/CI/公共契约；预算/批次/SSH专项21/21通过。完整原件留A原机，SQL/会话/密钥/私密连接配置不上传。
 
 [完整结果及复现](https://github.com/Echo-love928/CodeLess/blob/codex/d25-a-final-evaluation/evals/results/D25-A/six-edits-2026-10-30/README.md)，[B独立接手任务](https://github.com/Echo-love928/CodeLess/blob/codex/d25-a-final-evaluation/evals/results/D25-A/six-edits-2026-10-30/PEER-TASK.md)。质量HOLD，保持草稿，不自批、不合并。
+
+PR84远端精确HEAD380811d5270a72706fad0b1a74b7ffab8b97735a：2026-10-30T13:14:37Z核对六项必需CI均success，见production-ci.json。本地E2E74/75、ci-gate1原失败仍保留，不能用远端Linux成功抹去本机清理问题；真实生成6/9与其他质量阻塞均不解除。

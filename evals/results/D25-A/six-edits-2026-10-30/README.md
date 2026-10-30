@@ -70,3 +70,9 @@ E2E单次最小诊断返回CAPTURE_TIMEOUT、cleanupConfirmed=true，未复现�
 A保留运行中数据库、原三应用、六个新版本、原失败/导出、全部私有不可变根及新`retained-after-edits`/`retained-after-publication`快照直至B确认归档；回执`retention-receipt.json`、`publication-retention-receipt.json`。会话过期只正常登录；本机受控账户密码恢复、第二普通USER不改变原所有权/角色/版本。按最新约定A原机执行、B看去秘密证据，不再要求跨机密文/密钥。不要恢复旧导出覆盖成果或清理当前运行时。
 
 D26/B待办：原生成6/9与故障门槛、PR84 REAL未评、原13/14不完整、SHOW-02网络/封面失败、TASK-01根封面占位、生产cover接口未安装、自然FAILED编辑保护未覆盖、本地E2E回收断言失败、精确HEAD门禁及独立互审。剩余预算不自动授权任何额外付费任务。未自批、未改main、未合并。
+
+PR84远端精确HEAD380811d5270a72706fad0b1a74b7ffab8b97735a：2026-10-30T13:14:37Z核对六项必需CI均success，见production-ci.json。本地E2E74/75、ci-gate1原失败仍保留，不能用远端Linux成功抹去本机清理问题；真实生成6/9与其他质量阻塞均不解除。
+
+评测源码提交157f83f4eecd681f6e035ee629f3f2b66a99dc88后的受影响静态复验：node scripts/eval/record-final.mjs static，native0，源码/HEAD不变；../commands/2026-10-30T13-13-00.461Z-static/command.json。新增复算器在该源码上实测native0及6组负向检出；随后仅增加报告和回执。
+
+新增评测交付的远端检查均NOT_EXECUTED：本次新增制品公开授权仍待答复，未推送，PR82保持旧cf80bed，不继承该旧HEAD的success。公开前本地审计及提交已完成；实际当前提交以git rev-parse HEAD为准。
