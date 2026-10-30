@@ -75,4 +75,4 @@ PR84远端精确HEAD380811d5270a72706fad0b1a74b7ffab8b97735a：2026-10-30T13:14:
 
 评测源码提交157f83f4eecd681f6e035ee629f3f2b66a99dc88后的受影响静态复验：node scripts/eval/record-final.mjs static，native0，源码/HEAD不变；../commands/2026-10-30T13-13-00.461Z-static/command.json。新增复算器在该源码上实测native0及6组负向检出；随后仅增加报告和回执。
 
-新增评测交付的远端检查均NOT_EXECUTED：本次新增制品公开授权仍待答复，未推送，PR82保持旧cf80bed，不继承该旧HEAD的success。公开前本地审计及提交已完成；实际当前提交以git rev-parse HEAD为准。
+公开授权现已收到：用户明确选择“允许公开本次新增交付并更新草稿PR #82”。此前未推送/检查未执行的状态保留于dc57814历史提交；原始编辑、生成与失败记录字节不变。本次仅更新授权说明及最终逐文件审计，按正常快进更新PR82。新HEAD的远端必需检查须独立产生，不能继承旧cf80bed；最终状态以PR实时检查和PR描述中的精确SHA回执为准。
