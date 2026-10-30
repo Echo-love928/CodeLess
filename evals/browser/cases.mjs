@@ -189,11 +189,35 @@ export async function behavior(page, id, expect) {
     }
     const detailFor = name => page.locator('[role="region"], section, div').filter({ hasNot: cards })
       .filter({ has: page.getByRole('heading', { name: new RegExp('详情|' + namePattern(name).source, 'u') }) }).last()
+    const visibleParagraphs = card => card.locator('p, dd').evaluateAll(nodes => nodes
+      .filter(node => node.getClientRects().length && getComputedStyle(node).visibility !== 'hidden')
+      .map(node => node.textContent.trim()).filter(Boolean))
+    const openDetails = async (card, name) => {
+      const before = id === 'CAT-03' ? await visibleParagraphs(card) : []
+      await card.getByText(name, { exact: true }).click()
+      const region = detailFor(name)
+      if (id !== 'CAT-03' || (await region.count() && await region.isVisible())) return region
+      // An anonymous inline paragraph is also a detail view. A no-op click or pre-existing
+      // card metadata cannot prove expansion: require genuinely new visible content.
+      const added = async () => (await visibleParagraphs(card)).filter(value => !before.includes(value))
+      await expect.poll(async () => (await added()).length, { timeout: 4000 }).toBeGreaterThan(0)
+      for (const value of before) await expect(card).toContainText(value)
+      const metadata = /^(?:类别|分类|许可证|许可协议|开源许可证|开源许可)\s*[：:]/u
+      const fields = initial.find(item => item.name === name).fields
+      for (const value of (await added()).filter(value => metadata.test(value))) expect(fields).toContain(fieldValue(value))
+      expect((await added()).some(value => !metadata.test(value))).toBe(true)
+      return card
+    }
     const initial = []
     for (const card of await cards.all()) {
       const name = await cardName(card)
       let rawFields = await card.locator('p, dd').allTextContents()
-      if (id === 'CAT-03') rawFields = rawFields.flatMap(value => value.split(/\s+[·•|｜]\s+/u))
+      if (id === 'CAT-03') rawFields = rawFields.flatMap(value => value.split(/\s+[·•|｜]\s+/u)).flatMap(value => {
+        // Split an explicitly labelled category/license pair, never arbitrary prose or
+        // whitespace. Missing category, license or summary must still fail the field guard.
+        const pair = value.match(/^\s*((?:类别|分类)\s*[：:]\s*\S.*?)\s+((?:许可证|许可协议|开源许可证|开源许可)\s*[：:]\s*\S.*?)\s*$/u)
+        return pair ? [pair[1], pair[2]] : [value]
+      })
       // Normalize only a district/rating pair backed by a separate named drink.
       // Additional metadata such as an address must not manufacture a missing drink.
       if (id === 'CAT-02' && rawFields.some(value => /^\s*(?:招牌饮品|招牌|推荐饮品)(?:\s*[：:]\s*|\s+)\S/u.test(value))) {
@@ -238,8 +262,7 @@ export async function behavior(page, id, expect) {
     }
     await checkSearch(name)
     expect(await cards.count()).toBeLessThan(size)
-    await cards.first().getByText(name, { exact: true }).click()
-    const detail = detailFor(name)
+    const detail = await openDetails(cards.first(), name)
     await expect(detail).toBeVisible(); await expect(detail).toContainText(name)
     for (const field of fields) await expect(detail).toContainText(field)
     if (id === 'CAT-02') {

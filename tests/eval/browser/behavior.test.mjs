@@ -366,3 +366,26 @@ for(const variant of ['extra-address','address-instead-of-drink'])test('CAT-02: 
   const result=await check('CAT-02',catalog('CAT-02',{coffeeMetaSeparator:' · ',coffeeExtraAddress:variant==='extra-address',missingDescription:variant==='extra-address',coffeeAddressInsteadOfDrink:variant==='address-instead-of-drink'}),'joined-coffee-no-drink-'+variant)
   assert.equal(result.status,'FAILED',JSON.stringify(result))
 })
+
+// Independent implementation of compact labelled metadata and paragraph-only inline details.
+function anonymousToolCatalog(failure = '') {
+  return `<!doctype html><html lang="zh"><meta charset="utf-8"><body><input aria-label="搜索"><select aria-label="类别">
+    <option>全部</option><option>构建</option><option>测试</option><option>文档</option></select><ul></ul><p id="empty" hidden>没有匹配的工具</p>
+    <script>
+    const failure=${JSON.stringify(failure)}, groups=['构建','测试','文档'];
+    const items=Array.from({length:9},(_,i)=>({name:'工具'+i,category:groups[i%3],summary:'简介'+i}));
+    const list=document.querySelector('ul'),search=document.querySelector('input'),select=document.querySelector('select');
+    function render(){list.replaceChildren();for(const item of items.filter(x=>(select.value==='全部'||x.category===select.value||(failure==='combination'&&search.value))&&x.name.includes(search.value))){
+      const li=document.createElement('li'),name=document.createElement('button'),meta=document.createElement('p'),summary=document.createElement('p');name.textContent=item.name;
+      meta.textContent=(failure==='category'?'':'类别：'+item.category)+(failure==='license'?'':'　许可证：MIT');
+      summary.textContent=item.summary;li.append(name,meta);if(failure!=='summary')li.append(summary);
+      name.onclick=()=>{if(failure==='no-expansion')return;const old=li.querySelector('.expanded');if(old){old.remove();return}
+        const p=document.createElement('p');p.className='expanded';p.textContent=failure==='wrong-license'?'许可证：Wrong license':item.name+' 的补充使用说明';li.append(p)};list.append(li)}
+      document.querySelector('#empty').hidden=list.children.length>0}
+    search.oninput=render;select.onchange=render;render();</script></body></html>`
+}
+for (const failure of ['', 'license', 'category', 'summary', 'no-expansion', 'wrong-license', 'combination'])
+  test('D25 CAT-03 anonymous inline details: ' + (failure || 'valid'), async () => {
+    const result = await check('CAT-03', anonymousToolCatalog(failure), 'anonymous-tool-' + (failure || 'valid'))
+    assert.equal(result.status, failure ? 'FAILED' : 'PASSED', JSON.stringify(result))
+  })
