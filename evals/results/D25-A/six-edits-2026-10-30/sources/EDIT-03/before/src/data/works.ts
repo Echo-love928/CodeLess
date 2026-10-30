@@ -1,0 +1,23 @@
+export interface Work {
+  id: string;
+  title: string;
+  description: string;
+}
+
+export const works: Work[] = [
+  {
+    id: "mark-i",
+    title: "Harvard Mark I 编程",
+    description: "为早期大型计算机 Harvard Mark I 编写程序，奠定了现代计算机编程的实践基础。",
+  },
+  {
+    id: "a-0",
+    title: "A-0 编译器",
+    description: "开发了最早的编译器之一 A-0，让计算机能够理解符号化指令。",
+  },
+  {
+    id: "cobol",
+    title: "COBOL 标准化",
+    description: "推动 COBOL 语言的标准化，使业务编程更易读、更普及。",
+  },
+];

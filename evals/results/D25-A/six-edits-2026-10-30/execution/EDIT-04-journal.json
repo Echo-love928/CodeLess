@@ -1,0 +1,558 @@
+[
+  {
+    "sequence": 1,
+    "kind": "plan",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:50.219860300Z",
+    "payload": {
+      "schemaVersion": 1,
+      "template": "VUE",
+      "dataMode": "STATIC",
+      "pages": [
+        {
+          "route": "/",
+          "file": "src/pages/HomePage.vue",
+          "title": "2026 杭州前端开发者大会",
+          "purpose": "展示活动名称、日期、地点、三个日程项及报名演示按钮。"
+        }
+      ],
+      "components": [],
+      "files": [
+        {
+          "path": "src/pages/HomePage.vue",
+          "purpose": "活动信息、日程列表与本地报名状态切换的静态页面。"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "A1",
+          "route": "/",
+          "action": "打开首页",
+          "expected": "页面显示活动名称“2026 杭州前端开发者大会”、日期“2026年11月20日”和地点“杭州国际博览中心”。"
+        },
+        {
+          "id": "A2",
+          "route": "/",
+          "action": "查看日程列表",
+          "expected": "列表依次显示 09:00 开幕致辞、10:30 Vue 性能优化实战、14:00 无障碍设计实践，每项均含时间和标题。"
+        },
+        {
+          "id": "A3",
+          "route": "/",
+          "action": "点击“我要报名”按钮",
+          "expected": "按钮下方显示“报名意向已记录（演示）”，且无任何网络请求。"
+        }
+      ],
+      "capabilities": {
+        "backend": false,
+        "payments": false,
+        "externalServices": [],
+        "dependencies": []
+      }
+    },
+    "stage": "PLAN"
+  },
+  {
+    "sequence": 2,
+    "kind": "stage.finished",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:50.237060100Z",
+    "payload": {
+      "next": "GENERATE"
+    },
+    "stage": "PLAN"
+  },
+  {
+    "sequence": 3,
+    "kind": "tool.request",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:50.421267200Z",
+    "payload": {
+      "reservedTokens": 0,
+      "slots": 1
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 4,
+    "kind": "edit.seeded",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:50.618645800Z",
+    "payload": {
+      "files": [
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 2475,
+          "digest": "sha256:45d928ef5f73c7bd3b291003db44bc2255d31e9aa0db67dcee55ea53b55529f9"
+        }
+      ],
+      "sourceDigest": "sha256:eb4c4559b4b6b3ce879b018b60538e522bee844c4ff75dc618af595d8ee7c97d"
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 5,
+    "kind": "model.request",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:51.252078900Z",
+    "payload": {
+      "reservedTokens": 19635,
+      "outputTokens": 4096,
+      "slots": 1
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 6,
+    "kind": "model.input",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:51.296857Z",
+    "payload": {
+      "callId": "f4a5d5c6-ac9a-4302-8220-e37c939f0146",
+      "transport": {
+        "responseFormat": "json_object",
+        "kind": "DEEPSEEK_CHAT_JSON_V1",
+        "thinking": "disabled",
+        "bodyBytes": 15984,
+        "stream": false,
+        "maxOutputTokens": 4096,
+        "bodyDigest": "sha256:2739265137ce866ccc3c74042163174786a5020064415a1e20bbabd7c08d3738"
+      },
+      "inputDigest": "sha256:6bae2b11144fcb609f6db00ef36284b918a47d50775b54ad059261cb2e119105",
+      "roles": [
+        "system",
+        "user"
+      ],
+      "inputBytes": 6698,
+      "policyBytes": 8329,
+      "policyDigest": "sha256:c3b359546593398c78c08edf2261ef02a23193142a9d5921cacc2a3582956127"
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 7,
+    "kind": "model.response",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:55.152125700Z",
+    "payload": {
+      "type": "tool",
+      "name": "files.update",
+      "arguments": {
+        "path": "src/pages/HomePage.vue",
+        "expectedDigest": "sha256:45d928ef5f73c7bd3b291003db44bc2255d31e9aa0db67dcee55ea53b55529f9",
+        "content": "<script setup lang=\"ts\">\nimport { ref } from 'vue';\n\ninterface ScheduleItem {\n  time: string;\n  title: string;\n}\n\nconst eventName = '2026 杭州前端开发者大会';\nconst eventDate = '2026年11月20日';\nconst eventLocation = '杭州国际博览中心';\n\nconst schedule: ScheduleItem[] = [\n  { time: '09:00', title: '开幕致辞' },\n  { time: '10:30', title: 'Vue 性能优化实战' },\n  { time: '14:00', title: '无障碍设计实践' },\n];\n\nconst registered = ref<boolean>(false);\n\nfunction register(): void {\n  registered.value = true;\n}\n</script>\n\n<template>\n  <main data-ai-component=\"home-page\" class=\"event-page\">\n    <header class=\"hero\">\n      <h1 class=\"event-name\">{{ eventName }}</h1>\n      <p class=\"event-date\">{{ eventDate }}</p>\n      <p class=\"event-location\">{{ eventLocation }}</p>\n    </header>\n\n    <section class=\"schedule\">\n      <h2 class=\"schedule-title\">活动日程</h2>\n      <ul class=\"schedule-list\">\n        <li v-for=\"item in schedule\" :key=\"item.time\" class=\"schedule-item\">\n          <p class=\"schedule-item-text\">{{ item.time }} {{ item.title }}</p>\n        </li>\n      </ul>\n    </section>\n\n    <section class=\"signup\">\n      <button type=\"button\" class=\"signup-button\" @click=\"register\">立即报名</button>\n      <p v-if=\"registered\" class=\"signup-message\">报名意向已记录（演示）</p>\n    </section>\n  </main>\n</template>\n\n<style scoped>\n.event-page {\n  max-width: 720px;\n  margin: 0 auto;\n  padding: 2rem 1.5rem;\n  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;\n  color: #1f2933;\n}\n\n.hero {\n  border-bottom: 2px solid #2563eb;\n  padding-bottom: 1.5rem;\n  margin-bottom: 2rem;\n}\n\n.event-name {\n  margin: 0 0 0.75rem;\n  font-size: 1.875rem;\n}\n\n.event-date,\n.event-location {\n  margin: 0.25rem 0;\n  color: #52606d;\n  font-size: 1.05rem;\n}\n\n.schedule-title {\n  font-size: 1.25rem;\n  margin: 0 0 1rem;\n}\n\n.schedule-list {\n  list-style: none;\n  margin: 0;\n  padding: 0;\n}\n\n.schedule-item {\n  padding: 0.75rem 1rem;\n  border: 1px solid #e4e7eb;\n  border-radius: 8px;\n  margin-bottom: 0.75rem;\n  background: #f8fafc;\n}\n\n.schedule-item-text {\n  margin: 0;\n  font-weight: 600;\n}\n\n.signup {\n  margin-top: 2rem;\n}\n\n.signup-button {\n  padding: 0.7rem 1.6rem;\n  font-size: 1rem;\n  color: #ffffff;\n  background: #2563eb;\n  border: none;\n  border-radius: 8px;\n  cursor: pointer;\n}\n\n.signup-button:hover {\n  background: #1d4ed8;\n}\n\n.signup-message {\n  margin-top: 0.9rem;\n  color: #047857;\n  font-weight: 600;\n}\n</style>\n"
+      }
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 8,
+    "kind": "model.usage",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:55.254800100Z",
+    "payload": {
+      "estimated": false,
+      "reservationTokens": 19635,
+      "usage": {
+        "inputTokens": 4248,
+        "outputTokens": 1014,
+        "totalTokens": 5262,
+        "raw": {
+          "prompt_tokens": 4248,
+          "completion_tokens": 1014,
+          "total_tokens": 5262,
+          "prompt_tokens_details": {
+            "cached_tokens": 1536
+          },
+          "prompt_cache_hit_tokens": 1536,
+          "prompt_cache_miss_tokens": 2712
+        }
+      },
+      "releasedTokens": 14373,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 5262
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 9,
+    "kind": "tool.request",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:55.308507900Z",
+    "payload": {
+      "reservedTokens": 0,
+      "slots": 1
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 10,
+    "kind": "tool.result",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:55.553993200Z",
+    "payload": {
+      "callId": "db4f21b2-6ced-4dca-956e-27d8d131029b",
+      "status": "SUCCEEDED",
+      "errorCode": null,
+      "content": null,
+      "beforeDigest": "sha256:45d928ef5f73c7bd3b291003db44bc2255d31e9aa0db67dcee55ea53b55529f9",
+      "afterDigest": "sha256:32731fc6d95e9843b48b802763db52546837029651ff42192424519180fffffd",
+      "source": {
+        "files": [
+          {
+            "path": "src/pages/HomePage.vue",
+            "bytes": 2475,
+            "digest": "sha256:32731fc6d95e9843b48b802763db52546837029651ff42192424519180fffffd"
+          }
+        ],
+        "totalBytes": 2475,
+        "sourceDigest": "sha256:1ada52d5b9833fca992a5d463b8a13e2b4115010c66c2981d5567a4e9a0594a2"
+      }
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 11,
+    "kind": "model.request",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:55.641337300Z",
+    "payload": {
+      "reservedTokens": 20292,
+      "outputTokens": 4096,
+      "slots": 1
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 12,
+    "kind": "model.input",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:55.689061Z",
+    "payload": {
+      "callId": "91030680-4397-468e-b74f-d04318037e95",
+      "transport": {
+        "responseFormat": "json_object",
+        "kind": "DEEPSEEK_CHAT_JSON_V1",
+        "thinking": "disabled",
+        "bodyBytes": 16693,
+        "stream": false,
+        "maxOutputTokens": 4096,
+        "bodyDigest": "sha256:46c6a9efa7b28bafbd924eb90ea0b8c65e03645a44bd1cdd99e1d339005ada6b"
+      },
+      "inputDigest": "sha256:7762d356370407b70afb3f32547c890f1bd2f2f02c18349809b1dd7c1488eea4",
+      "roles": [
+        "system",
+        "user"
+      ],
+      "inputBytes": 7355,
+      "policyBytes": 8329,
+      "policyDigest": "sha256:c3b359546593398c78c08edf2261ef02a23193142a9d5921cacc2a3582956127"
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 13,
+    "kind": "model.response",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:56.620169Z",
+    "payload": {
+      "type": "done",
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "role": "button",
+            "name": "立即报名"
+          },
+          "value": "立即报名"
+        },
+        {
+          "type": "click",
+          "target": {
+            "role": "button",
+            "name": "立即报名"
+          }
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "text": "报名意向已记录（演示）"
+          },
+          "value": "报名意向已记录（演示）"
+        }
+      ]
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 14,
+    "kind": "model.usage",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:56.669696300Z",
+    "payload": {
+      "estimated": false,
+      "reservationTokens": 20292,
+      "usage": {
+        "inputTokens": 4519,
+        "outputTokens": 87,
+        "totalTokens": 4606,
+        "raw": {
+          "prompt_tokens": 4519,
+          "completion_tokens": 87,
+          "total_tokens": 4606,
+          "prompt_tokens_details": {
+            "cached_tokens": 2688
+          },
+          "prompt_cache_hit_tokens": 2688,
+          "prompt_cache_miss_tokens": 1831
+        }
+      },
+      "releasedTokens": 15686,
+      "meteringSource": "PROVIDER_USAGE",
+      "chargedTokens": 4606
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 15,
+    "kind": "tool.request",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:56.747842400Z",
+    "payload": {
+      "reservedTokens": 0,
+      "slots": 1
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 16,
+    "kind": "draft",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:57.292269400Z",
+    "payload": {
+      "actions": [
+        {
+          "type": "navigate",
+          "path": "/"
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "role": "button",
+            "name": "立即报名"
+          },
+          "value": "立即报名"
+        },
+        {
+          "type": "click",
+          "target": {
+            "role": "button",
+            "name": "立即报名"
+          }
+        },
+        {
+          "type": "expectText",
+          "target": {
+            "text": "报名意向已记录（演示）"
+          },
+          "value": "报名意向已记录（演示）"
+        }
+      ],
+      "sourceDirectory": "F:\\JAVA\\CodeLess\\CodeLess\\.local-data\\d25-a\\six-edits-2026-10-30\\runtime\\workspaces\\26b880d8-3820-42b8-8acc-c313907d3234\\snapshots\\b8194c35-4946-494a-97fb-131bc3cad215",
+      "files": [
+        {
+          "path": "src/pages/HomePage.vue",
+          "bytes": 2475,
+          "digest": "sha256:32731fc6d95e9843b48b802763db52546837029651ff42192424519180fffffd"
+        }
+      ],
+      "sourceDigest": "sha256:1ada52d5b9833fca992a5d463b8a13e2b4115010c66c2981d5567a4e9a0594a2",
+      "versionId": "dba60f5d-c216-4f43-8724-0a42c9381c0e",
+      "frozenSourceDirectory": "F:\\JAVA\\CodeLess\\CodeLess\\.local-data\\d25-a\\six-edits-2026-10-30\\runtime\\private\\versions\\dba60f5d-c216-4f43-8724-0a42c9381c0e\\source"
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 17,
+    "kind": "stage.finished",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:57.364528500Z",
+    "payload": {
+      "next": "VERIFY"
+    },
+    "stage": "GENERATE"
+  },
+  {
+    "sequence": 18,
+    "kind": "tool.request",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:58:57.481827600Z",
+    "payload": {
+      "reservedTokens": 0,
+      "slots": 2
+    },
+    "stage": "VERIFY"
+  },
+  {
+    "sequence": 19,
+    "kind": "runner.result",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:59:06.683845800Z",
+    "payload": {
+      "status": "VERIFIED",
+      "sourceDigest": "sha256:1ada52d5b9833fca992a5d463b8a13e2b4115010c66c2981d5567a4e9a0594a2",
+      "build": {
+        "id": "e31b8152-6dad-42c4-9585-e5838840c9de",
+        "imageId": "sha256:123c9fbed3a8b669331c05e06fcaeee1913f15e2eab8d4c8a0358dd41a57d82d",
+        "containerName": "codeless-build-e31b8152-6dad-42c4-9585-e5838840c9de",
+        "workspaceName": "codeless-build-JodUzH",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "oomKilled": false,
+        "timedOut": false,
+        "log": {
+          "text": "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001b[36mvite v6.2.3 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 30 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m 0.36 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[32mai-component-catalog.json  \u001b[39m\u001b[1m\u001b[2m 0.59 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.31 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[35mindex-BVctOxCs.css  \u001b[39m\u001b[1m\u001b[2m 1.07 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.45 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[2massets/\u001b[22m\u001b[36mindex-Bckypdvg.js   \u001b[39m\u001b[1m\u001b[2m85.26 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 33.98 kB\u001b[22m\n\u001b[32m✓ built in 1.29s\u001b[39m\n",
+          "bytes": 738,
+          "observedBytes": 738,
+          "truncated": false
+        },
+        "artifact": {
+          "digest": "sha256:c6fffb8f4eb959dfbf6f03c6a1bc8304e99d904ab1df936abb155a6a3cca72f4",
+          "bytes": 87281,
+          "files": [
+            {
+              "path": "ai-component-catalog.json",
+              "bytes": 587,
+              "digest": "sha256:f2dc57a70ed0e2ff7645e46335bde0a525fbfc28c038dcf4b9407f6758839481"
+            },
+            {
+              "path": "assets/index-BVctOxCs.css",
+              "bytes": 1074,
+              "digest": "sha256:5560dae7bd833855af1537072310a5a80ca350d71e24ca996eb6c0730da223c3"
+            },
+            {
+              "path": "assets/index-Bckypdvg.js",
+              "bytes": 85257,
+              "digest": "sha256:7e0a83f8d42c60fbfc14214deb31ba3dea3da96ed64092fa5a230a2ef52808a4"
+            },
+            {
+              "path": "index.html",
+              "bytes": 363,
+              "digest": "sha256:cad3785d23e701e59293b51c2a366fb591383cf4a4a6efdbc66076dd93e010e4"
+            }
+          ],
+          "directory": "F:\\JAVA\\CodeLess\\CodeLess\\.local-data\\d25-a\\six-edits-2026-10-30\\runtime\\private\\artifacts\\e31b8152-6dad-42c4-9585-e5838840c9de"
+        },
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        },
+        "createdAt": "2026-10-30T10:58:57.811Z",
+        "completedAt": "2026-10-30T10:59:05.348Z"
+      },
+      "verification": {
+        "id": "581384ff-01a9-401a-937a-85b5fe8a7caa",
+        "buildId": "e31b8152-6dad-42c4-9585-e5838840c9de",
+        "sourceDigest": "sha256:1ada52d5b9833fca992a5d463b8a13e2b4115010c66c2981d5567a4e9a0594a2",
+        "artifactDigest": "sha256:c6fffb8f4eb959dfbf6f03c6a1bc8304e99d904ab1df936abb155a6a3cca72f4",
+        "status": "PASSED",
+        "failure": null,
+        "startedAt": "2026-10-30T10:59:05.379Z",
+        "completedAt": "2026-10-30T10:59:06.577Z",
+        "workerPid": 25880,
+        "workerExitCode": 0,
+        "timedOut": false,
+        "phase": "SCREENSHOT",
+        "diagnostics": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "blockedRequests": [],
+          "failedRequests": [],
+          "actions": [
+            {
+              "index": 0,
+              "type": "navigate",
+              "status": "PASSED"
+            },
+            {
+              "index": 1,
+              "type": "expectText",
+              "status": "PASSED"
+            },
+            {
+              "index": 2,
+              "type": "click",
+              "status": "PASSED"
+            },
+            {
+              "index": 3,
+              "type": "expectText",
+              "status": "PASSED"
+            }
+          ],
+          "truncated": false,
+          "freshContext": {
+            "cookies": 0,
+            "pages": 1
+          },
+          "visibleContent": true,
+          "controlHost": "127.0.0.1",
+          "timingsMs": {
+            "LAUNCH": 291.4234,
+            "PAGE_OPEN": 45.76959999999997,
+            "CONTENT": 28.827600000000075,
+            "ACTION": 92.98389999999995,
+            "OBSERVE": 259.03779999999995,
+            "SCREENSHOT": 24.516300000000115,
+            "CLEANUP": 43.90269999999987
+          },
+          "browserPid": 37040
+        },
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "screenshot": {
+          "path": "F:\\JAVA\\CodeLess\\CodeLess\\.local-data\\d25-a\\six-edits-2026-10-30\\runtime\\private\\evidence\\581384ff-01a9-401a-937a-85b5fe8a7caa\\page.png",
+          "digest": "sha256:cfb3cf8a01d5754e3ec915339f10aa39c157de7c6bb2f0589e0608d836846780",
+          "bytes": 29021,
+          "width": 1280,
+          "height": 720
+        },
+        "reportPath": "F:\\JAVA\\CodeLess\\CodeLess\\.local-data\\d25-a\\six-edits-2026-10-30\\runtime\\private\\evidence\\581384ff-01a9-401a-937a-85b5fe8a7caa\\result.json"
+      },
+      "executionId": "e44d6422-2dbc-4fc3-acde-1bce333cbcce"
+    },
+    "stage": "VERIFY"
+  },
+  {
+    "sequence": 20,
+    "kind": "stage.finished",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:59:06.881945500Z",
+    "payload": {
+      "next": "READY"
+    },
+    "stage": "VERIFY"
+  },
+  {
+    "sequence": 21,
+    "kind": "completion",
+    "taskId": "26b880d8-3820-42b8-8acc-c313907d3234",
+    "at": "2026-10-30T10:59:07.097833400Z",
+    "payload": {
+      "buildId": "e31b8152-6dad-42c4-9585-e5838840c9de",
+      "sourceDigest": "sha256:1ada52d5b9833fca992a5d463b8a13e2b4115010c66c2981d5567a4e9a0594a2",
+      "versionId": "dba60f5d-c216-4f43-8724-0a42c9381c0e",
+      "artifactDigest": "sha256:c6fffb8f4eb959dfbf6f03c6a1bc8304e99d904ab1df936abb155a6a3cca72f4",
+      "verificationId": "581384ff-01a9-401a-937a-85b5fe8a7caa"
+    },
+    "stage": "VERIFY"
+  }
+]
