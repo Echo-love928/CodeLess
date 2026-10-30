@@ -11,6 +11,7 @@ export function validate(index) {
   assert.deepEqual(index.rows.map(r => r.id), [...edits.map(e => e.id), 'PUBLIC-PAGE', 'COVER', 'DOWNLOAD'])
   for (const row of index.rows) {
     assert.equal(row.candidate, index.candidate)
+    assert.equal(row.mode, index.mode, 'row mode must match index mode')
     assert.ok(['NOT_EXECUTED', 'FAILED', 'PASSED'].includes(row.status))
     if (row.status === 'NOT_EXECUTED') {
       assert.equal(row.passed, null)

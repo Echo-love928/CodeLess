@@ -20,3 +20,29 @@ test('cannot mix candidate commits or turn unknown into zero', () => {
   const zero = structuredClone(original); zero.rows[0].passed = 0
   assert.throws(() => validate(zero))
 })
+
+test('every row must match REAL mode, including otherwise complete successful MOCK edits', () => {
+  // Synthetic counterexample only: never write these placeholder IDs into the REAL index.
+  const complete = structuredClone(original)
+  for (const row of complete.rows.filter(r => r.id.startsWith('EDIT-'))) Object.assign(row, {
+    status: 'PASSED', passed: true, taskId: 'synthetic-task', versionId: 'synthetic-version',
+    beforeVersionId: 'synthetic-before', screenshot: 'synthetic.png', evidence: 'synthetic.json',
+    address: 'https://synthetic.example.test/', evidenceDigest: 'sha256:' + '0'.repeat(64),
+    diff: 'synthetic.diff', scopePreserved: true, historyPreserved: true,
+  })
+  assert.equal(validate(complete).acceptance, true) // Structurally complete positive control.
+  const allMock = structuredClone(complete)
+  for (const row of allMock.rows.filter(r => r.id.startsWith('EDIT-'))) row.mode = 'MOCK'
+  assert.throws(() => validate(allMock), /row mode must match index mode/)
+  for (let i = 0; i < complete.rows.length; i++) {
+    const mixed = structuredClone(complete); mixed.rows[i].mode = 'MOCK'
+    assert.throws(() => validate(mixed), /row mode must match index mode/, complete.rows[i].id)
+  }
+})
+
+test('unknown or absent row modes cannot enter a REAL index', () => {
+  for (let i = 0; i < original.rows.length; i++) for (const mode of [undefined, null, 'UNKNOWN']) {
+    const value = structuredClone(original); value.rows[i].mode = mode
+    assert.throws(() => validate(value), /row mode must match index mode/, value.rows[i].id)
+  }
+})
