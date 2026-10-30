@@ -38,6 +38,11 @@ final class AcceptanceActions {
     }
     private static Rejection invalid(String reason,Map<String,Object> extra) {
         var detail=new LinkedHashMap<String,Object>();detail.put("reason",reason);detail.putAll(extra);
+        // Host-authored format guidance only; never echo rejected model/source text or change the proposal.
+        if(reason.equals("INVALID_TARGET")) detail.put("correction",
+                "target is exactly {testId}, {text}, or {role,name}; value is a sibling of target, never inside it. Use an actual unique rendered target.");
+        if(reason.equals("INVALID_VALUE")) detail.put("correction",
+                "expectText and select require a nonblank string value. Only fill accepts an empty string. expectVisible has no value field and only tests visibility; assert actual nonblank result text or counts to test state.");
         return new Rejection("AGENT_ACCEPTANCE_INVALID",detail);
     }
     private static boolean keys(JsonNode value,Set<String> allowed) {
