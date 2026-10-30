@@ -73,7 +73,7 @@ final class RepairContext {
     }
     /**
      * Failure-first seed order over frozen planned files: files the diagnostic names, the page of the failing route, each
-     * file's planned relative imports, then the remaining pages, components and data with their imports. Diagnostic text
+     * file's planned relative imports before unrelated route files, then remaining pages, components and data. Diagnostic text
      * only orders host-owned bytes; it grants no path.
      */
     static List<String> seedOrder(JsonNode plan,JsonNode failure,JsonNode actions,Map<String,String> sources) {
@@ -108,7 +108,12 @@ final class RepairContext {
         var order=new LinkedHashSet<String>();
         while(!targets.isEmpty()||!rest.isEmpty()) {
             String next=targets.isEmpty()?rest.poll():targets.poll();
-            if(order.add(next))for(String dependency:imports(next,sources.get(next),sources.keySet()))if(!order.contains(dependency))targets.add(dependency);
+            if(order.add(next)) {
+                // Direct frozen dependencies must precede unrelated queued pages (e.g. Cafe.signature's declaration).
+                // Reorder only planned bytes; the caller still applies the same seeding and output reservation limits.
+                var dependencies=imports(next,sources.get(next),Set.copyOf(planned));
+                for(int i=dependencies.size()-1;i>=0;i--)if(!order.contains(dependencies.get(i)))targets.addFirst(dependencies.get(i));
+            }
         }
         return List.copyOf(order);
     }
