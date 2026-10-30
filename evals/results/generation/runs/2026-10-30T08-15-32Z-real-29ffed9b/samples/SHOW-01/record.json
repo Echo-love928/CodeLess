@@ -1,0 +1,1067 @@
+{
+  "schemaVersion" : 1,
+  "sampleId" : "SHOW-01",
+  "kind" : "REQUIREMENT",
+  "batchId" : "2026-10-30T08-15-32Z-real-29ffed9b",
+  "mode" : "REAL",
+  "attempt" : 1,
+  "harness" : {
+    "java" : "21.0.12.1",
+    "os" : "Windows 11",
+    "runtimeBudget" : {
+      "modelRequests" : 12,
+      "outputTokensPerRequest" : 4096,
+      "framingTokensPerRequest" : 512,
+      "toolSlots" : 20,
+      "repairRounds" : 3,
+      "chargedTokens" : 50000
+    },
+    "environment" : {
+      "containerCliOnPath" : true
+    },
+    "provider" : {
+      "model" : "deepseek-flash",
+      "transport" : "DeepSeekModelProvider",
+      "id" : "deepseek",
+      "privateCapture" : true
+    },
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "startedAt" : "2026-10-30T08:16:07.301409Z",
+    "finishedAt" : "2026-10-30T08:16:34.006265500Z",
+    "wallClockMs" : 26704
+  },
+  "injection" : null,
+  "application" : {
+    "id" : "56a7a884-d5e7-4b9e-a769-af68634fdb16",
+    "name" : "Grace Hopper 个人展示",
+    "dataMode" : "STATIC",
+    "status" : "ACTIVE",
+    "latestReadyVersionId" : "4e9a9577-4c70-456d-98b4-447e777964b9",
+    "createdAt" : "2026-10-30T08:16:07.369256Z",
+    "updatedAt" : "2026-10-30T08:16:32.255505Z"
+  },
+  "task" : {
+    "id" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "applicationId" : "56a7a884-d5e7-4b9e-a769-af68634fdb16",
+    "prompt" : "生成 Grace Hopper 的个人展示页：顶部显示姓名“Grace Hopper”和一句简介“计算机科学先驱，COBOL 语言的推动者”；中间用三张卡片展示代表作品：“Harvard Mark I 编程”“A-0 编译器”“COBOL 标准化”，每张卡片有标题和一句说明；底部显示联系邮箱 grace.hopper@example.com（纯文本，不需要发送邮件）。使用静态数据。",
+    "status" : "READY",
+    "repairAttempts" : 0,
+    "failureCode" : null,
+    "eventSequence" : 8,
+    "queueState" : "FINISHED",
+    "deadlineAt" : "2026-10-30T08:28:07.384468Z",
+    "createdAt" : "2026-10-30T08:16:07.384468Z",
+    "updatedAt" : "2026-10-30T08:16:32.248877Z"
+  },
+  "taskEvents" : [ {
+    "id" : "d43a9943-c5e8-41d7-87a9-45aa206039be",
+    "sequence" : 1,
+    "type" : "STAGE_STARTED",
+    "stage" : "PLAN",
+    "message" : "Task accepted in PLAN",
+    "occurredAt" : "2026-10-30T08:16:07.384468Z"
+  }, {
+    "id" : "262bd693-e463-40bc-bdb8-7111b0def069",
+    "sequence" : 2,
+    "type" : "STAGE_STARTED",
+    "stage" : "GENERATE",
+    "message" : "Validated plan saved",
+    "occurredAt" : "2026-10-30T08:16:10.458697Z"
+  }, {
+    "id" : "7757b24e-4050-4476-8af6-efecfc20b721",
+    "sequence" : 3,
+    "type" : "TOOL_RESULT",
+    "stage" : "GENERATE",
+    "message" : "File change metadata recorded",
+    "occurredAt" : "2026-10-30T08:16:12.787050Z"
+  }, {
+    "id" : "79a3bcd8-3824-4cab-a92a-9dbae4679ac2",
+    "sequence" : 4,
+    "type" : "TOOL_RESULT",
+    "stage" : "GENERATE",
+    "message" : "File tool 8e4241e1-ffae-4e60-95b1-89cfa03bdc08 SUCCEEDED",
+    "occurredAt" : "2026-10-30T08:16:12.790826Z"
+  }, {
+    "id" : "aa458595-c2a5-454a-97c8-35ee914cffa2",
+    "sequence" : 5,
+    "type" : "TOOL_RESULT",
+    "stage" : "GENERATE",
+    "message" : "File change metadata recorded",
+    "occurredAt" : "2026-10-30T08:16:16.241738Z"
+  }, {
+    "id" : "da37d1dc-551f-4dc8-8b5a-f32968966ed2",
+    "sequence" : 6,
+    "type" : "TOOL_RESULT",
+    "stage" : "GENERATE",
+    "message" : "File tool 450fcabc-34fd-47b5-8d94-bbc26124666f SUCCEEDED",
+    "occurredAt" : "2026-10-30T08:16:16.245740Z"
+  }, {
+    "id" : "f047607d-248d-49e6-8012-71f617014c1f",
+    "sequence" : 7,
+    "type" : "STAGE_STARTED",
+    "stage" : "VERIFY",
+    "message" : "Immutable source candidate saved",
+    "occurredAt" : "2026-10-30T08:16:19.499125Z"
+  }, {
+    "id" : "b5951f85-9907-45c1-9887-513dc3c23641",
+    "sequence" : 8,
+    "type" : "STAGE_COMPLETED",
+    "stage" : "READY",
+    "message" : "PREVIEW_READY versionId=4e9a9577-4c70-456d-98b4-447e777964b9 buildId=859b239e-1a94-4612-bffd-b35efe3bab34 verificationId=b8588a1a-b8de-4bb5-9454-d8b16b813382",
+    "occurredAt" : "2026-10-30T08:16:32.250807Z"
+  } ],
+  "versions" : [ {
+    "id" : "4e9a9577-4c70-456d-98b4-447e777964b9",
+    "number" : 1,
+    "sourceDigest" : "sha256:b4a8dfacd9e817de66104b9f66cfd1c9f6b1a42851d5930016a43f7d0c76c347",
+    "status" : "VERIFIED",
+    "buildId" : "859b239e-1a94-4612-bffd-b35efe3bab34",
+    "sourceTaskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "createdAt" : "2026-10-30T08:16:19.251799Z",
+    "updatedAt" : "2026-10-30T08:16:32.232942Z"
+  } ],
+  "builds" : [ {
+    "id" : "859b239e-1a94-4612-bffd-b35efe3bab34",
+    "versionId" : "4e9a9577-4c70-456d-98b4-447e777964b9",
+    "status" : "SUCCEEDED",
+    "exitCode" : 0,
+    "artifactDigest" : "sha256:149cd1afbff80429a1b26620947267870967223d2c968c99e6cce7d75917aa3a",
+    "createdAt" : "2026-10-30T08:16:20.449Z",
+    "completedAt" : "2026-10-30T08:16:29.697Z"
+  } ],
+  "modelCalls" : [ {
+    "id" : "f0c6bbc1-a60e-423b-be4c-6d1b697b242f",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "SUCCEEDED",
+    "inputTokens" : 1375,
+    "outputTokens" : 284,
+    "errorCode" : null,
+    "createdAt" : "2026-10-30T08:16:07.536765Z",
+    "completedAt" : "2026-10-30T08:16:10.370551Z"
+  }, {
+    "id" : "d44160c0-c562-440d-8828-6113273a7814",
+    "stage" : "GENERATE",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "SUCCEEDED",
+    "inputTokens" : 2728,
+    "outputTokens" : 225,
+    "errorCode" : null,
+    "createdAt" : "2026-10-30T08:16:10.609361Z",
+    "completedAt" : "2026-10-30T08:16:12.405718Z"
+  }, {
+    "id" : "86ae85a7-32f5-462b-abe8-e4034ffdf1b1",
+    "stage" : "GENERATE",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "SUCCEEDED",
+    "inputTokens" : 3168,
+    "outputTokens" : 639,
+    "errorCode" : null,
+    "createdAt" : "2026-10-30T08:16:12.984372Z",
+    "completedAt" : "2026-10-30T08:16:15.875508Z"
+  }, {
+    "id" : "dce82391-ac7f-49fd-8e00-6c6e739d43e7",
+    "stage" : "GENERATE",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "SUCCEEDED",
+    "inputTokens" : 3935,
+    "outputTokens" : 178,
+    "errorCode" : null,
+    "createdAt" : "2026-10-30T08:16:16.487637Z",
+    "completedAt" : "2026-10-30T08:16:18.112505Z"
+  } ],
+  "modelAudit" : [ {
+    "callId" : "f0c6bbc1-a60e-423b-be4c-6d1b697b242f",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : "deepseek-flash",
+    "requestId" : "c141a942-f93d-4c38-9688-011437d3e21a",
+    "responseId" : "c141a942-f93d-4c38-9688-011437d3e21a",
+    "status" : "SUCCEEDED",
+    "durationMs" : 2808,
+    "usage" : {
+      "inputTokens" : 1375,
+      "outputTokens" : 284,
+      "totalTokens" : 1659,
+      "raw" : {
+        "prompt_tokens" : 1375,
+        "completion_tokens" : 284,
+        "total_tokens" : 1659,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 1152
+        },
+        "prompt_cache_hit_tokens" : 1152,
+        "prompt_cache_miss_tokens" : 223
+      }
+    },
+    "errorCode" : null,
+    "createdAt" : "2026-10-30T08:16:07.536765Z",
+    "completedAt" : "2026-10-30T08:16:10.363226300Z"
+  }, {
+    "callId" : "d44160c0-c562-440d-8828-6113273a7814",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "stage" : "GENERATE",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : "deepseek-flash",
+    "requestId" : "9dec9223-b6c7-4f12-af60-2ec68a7f1559",
+    "responseId" : "9dec9223-b6c7-4f12-af60-2ec68a7f1559",
+    "status" : "SUCCEEDED",
+    "durationMs" : 1782,
+    "usage" : {
+      "inputTokens" : 2728,
+      "outputTokens" : 225,
+      "totalTokens" : 2953,
+      "raw" : {
+        "prompt_tokens" : 2728,
+        "completion_tokens" : 225,
+        "total_tokens" : 2953,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 0
+        },
+        "prompt_cache_hit_tokens" : 0,
+        "prompt_cache_miss_tokens" : 2728
+      }
+    },
+    "errorCode" : null,
+    "createdAt" : "2026-10-30T08:16:10.609361Z",
+    "completedAt" : "2026-10-30T08:16:12.399684900Z"
+  }, {
+    "callId" : "86ae85a7-32f5-462b-abe8-e4034ffdf1b1",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "stage" : "GENERATE",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : "deepseek-flash",
+    "requestId" : "77b61a5c-8cf8-4dca-8b38-196fc5d2b02d",
+    "responseId" : "77b61a5c-8cf8-4dca-8b38-196fc5d2b02d",
+    "status" : "SUCCEEDED",
+    "durationMs" : 2876,
+    "usage" : {
+      "inputTokens" : 3168,
+      "outputTokens" : 639,
+      "totalTokens" : 3807,
+      "raw" : {
+        "prompt_tokens" : 3168,
+        "completion_tokens" : 639,
+        "total_tokens" : 3807,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 2688
+        },
+        "prompt_cache_hit_tokens" : 2688,
+        "prompt_cache_miss_tokens" : 480
+      }
+    },
+    "errorCode" : null,
+    "createdAt" : "2026-10-30T08:16:12.984372Z",
+    "completedAt" : "2026-10-30T08:16:15.867874400Z"
+  }, {
+    "callId" : "dce82391-ac7f-49fd-8e00-6c6e739d43e7",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "stage" : "GENERATE",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : "deepseek-flash",
+    "requestId" : "7e1a3f51-82c1-46b9-a83a-cb8c0012e082",
+    "responseId" : "7e1a3f51-82c1-46b9-a83a-cb8c0012e082",
+    "status" : "SUCCEEDED",
+    "durationMs" : 1608,
+    "usage" : {
+      "inputTokens" : 3935,
+      "outputTokens" : 178,
+      "totalTokens" : 4113,
+      "raw" : {
+        "prompt_tokens" : 3935,
+        "completion_tokens" : 178,
+        "total_tokens" : 4113,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 2688
+        },
+        "prompt_cache_hit_tokens" : 2688,
+        "prompt_cache_miss_tokens" : 1247
+      }
+    },
+    "errorCode" : null,
+    "createdAt" : "2026-10-30T08:16:16.487637Z",
+    "completedAt" : "2026-10-30T08:16:18.105148800Z"
+  } ],
+  "journal" : [ {
+    "payload" : {
+      "slots" : 1,
+      "outputTokens" : 4096,
+      "reservedTokens" : 10018
+    },
+    "at" : "2026-10-30T08:16:07.527106Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.request",
+    "sequence" : 1,
+    "stage" : "PLAN"
+  }, {
+    "payload" : {
+      "inputBytes" : 457,
+      "roles" : [ "system", "user" ],
+      "inputDigest" : "sha256:2a8348c599ccc8ec6fb1238d93c2019a3d5cf3c50d82db6fb8fe6623338cc804",
+      "transport" : {
+        "maxOutputTokens" : 4096,
+        "stream" : false,
+        "bodyBytes" : 6030,
+        "thinking" : "disabled",
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "responseFormat" : "json_object",
+        "bodyDigest" : "sha256:1e84115cf59fb89da1382e8c5e45029edd14ac7867848f5cdb54678cf15571c1"
+      },
+      "callId" : "f0c6bbc1-a60e-423b-be4c-6d1b697b242f",
+      "policyDigest" : "sha256:91c22b35ef271e0d1de63df8c1388d6065fc8ac17a786fb859e36173ec925860",
+      "policyBytes" : 4953
+    },
+    "at" : "2026-10-30T08:16:07.599111700Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.input",
+    "sequence" : 2,
+    "stage" : "PLAN"
+  }, {
+    "payload" : {
+      "schemaVersion" : 1,
+      "template" : "VUE",
+      "dataMode" : "STATIC",
+      "pages" : [ {
+        "route" : "/",
+        "file" : "src/pages/HomePage.vue",
+        "title" : "Grace Hopper",
+        "purpose" : "显示姓名、简介、三张代表作品卡片和联系邮箱地址。"
+      } ],
+      "components" : [ ],
+      "files" : [ {
+        "path" : "src/pages/HomePage.vue",
+        "purpose" : "Grace Hopper 个人展示页，包含头部、三张作品卡片和页脚邮箱。"
+      }, {
+        "path" : "src/data/works.ts",
+        "purpose" : "静态数据：三张代表作品卡片的标题与说明。"
+      } ],
+      "acceptance" : [ {
+        "id" : "A1",
+        "route" : "/",
+        "action" : "打开 / 路由。",
+        "expected" : "页面顶部显示“Grace Hopper”和简介“计算机科学先驱，COBOL 语言的推动者”。"
+      }, {
+        "id" : "A2",
+        "route" : "/",
+        "action" : "查看页面中间区域。",
+        "expected" : "显示三张卡片，标题分别为“Harvard Mark I 编程”“A-0 编译器”“COBOL 标准化”，每张各有一句说明。"
+      }, {
+        "id" : "A3",
+        "route" : "/",
+        "action" : "查看页面底部。",
+        "expected" : "以纯文本显示邮箱 grace.hopper@example.com。"
+      } ],
+      "capabilities" : {
+        "backend" : false,
+        "payments" : false,
+        "externalServices" : [ ],
+        "dependencies" : [ ]
+      }
+    },
+    "at" : "2026-10-30T08:16:10.324599800Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.response",
+    "sequence" : 3,
+    "stage" : "PLAN"
+  }, {
+    "payload" : {
+      "meteringSource" : "PROVIDER_USAGE",
+      "releasedTokens" : 8359,
+      "usage" : {
+        "inputTokens" : 1375,
+        "outputTokens" : 284,
+        "totalTokens" : 1659,
+        "raw" : {
+          "prompt_tokens" : 1375,
+          "completion_tokens" : 284,
+          "total_tokens" : 1659,
+          "prompt_tokens_details" : {
+            "cached_tokens" : 1152
+          },
+          "prompt_cache_hit_tokens" : 1152,
+          "prompt_cache_miss_tokens" : 223
+        }
+      },
+      "reservationTokens" : 10018,
+      "estimated" : false,
+      "chargedTokens" : 1659
+    },
+    "at" : "2026-10-30T08:16:10.351858Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.usage",
+    "sequence" : 4,
+    "stage" : "PLAN"
+  }, {
+    "payload" : {
+      "schemaVersion" : 1,
+      "template" : "VUE",
+      "dataMode" : "STATIC",
+      "pages" : [ {
+        "route" : "/",
+        "file" : "src/pages/HomePage.vue",
+        "title" : "Grace Hopper",
+        "purpose" : "显示姓名、简介、三张代表作品卡片和联系邮箱地址。"
+      } ],
+      "components" : [ ],
+      "files" : [ {
+        "path" : "src/pages/HomePage.vue",
+        "purpose" : "Grace Hopper 个人展示页，包含头部、三张作品卡片和页脚邮箱。"
+      }, {
+        "path" : "src/data/works.ts",
+        "purpose" : "静态数据：三张代表作品卡片的标题与说明。"
+      } ],
+      "acceptance" : [ {
+        "id" : "A1",
+        "route" : "/",
+        "action" : "打开 / 路由。",
+        "expected" : "页面顶部显示“Grace Hopper”和简介“计算机科学先驱，COBOL 语言的推动者”。"
+      }, {
+        "id" : "A2",
+        "route" : "/",
+        "action" : "查看页面中间区域。",
+        "expected" : "显示三张卡片，标题分别为“Harvard Mark I 编程”“A-0 编译器”“COBOL 标准化”，每张各有一句说明。"
+      }, {
+        "id" : "A3",
+        "route" : "/",
+        "action" : "查看页面底部。",
+        "expected" : "以纯文本显示邮箱 grace.hopper@example.com。"
+      } ],
+      "capabilities" : {
+        "backend" : false,
+        "payments" : false,
+        "externalServices" : [ ],
+        "dependencies" : [ ]
+      }
+    },
+    "at" : "2026-10-30T08:16:10.396949300Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "plan",
+    "sequence" : 5,
+    "stage" : "PLAN"
+  }, {
+    "payload" : {
+      "next" : "GENERATE"
+    },
+    "at" : "2026-10-30T08:16:10.434353300Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "stage.finished",
+    "sequence" : 6,
+    "stage" : "PLAN"
+  }, {
+    "payload" : {
+      "slots" : 1,
+      "outputTokens" : 4096,
+      "reservedTokens" : 14716
+    },
+    "at" : "2026-10-30T08:16:10.598337900Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.request",
+    "sequence" : 7,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "inputBytes" : 4464,
+      "roles" : [ "system", "user" ],
+      "inputDigest" : "sha256:d8d706be28600c51356f5426be477cb577d0be50eedb9cecb30d23260a5333df",
+      "transport" : {
+        "maxOutputTokens" : 4096,
+        "stream" : false,
+        "bodyBytes" : 10827,
+        "thinking" : "disabled",
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "responseFormat" : "json_object",
+        "bodyDigest" : "sha256:910586f5cebfc983883a84392e2f7076120eb6d1897702402e10e8535cef64ec"
+      },
+      "callId" : "d44160c0-c562-440d-8828-6113273a7814",
+      "policyDigest" : "sha256:09673098c70e92bbe8100587dba9b02e81ae5abc76fefcdbe97faa17b6e6ec44",
+      "policyBytes" : 5644
+    },
+    "at" : "2026-10-30T08:16:10.660193500Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.input",
+    "sequence" : 8,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "type" : "tool",
+      "name" : "files.create",
+      "arguments" : {
+        "path" : "src/data/works.ts",
+        "content" : "export interface Work {\n  id: string;\n  title: string;\n  description: string;\n}\n\nexport const works: Work[] = [\n  {\n    id: \"mark-i\",\n    title: \"Harvard Mark I 编程\",\n    description: \"为早期大型计算机 Harvard Mark I 编写程序，奠定了现代计算机编程的实践基础。\",\n  },\n  {\n    id: \"a-0\",\n    title: \"A-0 编译器\",\n    description: \"开发了最早的编译器之一 A-0，让计算机能够理解符号化指令。\",\n  },\n  {\n    id: \"cobol\",\n    title: \"COBOL 标准化\",\n    description: \"推动 COBOL 语言的标准化，使业务编程更易读、更普及。\",\n  },\n];\n"
+      }
+    },
+    "at" : "2026-10-30T08:16:12.341991400Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.response",
+    "sequence" : 9,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "meteringSource" : "PROVIDER_USAGE",
+      "releasedTokens" : 11763,
+      "usage" : {
+        "inputTokens" : 2728,
+        "outputTokens" : 225,
+        "totalTokens" : 2953,
+        "raw" : {
+          "prompt_tokens" : 2728,
+          "completion_tokens" : 225,
+          "total_tokens" : 2953,
+          "prompt_tokens_details" : {
+            "cached_tokens" : 0
+          },
+          "prompt_cache_hit_tokens" : 0,
+          "prompt_cache_miss_tokens" : 2728
+        }
+      },
+      "reservationTokens" : 14716,
+      "estimated" : false,
+      "chargedTokens" : 2953
+    },
+    "at" : "2026-10-30T08:16:12.390718900Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.usage",
+    "sequence" : 10,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "slots" : 1,
+      "reservedTokens" : 0
+    },
+    "at" : "2026-10-30T08:16:12.479234300Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "tool.request",
+    "sequence" : 11,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "callId" : "8e4241e1-ffae-4e60-95b1-89cfa03bdc08",
+      "status" : "SUCCEEDED",
+      "errorCode" : null,
+      "content" : null,
+      "beforeDigest" : null,
+      "afterDigest" : "sha256:5795a87147cbda3886c455954076d5a07df62812c986bbe29f24e12856a632f2",
+      "source" : {
+        "files" : [ {
+          "path" : "src/data/works.ts",
+          "bytes" : 607,
+          "digest" : "sha256:5795a87147cbda3886c455954076d5a07df62812c986bbe29f24e12856a632f2"
+        } ],
+        "totalBytes" : 607,
+        "sourceDigest" : "sha256:a9e1beb22384b52b2d5aa9f384ea06133fdcbde4701a460463aab1b1cfbc5ed9"
+      }
+    },
+    "at" : "2026-10-30T08:16:12.844476600Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "tool.result",
+    "sequence" : 12,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "slots" : 1,
+      "outputTokens" : 4096,
+      "reservedTokens" : 15945
+    },
+    "at" : "2026-10-30T08:16:12.975525800Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.request",
+    "sequence" : 13,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "inputBytes" : 5693,
+      "roles" : [ "system", "user" ],
+      "inputDigest" : "sha256:61af66e1c989e36b5d4344b5b6d242a8012c4608c540f74f0739d365998169b8",
+      "transport" : {
+        "maxOutputTokens" : 4096,
+        "stream" : false,
+        "bodyBytes" : 12169,
+        "thinking" : "disabled",
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "responseFormat" : "json_object",
+        "bodyDigest" : "sha256:7a353e84c3e37497a4e26f65da2f915ffe59658e9b2efdaf52fff71b6bea489a"
+      },
+      "callId" : "86ae85a7-32f5-462b-abe8-e4034ffdf1b1",
+      "policyDigest" : "sha256:09673098c70e92bbe8100587dba9b02e81ae5abc76fefcdbe97faa17b6e6ec44",
+      "policyBytes" : 5644
+    },
+    "at" : "2026-10-30T08:16:13.041668700Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.input",
+    "sequence" : 14,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "type" : "tool",
+      "name" : "files.create",
+      "arguments" : {
+        "path" : "src/pages/HomePage.vue",
+        "content" : "<script setup lang=\"ts\">\nimport { works } from \"../data/works\";\n</script>\n\n<template>\n  <main data-ai-component=\"home-page\" class=\"page\">\n    <header class=\"header\">\n      <h1 class=\"name\">Grace Hopper</h1>\n      <p class=\"tagline\">计算机科学先驱，COBOL 语言的推动者</p>\n    </header>\n    <section class=\"works\">\n      <article v-for=\"work in works\" :key=\"work.id\" class=\"card\">\n        <h2 class=\"card-title\">{{ work.title }}</h2>\n        <p class=\"card-desc\">{{ work.description }}</p>\n      </article>\n    </section>\n    <footer class=\"footer\">\n      <p class=\"email\">grace.hopper@example.com</p>\n    </footer>\n  </main>\n</template>\n\n<style scoped>\n.page {\n  max-width: 960px;\n  margin: 0 auto;\n  padding: 2rem 1rem;\n  font-family: Georgia, serif;\n  color: #1f2933;\n}\n.header {\n  text-align: center;\n  padding: 2rem 0;\n  border-bottom: 2px solid #c9d2dc;\n}\n.name {\n  margin: 0 0 0.5rem;\n  font-size: 2.5rem;\n}\n.tagline {\n  margin: 0;\n  font-size: 1.1rem;\n  color: #52606d;\n}\n.works {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 1rem;\n  margin: 2rem 0;\n}\n.card {\n  flex: 1 1 240px;\n  border: 1px solid #c9d2dc;\n  border-radius: 8px;\n  padding: 1rem;\n  background: #f8fafc;\n}\n.card-title {\n  margin: 0 0 0.5rem;\n  font-size: 1.2rem;\n}\n.card-desc {\n  margin: 0;\n  line-height: 1.6;\n  color: #3e4c59;\n}\n.footer {\n  text-align: center;\n  padding-top: 1.5rem;\n  border-top: 2px solid #c9d2dc;\n}\n.email {\n  margin: 0;\n  font-family: monospace;\n}\n</style>\n"
+      }
+    },
+    "at" : "2026-10-30T08:16:15.808980Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.response",
+    "sequence" : 15,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "meteringSource" : "PROVIDER_USAGE",
+      "releasedTokens" : 12138,
+      "usage" : {
+        "inputTokens" : 3168,
+        "outputTokens" : 639,
+        "totalTokens" : 3807,
+        "raw" : {
+          "prompt_tokens" : 3168,
+          "completion_tokens" : 639,
+          "total_tokens" : 3807,
+          "prompt_tokens_details" : {
+            "cached_tokens" : 2688
+          },
+          "prompt_cache_hit_tokens" : 2688,
+          "prompt_cache_miss_tokens" : 480
+        }
+      },
+      "reservationTokens" : 15945,
+      "estimated" : false,
+      "chargedTokens" : 3807
+    },
+    "at" : "2026-10-30T08:16:15.857797200Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.usage",
+    "sequence" : 16,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "slots" : 1,
+      "reservedTokens" : 0
+    },
+    "at" : "2026-10-30T08:16:15.968459800Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "tool.request",
+    "sequence" : 17,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "callId" : "450fcabc-34fd-47b5-8d94-bbc26124666f",
+      "status" : "SUCCEEDED",
+      "errorCode" : null,
+      "content" : null,
+      "beforeDigest" : null,
+      "afterDigest" : "sha256:f0316ccb0ce7f51ab40211405857c62cebad0af838c7acaebb21829ab581b9db",
+      "source" : {
+        "files" : [ {
+          "path" : "src/data/works.ts",
+          "bytes" : 607,
+          "digest" : "sha256:5795a87147cbda3886c455954076d5a07df62812c986bbe29f24e12856a632f2"
+        }, {
+          "path" : "src/pages/HomePage.vue",
+          "bytes" : 1464,
+          "digest" : "sha256:f0316ccb0ce7f51ab40211405857c62cebad0af838c7acaebb21829ab581b9db"
+        } ],
+        "totalBytes" : 2071,
+        "sourceDigest" : "sha256:b4a8dfacd9e817de66104b9f66cfd1c9f6b1a42851d5930016a43f7d0c76c347"
+      }
+    },
+    "at" : "2026-10-30T08:16:16.308029700Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "tool.result",
+    "sequence" : 18,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "slots" : 1,
+      "outputTokens" : 4096,
+      "reservedTokens" : 17878
+    },
+    "at" : "2026-10-30T08:16:16.479158300Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.request",
+    "sequence" : 19,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "inputBytes" : 7626,
+      "roles" : [ "system", "user" ],
+      "inputDigest" : "sha256:c0527318f671d9b86a308511a126d61152332cc6cfdee95f8b4f6cc7cef967ab",
+      "transport" : {
+        "maxOutputTokens" : 4096,
+        "stream" : false,
+        "bodyBytes" : 14270,
+        "thinking" : "disabled",
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "responseFormat" : "json_object",
+        "bodyDigest" : "sha256:cccec5930f5b6d786eef62f6a2869b1ff1eed44a7d19dabb9b0902d0c132591b"
+      },
+      "callId" : "dce82391-ac7f-49fd-8e00-6c6e739d43e7",
+      "policyDigest" : "sha256:09673098c70e92bbe8100587dba9b02e81ae5abc76fefcdbe97faa17b6e6ec44",
+      "policyBytes" : 5644
+    },
+    "at" : "2026-10-30T08:16:16.554701600Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.input",
+    "sequence" : 20,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "type" : "done",
+      "actions" : [ {
+        "type" : "navigate",
+        "path" : "/"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "Grace Hopper"
+        },
+        "value" : "Grace Hopper"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "计算机科学先驱，COBOL 语言的推动者"
+        },
+        "value" : "计算机科学先驱，COBOL 语言的推动者"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "Harvard Mark I 编程"
+        },
+        "value" : "Harvard Mark I 编程"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "A-0 编译器"
+        },
+        "value" : "A-0 编译器"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "COBOL 标准化"
+        },
+        "value" : "COBOL 标准化"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "grace.hopper@example.com"
+        },
+        "value" : "grace.hopper@example.com"
+      } ]
+    },
+    "at" : "2026-10-30T08:16:18.028795Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.response",
+    "sequence" : 21,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "meteringSource" : "PROVIDER_USAGE",
+      "releasedTokens" : 13765,
+      "usage" : {
+        "inputTokens" : 3935,
+        "outputTokens" : 178,
+        "totalTokens" : 4113,
+        "raw" : {
+          "prompt_tokens" : 3935,
+          "completion_tokens" : 178,
+          "total_tokens" : 4113,
+          "prompt_tokens_details" : {
+            "cached_tokens" : 2688
+          },
+          "prompt_cache_hit_tokens" : 2688,
+          "prompt_cache_miss_tokens" : 1247
+        }
+      },
+      "reservationTokens" : 17878,
+      "estimated" : false,
+      "chargedTokens" : 4113
+    },
+    "at" : "2026-10-30T08:16:18.094969900Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "model.usage",
+    "sequence" : 22,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "slots" : 1,
+      "reservedTokens" : 0
+    },
+    "at" : "2026-10-30T08:16:18.229105300Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "tool.request",
+    "sequence" : 23,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "frozenSourceDirectory" : "<run-root>\\private\\versions\\4e9a9577-4c70-456d-98b4-447e777964b9\\source",
+      "versionId" : "4e9a9577-4c70-456d-98b4-447e777964b9",
+      "sourceDigest" : "sha256:b4a8dfacd9e817de66104b9f66cfd1c9f6b1a42851d5930016a43f7d0c76c347",
+      "files" : [ {
+        "path" : "src/data/works.ts",
+        "bytes" : 607,
+        "digest" : "sha256:5795a87147cbda3886c455954076d5a07df62812c986bbe29f24e12856a632f2"
+      }, {
+        "path" : "src/pages/HomePage.vue",
+        "bytes" : 1464,
+        "digest" : "sha256:f0316ccb0ce7f51ab40211405857c62cebad0af838c7acaebb21829ab581b9db"
+      } ],
+      "sourceDirectory" : "<run-root>\\workspaces\\0db85dbc-3d43-4409-b361-2e5d1ca66ed6\\snapshots\\bc6f2a0e-828b-48c6-a204-4e5e785180d9",
+      "actions" : [ {
+        "type" : "navigate",
+        "path" : "/"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "Grace Hopper"
+        },
+        "value" : "Grace Hopper"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "计算机科学先驱，COBOL 语言的推动者"
+        },
+        "value" : "计算机科学先驱，COBOL 语言的推动者"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "Harvard Mark I 编程"
+        },
+        "value" : "Harvard Mark I 编程"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "A-0 编译器"
+        },
+        "value" : "A-0 编译器"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "COBOL 标准化"
+        },
+        "value" : "COBOL 标准化"
+      }, {
+        "type" : "expectText",
+        "target" : {
+          "text" : "grace.hopper@example.com"
+        },
+        "value" : "grace.hopper@example.com"
+      } ]
+    },
+    "at" : "2026-10-30T08:16:19.336293700Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "draft",
+    "sequence" : 24,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "next" : "VERIFY"
+    },
+    "at" : "2026-10-30T08:16:19.479768700Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "stage.finished",
+    "sequence" : 25,
+    "stage" : "GENERATE"
+  }, {
+    "payload" : {
+      "slots" : 2,
+      "reservedTokens" : 0
+    },
+    "at" : "2026-10-30T08:16:19.725881100Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "tool.request",
+    "sequence" : 26,
+    "stage" : "VERIFY"
+  }, {
+    "payload" : {
+      "status" : "VERIFIED",
+      "sourceDigest" : "sha256:b4a8dfacd9e817de66104b9f66cfd1c9f6b1a42851d5930016a43f7d0c76c347",
+      "build" : {
+        "id" : "859b239e-1a94-4612-bffd-b35efe3bab34",
+        "imageId" : "sha256:123c9fbed3a8b669331c05e06fcaeee1913f15e2eab8d4c8a0358dd41a57d82d",
+        "containerName" : "codeless-build-859b239e-1a94-4612-bffd-b35efe3bab34",
+        "workspaceName" : "codeless-build-e9PNqd",
+        "status" : "SUCCEEDED",
+        "failure" : null,
+        "exitCode" : 0,
+        "oomKilled" : false,
+        "timedOut" : false,
+        "log" : {
+          "text" : "\n> @codeless/generated-vue@0.1.0 build\n> vue-tsc --noEmit && vite build --configLoader runner\n\n\u001B[36mvite v6.2.3 \u001B[32mbuilding for production...\u001B[36m\u001B[39m\ntransforming...\n\u001B[32m✓\u001B[39m 31 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001B[2mdist/\u001B[22m\u001B[32mindex.html                 \u001B[39m\u001B[1m\u001B[2m 0.36 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m │ gzip:  0.28 kB\u001B[22m\n\u001B[2mdist/\u001B[22m\u001B[32mai-component-catalog.json  \u001B[39m\u001B[1m\u001B[2m 0.59 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m │ gzip:  0.31 kB\u001B[22m\n\u001B[2mdist/\u001B[22m\u001B[2massets/\u001B[22m\u001B[35mindex-Cn5dEmsV.css  \u001B[39m\u001B[1m\u001B[2m 0.79 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m │ gzip:  0.36 kB\u001B[22m\n\u001B[2mdist/\u001B[22m\u001B[2massets/\u001B[22m\u001B[36mindex-Cn2qfc36.js   \u001B[39m\u001B[1m\u001B[2m85.18 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m │ gzip: 34.03 kB\u001B[22m\n\u001B[32m✓ built in 2.39s\u001B[39m\n",
+          "bytes" : 738,
+          "observedBytes" : 738,
+          "truncated" : false
+        },
+        "artifact" : {
+          "digest" : "sha256:149cd1afbff80429a1b26620947267870967223d2c968c99e6cce7d75917aa3a",
+          "bytes" : 86915,
+          "files" : [ {
+            "path" : "ai-component-catalog.json",
+            "bytes" : 587,
+            "digest" : "sha256:0651846a8c48ccd2ad5db2549dffb1024d00c9800d9559a13c92ecc12516050f"
+          }, {
+            "path" : "assets/index-Cn2qfc36.js",
+            "bytes" : 85176,
+            "digest" : "sha256:ff5aa9bc6cba746e60c58d2c8d74784537f6ba28e89d787a2cd35b1562fc2c51"
+          }, {
+            "path" : "assets/index-Cn5dEmsV.css",
+            "bytes" : 789,
+            "digest" : "sha256:39e137d489661fa4d86f83db4137a1576826193fc05f22aa5c8869135d2b8c17"
+          }, {
+            "path" : "index.html",
+            "bytes" : 363,
+            "digest" : "sha256:26bdee585e40ca452b4ca9c3516014d1011c80d6600383998554248e2915541b"
+          } ],
+          "directory" : "<run-root>\\private\\artifacts\\859b239e-1a94-4612-bffd-b35efe3bab34"
+        },
+        "cleanup" : {
+          "containerRemoved" : true,
+          "workspaceRemoved" : true,
+          "errors" : [ ]
+        },
+        "createdAt" : "2026-10-30T08:16:20.449Z",
+        "completedAt" : "2026-10-30T08:16:29.697Z"
+      },
+      "verification" : {
+        "id" : "b8588a1a-b8de-4bb5-9454-d8b16b813382",
+        "buildId" : "859b239e-1a94-4612-bffd-b35efe3bab34",
+        "sourceDigest" : "sha256:b4a8dfacd9e817de66104b9f66cfd1c9f6b1a42851d5930016a43f7d0c76c347",
+        "artifactDigest" : "sha256:149cd1afbff80429a1b26620947267870967223d2c968c99e6cce7d75917aa3a",
+        "status" : "PASSED",
+        "failure" : null,
+        "startedAt" : "2026-10-30T08:16:29.748Z",
+        "completedAt" : "2026-10-30T08:16:31.496Z",
+        "workerPid" : 38316,
+        "workerExitCode" : 0,
+        "timedOut" : false,
+        "phase" : "SCREENSHOT",
+        "diagnostics" : {
+          "pageErrors" : [ ],
+          "consoleErrors" : [ ],
+          "blockedRequests" : [ ],
+          "failedRequests" : [ ],
+          "actions" : [ {
+            "index" : 0,
+            "type" : "navigate",
+            "status" : "PASSED"
+          }, {
+            "index" : 1,
+            "type" : "expectText",
+            "status" : "PASSED"
+          }, {
+            "index" : 2,
+            "type" : "expectText",
+            "status" : "PASSED"
+          }, {
+            "index" : 3,
+            "type" : "expectText",
+            "status" : "PASSED"
+          }, {
+            "index" : 4,
+            "type" : "expectText",
+            "status" : "PASSED"
+          }, {
+            "index" : 5,
+            "type" : "expectText",
+            "status" : "PASSED"
+          }, {
+            "index" : 6,
+            "type" : "expectText",
+            "status" : "PASSED"
+          } ],
+          "truncated" : false,
+          "freshContext" : {
+            "cookies" : 0,
+            "pages" : 1
+          },
+          "visibleContent" : true,
+          "controlHost" : "127.0.0.1",
+          "timingsMs" : {
+            "LAUNCH" : 559.3344999999999,
+            "PAGE_OPEN" : 49.47679999999991,
+            "CONTENT" : 54.18560000000025,
+            "ACTION" : 101.43950000000018,
+            "OBSERVE" : 252.41820000000007,
+            "SCREENSHOT" : 27.739700000000084,
+            "CLEANUP" : 87.24350000000004
+          },
+          "browserPid" : 65760
+        },
+        "cleanup" : {
+          "browserClosed" : true,
+          "processTreeTerminated" : null
+        },
+        "screenshot" : {
+          "path" : "<run-root>\\private\\evidence\\b8588a1a-b8de-4bb5-9454-d8b16b813382\\page.png",
+          "digest" : "sha256:eee67ff1090c2e923db9450bdc56c02dd1c9a3bbe33e4557729fb8ae0bbc8a9f",
+          "bytes" : 30170,
+          "width" : 1280,
+          "height" : 720
+        },
+        "reportPath" : "<run-root>\\private\\evidence\\b8588a1a-b8de-4bb5-9454-d8b16b813382\\result.json"
+      },
+      "executionId" : "d2c5d3be-18a0-4f05-820c-77172f3eebb3"
+    },
+    "at" : "2026-10-30T08:16:31.673738400Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "runner.result",
+    "sequence" : 27,
+    "stage" : "VERIFY"
+  }, {
+    "payload" : {
+      "next" : "READY"
+    },
+    "at" : "2026-10-30T08:16:31.960670Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "stage.finished",
+    "sequence" : 28,
+    "stage" : "VERIFY"
+  }, {
+    "payload" : {
+      "verificationId" : "b8588a1a-b8de-4bb5-9454-d8b16b813382",
+      "artifactDigest" : "sha256:149cd1afbff80429a1b26620947267870967223d2c968c99e6cce7d75917aa3a",
+      "versionId" : "4e9a9577-4c70-456d-98b4-447e777964b9",
+      "sourceDigest" : "sha256:b4a8dfacd9e817de66104b9f66cfd1c9f6b1a42851d5930016a43f7d0c76c347",
+      "buildId" : "859b239e-1a94-4612-bffd-b35efe3bab34"
+    },
+    "at" : "2026-10-30T08:16:32.324543800Z",
+    "taskId" : "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+    "kind" : "completion",
+    "sequence" : 29,
+    "stage" : "VERIFY"
+  } ],
+  "platformMeter" : {
+    "models" : 4,
+    "tools" : 5,
+    "chargedTokens" : 12532
+  },
+  "sources" : [ {
+    "directory" : "source/v1",
+    "files" : [ {
+      "sha256" : "sha256:5795a87147cbda3886c455954076d5a07df62812c986bbe29f24e12856a632f2",
+      "path" : "src/data/works.ts",
+      "bytes" : 607
+    }, {
+      "sha256" : "sha256:f0316ccb0ce7f51ab40211405857c62cebad0af838c7acaebb21829ab581b9db",
+      "path" : "src/pages/HomePage.vue",
+      "bytes" : 1464
+    } ],
+    "versionId" : "4e9a9577-4c70-456d-98b4-447e777964b9",
+    "number" : 1,
+    "sourceDigest" : "sha256:b4a8dfacd9e817de66104b9f66cfd1c9f6b1a42851d5930016a43f7d0c76c347"
+  } ],
+  "screenshots" : [ {
+    "bytes" : 30170,
+    "path" : "screenshots/b8588a1a-b8de-4bb5-9454-d8b16b813382.png",
+    "verificationId" : "b8588a1a-b8de-4bb5-9454-d8b16b813382",
+    "sha256" : "sha256:eee67ff1090c2e923db9450bdc56c02dd1c9a3bbe33e4557729fb8ae0bbc8a9f"
+  } ],
+  "harnessError" : null
+}

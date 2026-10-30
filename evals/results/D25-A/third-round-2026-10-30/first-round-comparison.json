@@ -1,0 +1,3428 @@
+{
+  "schemaVersion": 1,
+  "task": "D25-A",
+  "baseline": {
+    "batchId": "2026-10-23T14-16-43Z-real-545bbebf",
+    "commit": "c25b722bee9122c7bc7cafe01b5739b7a7f4e1ac"
+  },
+  "candidate": {
+    "batchId": "2026-10-30T08-15-32Z-real-29ffed9b",
+    "commit": "fb79c402de6b66bc849e87b6880bf955488f8032"
+  },
+  "provider": {
+    "id": "deepseek",
+    "model": "deepseek-flash"
+  },
+  "frozen": {
+    "requirements": "sha256:ef219f3e5c0f05f3ab03ec854c66b32709349f80d1e1aee0076fe19d2b91cb2a",
+    "faults": "sha256:4b147818de5823b2ba3011cc65f57a08f63270154aa01289af8e7631c8790b13",
+    "runConfig": "sha256:6dc271c657cdb29e72ec052621fc2633ac5d82b8d8d963bfbffccd0d929cb054"
+  },
+  "requirements": {
+    "denominator": 9,
+    "baseline": {
+      "firstPass": {
+        "count": 3,
+        "rate": 0.3333
+      },
+      "finalSuccess": {
+        "count": 3,
+        "rate": 0.3333
+      },
+      "failureTypes": {
+        "MODEL_TRANSPORT": 6,
+        "MODEL_OUTPUT": 0,
+        "CODE_NOT_REPAIRED": 0,
+        "BUDGET": 0,
+        "ENVIRONMENT": 0,
+        "CANCELLED": 0,
+        "HARNESS": 0,
+        "UNCLASSIFIED": 0
+      }
+    },
+    "candidate": {
+      "firstPass": {
+        "count": 6,
+        "rate": 0.6667
+      },
+      "finalSuccess": {
+        "count": 7,
+        "rate": 0.7778
+      },
+      "failureTypes": {
+        "MODEL_TRANSPORT": 0,
+        "MODEL_OUTPUT": 2,
+        "CODE_NOT_REPAIRED": 0,
+        "BUDGET": 0,
+        "ENVIRONMENT": 0,
+        "CANCELLED": 0,
+        "HARNESS": 0,
+        "UNCLASSIFIED": 0
+      }
+    },
+    "successCountDelta": 4,
+    "target": {
+      "finalSuccessAtLeast": 8,
+      "of": 9,
+      "met": false,
+      "kind": "BASELINE_TARGET_NOT_A_CLAIM"
+    },
+    "behaviorAssertions": {
+      "status": "PENDING_D21_B",
+      "requirementLevelFinalSuccess": null,
+      "note": "Platform READY is counted above. D21-B behaviour assertions may only lower requirement-level success; until they run it is unknown, not success."
+    }
+  },
+  "faults": {
+    "baseline": {
+      "code": {
+        "denominator": 3,
+        "passed": 0,
+        "faultIds": [
+          "FAULT-CODE-01",
+          "FAULT-CODE-02",
+          "FAULT-CODE-03"
+        ]
+      },
+      "environment": {
+        "denominator": 2,
+        "passed": 1,
+        "faultIds": [
+          "FAULT-ENV-01",
+          "FAULT-ENV-02"
+        ]
+      }
+    },
+    "candidate": {
+      "code": {
+        "denominator": 3,
+        "passed": 1,
+        "faultIds": [
+          "FAULT-CODE-01",
+          "FAULT-CODE-02",
+          "FAULT-CODE-03"
+        ]
+      },
+      "environment": {
+        "denominator": 2,
+        "passed": 0,
+        "faultIds": [
+          "FAULT-ENV-01",
+          "FAULT-ENV-02"
+        ]
+      }
+    },
+    "results": [
+      {
+        "faultId": "FAULT-CODE-01",
+        "status": "PASSED",
+        "checks": [
+          {
+            "check": "sample JVM exit",
+            "expected": "OK",
+            "actual": "OK",
+            "pass": true
+          },
+          {
+            "check": "harness error",
+            "expected": null,
+            "actual": null,
+            "pass": true
+          },
+          {
+            "check": "journal and model calls recorded",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          },
+          {
+            "check": "injection applied",
+            "expected": "APPLIED",
+            "actual": "APPLIED",
+            "pass": true
+          },
+          {
+            "check": "injection labelled",
+            "expected": "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR",
+            "actual": "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR",
+            "pass": true
+          },
+          {
+            "check": "first verify",
+            "expected": "FAILED",
+            "actual": "FAILED",
+            "pass": true
+          },
+          {
+            "check": "first failure category",
+            "expected": "CODE",
+            "actual": "CODE",
+            "pass": true
+          },
+          {
+            "check": "first decision",
+            "expected": "REPAIR",
+            "actual": "REPAIR",
+            "pass": true
+          },
+          {
+            "check": "final",
+            "expected": "READY",
+            "actual": "READY",
+            "pass": true
+          },
+          {
+            "check": "repair rounds",
+            "expected": "1..3",
+            "actual": 1,
+            "pass": true
+          },
+          {
+            "check": "acceptance actions unchanged",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          },
+          {
+            "check": "final source differs from injected source",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          }
+        ]
+      },
+      {
+        "faultId": "FAULT-CODE-02",
+        "status": "FAILED",
+        "checks": [
+          {
+            "check": "sample JVM exit",
+            "expected": "OK",
+            "actual": "OK",
+            "pass": true
+          },
+          {
+            "check": "harness error",
+            "expected": null,
+            "actual": null,
+            "pass": true
+          },
+          {
+            "check": "journal and model calls recorded",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          },
+          {
+            "check": "injection applied",
+            "expected": "APPLIED",
+            "actual": null,
+            "pass": false
+          },
+          {
+            "check": "injection labelled",
+            "expected": "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR",
+            "actual": null,
+            "pass": false
+          },
+          {
+            "check": "first verify",
+            "expected": "FAILED",
+            "actual": "NONE",
+            "pass": false
+          },
+          {
+            "check": "first failure category",
+            "expected": "CODE",
+            "actual": null,
+            "pass": false
+          },
+          {
+            "check": "first decision",
+            "expected": "REPAIR",
+            "actual": null,
+            "pass": false
+          },
+          {
+            "check": "final",
+            "expected": "READY",
+            "actual": "FAILED",
+            "pass": false
+          },
+          {
+            "check": "repair rounds",
+            "expected": "1..3",
+            "actual": 0,
+            "pass": false
+          },
+          {
+            "check": "acceptance actions unchanged",
+            "expected": true,
+            "actual": false,
+            "pass": false
+          },
+          {
+            "check": "final source differs from injected source",
+            "expected": true,
+            "actual": false,
+            "pass": false
+          }
+        ]
+      },
+      {
+        "faultId": "FAULT-CODE-03",
+        "status": "FAILED",
+        "checks": [
+          {
+            "check": "sample JVM exit",
+            "expected": "OK",
+            "actual": "OK",
+            "pass": true
+          },
+          {
+            "check": "harness error",
+            "expected": null,
+            "actual": null,
+            "pass": true
+          },
+          {
+            "check": "journal and model calls recorded",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          },
+          {
+            "check": "injection applied",
+            "expected": "APPLIED",
+            "actual": "APPLIED",
+            "pass": true
+          },
+          {
+            "check": "injection labelled",
+            "expected": "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR",
+            "actual": "HOST_TEST_INJECTION_NOT_SPONTANEOUS_MODEL_ERROR",
+            "pass": true
+          },
+          {
+            "check": "first verify",
+            "expected": "FAILED",
+            "actual": "FAILED",
+            "pass": true
+          },
+          {
+            "check": "first failure category",
+            "expected": "CODE",
+            "actual": "CODE",
+            "pass": true
+          },
+          {
+            "check": "first decision",
+            "expected": "REPAIR",
+            "actual": "REPAIR",
+            "pass": true
+          },
+          {
+            "check": "final",
+            "expected": "READY",
+            "actual": "FAILED",
+            "pass": false
+          },
+          {
+            "check": "repair rounds",
+            "expected": "1..3",
+            "actual": 2,
+            "pass": true
+          },
+          {
+            "check": "acceptance actions unchanged",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          },
+          {
+            "check": "final source differs from injected source",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          }
+        ]
+      },
+      {
+        "faultId": "FAULT-ENV-01",
+        "status": "FAILED",
+        "checks": [
+          {
+            "check": "sample JVM exit",
+            "expected": "OK",
+            "actual": "OK",
+            "pass": true
+          },
+          {
+            "check": "harness error",
+            "expected": null,
+            "actual": null,
+            "pass": true
+          },
+          {
+            "check": "journal and model calls recorded",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          },
+          {
+            "check": "container CLI absent in sample JVM",
+            "expected": false,
+            "actual": false,
+            "pass": true
+          },
+          {
+            "check": "final",
+            "expected": "FAILED",
+            "actual": "FAILED",
+            "pass": true
+          },
+          {
+            "check": "failure stage",
+            "expected": "VERIFY",
+            "actual": "PLAN",
+            "pass": false
+          },
+          {
+            "check": "failure category",
+            "expected": "INFRASTRUCTURE",
+            "actual": "MODEL_INTERFACE",
+            "pass": false
+          },
+          {
+            "check": "no REPAIR decision",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          },
+          {
+            "check": "repair rounds",
+            "expected": 0,
+            "actual": 0,
+            "pass": true
+          },
+          {
+            "check": "REPAIR model calls",
+            "expected": 0,
+            "actual": 0,
+            "pass": true
+          },
+          {
+            "check": "immutable candidates",
+            "expected": 1,
+            "actual": 0,
+            "pass": false
+          },
+          {
+            "check": "file tool calls after failure",
+            "expected": 0,
+            "actual": 0,
+            "pass": true
+          }
+        ]
+      },
+      {
+        "faultId": "FAULT-ENV-02",
+        "status": "MISSING",
+        "checks": [
+          {
+            "check": "sample JVM exit",
+            "expected": "OK",
+            "actual": "LAUNCH_ERROR",
+            "pass": false
+          },
+          {
+            "check": "record present with task",
+            "expected": true,
+            "actual": false,
+            "pass": false
+          }
+        ]
+      }
+    ]
+  },
+  "usage": {
+    "baseline": {
+      "requirements": {
+        "callRecord": "RECORDED",
+        "calls": 26,
+        "knownCalls": 20,
+        "unknownCalls": 6,
+        "pendingCalls": 0,
+        "knownInputTokens": 66134,
+        "knownOutputTokens": 5858,
+        "knownTotalTokens": 71992,
+        "complete": false,
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "samplesWithoutTaskRecord": 0,
+        "samplesWithoutCallRecord": 0
+      },
+      "faults": {
+        "callRecord": "RECORDED",
+        "calls": 12,
+        "knownCalls": 8,
+        "unknownCalls": 4,
+        "pendingCalls": 0,
+        "knownInputTokens": 27190,
+        "knownOutputTokens": 5041,
+        "knownTotalTokens": 32231,
+        "complete": false,
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "samplesWithoutTaskRecord": 0,
+        "samplesWithoutCallRecord": 0
+      }
+    },
+    "candidate": {
+      "requirements": {
+        "callRecord": "RECORDED",
+        "calls": 37,
+        "knownCalls": 37,
+        "unknownCalls": 0,
+        "pendingCalls": 0,
+        "knownInputTokens": 117084,
+        "knownOutputTokens": 19393,
+        "knownTotalTokens": 136477,
+        "complete": true,
+        "inputTokens": 117084,
+        "outputTokens": 19393,
+        "totalTokens": 136477,
+        "samplesWithoutTaskRecord": 0,
+        "samplesWithoutCallRecord": 0
+      },
+      "faults": {
+        "callRecord": "RECORDED",
+        "calls": 13,
+        "knownCalls": 10,
+        "unknownCalls": 3,
+        "pendingCalls": 0,
+        "knownInputTokens": 30826,
+        "knownOutputTokens": 4930,
+        "knownTotalTokens": 35756,
+        "complete": false,
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "samplesWithoutTaskRecord": 1,
+        "samplesWithoutCallRecord": 1
+      }
+    }
+  },
+  "samples": [
+    {
+      "sampleId": "SHOW-01",
+      "before": {
+        "taskId": "7d9b5271-2098-414c-89a8-33bee250c829",
+        "outcome": "READY",
+        "firstPass": true,
+        "finalSuccess": true,
+        "failure": null,
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 8,
+          "knownCalls": 8,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 26549,
+          "knownOutputTokens": 1676,
+          "knownTotalTokens": 28225,
+          "complete": true,
+          "inputTokens": 26549,
+          "outputTokens": 1676,
+          "totalTokens": 28225
+        },
+        "charged": {
+          "calls": 8,
+          "chargedTokens": 28225,
+          "estimatedCalls": 0
+        },
+        "durationMs": 26179,
+        "finalVersion": {
+          "id": "58c9f5ef-b0a5-436b-b85d-867bf8fa9a71",
+          "number": 1,
+          "status": "VERIFIED",
+          "sourceDigest": "sha256:c6b28315f8adcd5a94b3f65e6c5a263d2eb501e90048fc08851b7bd5d0009fee",
+          "sourceDirectory": "source/v1"
+        }
+      },
+      "after": {
+        "taskId": "0db85dbc-3d43-4409-b361-2e5d1ca66ed6",
+        "outcome": "READY",
+        "firstPass": true,
+        "finalSuccess": true,
+        "failure": null,
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 4,
+          "knownCalls": 4,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 11206,
+          "knownOutputTokens": 1326,
+          "knownTotalTokens": 12532,
+          "complete": true,
+          "inputTokens": 11206,
+          "outputTokens": 1326,
+          "totalTokens": 12532
+        },
+        "charged": {
+          "calls": 4,
+          "chargedTokens": 12532,
+          "estimatedCalls": 0
+        },
+        "durationMs": 24866,
+        "finalVersion": {
+          "id": "4e9a9577-4c70-456d-98b4-447e777964b9",
+          "number": 1,
+          "status": "VERIFIED",
+          "sourceDigest": "sha256:b4a8dfacd9e817de66104b9f66cfd1c9f6b1a42851d5930016a43f7d0c76c347",
+          "sourceDirectory": "source/v1"
+        }
+      },
+      "transition": "UNCHANGED"
+    },
+    {
+      "sampleId": "SHOW-02",
+      "before": {
+        "taskId": "f65a7fb4-6710-41ec-a9a1-1ae660bf7d9b",
+        "outcome": "READY",
+        "firstPass": true,
+        "finalSuccess": true,
+        "failure": null,
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 4,
+          "knownCalls": 4,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 10340,
+          "knownOutputTokens": 1582,
+          "knownTotalTokens": 11922,
+          "complete": true,
+          "inputTokens": 10340,
+          "outputTokens": 1582,
+          "totalTokens": 11922
+        },
+        "charged": {
+          "calls": 4,
+          "chargedTokens": 11922,
+          "estimatedCalls": 0
+        },
+        "durationMs": 18668,
+        "finalVersion": {
+          "id": "e4767efa-8dd0-4961-a005-371983884e80",
+          "number": 1,
+          "status": "VERIFIED",
+          "sourceDigest": "sha256:2508e685f3929024bce28bd1dbad7af5fdb2758e3c9f79ec810d9f5f9992c237",
+          "sourceDirectory": "source/v1"
+        }
+      },
+      "after": {
+        "taskId": "5f5ce810-8f3e-4258-a05d-bc7f37dc9631",
+        "outcome": "READY",
+        "firstPass": false,
+        "finalSuccess": true,
+        "failure": null,
+        "execution": "OK",
+        "repairRounds": 1,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 4,
+          "knownCalls": 4,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 11471,
+          "knownOutputTokens": 2539,
+          "knownTotalTokens": 14010,
+          "complete": true,
+          "inputTokens": 11471,
+          "outputTokens": 2539,
+          "totalTokens": 14010
+        },
+        "charged": {
+          "calls": 4,
+          "chargedTokens": 14010,
+          "estimatedCalls": 0
+        },
+        "durationMs": 33568,
+        "finalVersion": {
+          "id": "30b84834-7588-4e0f-bb02-7408157f6016",
+          "number": 2,
+          "status": "VERIFIED",
+          "sourceDigest": "sha256:eb4c4559b4b6b3ce879b018b60538e522bee844c4ff75dc618af595d8ee7c97d",
+          "sourceDirectory": "source/v2"
+        }
+      },
+      "transition": "UNCHANGED"
+    },
+    {
+      "sampleId": "SHOW-03",
+      "before": {
+        "taskId": "38e065a7-225c-4e26-8381-92a8245b0445",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_NETWORK",
+          "stage": "PLAN",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_TRANSPORT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 1,
+          "knownCalls": 0,
+          "unknownCalls": 1,
+          "pendingCalls": 0,
+          "knownInputTokens": 0,
+          "knownOutputTokens": 0,
+          "knownTotalTokens": 0,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": 1,
+          "chargedTokens": 9637,
+          "estimatedCalls": 1
+        },
+        "durationMs": 581,
+        "finalVersion": null
+      },
+      "after": {
+        "taskId": "8f83402f-df0c-4550-bb77-30a30d3d7204",
+        "outcome": "READY",
+        "firstPass": true,
+        "finalSuccess": true,
+        "failure": null,
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 5,
+          "knownCalls": 5,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 16031,
+          "knownOutputTokens": 2062,
+          "knownTotalTokens": 18093,
+          "complete": true,
+          "inputTokens": 16031,
+          "outputTokens": 2062,
+          "totalTokens": 18093
+        },
+        "charged": {
+          "calls": 5,
+          "chargedTokens": 18093,
+          "estimatedCalls": 0
+        },
+        "durationMs": 25431,
+        "finalVersion": {
+          "id": "f2637fb8-4673-4ebd-a452-2559385e447f",
+          "number": 1,
+          "status": "VERIFIED",
+          "sourceDigest": "sha256:f7049b0afdd30741e5cf4e92d0adf42faf111437d0b7646466d6c63cab2f07c1",
+          "sourceDirectory": "source/v1"
+        }
+      },
+      "transition": "BECAME_READY"
+    },
+    {
+      "sampleId": "TASK-01",
+      "before": {
+        "taskId": "7e2ca29e-9521-4a46-aa97-1ab1fae9507b",
+        "outcome": "READY",
+        "firstPass": true,
+        "finalSuccess": true,
+        "failure": null,
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 8,
+          "knownCalls": 8,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 29245,
+          "knownOutputTokens": 2600,
+          "knownTotalTokens": 31845,
+          "complete": true,
+          "inputTokens": 29245,
+          "outputTokens": 2600,
+          "totalTokens": 31845
+        },
+        "charged": {
+          "calls": 8,
+          "chargedTokens": 31845,
+          "estimatedCalls": 0
+        },
+        "durationMs": 27258,
+        "finalVersion": {
+          "id": "eb6569e3-944e-4466-b496-c78a9f1b1814",
+          "number": 1,
+          "status": "VERIFIED",
+          "sourceDigest": "sha256:3138f45a5db51b7ebd702daa057e924837902f2900943215598e8ad239192553",
+          "sourceDirectory": "source/v1"
+        }
+      },
+      "after": {
+        "taskId": "f1a5c15e-088e-42ba-9119-d9c151a0c879",
+        "outcome": "READY",
+        "firstPass": true,
+        "finalSuccess": true,
+        "failure": null,
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 4,
+          "knownCalls": 4,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 12087,
+          "knownOutputTokens": 2128,
+          "knownTotalTokens": 14215,
+          "complete": true,
+          "inputTokens": 12087,
+          "outputTokens": 2128,
+          "totalTokens": 14215
+        },
+        "charged": {
+          "calls": 4,
+          "chargedTokens": 14215,
+          "estimatedCalls": 0
+        },
+        "durationMs": 22455,
+        "finalVersion": {
+          "id": "16b99f26-6002-4fdf-afa8-4f7284a63131",
+          "number": 1,
+          "status": "VERIFIED",
+          "sourceDigest": "sha256:e464c103d3d77acf8bc91a2f503e25346aacf8e21b490abaeda53da4240b3250",
+          "sourceDirectory": "source/v1"
+        }
+      },
+      "transition": "UNCHANGED"
+    },
+    {
+      "sampleId": "TASK-02",
+      "before": {
+        "taskId": "219efd2b-bee9-49a6-aa98-99de0b7ef216",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_NETWORK",
+          "stage": "PLAN",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_TRANSPORT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 1,
+          "knownCalls": 0,
+          "unknownCalls": 1,
+          "pendingCalls": 0,
+          "knownInputTokens": 0,
+          "knownOutputTokens": 0,
+          "knownTotalTokens": 0,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": 1,
+          "chargedTokens": 9562,
+          "estimatedCalls": 1
+        },
+        "durationMs": 374,
+        "finalVersion": null
+      },
+      "after": {
+        "taskId": "bb4501fa-b19b-4753-b4d8-2862cb58e116",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_INVALID_RESPONSE",
+          "stage": "GENERATE",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_OUTPUT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 3,
+          "knownCalls": 3,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 8191,
+          "knownOutputTokens": 1647,
+          "knownTotalTokens": 9838,
+          "complete": true,
+          "inputTokens": 8191,
+          "outputTokens": 1647,
+          "totalTokens": 9838
+        },
+        "charged": {
+          "calls": 3,
+          "chargedTokens": 9838,
+          "estimatedCalls": 0
+        },
+        "durationMs": 9494,
+        "finalVersion": null
+      },
+      "transition": "UNCHANGED"
+    },
+    {
+      "sampleId": "TASK-03",
+      "before": {
+        "taskId": "5fc90ad8-7d17-4633-a23f-8f9e4392b90b",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_NETWORK",
+          "stage": "PLAN",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_TRANSPORT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 1,
+          "knownCalls": 0,
+          "unknownCalls": 1,
+          "pendingCalls": 0,
+          "knownInputTokens": 0,
+          "knownOutputTokens": 0,
+          "knownTotalTokens": 0,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": 1,
+          "chargedTokens": 9493,
+          "estimatedCalls": 1
+        },
+        "durationMs": 416,
+        "finalVersion": null
+      },
+      "after": {
+        "taskId": "fb95b253-52d8-4c3f-ba69-a6ae96665be9",
+        "outcome": "READY",
+        "firstPass": true,
+        "finalSuccess": true,
+        "failure": null,
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 5,
+          "knownCalls": 5,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 17562,
+          "knownOutputTokens": 3270,
+          "knownTotalTokens": 20832,
+          "complete": true,
+          "inputTokens": 17562,
+          "outputTokens": 3270,
+          "totalTokens": 20832
+        },
+        "charged": {
+          "calls": 5,
+          "chargedTokens": 20832,
+          "estimatedCalls": 0
+        },
+        "durationMs": 29989,
+        "finalVersion": {
+          "id": "d554200d-128b-4d2c-bdea-901aa87bd5c4",
+          "number": 1,
+          "status": "VERIFIED",
+          "sourceDigest": "sha256:3f87d829a379bf3707b8d030df376539435bca9569089d1be3e832f85ca9d004",
+          "sourceDirectory": "source/v1"
+        }
+      },
+      "transition": "BECAME_READY"
+    },
+    {
+      "sampleId": "CAT-01",
+      "before": {
+        "taskId": "d9bfd28b-b18f-4ed9-b60d-b1e57c3e469e",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_NETWORK",
+          "stage": "PLAN",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_TRANSPORT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 1,
+          "knownCalls": 0,
+          "unknownCalls": 1,
+          "pendingCalls": 0,
+          "knownInputTokens": 0,
+          "knownOutputTokens": 0,
+          "knownTotalTokens": 0,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": 1,
+          "chargedTokens": 9541,
+          "estimatedCalls": 1
+        },
+        "durationMs": 406,
+        "finalVersion": null
+      },
+      "after": {
+        "taskId": "e2eec89d-4cd9-4ca1-a48c-a09e77551e2e",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_INVALID_RESPONSE",
+          "stage": "PLAN",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_OUTPUT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 1,
+          "knownCalls": 1,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 1356,
+          "knownOutputTokens": 439,
+          "knownTotalTokens": 1795,
+          "complete": true,
+          "inputTokens": 1356,
+          "outputTokens": 439,
+          "totalTokens": 1795
+        },
+        "charged": {
+          "calls": 1,
+          "chargedTokens": 1795,
+          "estimatedCalls": 0
+        },
+        "durationMs": 3000,
+        "finalVersion": null
+      },
+      "transition": "UNCHANGED"
+    },
+    {
+      "sampleId": "CAT-02",
+      "before": {
+        "taskId": "9878ef9c-f292-4a2b-8381-dcf788049c6f",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_NETWORK",
+          "stage": "PLAN",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_TRANSPORT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 1,
+          "knownCalls": 0,
+          "unknownCalls": 1,
+          "pendingCalls": 0,
+          "knownInputTokens": 0,
+          "knownOutputTokens": 0,
+          "knownTotalTokens": 0,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": 1,
+          "chargedTokens": 9477,
+          "estimatedCalls": 1
+        },
+        "durationMs": 393,
+        "finalVersion": null
+      },
+      "after": {
+        "taskId": "6b986e9b-4ede-4a81-897d-78a0c3596d6c",
+        "outcome": "READY",
+        "firstPass": true,
+        "finalSuccess": true,
+        "failure": null,
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 5,
+          "knownCalls": 5,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 17771,
+          "knownOutputTokens": 2982,
+          "knownTotalTokens": 20753,
+          "complete": true,
+          "inputTokens": 17771,
+          "outputTokens": 2982,
+          "totalTokens": 20753
+        },
+        "charged": {
+          "calls": 5,
+          "chargedTokens": 20753,
+          "estimatedCalls": 0
+        },
+        "durationMs": 29515,
+        "finalVersion": {
+          "id": "a9d1a72f-9561-4bc7-bcbc-35bb6ad69d0b",
+          "number": 1,
+          "status": "VERIFIED",
+          "sourceDigest": "sha256:e5dfe045ad169df7519660fb78c36264b0abae01cec8f4e5bcb2712b7fa17e6f",
+          "sourceDirectory": "source/v1"
+        }
+      },
+      "transition": "BECAME_READY"
+    },
+    {
+      "sampleId": "CAT-03",
+      "before": {
+        "taskId": "3f935da2-23d7-4fcf-ae8d-8d0d562a6234",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_NETWORK",
+          "stage": "PLAN",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_TRANSPORT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 1,
+          "knownCalls": 0,
+          "unknownCalls": 1,
+          "pendingCalls": 0,
+          "knownInputTokens": 0,
+          "knownOutputTokens": 0,
+          "knownTotalTokens": 0,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": 1,
+          "chargedTokens": 9508,
+          "estimatedCalls": 1
+        },
+        "durationMs": 399,
+        "finalVersion": null
+      },
+      "after": {
+        "taskId": "4ac79e37-046a-4aeb-8490-b273f6381aae",
+        "outcome": "READY",
+        "firstPass": true,
+        "finalSuccess": true,
+        "failure": null,
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 6,
+          "knownCalls": 6,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 21409,
+          "knownOutputTokens": 3000,
+          "knownTotalTokens": 24409,
+          "complete": true,
+          "inputTokens": 21409,
+          "outputTokens": 3000,
+          "totalTokens": 24409
+        },
+        "charged": {
+          "calls": 6,
+          "chargedTokens": 24409,
+          "estimatedCalls": 0
+        },
+        "durationMs": 31709,
+        "finalVersion": {
+          "id": "0e771c76-5c56-448a-a152-9065ef5a4229",
+          "number": 1,
+          "status": "VERIFIED",
+          "sourceDigest": "sha256:028d35a758338ede1aede245859ba2918bcf366f73be68b4526857d35462b8d1",
+          "sourceDirectory": "source/v1"
+        }
+      },
+      "transition": "BECAME_READY"
+    },
+    {
+      "sampleId": "FAULT-CODE-01",
+      "before": {
+        "taskId": "a72f215f-746c-4fb7-8ecf-9c4df663e36a",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_NETWORK",
+          "stage": "PLAN",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_TRANSPORT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 1,
+          "knownCalls": 0,
+          "unknownCalls": 1,
+          "pendingCalls": 0,
+          "knownInputTokens": 0,
+          "knownOutputTokens": 0,
+          "knownTotalTokens": 0,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": 1,
+          "chargedTokens": 9627,
+          "estimatedCalls": 1
+        },
+        "durationMs": 394,
+        "finalVersion": null
+      },
+      "after": {
+        "taskId": "a13ce4ce-a02b-49f0-aa98-47cf1acef4a0",
+        "outcome": "READY",
+        "firstPass": false,
+        "finalSuccess": true,
+        "failure": null,
+        "execution": "OK",
+        "repairRounds": 1,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 5,
+          "knownCalls": 5,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 14623,
+          "knownOutputTokens": 2014,
+          "knownTotalTokens": 16637,
+          "complete": true,
+          "inputTokens": 14623,
+          "outputTokens": 2014,
+          "totalTokens": 16637
+        },
+        "charged": {
+          "calls": 5,
+          "chargedTokens": 16637,
+          "estimatedCalls": 0
+        },
+        "durationMs": 100743,
+        "finalVersion": {
+          "id": "e22c9f95-a862-46e6-9349-5651d607baff",
+          "number": 2,
+          "status": "VERIFIED",
+          "sourceDigest": "sha256:7ee785f8b1bfe45d5371c16bf9f0ea48a3d9f3bb9fe793d1f566a21e8b665e4e",
+          "sourceDirectory": "source/v2"
+        }
+      },
+      "transition": "BECAME_READY"
+    },
+    {
+      "sampleId": "FAULT-CODE-02",
+      "before": {
+        "taskId": "526ce126-5ab2-4644-b957-dde8cc2d2609",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_NETWORK",
+          "stage": "PLAN",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_TRANSPORT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 1,
+          "knownCalls": 0,
+          "unknownCalls": 1,
+          "pendingCalls": 0,
+          "knownInputTokens": 0,
+          "knownOutputTokens": 0,
+          "knownTotalTokens": 0,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": 1,
+          "chargedTokens": 9548,
+          "estimatedCalls": 1
+        },
+        "durationMs": 415,
+        "finalVersion": null
+      },
+      "after": {
+        "taskId": "474ba000-6f04-48e8-b3a8-d865f9e16632",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_UNAVAILABLE",
+          "stage": "PLAN",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_TRANSPORT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 1,
+          "knownCalls": 0,
+          "unknownCalls": 1,
+          "pendingCalls": 0,
+          "knownInputTokens": 0,
+          "knownOutputTokens": 0,
+          "knownTotalTokens": 0,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": 1,
+          "chargedTokens": 9939,
+          "estimatedCalls": 1
+        },
+        "durationMs": 866,
+        "finalVersion": null
+      },
+      "transition": "UNCHANGED"
+    },
+    {
+      "sampleId": "FAULT-CODE-03",
+      "before": {
+        "taskId": "23f86a81-2357-4f0a-b95d-3d446c0429e5",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "AGENT_MODEL_BUDGET_EXCEEDED",
+          "stage": "REPAIR",
+          "platformCategory": "CONTROL",
+          "verifyFailure": "AGENT_PAGE_EXCEPTION",
+          "type": "BUDGET"
+        },
+        "execution": "OK",
+        "repairRounds": 1,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 8,
+          "knownCalls": 8,
+          "unknownCalls": 0,
+          "pendingCalls": 0,
+          "knownInputTokens": 27190,
+          "knownOutputTokens": 5041,
+          "knownTotalTokens": 32231,
+          "complete": true,
+          "inputTokens": 27190,
+          "outputTokens": 5041,
+          "totalTokens": 32231
+        },
+        "charged": {
+          "calls": 8,
+          "chargedTokens": 32231,
+          "estimatedCalls": 0
+        },
+        "durationMs": 35222,
+        "finalVersion": {
+          "id": "a3501ce2-0619-4539-beae-3e3ee089c326",
+          "number": 1,
+          "status": "FAILED",
+          "sourceDigest": "sha256:84eae31d74060d2d82e6ac84529a4c565b523084c1decde549f7e0f874cfe5c7",
+          "sourceDirectory": "source/v1"
+        }
+      },
+      "after": {
+        "taskId": "9a0db6bc-c8d2-4efd-bcef-2a757546d1f2",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_UNAVAILABLE",
+          "stage": "REPAIR",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": "AGENT_ACTION_FAILED",
+          "type": "MODEL_TRANSPORT"
+        },
+        "execution": "OK",
+        "repairRounds": 2,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 6,
+          "knownCalls": 5,
+          "unknownCalls": 1,
+          "pendingCalls": 0,
+          "knownInputTokens": 16203,
+          "knownOutputTokens": 2916,
+          "knownTotalTokens": 19119,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": 6,
+          "chargedTokens": 35864,
+          "estimatedCalls": 1
+        },
+        "durationMs": 91454,
+        "finalVersion": {
+          "id": "a8655a87-6def-4c84-8234-bff80a769db6",
+          "number": 2,
+          "status": "FAILED",
+          "sourceDigest": "sha256:0930417d809afe4930b44f57eb0cb1dde8171de2d219ec1956a780647449a660",
+          "sourceDirectory": "source/v2"
+        }
+      },
+      "transition": "UNCHANGED"
+    },
+    {
+      "sampleId": "FAULT-ENV-01",
+      "before": {
+        "taskId": "31f9feb1-1b0f-4580-b29b-32f5e0374114",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_NETWORK",
+          "stage": "PLAN",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_TRANSPORT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 1,
+          "knownCalls": 0,
+          "unknownCalls": 1,
+          "pendingCalls": 0,
+          "knownInputTokens": 0,
+          "knownOutputTokens": 0,
+          "knownTotalTokens": 0,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": 1,
+          "chargedTokens": 9676,
+          "estimatedCalls": 1
+        },
+        "durationMs": 393,
+        "finalVersion": null
+      },
+      "after": {
+        "taskId": "914d003c-db7b-401f-8444-3ae7b06ebd19",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_UNAVAILABLE",
+          "stage": "PLAN",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_TRANSPORT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 1,
+          "knownCalls": 0,
+          "unknownCalls": 1,
+          "pendingCalls": 0,
+          "knownInputTokens": 0,
+          "knownOutputTokens": 0,
+          "knownTotalTokens": 0,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": 1,
+          "chargedTokens": 10067,
+          "estimatedCalls": 1
+        },
+        "durationMs": 787,
+        "finalVersion": null
+      },
+      "transition": "UNCHANGED"
+    },
+    {
+      "sampleId": "FAULT-ENV-02",
+      "before": {
+        "taskId": "abe5b18d-4da1-4754-acb9-116bdefe0532",
+        "outcome": "FAILED",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": "MODEL_NETWORK",
+          "stage": "PLAN",
+          "platformCategory": "MODEL_INTERFACE",
+          "verifyFailure": null,
+          "type": "MODEL_TRANSPORT"
+        },
+        "execution": "OK",
+        "repairRounds": 0,
+        "usage": {
+          "callRecord": "RECORDED",
+          "calls": 1,
+          "knownCalls": 0,
+          "unknownCalls": 1,
+          "pendingCalls": 0,
+          "knownInputTokens": 0,
+          "knownOutputTokens": 0,
+          "knownTotalTokens": 0,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": 1,
+          "chargedTokens": 9562,
+          "estimatedCalls": 1
+        },
+        "durationMs": 212,
+        "finalVersion": null
+      },
+      "after": {
+        "taskId": null,
+        "outcome": "MISSING",
+        "firstPass": false,
+        "finalSuccess": false,
+        "failure": {
+          "code": null,
+          "stage": null,
+          "platformCategory": null,
+          "verifyFailure": null,
+          "type": "HARNESS"
+        },
+        "execution": "LAUNCH_ERROR",
+        "repairRounds": null,
+        "usage": {
+          "callRecord": "MISSING",
+          "calls": null,
+          "knownCalls": 0,
+          "unknownCalls": null,
+          "pendingCalls": null,
+          "knownInputTokens": 0,
+          "knownOutputTokens": 0,
+          "knownTotalTokens": 0,
+          "complete": false,
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null
+        },
+        "charged": {
+          "calls": null,
+          "chargedTokens": null,
+          "estimatedCalls": null
+        },
+        "durationMs": null,
+        "finalVersion": null
+      },
+      "transition": "UNCHANGED"
+    }
+  ],
+  "integrity": {
+    "baseline": {
+      "ok": true,
+      "checks": [
+        {
+          "id": "batch loads with intact frozen copies",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "frozen set equals repository frozen set",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "plan is the full frozen set (no subset)",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "requirement denominator is 9",
+          "pass": true,
+          "detail": 9
+        },
+        {
+          "id": "category SHOWCASE has 3 requirements",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "category TASKS has 3 requirements",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "category CATALOG has 3 requirements",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "fault denominator is 3 CODE + 2 ENVIRONMENT",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "no sample directory outside the plan",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "mode matches location",
+          "pass": true,
+          "detail": "REAL under evals/generation/runs or evals/results/generation/runs"
+        },
+        {
+          "id": "SHOW-01: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: task ID recorded",
+          "pass": true,
+          "detail": "7d9b5271-2098-414c-89a8-33bee250c829"
+        },
+        {
+          "id": "SHOW-01: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: task ID recorded",
+          "pass": true,
+          "detail": "f65a7fb4-6710-41ec-a9a1-1ae660bf7d9b"
+        },
+        {
+          "id": "SHOW-02: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: task ID recorded",
+          "pass": true,
+          "detail": "38e065a7-225c-4e26-8381-92a8245b0445"
+        },
+        {
+          "id": "SHOW-03: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: task ID recorded",
+          "pass": true,
+          "detail": "7e2ca29e-9521-4a46-aa97-1ab1fae9507b"
+        },
+        {
+          "id": "TASK-01: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: task ID recorded",
+          "pass": true,
+          "detail": "219efd2b-bee9-49a6-aa98-99de0b7ef216"
+        },
+        {
+          "id": "TASK-02: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: task ID recorded",
+          "pass": true,
+          "detail": "5fc90ad8-7d17-4633-a23f-8f9e4392b90b"
+        },
+        {
+          "id": "TASK-03: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: task ID recorded",
+          "pass": true,
+          "detail": "d9bfd28b-b18f-4ed9-b60d-b1e57c3e469e"
+        },
+        {
+          "id": "CAT-01: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: task ID recorded",
+          "pass": true,
+          "detail": "9878ef9c-f292-4a2b-8381-dcf788049c6f"
+        },
+        {
+          "id": "CAT-02: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: task ID recorded",
+          "pass": true,
+          "detail": "3f935da2-23d7-4fcf-ae8d-8d0d562a6234"
+        },
+        {
+          "id": "CAT-03: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: task ID recorded",
+          "pass": true,
+          "detail": "a72f215f-746c-4fb7-8ecf-9c4df663e36a"
+        },
+        {
+          "id": "FAULT-CODE-01: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: task ID recorded",
+          "pass": true,
+          "detail": "526ce126-5ab2-4644-b957-dde8cc2d2609"
+        },
+        {
+          "id": "FAULT-CODE-02: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: task ID recorded",
+          "pass": true,
+          "detail": "23f86a81-2357-4f0a-b95d-3d446c0429e5"
+        },
+        {
+          "id": "FAULT-CODE-03: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: task ID recorded",
+          "pass": true,
+          "detail": "31f9feb1-1b0f-4580-b29b-32f5e0374114"
+        },
+        {
+          "id": "FAULT-ENV-01: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: task ID recorded",
+          "pass": true,
+          "detail": "abe5b18d-4da1-4754-acb9-116bdefe0532"
+        },
+        {
+          "id": "FAULT-ENV-02: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "task IDs unique across samples",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "application IDs unique across samples",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "append-only event log has one entry per sample",
+          "pass": true,
+          "detail": "14 entries"
+        },
+        {
+          "id": "batch completed",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "no credential bytes in outputs",
+          "pass": true,
+          "detail": 0
+        },
+        {
+          "id": "report equals recomputation from raw records",
+          "pass": true,
+          "detail": null
+        }
+      ]
+    },
+    "candidate": {
+      "ok": false,
+      "checks": [
+        {
+          "id": "batch loads with intact frozen copies",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "frozen set equals repository frozen set",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "plan is the full frozen set (no subset)",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "requirement denominator is 9",
+          "pass": true,
+          "detail": 9
+        },
+        {
+          "id": "category SHOWCASE has 3 requirements",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "category TASKS has 3 requirements",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "category CATALOG has 3 requirements",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "fault denominator is 3 CODE + 2 ENVIRONMENT",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "no sample directory outside the plan",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "mode matches location",
+          "pass": true,
+          "detail": "REAL under evals/generation/runs or evals/results/generation/runs"
+        },
+        {
+          "id": "SHOW-01: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: task ID recorded",
+          "pass": true,
+          "detail": "0db85dbc-3d43-4409-b361-2e5d1ca66ed6"
+        },
+        {
+          "id": "SHOW-01: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-01: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: task ID recorded",
+          "pass": true,
+          "detail": "5f5ce810-8f3e-4258-a05d-bc7f37dc9631"
+        },
+        {
+          "id": "SHOW-02: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-02: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: task ID recorded",
+          "pass": true,
+          "detail": "8f83402f-df0c-4550-bb77-30a30d3d7204"
+        },
+        {
+          "id": "SHOW-03: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "SHOW-03: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: task ID recorded",
+          "pass": true,
+          "detail": "f1a5c15e-088e-42ba-9119-d9c151a0c879"
+        },
+        {
+          "id": "TASK-01: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-01: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: task ID recorded",
+          "pass": true,
+          "detail": "bb4501fa-b19b-4753-b4d8-2862cb58e116"
+        },
+        {
+          "id": "TASK-02: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-02: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: task ID recorded",
+          "pass": true,
+          "detail": "fb95b253-52d8-4c3f-ba69-a6ae96665be9"
+        },
+        {
+          "id": "TASK-03: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "TASK-03: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: task ID recorded",
+          "pass": true,
+          "detail": "e2eec89d-4cd9-4ca1-a48c-a09e77551e2e"
+        },
+        {
+          "id": "CAT-01: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-01: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: task ID recorded",
+          "pass": true,
+          "detail": "6b986e9b-4ede-4a81-897d-78a0c3596d6c"
+        },
+        {
+          "id": "CAT-02: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-02: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: task ID recorded",
+          "pass": true,
+          "detail": "4ac79e37-046a-4aeb-8490-b273f6381aae"
+        },
+        {
+          "id": "CAT-03: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "CAT-03: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: task ID recorded",
+          "pass": true,
+          "detail": "a13ce4ce-a02b-49f0-aa98-47cf1acef4a0"
+        },
+        {
+          "id": "FAULT-CODE-01: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-01: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: task ID recorded",
+          "pass": true,
+          "detail": "474ba000-6f04-48e8-b3a8-d865f9e16632"
+        },
+        {
+          "id": "FAULT-CODE-02: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-02: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: task ID recorded",
+          "pass": true,
+          "detail": "9a0db6bc-c8d2-4efd-bcef-2a757546d1f2"
+        },
+        {
+          "id": "FAULT-CODE-03: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-CODE-03: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: raw record present",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: record identity",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: task ID recorded",
+          "pass": true,
+          "detail": "914d003c-db7b-401f-8444-3ae7b06ebd19"
+        },
+        {
+          "id": "FAULT-ENV-01: task prompt is the frozen prompt byte-for-byte",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: application data mode is frozen",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: model calls only from the batch provider",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-01: exported sources and screenshots match recorded digests",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: spec is the frozen raw input",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: exactly one attempt started and finished",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: process result matches the append-only event log",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: record presence matches the process result",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "FAULT-ENV-02: success claimed only after a clean process exit",
+          "pass": true,
+          "detail": "exitCode=null timedOut=false"
+        },
+        {
+          "id": "FAULT-ENV-02: raw record present",
+          "pass": false,
+          "detail": "missing record counts as a failure in the denominator"
+        },
+        {
+          "id": "task IDs unique across samples",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "application IDs unique across samples",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "append-only event log has one entry per sample",
+          "pass": true,
+          "detail": "14 entries"
+        },
+        {
+          "id": "batch completed",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "id": "no credential bytes in outputs",
+          "pass": true,
+          "detail": 0
+        },
+        {
+          "id": "report equals recomputation from raw records",
+          "pass": true,
+          "detail": null
+        }
+      ]
+    }
+  },
+  "reportDigests": {
+    "baseline": "sha256:848bd92927c612feb6244eefc358f7d39e772d8f035ac7854d7eb1c38e9e22cd",
+    "candidate": "sha256:7d8e7fe3f27fb96e0ba9a3af3ae77657263f1e0763dc291c65650f2aaa415e75"
+  },
+  "acceptance": {
+    "evidenceValid": false,
+    "platformTargetMet": false,
+    "faultsMet": false,
+    "requirementBehaviorStatus": "PENDING_INDEPENDENT_REPLAY"
+  }
+}
