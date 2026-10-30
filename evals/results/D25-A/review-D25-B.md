@@ -1,5 +1,17 @@
 # D25-A 对 D25-B 的只读审查
 
+## 2026-10-30 修复复审：6ecf3f5
+
+复审 [PR #81](https://github.com/Echo-love928/CodeLess/pull/81) 精确提交 `6ecf3f5050c47e24ffe211a32e60460a2a6c033d`，仅检查上次审查后的变更和受影响范围。**模式校验代码阻塞已解除；真实验收仍 HOLD，不批准。** 未发送评论或 GitHub 正式 review。
+
+- **阻塞问题**：六项真实编辑、公网页面/封面/下载仍 `NOT_EXECUTED`，结构结果 `executed=0, passed=0, acceptance=null`。B 如实记录缺原运行时/有效会话；不能以修复校验器、fixture 或六项 CI success 解除真实验收阻塞。原 A 数据导出仍保留，原设备恢复/重新登录后需重新预检并采集终态。
+- **建议**：真实执行时固定产品候选、保留 01→02→03→05 的依赖关系，04/06 独立；每次成功后重探最新版本。完成后只复查新增真实证据和受影响范围。本方 F1/F2/F3 正在独立修复及新批次复评，旧 7/9、1/3 保留为历史。
+- **已核验内容**：`evals/edit-results/validate.mjs:14` 对全部九行校验 `row.mode === index.mode`；`tests/eval/d25-b.test.mjs:30` 起覆盖六项完整 MOCK 成功行、九行任意混合及缺失/未知模式，包含合法成功的正对照。A 从精确 Git 归档独立运行 **6/6、exit 0**；原 A 反例 **exit 0、rejected=true**。文件记录实际字节摘要及 CRLF 与 Git LF 的等价关系，不冒称原字节相同，见 `followup-2026-10-30/peer-unit.json`、`peer-counterexample.json`。修复提交自身六项远端检查全部 success，快照见 `peer-checks.json`（2026-10-30T02:25:40Z）。
+
+增量只涉及校验器、专项测试和任务文档/证据；未改生产、公共契约、锁、CI、权限或删除断言。演示口径已更新 A 候选与 HOLD，未发现新增代码阻塞或公开差异中的秘密。两次局部归档缺依赖的启动失败已识别，补齐完整归档后才取得上述专项结果；不算产品失败或测试通过。
+
+以下保留 2026-10-29 对旧提交的原始审查，不将已关闭的模式缺陷继续当作当前阻塞。
+
 对象：[PR #81](https://github.com/Echo-love928/CodeLess/pull/81)，精确 HEAD `bd6188ffef5cb1d2ab5d05a14d94f5e8e71a58ac`，产品候选 `5de2e6cf995c95ee91a1f9dc40403654df0af3de`。公开差异快照 `peer-pr81.json`；私有精确 Git 归档 `.local-data/d25-a/peer-bd6188f/`。未修改 B 工作，未提交远端审查或批准。
 
 ## 阻塞问题

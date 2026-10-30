@@ -1,0 +1,123 @@
+{
+  "status": "INTERRUPTED_AFTER_CONFIRMED_FAILURE",
+  "head": "165e31c0fec532fc910396257b8d468499ae91e3",
+  "commandEvidence": "evals/results/D25-A/commands/2026-10-30T02-52-57.827Z-gate/command.json",
+  "nativeExitCode": 1,
+  "apiStageTerminal": "UNKNOWN_INTERRUPTED",
+  "runnerStage": "NOT_EXECUTED",
+  "e2eStage": "NOT_EXECUTED",
+  "completedJUnitSuites": 56,
+  "partialTotals": {
+    "tests": 277,
+    "failures": 23,
+    "errors": 5,
+    "skipped": 0
+  },
+  "failedSuites": [
+    {
+      "name": "dev.codeless.api.agent.AgentLoopIntegrationTest",
+      "tests": "11",
+      "failures": "5",
+      "errors": "3",
+      "failedCases": [
+        "D09AT1_mockProviderGeneratesMultipleFilesThroughRealDatabaseDockerAndBrowser",
+        "D09AT2_wrongSourceArtifactAndScreenshotDigestsCannotPromote",
+        "D09AT3_realBuildFailureIsExplainedAndRetainsRecoveryWithoutReplacingReady",
+        "D09AT4_completionAndPublicReplayBindExactImmutableVersionAndBuild",
+        "actualFileResultsAreFedBackAndCancellationRetainsReceivedUsage",
+        "boundedLoopReservesUnknownUsageAndNeverTurnsItIntoZero",
+        "ambiguousBrowserTargetsCannotPromoteEvenAfterARealSuccessfulBuild",
+        "textPrefixCannotPromoteEvenAfterARealSuccessfulBuild"
+      ],
+      "sha256": "sha256:0a896e4575f83922926d24251d8a6cec8f371a4e556087ba9e93bd57fb3ffdbb"
+    },
+    {
+      "name": "dev.codeless.api.agent.CsrfDuringGenerationTest",
+      "tests": "1",
+      "failures": "1",
+      "errors": "0",
+      "failedCases": [
+        "csrfRemainsResponsiveWhileRealGenerationIsWaiting(CapturedOutput)"
+      ],
+      "sha256": "sha256:7a2053619c1a7e72ea223d1a9e621c57b1d09a80e8f6d7cc7e1143f20c9ef334"
+    },
+    {
+      "name": "dev.codeless.api.agent.RepairBudgetRegressionTest",
+      "tests": "5",
+      "failures": "1",
+      "errors": "0",
+      "failedCases": [
+        "cat01DependencyReadsNoLongerLeaveTheNextRequestUnfunded"
+      ],
+      "sha256": "sha256:871a29c1fb07e2aee151ec43810898555843fead7891dcae67bc6c43f5b61109"
+    },
+    {
+      "name": "dev.codeless.api.deploy.PublicationIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "1",
+      "failedCases": [
+        ""
+      ],
+      "sha256": "sha256:cfc33b88584f41b9e2c3c4bf12c53236d1c98c3620edd055e458eee2c23ffd5f"
+    },
+    {
+      "name": "dev.codeless.api.edit.EditLifecycleIntegrationTest",
+      "tests": "15",
+      "failures": "15",
+      "errors": "0",
+      "failedCases": [
+        "d12aT1EditCreatesNewDraftFromBaseThenRealReadyWithoutOverwriteOrPublication",
+        "d12aT2StaleBaseReturns409AndRetainsRequirementAndSource",
+        "d12aT3ConcurrentRequestsAllowOneQueuedEditAndBlockOrdinaryGeneration",
+        "d12aT4CancelRejectsLateWorkerAndPreservesOriginalUsableVersion",
+        "unauthorizedMalformedUnavailableBasesAndIdempotencyCollisionsFailClosed",
+        "realFailedEditBuildCannotReplaceUsableVersion",
+        "optimisticCommitRejectsBaseChangedAfterRealVerification",
+        "componentSidecarApiScopesOwnershipVersionsAndNewDraftInRealChain",
+        "sidecarCorruptionCannotCreateAnEditTask",
+        "modelCannotWidenSelectedComponentScope",
+        "repairCannotCreateDeleteOrUpdateOutsideTheSelectedComponent",
+        "deletionCannotExpandPermissionsOrRelaxFinalSnapshotEquality",
+        "deletingExistingFileCreatesVerifiedNewVersionAndPreservesBase",
+        "markerCaseAliasesFreezeDisabledSidecarAndCannotCreateAnEditTask",
+        "recordRuntimeModelUsageSeparatelyWithoutInventedTokens"
+      ],
+      "sha256": "sha256:444d7d86afb1a7b4e20515367c781ff7b87990c031e719731fdc051923e9c592"
+    },
+    {
+      "name": "dev.codeless.api.edit.EditVerificationIntegrationTest",
+      "tests": "1",
+      "failures": "1",
+      "errors": "0",
+      "failedCases": [
+        ""
+      ],
+      "sha256": "sha256:59b23d6cff3c643430897c4475326a9393512e78be2b36cabf066f4df894e0d3"
+    },
+    {
+      "name": "dev.codeless.api.export.SourceExportIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "1",
+      "failedCases": [
+        ""
+      ],
+      "sha256": "sha256:4b7f995b64ffd309fa0f67350931e230a0057a2c4efc1257f0cb19865c730010"
+    }
+  ],
+  "reason": "New prompt expansion caused AGENT_MODEL_BUDGET_EXCEEDED before VERIFY in existing unknown-usage tests. Preserved partial JUnit then stopped only the observed owned ci-gate process tree PID57428; do not count API or aggregate as success.",
+  "promptBytes": {
+    "generation": {
+      "baseline": 5338,
+      "regressed": 6839,
+      "proposed": 5190
+    },
+    "repair": {
+      "baseline": 1763,
+      "regressed": 2057,
+      "proposed": 1758
+    }
+  },
+  "limitsOrAssertionsChanged": false
+}

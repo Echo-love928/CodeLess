@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { root, canonical, sha256 } from '../../scripts/eval/lib.mjs'
-const base = '5de2e6cf995c95ee91a1f9dc40403654df0af3de'
+const base = process.argv[3] ?? '5de2e6cf995c95ee91a1f9dc40403654df0af3de'
 const output = process.argv[2]
 const git = (...args) => {
   const result = spawnSync('git', ['-c', 'safe.directory=' + root.replaceAll('\\', '/').replace(/\/$/, ''), ...args], { cwd: root, windowsHide: true, encoding: 'utf8' })

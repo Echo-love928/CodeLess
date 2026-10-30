@@ -1,0 +1,139 @@
+{
+  "startedAt": "2026-10-30T02:47:36.686Z",
+  "updatedAt": "2026-10-30T03:07:31.843Z",
+  "batch": "evals/results/generation/runs/2026-10-30T02-41-32Z-real-c3368088",
+  "steps": [
+    {
+      "label": "verify",
+      "command": [
+        "F:\\nodejs\\node.exe",
+        "scripts/eval/record-final.mjs",
+        "verify",
+        "evals/results/generation/runs/2026-10-30T02-41-32Z-real-c3368088"
+      ],
+      "startedAt": "2026-10-30T02:52:08.797Z",
+      "completedAt": "2026-10-30T02:52:09.457Z",
+      "exitCode": 0,
+      "signal": null,
+      "logSha256": "sha256:511d0f3b78d2955fe54471981135fc1791bf2573f180eee164ee1c556655860a",
+      "privateLog": ".local-data/d25-a/followup/pipeline/verify.log",
+      "qualityFailureAllowed": false
+    },
+    {
+      "label": "report-check",
+      "command": [
+        "F:\\nodejs\\node.exe",
+        "scripts/eval/record-final.mjs",
+        "report-check",
+        "evals/results/generation/runs/2026-10-30T02-41-32Z-real-c3368088"
+      ],
+      "startedAt": "2026-10-30T02:52:09.459Z",
+      "completedAt": "2026-10-30T02:52:10.090Z",
+      "exitCode": 0,
+      "signal": null,
+      "logSha256": "sha256:69259fbdbc81a4bdadb5190e5cca9fd18fe83ebaa8dc8e1ea9e61ad7143c6a02",
+      "privateLog": ".local-data/d25-a/followup/pipeline/report-check.log",
+      "qualityFailureAllowed": false
+    },
+    {
+      "label": "comparison",
+      "command": [
+        "F:\\nodejs\\node.exe",
+        "scripts/eval/final-comparison.mjs",
+        "evals/results/generation/runs/2026-10-29T10-12-17Z-real-4e8e6f51",
+        "evals/results/generation/runs/2026-10-30T02-41-32Z-real-c3368088",
+        "evals/results/D25-A/followup-2026-10-30/round2-comparison.json"
+      ],
+      "startedAt": "2026-10-30T02:52:10.091Z",
+      "completedAt": "2026-10-30T02:52:10.273Z",
+      "exitCode": 1,
+      "signal": null,
+      "logSha256": "sha256:a986ed47998a9b674f9def94a3ec8920ba287c049165f6b29d57d695f568a2d1",
+      "privateLog": ".local-data/d25-a/followup/pipeline/comparison.log",
+      "qualityFailureAllowed": true
+    },
+    {
+      "label": "behavior",
+      "command": [
+        "F:\\nodejs\\node.exe",
+        "tests/eval/d25-a-run-replay.mjs",
+        "evals/results/generation/runs/2026-10-30T02-41-32Z-real-c3368088",
+        "evals/results/D25-A/followup-2026-10-30/round2-behavior"
+      ],
+      "startedAt": "2026-10-30T02:52:10.274Z",
+      "completedAt": "2026-10-30T02:52:49.215Z",
+      "exitCode": 1,
+      "signal": null,
+      "logSha256": "sha256:eed4a816684a199efcd1c0add525dd02c8670011f4008d9ab82210370c5c1ca9",
+      "privateLog": ".local-data/d25-a/followup/pipeline/behavior.log",
+      "qualityFailureAllowed": true
+    },
+    {
+      "label": "final-metrics",
+      "command": [
+        "F:\\nodejs\\node.exe",
+        "scripts/eval/final-metrics.mjs",
+        "evals/results/generation/runs/2026-10-30T02-41-32Z-real-c3368088",
+        "evals/results/D25-A/followup-2026-10-30/round2-behavior/report.json",
+        "evals/results/D25-A/followup-2026-10-30/round2-final-metrics.json"
+      ],
+      "startedAt": "2026-10-30T02:52:49.217Z",
+      "completedAt": "2026-10-30T02:52:49.378Z",
+      "exitCode": 1,
+      "signal": null,
+      "logSha256": "sha256:e859d9c1d94b1bb00a18ef7fe8e30ff9867b03ae3875fc6b7b694ca03147f102",
+      "privateLog": ".local-data/d25-a/followup/pipeline/final-metrics.log",
+      "qualityFailureAllowed": true
+    },
+    {
+      "label": "final-metrics-check",
+      "command": [
+        "F:\\nodejs\\node.exe",
+        "scripts/eval/final-metrics.mjs",
+        "evals/results/generation/runs/2026-10-30T02-41-32Z-real-c3368088",
+        "evals/results/D25-A/followup-2026-10-30/round2-behavior/report.json",
+        "evals/results/D25-A/followup-2026-10-30/round2-final-metrics.json",
+        "--check"
+      ],
+      "startedAt": "2026-10-30T02:52:49.380Z",
+      "completedAt": "2026-10-30T02:52:49.528Z",
+      "exitCode": 0,
+      "signal": null,
+      "logSha256": "sha256:e3219b48ab18a7e9e3e1ac4fad3de5f1d2561025a5a89dfe2c55d046e263517a",
+      "privateLog": ".local-data/d25-a/followup/pipeline/final-metrics-check.log",
+      "qualityFailureAllowed": false
+    },
+    {
+      "label": "provenance",
+      "command": [
+        "F:\\nodejs\\node.exe",
+        "tests/eval/d25-a-followup-provenance.mjs",
+        "evals/results/generation/runs/2026-10-30T02-41-32Z-real-c3368088",
+        "evals/results/D25-A/commands/2026-10-30T02-41-31.796Z-real/command.json",
+        "evals/results/D25-A/followup-2026-10-30/round2-provenance.json"
+      ],
+      "startedAt": "2026-10-30T02:52:49.528Z",
+      "completedAt": "2026-10-30T02:52:57.663Z",
+      "exitCode": 0,
+      "signal": null,
+      "logSha256": "sha256:b2860c3ae3847d19632c667b55a6d000fb6eaeeec1586dd3243941b382001bd5",
+      "privateLog": ".local-data/d25-a/followup/pipeline/provenance.log",
+      "qualityFailureAllowed": false
+    },
+    {
+      "label": "gate",
+      "command": [
+        "F:\\nodejs\\node.exe",
+        "scripts/eval/record-final.mjs",
+        "gate"
+      ],
+      "startedAt": "2026-10-30T02:52:57.664Z",
+      "completedAt": "2026-10-30T03:07:31.843Z",
+      "exitCode": 1,
+      "signal": null,
+      "logSha256": "sha256:71fa2b655c588891f70d4e47ecf99df5dd0e4c31522f0378ea5557899407dab2",
+      "privateLog": ".local-data/d25-a/followup/pipeline/gate.log",
+      "qualityFailureAllowed": true
+    }
+  ]
+}

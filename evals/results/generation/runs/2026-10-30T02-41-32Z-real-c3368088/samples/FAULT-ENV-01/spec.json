@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-10-30T02-41-32Z-real-c3368088",
+  "sampleId": "FAULT-ENV-01",
+  "kind": "ENV_FAULT",
+  "mode": "REAL",
+  "category": "SHOWCASE",
+  "requirement": {
+    "id": "SHOW-02",
+    "category": "SHOWCASE",
+    "applicationName": "杭州前端大会活动页",
+    "dataMode": "STATIC",
+    "prompt": "生成“2026 杭州前端开发者大会”活动页：显示活动名称、日期“2026年11月20日”、地点“杭州国际博览中心”；用列表展示三个日程：09:00 开幕致辞、10:30 Vue 性能优化实战、14:00 无障碍设计实践，每项显示时间和标题；页面有“我要报名”按钮，点击后在按钮下方显示“报名意向已记录（演示）”。只在页面内展示，不需要后端。使用静态数据。",
+    "statedBehaviors": [
+      "显示活动名称、日期与地点",
+      "日程列表三项，各有时间与标题",
+      "点击“我要报名”后显示“报名意向已记录（演示）”"
+    ]
+  },
+  "fault": {
+    "id": "FAULT-ENV-01",
+    "class": "ENVIRONMENT",
+    "baseRequirement": "SHOW-02",
+    "injection": "CONTAINER_CLI_UNAVAILABLE",
+    "origin": "HOST_ENVIRONMENT_FAULT",
+    "timing": "WHOLE_SAMPLE_JVM",
+    "mechanism": "The driver starts this sample's JVM with every PATH entry that contains a docker executable removed. PLAN and GENERATE are unaffected; the restricted runner cannot start the container CLI at VERIFY.",
+    "expected": {
+      "final": "FAILED",
+      "failureCategory": "INFRASTRUCTURE",
+      "repairRounds": 0,
+      "repairModelCalls": 0,
+      "sourceChangesAfterFailure": 0
+    }
+  },
+  "runConfig": {
+    "runtimeBudget": {
+      "repairRounds": 3,
+      "modelRequests": 12,
+      "toolSlots": 20,
+      "chargedTokens": 50000,
+      "outputTokensPerRequest": 4096,
+      "framingTokensPerRequest": 512,
+      "taskDeadlineMinutes": 12
+    }
+  },
+  "frozenDigests": {
+    "requirements": "sha256:ef219f3e5c0f05f3ab03ec854c66b32709349f80d1e1aee0076fe19d2b91cb2a",
+    "faults": "sha256:4b147818de5823b2ba3011cc65f57a08f63270154aa01289af8e7631c8790b13",
+    "runConfig": "sha256:6dc271c657cdb29e72ec052621fc2633ac5d82b8d8d963bfbffccd0d929cb054"
+  }
+}

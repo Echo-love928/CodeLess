@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-30",
+  "incidents": [
+    {"stage": "peer archive setup", "result": "Two partial archive launches failed on missing import dependencies; extracted the full pinned Git archive, then the actual six tests passed. No B source was changed."},
+    {"stage": "local recorder setup", "result": "Initial recorder import used one extra parent directory and PowerShell parsed an unquoted Maven comma argument. Corrected the local helper and quoting before recording the actual red/green tests."},
+    {"stage": "peer identity audit", "result": "Archive git rev-parse discovered the A parent repository. Marked head null, retained executionParentHead, and recorded the pinned B archive commit plus actual hashes and normalized LF equality. Archive text had CRLF expansion; raw equality is not claimed."},
+    {"stage": "network preflight", "result": "First TLS 12/12 and JVM 12/12 reached provider; Docker Linux pipe absent so preflight exit 1, no samples started. Started the existing Docker Desktop in background; engine 29.9.2 recovered. A new full preflight passed before the one complete REAL batch."}
+  ],
+  "modelRequestsDuringSetup": 0,
+  "trustOrIsolationChanged": false
+}
