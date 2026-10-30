@@ -1,0 +1,310 @@
+[
+  {
+    "case": "books-original-ambiguous",
+    "mode": "MOCK",
+    "measurement": "DETERMINISTIC_NOT_REAL_MODEL_EVALUATION",
+    "proposalKind": "ORIGINAL_FROZEN_FULL",
+    "status": "FAILED",
+    "failureCode": "AGENT_ACTION_FAILED",
+    "modelRequests": 4,
+    "meterSynthetic": {
+      "models": 4,
+      "tools": 5,
+      "chargedTokens": 800
+    },
+    "repairAttempts": 0,
+    "invalid": [],
+    "runs": [
+      {
+        "buildExitCode": 0,
+        "browserExitCode": 1,
+        "browserStatus": "FAILED",
+        "failure": "ACTION_FAILED",
+        "error": "locator.click: Error: strict mode violation: getByText('科技', { exact: true }) resolved to 3 elements:\n    1) <button type=\"button\" data-v-22b66079=\"\" class=\"filter-btn\">科技</button> aka getByRole('button', { name: '科技', exact: true })\n    2) <span class=\"book-cat\" data-v-22b66079=\"\">科技</span> aka getByRole('button', { name: '代码大全 史蒂夫·迈克康奈尔 科技' })\n    3) <span class=\"book-cat\" data-v-22b66079=\"\">科技</span> aka getByRole('button', { name: '深入理解计算机系统 Randal E. Bryant 科技' })\n\nCall log:\n\u001b[2m  - waiting for getByTe"
+      }
+    ]
+  },
+  {
+    "case": "books-role-specific-new-proposal",
+    "mode": "MOCK",
+    "measurement": "DETERMINISTIC_NOT_REAL_MODEL_EVALUATION",
+    "proposalKind": "NEW_DETERMINISTIC_PROPOSAL",
+    "status": "READY",
+    "failureCode": null,
+    "modelRequests": 4,
+    "meterSynthetic": {
+      "models": 4,
+      "tools": 5,
+      "chargedTokens": 800
+    },
+    "repairAttempts": 0,
+    "invalid": [],
+    "runs": [
+      {
+        "buildExitCode": 0,
+        "browserExitCode": 0,
+        "browserStatus": "PASSED",
+        "failure": null,
+        "error": null
+      }
+    ]
+  },
+  {
+    "case": "cafe-consumer-type-repair",
+    "mode": "MOCK",
+    "measurement": "DETERMINISTIC_NOT_REAL_MODEL_EVALUATION",
+    "proposalKind": "NEW_DETERMINISTIC_PROPOSAL",
+    "status": "READY",
+    "failureCode": null,
+    "modelRequests": 7,
+    "meterSynthetic": {
+      "models": 7,
+      "tools": 11,
+      "chargedTokens": 1400
+    },
+    "repairAttempts": 1,
+    "invalid": [],
+    "runs": [
+      {
+        "buildExitCode": 2,
+        "browserExitCode": null,
+        "browserStatus": "NOT_EXECUTED",
+        "failure": "BUILD_EXIT",
+        "error": null
+      },
+      {
+        "buildExitCode": 0,
+        "browserExitCode": 0,
+        "browserStatus": "PASSED",
+        "failure": null,
+        "error": null
+      }
+    ]
+  },
+  {
+    "case": "cafe-original-ambiguous",
+    "mode": "MOCK",
+    "measurement": "DETERMINISTIC_NOT_REAL_MODEL_EVALUATION",
+    "proposalKind": "ORIGINAL_FROZEN_FULL",
+    "status": "FAILED",
+    "failureCode": "AGENT_ACTION_FAILED",
+    "modelRequests": 6,
+    "meterSynthetic": {
+      "models": 6,
+      "tools": 7,
+      "chargedTokens": 1200
+    },
+    "repairAttempts": 0,
+    "invalid": [],
+    "runs": [
+      {
+        "buildExitCode": 0,
+        "browserExitCode": 1,
+        "browserStatus": "FAILED",
+        "failure": "ACTION_FAILED",
+        "error": "locator.waitFor: Error: strict mode violation: getByRole('heading', { name: '云间咖啡', exact: true }) resolved to 2 elements:\n    1) <h3 class=\"cafe-name\" data-v-4ecb9ad8=\"\">云间咖啡</h3> aka locator('h3').filter({ hasText: '云间咖啡' })\n    2) <h2 data-v-7ab964aa=\"\" class=\"detail-title\">云间咖啡</h2> aka locator('h2')\n\nCall log:\n\u001b[2m  - waiting for getByRole('heading', { name: '云间咖啡', exact: true }) to be visible\u001b[22m\n"
+      }
+    ]
+  },
+  {
+    "case": "cafe-unique-new-proposal",
+    "mode": "MOCK",
+    "measurement": "DETERMINISTIC_NOT_REAL_MODEL_EVALUATION",
+    "proposalKind": "NEW_DETERMINISTIC_PROPOSAL",
+    "status": "READY",
+    "failureCode": null,
+    "modelRequests": 6,
+    "meterSynthetic": {
+      "models": 6,
+      "tools": 7,
+      "chargedTokens": 1200
+    },
+    "repairAttempts": 0,
+    "invalid": [],
+    "runs": [
+      {
+        "buildExitCode": 0,
+        "browserExitCode": 0,
+        "browserStatus": "PASSED",
+        "failure": null,
+        "error": null
+      }
+    ]
+  },
+  {
+    "case": "original-duplicate-content",
+    "mode": "MOCK",
+    "measurement": "DETERMINISTIC_NOT_REAL_MODEL_EVALUATION",
+    "proposalKind": "STRICT_PARSER_NEGATIVE",
+    "status": "FAILED",
+    "failureCode": "MODEL_INVALID_RESPONSE",
+    "modelRequests": 2,
+    "meterSynthetic": {
+      "models": 2,
+      "tools": 0,
+      "chargedTokens": 400
+    },
+    "repairAttempts": 0,
+    "invalid": [
+      {
+        "source": "PARSER",
+        "reason": "DUPLICATE_KEY",
+        "contentBytes": 9618,
+        "contentDigest": "sha256:583e3156e013652bb4ac5e85b2c8acff41336f82481480862c787a61df2944a8",
+        "line": 1,
+        "column": 4706,
+        "rootValues": [
+          "OBJECT"
+        ],
+        "rootKeys": [
+          "type",
+          "name",
+          "arguments"
+        ],
+        "rootType": "tool"
+      }
+    ],
+    "runs": []
+  },
+  {
+    "case": "tools-cumulative-new-proposal",
+    "mode": "MOCK",
+    "measurement": "DETERMINISTIC_NOT_REAL_MODEL_EVALUATION",
+    "proposalKind": "NEW_DETERMINISTIC_PROPOSAL",
+    "status": "READY",
+    "failureCode": null,
+    "modelRequests": 6,
+    "meterSynthetic": {
+      "models": 6,
+      "tools": 7,
+      "chargedTokens": 1200
+    },
+    "repairAttempts": 0,
+    "invalid": [],
+    "runs": [
+      {
+        "buildExitCode": 0,
+        "browserExitCode": 0,
+        "browserStatus": "PASSED",
+        "failure": null,
+        "error": null
+      }
+    ]
+  },
+  {
+    "case": "tools-isolated-original-category-contradiction",
+    "mode": "MOCK",
+    "measurement": "DETERMINISTIC_NOT_REAL_MODEL_EVALUATION",
+    "proposalKind": "DERIVED_DIAGNOSTIC_SUFFIX",
+    "status": "FAILED",
+    "failureCode": "AGENT_ACTION_TIMEOUT",
+    "modelRequests": 6,
+    "meterSynthetic": {
+      "models": 6,
+      "tools": 7,
+      "chargedTokens": 1200
+    },
+    "repairAttempts": 0,
+    "invalid": [],
+    "runs": [
+      {
+        "buildExitCode": 0,
+        "browserExitCode": 1,
+        "browserStatus": "FAILED",
+        "failure": "ACTION_TIMEOUT",
+        "error": "locator.waitFor: Timeout 2000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('tool-name-docusaurus') to be visible\u001b[22m\n"
+      }
+    ]
+  },
+  {
+    "case": "tools-original-contradictory",
+    "mode": "MOCK",
+    "measurement": "DETERMINISTIC_NOT_REAL_MODEL_EVALUATION",
+    "proposalKind": "ORIGINAL_FROZEN_FULL",
+    "status": "FAILED",
+    "failureCode": "AGENT_ACTION_TIMEOUT",
+    "modelRequests": 6,
+    "meterSynthetic": {
+      "models": 6,
+      "tools": 7,
+      "chargedTokens": 1200
+    },
+    "repairAttempts": 0,
+    "invalid": [],
+    "runs": [
+      {
+        "buildExitCode": 0,
+        "browserExitCode": 1,
+        "browserStatus": "FAILED",
+        "failure": "ACTION_TIMEOUT",
+        "error": "locator.waitFor: Timeout 2000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('empty-state') to be visible\u001b[22m\n"
+      }
+    ]
+  },
+  {
+    "case": "trailing-data",
+    "mode": "MOCK",
+    "measurement": "DETERMINISTIC_NOT_REAL_MODEL_EVALUATION",
+    "proposalKind": "STRICT_PARSER_NEGATIVE",
+    "status": "FAILED",
+    "failureCode": "MODEL_INVALID_RESPONSE",
+    "modelRequests": 2,
+    "meterSynthetic": {
+      "models": 2,
+      "tools": 0,
+      "chargedTokens": 400
+    },
+    "repairAttempts": 0,
+    "invalid": [
+      {
+        "source": "PARSER",
+        "reason": "TRAILING_TOKENS",
+        "contentBytes": 1741,
+        "contentDigest": "sha256:56c97ba7e3b9a6b62abef193d7d8c4a7a3e64df0ed65d70ecf2a0ad96a7adfb6",
+        "line": 1,
+        "column": 1228,
+        "rootValues": [
+          "OBJECT",
+          "OBJECT"
+        ],
+        "rootKeys": [
+          "name",
+          "arguments",
+          "type"
+        ],
+        "rootType": "tool"
+      }
+    ],
+    "runs": []
+  },
+  {
+    "case": "truncated-json",
+    "mode": "MOCK",
+    "measurement": "DETERMINISTIC_NOT_REAL_MODEL_EVALUATION",
+    "proposalKind": "STRICT_PARSER_NEGATIVE",
+    "status": "FAILED",
+    "failureCode": "MODEL_INVALID_RESPONSE",
+    "modelRequests": 2,
+    "meterSynthetic": {
+      "models": 2,
+      "tools": 0,
+      "chargedTokens": 400
+    },
+    "repairAttempts": 0,
+    "invalid": [
+      {
+        "source": "PARSER",
+        "reason": "SYNTAX",
+        "contentBytes": 1736,
+        "contentDigest": "sha256:aa5fb9c2d609692183acb3fa75ee04b01f9b51c6d01eef7badaf9f16aab3a953",
+        "line": 1,
+        "column": 1225,
+        "rootValues": [
+          "UNREADABLE"
+        ],
+        "rootKeys": []
+      }
+    ],
+    "runs": []
+  }
+]
