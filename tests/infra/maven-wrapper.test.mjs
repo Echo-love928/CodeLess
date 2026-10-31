@@ -86,7 +86,7 @@ test('persistent Maven HTTP 429 exhausts four attempts and remains a failure', {
 test('Maven HTTP 404 fails immediately without installing or running Maven', { timeout: 25000 }, async () => {
   await fixture(() => 404, async ({ execute, requests, cache }) => {
     const result = await execute()
-    assert.equal(result.code, 22, result.output); assert.equal(requests.length, 1)
+    assert.equal(result.code, 22, JSON.stringify(result)); assert.equal(requests.length, 1)
     assert.doesNotMatch(result.output, /fixture-maven:/); await assert.rejects(access(cache), { code: 'ENOENT' })
   })
 })
