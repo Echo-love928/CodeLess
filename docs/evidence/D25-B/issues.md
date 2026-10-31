@@ -1,5 +1,9 @@
 # D25-B 问题与阻塞
 
+## 用户追加处理：公网验证及VPS读取服务已上线
+
+本轮 `public-rollout-2026-10-31/README.md` 登记B直接双HTTPS DNS＋TLS/资产/浏览器/刷新3/3，原默认fake-IP诊断保留而系统配置未改；“B无独立公网证据”已解除。VPS固定54f347f API/UI及只读cover接口已部署、Linux检查与外部资产验证通过；“VPS完全未部署”已解除。自动捕获执行器仍需受限IPC/角色接入，worker保持false，不宣称自动cover全链路可用；TASK-01原FAILED/两次/无图与原模型质量6/9、自然FAILED缺口继续HOLD。旧2/3及所有失败保留。原VPS模型账本29→29，与A原机26行实例分账；未启动新捕获或付费任务。
+
 ## 当前生产cover审查（PR86 / 54f347f）
 
 生产实现45650b1的owner GET/持久协调器/原生入口及UI接线已完成独立增量审查，默认关闭、未部署VPS；此前“缺生产接线”作为源码缺口已解除，不能据此宣布原运行时或VPS已启用。A新接口功能cover2/3，TASK-01 /tasks仍FAILED/CAPTURE_FAILED、两次、无图、根因UNKNOWN。B未发现新增代码阻塞；回归及证据复算见 `cover-review-2026-10-31/README.md`。原九需求6/9、本候选REAL NOT_EVALUATED、自然FAILED未观察及直接公网DNS缺口继续HOLD。Java本机NVM路径拒绝首轮native1保留，真实同版本路径仅复查3/3/native0，属配置核对，未改生产安全边界。TASK-01只读取证方案已给出，未重置或新捕获。

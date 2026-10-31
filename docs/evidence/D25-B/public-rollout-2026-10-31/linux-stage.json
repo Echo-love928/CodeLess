@@ -1,0 +1,64 @@
+{
+  "state": "PASSED",
+  "records": [
+    {
+      "command": [
+        "corepack",
+        "pnpm",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "services/api/mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "services/api/pom.xml",
+        "-Dtest=CoverEntryProofTest,CoverStoreTest,NodeCoverGatewayTest",
+        "package"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "tests/infra/cover-entry.test.mjs",
+        "tests/infra/cover-queue-binding.test.mjs",
+        "tests/infra/cover-gateway.test.mjs",
+        "tests/deploy/contracts.test.mjs"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "corepack",
+        "pnpm",
+        "--dir",
+        "apps/web",
+        "exec",
+        "vitest",
+        "run",
+        "src/features/deploy/DeploymentCover.test.ts",
+        "src/features/deploy/cover-api.test.ts"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "corepack",
+        "pnpm",
+        "--filter",
+        "@codeless/web",
+        "build"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "sourceFilesVerified": 3831,
+  "jarSha256": "18e8d0c3e12c4a608f05c87ba9ddbe578b5779f04e57ce3fa03e1a6236311b5f",
+  "productionChanged": false
+}
