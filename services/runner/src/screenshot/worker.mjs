@@ -5,7 +5,7 @@ import { CSP } from '../artifacts/service.mjs'
 import { pathToFileURL } from 'node:url'
 
 // The injected request is a private test dependency; stdio accepts no transport options.
-export async function capturePage(job, request) {
+export async function capturePage(job, request, authorizeLaunch = async () => {}) {
 const asset = createAssetReader(job, request), origin = new URL(job.url), entryPath = job.entryPath ?? '/'
 let browserServer, proxy, deadlineTimer, deadlineExceeded = false, blocked = false, failed = false
 const result = { status: 'FAILED', failure: 'CAPTURE_FAILED', browserClosed: false, screenshot: null }
@@ -17,7 +17,8 @@ try {
   proxy.on('connect', (_req, socket) => socket.end('HTTP/1.1 403 Forbidden\r\n\r\n'))
   proxy.on('upgrade', (_req, socket) => socket.destroy())
   await new Promise((done, reject) => { proxy.once('error', reject); proxy.listen(0, '127.0.0.1', done) })
-  process.send?.({ phase: 'BROWSER_STARTING' })
+  await authorizeLaunch(job.deadline)
+  if (Date.now() >= job.deadline) { deadlineExceeded = true; throw new Error('CAPTURE_TIMEOUT') }
   browserServer = await chromium.launchServer({ host: '127.0.0.1', headless: true, timeout: 5000,
     proxy: { server: 'http://127.0.0.1:' + proxy.address().port, bypass: '<-loopback>' },
     args: ['--disable-quic', '--disable-background-networking', '--disable-extensions',
@@ -66,7 +67,7 @@ try {
   const png = await page.screenshot({ type: 'png', fullPage: false, animations: 'disabled', caret: 'hide', timeout: 2000 })
   if (blocked || failed || png.length > 6 * 1024 * 1024) throw new Error('CAPTURE_FAILED')
   result.status = 'SUCCEEDED'; result.failure = null; result.screenshot = png.toString('base64')
-} catch { /* Only fixed failure codes cross the private worker boundary. */ }
+} catch (error) { if (error?.message === 'CAPTURE_TIMEOUT') deadlineExceeded = true /* Only fixed codes cross the boundary. */ }
 finally {
   try { if (browserServer) await browserServer.close(); result.browserClosed = true }
   catch { result.status = 'FAILED'; result.failure = 'CLEANUP_FAILED'; result.screenshot = null }
@@ -76,10 +77,29 @@ finally {
 }
 return result
 }
+// The stdio worker cannot fork a browser until its owning parent records and grants the permit.
+// Job JSON cannot supply this function. Direct in-process tests retain their private transport seam.
+function parentLaunchPermit(deadline) {
+  return new Promise((done, reject) => {
+    if (!process.connected || typeof process.send !== 'function') return reject(new Error('CAPTURE_FAILED'))
+    let settled = false
+    const finish = error => {
+      if (settled) return
+      settled = true; clearTimeout(timer); process.removeListener('message', receive)
+      if (error) reject(error); else done()
+    }
+    const receive = message => {
+      if (message?.phase === 'BROWSER_LAUNCH_ALLOWED') finish(Date.now() >= deadline ? new Error('CAPTURE_TIMEOUT') : null)
+    }
+    const timer = setTimeout(() => finish(new Error('CAPTURE_TIMEOUT')), Math.max(1, deadline - Date.now()))
+    process.on('message', receive)
+    process.send({ phase: 'BROWSER_STARTING' }, error => { if (error) finish(new Error('CAPTURE_FAILED')) })
+  })
+}
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   let input = ''
   for await (const chunk of process.stdin) { input += chunk; if (input.length > 768 * 1024) throw new Error('JOB_LIMIT') }
-  const result = await capturePage(JSON.parse(input))
+  const result = await capturePage(JSON.parse(input), undefined, parentLaunchPermit)
   process.stdout.write(JSON.stringify(result))
   process.exitCode = result.status === 'SUCCEEDED' ? 0 : 1
 }

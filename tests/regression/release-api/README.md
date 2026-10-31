@@ -1,5 +1,28 @@
 # D26-A 限定回归
 
+## B 复审后的独立修复
+
+后续分支 `codex/d26-a-cleanup-followup` 基于 PR88 最终 `6ceeb5a`，不覆盖下方历史结果。两份 runner 文件是为复现截图清理失败而进行的最小跨模块扩展；没有修改公共契约、依赖、隔离、超时或原断言。PR89 的 signal/cleanupProof 诊断仍是独立依赖，不把诊断 PR 当修复。
+
+```powershell
+node tests/regression/release-api/record.mjs followup
+node tests/regression/release-api/freeze.mjs check
+node tests/regression/release-api/freeze.mjs check-raw
+node tests/regression/release-api/restore-runtime-bytes.mjs
+node tests/regression/release-api/record.mjs screenshot-diagnostic
+node tests/regression/release-api/record.mjs cover-boundaries
+node tests/regression/release-api/record.mjs runner
+node tests/regression/release-api/record.mjs e2e
+```
+
+`check-raw` 保留旧快照逐字节检查，正常 Git 换行转换也可能失败。`check` 附加核验固定 PR88 Git blob，只接受登记的 LF/CRLF 检出形式，输出所有差异；运行时提示词和原七份失败记录始终要求原始字节。四份混合换行原件、摘要和原机 runner 完整阶段日志见 `evidence/followup-2026-10-31/`。不得重新 capture 旧冻结以消除差异。
+
+B 已提供的报告精确核对在 `peer-byte-verification.json`：四份均为上述 CRLF 形式，另两份提示词 `generate-v1.txt` / `repair-v1.txt` 发生了 CRLF 检出变化。`restore-runtime-bytes.mjs` 默认只读；明确执行 `--write` 时，只对这两份与已知 CRLF 摘要完全相符的文件备份并恢复固定 Git blob，恢复后必须匹配原 raw 冻结；遇到未知内容先拒绝整组操作。它不修改 Git 提交、提示词内容或冻结快照，之后重新执行 `freeze.mjs check`。不要将原生失败改写成成功。
+
+`screenshot-diagnostic` 从固定 PR89 `30a2474` 提取未经修改的七项截图验收并校验摘要；结束后只删除本次新建且未变的临时副本。它不修改 PR89 原断言。完整 runner/E2E 默认不启用进程观察器；两次旧诊断运行受观察器 overload 缺陷干扰，原退出保留且不能作为生产根因证据，详见 `observer-interference.json`。
+
+真实许可边界回归使用独立 stdio worker 和真实 Chromium、明确命名的无公网传输 fixture；不证明公网生产 capture 成功。整体发布仍 HOLD，完整状态见交接中的后续补记。
+
 当前结论 **HOLD**。平台代码候选 `3286dd3`，基线 `df6822e`；全部命令、原生退出和证据边界见 `docs/handoffs/D26-A.md`。原完整 ci-gate=1，runner276/285；独立映射15/15不替代失败门禁。
 
 从仓库根执行（锁定Node24.22.1、pnpm12.6.0、Java21、Maven3.9.11，需真实Docker与已锁定Chromium）：

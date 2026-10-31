@@ -38,18 +38,27 @@ async function terminate(child, browserPid) {
   } catch { child.kill('SIGKILL'); return false }
 }
 
+// Called only after this executor's own child has emitted close. Unknown permit state is never proof.
+export function confirmedStoppedCleanup({ childClosed, terminated, browserClosed, launchPermitGranted }) {
+  return childClosed === true && (terminated === true || terminated?.confirmed === true ||
+    browserClosed === true || launchPermitGranted === false)
+}
 export function captureDeployment(target, { signal, timeoutMs = 10000 } = {}) {
   if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 15000) throw new Error('capture timeout rejected')
   return new Promise(done => {
     const child = spawn(process.execPath, [worker], { windowsHide: true, detached: process.platform !== 'win32',
       env: environment(), stdio: ['pipe', 'pipe', 'pipe', 'ipc'] })
-    let output = '', overflow = false, stopped = false, browserPid, browserStarting = false, launchError = false, cleanup = Promise.resolve(null)
+    let output = '', overflow = false, stopped = false, browserPid, launchPermitGranted = false, launchError = false, cleanup = Promise.resolve(null)
     const stop = () => { if (!stopped) { stopped = true; cleanup = terminate(child, browserPid) } }
     const timer = setTimeout(stop, timeoutMs)
     signal?.addEventListener('abort', stop, { once: true })
     if (signal?.aborted) stop()
     child.on('message', value => {
-      if (value?.phase === 'BROWSER_STARTING') browserStarting = true
+      if (value?.phase === 'BROWSER_STARTING' && !stopped && child.connected) {
+        // Record before sending: a send error leaves the state conservatively granted/unknown.
+        launchPermitGranted = true
+        child.send({ phase: 'BROWSER_LAUNCH_ALLOWED' }, () => {})
+      }
       if (Number.isSafeInteger(value?.browserPid) && value.browserPid > 1) browserPid = value.browserPid
     })
     child.stdout.on('data', bytes => { if (output.length + bytes.length > 9 * 1024 * 1024) { overflow = true; stop() } else output += bytes })
@@ -61,12 +70,13 @@ export function captureDeployment(target, { signal, timeoutMs = 10000 } = {}) {
       const terminated = await cleanup
       let result
       try { result = JSON.parse(output) } catch {}
-      // Windows may report PID-not-found after the worker's own deadline has
-      // already exited. Only confirm that race with explicit closed-browser
-      // evidence or when the IPC launch barrier was never crossed.
-      const alreadyClosed = terminated?.code === 128 && (result?.browserClosed === true || !browserStarting)
+      // A taskkill failure is not cleanup proof. A closed owned worker that never received a
+      // launch permit is: the worker cannot fork Chromium before the parent grants that permit.
+      const cleanupConfirmed = confirmedStoppedCleanup({ childClosed: true, terminated,
+        browserClosed: result?.browserClosed, launchPermitGranted })
       if (stopped || overflow || launchError || exitCode !== 0 || exitSignal !== null || result?.status !== 'SUCCEEDED' || result.browserClosed !== true)
-        return done({ status: 'FAILED', failure: stopped ? 'CAPTURE_TIMEOUT' : 'CAPTURE_FAILED', cleanupConfirmed: stopped ? terminated === true || terminated?.confirmed === true || alreadyClosed : result?.browserClosed === true, cleanupProof: terminated })
+        return done({ status: 'FAILED', failure: stopped || result?.failure === 'CAPTURE_TIMEOUT' ? 'CAPTURE_TIMEOUT' : 'CAPTURE_FAILED',
+          cleanupConfirmed: stopped ? cleanupConfirmed : result?.browserClosed === true, cleanupProof: terminated, launchPermitGranted })
       const png = Buffer.from(result.screenshot ?? '', 'base64')
       done({ status: 'SUCCEEDED', failure: null, cleanupConfirmed: true, png })
     })
