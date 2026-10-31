@@ -5,16 +5,27 @@ import { uuid } from '../preview/credentials.mjs'
 import { readSnapshot, digest, isDigest } from '../artifacts/snapshot.mjs'
 import { deploymentUrl, publicationSite, publicAddress, publicFile } from '../publish/policy.mjs'
 
+// This projection comes only from the private coordinator, never HTTP/model input.
+export function validatePublishedBinding(config, deploymentId, publication) {
+  const { site } = publicationSite(config.publicOrigin, config.platformOrigin, config.previewOrigin)
+  if (typeof deploymentId !== 'string' || !uuid.test(deploymentId)) throw new Error('TARGET_REJECTED')
+  const url = deploymentUrl(deploymentId, site)
+  const entryPath = publication?.entryPath === undefined ? '/' : publication.entryPath
+  if (!publication || publication.id !== deploymentId || publication.status !== 'PUBLISHED' || publication.url !== url ||
+      !uuid.test(publication.applicationId ?? '') || !uuid.test(publication.versionId ?? '') ||
+      !isDigest(publication.sourceDigest) || !isDigest(publication.artifactDigest) ||
+      !['/', '/tasks', '/catalog'].includes(entryPath)) throw new Error('TARGET_REJECTED')
+  return Object.freeze({ deploymentId, applicationId: publication.applicationId, versionId: publication.versionId,
+    sourceDigest: publication.sourceDigest, artifactDigest: publication.artifactDigest, url, entryPath })
+}
+
 // Only the private coordinator can supply lookupDeployment. No caller-supplied URL or path.
 export function createTargetResolver(config, resolveDns = lookup) {
-  const { site } = publicationSite(config.publicOrigin, config.platformOrigin, config.previewOrigin)
+  publicationSite(config.publicOrigin, config.platformOrigin, config.previewOrigin)
   return async function resolveTarget(deploymentId, signal) {
     if (typeof deploymentId !== 'string' || !uuid.test(deploymentId)) throw new Error('TARGET_REJECTED')
     const publication = structuredClone(await config.lookupDeployment(deploymentId, signal))
-    const url = deploymentUrl(deploymentId, site)
-    if (!publication || publication.id !== deploymentId || publication.status !== 'PUBLISHED' || publication.url !== url ||
-        !uuid.test(publication.applicationId ?? '') || !uuid.test(publication.versionId ?? '') ||
-        !isDigest(publication.sourceDigest) || !isDigest(publication.artifactDigest)) throw new Error('TARGET_REJECTED')
+    const binding = validatePublishedBinding(config, deploymentId, publication), { url } = binding
     const root = await canonical(config.hostingRoot), directory = join(root, deploymentId)
     await canonical(directory)
     const snapshot = await readSnapshot(directory, { files: 2001, bytes: 33 * 1024 * 1024 })
@@ -33,8 +44,6 @@ export function createTargetResolver(config, resolveDns = lookup) {
     const records = await resolveDns(new URL(url).hostname, { all: true, verbatim: true })
     signal?.throwIfAborted()
     if (!records.length || records.some(record => !publicAddress(record.address))) throw new Error('TARGET_REJECTED')
-    return Object.freeze({ deploymentId, applicationId: publication.applicationId, versionId: publication.versionId,
-      sourceDigest: publication.sourceDigest, artifactDigest: publication.artifactDigest, url,
-      files: receipt.files, address: records[0].address })
+    return Object.freeze({ ...binding, files: receipt.files, address: records[0].address })
   }
 }

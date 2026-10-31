@@ -6,6 +6,7 @@ export function validateTarget(job) {
   const url = new URL(job.url)
   if (url.protocol !== 'https:' || url.username || url.password || url.pathname !== '/' || url.search || url.hash ||
       !/^d[a-f0-9]{32}\./.test(url.hostname) || !publicAddress(job.address) ||
+      !['/', '/tasks', '/catalog'].includes(job.entryPath === undefined ? '/' : job.entryPath) ||
       !Number.isFinite(job.deadline) || job.deadline <= Date.now() || job.deadline > Date.now() + 30000 ||
       !Array.isArray(job.files) || job.files.length < 2 || job.files.length > 2000 ||
       new Set(job.files.map(file => file.path)).size !== job.files.length ||
@@ -32,7 +33,8 @@ export function createAssetReader(job, request = https.request) {
       const timeout = Math.max(1, Math.min(3000, job.deadline - Date.now()))
       let timer
       const req = request({ protocol: 'https:', hostname: origin.hostname, port: origin.port || 443,
-        path, method: 'GET', servername: origin.hostname, agent: false, timeout,
+        path: path === '/index.html' && job.entryPath && job.entryPath !== '/' ? job.entryPath : path,
+        method: 'GET', servername: origin.hostname, agent: false, timeout,
         lookup: (_host, options, callback) => options.all ? callback(null, [{ address: job.address, family: 4 }]) : callback(null, job.address, 4),
         headers: { Accept: '*/*', 'Accept-Encoding': 'identity' } }, response => {
         if (response.statusCode !== 200 || response.headers['content-encoding'] && response.headers['content-encoding'] !== 'identity') {

@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { ApiError } from '../../api/http'
 import { session } from '../auth/session'
 import type { Publication } from './deploy-api'
-import { getCover, type Cover } from './cover-api'
+import { coverEntryUrl, getCover, type Cover } from './cover-api'
 
 const props = defineProps<{ publication: Publication }>()
 const emit = defineEmits<{ unauthorized: [] }>()
 const cover = ref<Cover>(), loading = ref(false), unavailable = ref(false)
+const entryUrl = computed(() => cover.value?.status === 'SUCCEEDED' ? coverEntryUrl(props.publication, cover.value) : undefined)
 let generation = 0, abort: AbortController | undefined
 async function load() {
   const current = ++generation
@@ -32,6 +33,7 @@ onBeforeUnmount(() => { generation++; abort?.abort() })
     <div v-else class="cover-placeholder" role="img" aria-label="应用封面占位图"><span>CodeLess</span><span>已发布应用</span></div>
     <p role="status">{{ loading ? '正在读取封面…' : unavailable || cover?.status === 'FAILED' ? '封面暂不可用，网站仍已发布。' : cover?.status === 'SUCCEEDED' ? '封面已生成' : '封面排队或生成中，网站仍可访问。' }}</p>
     <button type="button" class="button-secondary" :disabled="loading" @click="load">刷新封面</button>
+    <a v-if="entryUrl && !unavailable" :href="entryUrl" target="_blank" rel="noopener noreferrer">查看封面对应页面</a>
   </div>
 </template>
 

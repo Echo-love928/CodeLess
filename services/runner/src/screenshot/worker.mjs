@@ -6,7 +6,7 @@ import { pathToFileURL } from 'node:url'
 
 // The injected request is a private test dependency; stdio accepts no transport options.
 export async function capturePage(job, request) {
-const asset = createAssetReader(job, request), origin = new URL(job.url)
+const asset = createAssetReader(job, request), origin = new URL(job.url), entryPath = job.entryPath ?? '/'
 let browserServer, proxy, deadlineTimer, deadlineExceeded = false, blocked = false, failed = false
 const result = { status: 'FAILED', failure: 'CAPTURE_FAILED', browserClosed: false, screenshot: null }
 const mime = { html: 'text/html; charset=utf-8', js: 'text/javascript; charset=utf-8', css: 'text/css; charset=utf-8', svg: 'image/svg+xml', png: 'image/png',
@@ -43,9 +43,9 @@ try {
   await context.route('**/*', async route => {
     const request = route.request(), url = new URL(request.url())
     const main = request.isNavigationRequest() && request.frame() === page?.mainFrame()
-    const path = main && url.pathname === '/' ? '/index.html' : url.pathname
+    const path = main && url.pathname === entryPath ? '/index.html' : url.pathname
     if (url.origin !== origin.origin || url.username || url.password || url.search || url.hash ||
-        request.method() !== 'GET' || request.isNavigationRequest() && (!main || url.pathname !== '/') ||
+        request.method() !== 'GET' || request.isNavigationRequest() && (!main || url.pathname !== entryPath) ||
         !job.files.some(file => '/' + file.path === path)) {
       blocked = true; await route.abort('blockedbyclient'); return
     }
@@ -59,7 +59,7 @@ try {
   page.on('pageerror', () => { failed = true })
   page.on('popup', popup => { blocked = true; void popup.close() })
   page.on('download', download => { blocked = true; void download.cancel() })
-  const response = await page.goto(job.url, { waitUntil: 'networkidle', timeout: Math.max(1, job.deadline - Date.now() - 1000) })
+  const response = await page.goto(new URL(entryPath, origin).href, { waitUntil: 'networkidle', timeout: Math.max(1, job.deadline - Date.now() - 1000) })
   if (!response || response.status() !== 200 || blocked || failed) throw new Error('CAPTURE_FAILED')
   // A screenshot of an empty/hidden document is not a usable cover.
   if (!await page.locator('body').innerText().then(text => text.trim().length > 0) && !await page.locator('img').count()) throw new Error('CAPTURE_FAILED')

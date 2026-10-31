@@ -1,0 +1,35 @@
+{
+  "paths": {
+    "/api/v0/publications/{publicationId}/cover": {
+      "parameters": [{"$ref": "#/components/parameters/PublicationId"}],
+      "get": {
+        "operationId": "getPublicationCover", "tags": ["publications"],
+        "summary": "Read an owned immutable publication cover",
+        "description": "Default disabled. Authenticated application owner only, including ADMIN. Read never enqueues or retries. Entry derives from the same version's native verification. No-store and nosniff. Missing record 404, unavailable immutable proof or corrupt storage 503. Capture failure never changes publication or latestReady.",
+        "responses": {
+          "200": {"description": "Bound native cover state", "content": {"application/json": {"schema": {"$ref": "./cover/record.schema.json"}}}},
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "503": {"description": "Native cover evidence unavailable", "content": {"application/json": {"schema": {"$ref": "./schemas/v0/error.schema.json"}}}}
+        }
+      }
+    },
+    "/api/v0/publications/{publicationId}/cover/image": {
+      "parameters": [{"$ref": "#/components/parameters/PublicationId"}],
+      "get": {
+        "operationId": "getPublicationCoverImage", "tags": ["publications"],
+        "summary": "Read checked PNG bytes of an owned publication cover",
+        "description": "No-store, nosniff, image/png only; SHA256, size, 1280x720 PNG header and complete owner/version/artifact/entry binding rechecked per request. Missing or wrong digest returns 404. No arbitrary path, URL or capture operation.",
+        "parameters": [{"name": "digest", "in": "query", "required": true, "schema": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}}],
+        "responses": {
+          "200": {"description": "Checked PNG, at most 6 MiB", "content": {"image/png": {"schema": {"type": "string", "contentMediaType": "image/png"}}}},
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "503": {"description": "Native cover evidence unavailable", "content": {"application/json": {"schema": {"$ref": "./schemas/v0/error.schema.json"}}}}
+        }
+      }
+    }
+  }
+}

@@ -21,6 +21,11 @@ server:
         secure: ${CODELESS_COOKIE_SECURE:true}
         same-site: lax
 codeless:
+  cover:
+    enabled: ${CODELESS_COVER_ENABLED:false}
+    worker-enabled: ${CODELESS_COVER_WORKER_ENABLED:true}
+    root: ${CODELESS_COVER_ROOT:.local-data/covers}
+    gateway-entry: ${CODELESS_COVER_GATEWAY_ENTRY:}
   capacity:
     queue: ${CODELESS_TASK_QUEUE_LIMIT:32}
     user-active: ${CODELESS_USER_ACTIVE_TASK_LIMIT:16}

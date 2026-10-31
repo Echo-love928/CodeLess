@@ -4,11 +4,16 @@ import { randomUUID } from 'node:crypto'
 import { canonical } from '../preview/registry.mjs'
 import { uuid } from '../preview/credentials.mjs'
 import { readSnapshot, digest, isDigest } from '../artifacts/snapshot.mjs'
-import { createTargetResolver } from './target.mjs'
+import { createTargetResolver, validatePublishedBinding } from './target.mjs'
 import { captureDeployment } from './capture.mjs'
 import { acquireQueueOwner } from './owner.mjs'
 
 const terminal = new Set(['SUCCEEDED', 'FAILED'])
+const entry = value => {
+  const path = value.entryPath === undefined ? '/' : value.entryPath
+  if (!['/', '/tasks', '/catalog'].includes(path)) throw new Error('TARGET_REJECTED')
+  return path
+}
 const pngValid = png => Buffer.isBuffer(png) && png.length >= 24 && png.length <= 6 * 1024 * 1024 &&
   png.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) && png.readUInt32BE(16) === 1280 && png.readUInt32BE(20) === 720
 function timed(operation, signal) {
@@ -42,7 +47,7 @@ export async function createScreenshotQueue(config, dependencies = {}) {
   function view(job) {
     if (!job) return null
     const { deploymentId, applicationId, versionId, sourceDigest, artifactDigest, status, attempts, failureCode, imageDigest, imageBytes } = job
-    return { deploymentId, applicationId, versionId, sourceDigest, artifactDigest, status, attempts, failureCode, imageDigest, imageBytes }
+    return { deploymentId, applicationId, versionId, sourceDigest, artifactDigest, entryPath: entry(job), status, attempts, failureCode, imageDigest, imageBytes }
   }
   try {
     for (const name of await readdir(root)) {
@@ -55,6 +60,7 @@ export async function createScreenshotQueue(config, dependencies = {}) {
           !uuid.test(job.applicationId ?? '') || !uuid.test(job.versionId ?? '') || !isDigest(job.sourceDigest) || !isDigest(job.artifactDigest) ||
           !Number.isSafeInteger(job.attempts) || job.attempts < 0 || job.attempts > maxAttempts ||
           (job.completedAt != null && (!Number.isSafeInteger(job.completedAt) || job.completedAt < 0))) throw new Error('QUEUE_STORAGE_INVALID')
+      entry(job)
       if (job.status === 'SUCCEEDED') {
         const png = snapshot.buffers.get('cover.png')
         if (!pngValid(png) || digest(png) !== job.imageDigest || png.length !== job.imageBytes) throw new Error('QUEUE_STORAGE_INVALID')
@@ -86,9 +92,27 @@ export async function createScreenshotQueue(config, dependencies = {}) {
     try { target = await timed(() => resolveTarget(deploymentId, controller.signal), controller.signal) }
     finally { clearTimeout(timer) }
     await makeRoom()
-    const job = { deploymentId, applicationId: target.applicationId, versionId: target.versionId,
+    const job = { deploymentId, applicationId: target.applicationId, versionId: target.versionId, entryPath: entry(target),
       sourceDigest: target.sourceDigest, artifactDigest: target.artifactDigest, status: 'QUEUED', attempts: 0,
       failureCode: null, imageDigest: null, imageBytes: null, completedAt: null }
+    await mkdir(join(root, deploymentId), { mode: 0o700 }); await save(job); jobs.set(deploymentId, job)
+    return view(job)
+  }
+  // Private coordinator only: persist a proven pre-capture failure under the same
+  // quota/owner lock. No image, attempt or successful capture is invented.
+  async function admissionFailure(deploymentId, failureCode) {
+    if (closed || typeof deploymentId !== 'string' || !uuid.test(deploymentId) ||
+        !['TARGET_REJECTED', 'CAPTURE_TIMEOUT', 'CAPTURE_FAILED'].includes(failureCode)) throw new Error('TARGET_REJECTED')
+    if (jobs.has(deploymentId)) return view(jobs.get(deploymentId))
+    const controller = new AbortController(), timer = setTimeout(() => controller.abort(), timeoutMs)
+    let binding
+    try { binding = validatePublishedBinding(config, deploymentId,
+      structuredClone(await timed(() => config.lookupDeployment(deploymentId, controller.signal), controller.signal))) }
+    finally { clearTimeout(timer) }
+    await makeRoom()
+    const job = { deploymentId, applicationId: binding.applicationId, versionId: binding.versionId,
+      sourceDigest: binding.sourceDigest, artifactDigest: binding.artifactDigest, entryPath: binding.entryPath,
+      status: 'FAILED', attempts: 0, failureCode, imageDigest: null, imageBytes: null, completedAt: Date.now() }
     await mkdir(join(root, deploymentId), { mode: 0o700 }); await save(job); jobs.set(deploymentId, job)
     return view(job)
   }
@@ -102,7 +126,8 @@ export async function createScreenshotQueue(config, dependencies = {}) {
       let retry = true
       try {
         const target = await timed(() => resolveTarget(job.deploymentId, controller.signal), controller.signal)
-        if (['applicationId', 'versionId', 'sourceDigest', 'artifactDigest'].some(key => job[key] !== target[key])) throw new Error('TARGET_REJECTED')
+        if (['applicationId', 'versionId', 'sourceDigest', 'artifactDigest'].some(key => job[key] !== target[key]) ||
+            entry(job) !== entry(target)) throw new Error('TARGET_REJECTED')
         const result = await capture(target, { signal: controller.signal, timeoutMs })
         retry = result?.cleanupConfirmed === true
         if (controller.signal.aborted || result?.status !== 'SUCCEEDED' || result.failure !== null || !retry)
@@ -124,6 +149,7 @@ export async function createScreenshotQueue(config, dependencies = {}) {
   return {
     // Serialize admission, including duplicate calls awaiting the same filesystem entry.
     enqueue(id) { return serialize(() => enqueue(id)) },
+    recordAdmissionFailure(id, code) { return serialize(() => admissionFailure(id, code)) },
     get(id) { return view(jobs.get(id)) },
     image(id) { return serialize(async () => {
       const job = jobs.get(id)

@@ -1,4 +1,5 @@
 import test from 'node:test'
+import './cover-contract.cases.mjs'
 import assert from 'node:assert/strict'
 import {readFile} from 'node:fs/promises'
 import Ajv from 'ajv/dist/2020.js'
