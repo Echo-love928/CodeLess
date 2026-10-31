@@ -170,4 +170,21 @@ class CoverHttpIntegrationTest {
         try(var resumed=new CoverCoordinator(root,jdbc,covers,store,gateway)) {resumed.start();resumed.tick();}
         assertThat(calls.get()).isEqualTo(1);assertThat(get(route(),login).statusCode()).isEqualTo(200);
     }
+    @Test @Order(7) void nativeJsonSuccessWithSmallImageByteCountAdvancesCursor() throws Exception {
+        var root=Path.of("target/cover-integration/native-json-"+UUID.randomUUID()).toAbsolutePath();Files.createDirectories(root.resolve("queue"));
+        var store=new CoverStore(root.resolve("queue"));
+        CoverGateway gateway=(binding,deadline)->{
+            var value=new CoverStore.View(binding.id(),binding.applicationId(),binding.versionId(),binding.sourceDigest(),binding.artifactDigest(),binding.entryPath(),"SUCCEEDED",1,null,imageDigest,(long)image.length);
+            try {
+                var directory=root.resolve("queue/"+binding.id());Files.createDirectories(directory);Files.write(directory.resolve("cover.png"),image);
+                var bytes=CoverStore.JSON.writeValueAsBytes(value);Files.write(directory.resolve("job.json"),bytes);
+                // Actual Node stdout is parsed JSON. Jackson chooses IntNode for these small byte counts.
+                return CoverStore.JSON.readTree(bytes);
+            } catch(Exception failure) {throw new IllegalStateException(failure);}
+        };
+        try(var coordinator=new CoverCoordinator(root,jdbc,covers,store,gateway)) {coordinator.tick();}
+        assertThat(store.metadata(covers.binding(owner,publication)).status()).isEqualTo("SUCCEEDED");
+        assertThat(Files.exists(root.resolve("quarantine.json"))).isFalse();assertThat(Files.exists(root.resolve("cursor.json"))).isTrue();
+        assertThat(Files.exists(root.resolve("inflight.json"))).isFalse();
+    }
 }

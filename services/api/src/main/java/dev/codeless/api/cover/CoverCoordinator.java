@@ -66,7 +66,10 @@ public final class CoverCoordinator implements AutoCloseable {
                     write("inflight.json",Map.of("publicationId",p.id().toString(),"at",Instant.now().toString()));
                     var result=gateway.capture(binding,Instant.now().plusSeconds(45));
                     var record=store.metadata(binding);
-                    if(!Set.of("SUCCEEDED","FAILED").contains(record.status()) || !CoverStore.JSON.valueToTree(record).equals(result)
+                    // Normalize the typed Long byte count through the wire JSON parser too.
+                    // IntNode(36233) and LongNode(36233) differ in Jackson tree equality.
+                    var expected=CoverStore.JSON.readTree(CoverStore.JSON.writeValueAsBytes(record));
+                    if(!Set.of("SUCCEEDED","FAILED").contains(record.status()) || !expected.equals(result)
                             || "CLEANUP_FAILED".equals(record.failureCode())) throw new IllegalStateException("COVER_RESULT_UNCONFIRMED");
                     Files.delete(root.resolve("inflight.json"));
                 } finally {active=false;}
