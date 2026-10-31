@@ -1,0 +1,173 @@
+{
+  "task": "D26-B",
+  "status": "DONE_WITH_CONCERNS",
+  "overallRelease": "HOLD",
+  "date": "2026-10-31",
+  "timezone": "Asia/Tokyo",
+  "base": "df6822e2330d82f0ed5cffaf033e4b54368e6e31",
+  "branch": "codex/D26-B",
+  "productCandidate": "85155fd370d63e3694e43cceb7b9c6acce1e0c6c",
+  "pr": "https://github.com/Echo-love928/CodeLess/pull/87",
+  "commands": [
+    {
+      "command": "node apps/web/node_modules/@playwright/test/cli.js test --config apps/web/playwright.release.config.ts",
+      "phase": "baseline red",
+      "exitCode": 1,
+      "passed": 0,
+      "failed": 2,
+      "evidence": "keyboard-red.json"
+    },
+    {
+      "command": "same targeted Playwright command",
+      "phase": "pre-download-focus fix red",
+      "exitCode": 1,
+      "passed": 3,
+      "failed": 1,
+      "evidence": "download-focus-red.json"
+    },
+    {
+      "command": "same targeted Playwright command after all fixes",
+      "phase": "green",
+      "exitCode": 0,
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "retries": 0,
+      "evidence": "keyboard-green.json",
+      "mode": "UI_CONTRACT_FIXTURE; real Chromium, API/model/build doubles; PK transport bytes are not a valid source ZIP"
+    },
+    {
+      "command": [
+        "E:\\nvm\\v24.22.1\\node.exe",
+        "--test",
+        "--test-concurrency=1",
+        "tests/security/runner/network.test.mjs",
+        "tests/security/runner/store.test.mjs",
+        "tests/security/runner/site.test.mjs",
+        "tests/security/runner/browser.test.mjs",
+        "tests/security/runner/build.test.mjs",
+        "tests/e2e/share/screenshot.acceptance.mjs"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0,
+      "evidence": "isolation-run.json",
+      "logDigest": "sha256:8c49fd586e4b700c1f39ad749eb210d7e29b13952446944c02557f7ccd38eb85"
+    },
+    {
+      "command": "node tests/e2e/full/record-command.mjs gate",
+      "nativeExitCode": 1,
+      "signal": null,
+      "status": "CANCELLED_DUPLICATE",
+      "evidence": "local-gate.json",
+      "localStatic": "PASSED",
+      "localApi": "CANCELLED_PARTIAL",
+      "localRunner": "NOT_REACHED",
+      "localE2e": "NOT_REACHED",
+      "aggregateSuccess": false
+    }
+  ],
+  "remoteCandidate": {
+    "candidate": "85155fd370d63e3694e43cceb7b9c6acce1e0c6c",
+    "run": "https://github.com/Echo-love928/CodeLess/actions/runs/41187304038",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "infra-preflight",
+        "conclusion": "success",
+        "url": "https://github.com/Echo-love928/CodeLess/actions/runs/41187304038/job/124496721346",
+        "startedAt": "2026-10-31T09:06:37Z",
+        "completedAt": "2026-10-31T09:07:19Z"
+      },
+      {
+        "name": "verify:e2e",
+        "conclusion": "success",
+        "url": "https://github.com/Echo-love928/CodeLess/actions/runs/41187304038/job/124496721482",
+        "startedAt": "2026-10-31T09:06:27Z",
+        "completedAt": "2026-10-31T09:10:56Z"
+      },
+      {
+        "name": "verify:static",
+        "conclusion": "success",
+        "url": "https://github.com/Echo-love928/CodeLess/actions/runs/41187304038/job/124496721488",
+        "startedAt": "2026-10-31T09:06:27Z",
+        "completedAt": "2026-10-31T09:07:02Z"
+      },
+      {
+        "name": "verify:runner",
+        "conclusion": "success",
+        "url": "https://github.com/Echo-love928/CodeLess/actions/runs/41187304038/job/124496721617",
+        "startedAt": "2026-10-31T09:06:27Z",
+        "completedAt": "2026-10-31T09:14:01Z"
+      },
+      {
+        "name": "verify:api",
+        "conclusion": "success",
+        "url": "https://github.com/Echo-love928/CodeLess/actions/runs/41187304038/job/124496722152",
+        "startedAt": "2026-10-31T09:06:27Z",
+        "completedAt": "2026-10-31T09:21:18Z"
+      },
+      {
+        "name": "ci-gate",
+        "conclusion": "success",
+        "url": "https://github.com/Echo-love928/CodeLess/actions/runs/41187304038/job/124499791392",
+        "startedAt": "2026-10-31T09:21:20Z",
+        "completedAt": "2026-10-31T09:21:24Z"
+      }
+    ],
+    "counts": {
+      "staticNode": 64,
+      "staticUi": 206,
+      "api": 419,
+      "runner": 285,
+      "smokeBrowser": 80,
+      "deterministicRequirements": {
+        "passed": 9,
+        "denominator": 9
+      },
+      "deterministicEdits": {
+        "passed": 6,
+        "denominator": 6
+      },
+      "fullProductBrowserExitCode": 0
+    },
+    "modes": {
+      "model": "deterministic-mock",
+      "database": "real isolated PostgreSQL",
+      "build": "real restricted Docker",
+      "browser": "real Chromium",
+      "hosting": "local HTTPS fixture; not public acceptance",
+      "export": "production ZIP with independent manifest/byte verification in full-product"
+    },
+    "logs": "remote-candidate-summary.log",
+    "originalLogDigest": "sha256:e43f7e13b8ce1b57caf0ad3e7f754d504877d7ec3c51ccc3d7ced10d3d7535d0"
+  },
+  "finalDelivery": {
+    "identity": "PR HEAD; documentation/evidence-only follow-up",
+    "ci": "PENDING_NEW_HEAD; query live PR; never inherit candidate success to final SHA",
+    "requiredBeforeMerge": "all six exact final HEAD checks success, independent approval, no unresolved discussions, real acceptance blockers closed"
+  },
+  "releaseBlockers": [
+    "original REAL quality 6/9",
+    "natural FAILED edit protection NOT_COVERED",
+    "production automatic capture/IPC not enabled; TASK-01 original cover FAILED",
+    "D26-A candidate/review unavailable"
+  ],
+  "usage": {
+    "developer": {
+      "inputTokens": null,
+      "outputTokens": null,
+      "totalTokens": null,
+      "measurement": "UNKNOWN"
+    },
+    "platformRuntime": {
+      "paidRequests": 0,
+      "realModelTokens": 0,
+      "deterministicMockAggregateCalls": null,
+      "deterministicMockAggregateTokens": null,
+      "measurement": "separate runtime ledger; synthetic aggregate UNKNOWN"
+    }
+  }
+}
