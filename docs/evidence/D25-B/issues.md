@@ -1,5 +1,9 @@
 # D25-B 问题与阻塞
 
+## 当前生产cover审查（PR86 / 54f347f）
+
+生产实现45650b1的owner GET/持久协调器/原生入口及UI接线已完成独立增量审查，默认关闭、未部署VPS；此前“缺生产接线”作为源码缺口已解除，不能据此宣布原运行时或VPS已启用。A新接口功能cover2/3，TASK-01 /tasks仍FAILED/CAPTURE_FAILED、两次、无图、根因UNKNOWN。B未发现新增代码阻塞；回归及证据复算见 `cover-review-2026-10-31/README.md`。原九需求6/9、本候选REAL NOT_EVALUATED、自然FAILED未观察及直接公网DNS缺口继续HOLD。Java本机NVM路径拒绝首轮native1保留，真实同版本路径仅复查3/3/native0，属配置核对，未改生产安全边界。TASK-01只读取证方案已给出，未重置或新捕获。
+
 ## 当前增量审查（2026-10-31 / A35a9ef3）
 
 六项真实编辑成功路径已由B独立重建/浏览器复核6/6，三个真实ZIP字节校验通过；“等待A编辑交付／跨机私密包”已不适用。原九需求6/9、原故障及13/14不完整继续HOLD。公网A2/3（SHOW-02超时），B本机域名解析至198.18.*拒绝；功能封面仅SHOW-01、生产cover接口未安装；自然FAILED编辑及旧发布保护NOT_COVERED。PR84确定性回归接受，REAL NOT_EVALUATED，A本地E2E74/75及gate1继续保留。报告、位置、原生退出码和无需模型补取清单见 `six-edits-review-2026-10-31/README.md`。下方旧状态为时间线，不能覆盖当前结论。
