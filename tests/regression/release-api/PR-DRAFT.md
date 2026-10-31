@@ -14,4 +14,4 @@
 
 本PR必须保持draft。另一人批准、最新main同步、精确HEAD必需检查全部真实success、无未解决讨论以及实际质量门槛达标前，不具备合并条件。交接 `docs/handoffs/D26-A.md`，阻塞 `docs/release-blockers.md`。
 
-当前仅完成本地草稿；向 `https://github.com/Echo-love928/CodeLess` 推送被自动审批拒绝，尚未上传或创建远端PR。待用户针对最终公开源码与证据载荷明确授权，不绕过审核换通道上传。
+原自动审批曾在进程创建前拒绝推送，记录保留。用户随后在本聊天明确确认有权公开并授权171文件/e98bc8b上传至 `https://github.com/Echo-love928/CodeLess` 和创建草稿PR；正常Git通道已成功推送，[草稿PR #88](https://github.com/Echo-love928/CodeLess/pull/88) 已创建。逐文件清单保持上传前快照，后续只同步本段和交接元数据，平台代码不变。精确最终HEAD检查另查，不继承旧success；本地runner失败及全部质量HOLD仍阻塞，不自批、不合并。
