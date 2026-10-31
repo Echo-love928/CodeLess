@@ -12,6 +12,12 @@ export const FROZEN = Object.freeze({
 })
 export const CATEGORIES = Object.freeze(['SHOWCASE', 'TASKS', 'CATALOG'])
 export const REAL_RUNS = 'evals/generation/runs'
+// D25 keeps new evidence inside its authorized results scope; legacy batches remain valid.
+export const REAL_RESULT_RUNS = 'evals/results/generation/runs'
+export function isRealRunLocation(path, base = root) {
+  const normalized = resolve(path).replaceAll('\\', '/').toLowerCase() + '/'
+  return [REAL_RUNS, REAL_RESULT_RUNS].some(directory => normalized.startsWith(resolve(base, directory).replaceAll('\\', '/').toLowerCase() + '/'))
+}
 
 export const sha256 = (bytes) => 'sha256:' + createHash('sha256').update(bytes).digest('hex')
 export const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'))

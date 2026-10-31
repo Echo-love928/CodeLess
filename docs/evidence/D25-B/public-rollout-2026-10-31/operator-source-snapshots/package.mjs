@@ -1,0 +1,12 @@
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {writeFileSync,readFileSync,mkdirSync} from 'node:fs';
+import {resolve} from 'node:path';
+const commit='54f347f7da3c39311003f682022c955a6769b76e',out=resolve('.local-data/d25-vps-rollout');mkdirSync(out,{recursive:true});
+const git=args=>execFileSync('git',['-c','core.longpaths=true','-c','core.autocrlf=false','-c','core.eol=lf',...args],{maxBuffer:200*1024*1024});
+const entries=git(['ls-tree','-r','-z',commit]).toString().split('\0').filter(Boolean).map(line=>{const m=line.match(/^(100644|100755) blob ([a-f0-9]{40})\t(.+)$/);if(!m)throw Error('Unsupported git entry');return{path:m[3],blob:m[2],mode:m[1]};});
+const blobs=execFileSync('git',['cat-file','--batch'],{input:entries.map(e=>e.blob).join('\n')+'\n',maxBuffer:200*1024*1024});let offset=0;const sha=b=>createHash('sha256').update(b).digest('hex');
+const files=entries.map(e=>{const end=blobs.indexOf(10,offset),h=blobs.subarray(offset,end).toString().split(' '),size=Number(h[2]),start=end+1;if(h[0]!==e.blob||h[1]!=='blob')throw Error('Blob mismatch');offset=start+size+1;return{...e,bytes:size,sha256:sha(blobs.subarray(start,start+size))};});
+git(['archive','--format=tar.gz','--output='+resolve(out,'source.tar.gz'),commit]);
+writeFileSync(resolve(out,'source-manifest.json'),JSON.stringify({commit,tree:git(['rev-parse',commit+'^{tree}']).toString().trim(),files},null,2)+'\n');
+const result={commit,files:files.length,archiveBytes:readFileSync(resolve(out,'source.tar.gz')).length,archiveSha256:sha(readFileSync(resolve(out,'source.tar.gz'))),manifestSha256:sha(readFileSync(resolve(out,'source-manifest.json')))};writeFileSync(resolve(out,'package-result.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));

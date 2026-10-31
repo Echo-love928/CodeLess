@@ -1,0 +1,57 @@
+{
+  "task": "D25-B",
+  "date": "2026-10-30",
+  "baseCommit": "bd6188ffef5cb1d2ab5d05a14d94f5e8e71a58ac",
+  "feedback": {
+    "pr": 82,
+    "commit": "9ad40a0ee05cac7091de7520592eb764f3e46342",
+    "path": "evals/results/D25-A/peer-mode-counterexample-repeat.json"
+  },
+  "validatorDigest": "sha256:07271a9a47d9b9542361427a31d79501cedb3ca4b5aa84bddfeef1be0ae63883",
+  "testDigest": "sha256:ca26bb8cda757aa51d6750cfc11262c5fb9280d39315d8e64852a27fecc9b195",
+  "red": {
+    "command": "node --test tests/eval/d25-b.test.mjs",
+    "exitCode": 1,
+    "passed": 4,
+    "failed": 2,
+    "log": "docs/evidence/D25-B/mode-red.log",
+    "digest": "sha256:b03175299053202cafb23f1dbae65145602f3df3932b4be331a4e53f8d62b07d"
+  },
+  "green": {
+    "command": "node --test tests/eval/d25-b.test.mjs",
+    "exitCode": 0,
+    "passed": 6,
+    "failed": 0,
+    "log": "docs/evidence/D25-B/mode-green.log",
+    "digest": "sha256:bde98b2e66943ae8b37208540ccbcbf9c40eba0bd63770513fd7770750b70dee"
+  },
+  "peerRepro": {
+    "command": "node .local-data/d25-a-review/tests/eval/d25-a-peer-repro.mjs . .local-data/d25-b-peer-fixed.json",
+    "exitCode": 0,
+    "target": "current fixed working tree; upstream script hardcodes reviewedCommit=bd6188f, not reused here as target identity",
+    "rejected": true,
+    "observed": null,
+    "original": {
+      "denominator": 6,
+      "executed": 0,
+      "passed": 0,
+      "acceptance": null
+    }
+  },
+  "runtime": {
+    "originalRevision": "a863b76e9d5785e20cb6f0d43bb67f79f5df0a50",
+    "originalRootExists": false,
+    "privateSessionAvailable": false,
+    "initialTcpProbe": "sandbox EACCES; not evidence of service failure",
+    "normalPermissionTcpProbe": {
+      "host": "127.0.0.1",
+      "port": 65065,
+      "status": "ECONNREFUSED"
+    },
+    "realEditsExecuted": 0,
+    "preflight": "NOT_EXECUTED",
+    "blocker": "Need retained original database/private roots via private handoff or execution on A original device with refreshed legitimate sessions; public archive cannot recreate original runtime identity"
+  },
+  "additionalPaidModelRequests": 0,
+  "acceptance": "HOLD"
+}

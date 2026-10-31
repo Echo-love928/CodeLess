@@ -1,0 +1,190 @@
+{
+  "schemaVersion" : 1,
+  "sampleId" : "FAULT-CODE-02",
+  "kind" : "CODE_FAULT",
+  "batchId" : "2026-10-30T08-15-32Z-real-29ffed9b",
+  "mode" : "REAL",
+  "attempt" : 1,
+  "harness" : {
+    "java" : "21.0.12.1",
+    "os" : "Windows 11",
+    "runtimeBudget" : {
+      "framingTokensPerRequest" : 512,
+      "outputTokensPerRequest" : 4096,
+      "modelRequests" : 12,
+      "chargedTokens" : 50000,
+      "repairRounds" : 3,
+      "toolSlots" : 20
+    },
+    "environment" : {
+      "containerCliOnPath" : true
+    },
+    "provider" : {
+      "privateCapture" : true,
+      "id" : "deepseek",
+      "transport" : "DeepSeekModelProvider",
+      "model" : "deepseek-flash"
+    },
+    "taskId" : "474ba000-6f04-48e8-b3a8-d865f9e16632",
+    "startedAt" : "2026-10-30T08:24:21.424394800Z",
+    "finishedAt" : "2026-10-30T08:24:22.414936700Z",
+    "wallClockMs" : 990
+  },
+  "injection" : null,
+  "application" : {
+    "id" : "6a28c820-260b-4d71-b964-d1042b62b5d3",
+    "name" : "个人待办清单",
+    "dataMode" : "LOCAL_STORAGE",
+    "status" : "ACTIVE",
+    "latestReadyVersionId" : null,
+    "createdAt" : "2026-10-30T08:24:21.519291Z",
+    "updatedAt" : "2026-10-30T08:24:21.519291Z"
+  },
+  "task" : {
+    "id" : "474ba000-6f04-48e8-b3a8-d865f9e16632",
+    "applicationId" : "6a28c820-260b-4d71-b964-d1042b62b5d3",
+    "prompt" : "生成一个个人待办清单页：可以在输入框输入任务标题，点击“添加”按钮新增任务；每个任务可以勾选完成、可以点击“删除”移除；页面显示“未完成：N”的未完成任务数量。任务数据保存在 LocalStorage，刷新页面后任务和完成状态仍然保留。",
+    "status" : "FAILED",
+    "repairAttempts" : 0,
+    "failureCode" : "MODEL_UNAVAILABLE",
+    "eventSequence" : 2,
+    "queueState" : "FINISHED",
+    "deadlineAt" : "2026-10-30T08:36:21.535391Z",
+    "createdAt" : "2026-10-30T08:24:21.535391Z",
+    "updatedAt" : "2026-10-30T08:24:22.399999Z"
+  },
+  "taskEvents" : [ {
+    "id" : "4f35b378-bc17-4492-b943-932ba1bdd005",
+    "sequence" : 1,
+    "type" : "STAGE_STARTED",
+    "stage" : "PLAN",
+    "message" : "Task accepted in PLAN",
+    "occurredAt" : "2026-10-30T08:24:21.535391Z"
+  }, {
+    "id" : "ad842d04-7b3f-4eda-86d0-3b00eb3b197e",
+    "sequence" : 2,
+    "type" : "TASK_FAILED",
+    "stage" : "FAILED",
+    "message" : "Generation stopped; recovery information retained",
+    "occurredAt" : "2026-10-30T08:24:22.401982Z"
+  } ],
+  "versions" : [ ],
+  "builds" : [ ],
+  "modelCalls" : [ {
+    "id" : "28d4631e-6e44-4cd7-85aa-d4ddd1336954",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "model" : "deepseek-flash",
+    "status" : "FAILED",
+    "inputTokens" : null,
+    "outputTokens" : null,
+    "errorCode" : "MODEL_UNAVAILABLE",
+    "createdAt" : "2026-10-30T08:24:21.696289Z",
+    "completedAt" : "2026-10-30T08:24:22.340315Z"
+  } ],
+  "modelAudit" : [ {
+    "callId" : "28d4631e-6e44-4cd7-85aa-d4ddd1336954",
+    "taskId" : "474ba000-6f04-48e8-b3a8-d865f9e16632",
+    "stage" : "PLAN",
+    "provider" : "deepseek",
+    "requestedModel" : "deepseek-flash",
+    "actualModel" : null,
+    "requestId" : null,
+    "responseId" : null,
+    "status" : "FAILED",
+    "durationMs" : 622,
+    "usage" : {
+      "inputTokens" : null,
+      "outputTokens" : null,
+      "totalTokens" : null,
+      "raw" : null
+    },
+    "errorCode" : "MODEL_UNAVAILABLE",
+    "createdAt" : "2026-10-30T08:24:21.696289Z",
+    "completedAt" : "2026-10-30T08:24:22.329220500Z"
+  } ],
+  "journal" : [ {
+    "taskId" : "474ba000-6f04-48e8-b3a8-d865f9e16632",
+    "at" : "2026-10-30T08:24:21.680265400Z",
+    "payload" : {
+      "outputTokens" : 4096,
+      "slots" : 1,
+      "reservedTokens" : 9939
+    },
+    "stage" : "PLAN",
+    "sequence" : 1,
+    "kind" : "model.request"
+  }, {
+    "taskId" : "474ba000-6f04-48e8-b3a8-d865f9e16632",
+    "at" : "2026-10-30T08:24:21.750777500Z",
+    "payload" : {
+      "inputDigest" : "sha256:ff55223a48fc530b6e4e663bbd3be2ecd0499301f0fe48499759fd6a83a629f7",
+      "roles" : [ "system", "user" ],
+      "inputBytes" : 378,
+      "policyBytes" : 4953,
+      "policyDigest" : "sha256:91c22b35ef271e0d1de63df8c1388d6065fc8ac17a786fb859e36173ec925860",
+      "callId" : "28d4631e-6e44-4cd7-85aa-d4ddd1336954",
+      "transport" : {
+        "kind" : "DEEPSEEK_CHAT_JSON_V1",
+        "thinking" : "disabled",
+        "bodyBytes" : 5951,
+        "stream" : false,
+        "maxOutputTokens" : 4096,
+        "bodyDigest" : "sha256:39f6c8f681b9409518169480a7560af30fbd2ac4320200066489093257207167",
+        "responseFormat" : "json_object"
+      }
+    },
+    "stage" : "PLAN",
+    "sequence" : 2,
+    "kind" : "model.input"
+  }, {
+    "taskId" : "474ba000-6f04-48e8-b3a8-d865f9e16632",
+    "at" : "2026-10-30T08:24:22.288936300Z",
+    "payload" : {
+      "reason" : "HTTP_STATUS_503",
+      "outputTokens" : 4096,
+      "source" : "PROVIDER"
+    },
+    "stage" : "PLAN",
+    "sequence" : 3,
+    "kind" : "model.invalid"
+  }, {
+    "taskId" : "474ba000-6f04-48e8-b3a8-d865f9e16632",
+    "at" : "2026-10-30T08:24:22.320815500Z",
+    "payload" : {
+      "reservationTokens" : 9939,
+      "usage" : {
+        "inputTokens" : null,
+        "outputTokens" : null,
+        "totalTokens" : null,
+        "raw" : null
+      },
+      "releasedTokens" : 0,
+      "meteringSource" : "UTF8_BYTES_PLUS_FRAMING_AND_MAX_OUTPUT",
+      "chargedTokens" : 9939,
+      "estimated" : true
+    },
+    "stage" : "PLAN",
+    "sequence" : 4,
+    "kind" : "model.usage"
+  }, {
+    "taskId" : "474ba000-6f04-48e8-b3a8-d865f9e16632",
+    "at" : "2026-10-30T08:24:22.362884600Z",
+    "payload" : {
+      "code" : "MODEL_UNAVAILABLE",
+      "recovery" : "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+      "category" : "MODEL_INTERFACE"
+    },
+    "stage" : "PLAN",
+    "sequence" : 5,
+    "kind" : "failure"
+  } ],
+  "platformMeter" : {
+    "models" : 1,
+    "tools" : 0,
+    "chargedTokens" : 9939
+  },
+  "sources" : [ ],
+  "screenshots" : [ ],
+  "harnessError" : null
+}

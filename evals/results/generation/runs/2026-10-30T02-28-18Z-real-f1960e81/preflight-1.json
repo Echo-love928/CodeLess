@@ -1,0 +1,70 @@
+{
+  "at": "2026-10-30T02:28:35.722Z",
+  "checkout": "IN_PLACE",
+  "ok": true,
+  "steps": [
+    {
+      "name": "node",
+      "command": "F:\\nodejs\\node.exe --version",
+      "exitCode": 0,
+      "error": null,
+      "output": "v24.22.1"
+    },
+    {
+      "name": "java",
+      "command": "F:\\JAVA\\CodeLess\\CodeLess\\.local-data\\d07-a\\tools\\java21\\jdk-21.0.12.1+1\\bin\\java.exe -version",
+      "exitCode": 0,
+      "error": null,
+      "output": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)"
+    },
+    {
+      "name": "docker server",
+      "command": "docker version --format {{.Server.Version}}",
+      "exitCode": 0,
+      "error": null,
+      "output": "29.9.2"
+    },
+    {
+      "name": "runtime prerequisites (pnpm deps, Chromium, build image)",
+      "command": "F:\\nodejs\\node.exe tests/agent/prepare-runtime.mjs",
+      "exitCode": 0,
+      "error": null,
+      "output": "#14 naming to docker.io/library/codeless-vue-build:d05 done\n#14 unpacking to docker.io/library/codeless-vue-build:d05 done\n#14 DONE 0.1s"
+    },
+    {
+      "name": "build image id",
+      "command": "docker image inspect codeless-vue-build:d05 --format {{.Id}}",
+      "exitCode": 0,
+      "error": null,
+      "output": "sha256:ca68d0c36b2c72cdc5b6cc8cdc47576a8333f88a51c3a316d778678c0a532eff"
+    },
+    {
+      "name": "maven test-compile",
+      "command": "C:\\Windows\\system32\\cmd.exe /d /c services\\api\\mvnw.cmd -B -ntp -f services/api/pom.xml -DskipTests test-compile",
+      "exitCode": 0,
+      "error": null,
+      "output": "[INFO] Total time:  11.802 s\n[INFO] Finished at: 2026-10-30T11:28:35+09:00\n[INFO] ------------------------------------------------------------------------"
+    }
+  ],
+  "buildImageId": "sha256:ca68d0c36b2c72cdc5b6cc8cdc47576a8333f88a51c3a316d778678c0a532eff",
+  "network": {
+    "schemaVersion": 1,
+    "status": "PASSED",
+    "endpoint": "https://api.deepseek.com",
+    "completedAt": "2026-10-30T02:27:58.082Z",
+    "tlsVerified": 12,
+    "transportReached": 12,
+    "tlsLogDigest": "sha256:8bc7b61f8edf3f741ce6f45df5f8c6d0769d8de5136468f2828798fd253a2960",
+    "transportLogDigests": [
+      "sha256:bd8fa356f355cec993c4a741a448ba396e5958f8980e3c59a915de8b545d96ad",
+      "sha256:069981b94a3e80a14cef419b13c980a2bc93cf5ecfac3bbc9e923a0238fda751",
+      "sha256:27cb66a34393b15deb38e48aba714c60206eaa4529d12242ef410dc63b4cae2f",
+      "sha256:33cfda3ba4e45a42854642f2f2c6e68bacb761285498b168e3a2998d78a51fb2",
+      "sha256:cc23f960be690adb34e4ce8a536fe16e8b936346b22fb95ee0526bbbb958a556",
+      "sha256:abaf60337c102f6d86f21afa251d35549d63bf3c7d44106a645758703b857c27"
+    ],
+    "docker": "29.9.2",
+    "image": "sha256:78bf1069de4d86791bbd9dbe86c12d7c797e62cee96b7d69df9a6b45d89ea25e",
+    "modelCalls": 0
+  }
+}

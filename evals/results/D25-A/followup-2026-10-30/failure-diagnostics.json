@@ -1,0 +1,707 @@
+{
+  "additionalModelRequests": 0,
+  "batches": [
+    {
+      "batchId": "2026-10-30T02-28-18Z-real-f1960e81",
+      "sampleId": "SHOW-03",
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_BUDGET_EXCEEDED",
+      "repairAttempts": 0,
+      "recordSha256": "sha256:4778b4465c9642dc6971aae27297f9eaa30f44ae38fb07eecd6cf9824f4bd3a5",
+      "events": [
+        {
+          "stage": "GENERATE",
+          "kind": "done.rejected",
+          "payload": {
+            "tool": "done",
+            "status": "REJECTED",
+            "errorCode": "AGENT_ACCEPTANCE_INVALID",
+            "reason": "INVALID_VALUE",
+            "index": 2,
+            "correction": "expectText and select require a nonblank string value. Only fill accepts an empty string. expectVisible has no value field and only tests visibility; assert actual nonblank result text or counts to test state."
+          }
+        },
+        {
+          "stage": "GENERATE",
+          "kind": "failure",
+          "payload": {
+            "category": "CONTROL",
+            "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+            "code": "AGENT_MODEL_BUDGET_EXCEEDED"
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "2026-10-30T02-28-18Z-real-f1960e81",
+      "sampleId": "TASK-02",
+      "status": "FAILED",
+      "failureCode": "AGENT_REPAIR_LIMIT_EXCEEDED",
+      "repairAttempts": 3,
+      "recordSha256": "sha256:ce43b660ce2b95dbf1aea75d02f191d9071f06d6c5c8df7ebff2f1a51934fc45",
+      "events": [
+        {
+          "stage": "GENERATE",
+          "kind": "done.rejected",
+          "payload": {
+            "tool": "done",
+            "status": "REJECTED",
+            "errorCode": "AGENT_ACCEPTANCE_INVALID",
+            "reason": "INVALID_VALUE",
+            "index": 1,
+            "correction": "expectText and select require a nonblank string value. Only fill accepts an empty string. expectVisible has no value field and only tests visibility; assert actual nonblank result text or counts to test state."
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_TIMEOUT",
+            "category": "CODE",
+            "fingerprint": "sha256:26166c832526b2d6324396193762b10597972cab5ff49514201500a14a13a816",
+            "diagnostic": "locator.click: Timeout <duration> exceeded.\nCall log:\n - waiting for getByTestId('next-0fa49353858027ed28f894b9e0695271a63f522fd6402c39f620a5a1afb6085d')",
+            "sourceDigest": "sha256:9c9ab5edb0697088c73b3a00a283fc1fdfb5f335f06a033439cf95375aa53bb3",
+            "repairAttempts": 0,
+            "failedAction": {
+              "index": 4,
+              "action": {
+                "type": "click",
+                "target": {
+                  "testId": "next-0fa49353858027ed28f894b9e0695271a63f522fd6402c39f620a5a1afb6085d"
+                }
+              }
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_TIMEOUT",
+            "category": "CODE",
+            "fingerprint": "sha256:26166c832526b2d6324396193762b10597972cab5ff49514201500a14a13a816",
+            "diagnostic": "locator.click: Timeout <duration> exceeded.\nCall log:\n - waiting for getByTestId('next-0fa49353858027ed28f894b9e0695271a63f522fd6402c39f620a5a1afb6085d')",
+            "sourceDigest": "sha256:7874f4ed3bce478829e7679a3786567dc73a4677ecda8ef71334468602aa7c87",
+            "repairAttempts": 1,
+            "failedAction": {
+              "index": 4,
+              "action": {
+                "type": "click",
+                "target": {
+                  "testId": "next-0fa49353858027ed28f894b9e0695271a63f522fd6402c39f620a5a1afb6085d"
+                }
+              }
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_TIMEOUT",
+            "category": "CODE",
+            "fingerprint": "sha256:26166c832526b2d6324396193762b10597972cab5ff49514201500a14a13a816",
+            "diagnostic": "locator.click: Timeout <duration> exceeded.\nCall log:\n - waiting for getByTestId('next-0fa49353858027ed28f894b9e0695271a63f522fd6402c39f620a5a1afb6085d')",
+            "sourceDigest": "sha256:f1efe5856d2bcdb10852cde0417d759a064bf821a678a16a69fc6098804883c6",
+            "repairAttempts": 2,
+            "failedAction": {
+              "index": 4,
+              "action": {
+                "type": "click",
+                "target": {
+                  "testId": "next-0fa49353858027ed28f894b9e0695271a63f522fd6402c39f620a5a1afb6085d"
+                }
+              }
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_BUILD_EXIT",
+            "category": "CODE",
+            "fingerprint": "sha256:3f22caaadc5d665bbc7adc568629b0455df8e0a67f0ff686aae8ef41c88c5810",
+            "diagnostic": "> @codeless/generated-vue@0.1.0 build\n\nsrc/pages/TasksPage.vue(3,10): error TS2305: Module '\"../data/tasks\"' has no exported member 'buildNextId'.\nsrc/pages/TasksPage.vue(3,61): error TS2305: Module '\"../data/tasks\"' has no exported member 'TaskStatus'.\nsrc/pages/TasksPage.vue(23,21): error TS2339: Property 'status' does not exist on type '{ id: string; title: string; column: ColumnId; }'.\nsrc/pages/TasksPage.vue(23,42): error TS2339: Property 'status' does not exist on type '{ id: string; title: string; column: ColumnId; }'.\nsrc/pages/TasksPage.vue(35,48): error TS2353: Object literal may only specify known properties, and 'status' does not exist in type '{ id: string; title: string; column: ColumnId; }'.\nsrc/pages/TasksPage.vue(43,36): error TS2339: Property 'status' does not exist on type '{ id: string; title: string; column: ColumnId; }'.\nsrc/pages/TasksPage.vue(45,10): error TS2339: Property 'status' does not exist on type '{ id: string; title: string; column: ColumnId; }'.",
+            "sourceDigest": "sha256:ce93423cef93a0fab1f414d031111dfd86380279cf7c9579595157183e1b07f9",
+            "repairAttempts": 3,
+            "decision": "AGENT_REPAIR_LIMIT_EXCEEDED"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "failure",
+          "payload": {
+            "code": "AGENT_REPAIR_LIMIT_EXCEEDED",
+            "category": "CONTROL",
+            "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY"
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "2026-10-30T02-28-18Z-real-f1960e81",
+      "sampleId": "CAT-02",
+      "status": "READY",
+      "failureCode": null,
+      "repairAttempts": 0,
+      "recordSha256": "sha256:3e798872817f780338512ffb0a2725e6645a9b76e286bf211eedae38cffa3408",
+      "events": []
+    },
+    {
+      "batchId": "2026-10-30T02-28-18Z-real-f1960e81",
+      "sampleId": "CAT-03",
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_PROTOCOL_INVALID",
+      "repairAttempts": 1,
+      "recordSha256": "sha256:fd861ba5e5a6e07a189110be13add0373d60c042a859cc37fc1daed68ab408db",
+      "events": [
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_TIMEOUT",
+            "category": "CODE",
+            "fingerprint": "sha256:7f0be15658d9e5eabe86f9a28c3945cd0f31289e76144978282dd65380ef7de1",
+            "diagnostic": "locator.waitFor: Timeout <duration> exceeded.\nCall log:\n - waiting for getByTestId('empty-state') to be visible",
+            "sourceDigest": "sha256:7eec16bb9b3c638a1a5b8618717f7d7e975799b6f8dd9f89b5a71acca51894a0",
+            "repairAttempts": 0,
+            "failedAction": {
+              "index": 4,
+              "action": {
+                "type": "expectVisible",
+                "target": {
+                  "testId": "empty-state"
+                }
+              }
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "REPAIR",
+          "kind": "failure",
+          "payload": {
+            "code": "AGENT_MODEL_PROTOCOL_INVALID",
+            "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+            "category": "MODEL_INTERFACE"
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "2026-10-30T02-28-18Z-real-f1960e81",
+      "sampleId": "FAULT-CODE-03",
+      "status": "FAILED",
+      "failureCode": "AGENT_MODEL_BUDGET_EXCEEDED",
+      "repairAttempts": 3,
+      "recordSha256": "sha256:a8637a9ebfcfc1ab66f5d5888901c9a1c9403583d3cb9796b8c94ebec5b8b9cb",
+      "events": [
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_TIMEOUT",
+            "category": "CODE",
+            "fingerprint": "sha256:24f6c98fb73dc6f385dd054a83f05cc32580c574870783d86da578229d55c999",
+            "diagnostic": "locator.click: Timeout <duration> exceeded.\nCall log:\n - waiting for getByTestId('book-5')\n\npageErrors: [\"D21_EVAL_INJECTED_RUNTIME_FAULT\"]\nconsoleErrors: []",
+            "sourceDigest": "sha256:36dd0c44399d945cc4357f79dbd642dc342455e7082468b65c59fa11a73f36c5",
+            "repairAttempts": 0,
+            "failedAction": {
+              "action": {
+                "type": "click",
+                "target": {
+                  "testId": "book-5"
+                }
+              },
+              "index": 9
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_TIMEOUT",
+            "category": "CODE",
+            "fingerprint": "sha256:0029fd572345ac5cf40a7077382ca9a426ad9c814e65e6b5afa139f25725db42",
+            "diagnostic": "locator.click: Timeout <duration> exceeded.\nCall log:\n - waiting for getByTestId('book-5')",
+            "sourceDigest": "sha256:56e05f6875f01f8b640c31882e6bbd0fdb8e69b681a8443caac1d289babc9d82",
+            "repairAttempts": 1,
+            "failedAction": {
+              "action": {
+                "type": "click",
+                "target": {
+                  "testId": "book-5"
+                }
+              },
+              "index": 9
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_TIMEOUT",
+            "category": "CODE",
+            "fingerprint": "sha256:0029fd572345ac5cf40a7077382ca9a426ad9c814e65e6b5afa139f25725db42",
+            "diagnostic": "locator.click: Timeout <duration> exceeded.\nCall log:\n - waiting for getByTestId('book-5')",
+            "sourceDigest": "sha256:2c77ec9510bdef27ed4e03c0851500f2a8dc00ef074b9dc1015584b20423cde2",
+            "repairAttempts": 2,
+            "failedAction": {
+              "action": {
+                "type": "click",
+                "target": {
+                  "testId": "book-5"
+                }
+              },
+              "index": 9
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "REPAIR",
+          "kind": "failure",
+          "payload": {
+            "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+            "category": "CONTROL",
+            "code": "AGENT_MODEL_BUDGET_EXCEEDED"
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "2026-10-30T02-41-32Z-real-c3368088",
+      "sampleId": "SHOW-03",
+      "status": "READY",
+      "failureCode": null,
+      "repairAttempts": 0,
+      "recordSha256": "sha256:398fc23da5a90acbd058229af9182fd0a40a3e3b1cda10fec73c8b29d60a3a32",
+      "events": [
+        {
+          "stage": "GENERATE",
+          "kind": "done.rejected",
+          "payload": {
+            "tool": "done",
+            "status": "REJECTED",
+            "errorCode": "AGENT_ACCEPTANCE_INVALID",
+            "reason": "INVALID_TARGET",
+            "index": 10,
+            "correction": "target is exactly {testId}, {text}, or {role,name}; value is a sibling of target, never inside it. Use an actual unique rendered target."
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "2026-10-30T02-41-32Z-real-c3368088",
+      "sampleId": "TASK-02",
+      "status": "FAILED",
+      "failureCode": "MODEL_INVALID_RESPONSE",
+      "repairAttempts": 0,
+      "recordSha256": "sha256:c607cb3286c96f8081264e0289665081c46675e347fe56bb3449f266f297d388",
+      "events": [
+        {
+          "stage": "GENERATE",
+          "kind": "model.invalid",
+          "payload": {
+            "source": "PARSER",
+            "reason": "DUPLICATE_KEY",
+            "contentBytes": 9618,
+            "contentDigest": "sha256:583e3156e013652bb4ac5e85b2c8acff41336f82481480862c787a61df2944a8",
+            "line": 1,
+            "column": 4706,
+            "rootValues": [
+              "OBJECT"
+            ],
+            "rootKeys": [
+              "type",
+              "name",
+              "arguments"
+            ],
+            "rootType": "tool"
+          }
+        },
+        {
+          "stage": "GENERATE",
+          "kind": "failure",
+          "payload": {
+            "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+            "code": "MODEL_INVALID_RESPONSE",
+            "category": "MODEL_INTERFACE"
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "2026-10-30T02-41-32Z-real-c3368088",
+      "sampleId": "CAT-02",
+      "status": "FAILED",
+      "failureCode": "AGENT_REPAIR_LIMIT_EXCEEDED",
+      "repairAttempts": 3,
+      "recordSha256": "sha256:6c7fd0e1df7a96489cdd7db0f74b2aefdaf1078d10af722dd69f226cc653b312",
+      "events": [
+        {
+          "stage": "GENERATE",
+          "kind": "done.rejected",
+          "payload": {
+            "tool": "done",
+            "status": "REJECTED",
+            "errorCode": "AGENT_ACCEPTANCE_INVALID",
+            "reason": "INVALID_VALUE",
+            "index": 16,
+            "correction": "expectText and select require a nonblank string value. Only fill accepts an empty string. expectVisible has no value field and only tests visibility; assert actual nonblank result text or counts to test state."
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_FAILED",
+            "category": "CODE",
+            "fingerprint": "sha256:2af0585dec620f176b59e735b6454683b6d3c43b913ca8e4f5ae9ef7c45faecf",
+            "diagnostic": "locator.waitFor: Error: strict mode violation: getByRole('heading', { name: '云间咖啡', exact: true }) resolved to 2 elements:\n 1) <h3 class=\"cafe-name\" data-v-4ecb9ad8=\"\">云间咖啡</h3> aka locator('h3').filter({ hasText: '云间咖啡' })\n 2) <h2 data-v-7ab964aa=\"\" class=\"detail-title\">云间咖啡</h2> aka locator('h2')\n\nCall log:\n - waiting for getByRole('heading', { name: '云间咖啡', exact: true }) to be visible",
+            "sourceDigest": "sha256:d12b51a0860f3c6157fbf55f8863e9cd09370cfcab57a498bdbcbc44fede4bc5",
+            "repairAttempts": 0,
+            "failedAction": {
+              "action": {
+                "type": "expectText",
+                "target": {
+                  "role": "heading",
+                  "name": "云间咖啡"
+                },
+                "value": "云间咖啡"
+              },
+              "index": 14
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_FAILED",
+            "category": "CODE",
+            "fingerprint": "sha256:2af0585dec620f176b59e735b6454683b6d3c43b913ca8e4f5ae9ef7c45faecf",
+            "diagnostic": "locator.waitFor: Error: strict mode violation: getByRole('heading', { name: '云间咖啡', exact: true }) resolved to 2 elements:\n 1) <h3 class=\"cafe-name\" data-v-4ecb9ad8=\"\">云间咖啡</h3> aka locator('h3').filter({ hasText: '云间咖啡' })\n 2) <h2 data-v-7ab964aa=\"\" class=\"detail-title\">云间咖啡</h2> aka locator('h2')\n\nCall log:\n - waiting for getByRole('heading', { name: '云间咖啡', exact: true }) to be visible",
+            "sourceDigest": "sha256:077d1f5b80fdd46a1b46f0d0b1954c7be5ed28b3ad3795634a791596a7c3bf14",
+            "repairAttempts": 1,
+            "failedAction": {
+              "action": {
+                "type": "expectText",
+                "target": {
+                  "role": "heading",
+                  "name": "云间咖啡"
+                },
+                "value": "云间咖啡"
+              },
+              "index": 14
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_BUILD_EXIT",
+            "category": "CODE",
+            "fingerprint": "sha256:f71fb6adee4c1ecd8e7296fe519cdc908e790df7597a11d148885cba9569e43f",
+            "diagnostic": "> @codeless/generated-vue@0.1.0 build\n\nsrc/components/CafeCard.vue(13,44): error TS2339: Property 'signatureDrink' does not exist on type 'Cafe'.",
+            "sourceDigest": "sha256:70938b9ad334ba4efe976234c9e3fb04ec5c19a68c641d04dc5224e06e35e7a2",
+            "repairAttempts": 2,
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_FAILED",
+            "category": "CODE",
+            "fingerprint": "sha256:215d62b8eebce04597e5b0835abc74a4bbcb50ca09b7b235c29e80204b109421",
+            "diagnostic": "locator.waitFor: Error: strict mode violation: getByRole('heading', { name: '云间咖啡', exact: true }) resolved to 2 elements:\n 1) <h3 class=\"cafe-name\" data-v-a02ec409=\"\">云间咖啡</h3> aka locator('h3').filter({ hasText: '云间咖啡' })\n 2) <h2 data-v-7ab964aa=\"\" class=\"detail-title\">云间咖啡</h2> aka locator('h2')\n\nCall log:\n - waiting for getByRole('heading', { name: '云间咖啡', exact: true }) to be visible",
+            "sourceDigest": "sha256:d0aa05306299548dfcd91fe353c2b53592e6243a1890463c16fc4e95bfe354d0",
+            "repairAttempts": 3,
+            "failedAction": {
+              "action": {
+                "type": "expectText",
+                "target": {
+                  "role": "heading",
+                  "name": "云间咖啡"
+                },
+                "value": "云间咖啡"
+              },
+              "index": 14
+            },
+            "decision": "AGENT_REPAIR_LIMIT_EXCEEDED"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "failure",
+          "payload": {
+            "category": "CONTROL",
+            "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY",
+            "code": "AGENT_REPAIR_LIMIT_EXCEEDED"
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "2026-10-30T02-41-32Z-real-c3368088",
+      "sampleId": "CAT-03",
+      "status": "FAILED",
+      "failureCode": "AGENT_REPAIR_LIMIT_EXCEEDED",
+      "repairAttempts": 3,
+      "recordSha256": "sha256:3f1e83318e9ac21500d3e6090adec9a5156c64fb4f43a669dbee84c4d4162a79",
+      "events": [
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_FAILED",
+            "category": "CODE",
+            "fingerprint": "sha256:5f9de605fea814871b879dfa3042bc407d330130dfe864b95cf98f2aee6582fe",
+            "diagnostic": "locator.waitFor: Error: strict mode violation: getByRole('heading', { name: 'Vitest', exact: true }) resolved to 2 elements:\n 1) <h3 class=\"tool-name\" data-v-c0302be9=\"\">…</h3> aka locator('h3').filter({ hasText: 'Vitest' })\n 2) <h2 data-v-30bf812d=\"\" class=\"detail-name\">Vitest</h2> aka locator('h2')\n\nCall log:\n - waiting for getByRole('heading', { name: 'Vitest', exact: true }) to be visible",
+            "sourceDigest": "sha256:30ca2e46c0576d9cea73f07c7d5567169c75e60a564bcdb99101240128641bb4",
+            "repairAttempts": 0,
+            "failedAction": {
+              "action": {
+                "type": "expectText",
+                "target": {
+                  "role": "heading",
+                  "name": "Vitest"
+                },
+                "value": "Vitest"
+              },
+              "index": 12
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_TIMEOUT",
+            "category": "CODE",
+            "fingerprint": "sha256:20c37b910edbf278eabe5f2ac7ae884a0457fea5a3a8480b8fa20e08e0b8a4a0",
+            "diagnostic": "locator.waitFor: Timeout <duration> exceeded.\nCall log:\n - waiting for getByRole('heading', { name: 'Vite', exact: true }) to be visible",
+            "sourceDigest": "sha256:6fd47e4d073d9c52464a7354d5611704f1654d9f7aeea2c452cd50bd6f81d00f",
+            "repairAttempts": 1,
+            "failedAction": {
+              "action": {
+                "type": "expectText",
+                "target": {
+                  "role": "heading",
+                  "name": "Vite"
+                },
+                "value": "Vite"
+              },
+              "index": 2
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_TIMEOUT",
+            "category": "CODE",
+            "fingerprint": "sha256:20c37b910edbf278eabe5f2ac7ae884a0457fea5a3a8480b8fa20e08e0b8a4a0",
+            "diagnostic": "locator.waitFor: Timeout <duration> exceeded.\nCall log:\n - waiting for getByRole('heading', { name: 'Vite', exact: true }) to be visible",
+            "sourceDigest": "sha256:c65faf7b445672708830aed23d3d9e331749219dfe44a976f0dcdf3ca6d737fa",
+            "repairAttempts": 2,
+            "failedAction": {
+              "action": {
+                "type": "expectText",
+                "target": {
+                  "role": "heading",
+                  "name": "Vite"
+                },
+                "value": "Vite"
+              },
+              "index": 2
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_TIMEOUT",
+            "category": "CODE",
+            "fingerprint": "sha256:20c37b910edbf278eabe5f2ac7ae884a0457fea5a3a8480b8fa20e08e0b8a4a0",
+            "diagnostic": "locator.waitFor: Timeout <duration> exceeded.\nCall log:\n - waiting for getByRole('heading', { name: 'Vite', exact: true }) to be visible",
+            "sourceDigest": "sha256:6fd47e4d073d9c52464a7354d5611704f1654d9f7aeea2c452cd50bd6f81d00f",
+            "repairAttempts": 3,
+            "failedAction": {
+              "action": {
+                "type": "expectText",
+                "target": {
+                  "role": "heading",
+                  "name": "Vite"
+                },
+                "value": "Vite"
+              },
+              "index": 2
+            },
+            "decision": "AGENT_REPAIR_LIMIT_EXCEEDED"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "failure",
+          "payload": {
+            "category": "CONTROL",
+            "code": "AGENT_REPAIR_LIMIT_EXCEEDED",
+            "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY"
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "2026-10-30T02-41-32Z-real-c3368088",
+      "sampleId": "FAULT-CODE-03",
+      "status": "FAILED",
+      "failureCode": "AGENT_REPAIR_LIMIT_EXCEEDED",
+      "repairAttempts": 3,
+      "recordSha256": "sha256:755f737ba43c5cb9b9d4b1fd44fea7e3139890b2acc7bc8a11ba113f8862863b",
+      "events": [
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_FAILED",
+            "category": "CODE",
+            "fingerprint": "sha256:15c9834c4d16dbbdf4dea42fa75cfc3b1405193ec835b1f961d2d5035c2fe933",
+            "diagnostic": "locator.click: Error: strict mode violation: getByText('科技', { exact: true }) resolved to 3 elements:\n 1) <button type=\"button\" data-v-e07d674e=\"\" class=\"filter-btn\">科技</button> aka getByRole('button', { name: '科技', exact: true })\n 2) <span class=\"book-cat\" data-v-e07d674e=\"\">科技</span> aka getByRole('button', { name: '代码大全 史蒂夫·迈克康奈尔 科技' })\n 3) <span class=\"book-cat\" data-v-e07d674e=\"\">科技</span> aka getByRole('button', { name: '深入理解计算机系统 Randal E. Bryant 科技' })\n\nCall log:\n - waiting for getByTe\npageErrors: [\"D21_EVAL_INJECTED_RUNTIME_FAULT\"]\nconsoleErrors: []",
+            "sourceDigest": "sha256:fc556b6c7695300b47ffcdd3cf0f25545433994e847e1d0dce073524871427f2",
+            "repairAttempts": 0,
+            "failedAction": {
+              "index": 10,
+              "action": {
+                "type": "click",
+                "target": {
+                  "text": "科技"
+                }
+              }
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_FAILED",
+            "category": "CODE",
+            "fingerprint": "sha256:091beed664145b3c034424199b2bd1a927f5f06644c81e840c88d4d37e2a9970",
+            "diagnostic": "locator.click: Error: strict mode violation: getByText('科技', { exact: true }) resolved to 3 elements:\n 1) <button type=\"button\" data-v-22b66079=\"\" class=\"filter-btn\">科技</button> aka getByRole('button', { name: '科技', exact: true })\n 2) <span class=\"book-cat\" data-v-22b66079=\"\">科技</span> aka getByRole('button', { name: '代码大全 史蒂夫·迈克康奈尔 科技' })\n 3) <span class=\"book-cat\" data-v-22b66079=\"\">科技</span> aka getByRole('button', { name: '深入理解计算机系统 Randal E. Bryant 科技' })\n\nCall log:\n - waiting for getByTe",
+            "sourceDigest": "sha256:ed78255c68ebefe961f8efe9d88911d9085aec8072803f9e44f079355d718cf4",
+            "repairAttempts": 1,
+            "failedAction": {
+              "index": 10,
+              "action": {
+                "type": "click",
+                "target": {
+                  "text": "科技"
+                }
+              }
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_FAILED",
+            "category": "CODE",
+            "fingerprint": "sha256:8ab76131a7c87501e79e15843b346beb0e28a85f887749fef525ad4623b599f7",
+            "diagnostic": "locator.click: Error: strict mode violation: getByText('科技', { exact: true }) resolved to 3 elements:\n 1) <button type=\"button\" data-v-86d3633c=\"\" class=\"filter-btn\">科技</button> aka getByTestId('category-filters').getByRole('button', { name: '科技' })\n 2) <span class=\"book-cat\" data-v-86d3633c=\"\" data-testid=\"book-category\">科技</span> aka getByRole('button', { name: '代码大全 史蒂夫·迈克康奈尔 科技' })\n 3) <span class=\"book-cat\" data-v-86d3633c=\"\" data-testid=\"book-category\">科技</span> aka getByRole('button', { name",
+            "sourceDigest": "sha256:bc30dc6d137efe6b70c57be2b941f72668312ddd035f1fa0409be8ca1cb039b3",
+            "repairAttempts": 2,
+            "failedAction": {
+              "index": 10,
+              "action": {
+                "type": "click",
+                "target": {
+                  "text": "科技"
+                }
+              }
+            },
+            "decision": "REPAIR"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "repair.failure",
+          "payload": {
+            "code": "AGENT_ACTION_FAILED",
+            "category": "CODE",
+            "fingerprint": "sha256:c5e024ad55851c664f92b62e8b7c6b5855c8066849719d5a451fc743b6c8a79d",
+            "diagnostic": "locator.click: Error: strict mode violation: getByText('科技', { exact: true }) resolved to 3 elements:\n 1) <button type=\"button\" data-v-73c6419f=\"\" class=\"filter-btn\">科技</button> aka getByTestId('category-filters').getByRole('button', { name: '科技' })\n 2) <span class=\"book-cat\" data-v-73c6419f=\"\">科技</span> aka getByRole('button', { name: '代码大全 史蒂夫·迈克康奈尔 科技' })\n 3) <span class=\"book-cat\" data-v-73c6419f=\"\">科技</span> aka getByRole('button', { name: '深入理解计算机系统 Randal E. Bryant 科技' })\n\nCall log:\n -",
+            "sourceDigest": "sha256:c52a04460eb5c60cca05a28d2fb2e7bd43ea8579aa2b9892ae91ac5a4a96e734",
+            "repairAttempts": 3,
+            "failedAction": {
+              "index": 10,
+              "action": {
+                "type": "click",
+                "target": {
+                  "text": "科技"
+                }
+              }
+            },
+            "decision": "AGENT_REPAIR_LIMIT_EXCEEDED"
+          }
+        },
+        {
+          "stage": "VERIFY",
+          "kind": "failure",
+          "payload": {
+            "code": "AGENT_REPAIR_LIMIT_EXCEEDED",
+            "category": "CONTROL",
+            "recovery": "MANUAL_REVIEW_NO_AUTOMATIC_RETRY"
+          }
+        }
+      ]
+    }
+  ],
+  "invalids": [
+    {
+      "sampleId": "TASK-02",
+      "wireResultSha256": "sha256:333b0b51ff23c9ed12668fbe273d1e6dc40bbdf37136ce8a238287b08508a040",
+      "replySha256": "sha256:583e3156e013652bb4ac5e85b2c8acff41336f82481480862c787a61df2944a8",
+      "replyBytes": 9618,
+      "expectedRejection": "DUPLICATE_KEY",
+      "rawReply": "diagnostics/TASK-02-duplicate-key-reply.txt",
+      "causeBeyondStrictParseRejection": "UNKNOWN",
+      "usage": {
+        "inputTokens": 3952,
+        "outputTokens": 3261,
+        "totalTokens": 7213,
+        "raw": {
+          "prompt_tokens": 3952,
+          "completion_tokens": 3261,
+          "total_tokens": 7213,
+          "prompt_tokens_details": {
+            "cached_tokens": 3072
+          },
+          "prompt_cache_hit_tokens": 3072,
+          "prompt_cache_miss_tokens": 880
+        }
+      }
+    }
+  ]
+}

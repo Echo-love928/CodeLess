@@ -1,0 +1,11 @@
+# Production cover contract — D25-A final integration
+
+A owns the two additive GET registrations and their schema in this independent PR. No migration, lockfile or CI change. B independently reviews the diff and native evidence before enabling or merging. Default `CODELESS_COVER_ENABLED=false`; this PR does not deploy the VPS.
+
+The coordinator alone scans committed PUBLISHED records; GET never captures, retries, publishes or changes latestReady. Entry is a closed `/`, `/tasks`, `/catalog` value proven by that immutable version's own draft and PASSED native actions. A root capture cannot be relabelled as a functional route. Missing proof is unavailable, not root success. Legacy native jobs without entryPath bind to root only; HTTP responses always include entryPath.
+
+Capture retains 12-second native phases, two attempts and 100 retained records. The 45-second installed-process envelope includes admission and cleanup; it does not raise the phase limit. Unknown cleanup/process state writes durable quarantine and stops further work. Existing successful covers remain readable. Operator recovery requires confirming every worker is stopped before clearing quarantine; automatic stale lock recovery is prohibited.
+
+Enable only with trusted absolute node/gateway/hosting roots and three separate HTTPS sites: `CODELESS_NODE_EXECUTABLE`, `CODELESS_COVER_GATEWAY_ENTRY`, `CODELESS_HOSTING_ROOT`, `CODELESS_PUBLICATION_ORIGIN`, `CODELESS_PLATFORM_ORIGIN`, `CODELESS_PREVIEW_ORIGIN`, plus private `CODELESS_COVER_ROOT`. The cover root is separate from hosting, source and secret roots. One worker owns it; read-only replicas set `CODELESS_COVER_WORKER_ENABLED=false`. Do not expose private files as static assets. The Node process receives only OS/cache metadata and these non-secret paths/origins; no platform credentials, database password or session cookie.
+
+401 anonymous; 404 foreign owner (ADMIN included), missing job, mismatched binding or wrong image digest; 503 missing immutable entry proof, corrupt bytes or unknown capture state. PNG reads recheck hash, size and header; no client-supplied URL/route or write endpoint. Feature-disabled routes remain absent. All responses use no-store/nosniff.

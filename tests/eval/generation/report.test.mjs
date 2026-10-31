@@ -1,3 +1,5 @@
+// Keep entry-proof boundary cases in the existing static gate without changing CI.
+import './verified-entry-evidence.cases.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
@@ -5,6 +7,58 @@ import { join } from 'node:path'
 import { buildReport, checkReport, writeReport } from '../../../scripts/eval/report.mjs'
 import { verifyBatch } from '../../../scripts/eval/verify-batch.mjs'
 import { defaultRecord, syntheticBatch } from './fixtures.mjs'
+import { compareReports } from '../../../scripts/eval/final-comparison.mjs'
+import { joinBehavior } from '../../../scripts/eval/final-metrics.mjs'
+
+test('D25 missing record remains in denominator, with usage and behavior unknown', t => {
+  const baseline = syntheticBatch(), candidate = syntheticBatch({ omit: ['CAT-02'] })
+  t.after(() => { rmSync(baseline.parent, { recursive: true, force: true }); rmSync(candidate.parent, { recursive: true, force: true }) })
+  const result = compareReports(buildReport(baseline.dir), buildReport(candidate.dir))
+  assert.equal(result.requirements.denominator, 9)
+  assert.equal(result.requirements.successCountDelta, -1)
+  assert.equal(result.samples.find(row => row.sampleId === 'CAT-02').transition, 'REGRESSED')
+  assert.equal(result.usage.candidate.requirements.totalTokens, null)
+  assert.equal(result.requirements.behaviorAssertions.requirementLevelFinalSuccess, null)
+})
+
+test('D25 comparison rejects mock, configuration/model drift and replaced samples', t => {
+  const batch = syntheticBatch(); t.after(() => rmSync(batch.parent, { recursive: true, force: true }))
+  const report = buildReport(batch.dir)
+  for (const change of [r => { r.mode = 'MOCK' }, r => { r.realModelEvidence = false },
+    r => { r.frozen.runConfig = 'changed' }, r => { r.provider.model = 'other-model' },
+    r => { r.requirements.denominator = 8 }, r => { r.requirements.sampleIds[0] = 'replacement' },
+    r => { r.faults.results[0].sample.sampleId = 'replacement-fault' }]) {
+    const candidate = structuredClone(report); change(candidate)
+    assert.throws(() => compareReports(report, candidate))
+  }
+})
+
+test('D25 behavior join lowers platform success and rejects unknown, mock or mismatched evidence', t => {
+  const batch = syntheticBatch(); t.after(() => rmSync(batch.parent, { recursive: true, force: true }))
+  const platform = buildReport(batch.dir)
+  const behavior = { mode: 'REAL', batchId: platform.batchId, completedAt: '2026-10-29T10:22:00Z', status: 'FAILED', additionalModelRequests: 0,
+    rows: platform.requirements.samples.map(sample => ({ sampleId: sample.sampleId, taskId: sample.taskId, mode: 'REAL', passed: true,
+      rawDigest: platform.inputs['samples/' + sample.sampleId + '/record.json'], versionId: sample.finalVersion.id,
+      sourceDigest: sample.finalVersion.sourceDigest, originalVerification: { status: 'PASSED' }, build: { status: 'SUCCEEDED', exitCode: 0 }, browser: { status: 'PASSED' } })) }
+  behavior.rows[0].passed = false
+  assert.equal(joinBehavior(platform, behavior).passed, 8)
+  for (const change of [r => { r.mode = 'MOCK' }, r => { r.rows[1].mode = 'MOCK' }, r => { r.rows[1].taskId = 'other' }, r => { r.rows[1].sourceDigest = 'other' },
+    r => { r.rows[1].rawDigest = 'other' }, r => { r.rows[1].passed = null }, r => { r.rows[1].build.exitCode = 1 },
+    r => { r.rows.pop() }, r => { r.completedAt = null }]) {
+    const invalid = structuredClone(behavior); change(invalid)
+    assert.throws(() => joinBehavior(platform, invalid))
+  }
+})
+
+test('D25 finalizer rejects reduced denominators and replaced platform rows', t => {
+  const batch = syntheticBatch(); t.after(() => rmSync(batch.parent, { recursive: true, force: true }))
+  const platform = buildReport(batch.dir)
+  for (const change of [r => { r.requirements.denominator = 8 }, r => { r.requirements.sampleIds.pop() },
+    r => { r.requirements.sampleIds[1] = r.requirements.sampleIds[0] }, r => { r.requirements.samples.pop() }]) {
+    const invalid = structuredClone(platform); change(invalid)
+    assert.throws(() => joinBehavior(invalid, {}))
+  }
+})
 
 const failed = (result) => result.checks.filter((c) => !c.pass).map((c) => c.id)
 

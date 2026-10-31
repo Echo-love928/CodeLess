@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-10-30T02-41-32Z-real-c3368088",
+  "mode": "REAL",
+  "createdAt": "2026-10-30T02:41:32.270Z",
+  "provider": {
+    "id": "deepseek",
+    "model": "deepseek-flash"
+  },
+  "realModelEvidence": true,
+  "subset": null,
+  "git": {
+    "head": "165e31c0fec532fc910396257b8d468499ae91e3",
+    "branch": "codex/d25-a-final-evaluation",
+    "scopedClean": true,
+    "scopedStatus": "",
+    "scope": [
+      "services/api/src",
+      "services/api/pom.xml",
+      "services/api/agent-runner.mjs",
+      "services/runner/src",
+      "prompts",
+      "templates",
+      "infra/runner",
+      "infra/build-image",
+      "scripts/eval",
+      "evals/generation",
+      "tests/agent/prepare-runtime.mjs",
+      "package.json",
+      "pnpm-lock.yaml"
+    ]
+  },
+  "isolation": "IN_PLACE",
+  "frozen": {
+    "requirements": {
+      "path": "evals/generation/requirements.json",
+      "copy": "frozen/requirements.json",
+      "sha256": "sha256:ef219f3e5c0f05f3ab03ec854c66b32709349f80d1e1aee0076fe19d2b91cb2a"
+    },
+    "faults": {
+      "path": "evals/generation/faults.json",
+      "copy": "frozen/faults.json",
+      "sha256": "sha256:4b147818de5823b2ba3011cc65f57a08f63270154aa01289af8e7631c8790b13"
+    },
+    "runConfig": {
+      "path": "evals/generation/run-config.json",
+      "copy": "frozen/runConfig.json",
+      "sha256": "sha256:6dc271c657cdb29e72ec052621fc2633ac5d82b8d8d963bfbffccd0d929cb054"
+    }
+  },
+  "code": {
+    "services/api/src/test/java/dev/codeless/api/eval/GenerationEvalIT.java": "sha256:ea8b87d797683fef8a6b89f38b64d331eba8f9891034ac394fa69ce1a1ada17b",
+    "scripts/eval/run-batch.mjs": "sha256:f9e3a93d4cf00a9d8133d01860a2454d6c084a5f9afb8c79626b76f5a36b8205",
+    "scripts/eval/lib.mjs": "sha256:9b4d9419efbf5f0a2aca7729e4863c0a59a4df86d6eb1d9eef9634cade7a2f7d",
+    "scripts/eval/ledger.mjs": "sha256:6d7a2add758acfb004ebcd537fffd8823a83731e9de0ed23463001942ad89220",
+    "scripts/eval/report.mjs": "sha256:c43e8d26259eb85d776db3143d173404126be7272d28fea26a5a059aa82c48ff"
+  },
+  "samples": [
+    {
+      "id": "SHOW-01",
+      "kind": "REQUIREMENT",
+      "category": "SHOWCASE",
+      "baseRequirement": null
+    },
+    {
+      "id": "SHOW-02",
+      "kind": "REQUIREMENT",
+      "category": "SHOWCASE",
+      "baseRequirement": null
+    },
+    {
+      "id": "SHOW-03",
+      "kind": "REQUIREMENT",
+      "category": "SHOWCASE",
+      "baseRequirement": null
+    },
+    {
+      "id": "TASK-01",
+      "kind": "REQUIREMENT",
+      "category": "TASKS",
+      "baseRequirement": null
+    },
+    {
+      "id": "TASK-02",
+      "kind": "REQUIREMENT",
+      "category": "TASKS",
+      "baseRequirement": null
+    },
+    {
+      "id": "TASK-03",
+      "kind": "REQUIREMENT",
+      "category": "TASKS",
+      "baseRequirement": null
+    },
+    {
+      "id": "CAT-01",
+      "kind": "REQUIREMENT",
+      "category": "CATALOG",
+      "baseRequirement": null
+    },
+    {
+      "id": "CAT-02",
+      "kind": "REQUIREMENT",
+      "category": "CATALOG",
+      "baseRequirement": null
+    },
+    {
+      "id": "CAT-03",
+      "kind": "REQUIREMENT",
+      "category": "CATALOG",
+      "baseRequirement": null
+    },
+    {
+      "id": "FAULT-CODE-01",
+      "kind": "CODE_FAULT",
+      "category": "SHOWCASE",
+      "baseRequirement": "SHOW-01"
+    },
+    {
+      "id": "FAULT-CODE-02",
+      "kind": "CODE_FAULT",
+      "category": "TASKS",
+      "baseRequirement": "TASK-01"
+    },
+    {
+      "id": "FAULT-CODE-03",
+      "kind": "CODE_FAULT",
+      "category": "CATALOG",
+      "baseRequirement": "CAT-01"
+    },
+    {
+      "id": "FAULT-ENV-01",
+      "kind": "ENV_FAULT",
+      "category": "SHOWCASE",
+      "baseRequirement": "SHOW-02"
+    },
+    {
+      "id": "FAULT-ENV-02",
+      "kind": "ENV_FAULT",
+      "category": "TASKS",
+      "baseRequirement": "TASK-02"
+    }
+  ],
+  "policy": {
+    "attemptsPerSample": 1,
+    "outerRetries": 0,
+    "deleteFailedSamples": false,
+    "rerun": "NEW_BATCH_ONLY"
+  }
+}

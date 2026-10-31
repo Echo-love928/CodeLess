@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeless.dev/contracts/cover/record.schema.json",
+  "title": "Owner-only immutable publication cover",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["deploymentId", "applicationId", "versionId", "sourceDigest", "artifactDigest", "entryPath", "status", "attempts", "failureCode", "imageDigest", "imageBytes"],
+  "properties": {
+    "deploymentId": {"type": "string", "format": "uuid"},
+    "applicationId": {"type": "string", "format": "uuid"},
+    "versionId": {"type": "string", "format": "uuid"},
+    "sourceDigest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "artifactDigest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "entryPath": {"enum": ["/", "/tasks", "/catalog"]},
+    "status": {"enum": ["QUEUED", "RUNNING", "RETRYING", "SUCCEEDED", "FAILED"]},
+    "attempts": {"type": "integer", "minimum": 0, "maximum": 2},
+    "failureCode": {"enum": [null, "TARGET_REJECTED", "CAPTURE_TIMEOUT", "CAPTURE_FAILED", "CLEANUP_FAILED", "CAPTURE_INTERRUPTED"]},
+    "imageDigest": {"type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$"},
+    "imageBytes": {"type": ["integer", "null"], "minimum": 24, "maximum": 6291456}
+  },
+  "allOf": [
+    {"if": {"properties": {"status": {"const": "SUCCEEDED"}}}, "then": {"properties": {"failureCode": {"type": "null"}, "imageDigest": {"type": "string"}, "imageBytes": {"type": "integer"}}}, "else": {"properties": {"imageDigest": {"type": "null"}, "imageBytes": {"type": "null"}}}},
+    {"if": {"properties": {"status": {"const": "FAILED"}}}, "then": {"properties": {"failureCode": {"type": "string"}}}},
+    {"if": {"properties": {"status": {"enum": ["QUEUED", "RUNNING"]}}}, "then": {"properties": {"failureCode": {"type": "null"}}}}
+  ]
+}

@@ -6,7 +6,8 @@ export function createCoverAdapter({ queue, ownedPublication }) {
     if (!publication || publication.id !== id || publication.status !== 'PUBLISHED') throw new Error('NOT_FOUND')
     const record = queue.get(id)
     if (!record || record.applicationId !== publication.applicationId || record.versionId !== publication.versionId ||
-        record.sourceDigest !== publication.sourceDigest || record.artifactDigest !== publication.artifactDigest) throw new Error('NOT_FOUND')
+        record.sourceDigest !== publication.sourceDigest || record.artifactDigest !== publication.artifactDigest ||
+        (record.entryPath === undefined ? '/' : record.entryPath) !== (publication.entryPath === undefined ? '/' : publication.entryPath)) throw new Error('NOT_FOUND')
     return record
   }
   return {

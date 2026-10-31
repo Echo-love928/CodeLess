@@ -1,0 +1,47 @@
+{
+  "task": "D25-A",
+  "incidents": [
+    {
+      "status": "EXPLICIT_PUBLIC_DATA_APPROVAL_RECEIVED",
+      "source": "Direct human reply in this task on 2026-10-29 Asia/Tokyo",
+      "approvedPayload": "Approximately 5.2 MB of D25-A original evaluation records, model outputs, generated sources, screenshots/traces, log summaries and reports to public Echo-love928/CodeLess; private SQL, sessions and keys excluded",
+      "approvedActions": "Normal task/reproduction-branch push and draft PR creation; no merge or application publication"
+    },
+    {
+      "command": "git commit ...; git push origin codex/d25-a-final-evaluation codex/d25-a-evaluated-a863b76",
+      "processStarted": false,
+      "status": "AUTO_REVIEW_REJECTED",
+      "reason": "Public GitHub upload of approximately 206 evaluation payload files requires explicit human authorization for these model outputs, generated sources, screenshots/traces and log summaries; zero credential matches is insufficient",
+      "resolution": "Local commit completed separately; no alternate upload channel used; remote push and PR creation await explicit public-data approval"
+    },
+    {
+      "command": "git diff --cached --check",
+      "nativeExitCode": 1,
+      "result": "Byte-preserved CRLF journals were reported as trailing whitespace; raw captured/generated evidence must not be reformatted",
+      "resolution": "Scoped results .gitattributes matches existing immutable evidence policy: -text -whitespace. Platform source/tests retain whitespace checks; model/build/browser assertions unchanged",
+      "rawEvidenceBytesChanged": false
+    },
+    {
+      "command": "git status --short; git branch --show-current",
+      "result": "Git refused repository ownership in the restricted sandbox",
+      "resolution": "Per-command safe.directory; global Git configuration unchanged",
+      "testsStarted": false
+    },
+    {
+      "command": "node scripts/eval/network-preflight.mjs evals/results/D25-A/network-preflight",
+      "nativeExitCode": 1,
+      "result": "ENOENT creating the output directory because its parent did not exist; no network probe started",
+      "resolution": "Created authorized parent and selected observed C:/Program Files/Git/bin/bash.exe; subsequent real probe passed",
+      "modelCalls": 0
+    },
+    {
+      "command": "node scripts/eval/record-final.mjs unit; node scripts/eval/record-final.mjs mutation",
+      "shellExitCode": 0,
+      "nativeRecorderExitCode": 1,
+      "result": "Both recorders failed with EPERM creating private .local-data/d25-a log directories; neither test command started; trailing git diff --check made composite shell exit 0",
+      "resolution": "Executed unchanged recorders with original-user permissions; public command.json records the actual test exits",
+      "testsStarted": false,
+      "modelCalls": 0
+    }
+  ]
+}

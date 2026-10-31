@@ -1,0 +1,67 @@
+{
+  "task": "D25-A",
+  "recordedAt": "2026-10-30T08:04:00.975Z",
+  "preparationOnly": true,
+  "measurement": "LOCAL_DETERMINISTIC_TESTS_NO_MODEL_OR_ACCOUNT_CALLS",
+  "taskHead": "625542500ed6dae8e227d46cfaef12e3dc662163",
+  "candidateHead": "fb79c402de6b66bc849e87b6880bf955488f8032",
+  "candidateTrackedDiff": "",
+  "localMain": "944738c3c4f035f3d503281fecba9f96a09fdf88",
+  "tests": [
+    {
+      "command": "node --test tests/eval/cny-budget.test.mjs tests/eval/budgeted-batch.test.mjs tests/eval/private-handoff-crypto.test.mjs",
+      "nativeExitCode": 0,
+      "tests": 18,
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0,
+      "capture": "budget-execution-crypto-18.log",
+      "captureKind": "complete tool text capture",
+      "captureSha256": "sha256:e534d332828dd83da80484de8b1b02d6aa521630a572bde87fb04d7faf8e5311"
+    },
+    {
+      "command": "$files = @(rg --files tests/eval/generation -g '*.test.mjs'); node --test @files",
+      "nativeExitCode": 0,
+      "tests": 44,
+      "passed": 44,
+      "failed": 0,
+      "skipped": 0,
+      "capture": "evaluation-44.tool-excerpt.log",
+      "captureKind": "TOOL_TRUNCATED_EXCERPT_NOT_FULL_RAW_LOG",
+      "captureSha256": "sha256:3cfc8d5f62eff974ed9c348e1f17b6908978ca9380ddbaed092ca7cf96eff13e"
+    }
+  ],
+  "negativeLaunch": {
+    "command": "node scripts/eval/budgeted-batch.mjs evals/results/D25-A/third-round-2026-10-30/execution-plan.json",
+    "nativeExitCode": 1,
+    "observed": "Permission-review service must actually recover before execution; false !== true",
+    "expectedPrelaunchRefusal": true,
+    "sampleJvmOrModelStarted": false
+  },
+  "newPaidModelCalls": 0,
+  "thirdBatch": "NOT_STARTED",
+  "newRealRuntimeTokens": "NOT_EXECUTED",
+  "accountCurrencyAndBalance": "NOT_QUERIED",
+  "nativeRealPreflight": "NOT_EXECUTED",
+  "newEncryptedBundle": "NOT_CREATED",
+  "sourceFingerprintsCapturedAfterTests": true,
+  "sources": [
+    { "path": "scripts/eval/cny-budget.mjs", "bytes": 5308, "sha256": "sha256:0acbdb401e8a447c88d618051b507d1a701a63c4412dd9fae492670a4b25bec2" },
+    { "path": "scripts/eval/budgeted-batch.mjs", "bytes": 10509, "sha256": "sha256:414b58ddfac13008227777d7c306ac74dff7e40e791fdb7de66202734e56d551" },
+    { "path": "scripts/eval/private-handoff-crypto.mjs", "bytes": 1497, "sha256": "sha256:a58a765c47bc75c74cc12e0b67b33067c5760eb406c7783e7f9553cf2436f677" },
+    { "path": "tests/eval/cny-budget.test.mjs", "bytes": 4275, "sha256": "sha256:8a365e6c523ef1944707a1409f61d35791fc6e5277f2b5531d3f5125873af197" },
+    { "path": "tests/eval/budgeted-batch.test.mjs", "bytes": 2933, "sha256": "sha256:b303cfcc1dac844819723f60929859bcb763f889511b377f4beafa8e05d1a1b2" },
+    { "path": "tests/eval/private-handoff-crypto.test.mjs", "bytes": 1936, "sha256": "sha256:3fa22eeeca6303f426633b1bdcb15d0d6dedd6ed76d349cc4d136392b739797f" }
+  ],
+  "blockingService": {
+    "type": "AUTOMATIC_PERMISSION_APPROVAL_REVIEW_UNAVAILABLE",
+    "events": [
+      "initial read-only account/environment commands: approval timed out before process creation",
+      "account retry: Selected model is at capacity; approval could not complete",
+      "after user chose continue after recovery: original approval channel timed out again before process creation"
+    ],
+    "notAnUnsafeDetermination": true,
+    "noBypass": true
+  },
+  "developmentAgentTokens": { "input": null, "output": null, "total": null, "measurement": "UNKNOWN" }
+}

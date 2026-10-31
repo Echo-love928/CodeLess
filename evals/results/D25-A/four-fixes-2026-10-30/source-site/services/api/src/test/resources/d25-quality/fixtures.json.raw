@@ -1,0 +1,925 @@
+{
+  "schemaVersion": 1,
+  "measurement": "DETERMINISTIC_OFFLINE_REPLAY_NOT_MODEL_EVALUATION",
+  "paidRequests": 0,
+  "cafe": {
+    "batch": "2026-10-30T02-41-32Z-real-c3368088",
+    "sample": "CAT-02",
+    "version": 1,
+    "versionId": "0a42cfe6-8db1-4a08-9492-85fd2767fc54",
+    "recordDigest": "sha256:6c7fd0e1df7a96489cdd7db0f74b2aefdaf1078d10af722dd69f226cc653b312",
+    "sourceDigest": "sha256:d12b51a0860f3c6157fbf55f8863e9cd09370cfcab57a498bdbcbc44fede4bc5",
+    "files": {
+      "src/components/CafeCard.vue": "<script setup lang=\"ts\">\nimport type { Cafe } from '../data/cafes';\n\ndefineProps<{ cafe: Cafe }>();\nconst emit = defineEmits<{ (e: 'select', id: number): void }>();\n</script>\n\n<template>\n  <article class=\"cafe-card\" data-ai-component=\"cafe-card\" @click=\"emit('select', cafe.id)\">\n    <h3 class=\"cafe-name\">{{ cafe.name }}</h3>\n    <p class=\"cafe-meta\">城区：{{ cafe.district }}</p>\n    <p class=\"cafe-meta\">评分：{{ cafe.rating }}</p>\n    <p class=\"cafe-meta\">招牌饮品：{{ cafe.signature }}</p>\n  </article>\n</template>\n\n<style scoped>\n.cafe-card {\n  border: 1px solid #ddd;\n  border-radius: 8px;\n  padding: 12px 16px;\n  background: #fff;\n  cursor: pointer;\n  transition: box-shadow 0.2s;\n}\n.cafe-card:hover {\n  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);\n}\n.cafe-name {\n  margin: 0 0 8px;\n  font-size: 18px;\n}\n.cafe-meta {\n  margin: 4px 0;\n  font-size: 14px;\n  color: #555;\n}\n</style>\n",
+      "src/components/CafeDetail.vue": "<script setup lang=\"ts\">\nimport type { Cafe } from '../data/cafes';\n\ndefineProps<{ cafe: Cafe | null }>();\n</script>\n\n<template>\n  <section class=\"cafe-detail\" data-ai-component=\"cafe-detail\">\n    <template v-if=\"cafe\">\n      <h2 class=\"detail-title\">{{ cafe.name }}</h2>\n      <p class=\"detail-line\">城区：{{ cafe.district }}</p>\n      <p class=\"detail-line\">评分：{{ cafe.rating }}</p>\n      <p class=\"detail-line\">招牌饮品：{{ cafe.signature }}</p>\n      <p class=\"detail-desc\">{{ cafe.description }}</p>\n    </template>\n    <p v-else class=\"detail-empty\">点击上方咖啡馆卡片查看详情</p>\n  </section>\n</template>\n\n<style scoped>\n.cafe-detail {\n  margin-top: 24px;\n  border: 1px solid #ddd;\n  border-radius: 8px;\n  padding: 16px;\n  background: #fafafa;\n}\n.detail-title {\n  margin: 0 0 8px;\n  font-size: 20px;\n}\n.detail-line {\n  margin: 4px 0;\n  font-size: 14px;\n  color: #444;\n}\n.detail-desc {\n  margin: 10px 0 0;\n  font-size: 14px;\n  color: #333;\n}\n.detail-empty {\n  margin: 0;\n  color: #888;\n}\n</style>\n",
+      "src/data/cafes.ts": "export interface Cafe {\n  id: number;\n  name: string;\n  district: string;\n  rating: number;\n  signature: string;\n  description: string;\n}\n\nexport const cafes: Cafe[] = [\n  {\n    id: 1,\n    name: '云间咖啡',\n    district: '静安区',\n    rating: 4.8,\n    signature: '桂花拿铁',\n    description: '坐落于老弄堂中的安静小店，以手冲与桂花风味拿铁闻名，适合午后阅读。'\n  },\n  {\n    id: 2,\n    name: '梧桐树下',\n    district: '徐汇区',\n    rating: 4.6,\n    signature: '海盐焦糖玛奇朵',\n    description: '梧桐掩映的街角咖啡馆，主打海盐焦糖系列，露天座位深受附近居民喜爱。'\n  },\n  {\n    id: 3,\n    name: '外滩一号烘焙',\n    district: '黄浦区',\n    rating: 4.7,\n    signature: '燕麦冷萃',\n    description: '临近外滩的自烘焙工坊，每日现烘咖啡豆，燕麦冷萃清爽回甘。'\n  },\n  {\n    id: 4,\n    name: '长宁小院',\n    district: '长宁区',\n    rating: 4.5,\n    signature: '陈皮美式',\n    description: '带小院子的社区咖啡馆，陈皮美式独特清新，常有邻里猫咪光顾。'\n  },\n  {\n    id: 5,\n    name: '陆家嘴云端',\n    district: '浦东新区',\n    rating: 4.9,\n    signature: '氮气冷萃',\n    description: '高层写字楼中的现代咖啡馆，可俯瞰城市天际线，氮气冷萃口感绵密。'\n  },\n  {\n    id: 6,\n    name: '老北站咖啡',\n    district: '静安区',\n    rating: 4.3,\n    signature: '黑糖珍珠拿铁',\n    description: '怀旧风格的街边小店，黑糖珍珠拿铁甜而不腻，价格亲民。'\n  }\n];\n",
+      "src/pages/CatalogPage.vue": "<script setup lang=\"ts\">\nimport { computed, ref } from 'vue';\nimport CafeCard from '../components/CafeCard.vue';\nimport CafeDetail from '../components/CafeDetail.vue';\nimport { cafes } from '../data/cafes';\nimport type { Cafe } from '../data/cafes';\n\nconst districts = computed<string[]>(() => {\n  const set: string[] = [];\n  for (const cafe of cafes) {\n    if (!set.includes(cafe.district)) {\n      set.push(cafe.district);\n    }\n  }\n  return set;\n});\n\nconst selectedDistrict = ref<string>('all');\nconst searchText = ref<string>('');\nconst selectedCafe = ref<Cafe | null>(null);\n\nconst filteredCafes = computed<Cafe[]>(() => {\n  const keyword = searchText.value.trim();\n  return cafes.filter((cafe) => {\n    const districtOk = selectedDistrict.value === 'all' || cafe.district === selectedDistrict.value;\n    const nameOk = keyword === '' || cafe.name.includes(keyword);\n    return districtOk && nameOk;\n  });\n});\n\nfunction selectCafe(id: number): void {\n  selectedCafe.value = cafes.find((cafe) => cafe.id === id) ?? null;\n}\n</script>\n\n<template>\n  <main class=\"catalog-page\" data-ai-component=\"catalog-page\">\n    <h1 class=\"page-title\">城市咖啡馆目录</h1>\n    <div class=\"filters\">\n      <label class=\"filter-label\" for=\"district-select\">城区筛选</label>\n      <select id=\"district-select\" v-model=\"selectedDistrict\" class=\"filter-select\" data-testid=\"district-select\">\n        <option value=\"all\">全部城区</option>\n        <option v-for=\"district in districts\" :key=\"district\" :value=\"district\">{{ district }}</option>\n      </select>\n      <label class=\"filter-label\" for=\"search-input\">按名称搜索</label>\n      <input id=\"search-input\" v-model=\"searchText\" type=\"text\" class=\"filter-input\" placeholder=\"输入咖啡馆名称\" data-testid=\"search-input\" />\n    </div>\n    <p class=\"result-count\" data-testid=\"result-count\">共 {{ filteredCafes.length }} 家咖啡馆</p>\n    <div class=\"cafe-list\">\n      <CafeCard\n        v-for=\"cafe in filteredCafes\"\n        :key=\"cafe.id\"\n        :cafe=\"cafe\"\n        @select=\"selectCafe\"\n      />\n    </div>\n    <p v-if=\"filteredCafes.length === 0\" class=\"empty-tip\" data-testid=\"empty-tip\">没有符合条件的咖啡馆</p>\n    <CafeDetail :cafe=\"selectedCafe\" />\n  </main>\n</template>\n\n<style scoped>\n.catalog-page {\n  max-width: 960px;\n  margin: 0 auto;\n  padding: 24px 16px;\n}\n.page-title {\n  margin: 0 0 16px;\n  font-size: 24px;\n}\n.filters {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  gap: 8px 12px;\n  margin-bottom: 12px;\n}\n.filter-label {\n  font-size: 14px;\n  color: #333;\n}\n.filter-select,\n.filter-input {\n  padding: 6px 8px;\n  border: 1px solid #ccc;\n  border-radius: 6px;\n  font-size: 14px;\n}\n.result-count {\n  margin: 0 0 12px;\n  font-size: 14px;\n  color: #666;\n}\n.cafe-list {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));\n  gap: 16px;\n}\n.empty-tip {\n  color: #999;\n}\n</style>\n"
+    },
+    "digests": [
+      {
+        "path": "src/components/CafeCard.vue",
+        "bytes": 897,
+        "digest": "sha256:19fa20c40d868edab4be41e4c6f6fea3a18407da60906197843ae19ab1598be5"
+      },
+      {
+        "path": "src/components/CafeDetail.vue",
+        "bytes": 1030,
+        "digest": "sha256:cffc03c880d439a40e72952d0a803ec196c808575170ddf8cd01be5cc4fa09af"
+      },
+      {
+        "path": "src/data/cafes.ts",
+        "bytes": 1588,
+        "digest": "sha256:c127f1389b82821225c19426e5d34886ad39aedff90aa760f89e8e7c5c9951a4"
+      },
+      {
+        "path": "src/pages/CatalogPage.vue",
+        "bytes": 2905,
+        "digest": "sha256:a4771e9172b71e2a2a82b7d4b28b6811bc40b482fcd7a8248676ca3b7483b5da"
+      }
+    ],
+    "actions": [
+      {
+        "type": "navigate",
+        "path": "/catalog"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "result-count"
+        },
+        "value": "共 6 家咖啡馆"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "云间咖啡"
+        },
+        "value": "云间咖啡"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "老北站咖啡"
+        },
+        "value": "老北站咖啡"
+      },
+      {
+        "type": "select",
+        "target": {
+          "testId": "district-select"
+        },
+        "value": "静安区"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "result-count"
+        },
+        "value": "共 2 家咖啡馆"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "云间咖啡"
+        },
+        "value": "云间咖啡"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "老北站咖啡"
+        },
+        "value": "老北站咖啡"
+      },
+      {
+        "type": "select",
+        "target": {
+          "testId": "district-select"
+        },
+        "value": "all"
+      },
+      {
+        "type": "fill",
+        "target": {
+          "testId": "search-input"
+        },
+        "value": "梧桐"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "result-count"
+        },
+        "value": "共 1 家咖啡馆"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "梧桐树下"
+        },
+        "value": "梧桐树下"
+      },
+      {
+        "type": "fill",
+        "target": {
+          "testId": "search-input"
+        },
+        "value": ""
+      },
+      {
+        "type": "click",
+        "target": {
+          "role": "heading",
+          "name": "云间咖啡"
+        }
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "云间咖啡"
+        },
+        "value": "云间咖啡"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "梧桐树下"
+        },
+        "value": "梧桐树下"
+      }
+    ],
+    "plan": {
+      "schemaVersion": 1,
+      "template": "VUE",
+      "dataMode": "MOCK",
+      "pages": [
+        {
+          "route": "/catalog",
+          "file": "src/pages/CatalogPage.vue",
+          "title": "城市咖啡馆目录",
+          "purpose": "展示 6 家咖啡馆的卡片列表，支持城区下拉筛选、名称搜索，点击卡片在列表下方显示详情。"
+        }
+      ],
+      "components": [
+        {
+          "name": "CafeCard",
+          "file": "src/components/CafeCard.vue",
+          "purpose": "展示单家咖啡馆的名称、城区、评分和招牌饮品，并发出点击选择事件。"
+        },
+        {
+          "name": "CafeDetail",
+          "file": "src/components/CafeDetail.vue",
+          "purpose": "在列表下方展示所选咖啡馆的详细信息，未选择时显示提示。"
+        }
+      ],
+      "files": [
+        {
+          "path": "src/pages/CatalogPage.vue",
+          "purpose": "页面主体：搜索框、城区下拉、卡片列表与详情区域，包含 Mock 数据筛选逻辑。"
+        },
+        {
+          "path": "src/components/CafeCard.vue",
+          "purpose": "咖啡馆卡片组件，显示名称、城区、评分、招牌饮品。"
+        },
+        {
+          "path": "src/components/CafeDetail.vue",
+          "purpose": "咖啡馆详情组件，展示所选咖啡馆的完整信息。"
+        },
+        {
+          "path": "src/data/cafes.ts",
+          "purpose": "本地 Mock 数据：6 家咖啡馆的名称、城区、评分、招牌饮品及详情描述。"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "A1",
+          "route": "/catalog",
+          "action": "打开 /catalog 页面，观察咖啡馆列表。",
+          "expected": "列表显示 6 张咖啡馆卡片，每张含名称、城区、评分和招牌饮品。"
+        },
+        {
+          "id": "A2",
+          "route": "/catalog",
+          "action": "在城区下拉框中选择某个城区。",
+          "expected": "列表仅显示该城区的咖啡馆，其他城区卡片消失。"
+        },
+        {
+          "id": "A3",
+          "route": "/catalog",
+          "action": "在搜索框输入某咖啡馆名称的部分文字。",
+          "expected": "列表实时过滤，仅保留名称匹配的咖啡馆。"
+        },
+        {
+          "id": "A4",
+          "route": "/catalog",
+          "action": "点击任意一张咖啡馆卡片。",
+          "expected": "列表下方出现该咖啡馆的详情区域，显示其完整信息。"
+        },
+        {
+          "id": "A5",
+          "route": "/catalog",
+          "action": "点击另一张咖啡馆卡片。",
+          "expected": "详情区域更新为新选中的咖啡馆内容。"
+        }
+      ],
+      "capabilities": {
+        "backend": false,
+        "payments": false,
+        "externalServices": [],
+        "dependencies": []
+      }
+    },
+    "prompt": "生成一个城市咖啡馆目录：使用 Mock 数据列出 6 家咖啡馆（名称、所在城区、评分、招牌饮品）；可以通过下拉框按城区筛选，也可以按名称搜索；点击咖啡馆卡片后在列表下方显示该咖啡馆的详情。"
+  },
+  "cafeType": {
+    "batch": "2026-10-30T02-41-32Z-real-c3368088",
+    "sample": "CAT-02",
+    "version": 3,
+    "versionId": "a062cef1-fc7c-4109-9d8e-0aa9602d9d31",
+    "recordDigest": "sha256:6c7fd0e1df7a96489cdd7db0f74b2aefdaf1078d10af722dd69f226cc653b312",
+    "sourceDigest": "sha256:70938b9ad334ba4efe976234c9e3fb04ec5c19a68c641d04dc5224e06e35e7a2",
+    "files": {
+      "src/components/CafeCard.vue": "<script setup lang=\"ts\">\nimport type { Cafe } from '../data/cafes';\n\ndefineProps<{ cafe: Cafe }>();\nconst emit = defineEmits<{ (e: 'select', id: number): void }>();\n</script>\n\n<template>\n  <article class=\"cafe-card\" data-ai-component=\"cafe-card\" @click=\"emit('select', cafe.id)\">\n    <h3 class=\"cafe-name\">{{ cafe.name }}</h3>\n    <p class=\"cafe-district\">{{ cafe.district }}</p>\n    <p class=\"cafe-rating\">评分：{{ cafe.rating }}</p>\n    <p class=\"cafe-signature\">招牌饮品：{{ cafe.signatureDrink }}</p>\n  </article>\n</template>\n\n<style scoped>\n.cafe-card {\n  border: 1px solid #e0e0e0;\n  border-radius: 8px;\n  padding: 12px;\n  cursor: pointer;\n  background: #fff;\n}\n.cafe-card:hover {\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);\n}\n.cafe-name {\n  margin: 0 0 8px;\n  font-size: 18px;\n}\n.cafe-card p {\n  margin: 4px 0;\n  font-size: 14px;\n  color: #555;\n}\n</style>\n",
+      "src/components/CafeDetail.vue": "<script setup lang=\"ts\">\nimport type { Cafe } from '../data/cafes';\n\ndefineProps<{ cafe: Cafe | null }>();\n</script>\n\n<template>\n  <section class=\"cafe-detail\" data-ai-component=\"cafe-detail\">\n    <template v-if=\"cafe\">\n      <h2 class=\"detail-title\">{{ cafe.name }}</h2>\n      <p class=\"detail-line\">城区：{{ cafe.district }}</p>\n      <p class=\"detail-line\">评分：{{ cafe.rating }}</p>\n      <p class=\"detail-line\">招牌饮品：{{ cafe.signature }}</p>\n      <p class=\"detail-desc\">{{ cafe.description }}</p>\n    </template>\n    <p v-else class=\"detail-empty\">点击上方咖啡馆卡片查看详情</p>\n  </section>\n</template>\n\n<style scoped>\n.cafe-detail {\n  margin-top: 24px;\n  border: 1px solid #ddd;\n  border-radius: 8px;\n  padding: 16px;\n  background: #fafafa;\n}\n.detail-title {\n  margin: 0 0 8px;\n  font-size: 20px;\n}\n.detail-line {\n  margin: 4px 0;\n  font-size: 14px;\n  color: #444;\n}\n.detail-desc {\n  margin: 10px 0 0;\n  font-size: 14px;\n  color: #333;\n}\n.detail-empty {\n  margin: 0;\n  color: #888;\n}\n</style>\n",
+      "src/data/cafes.ts": "export interface Cafe {\n  id: number;\n  name: string;\n  district: string;\n  rating: number;\n  signature: string;\n  description: string;\n}\n\nexport const cafes: Cafe[] = [\n  {\n    id: 1,\n    name: '云间咖啡',\n    district: '静安区',\n    rating: 4.8,\n    signature: '桂花拿铁',\n    description: '坐落于老弄堂中的安静小店，以手冲与桂花风味拿铁闻名，适合午后阅读。'\n  },\n  {\n    id: 2,\n    name: '梧桐树下',\n    district: '徐汇区',\n    rating: 4.6,\n    signature: '海盐焦糖玛奇朵',\n    description: '梧桐掩映的街角咖啡馆，主打海盐焦糖系列，露天座位深受附近居民喜爱。'\n  },\n  {\n    id: 3,\n    name: '外滩一号烘焙',\n    district: '黄浦区',\n    rating: 4.7,\n    signature: '燕麦冷萃',\n    description: '临近外滩的自烘焙工坊，每日现烘咖啡豆，燕麦冷萃清爽回甘。'\n  },\n  {\n    id: 4,\n    name: '长宁小院',\n    district: '长宁区',\n    rating: 4.5,\n    signature: '陈皮美式',\n    description: '带小院子的社区咖啡馆，陈皮美式独特清新，常有邻里猫咪光顾。'\n  },\n  {\n    id: 5,\n    name: '陆家嘴云端',\n    district: '浦东新区',\n    rating: 4.9,\n    signature: '氮气冷萃',\n    description: '高层写字楼中的现代咖啡馆，可俯瞰城市天际线，氮气冷萃口感绵密。'\n  },\n  {\n    id: 6,\n    name: '老北站咖啡',\n    district: '静安区',\n    rating: 4.3,\n    signature: '黑糖珍珠拿铁',\n    description: '怀旧风格的街边小店，黑糖珍珠拿铁甜而不腻，价格亲民。'\n  }\n];\n",
+      "src/pages/CatalogPage.vue": "<script setup lang=\"ts\">\nimport { computed, ref } from 'vue';\nimport CafeCard from '../components/CafeCard.vue';\nimport CafeDetail from '../components/CafeDetail.vue';\nimport { cafes } from '../data/cafes';\nimport type { Cafe } from '../data/cafes';\n\nconst districts = computed<string[]>(() => {\n  const set: string[] = [];\n  for (const cafe of cafes) {\n    if (!set.includes(cafe.district)) {\n      set.push(cafe.district);\n    }\n  }\n  return set;\n});\n\nconst selectedDistrict = ref<string>('all');\nconst searchText = ref<string>('');\nconst selectedCafe = ref<Cafe | null>(null);\n\nconst filteredCafes = computed<Cafe[]>(() => {\n  const keyword = searchText.value.trim();\n  return cafes.filter((cafe) => {\n    const districtOk = selectedDistrict.value === 'all' || cafe.district === selectedDistrict.value;\n    const nameOk = keyword === '' || cafe.name.includes(keyword);\n    return districtOk && nameOk;\n  });\n});\n\nfunction selectCafe(id: number): void {\n  selectedCafe.value = cafes.find((cafe) => cafe.id === id) ?? null;\n}\n</script>\n\n<template>\n  <main class=\"catalog-page\" data-ai-component=\"catalog-page\">\n    <h1 class=\"page-title\">城市咖啡馆目录</h1>\n    <div class=\"filters\">\n      <label class=\"filter-label\" for=\"district-select\">城区筛选</label>\n      <select id=\"district-select\" v-model=\"selectedDistrict\" class=\"filter-select\" data-testid=\"district-select\">\n        <option value=\"all\">全部城区</option>\n        <option v-for=\"district in districts\" :key=\"district\" :value=\"district\">{{ district }}</option>\n      </select>\n      <label class=\"filter-label\" for=\"search-input\">按名称搜索</label>\n      <input id=\"search-input\" v-model=\"searchText\" type=\"text\" class=\"filter-input\" placeholder=\"输入咖啡馆名称\" data-testid=\"search-input\" />\n    </div>\n    <p class=\"result-count\" data-testid=\"result-count\">共 {{ filteredCafes.length }} 家咖啡馆</p>\n    <div class=\"cafe-list\">\n      <CafeCard\n        v-for=\"cafe in filteredCafes\"\n        :key=\"cafe.id\"\n        :cafe=\"cafe\"\n        @select=\"selectCafe\"\n      />\n    </div>\n    <p v-if=\"filteredCafes.length === 0\" class=\"empty-tip\" data-testid=\"empty-tip\">没有符合条件的咖啡馆</p>\n    <CafeDetail v-if=\"selectedCafe\" :cafe=\"selectedCafe\" />\n  </main>\n</template>\n\n<style scoped>\n.catalog-page {\n  max-width: 960px;\n  margin: 0 auto;\n  padding: 24px 16px;\n}\n.page-title {\n  margin: 0 0 16px;\n  font-size: 24px;\n}\n.filters {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  gap: 8px 12px;\n  margin-bottom: 12px;\n}\n.filter-label {\n  font-size: 14px;\n  color: #333;\n}\n.filter-select,\n.filter-input {\n  padding: 6px 8px;\n  border: 1px solid #ccc;\n  border-radius: 6px;\n  font-size: 14px;\n}\n.result-count {\n  margin: 0 0 12px;\n  font-size: 14px;\n  color: #666;\n}\n.cafe-list {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));\n  gap: 16px;\n}\n.empty-tip {\n  color: #999;\n}\n</style>\n"
+    },
+    "digests": [
+      {
+        "path": "src/components/CafeCard.vue",
+        "bytes": 872,
+        "digest": "sha256:c0065f70fbcc005626853dde74f4f60ac0688e184a53c4d180ec70344448188f"
+      },
+      {
+        "path": "src/components/CafeDetail.vue",
+        "bytes": 1030,
+        "digest": "sha256:cffc03c880d439a40e72952d0a803ec196c808575170ddf8cd01be5cc4fa09af"
+      },
+      {
+        "path": "src/data/cafes.ts",
+        "bytes": 1588,
+        "digest": "sha256:c127f1389b82821225c19426e5d34886ad39aedff90aa760f89e8e7c5c9951a4"
+      },
+      {
+        "path": "src/pages/CatalogPage.vue",
+        "bytes": 2925,
+        "digest": "sha256:11a97aa8d5a603fb52db7e67848389da9cdc3ed4558851807df12cb01e796ad9"
+      }
+    ],
+    "actions": [
+      {
+        "type": "navigate",
+        "path": "/catalog"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "result-count"
+        },
+        "value": "共 6 家咖啡馆"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "云间咖啡"
+        },
+        "value": "云间咖啡"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "老北站咖啡"
+        },
+        "value": "老北站咖啡"
+      },
+      {
+        "type": "select",
+        "target": {
+          "testId": "district-select"
+        },
+        "value": "静安区"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "result-count"
+        },
+        "value": "共 2 家咖啡馆"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "云间咖啡"
+        },
+        "value": "云间咖啡"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "老北站咖啡"
+        },
+        "value": "老北站咖啡"
+      },
+      {
+        "type": "select",
+        "target": {
+          "testId": "district-select"
+        },
+        "value": "all"
+      },
+      {
+        "type": "fill",
+        "target": {
+          "testId": "search-input"
+        },
+        "value": "梧桐"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "result-count"
+        },
+        "value": "共 1 家咖啡馆"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "梧桐树下"
+        },
+        "value": "梧桐树下"
+      },
+      {
+        "type": "fill",
+        "target": {
+          "testId": "search-input"
+        },
+        "value": ""
+      },
+      {
+        "type": "click",
+        "target": {
+          "role": "heading",
+          "name": "云间咖啡"
+        }
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "云间咖啡"
+        },
+        "value": "云间咖啡"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "role": "heading",
+          "name": "梧桐树下"
+        },
+        "value": "梧桐树下"
+      }
+    ],
+    "plan": {
+      "schemaVersion": 1,
+      "template": "VUE",
+      "dataMode": "MOCK",
+      "pages": [
+        {
+          "route": "/catalog",
+          "file": "src/pages/CatalogPage.vue",
+          "title": "城市咖啡馆目录",
+          "purpose": "展示 6 家咖啡馆的卡片列表，支持城区下拉筛选、名称搜索，点击卡片在列表下方显示详情。"
+        }
+      ],
+      "components": [
+        {
+          "name": "CafeCard",
+          "file": "src/components/CafeCard.vue",
+          "purpose": "展示单家咖啡馆的名称、城区、评分和招牌饮品，并发出点击选择事件。"
+        },
+        {
+          "name": "CafeDetail",
+          "file": "src/components/CafeDetail.vue",
+          "purpose": "在列表下方展示所选咖啡馆的详细信息，未选择时显示提示。"
+        }
+      ],
+      "files": [
+        {
+          "path": "src/pages/CatalogPage.vue",
+          "purpose": "页面主体：搜索框、城区下拉、卡片列表与详情区域，包含 Mock 数据筛选逻辑。"
+        },
+        {
+          "path": "src/components/CafeCard.vue",
+          "purpose": "咖啡馆卡片组件，显示名称、城区、评分、招牌饮品。"
+        },
+        {
+          "path": "src/components/CafeDetail.vue",
+          "purpose": "咖啡馆详情组件，展示所选咖啡馆的完整信息。"
+        },
+        {
+          "path": "src/data/cafes.ts",
+          "purpose": "本地 Mock 数据：6 家咖啡馆的名称、城区、评分、招牌饮品及详情描述。"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "A1",
+          "route": "/catalog",
+          "action": "打开 /catalog 页面，观察咖啡馆列表。",
+          "expected": "列表显示 6 张咖啡馆卡片，每张含名称、城区、评分和招牌饮品。"
+        },
+        {
+          "id": "A2",
+          "route": "/catalog",
+          "action": "在城区下拉框中选择某个城区。",
+          "expected": "列表仅显示该城区的咖啡馆，其他城区卡片消失。"
+        },
+        {
+          "id": "A3",
+          "route": "/catalog",
+          "action": "在搜索框输入某咖啡馆名称的部分文字。",
+          "expected": "列表实时过滤，仅保留名称匹配的咖啡馆。"
+        },
+        {
+          "id": "A4",
+          "route": "/catalog",
+          "action": "点击任意一张咖啡馆卡片。",
+          "expected": "列表下方出现该咖啡馆的详情区域，显示其完整信息。"
+        },
+        {
+          "id": "A5",
+          "route": "/catalog",
+          "action": "点击另一张咖啡馆卡片。",
+          "expected": "详情区域更新为新选中的咖啡馆内容。"
+        }
+      ],
+      "capabilities": {
+        "backend": false,
+        "payments": false,
+        "externalServices": [],
+        "dependencies": []
+      }
+    },
+    "prompt": "生成一个城市咖啡馆目录：使用 Mock 数据列出 6 家咖啡馆（名称、所在城区、评分、招牌饮品）；可以通过下拉框按城区筛选，也可以按名称搜索；点击咖啡馆卡片后在列表下方显示该咖啡馆的详情。"
+  },
+  "tools": {
+    "batch": "2026-10-30T02-28-18Z-real-f1960e81",
+    "sample": "CAT-03",
+    "version": 1,
+    "versionId": "b76616c3-eaf7-4245-aafa-04b9a91ddc14",
+    "recordDigest": "sha256:fd861ba5e5a6e07a189110be13add0373d60c042a859cc37fc1daed68ab408db",
+    "sourceDigest": "sha256:7eec16bb9b3c638a1a5b8618717f7d7e975799b6f8dd9f89b5a71acca51894a0",
+    "files": {
+      "src/components/ToolCard.vue": "<script setup lang=\"ts\">\nimport type { Tool } from '../data/tools';\n\ntype ToolCardProps = { tool: Tool };\n\ndefineProps<ToolCardProps>();\nconst emit = defineEmits<{ (e: 'select', id: string): void }>();\n\nfunction onSelect(id: string): void {\n  emit('select', id);\n}\n</script>\n\n<template>\n  <li class=\"tool-card\" data-ai-component=\"tool-card\">\n    <button class=\"tool-name\" type=\"button\" :data-testid=\"`tool-name-${tool.id}`\" @click=\"onSelect(tool.id)\">\n      {{ tool.name }}\n    </button>\n    <div class=\"meta\">\n      <span class=\"category\">类别：{{ tool.category }}</span>\n      <span class=\"license\">许可证：{{ tool.license }}</span>\n    </div>\n    <p class=\"summary\">{{ tool.summary }}</p>\n  </li>\n</template>\n\n<style scoped>\n.tool-card {\n  list-style: none;\n  border: 1px solid #d8dee9;\n  border-radius: 8px;\n  padding: 12px 14px;\n  background: #fff;\n}\n.tool-name {\n  background: none;\n  border: none;\n  padding: 0;\n  font-size: 17px;\n  font-weight: 600;\n  color: #1f6feb;\n  cursor: pointer;\n}\n.tool-name:hover {\n  text-decoration: underline;\n}\n.meta {\n  display: flex;\n  gap: 12px;\n  margin: 6px 0;\n  font-size: 13px;\n  color: #57606a;\n}\n.summary {\n  margin: 0;\n  font-size: 14px;\n  color: #24292f;\n}\n</style>\n",
+      "src/components/ToolDetail.vue": "<script setup lang=\"ts\">\nimport type { Tool } from '../data/tools';\n\ntype ToolDetailProps = { tool: Tool };\n\ndefineProps<ToolDetailProps>();\nconst emit = defineEmits<{ (e: 'close'): void }>();\n</script>\n\n<template>\n  <section class=\"tool-detail\" data-ai-component=\"tool-detail\">\n    <h2 class=\"detail-name\" data-testid=\"detail-name\">{{ tool.name }}</h2>\n    <div class=\"meta\">\n      <span data-testid=\"detail-category\">类别：{{ tool.category }}</span>\n      <span data-testid=\"detail-license\">许可证：{{ tool.license }}</span>\n    </div>\n    <p class=\"summary\" data-testid=\"detail-summary\">{{ tool.summary }}</p>\n    <p class=\"detail-text\" data-testid=\"detail-text\">{{ tool.detail }}</p>\n    <button class=\"close\" type=\"button\" data-testid=\"detail-close\" @click=\"emit('close')\">关闭</button>\n  </section>\n</template>\n\n<style scoped>\n.tool-detail {\n  border: 1px solid #1f6feb;\n  border-radius: 8px;\n  padding: 14px 16px;\n  background: #f6f8fa;\n  margin-bottom: 16px;\n}\n.detail-name {\n  margin: 0 0 6px;\n  font-size: 20px;\n}\n.meta {\n  display: flex;\n  gap: 12px;\n  font-size: 13px;\n  color: #57606a;\n  margin-bottom: 6px;\n}\n.summary {\n  font-size: 14px;\n  font-weight: 600;\n  margin: 6px 0;\n}\n.detail-text {\n  font-size: 14px;\n  color: #24292f;\n  margin: 6px 0 10px;\n}\n.close {\n  padding: 4px 12px;\n  border: 1px solid #d0d7de;\n  border-radius: 6px;\n  background: #fff;\n  cursor: pointer;\n}\n</style>\n",
+      "src/data/tools.ts": "export type ToolCategory = '构建' | '测试' | '文档';\n\nexport interface Tool {\n  id: string;\n  name: string;\n  category: ToolCategory;\n  license: string;\n  summary: string;\n  detail: string;\n}\n\nexport const tools: Tool[] = [\n  {\n    id: 'vite',\n    name: 'Vite',\n    category: '构建',\n    license: 'MIT',\n    summary: '下一代前端构建工具，提供极速的开发服务器与生产构建。',\n    detail: 'Vite 由 Vue 作者尤雨溪发起，利用浏览器原生 ES 模块实现闪电般的冷启动，并内置 Rollup 完成生产构建。',\n  },\n  {\n    id: 'rollup',\n    name: 'Rollup',\n    category: '构建',\n    license: 'MIT',\n    summary: '面向 ES 模块的 JavaScript 打包器，输出精简的构建产物。',\n    detail: 'Rollup 以 tree-shaking 著称，适合打包库与应用程序，是众多构建工具的核心依赖。',\n  },\n  {\n    id: 'esbuild',\n    name: 'esbuild',\n    category: '构建',\n    license: 'MIT',\n    summary: '用 Go 编写的极快 JavaScript 打包与压缩工具。',\n    detail: 'esbuild 通过并行编译与 Go 语言性能优势，将构建速度提升到传统工具的数倍，并支持 TypeScript 与 CSS。',\n  },\n  {\n    id: 'vitest',\n    name: 'Vitest',\n    category: '测试',\n    license: 'MIT',\n    summary: '由 Vite 驱动的单元测试框架，配置简单、运行迅速。',\n    detail: 'Vitest 提供与 Jest 兼容的 API，支持快照、覆盖率与并发测试，并与 Vite 的模块解析无缝集成。',\n  },\n  {\n    id: 'playwright',\n    name: 'Playwright',\n    category: '测试',\n    license: 'Apache-2.0',\n    summary: '跨浏览器的端到端测试框架，支持 Chromium、Firefox 与 WebKit。',\n    detail: 'Playwright 提供自动等待、追踪与并行执行能力，适合编写稳定的端到端测试。',\n  },\n  {\n    id: 'jest',\n    name: 'Jest',\n    category: '测试',\n    license: 'MIT',\n    summary: '流行的 JavaScript 测试框架，开箱即用无需额外配置。',\n    detail: 'Jest 内置断言、Mock 与覆盖率统计，广泛应用于 React、Node 等生态的单元测试。',\n  },\n  {\n    id: 'vitepress',\n    name: 'VitePress',\n    category: '文档',\n    license: 'MIT',\n    summary: '基于 Vite 与 Vue 的静态站点生成器，专注文档编写。',\n    detail: 'VitePress 支持 Markdown 内嵌 Vue 组件、快速热更新与主题定制，适合构建技术文档站点。',\n  },\n  {\n    id: 'docusaurus',\n    name: 'Docusaurus',\n    category: '文档',\n    license: 'MIT',\n    summary: '由 Meta 开源的文档站点框架，支持版本化与多语言。',\n    detail: 'Docusaurus 提供内置搜索、博客与版本管理能力，帮助团队快速搭建文档中心。',\n  },\n  {\n    id: 'typedoc',\n    name: 'TypeDoc',\n    category: '文档',\n    license: 'Apache-2.0',\n    summary: '从 TypeScript 源码注释自动生成 API 文档。',\n    detail: 'TypeDoc 解析 TypeScript 类型与 JSDoc 注释，输出风格一致的静态文档站点。',\n  },\n];\n",
+      "src/pages/CatalogPage.vue": "<script setup lang=\"ts\">\nimport { computed, ref } from 'vue';\nimport ToolCard from '../components/ToolCard.vue';\nimport ToolDetail from '../components/ToolDetail.vue';\nimport { tools } from '../data/tools';\nimport type { Tool, ToolCategory } from '../data/tools';\n\nconst categories: ToolCategory[] = ['构建', '测试', '文档'];\nconst keyword = ref<string>('');\nconst category = ref<string>('全部');\nconst selectedId = ref<string>('');\n\nconst filtered = computed<Tool[]>(() => {\n  const kw = keyword.value.trim().toLowerCase();\n  return tools.filter((t) => {\n    const matchKw =\n      kw === '' ||\n      t.name.toLowerCase().includes(kw) ||\n      t.summary.toLowerCase().includes(kw);\n    const matchCat = category.value === '全部' || t.category === category.value;\n    return matchKw && matchCat;\n  });\n});\n\nconst selected = computed<Tool | null>(\n  () => tools.find((t) => t.id === selectedId.value) ?? null,\n);\n\nfunction onSelect(id: string): void {\n  selectedId.value = id;\n}\n\nfunction onClose(): void {\n  selectedId.value = '';\n}\n</script>\n\n<template>\n  <main class=\"catalog-page\" data-ai-component=\"catalog-page\">\n    <h1>开源工具目录</h1>\n    <div class=\"controls\">\n      <input\n        v-model=\"keyword\"\n        class=\"search\"\n        type=\"text\"\n        placeholder=\"搜索工具关键字\"\n        data-testid=\"search-input\"\n      />\n      <select v-model=\"category\" class=\"category-select\" data-testid=\"category-select\">\n        <option value=\"全部\">全部</option>\n        <option v-for=\"c in categories\" :key=\"c\" :value=\"c\">{{ c }}</option>\n      </select>\n    </div>\n\n    <ToolDetail v-if=\"selected\" :tool=\"selected\" @close=\"onClose\" />\n\n    <ul v-if=\"filtered.length > 0\" class=\"tool-list\">\n      <ToolCard v-for=\"t in filtered\" :key=\"t.id\" :tool=\"t\" @select=\"onSelect\" />\n    </ul>\n    <p v-else class=\"empty\" data-testid=\"empty-state\">没有匹配的工具</p>\n  </main>\n</template>\n\n<style scoped>\n.catalog-page {\n  max-width: 860px;\n  margin: 0 auto;\n  padding: 16px;\n  font-family: system-ui, sans-serif;\n}\nh1 {\n  font-size: 22px;\n  margin: 0 0 12px;\n}\n.controls {\n  display: flex;\n  gap: 10px;\n  margin-bottom: 16px;\n}\n.search {\n  flex: 1;\n  padding: 6px 10px;\n  border: 1px solid #d0d7de;\n  border-radius: 6px;\n}\n.category-select {\n  padding: 6px 10px;\n  border: 1px solid #d0d7de;\n  border-radius: 6px;\n}\n.tool-list {\n  display: grid;\n  gap: 10px;\n  margin: 0;\n  padding: 0;\n}\n.empty {\n  padding: 24px;\n  text-align: center;\n  color: #57606a;\n}\n</style>\n"
+    },
+    "digests": [
+      {
+        "path": "src/components/ToolCard.vue",
+        "bytes": 1221,
+        "digest": "sha256:99b72d716b78e26972d3482fc9abf68eee7a50d1979171cd3e41eeb53467f82b"
+      },
+      {
+        "path": "src/components/ToolDetail.vue",
+        "bytes": 1408,
+        "digest": "sha256:6233f3b705614faf8598002114ceca2cfc1395cd0d92a1787d1d3755c95f466a"
+      },
+      {
+        "path": "src/data/tools.ts",
+        "bytes": 3001,
+        "digest": "sha256:8ca8855ec6e73590c187aa703498f9d22b6c67723521b1853c31209e402e9cc6"
+      },
+      {
+        "path": "src/pages/CatalogPage.vue",
+        "bytes": 2491,
+        "digest": "sha256:50153f05bafc36a87ee57f5a05808fae3695dc7572183ab7e890208496543b84"
+      }
+    ],
+    "actions": [
+      {
+        "type": "navigate",
+        "path": "/catalog"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "tool-name-vite"
+        },
+        "value": "Vite"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "tool-name-typedoc"
+        },
+        "value": "TypeDoc"
+      },
+      {
+        "type": "fill",
+        "target": {
+          "testId": "search-input"
+        },
+        "value": "build"
+      },
+      {
+        "type": "expectVisible",
+        "target": {
+          "testId": "empty-state"
+        }
+      },
+      {
+        "type": "fill",
+        "target": {
+          "testId": "search-input"
+        },
+        "value": ""
+      },
+      {
+        "type": "select",
+        "target": {
+          "testId": "category-select"
+        },
+        "value": "测试"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "tool-name-vitest"
+        },
+        "value": "Vitest"
+      },
+      {
+        "type": "fill",
+        "target": {
+          "testId": "search-input"
+        },
+        "value": "doc"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "tool-name-docusaurus"
+        },
+        "value": "Docusaurus"
+      },
+      {
+        "type": "fill",
+        "target": {
+          "testId": "search-input"
+        },
+        "value": "zzzz"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "empty-state"
+        },
+        "value": "没有匹配的工具"
+      },
+      {
+        "type": "reload"
+      },
+      {
+        "type": "click",
+        "target": {
+          "testId": "tool-name-playwright"
+        }
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "detail-name"
+        },
+        "value": "Playwright"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "detail-license"
+        },
+        "value": "许可证：Apache-2.0"
+      },
+      {
+        "type": "click",
+        "target": {
+          "testId": "detail-close"
+        }
+      },
+      {
+        "type": "expectVisible",
+        "target": {
+          "testId": "tool-name-playwright"
+        }
+      }
+    ],
+    "plan": {
+      "schemaVersion": 1,
+      "template": "VUE",
+      "dataMode": "STATIC",
+      "pages": [
+        {
+          "route": "/catalog",
+          "file": "src/pages/CatalogPage.vue",
+          "title": "开源工具目录",
+          "purpose": "展示 9 个开源工具，支持关键字搜索与类别筛选组合生效，空结果显示“没有匹配的工具”，点击名称查看详情。"
+        }
+      ],
+      "components": [
+        {
+          "name": "ToolCard",
+          "file": "src/components/ToolCard.vue",
+          "purpose": "展示单个工具的名称、类别、许可证与简介，点击名称触发详情查看。"
+        },
+        {
+          "name": "ToolDetail",
+          "file": "src/components/ToolDetail.vue",
+          "purpose": "显示所选工具的完整详情并可关闭返回列表。"
+        }
+      ],
+      "files": [
+        {
+          "path": "src/pages/CatalogPage.vue",
+          "purpose": "目录页：搜索框、类别筛选、工具网格、空状态与详情面板。"
+        },
+        {
+          "path": "src/components/ToolCard.vue",
+          "purpose": "工具卡片组件。"
+        },
+        {
+          "path": "src/components/ToolDetail.vue",
+          "purpose": "工具详情面板组件。"
+        },
+        {
+          "path": "src/data/tools.ts",
+          "purpose": "静态工具数据：9 条记录，含名称、类别（构建/测试/文档）、许可证、一句简介与详情字段。"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "A1",
+          "route": "/catalog",
+          "action": "打开 /catalog 页面。",
+          "expected": "显示 9 个工具卡片，每张包含名称、类别、许可证和一句简介。"
+        },
+        {
+          "id": "A2",
+          "route": "/catalog",
+          "action": "在关键字搜索框输入“build”。",
+          "expected": "列表仅显示名称或简介包含“build”的工具。"
+        },
+        {
+          "id": "A3",
+          "route": "/catalog",
+          "action": "选择类别筛选“测试”。",
+          "expected": "列表仅显示类别为测试的工具。"
+        },
+        {
+          "id": "A4",
+          "route": "/catalog",
+          "action": "同时输入关键字“doc”并选择类别“文档”。",
+          "expected": "列表仅显示同时满足关键字与类别条件的工具。"
+        },
+        {
+          "id": "A5",
+          "route": "/catalog",
+          "action": "输入不存在的关键字“zzzz”。",
+          "expected": "列表为空并显示“没有匹配的工具”。"
+        },
+        {
+          "id": "A6",
+          "route": "/catalog",
+          "action": "点击某个工具名称。",
+          "expected": "显示该工具的详情（名称、类别、许可证、简介等），并可关闭返回列表。"
+        }
+      ],
+      "capabilities": {
+        "backend": false,
+        "payments": false,
+        "externalServices": [],
+        "dependencies": []
+      }
+    },
+    "prompt": "生成一个开源工具目录页：静态数据包含 9 个工具（名称、类别：构建/测试/文档、许可证、一句简介）；支持关键字搜索与类别筛选同时生效，没有匹配结果时显示“没有匹配的工具”；点击工具名称查看该工具的详情。"
+  },
+  "books": {
+    "batch": "2026-10-30T02-41-32Z-real-c3368088",
+    "sample": "FAULT-CODE-03",
+    "version": 2,
+    "versionId": "67abe322-9ed8-492a-9eed-595be8abe53b",
+    "recordDigest": "sha256:755f737ba43c5cb9b9d4b1fd44fea7e3139890b2acc7bc8a11ba113f8862863b",
+    "sourceDigest": "sha256:ed78255c68ebefe961f8efe9d88911d9085aec8072803f9e44f079355d718cf4",
+    "files": {
+      "src/data/books.ts": "export type BookCategory = '小说' | '科技' | '历史';\n\nexport interface Book {\n  id: number;\n  title: string;\n  author: string;\n  category: BookCategory;\n  summary: string;\n}\n\nexport const books: Book[] = [\n  {\n    id: 1,\n    title: '三体',\n    author: '刘慈欣',\n    category: '小说',\n    summary: '人类文明与三体文明在宇宙中的生死博弈。'\n  },\n  {\n    id: 2,\n    title: '活着',\n    author: '余华',\n    category: '小说',\n    summary: '福贵一生坎坷，讲述苦难中生命的坚韧。'\n  },\n  {\n    id: 3,\n    title: '百年孤独',\n    author: '加西亚·马尔克斯',\n    category: '小说',\n    summary: '布恩迪亚家族七代人的传奇与孤独。'\n  },\n  {\n    id: 4,\n    title: '代码大全',\n    author: '史蒂夫·迈克康奈尔',\n    category: '科技',\n    summary: '软件构建实践的权威指南，覆盖编码与调试。'\n  },\n  {\n    id: 5,\n    title: '深入理解计算机系统',\n    author: 'Randal E. Bryant',\n    category: '科技',\n    summary: '从程序员视角剖析计算机系统的底层原理。'\n  },\n  {\n    id: 6,\n    title: '明朝那些事儿',\n    author: '当年明月',\n    category: '历史',\n    summary: '以通俗笔法讲述明朝三百年的兴衰故事。'\n  },\n  {\n    id: 7,\n    title: '万历十五年',\n    author: '黄仁宇',\n    category: '历史',\n    summary: '从一年切入，透视明代社会的深层结构。'\n  },\n  {\n    id: 8,\n    title: '人类简史',\n    author: '尤瓦尔·赫拉利',\n    category: '历史',\n    summary: '从认知革命到科学革命，梳理人类的演进。'\n  }\n];\n",
+      "src/pages/CatalogPage.vue": "<script setup lang=\"ts\">\nimport { computed, ref } from 'vue';\nimport { books } from '../data/books';\nimport type { Book, BookCategory } from '../data/books';\n\ntype Filter = '全部' | BookCategory;\n\nconst query = ref<string>('');\nconst filter = ref<Filter>('全部');\nconst selected = ref<Book | null>(null);\n\nconst filters: Filter[] = ['全部', '小说', '科技', '历史'];\n\nconst filtered = computed<Book[]>(() => {\n  const q = query.value.trim();\n  return books.filter((b) => {\n    const matchQuery = q === '' || b.title.includes(q) || b.author.includes(q);\n    const matchFilter = filter.value === '全部' || b.category === filter.value;\n    return matchQuery && matchFilter;\n  });\n});\n\nfunction selectBook(b: Book): void {\n  selected.value = b;\n}\n</script>\n\n<template>\n  <main data-ai-component=\"catalog-page\" class=\"catalog\">\n    <h1 class=\"title\">图书目录</h1>\n\n    <div class=\"controls\">\n      <input\n        v-model=\"query\"\n        class=\"search\"\n        data-testid=\"search-input\"\n        type=\"text\"\n        placeholder=\"按书名或作者搜索\"\n      />\n      <div class=\"filters\">\n        <button\n          v-for=\"f in filters\"\n          :key=\"f\"\n          class=\"filter-btn\"\n          :class=\"{ active: filter === f }\"\n          type=\"button\"\n          @click=\"filter = f\"\n        >\n          {{ f }}\n        </button>\n      </div>\n    </div>\n\n    <p class=\"count\" data-testid=\"result-count\">\n      {{ filtered.length }} 本图书\n    </p>\n\n    <ul class=\"list\" data-testid=\"book-list\">\n      <li v-for=\"b in filtered\" :key=\"b.id\" class=\"book-card\">\n        <button class=\"book-btn\" type=\"button\" @click=\"selectBook(b)\">\n          <span class=\"book-title\">{{ b.title }}</span>\n          <span class=\"book-author\">{{ b.author }}</span>\n          <span class=\"book-cat\">{{ b.category }}</span>\n        </button>\n      </li>\n    </ul>\n\n    <p v-if=\"filtered.length === 0\" class=\"empty\" data-testid=\"empty\">\n      没有匹配的图书\n    </p>\n\n    <section v-if=\"selected\" class=\"detail\" data-testid=\"detail\">\n      <h2 class=\"detail-title\">{{ selected.title }}</h2>\n      <p class=\"detail-author\" data-testid=\"detail-author\">{{ selected.author }}</p>\n      <p class=\"detail-cat\" data-testid=\"detail-category\">{{ selected.category }}</p>\n      <p class=\"detail-summary\" data-testid=\"detail-summary\">{{ selected.summary }}</p>\n    </section>\n  </main>\n</template>\n\n<style scoped>\n.catalog {\n  max-width: 760px;\n  margin: 0 auto;\n  padding: 24px 16px;\n  font-family: system-ui, sans-serif;\n}\n.title {\n  font-size: 24px;\n  margin-bottom: 16px;\n}\n.controls {\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  margin-bottom: 12px;\n}\n.search {\n  padding: 8px 10px;\n  font-size: 14px;\n  border: 1px solid #ccc;\n  border-radius: 6px;\n}\n.filters {\n  display: flex;\n  gap: 8px;\n}\n.filter-btn {\n  padding: 6px 14px;\n  border: 1px solid #ccc;\n  border-radius: 999px;\n  background: #fff;\n  cursor: pointer;\n}\n.filter-btn.active {\n  background: #3459e6;\n  color: #fff;\n  border-color: #3459e6;\n}\n.count {\n  color: #666;\n  font-size: 13px;\n}\n.list {\n  list-style: none;\n  padding: 0;\n  margin: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n.book-btn {\n  width: 100%;\n  text-align: left;\n  padding: 12px;\n  border: 1px solid #e0e0e0;\n  border-radius: 8px;\n  background: #fafafa;\n  display: flex;\n  gap: 12px;\n  cursor: pointer;\n}\n.book-title {\n  font-weight: 600;\n}\n.book-author {\n  color: #555;\n}\n.book-cat {\n  margin-left: auto;\n  color: #3459e6;\n  font-size: 13px;\n}\n.empty {\n  color: #999;\n}\n.detail {\n  margin-top: 20px;\n  padding: 16px;\n  border: 1px solid #d5defa;\n  border-radius: 8px;\n  background: #f4f7ff;\n}\n.detail-title {\n  margin: 0 0 8px;\n  font-size: 20px;\n}\n.detail p {\n  margin: 4px 0;\n}\n</style>\n"
+    },
+    "digests": [
+      {
+        "path": "src/data/books.ts",
+        "bytes": 1612,
+        "digest": "sha256:1dfb743dba77aaedf76f42797e72e27c8cb93a4f8589b805ec3953254a0df78c"
+      },
+      {
+        "path": "src/pages/CatalogPage.vue",
+        "bytes": 3743,
+        "digest": "sha256:11357e1a6676994dce217e382207f4f36ebb0fd609e45f63ab8c8fce16050d1d"
+      }
+    ],
+    "actions": [
+      {
+        "type": "navigate",
+        "path": "/catalog"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "result-count"
+        },
+        "value": "8 本图书"
+      },
+      {
+        "type": "expectVisible",
+        "target": {
+          "testId": "book-list"
+        }
+      },
+      {
+        "type": "fill",
+        "target": {
+          "testId": "search-input"
+        },
+        "value": "三体"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "result-count"
+        },
+        "value": "1 本图书"
+      },
+      {
+        "type": "fill",
+        "target": {
+          "testId": "search-input"
+        },
+        "value": "刘慈欣"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "result-count"
+        },
+        "value": "1 本图书"
+      },
+      {
+        "type": "fill",
+        "target": {
+          "testId": "search-input"
+        },
+        "value": "xqzzz"
+      },
+      {
+        "type": "expectVisible",
+        "target": {
+          "testId": "empty"
+        }
+      },
+      {
+        "type": "fill",
+        "target": {
+          "testId": "search-input"
+        },
+        "value": ""
+      },
+      {
+        "type": "click",
+        "target": {
+          "text": "科技"
+        }
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "result-count"
+        },
+        "value": "2 本图书"
+      },
+      {
+        "type": "click",
+        "target": {
+          "text": "全部"
+        }
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "result-count"
+        },
+        "value": "8 本图书"
+      },
+      {
+        "type": "click",
+        "target": {
+          "text": "三体刘慈欣小说"
+        }
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "detail-author"
+        },
+        "value": "刘慈欣"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "detail-category"
+        },
+        "value": "小说"
+      },
+      {
+        "type": "expectText",
+        "target": {
+          "testId": "detail-summary"
+        },
+        "value": "人类文明与三体文明在宇宙中的生死博弈。"
+      }
+    ],
+    "plan": {
+      "schemaVersion": 1,
+      "template": "VUE",
+      "dataMode": "STATIC",
+      "pages": [
+        {
+          "route": "/catalog",
+          "file": "src/pages/CatalogPage.vue",
+          "title": "图书目录",
+          "purpose": "展示内置 8 本图书，按书名/作者搜索与分类筛选，点击图书显示详情。"
+        }
+      ],
+      "components": [],
+      "files": [
+        {
+          "path": "src/pages/CatalogPage.vue",
+          "purpose": "目录页：搜索框、分类按钮、图书列表与详情区域。"
+        },
+        {
+          "path": "src/data/books.ts",
+          "purpose": "8 本图书的静态数据（书名、作者、分类、简介）。"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "A1",
+          "route": "/catalog",
+          "action": "打开 /catalog 页面",
+          "expected": "显示全部 8 本图书卡片，含书名、作者与分类。"
+        },
+        {
+          "id": "A2",
+          "route": "/catalog",
+          "action": "在搜索框输入某本书的书名片段",
+          "expected": "列表实时过滤，仅显示书名匹配的图书。"
+        },
+        {
+          "id": "A3",
+          "route": "/catalog",
+          "action": "在搜索框输入某位作者名字",
+          "expected": "列表实时过滤，仅显示该书作者的作品。"
+        },
+        {
+          "id": "A4",
+          "route": "/catalog",
+          "action": "点击“科技”分类按钮",
+          "expected": "仅显示分类为科技的图书；点击“全部”恢复 8 本。"
+        },
+        {
+          "id": "A5",
+          "route": "/catalog",
+          "action": "点击一本图书",
+          "expected": "详情区域显示该书的书名、作者、分类与简介。"
+        }
+      ],
+      "capabilities": {
+        "backend": false,
+        "payments": false,
+        "externalServices": [],
+        "dependencies": []
+      }
+    },
+    "prompt": "生成一个图书目录页：内置 8 本图书的静态数据（书名、作者、分类：小说/科技/历史、一句简介）；提供搜索框按书名或作者实时过滤，提供“全部/小说/科技/历史”分类筛选按钮；点击某本书后显示它的详情区域（书名、作者、分类、简介）。"
+  }
+}
