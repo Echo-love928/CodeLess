@@ -12,7 +12,7 @@ const selected = {
   boundaries: 'D26ReleaseBoundaryTest',
   affected: 'D25QualityRegressionTest,D25QualityPolicyTest,D25ProposalFeedbackTest,AcceptanceActionsTest,RepairPolicyTest,PlanValidatorTest,PublicationIntegrationTest,VersionHttpIntegrationTest,ApiSecurityMatrixTest',
 }
-if (!selected[mode] && mode !== 'gate') throw Error('Expected boundaries, affected or gate')
+if (!selected[mode] && !['gate', 'static', 'mapping-diagnostic'].includes(mode)) throw Error('Expected a registered D26-A verification mode')
 const git = (...args) => {
   const r = spawnSync('git', ['-c', `safe.directory=${root.replaceAll('\\', '/')}`, ...args], { cwd: root, encoding: 'utf8' })
   if (r.status !== 0) throw Error(r.stderr)
@@ -39,8 +39,10 @@ const manifest = () => Object.fromEntries(sources.map(p => [p, hash(readFileSync
 const sourceBefore = manifest()
 const screenshots = new Map(mode === 'gate' ? git('ls-files', '*.png').split(/\r?\n/).filter(Boolean).map(p => [p, readFileSync(join(root, p))]) : [])
 const win = process.platform === 'win32'
-const command = mode === 'gate' ? process.execPath : win ? (env.ComSpec ?? 'cmd.exe') : './services/api/mvnw'
+const command = mode === 'gate' || mode === 'mapping-diagnostic' ? process.execPath : mode === 'static' ? (win ? (env.ComSpec ?? 'cmd.exe') : 'corepack') : win ? (env.ComSpec ?? 'cmd.exe') : './services/api/mvnw'
 const args = mode === 'gate' ? ['--import', new URL('./stage-observer.mjs', import.meta.url).href, 'scripts/ci-gate.mjs']
+  : mode === 'mapping-diagnostic' ? ['--test', 'tests/infra/mapping.test.mjs']
+  : mode === 'static' ? [...(win ? ['/d', '/c', 'corepack'] : []), 'pnpm', 'run', 'verify:static']
   : [...(win ? ['/d', '/c', 'services\\api\\mvnw.cmd'] : []), '-f', 'services/api/pom.xml', `-Dtest=${selected[mode]}`, 'test']
 const startedAt = new Date().toISOString()
 writeFileSync(join(output, 'started.json'), JSON.stringify({ task: 'D26-A', mode, head, branch, startedAt, command: [command, ...args] }, null, 2))

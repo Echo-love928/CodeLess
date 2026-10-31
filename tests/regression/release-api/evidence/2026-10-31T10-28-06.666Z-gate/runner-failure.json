@@ -1,0 +1,55 @@
+{
+  "task": "D26-A",
+  "issue": "D26-A-RUNNER-01",
+  "status": "OPEN_BLOCKING",
+  "owner": "Runner and shared gate maintainer; coordinate with D26-B",
+  "command": "pnpm verify:runner",
+  "exitCode": 1,
+  "tests": 285,
+  "passed": 276,
+  "failed": 9,
+  "skipped": 0,
+  "originalHead": "3286dd3095aca37a9ac3570f06087c282e26c325",
+  "originalLogSha256": "sha256:14b7aa6a67f5a26a34c2fcedc97bbc6d757d5ea2cf607eca32400e6b908aef5a",
+  "failureLocation": "tests/runner/mapping/acceptance.test.mjs:28",
+  "imageId": "sha256:a79a1714b7c55ba2dc7bbf223311debd01c58a4fde2d9324060b192f57a8e8d0",
+  "actualBuild": {
+    "status": "FAILED",
+    "failure": "INPUT_OR_RUNNER_ERROR",
+    "exitCode": null,
+    "diagnostic": "Docker daemon returned No such image for the already resolved immutable image ID"
+  },
+  "failedTests": [
+    "✖ D12-B-T1: real production build locates a bounded existing immutable source file",
+    "✖ D12-B-T2: real nested and repeated Vue instances select the same shared source scope",
+    "✖ D12-B-T3: even identical source bytes cannot reuse an old version mapping",
+    "✖ D12-B-T4: forged paths, existing-file remaps and malformed mappings are rejected",
+    "✖ missing, dynamic, nested, fragment and duplicate identifiers disable selection in an actual build",
+    "✖ source mismatch and build failure never produce a selectable manifest",
+    "✖ R1: call-site spread and dynamic arguments cannot select another component source",
+    "✖ R2: call-site HTML marker case aliases cannot select the parent source",
+    "✖ R2: root case aliases, duplicate aliases and static bind arguments disable the namespace"
+  ],
+  "independentDiagnostic": {
+    "command": "node --test tests/infra/mapping.test.mjs",
+    "exitCode": 0,
+    "summaries": [
+      "ℹ tests 15",
+      "ℹ pass 15",
+      "ℹ fail 0",
+      "ℹ skipped 0"
+    ]
+  },
+  "observedParallelPreparers": [
+    "tests/infra/build.test.mjs",
+    "tests/infra/d21-evaluation.test.mjs",
+    "tests/infra/mapping.test.mjs",
+    "tests/infra/template.test.mjs",
+    "tests/runner/browser/acceptance.test.mjs"
+  ],
+  "hypothesis": "Several test entries build the same codeless-vue-build:d05 tag. The exact actor/mechanism that made the pinned image unavailable is NOT_CONFIRMED.",
+  "codeFixInThisCard": false,
+  "runnerAssertionChanges": false,
+  "fullRunnerRetried": false,
+  "acceptance": "An isolated pass does not close the original full runner failure. Do not merge or convert ci-gate=1 to success."
+}

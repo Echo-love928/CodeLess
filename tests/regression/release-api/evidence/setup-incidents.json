@@ -1,0 +1,41 @@
+{
+  "task": "D26-A",
+  "source": "Observed tool results in this chat; timestamps absent from a result remain unknown",
+  "incidents": [
+    {
+      "command": "git status --short",
+      "result": "DUBIOUS_OWNERSHIP",
+      "nativeExitCode": null,
+      "resolution": "Use per-command safe.directory for this explicitly authorized repository; no global Git setting changed"
+    },
+    {
+      "command": "git -c safe.directory=F:/JAVA/CodeLess/CodeLess switch -c codex/d26-a-release-blockers",
+      "result": "GIT_METADATA_READ_ONLY",
+      "error": "Unable to create .git/refs/heads/codex/d26-a-release-blockers.lock: Permission denied",
+      "nativeExitCode": null,
+      "resolution": "Same concrete branch operation succeeded through the reviewed escalation; no other work reset"
+    },
+    {
+      "command": "docker info --format '{{.ServerVersion}}'",
+      "result": "SANDBOX_PIPE_ACCESS_DENIED",
+      "nativeExitCode": 1,
+      "resolution": "Real Docker tests ran via explicitly reviewed record.mjs commands, not by weakening runner isolation"
+    },
+    {
+      "command": "node tests/regression/release-api/record.mjs boundaries",
+      "result": "EPERM_BEFORE_MAVEN_LAUNCH",
+      "observedDirectoryTimestamp": "2026-10-31T10:13:11.925Z",
+      "nativeExitCode": 1,
+      "error": "EPERM mkdir .local-data/d26-a/commands/2026-10-31T10-13-11.925Z-boundaries",
+      "resolution": "Same record.mjs boundaries executed through the reviewed escalation, native0 and six actual tests; startup refusal is not a test pass"
+    },
+    {
+      "command": "git -c safe.directory=F:/JAVA/CodeLess/CodeLess push -u origin codex/d26-a-release-blockers",
+      "result": "AUTO_REVIEW_REJECTED_BEFORE_PROCESS_CREATION",
+      "nativeExitCode": null,
+      "destination": "https://github.com/Echo-love928/CodeLess.git",
+      "reason": "Pushing uploads the full task commit, including source and evidence, to the external GitHub remote; the user requested a PR draft but did not explicitly authorize this payload to this destination, and the repository's trust/ownership is not established by trusted evidence.",
+      "resolution": "No alternative upload channel attempted. Finish local verification, exact payload manifest, PR draft and handoff, then request explicit user authorization for the reviewed payload and destination."
+    }
+  ]
+}

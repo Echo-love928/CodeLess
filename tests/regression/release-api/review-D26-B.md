@@ -22,3 +22,5 @@
 7. 公开 GitHub API 于 `2026-10-31T10:17:11Z` 查询 PR 精确 `b0fc773`：draft/open，static/API/runner/E2E/infra-preflight/ci-gate 六项 completed/success，均绑定该 HEAD。原始精简回执 `peer-pr87.json`；没有继承旧 `85155fd` 候选状态。复现：只读 `GET /repos/Echo-love928/CodeLess/pulls/87` 及 `GET /repos/Echo-love928/CodeLess/commits/<HEAD>/check-runs`。
 
 结论：此审查未发现 B 新增代码阻塞；不代表质量门槛、独立真实模型复评或双方组合联调完成。保持草稿，未批准。
+
+后续A本机完整门禁暴露共享runner镜像可用性阻塞：固定3286dd3上runner276/285，9项映射before hook收到固定imageId不存在；B此前精确HEAD的Linux CI success不否定这个Windows实测。独立映射15/15不关闭整套失败。请runner/公共门禁维护者与B协调；细节见D26-A的gate/runner-failure.json，A未修改B文件或runner代码。

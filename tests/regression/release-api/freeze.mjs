@@ -12,7 +12,7 @@ const git = (...args) => {
   return r.stdout.trim()
 }
 const target = join(import.meta.dirname, 'release-freeze.json')
-const frozenPaths = () => git('ls-files', '--cached', '--others', '--exclude-standard', '--', 'contracts/openapi.v0.json', 'contracts/schemas/v0', 'prompts/runtime', 'services/api/src/main', 'services/api/pom.xml').split(/\r?\n/).filter(Boolean)
+const frozenPaths = () => git('ls-files', '--cached', '--others', '--exclude-standard', '--', 'contracts', 'prompts/runtime', 'services/api/src/main', 'services/api/pom.xml', 'services/api/agent-runner.mjs').split(/\r?\n/).filter(Boolean)
 if (process.argv[2] === 'capture') {
   const paths = frozenPaths()
   const batch = 'evals/results/generation/runs/2026-10-30T08-15-32Z-real-29ffed9b/samples'

@@ -14,6 +14,7 @@
 | D25 自然 FAILED 编辑 / P1 | 原六项真实编辑6/6，无自然失败；原需求6/9，未达8/9 | D26 新回归是受控 mock 提议 + 真实坏 Vue 构建，不是自然 REAL 失败；证明 latestReady/历史源码/迟到提交保护，不能填入原真实分母。自然观察继续 NOT_COVERED |
 | 生产自动 capture / P1 | D25-A-COVER 默认关闭，历史三版本 cover 联调2/3，TASK-01两次 CAPTURE_FAILED | 本卡只修协调器可靠性，不部署、不启用、不复位旧队列；功能截图、fixture、operator 公网补验不能代替生产 capture 成功 |
 | 同日组合联调 / P1 | D26-B [PR87](https://github.com/Echo-love928/CodeLess/pull/87)，HEAD b0fc773，独立六项 CI success | A 已只读审查，未发现 B 新增代码阻塞。A/B 组合候选和最终 HEAD 检查、另一人批准尚待；最后启用功能的 PR 承担真实联调 |
+| D26-A-RUNNER-01 / P1 | 完整本地runner **276/285**，9项映射验收共同before hook失败；`tests/runner/mapping/acceptance.test.mjs:28`固定imageId创建容器时`No such image`；原始build exitCode=null | **OPEN / 阻塞**。独立映射15/15仅证明该组单独准备镜像后可执行，不关闭原门禁失败。多个入口并行构建共享标签可见，但具体镜像失效机制/删除者UNKNOWN。runner/公共门禁维护者协调D26-B处理；A未改runner、infra、根脚本、断言或隔离，未重试整套runner。原ci-gate=1保留 |
 
 没有据当前有限回归发现新 P0；这不是“没有严重数据/权限问题”的全局证明。任何未解决 P0 仍是延期信号，不允许绕过门禁。
 
@@ -21,7 +22,7 @@
 
 本卡不改变公共 HTTP API、契约、根锁、CI、迁移、依赖版本或模型提示词。后端行为唯一变更是封面入口未知时从永久跳过改为隔离并保留游标。生产 `codeless.cover.enabled` / worker 默认开关不变。
 
-`node tests/regression/release-api/freeze.mjs check` 检查生产 API/资源、运行时提示词、v0契约及原失败文件集合和 SHA256。任何变更必须登记清单、重跑对应真实样本和确定性回归；新增文件同样使冻结检查失败。冻结不是质量成功判据。
+`node tests/regression/release-api/freeze.mjs check` 检查204个生产 API/资源/运行时适配器、运行时提示词、全部契约（包含外部封面schema）及7份原失败文件集合和 SHA256。任何变更必须登记清单、重跑对应真实样本和确定性回归；新增文件同样使冻结检查失败。冻结不是质量成功判据。原代码候选140文件冻结保留，扩大覆盖后静态复验0。
 
 操作恢复：quarantine 表示需要人工核对原 published 版本、原台账和不可变入口证明；未确认前保留 cursor/inflight/quarantine，不用 GET 创建新 job，不猜测路由，不删除或重置旧失败。当前版本没有自动恢复端点。
 
