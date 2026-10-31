@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { ApiError } from '../../api/http'
 import { session } from '../auth/session'
 import { getVersion, type Version } from '../versions/version-api'
@@ -12,6 +12,8 @@ const props = defineProps<{ applicationId: string; versionId?: string | null }>(
 const emit = defineEmits<{ unauthorized: [] }>()
 const open = ref(false), loading = ref(false), posting = ref(false), refreshing = ref(false), recovering = ref(false)
 const trigger = ref<HTMLButtonElement>()
+const closeButton = ref<HTMLButtonElement>()
+const panelId = useId()
 const version = ref<Version>(), confirmed = ref(false), error = ref(''), notice = ref('')
 const copyError = ref('')
 const current = ref<Publication>(), last = ref<Publication>(), uncertain = ref(false)
@@ -139,15 +141,19 @@ watch(() => [props.applicationId, session.user?.id], () => {
   }).catch(cause => { if (generation === epoch) { configured.value = false; report(cause) } })
 }, { immediate: true })
 watch(() => props.versionId, () => { version.value = undefined; artifactDigest.value = ''; confirmed.value = false; if (open.value) void loadVersion() })
-watch(open, value => { if (value) void loadVersion() })
+watch(open, value => {
+  if (!value) return
+  void loadVersion()
+  void nextTick(() => { if (open.value) closeButton.value?.focus() })
+})
 onBeforeUnmount(() => { epoch++; versionRequest++ })
 </script>
 
 <template>
   <div class="deploy-control">
-    <button ref="trigger" type="button" class="button-primary" :aria-expanded="open" @click="open = !open">发布</button>
-    <section v-if="open" class="deploy-panel" aria-label="发布面板" @keydown.esc.stop.prevent="close">
-      <div class="deploy-heading"><h2>发布应用</h2><button type="button" aria-label="关闭发布面板" @click="close">关闭</button></div>
+    <button ref="trigger" type="button" class="button-primary" :aria-expanded="open" :aria-controls="open ? panelId : undefined" @click="open = !open">发布</button>
+    <section v-if="open" :id="panelId" class="deploy-panel" aria-label="发布面板" @keydown.esc.stop.prevent="close">
+      <div class="deploy-heading"><h2>发布应用</h2><button ref="closeButton" type="button" aria-label="关闭发布面板" @click="close">关闭</button></div>
       <p>确认后，此版本会拥有独立的公开地址。</p>
       <p v-if="!configured" role="alert">公开站点尚未配置，暂时无法发布。</p>
       <p v-if="loading" role="status">正在核对待发布版本…</p>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { ApiError } from '../../api/http'
 import { session } from '../auth/session'
 import type { Version } from '../versions/version-api'
@@ -8,12 +8,14 @@ import { exportSource } from './export-api'
 const props = defineProps<{ version?: Version }>()
 const emit = defineEmits<{ unauthorized: [] }>()
 const loading = ref(false), error = ref(''), notice = ref('')
+const button = ref<HTMLButtonElement>()
 let generation = 0, abort: AbortController | undefined
 const urls = new Set<string>()
 function reset() { generation++; abort?.abort(); loading.value = false; error.value = ''; notice.value = ''; for (const url of urls) URL.revokeObjectURL(url); urls.clear() }
 async function download() {
   if (loading.value || props.version?.status !== 'VERIFIED') return
   const current = ++generation, version = { ...props.version }
+  const restoreFocus = document.activeElement === button.value
   loading.value = true; error.value = ''; notice.value = ''; abort = new AbortController()
   try {
     const archive = await exportSource(version, abort.signal)
@@ -27,7 +29,13 @@ async function download() {
     if (current !== generation) return
     error.value = cause instanceof Error ? cause.message : '源码下载失败。'
     if (cause instanceof ApiError && cause.status === 401) emit('unauthorized')
-  } finally { if (current === generation) loading.value = false }
+  } finally {
+    if (current === generation) {
+      loading.value = false
+      await nextTick()
+      if (current === generation && restoreFocus && document.activeElement === document.body) button.value?.focus()
+    }
+  }
 }
 watch(() => [props.version?.id, props.version?.sourceDigest, props.version?.status, session.user?.id, session.status], reset)
 onBeforeUnmount(reset)
@@ -35,7 +43,7 @@ onBeforeUnmount(reset)
 
 <template>
   <div class="source-download">
-    <button type="button" class="button-secondary" :disabled="version?.status !== 'VERIFIED' || loading" @click="download">{{ loading ? '正在校验源码包…' : version ? `下载源码 · v${version.number}` : '下载源码' }}</button>
+    <button ref="button" type="button" class="button-secondary" :disabled="version?.status !== 'VERIFIED' || loading" @click="download">{{ loading ? '正在校验源码包…' : version ? `下载源码 · v${version.number}` : '下载源码' }}</button>
     <p v-if="version && version.status !== 'VERIFIED'" role="status">{{ version.status === 'DRAFT' ? '草稿版本尚未验证，暂不可下载源码。' : '验证失败的版本不可下载源码。' }}</p>
     <p v-if="version" class="download-binding">下载版本：{{ version.id }}<br>源码摘要：{{ version.sourceDigest }}</p>
     <p v-if="error" role="alert">{{ error }}</p><p v-if="notice" role="status">{{ notice }}</p>
