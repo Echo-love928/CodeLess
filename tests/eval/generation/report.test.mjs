@@ -1,3 +1,5 @@
+// Keep entry-proof boundary cases in the existing static gate without changing CI.
+import './verified-entry-evidence.cases.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'

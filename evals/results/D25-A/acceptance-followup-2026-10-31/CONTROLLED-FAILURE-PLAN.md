@@ -1,0 +1,13 @@
+# 零付费受控失败补验方案（本轮未执行）
+
+自然FAILED编辑任务仍为0。本方案证明失败保护机制，不能填入自然模型失败统计，也不能把原六项6/6变成新分母。B的85b58c3要求先明确方案与证明边界，本轮没有向原库新增编辑任务。
+
+拟在全新隔离数据库/私有根复制本轮保留快照，先核对原latestReady、既有PUBLISHED、源码及资产摘要；原库只读，不恢复旧导出覆盖原机成果。所有任务调度默认关闭，模型密钥剥离，禁止真实模型网络。
+
+新建独立CONTROLLED_FAULT任务，通过已有原生edit/lease/file工具及真实runner构造确定性坏Vue构建，保留原生非零构建退出、VERIFY→FAILED和失败候选。若需要模型阶段，明确命名mock provider并独立记合成/UNKNOWN用量；不得写入REAL账本、原批次或六项索引。另覆盖受控浏览器验证失败，避免只证明编译失败。
+
+失败后同时核验：latestReady仍为失败前同一VERIFIED版本；旧快照和源码字节不变；先前PUBLISHED记录、URL、source/artifact摘要及可访问内容不变；无自动发布；失败候选不能下载为可用版本或被发布；其他owner不能读/编辑。所有postcondition由实际DB/API及真实构建/浏览器/HTTP结果决定，不直接UPDATE指针来制造通过。
+
+现有EditLifecycleIntegrationTest的真实坏Vue测试只证明latestReady机制，PublicationIntegrationTest的失败探测夹具只证明旧发布机制；两者不能冒称同一个自然FAILED编辑案例。本方案拟把两种保护在同一隔离应用和一次受控失败上联验，仍标注CONTROLLED_FAULT。
+
+若验收仍要求自然REAL失败，需要另行固定真实执行范围与付费授权；不能以剩余额度、重复请求或人为故障冒充自然失败。无自然样本时继续NOT_OBSERVED/NOT_COVERED；是否接受受控补证由双方明确，A不擅自改验收口径。
