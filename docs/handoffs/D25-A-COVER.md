@@ -17,4 +17,14 @@
 
 设计采用Java持久协调器/owner读适配器，加一次性Node capture CLI，复用原Node durable queue及捕获worker。CLI只写独立队列/PNG，API只读；模型没有此工具。平台密钥、DB凭据、session cookie、Docker socket不传给Node捕获或浏览器。原机验收进程保持禁用任务调度及模型密钥。
 
-进展：已建分支并完成冻结依赖安装，尚未实现或声明生产cover可用。实现与实际检查结果将逐项补录。开发agent计量UNKNOWN；本任务付费模型0。
+实现候选：`45650b16981b04b6d65742befea8793b21f7a229`，草稿[PR86](https://github.com/Echo-love928/CodeLess/pull/86)。生产接线已实现，开关默认关闭；未部署VPS。真实原机owner接口联调2/3：SHOW-01、SHOW-02成功，TASK-01仍FAILED/CAPTURE_FAILED，两次封顶且保留。最早候选因JSON数字表示不一致隔离，旧失败/队列保持不变；新增回归先红后绿，修复后Java专项18/18，完整static Node54/54+前端206/206。runner首轮277/278失败：固定Docker镜像消失，期间A曾并行重建共享标签；后续严格串行复查278/278、完整API419/419、E2E75/75及完整平台链全部通过，原生退出码均0、无跳过。9份历史PNG逐字节恢复，旧失败不覆盖。
+
+代码候选45650b1六项实时CI（含ci-gate）04:17Z均success；本轮交付提交只补文档/证据，该提交CI以PR86实时精确HEAD为准。没有重复执行会再次跑四门禁的本地ci:gate聚合入口。全部门禁日志路径、原生退出码与SHA见报告gates.json/commands。未自批、未合并、未推送main。没有把mock夹具的9/9或6/6改成REAL指标。
+
+交付详情、原生命令/退出码、日志摘要与哈希、三条真实版本/权限检查、受控失败保护、先红后绿和明日待办见[本轮报告](../../evals/results/D25-A/production-cover-2026-10-31/README.md)。受控失败仅为隔离mock fixture，不是自然FAILED或REAL质量证明。原真实质量6/9与自然FAILED缺口继续HOLD。
+
+运行时责任：A保留原机原DB、三个已发布不可变版本、六项REAL依赖链及原API61997；新cover联调API在61998、使用独立私有cover根，生成/发布/恢复worker禁用，未传模型密钥。B继续审查原机证据，无跨机密文/密钥转交。原队列FAILED不清理、不复位。原机公开环境与部署连接配置仍私密，不纳入PR。新开关启用或VPS部署另行明确范围。
+
+公共契约协调：A已登记并实现两个只读GET及schema；没有公共写入API、任意路由或模型工具。B增量复审所有权、entry/版本摘要、停机隔离、旧版本/发布保护与UI兼容性；未取得B独立批准，不合并。
+
+开发agent input_tokens/output_tokens/合计UNKNOWN，工具无实测计量。新增外部付费模型请求0。原14次REAL编辑65,427 token另账、费用上界0.171768元、实际扣费UNKNOWN；隔离受控fixture实测5行mock账本，不能算自然失败或并入个人开发token。
