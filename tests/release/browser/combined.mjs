@@ -2,13 +2,15 @@
 import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
 import { once } from 'node:events'
+import { randomUUID } from 'node:crypto'
 import { mkdir, open, readFile, writeFile, cp } from 'node:fs/promises'
 import { resolve, join, relative, isAbsolute } from 'node:path'
 import { root, hash, verify, pnpm, command } from '../../../infra/release/client/package.mjs'
 import { environment } from '../../e2e/full/support.mjs'
-const [commit, destination] = process.argv.slice(2)
+const [commit, destination, imageReference] = process.argv.slice(2)
 assert.match(commit, /^[a-f0-9]{40}$/)
 assert.equal(command('git', ['rev-parse', `${commit}^{commit}`]), commit)
+assert.equal(imageReference, 'codeless-d27-b:' + commit, 'Build/export the exact candidate image first')
 const output = resolve(destination), rel = relative(resolve(root, '.local-data/d27-b'), output)
 assert.ok(rel && !isAbsolute(rel) && !rel.startsWith('..'))
 await mkdir(output)
@@ -66,10 +68,34 @@ try {
   for (const item of apiManifest.sourceFiles) {
     assert.equal(hash(await readFile(join(runtime, item.path.replace(/^repository\//, '')))), item.sha256)
   }
-  await run('bridge-runner-only', process.execPath, ['tests/release/browser/bridge.mjs', commit,
-    clientBundle, join(clientBuild, 'runner-check'), join(output, 'bridge-runner-only')])
-  await run('bridge-api-root', process.execPath, ['tests/release/browser/bridge.mjs', commit,
-    clientBundle, runtime, join(output, 'bridge-api-root')])
+  const image = JSON.parse(command('docker', ['image', 'inspect', imageReference]))[0]
+  assert.equal(image.Config.Labels['org.opencontainers.image.revision'], commit)
+  const policyTag = 'codeless-vue-build:d05'
+  const previous = command('docker', ['image', 'inspect', policyTag, '--format', '{{.Id}}'])
+  const backupTag = 'codeless-d27-bridge-backup:' + randomUUID()
+  command('docker', ['image', 'tag', previous, backupTag])
+  report.buildImage = { reference: imageReference, imageId: image.Id, previousPolicyImageId: previous, policyRestored: false }
+  let promoted = false
+  try {
+    command('docker', ['image', 'tag', imageReference, policyTag]); promoted = true
+    await run('bridge-runner-only', process.execPath, ['tests/release/browser/bridge.mjs', commit,
+      clientBundle, join(clientBuild, 'runner-check'), join(output, 'bridge-runner-only')])
+    await run('bridge-api-root', process.execPath, ['tests/release/browser/bridge.mjs', commit,
+      clientBundle, runtime, join(output, 'bridge-api-root')])
+    const b = JSON.parse(await readFile(join(output, 'bridge-runner-only/bridge.json')))
+    const a = JSON.parse(await readFile(join(output, 'bridge-api-root/bridge.json')))
+    assert.equal(b.buildImageId, image.Id); assert.equal(a.buildImageId, image.Id)
+    assert.equal(a.artifactDigest, b.artifactDigest)
+  } finally {
+    if (promoted) {
+      assert.equal(command('docker', ['image', 'inspect', policyTag, '--format', '{{.Id}}']), image.Id,
+        'Another operator changed the policy tag; preserve backup and require manual reconciliation')
+      command('docker', ['image', 'tag', previous, policyTag])
+    }
+    command('docker', ['image', 'rm', backupTag])
+    report.buildImage.policyRestored = true
+    await save()
+  }
   // Verification still succeeds after runtime installation; the sealed API was not modified.
   await run('api-reverify', 'python', ['-B', 'scripts/release/api_release.py', 'verify', '--package', api, '--manifest-sha256', hash(apiBytes)])
   report.api = { package: portable(api), manifestSha256: hash(apiBytes), jarSha256: apiManifest.files.find(x => x.path === 'api.jar').sha256, fileCount: apiManifest.files.length }
