@@ -6,11 +6,12 @@ import { installVersionsFixture, openWorkbench, ids, versions } from '../version
 const versionId = ids[1], sourceDigest = versions[1].sourceDigest
 const origin = `https://v${versionId.replaceAll('-', '')}.preview.codeless-preview.test`
 const component = { componentId: 'shared-card', sourceFile: 'src/components/SharedCard.vue', fileDigest: 'sha256:' + 'a'.repeat(64), scope: 'SOURCE_FILE' }
-async function fixture(page: Page) {
+async function fixture(page: Page, selectionGate: Promise<void> = Promise.resolve()) {
   await installVersionsFixture(page)
   const requests: object[] = []
   await page.route('**/component-mapping', route => route.fulfill({ json: { protocol: 'codeless-component-mapping/v1', versionId, sourceDigest, components: [component], disabled: [] } }))
-  await page.route('**/component-selection', route => {
+  await page.route('**/component-selection', async route => {
+    await selectionGate
     const candidate = route.request().postDataJSON(); requests.push(candidate)
     return route.fulfill({ json: { ...component, ...candidate, selectable: true, shared: true, notice: '修改影响整个组件源码及所有实例。' } })
   })
@@ -27,14 +28,22 @@ async function fixture(page: Page) {
   return { requests, frame: page.frameLocator('iframe[title="当前版本预览"]') }
 }
 test('D13-B-T1/T3: hover nested component, select/cancel, Esc and restored navigation', async ({ page }, info) => {
-  const { requests, frame } = await fixture(page)
+  let releaseSelection!: () => void
+  const selectionGate = new Promise<void>(resolve => { releaseSelection = resolve })
+  const { requests, frame } = await fixture(page, selectionGate)
   await frame.getByText('嵌套链接一').click()
   await expect.poll(() => frame.locator('body').evaluate(() => location.hash)).toBe('#destination')
   await page.getByLabel('选择组件进行修改').check()
   await frame.getByText('嵌套链接一').hover()
   await expect(frame.locator('[data-codeless-selector-overlay]')).toBeVisible()
+  const selectionRequest = page.waitForRequest(request => request.method() === 'POST' && new URL(request.url()).pathname.endsWith('/component-selection'))
   await frame.getByText('嵌套链接一').click()
   await expect(page.getByRole('region', { name: '组件修改' })).toContainText(component.sourceFile)
+  await selectionRequest
+  await expect(page.getByLabel('组件修改描述')).toHaveCount(0)
+  expect(requests).toHaveLength(0)
+  releaseSelection()
+  await expect(page.getByRole('region', { name: '组件修改' }).getByText(`已选组件：${component.componentId} · ${component.sourceFile}`, { exact: true })).toBeVisible()
   expect(requests[0]).toEqual({ componentId: 'shared-card', versionId, sourceDigest })
   expect(await frame.locator('body').evaluate(() => (window as unknown as { clicks: number }).clicks)).toBe(1)
   await page.getByRole('button', { name: '取消选择', exact: true }).click()

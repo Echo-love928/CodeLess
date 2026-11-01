@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, inject, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { ApiError } from '../../api/http'
 import { createComponentEdit, getMapping, selectComponent, type Candidate, type Mapping, type Selection } from '../mapping/component-api'
 import { editContext, validateAccepted } from './edit-flow'
@@ -9,6 +9,8 @@ const emit = defineEmits<{ available: [value: boolean]; unauthorized: []; accept
 const flow = inject(editContext, undefined)
 const mapping = ref<Mapping>(), selection = ref<Selection>()
 const prompt = ref(''), confirmed = ref(false), error = ref(''), submitting = ref(false)
+const keyboardSelection = ref(false)
+const keyboardSummary = ref<HTMLElement>()
 const locked = computed(() => submitting.value || flow?.locked.value === true)
 const validPrompt = computed(() => !!prompt.value.trim() && Array.from(prompt.value.trim()).length <= 8000)
 let generation = 0, selectionGeneration = 0, key = crypto.randomUUID(), signature = ''
@@ -29,7 +31,7 @@ watch(() => [props.applicationId, props.versionId], async () => {
     mapping.value = value; emit('available', value.components.length > 0)
   } catch (cause) { if (current === generation) report(cause) }
 }, { immediate: true })
-watch(() => [props.candidate, mapping.value] as const, async ([candidate, currentMapping]) => {
+async function resolveCandidate(candidate: Candidate | null, currentMapping = mapping.value) {
   const current = ++selectionGeneration; selectionAbort?.abort(); selectionAbort = new AbortController()
   selection.value = undefined; confirmed.value = false
   if (!currentMapping || !candidate || locked.value) return
@@ -38,7 +40,21 @@ watch(() => [props.candidate, mapping.value] as const, async ([candidate, curren
     if (current !== selectionGeneration) return
     selection.value = value; error.value = ''
   } catch (cause) { if (current === selectionGeneration) report(cause) }
+}
+watch(() => [props.candidate, mapping.value] as const, ([candidate, currentMapping]) => {
+  keyboardSelection.value = false
+  void resolveCandidate(candidate, currentMapping)
 })
+function choose(componentId: string) {
+  if (locked.value || !mapping.value) return
+  keyboardSelection.value = true
+  void resolveCandidate({ componentId, versionId: mapping.value.versionId, sourceDigest: mapping.value.sourceDigest })
+}
+async function clearKeyboardSelection() {
+  await resolveCandidate(null)
+  await nextTick()
+  keyboardSummary.value?.focus()
+}
 async function submit() {
   if (!flow || !selection.value?.selectable || !validPrompt.value || !confirmed.value || locked.value) return
   const current = generation, target = selection.value, text = prompt.value.trim()
@@ -72,7 +88,16 @@ onBeforeUnmount(() => { generation++; selectionGeneration++; abort?.abort(); sel
       <label class="confirm"><input v-model="confirmed" type="checkbox" :disabled="locked" />我确认修改影响整个源码组件及所有共享实例</label>
       <p v-if="!flow" role="alert">修改任务入口不可用，请返回版本工作台。</p>
       <button class="button-primary" type="button" :disabled="!flow || locked || !confirmed || !validPrompt" @click="submit">{{ submitting ? '正在创建修改任务…' : '创建组件修改' }}</button>
+      <button v-if="keyboardSelection" class="button-secondary" type="button" :disabled="locked" @click="clearKeyboardSelection">取消源码组件选择</button>
     </template>
+    <details v-if="mapping?.components.length" class="keyboard-components">
+      <summary ref="keyboardSummary">使用键盘选择源码组件</summary>
+      <p>选择当前版本的源码组件，仍需服务端核对。修改影响所有共享实例，不代表某个已渲染实例。</p>
+      <ul><li v-for="file in mapping.components" :key="file.componentId">
+        <button type="button" class="button-secondary" :disabled="locked" @click="choose(file.componentId)">选择 {{ file.componentId }}</button>
+        <span>{{ file.sourceFile }}</span>
+      </li></ul>
+    </details>
   </section>
 </template>
 
@@ -85,4 +110,8 @@ textarea { width: 100%; min-height: 88px; padding: 8px; border: 1px solid #ccd3d
 .confirm input { margin-top: 4px; flex-shrink: 0; }
 button { min-height: 44px; }
 ul { padding-left: 20px; color: #8b4d18; }
+.keyboard-components summary { min-height: 44px; padding: 12px 0; cursor: pointer; }
+.keyboard-components ul { list-style: none; padding: 0; color: inherit; }
+.keyboard-components li { margin-bottom: 12px; }
+.keyboard-components span { display: block; margin-top: 6px; }
 </style>

@@ -57,8 +57,10 @@ public final class CoverCoordinator implements AutoCloseable {
                 CoverGateway.Binding binding;
                 try {binding=service.binding(p.owner(),p.id());}
                 catch(AuthFailure unavailable) {
-                    // No native immutable entry proof: skip this publication without guessing a route.
-                    org.slf4j.LoggerFactory.getLogger(getClass()).warn("COVER_ENTRY_UNAVAILABLE publication={}",p.id());advance(p);continue;
+                    // SQL publication and the terminal file ledger are separate resources. A missing/unavailable
+                    // binding is not proof that this publication may be permanently skipped by the durable cursor.
+                    org.slf4j.LoggerFactory.getLogger(getClass()).warn("COVER_ENTRY_UNAVAILABLE publication={}",p.id());
+                    quarantine("COVER_ENTRY_UNAVAILABLE");return;
                 }
                 active=true;
                 try {

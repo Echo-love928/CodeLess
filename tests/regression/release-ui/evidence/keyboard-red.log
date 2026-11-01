@@ -1,0 +1,84 @@
+[WebServer] (node:298652) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:299988) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:299988) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 [chromium] › tests\regression\release-ui\flow.spec.ts:16:5 › D26-B-T1: keyboard selects a server-resolved source component and completes an edit (30.1s)
+(node:268128) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:268128) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  2 [chromium] › tests\regression\release-ui\flow.spec.ts:47:5 › D26-B-T1: opening publication moves focus inside; Escape returns to trigger (5.8s)
+
+
+  1) [chromium] › tests\regression\release-ui\flow.spec.ts:16:5 › D26-B-T1: keyboard selects a server-resolved source component and completes an edit 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.focus: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('使用键盘选择源码组件', { exact: true })[22m
+
+
+       6 | async function chooseWithKeyboard(page: Page) {
+       7 |   const summary = page.getByText('使用键盘选择源码组件', { exact: true })
+    >  8 |   await summary.focus()
+         |                 ^
+       9 |   await page.keyboard.press('Enter')
+      10 |   await page.keyboard.press('Tab')
+      11 |   await expect(page.getByRole('button', { name: '选择 shared-card', exact: true })).toBeFocused()
+        at chooseWithKeyboard (C:\Users\12058\Documents\ChatGPT\CodeLess\D26-B-work\tests\regression\release-ui\flow.spec.ts:8:17)
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\D26-B-work\tests\regression\release-ui\flow.spec.ts:18:9
+
+    Error Context: .local-data\d26-b\browser\flow-D26-B-T1-keyboard-sel-02979-onent-and-completes-an-edit-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .local-data\d26-b\browser\flow-D26-B-T1-keyboard-sel-02979-onent-and-completes-an-edit-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace .local-data\d26-b\browser\flow-D26-B-T1-keyboard-sel-02979-onent-and-completes-an-edit-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests\regression\release-ui\flow.spec.ts:47:5 › D26-B-T1: opening publication moves focus inside; Escape returns to trigger 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeFocused[2m([22m[2m)[22m failed
+
+    Locator:  getByRole('region', { name: '发布面板' }).getByRole('button', { name: '关闭发布面板' })
+    Expected: focused
+    Received: inactive
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toBeFocused" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('region', { name: '发布面板' }).getByRole('button', { name: '关闭发布面板' })[22m
+    [2m    14 × locator resolved to <button type="button" data-v-301d9d5c="" aria-label="关闭发布面板">关闭</button>[22m
+    [2m       - unexpected value "inactive"[22m
+
+
+      51 |   await page.keyboard.press('Enter')
+      52 |   const panel = page.getByRole('region', { name: '发布面板' })
+    > 53 |   await expect(panel.getByRole('button', { name: '关闭发布面板' })).toBeFocused()
+         |                                                               ^
+      54 |   await expect(trigger).toHaveAttribute('aria-controls', await panel.getAttribute('id') as string)
+      55 |   await page.keyboard.press('Escape')
+      56 |   await expect(panel).toHaveCount(0)
+        at C:\Users\12058\Documents\ChatGPT\CodeLess\D26-B-work\tests\regression\release-ui\flow.spec.ts:53:63
+
+    Error Context: .local-data\d26-b\browser\flow-D26-B-T1-opening-publ-9323b-e-Escape-returns-to-trigger-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .local-data\d26-b\browser\flow-D26-B-T1-opening-publ-9323b-e-Escape-returns-to-trigger-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace .local-data\d26-b\browser\flow-D26-B-T1-opening-publ-9323b-e-Escape-returns-to-trigger-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › tests\regression\release-ui\flow.spec.ts:16:5 › D26-B-T1: keyboard selects a server-resolved source component and completes an edit 
+    [chromium] › tests\regression\release-ui\flow.spec.ts:47:5 › D26-B-T1: opening publication moves focus inside; Escape returns to trigger 

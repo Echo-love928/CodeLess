@@ -1,0 +1,153 @@
+{
+  "task": "D26-A-REVIEW-FOLLOWUP",
+  "base": "d4d250f80f779b784416e9328877c7e13b3967aa",
+  "sourceCandidate": "b75b024d72fec987954a5c26649c8b8ea622495b",
+  "recommendations": {
+    "realIpcCancellation": "COMPLETED",
+    "sessionFreeOriginalCombinationCounts": "COMPLETED"
+  },
+  "productionGitDifferences": [],
+  "priorEvidenceModifiedOrDeleted": [],
+  "checks": [
+    {
+      "label": "source-bound count excerpt",
+      "command": [
+        "F:\\nodejs\\node.exe",
+        "tests/regression/release-api/extract-combination-counts.mjs",
+        "check"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "{\"mode\":\"check\",\"status\":\"PASSED\",\"sourceLogSha256\":\"sha256:a25e5afd126d6dd4d87375d51d1ddd3554d97c525acbaa92547655ce1f20afbd\",\"sourceLogBytes\":39107,\"excerptSha256\":\"sha256:bbc47e1d90d4b1cafb75de30854dd8927362660042ae5daf152f3889a536c90c\",\"excerptBytes\":57,\"playwrightPassed\":80,\"outerExitCode\":0,\"browserExitCode\":0,\"originalReportsUnchanged\":true,\"newE2eRun\":false}\n",
+      "stderr": ""
+    },
+    {
+      "label": "strict production/history freeze",
+      "command": [
+        "F:\\nodejs\\node.exe",
+        "tests/regression/release-api/freeze.mjs",
+        "check"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "{\"task\":\"D26-A\",\"status\":\"PASSED\",\"frozenFiles\":204,\"originalFailures\":7,\"policy\":\"PINNED_SOURCE_IDENTITY_WITH_EXPLICIT_CHECKOUT_EOL\",\"rawPromptIdentity\":\"EXACT\",\"checkoutEolDifferences\":[],\"apiChanges\":[],\"runtimePromptChanges\":[],\"realModelEvaluation\":\"NOT_EVALUATED\"}\n",
+      "stderr": ""
+    }
+  ],
+  "followup": {
+    "report": "tests/regression/release-api/evidence/2026-11-01T02-55-31.425Z-followup/command.json",
+    "head": "b75b024d72fec987954a5c26649c8b8ea622495b",
+    "exitCode": 0,
+    "tests": 12,
+    "failures": 0,
+    "signal": null,
+    "sourceBytesUnchanged": true,
+    "logSha256": "sha256:c7303761818e18211458795db8cddbadba5c9bbf4001f404843408267fc56901",
+    "publicLog": "tests/regression/release-api/evidence/2026-11-01T02-55-31.425Z-followup/followup.log",
+    "ipc": [
+      {
+        "fixtureNativeExitCode": 0,
+        "fixture": "REAL_IPC_CANCEL_BEFORE_PERMISSION",
+        "testSensitivityMutation": false,
+        "requests": 1,
+        "permissions": 0,
+        "browserPidCount": 0,
+        "ownedWorkerObserved": true,
+        "ownedWorkerClosed": true,
+        "workerExit": {
+          "code": 1,
+          "signal": null
+        },
+        "aborted": true,
+        "events": [
+          "REQUEST_RECEIVED",
+          "ABORT_RETURNED",
+          "OWNED_WORKER_CLOSED"
+        ],
+        "result": {
+          "status": "FAILED",
+          "failure": "CAPTURE_TIMEOUT",
+          "cleanupConfirmed": true,
+          "launchPermitGranted": false,
+          "cleanupProof": {
+            "confirmed": true,
+            "code": 0
+          }
+        }
+      },
+      {
+        "fixtureNativeExitCode": 1,
+        "fixture": "REAL_IPC_CANCEL_BEFORE_PERMISSION",
+        "testSensitivityMutation": true,
+        "requests": 1,
+        "permissions": 1,
+        "browserPidCount": 1,
+        "ownedWorkerObserved": true,
+        "ownedWorkerClosed": true,
+        "workerExit": {
+          "code": 1,
+          "signal": null
+        },
+        "aborted": true,
+        "events": [
+          "REQUEST_RECEIVED",
+          "ABORT_RETURNED",
+          "PERMISSION_SENT",
+          "OWNED_WORKER_CLOSED"
+        ],
+        "result": {
+          "status": "FAILED",
+          "failure": "CAPTURE_TIMEOUT",
+          "cleanupConfirmed": true,
+          "launchPermitGranted": true,
+          "cleanupProof": {
+            "confirmed": true,
+            "code": 0
+          }
+        }
+      }
+    ]
+  },
+  "static": {
+    "report": "tests/regression/release-api/evidence/2026-11-01T02-51-13.765Z-static/command.json",
+    "head": "d4d250f80f779b784416e9328877c7e13b3967aa",
+    "exitCode": 0,
+    "nodeTests": 64,
+    "uiTests": 206,
+    "sourceBytesUnchanged": true,
+    "logSha256": "sha256:6480e53bd0f0f1b4459c2324b0d4b1efb7ad329d12d5f59b91c84992bd4e9f9e"
+  },
+  "currentCandidateOtherGates": {
+    "api": "NOT_RERUN",
+    "runner": "NOT_RERUN",
+    "e2e": "NOT_RERUN",
+    "serialIsolation21": "NOT_RERUN",
+    "ciGate": "NOT_RERUN",
+    "remote": "NOT_STARTED",
+    "reason": "Production and static-covered entry files unchanged; prior d4d250f exact-head checks retained separately, not inherited"
+  },
+  "oldHeadRemoteEvidence": "tests/regression/release-api/evidence/review-2026-11-01/pr90-exact-head-ci.json",
+  "newE2eRun": false,
+  "BIndependentCombination80": false,
+  "release": "HOLD",
+  "unresolved": [
+    "Original missing-image and Maven historical mechanisms UNKNOWN",
+    "Historical cleanup exact attribution unproven",
+    "REAL quality and production capture gaps"
+  ],
+  "publication": {
+    "status": "LOCAL_ONLY_NEW_PAYLOAD_SCOPE_TO_REVIEW",
+    "newPR": null
+  },
+  "developerTokens": {
+    "input": "UNKNOWN",
+    "output": "UNKNOWN",
+    "total": "UNKNOWN",
+    "source": "UNKNOWN"
+  },
+  "runtimeModelUsage": {
+    "paidRequests": 0,
+    "mockRequests": "UNKNOWN",
+    "mockTokens": "UNKNOWN"
+  }
+}

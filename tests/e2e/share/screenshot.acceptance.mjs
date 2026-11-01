@@ -139,7 +139,7 @@ test('real Chromium cannot make private/metadata/page-selected requests through 
 
 test('real stdio worker is forcibly bounded and its process tree is reclaimed', { timeout: 10000 }, async () => {
   const result = await captureDeployment(target, { timeoutMs: 150 })
-  assert.equal(result.status, 'FAILED'); assert.equal(result.failure, 'CAPTURE_TIMEOUT'); assert.equal(result.cleanupConfirmed, true)
+  assert.equal(result.status, 'FAILED'); assert.equal(result.failure, 'CAPTURE_TIMEOUT'); assert.equal(result.cleanupConfirmed, true, JSON.stringify(result))
 })
 
 test('unknown cleanup stops retries; queue ownership and read-time image digest are fail-closed', async () => {

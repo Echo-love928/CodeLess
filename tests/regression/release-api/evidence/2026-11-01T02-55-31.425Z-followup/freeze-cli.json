@@ -1,0 +1,79 @@
+{
+  "fixture": "F:\\JAVA\\CodeLess\\CodeLess\\.local-data\\d26-a\\followup\\freeze-fixture-5f595b14-6b23-40da-a2d1-e528fe16f5eb",
+  "fixtureRetained": true,
+  "results": [
+    {
+      "label": "all original bytes",
+      "mode": "check",
+      "expected": 0,
+      "exitCode": 0,
+      "stdout": "{\"task\":\"D26-A\",\"status\":\"PASSED\",\"frozenFiles\":204,\"originalFailures\":7,\"policy\":\"PINNED_SOURCE_IDENTITY_WITH_EXPLICIT_CHECKOUT_EOL\",\"rawPromptIdentity\":\"EXACT\",\"checkoutEolDifferences\":[],\"apiChanges\":[],\"runtimePromptChanges\":[],\"realModelEvaluation\":\"NOT_EVALUATED\"}\n",
+      "stderr": ""
+    },
+    {
+      "label": "four known mixed originals checked out as LF",
+      "mode": "check",
+      "expected": 0,
+      "exitCode": 0,
+      "stdout": "{\"task\":\"D26-A\",\"status\":\"PASSED\",\"frozenFiles\":204,\"originalFailures\":7,\"policy\":\"PINNED_SOURCE_IDENTITY_WITH_EXPLICIT_CHECKOUT_EOL\",\"rawPromptIdentity\":\"EXACT\",\"checkoutEolDifferences\":[{\"path\":\"contracts/tools/review-D08-B.md\",\"originalRawDigest\":\"sha256:ac68da6205a211145e86de771ef83ec6ef5125f6a37f9cb7383161a3e21c00c4\",\"checkoutDigest\":\"sha256:d61c215cca1314150baa38cb48afdfcdb59dae38c09f90548ec7c1ee967d621b\",\"classification\":\"REVIEWED_CHECKOUT_EOL\"},{\"path\":\"services/api/pom.xml\",\"originalRawDigest\":\"sha256:5164d17c076b6dc5141e39faf890a345a81419d31f66b456dc0e9c8a0caf9e18\",\"checkoutDigest\":\"sha256:9b5ebabfb7259db6f9c007c7c1d24dc13058e03dd17117d5f31073192d8d1fea\",\"classification\":\"REVIEWED_CHECKOUT_EOL\"},{\"path\":\"services/api/src/main/java/dev/codeless/api/data/TaskProgressService.java\",\"originalRawDigest\":\"sha256:c2515819524e78f024ad103aaf66d2ffe39eed22c5fb35d163f9adc53ca041a0\",\"checkoutDigest\":\"sha256:79e16e43799173d5e86b6ab3266699b91c850889768ced668e864246e14a93f6\",\"classification\":\"REVIEWED_CHECKOUT_EOL\"},{\"path\":\"services/api/src/main/java/dev/codeless/api/tasks/TaskEventReplay.java\",\"originalRawDigest\":\"sha256:c00cca9435381b21a980d4bc2d103bb7b096db50d09a1e4c63c5397e7521a26e\",\"checkoutDigest\":\"sha256:9cbf64d781b3b9286d321ac05855d9fc70b1ab32b3fd51d57e70284432a853fb\",\"classification\":\"REVIEWED_CHECKOUT_EOL\"}],\"apiChanges\":[],\"runtimePromptChanges\":[],\"realModelEvaluation\":\"NOT_EVALUATED\"}\n",
+      "stderr": ""
+    },
+    {
+      "label": "raw legacy mode still reports original hash differences",
+      "mode": "check-raw",
+      "expected": 1,
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:107\r\n    triggerUncaughtException(\r\n    ^\r\n\r\nAssertionError [ERR_ASSERTION]: frozen API/runtime changed: contracts/tools/review-D08-B.md; review change list and rerun affected evaluation\r\n\r\nfalse !== true\r\n\r\n    at file:///F:/JAVA/CodeLess/CodeLess/.local-data/d26-a/followup/freeze-fixture-5f595b14-6b23-40da-a2d1-e528fe16f5eb/tests/regression/release-api/freeze.mjs:71:12\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\r\n    at async node:internal/modules/esm/loader:647:26\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\r\n  generatedMessage: false,\r\n  code: 'ERR_ASSERTION',\r\n  actual: false,\r\n  expected: true,\r\n  operator: 'strictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v24.22.1\r\n"
+    },
+    {
+      "label": "four known mixed originals checked out as CRLF",
+      "mode": "check",
+      "expected": 0,
+      "exitCode": 0,
+      "stdout": "{\"task\":\"D26-A\",\"status\":\"PASSED\",\"frozenFiles\":204,\"originalFailures\":7,\"policy\":\"PINNED_SOURCE_IDENTITY_WITH_EXPLICIT_CHECKOUT_EOL\",\"rawPromptIdentity\":\"EXACT\",\"checkoutEolDifferences\":[{\"path\":\"contracts/tools/review-D08-B.md\",\"originalRawDigest\":\"sha256:ac68da6205a211145e86de771ef83ec6ef5125f6a37f9cb7383161a3e21c00c4\",\"checkoutDigest\":\"sha256:1eef04f919aeeb4993ae3d0d6e20757a94c10f0b3771fa977f00c2f02e128ba7\",\"classification\":\"REVIEWED_CHECKOUT_EOL\"},{\"path\":\"services/api/pom.xml\",\"originalRawDigest\":\"sha256:5164d17c076b6dc5141e39faf890a345a81419d31f66b456dc0e9c8a0caf9e18\",\"checkoutDigest\":\"sha256:bd89f8a16d73d00cec4bec4f5113ec206f61aad1432d2bed6ec0450b0ff20a15\",\"classification\":\"REVIEWED_CHECKOUT_EOL\"},{\"path\":\"services/api/src/main/java/dev/codeless/api/data/TaskProgressService.java\",\"originalRawDigest\":\"sha256:c2515819524e78f024ad103aaf66d2ffe39eed22c5fb35d163f9adc53ca041a0\",\"checkoutDigest\":\"sha256:8a3a19e00aa4279822e447230eaee40ab1d5297cc28884e6083822d841722c66\",\"classification\":\"REVIEWED_CHECKOUT_EOL\"},{\"path\":\"services/api/src/main/java/dev/codeless/api/tasks/TaskEventReplay.java\",\"originalRawDigest\":\"sha256:c00cca9435381b21a980d4bc2d103bb7b096db50d09a1e4c63c5397e7521a26e\",\"checkoutDigest\":\"sha256:ccb30e35905949340e0211552cddd8da42e466c5c61a5d67bea13e2b15ae07e3\",\"classification\":\"REVIEWED_CHECKOUT_EOL\"}],\"apiChanges\":[],\"runtimePromptChanges\":[],\"realModelEvaluation\":\"NOT_EVALUATED\"}\n",
+      "stderr": ""
+    },
+    {
+      "label": "source content mutation",
+      "mode": "check",
+      "expected": 1,
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:107\r\n    triggerUncaughtException(\r\n    ^\r\n\r\nAssertionError [ERR_ASSERTION]: frozen API/runtime changed: services/api/src/main/java/dev/codeless/api/data/TaskProgressService.java; review change list and rerun affected evaluation\r\n\r\nfalse !== true\r\n\r\n    at file:///F:/JAVA/CodeLess/CodeLess/.local-data/d26-a/followup/freeze-fixture-5f595b14-6b23-40da-a2d1-e528fe16f5eb/tests/regression/release-api/freeze.mjs:71:12\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\r\n    at async node:internal/modules/esm/loader:647:26\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\r\n  generatedMessage: false,\r\n  code: 'ERR_ASSERTION',\r\n  actual: false,\r\n  expected: true,\r\n  operator: 'strictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v24.22.1\r\n"
+    },
+    {
+      "label": "runtime prompt EOL mutation",
+      "mode": "check",
+      "expected": 1,
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:107\r\n    triggerUncaughtException(\r\n    ^\r\n\r\nAssertionError [ERR_ASSERTION]: frozen API/runtime changed: prompts/runtime/generate-v1.txt; review change list and rerun affected evaluation\r\n\r\nfalse !== true\r\n\r\n    at file:///F:/JAVA/CodeLess/CodeLess/.local-data/d26-a/followup/freeze-fixture-5f595b14-6b23-40da-a2d1-e528fe16f5eb/tests/regression/release-api/freeze.mjs:71:12\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\r\n    at async node:internal/modules/esm/loader:647:26\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\r\n  generatedMessage: false,\r\n  code: 'ERR_ASSERTION',\r\n  actual: false,\r\n  expected: true,\r\n  operator: 'strictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v24.22.1\r\n"
+    },
+    {
+      "label": "explicit reviewed prompt EOL restoration",
+      "exitCode": 0,
+      "stdout": "{\"reference\":\"6ceeb5a7e822f058e5b84ee96f15eac952e87fda\",\"write\":true,\"runtimePromptChanges\":[],\"results\":[{\"path\":\"prompts/runtime/generate-v1.txt\",\"before\":\"sha256:7a2c382a7c438ab50e339e69ae881530b05a645bef94674762928988d059091d\",\"expected\":\"sha256:715e255d287c2ba3fdc537f352d02cb971aca4d38121f4e96cc5733dd13136c1\",\"action\":\"RESTORED_EXACT_FROZEN_BYTES\",\"backup\":\".local-data/d26-a/followup/prompt-checkout-backups/7a2c382a7c438ab50e339e69ae881530b05a645bef94674762928988d059091d.raw\"},{\"path\":\"prompts/runtime/repair-v1.txt\",\"before\":\"sha256:e826df3d5e4c3a89fe0ce704a39756b906c815c984637593e8830a3de49e28b0\",\"expected\":\"sha256:e826df3d5e4c3a89fe0ce704a39756b906c815c984637593e8830a3de49e28b0\",\"action\":\"ALREADY_EXACT\",\"backup\":null}]}\n"
+    },
+    {
+      "label": "restored prompt exact raw identity",
+      "mode": "check",
+      "expected": 0,
+      "exitCode": 0,
+      "stdout": "{\"task\":\"D26-A\",\"status\":\"PASSED\",\"frozenFiles\":204,\"originalFailures\":7,\"policy\":\"PINNED_SOURCE_IDENTITY_WITH_EXPLICIT_CHECKOUT_EOL\",\"rawPromptIdentity\":\"EXACT\",\"checkoutEolDifferences\":[{\"path\":\"contracts/tools/review-D08-B.md\",\"originalRawDigest\":\"sha256:ac68da6205a211145e86de771ef83ec6ef5125f6a37f9cb7383161a3e21c00c4\",\"checkoutDigest\":\"sha256:1eef04f919aeeb4993ae3d0d6e20757a94c10f0b3771fa977f00c2f02e128ba7\",\"classification\":\"REVIEWED_CHECKOUT_EOL\"},{\"path\":\"services/api/pom.xml\",\"originalRawDigest\":\"sha256:5164d17c076b6dc5141e39faf890a345a81419d31f66b456dc0e9c8a0caf9e18\",\"checkoutDigest\":\"sha256:bd89f8a16d73d00cec4bec4f5113ec206f61aad1432d2bed6ec0450b0ff20a15\",\"classification\":\"REVIEWED_CHECKOUT_EOL\"},{\"path\":\"services/api/src/main/java/dev/codeless/api/tasks/TaskEventReplay.java\",\"originalRawDigest\":\"sha256:c00cca9435381b21a980d4bc2d103bb7b096db50d09a1e4c63c5397e7521a26e\",\"checkoutDigest\":\"sha256:ccb30e35905949340e0211552cddd8da42e466c5c61a5d67bea13e2b15ae07e3\",\"classification\":\"REVIEWED_CHECKOUT_EOL\"}],\"apiChanges\":[],\"runtimePromptChanges\":[],\"realModelEvaluation\":\"NOT_EVALUATED\"}\n",
+      "stderr": ""
+    },
+    {
+      "label": "unknown prompt content refused without overwrite",
+      "exitCode": 1
+    },
+    {
+      "label": "historical failure whitespace mutation",
+      "mode": "check",
+      "expected": 1,
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:107\r\n    triggerUncaughtException(\r\n    ^\r\n\r\nAssertionError [ERR_ASSERTION]: original failure changed: TASK-02\r\n+ actual - expected\r\n\r\n+ 'sha256:9016d8c1325d75a90c48699391c6c646f51d922583b734cbc6e15d9e96c4f4a7'\r\n- 'sha256:1587d3e292d2e8a77ee38ff8a2f76f4095cb57e8d814dc95c4081bbb018e9428'\r\n\r\n    at file:///F:/JAVA/CodeLess/CodeLess/.local-data/d26-a/followup/freeze-fixture-5f595b14-6b23-40da-a2d1-e528fe16f5eb/tests/regression/release-api/freeze.mjs:74:43\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\r\n    at async node:internal/modules/esm/loader:647:26\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\r\n  generatedMessage: false,\r\n  code: 'ERR_ASSERTION',\r\n  actual: 'sha256:9016d8c1325d75a90c48699391c6c646f51d922583b734cbc6e15d9e96c4f4a7',\r\n  expected: 'sha256:1587d3e292d2e8a77ee38ff8a2f76f4095cb57e8d814dc95c4081bbb018e9428',\r\n  operator: 'strictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v24.22.1\r\n"
+    }
+  ]
+}
