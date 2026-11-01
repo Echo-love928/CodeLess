@@ -7,14 +7,20 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import assert from 'node:assert/strict'
 
 export const root = fileURLToPath(new URL('../../../', import.meta.url))
-export const inputs = ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'apps/web',
-  'services/runner', 'services/api/src/main/resources/network/site-policy.json', 'templates/vue',
-  'infra/runner', 'infra/build-image', 'infra/preview', 'infra/hosting', 'infra/public', 'infra/release/client']
-export const runnerInputs = inputs.filter(p => !['apps/web', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'infra/release/client'].includes(p))
+export const runnerInputs = ['services/runner', 'services/api/src/main/resources/network/site-policy.json', 'templates/vue',
+  'infra/runner', 'infra/build-image', 'infra/preview', 'infra/hosting', 'infra/public']
+export const inputs = [...runnerInputs, 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'apps/web',
+  'infra/release/client', 'tests/e2e/admin/wire-fixture.ts',
+  'services/api/src/test/resources/network/site-cases.json', 'contracts/examples/v0/valid']
 export const hash = bytes => createHash('sha256').update(bytes).digest('hex')
 export function command(cmd, args, options = {}) {
   const result = spawnSync(cmd, args, { cwd: root, encoding: 'utf8', windowsHide: true, timeout: 600000, ...options })
-  if (result.error || result.signal || result.status !== 0) throw new Error(`Command failed: ${cmd}; exit=${result.status}; signal=${result.signal}`, { cause: result.error })
+  if (result.error || result.signal || result.status !== 0) {
+    const error = new Error(`Command failed: ${cmd}; exit=${result.status}; signal=${result.signal}`, { cause: result.error })
+    error.log = (result.stdout ?? '') + (result.stderr ?? '')
+    error.exitCode = result.status; error.signal = result.signal
+    throw error
+  }
   return result.stdout?.trim()
 }
 export function pnpm(args, options = {}) {
@@ -110,7 +116,12 @@ export async function build(commit, destination) {
     report.status = 'BUILT'; report.files = manifest.files; report.manifestSha256 = hash(await readFile(join(bundle, 'manifest.json')))
     await save()
     return { output, manifestSha256: report.manifestSha256, commit }
-  } catch (error) { report.status = 'FAILED'; report.error = error.message; await save(); throw error }
+  } catch (error) {
+    report.status = 'FAILED'; report.error = error.message
+    report.exitCode = error.exitCode ?? null; report.signal = error.signal ?? null
+    if (error.log) await writeFile(join(output, 'failure.log'), error.log)
+    await save(); throw error
+  }
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const [mode, value, path] = process.argv.slice(2)
