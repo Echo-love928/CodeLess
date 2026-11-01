@@ -1,3 +1,9 @@
+# 当前部署与验收状态
+
+唯一当前产物源码为 `61df15eba456422762a667aaed7734b7d13b48e7`，指针 `tests/release/browser/candidate.json`，证据 `tests/release/browser/evidence/final-61df15e/`。用户授权后已部署到23.136.172.128并完成新run-id真实公网登录/生成/预览/UI源码ZIP/新站点/真实会话隔离与独立外部验收。API/client/镜像同源，固定API/agent/export有效根为 `/srv/codeless/repository`，OPS worker也更新为同源版本。
+
+原51公网IPC失败已回退，后续b4已修复IPC但在启用前被61的HTTP响应流修复替换；旧6d因Linux校验排序问题撤回。以下步骤保留为操作说明，具体新集合以当前指针与handoff最新节为准。原ENOTEMPTY、PR93历史清理失败和D23规范备份缺口未关闭，PR仍draft/HOLD，未合并main。
+
 # D27 前端 / runner 候选发布包
 
 本流程只产生候选文件，不启动生产服务、不发布生成应用。API JAR、迁移和数据库恢复由 D27-A 交付。必须将双方产物绑定同一完整提交；当前线上版本和历史 D15 示例不能当作 D27 部署证明。生产自动 cover 及真实生成质量的既有 HOLD 继续保留。
@@ -24,12 +30,12 @@ node --test tests/release/browser/package.test.mjs
 
 另用 `node tests/release/browser/record.mjs image <候选SHA> .local-data/d27-b/image-2` 从相同 SHA 的 `infra/build-image` 和 `templates/vue` 独立归档上下文，真实构建、运行版本探针并 `docker image save`。独立 tag 为 `codeless-d27-b:<完整SHA>`；不提升本机已有 runner tag，不上传 registry。`image.json` 记录固定基础镜像、源文件摘要、实际 image ID/架构、Node/Vue/Vite/TypeScript 运行版本及离线镜像归档 SHA256。探针使用非 root、禁网、只读根与原资源上限。Docker build 可命中缓存，不将它声称为冷缓存镜像字节复现。
 
-当前组合交付集合含 API/client 成组归档和单独的 runner 构建镜像归档，源提交均为 `51e415e143ee5c167a25f39476b27b0f37965813`，见 `tests/release/browser/evidence/followup-51e415e/selected.json`；旧 `artifact-set.json` 仅为历史 B-only 集合。目标候选宿主先核验归档 SHA256，再离线 `docker image load --input <runner-build-image.tar>`，检查版本标签、源 revision label 和实际镜像身份，再由维护者按既有 worker 配置提升允许的固定 tag。本机 containerd 的 image ID 是 OCI index 摘要，归档的 configDigest 另列；两个摘要均已从导出归档核验，不能混用。目标环境的导入/后端兼容性尚未演练，出现未知身份必须 HOLD。API/生成容器不参与镜像导入或获得 Docker socket。
+当前组合交付集合含 API/client 成组归档和单独的 runner 构建镜像归档，源提交均为 `61df15eba456422762a667aaed7734b7d13b48e7`，见 `tests/release/browser/evidence/final-61df15e/selected.json`；旧 `artifact-set.json` 仅为历史 B-only 集合。目标候选宿主先核验归档 SHA256，再离线 `docker image load --input <runner-build-image.tar>`，检查版本标签、源 revision label 和实际镜像身份，再由维护者按既有 worker 配置提升允许的固定 tag。本机 containerd 的 image ID 是 OCI index 摘要，归档的 configDigest 另列；两个摘要均已从导出归档核验，不能混用。目标环境的导入/后端兼容性尚未演练，出现未知身份必须 HOLD。API/生成容器不参与镜像导入或获得 Docker socket。
 
 ## 候选环境部署步骤
 
 1. 获取 D27-A 同提交 API/JAR/迁移、客户端 bundle 和受信 manifest 摘要；先核验摘要及 `verify`，禁止混用两个提交。既有备份/恢复与 A 的空环境迁移验证是启用前置。
-2. 新建组合版本目录，保持封存的 `release/api/repository` 不变，将其完整复制到 **`runtime/repository` 作为实际受信 repository 根**，平台 dist 指向 `release/client/web`。`CODELESS_AGENT_REPOSITORY_ROOT` 和 `codeless.export.repository-root` 均指向该 runtime repository；其中 `services/api/agent-runner.mjs` 是 Java LocalBuildGateway 与 worker IPC 固定调用的桥。Linux public worker 固定根为 `/srv/codeless/repository`，操作员必须把已核验的同源 runtime repository 安装到该路径；不能只更改 API 环境变量而让 worker 继续读取另一份源码。现有 systemd/worker 固定路径未在本卡修改，实际主机映射还需部署身份验收。
+2. 新建组合版本目录，保持封存的 `release/api/repository` 不变，复制到 `runtime/repository`，仅在该副本安装依赖。**本机直接Node验证**可把它作为受信根；**Linux生产IPC组合**必须将其完整安装到 `/srv/codeless/repository`，API `codeless.agent.repository-root`（或对应受信环境配置）、源码导出 `codeless.export.repository-root` 均解析到这个相同固定路径；未显式设置export根时应确认其回退到agent根。worker常量REPOSITORY也是该路径，固定桥为 `/srv/codeless/repository/services/api/agent-runner.mjs`。不能让API指向staging runtime路径而worker继续匹配另一条固定路径，即使两份源码字节相同也会被IPC拒绝。平台资源将 `release/client/web` 安装到 `/srv/codeless/web`，允许保留旧hashed资源供已打开页面使用，但当前index及其清单7个文件必须逐项匹配新包。生产broker `/opt/codeless/ops/worker.py` 必须匹配同源 `infra/public/worker.py`；work参数仅允许固定base或其一层规范task UUID，其他根/entry保持固定且拒绝链接。实际映射和运行receipt见最终证据。
 
    B 的 runner.tar 同样补入该受信桥和导出 README，可单独展开作桥/runner 验证；它不是包含 API 配置与安装输入的完整 API repository。两包重叠源码必须逐字节相同，不能把不同候选覆盖拼装。可信宿主仅在 runtime 副本内按原根锁 `corepack pnpm install --frozen-lockfile`，再执行 `corepack pnpm exec playwright install chromium` 并满足系统前置；完成后核验封存源文件摘要未变，再将源码设只读；不要向封存 API 包内安装 node_modules。打包器已从单独展开的 runner 真实安装依赖/加载桥，专项另以有效受控 Vue 输入实际跑桥→Docker→Chromium→receipt。归档内原根 CI scripts 仍需完整开发源码，不能在运行包调用。构建镜像可从归档内直接执行 `docker build -f infra/build-image/Dockerfile -t <受信候选tag> .`；原文提到的 tests/agent/prepare-runtime.mjs 仅在完整开发 checkout 存在。保留旧版本目录与私有卷，宿主依赖安装不发生在生成代码容器内。
 3. 通过私密渠道在服务器配置现有 `/etc/codeless/` 受保护配置，复用 `infra/public/README.md` 的服务账号、worker IPC、隔离镜像、私有根及防火墙。不要复制配置、密码、cookie 或 TLS 私钥到构建目录。API/preview 和生成容器不得取得 Docker socket。
@@ -56,7 +62,7 @@ node tests/release/browser/record.mjs sample .local-data/d27-b/sample-1
 
 当前执行结果、候选 SHA、证据与阻塞见 `docs/handoffs/D27-B.md`。未经另一人批准、当前 HEAD 全部门禁成功和无未解决讨论，不具备合并条件。
 
-## 同提交组合复现（51e415e 历史，公网IPC验收撤回）
+## 同提交组合复现（当前61df15e）
 
 先构建同源镜像，再在全新输出目录组合；以下操作需要可信宿主 Docker、Java21、锁定 Node/pnpm 和 Chromium 前置。组合工具从同一 Git 提交分别构建 API/client，逐字节核对113个重叠文件，复制 runtime，实际执行两种展开根的受信桥并验证 Docker/Chromium/持久化回执。测试期间仅临时绑定本机策略 tag，finally 校验并恢复原 image ID；不向 registry 推送。
 
@@ -65,6 +71,6 @@ node tests/release/browser/record.mjs image <完整SHA> .local-data/d27-b/image-
 node tests/release/browser/record.mjs combined <完整SHA> .local-data/d27-b/combined-new codeless-d27-b:<完整SHA>
 ```
 
-本机实际根为 `.local-data/d27-b/combined-51e415e/runtime/repository`；`release/client/web` 是平台资源。`bridge-runner-only.json` 只验证独立 runner 根契约，正式 API/worker 采用完整 runtime 根。Linux `/srv/codeless/repository` 尚未安装，公开主机映射 UNKNOWN。用户已指定23.136.172.128，独立候选安装、镜像/浏览器和真实旧库副本登录下载验收通过；公网新候选尚未启用，仍需精确部署身份、真实公网登录/预览/下载/会话隔离，不以历史D15/合成Cookie替代。
+本机实际根为 `.local-data/d27-b/combined-61df15e/runtime/repository`；`release/client/web` 是平台资源。`bridge-runner-only.json` 只验证独立 runner 根契约，正式 API/worker 采用完整 runtime 根。Linux `/srv/codeless/repository` 尚未安装，公开主机映射 UNKNOWN。用户已指定23.136.172.128，独立候选安装、镜像/浏览器和真实旧库副本登录下载验收通过；公网新候选尚未启用，仍需精确部署身份、真实公网登录/预览/下载/会话隔离，不以历史D15/合成Cookie替代。
 
 注意：51e415e公网生成实测发现Java任务scratch与Linux worker固定base-root契约不兼容，已回退，不得再启用该集合。修复后不仅要复制repository，还需按同源文件更新受信 `/opt/codeless/ops/worker.py` 并重启broker，保持原peer UID、固定桥、固定其他根、严格单层task UUID和链接拒绝；不接受任意目录。新组合身份以handoff最新增量为准。
