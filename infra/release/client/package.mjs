@@ -2,7 +2,7 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { readFile, writeFile, mkdir, readdir, lstat, cp } from 'node:fs/promises'
-import { resolve, join, relative } from 'node:path'
+import { resolve, join, relative, isAbsolute } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import assert from 'node:assert/strict'
 
@@ -63,7 +63,7 @@ export async function build(commit, destination) {
   // All writes remain in an ignored, task-local output directory. Never overwrite.
   const privateRoot = resolve(root, '.local-data/d27-b')
   const rel = relative(privateRoot, output)
-  assert.ok(rel && !rel.startsWith('..') && !resolve(output).endsWith('.git'), 'Use a new directory below .local-data/d27-b')
+  assert.ok(rel && !isAbsolute(rel) && !rel.startsWith('..') && !resolve(output).endsWith('.git'), 'Use a new directory below .local-data/d27-b')
   await mkdir(privateRoot, { recursive: true })
   await mkdir(output)
   const report = { schema: 1, commit, status: 'BUILDING', files: {}, deployed: false }

@@ -22,7 +22,7 @@ try {
   const page = await context.newPage()
   const errors = []
   page.on('pageerror', error => errors.push(error.name))
-  for (const path of ['/', '/applications']) {
+  for (const path of ['/', '/apps']) {
     const response = await page.goto(config.platformOrigin + path, { timeout: 30000, waitUntil: 'networkidle' })
     assert.equal(response.status(), 200)
     await expect(page.getByRole('button', { name: '登录', exact: true })).toBeVisible()
@@ -45,9 +45,11 @@ try {
   await context.addCookies([{ name: 'JSESSIONID', value: 'D27_SYNTHETIC_NON_AUTH_CANARY',
     url: config.platformOrigin, secure: true, httpOnly: true, sameSite: 'Lax' }])
   await page.evaluate(() => localStorage.setItem('d27-platform-canary', 'platform-only'))
-  const leaked = []
+  const leaked = [], requests = []
   page.on('request', request => {
-    if (new URL(request.url()).hostname.endsWith('.sites.codeless-publish.top') && request.headers().cookie?.includes('D27_SYNTHETIC')) leaked.push(true)
+    if (new URL(request.url()).hostname.endsWith('.sites.codeless-publish.top')) requests.push(request.allHeaders().then(headers => {
+      if (headers.cookie?.includes('D27_SYNTHETIC')) leaked.push(true)
+    }))
   })
   for (const path of ['/', '/tasks', '/catalog']) {
     const response = await page.goto(new URL(path, historical.publicationUrl).href, { timeout: 30000, waitUntil: 'networkidle' })
@@ -59,6 +61,7 @@ try {
     report.steps.push({ name: 'sample route / reload / isolated storage', path, status: 'PASSED' })
   }
   assert.equal((await context.cookies(historical.publicationUrl)).some(c => c.name === 'JSESSIONID'), false)
+  await Promise.all(requests)
   assert.equal(leaked.length, 0)
   assert.equal(errors.length, 0)
   await page.screenshot({ path: join(output, 'sample.png'), fullPage: true })
