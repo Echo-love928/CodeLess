@@ -1,0 +1,27 @@
+✔ release verifier rejects tamper, unexpected commit, missing and extra files (40.317ms)
+✔ build rejects movable refs before creating output (1.0112ms)
+✖ runner archive starts the exact bridge required by LocalBuildGateway and worker IPC (1.4588ms)
+✔ formal ingress keeps private APIs and platform cookies off generated hosts (31.5628ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 203.8038
+
+✖ failing tests:
+
+test at tests\release\browser\package.test.mjs:33:1
+✖ runner archive starts the exact bridge required by LocalBuildGateway and worker IPC (1.4588ms)
+  Error: EPERM: operation not permitted, mkdir 'F:\JAVA\CodeLess\CodeLess\.local-data\d27-b'
+      at async mkdir (node:internal/fs/promises:1571:10)
+      at async TestContext.<anonymous> (file:///F:/JAVA/CodeLess/CodeLess/tests/release/browser/package.test.mjs:35:3)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'mkdir',
+    path: 'F:\\JAVA\\CodeLess\\CodeLess\\.local-data\\d27-b'
+  }
