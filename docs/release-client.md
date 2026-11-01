@@ -20,6 +20,8 @@ node --test tests/release/browser/package.test.mjs
 
 重复到另一个全新目录构建同一提交，比对两个 manifest 的 files、commit、toolchain、config；这验证本轮实际字节复现，不承诺任意操作系统/工具版本均字节相同。不得用最终文档提交替换已构建候选身份。
 
+本轮全新目录复用宿主 pnpm 下载缓存，不宣称冷缓存安装。可用 `node tests/release/browser/record.mjs build|verify|unit|audit|compare ...` 保存原生命令退出码、signal 和日志摘要。`compare` 参数为候选 SHA、两个 bundle 路径。
+
 ## 候选环境部署步骤
 
 1. 获取 D27-A 同提交 API/JAR/迁移、客户端 bundle 和受信 manifest 摘要；先核验摘要及 `verify`，禁止混用两个提交。既有备份/恢复与 A 的空环境迁移验证是启用前置。
@@ -31,9 +33,13 @@ node --test tests/release/browser/package.test.mjs
 
 ```sh
 node tests/release/browser/public.mjs <候选SHA> .local-data/d27-b/candidate-1/bundle .local-data/d27-b/public-1
+node tests/release/browser/record.mjs ingress <候选SHA> .local-data/d27-b/candidate-1/bundle .local-data/d27-b/ingress-1
+node tests/release/browser/record.mjs sample .local-data/d27-b/sample-1
 ```
 
 该脚本使用正常 DNS/系统 TLS、无会话 Chromium，不请求登录密码、不改线上数据。检查平台和 D15 历史示例的资源、直达路由/刷新、匿名 API、内部路由拒绝、模拟 host-only cookie 和 LocalStorage 跨站隔离。公开报告明确该 canary 不是已登录账号；index 比对也不证明 API/runner 部署身份。登录预览、下载和真实会话隔离由受保护服务器验收及完整本地链另证。错误/未知均不写 PASSED。
+
+`ingress` 单独使用固定 nginx 镜像、一次性测试 CA（显式信任它并校验 Host/SNI）、本机 loopback 端口和候选原始配置，执行三个 `nginx -t`、正式 Compose 配置解析、真实 HTTP 静态字节/MIME、路由回退及内部路径拒绝。仅启动自有临时平台 nginx，不启动生产 Compose/API，不使用系统 TLS 例外；结束精确删除该测试容器。它不证明公网 DNS/受信正式证书或真实登录。`sample` 是平台登录 bootstrap 受阻时的独立检查：只在平台静态文档写入合成存储标记，检查历史示例的三路由、刷新、跨站存储和合成 Cookie；报告始终 `authenticatedSession=false`、`platformBootstrapPassed=false`。该部分通过不关闭原平台失败。
 
 ## 公开入口和评审账户
 
