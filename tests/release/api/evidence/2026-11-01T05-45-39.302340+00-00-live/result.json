@@ -1,0 +1,267 @@
+{
+  "actualDemoBackup": "NOT_PROVIDED",
+  "apiJarSha256": "d2c1bc7bccd9df9eec194fde509fa012f5c41eb3a7703aad669aaa447e067446",
+  "apiManifestSha256": "30204e1510a7715a8d985028d8505f33d41e4c9392145fc32600dcf053614f26",
+  "backupBinding": {
+    "activation": "NOT_AUTHORIZED",
+    "apiManifestSha256": "30204e1510a7715a8d985028d8505f33d41e4c9392145fc32600dcf053614f26",
+    "applicationAcceptance": "NOT_RUN",
+    "backupId": "98eb7c53-f798-48a2-a4ea-59ebcc26b360",
+    "backupManifestSha256": "1dbe471a7d67b81b6f12b1bb25388a7cc86d43acff23c84ddb3fb00e5f32174e",
+    "sourceCommit": "1f072dc361bd6e05b899390c7e84678711716f20",
+    "status": "BACKUP_BOUND_OFFLINE"
+  },
+  "checks": [
+    "T1_EMPTY_DATABASE",
+    "SAME_SEALED_JAR",
+    "API_READY_empty-V5",
+    "T1_FLYWAY_V1_V5",
+    "NO_DEFAULT_ACCOUNTS",
+    "T1_ANONYMOUS_401",
+    "OWNED_PG_LABEL",
+    "T2_EMPTY_LEGACY_DATABASE",
+    "SAME_SEALED_JAR",
+    "API_READY_legacy-target-V4",
+    "T2_BASELINE_V4",
+    "T2_BACKUP_CANDIDATE_BOUND",
+    "OWNED_PG_LABEL",
+    "T2_INDEPENDENT_EMPTY_CLUSTER_RESTORE",
+    "SAME_SEALED_JAR",
+    "API_READY_restored-migrate-V5",
+    "T2_FLYWAY_V5",
+    "T2_EXISTING_ROWS_UNCHANGED",
+    "T2_VERSION_ID_DIGEST_STATUS_UNCHANGED",
+    "T2_PROVENANCE_BACKFILLED",
+    "T2_UNKNOWN_AND_AMBIGUOUS_STAY_NULL",
+    "T2_CSRF",
+    "T2_OWNER_LOGIN",
+    "T2_OWNER_VERSION_LIST",
+    "T2_OWNER_VERSION_DETAIL",
+    "T2_SOURCE_HTTP_BYTES",
+    "T2_HISTORICAL_PUBLICATION_READ",
+    "T2_ANONYMOUS_401",
+    "OWNED_PG_LABEL"
+  ],
+  "cleanupErrors": [],
+  "commands": [
+    {
+      "exitCode": 0,
+      "operation": "docker-preflight",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "3795a4b1e2c6937a65f1be5ac40e8c7998963c6077c5cb1d19874a2d2474db02"
+    },
+    {
+      "exitCode": 0,
+      "operation": "create-owned-pg",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "32c8f6cbe2f609293ec20a022d21cd35b0b63566e4c3825468b1c43988391ebb"
+    },
+    {
+      "exitCode": 0,
+      "operation": "docker",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "43c19038bd10adcc7d534eb82115d6edb05462818ae6d053ec145d9d71a88c73"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "1f5b2ec688d2d64ea03176fea4e45e8f4206153053def5ce2111e8b18b1b36da"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "exitCode": 0,
+      "operation": "docker",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74"
+    },
+    {
+      "exitCode": 0,
+      "operation": "remove-owned-pg",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "feaa7683b958c6cc66f59954451648ec79976ab118073f112bee26d15934223a"
+    },
+    {
+      "exitCode": 0,
+      "operation": "create-owned-pg",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "dc6fc7a617f1c1781d07e86038cb0a960560712e3ff74516858b0d93fe247d2e"
+    },
+    {
+      "exitCode": 0,
+      "operation": "docker",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "9a74896d8c28d5ef5276d8a44ae9b53d0da7f350f1c7c76817786293bde948b7"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "b880cdf1bc0bd0270a22b4a9f30100c7894e2b482847836ed5d6e319b5323493"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "ba3bf9f03fed879f05606b33fd3ab3aa444281f8109abd6d97ba6a5657af828a"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "e4b1fc34982f93206847e55b7390e6cea3432af966cfda17615b0852f60aec34"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "0f608cc3b0ee71d4051d9aeabcd1f1b433d65c033bbc9e80fe58f45e3a9b1adf"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "c9224961b993ae975397f1334271dd5400458dfdbccebf6d31e933dca9d8fd03"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "ad0a16b334042d18cad1e3d9d04ebcd48dea37724ec1620925537207ccbfcce4"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "f8f89e74173f801bc0515ed23375980cc382fe015f6385e656a5d2a6116a0046"
+    },
+    {
+      "exitCode": 0,
+      "operation": "docker",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74"
+    },
+    {
+      "exitCode": 0,
+      "operation": "remove-owned-pg",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "092bd02c37a2c329801b53e3fdf12c39beebccca9f2767e37577b55b709c4fb1"
+    },
+    {
+      "exitCode": 0,
+      "operation": "create-owned-pg",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "57246e01d37f860e1fdb7952b554498fca3ff50d7ba51ada546d165cccf01e03"
+    },
+    {
+      "exitCode": 0,
+      "operation": "docker",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "243b7f75805f7fc3407b4d48d92b9e2181177c1812f7cd11f266b3188e76c73a"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "f0b5c2c2211c8d67ed15e75e656c7862d086e9245420892a7de62cd9ec582a06"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "e4b1fc34982f93206847e55b7390e6cea3432af966cfda17615b0852f60aec34"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "0f608cc3b0ee71d4051d9aeabcd1f1b433d65c033bbc9e80fe58f45e3a9b1adf"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "c9224961b993ae975397f1334271dd5400458dfdbccebf6d31e933dca9d8fd03"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "ad0a16b334042d18cad1e3d9d04ebcd48dea37724ec1620925537207ccbfcce4"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "f8f89e74173f801bc0515ed23375980cc382fe015f6385e656a5d2a6116a0046"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "08827d13c0e108fd3585fc91a61d788c61ef5f3da7bfedf5999a295f10c3bd8e"
+    },
+    {
+      "exitCode": 0,
+      "operation": "psql",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "exitCode": 0,
+      "operation": "docker",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74"
+    },
+    {
+      "exitCode": 0,
+      "operation": "remove-owned-pg",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "1589960a562baa6c4925d6cbc3f4d7ff979e66e072ac97b895ef45802a95606a"
+    }
+  ],
+  "databaseImage": "postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94",
+  "errorCode": "T2_OTHER_ACCOUNT_LOGIN",
+  "history": "explicit synthetic V4 demo fixture; not an operator demo backup or historical build proof",
+  "logDigests": {
+    "empty-V5.log": "a5864ee12898238c8a822b1fa39e4eec13b98c56d3916d6bf392d7fe7332f054",
+    "legacy-target-V4.log": "2d03342831779b18e1899c3958e1854d1eeb1c772fce944c0a79cfe24a3d610c",
+    "restored-migrate-V5.log": "85a55e2ec84d178baafefcfad13445c6a0a743c84b77922bccf32c79f8500a52"
+  },
+  "migrationFiles": {
+    "V1__platform_data.sql": "9be36330272210955041c7bd06b41817a63c2bc06ae709d79d1ce23a3a7c0a9f",
+    "V2__authentication.sql": "04fb058dadc8a3eeb55eae41535609c92a36ed175ea06c1414229aaa835eae1f",
+    "V3__task_queue.sql": "8af2357858372e6dea977f44d130cf5887ff36633f09f33a6f30fe158bf7d302",
+    "V4__task_file_snapshots.sql": "1ba7a331b2445a486de268adb9eb3b87464a2df824a59add89e9132972a93813",
+    "V5__version_source_tasks.sql": "1316e7cc67ef8b9afc93a1b898c1ccb872cdbe4e842cc3835e1c2c9a0db968d4"
+  },
+  "modelProvider": "deterministic-mock",
+  "paidModelRequests": 0,
+  "publicAcceptance": false,
+  "sourceCommit": "1f072dc361bd6e05b899390c7e84678711716f20",
+  "status": "FAILED",
+  "task": "D27-A"
+}

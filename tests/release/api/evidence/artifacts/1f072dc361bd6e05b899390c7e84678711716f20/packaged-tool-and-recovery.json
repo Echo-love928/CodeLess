@@ -1,0 +1,72 @@
+{
+  "sourceCommit": "1f072dc361bd6e05b899390c7e84678711716f20",
+  "commands": [
+    {
+      "operation": "verify",
+      "command": [
+        "F:\\python314\\python.exe",
+        "-B",
+        "F:\\JAVA\\CodeLess\\CodeLess\\tests\\release\\api\\.private\\runs\\2026-11-01T05-43-40.401427+00-00-build\\release\\api\\repository\\scripts\\release\\api_release.py",
+        "verify",
+        "--package",
+        "F:\\JAVA\\CodeLess\\CodeLess\\tests\\release\\api\\.private\\runs\\2026-11-01T05-43-40.401427+00-00-build\\release\\api",
+        "--manifest-sha256",
+        "30204e1510a7715a8d985028d8505f33d41e4c9392145fc32600dcf053614f26"
+      ],
+      "nativeExitCode": 0,
+      "result": {
+        "status": "VERIFIED",
+        "sourceCommit": "1f072dc361bd6e05b899390c7e84678711716f20"
+      },
+      "stdoutSha256": "8bf39a03b1d454be616c3f4f874924a6594fdd4e11457209b52a8d45c18e723c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "operation": "verify-backup",
+      "command": [
+        "F:\\python314\\python.exe",
+        "-B",
+        "F:\\JAVA\\CodeLess\\CodeLess\\tests\\release\\api\\.private\\runs\\2026-11-01T05-43-40.401427+00-00-build\\release\\api\\repository\\scripts\\release\\api_release.py",
+        "verify-backup",
+        "--backup",
+        "F:\\JAVA\\CodeLess\\CodeLess\\tests\\release\\api\\.private\\runs\\2026-11-01T05-57-13.158234+00-00-live\\live\\backup",
+        "--manifest-sha256",
+        "30204e1510a7715a8d985028d8505f33d41e4c9392145fc32600dcf053614f26"
+      ],
+      "nativeExitCode": 0,
+      "result": {
+        "status": "BACKUP_BOUND_OFFLINE",
+        "backupId": "73e88787-5d0e-4aff-a0de-010d0cc0b25c",
+        "backupManifestSha256": "ca35af5284bb33bec98c6b3b9263c88ef490f6878ed407baf55328907c446c82",
+        "sourceCommit": "1f072dc361bd6e05b899390c7e84678711716f20",
+        "apiManifestSha256": "30204e1510a7715a8d985028d8505f33d41e4c9392145fc32600dcf053614f26",
+        "applicationAcceptance": "NOT_RUN",
+        "activation": "NOT_AUTHORIZED"
+      },
+      "stdoutSha256": "3120adb2aa2cdf86c3f4b1b91e1a7c525a3c3d16dc2660f1a59b5e920361745a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "operation": "wrong-candidate",
+      "command": [
+        "F:\\python314\\python.exe",
+        "-B",
+        "F:\\JAVA\\CodeLess\\CodeLess\\tests\\release\\api\\.private\\runs\\2026-11-01T05-43-40.401427+00-00-build\\release\\api\\repository\\scripts\\release\\api_release.py",
+        "verify-backup",
+        "--backup",
+        "F:\\JAVA\\CodeLess\\CodeLess\\tests\\release\\api\\.private\\runs\\2026-11-01T05-57-13.158234+00-00-live\\live\\backup",
+        "--manifest-sha256",
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "nativeExitCode": 1,
+      "result": {
+        "status": "FAILED",
+        "code": "RELEASE_MANIFEST_MISMATCH"
+      },
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "0b0310e2c2b4ec0468eb205abe7146bfabf67882d37e1a36f6ac02549dbf42fb"
+    }
+  ],
+  "validationExitCode": 0,
+  "note": "Runs tool from sealed package, not root checkout; wrong-candidate native1 is preserved."
+}
