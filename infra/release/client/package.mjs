@@ -74,7 +74,9 @@ export async function build(commit, destination) {
     // Prevent local shell credentials and VITE overrides entering public build bytes.
     const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => /^(PATH|PATHEXT|SYSTEMROOT|WINDIR|COMSPEC|TEMP|TMP|HOME|USERPROFILE|LOCALAPPDATA|APPDATA|COREPACK_HOME)$/i.test(key)))
     assert.equal(pnpm(['--version'], { cwd: source, env }), pkg.engines.pnpm)
-    assert.equal(hash(await readFile(fileURLToPath(import.meta.url))), hash(await readFile(join(source, 'infra/release/client/package.mjs'))), 'Builder differs from candidate')
+    // Git's Windows checkout filter may use CRLF; require identical canonical source.
+    const builderBytes = await readFile(join(source, 'infra/release/client/package.mjs'))
+    assert.equal((await readFile(fileURLToPath(import.meta.url), 'utf8')).replaceAll('\r\n', '\n'), builderBytes.toString('utf8').replaceAll('\r\n', '\n'), 'Builder differs from candidate')
     const configBytes = await readFile(join(source, 'infra/release/client/config.json'))
     const config = JSON.parse(configBytes)
     const { publicConfiguration } = await import(pathToFileURL(join(source, 'infra/public/render.mjs')).href)
@@ -100,7 +102,7 @@ export async function build(commit, destination) {
       runnerFormat: 'uncompiled Node ESM source + locked template + policies + operator adapters; not a Docker image',
       sourceArchiveSha256: hash(await readFile(archive)),
       lockSha256: hash(await readFile(join(source, 'pnpm-lock.yaml'))),
-      builderSha256: hash(await readFile(fileURLToPath(import.meta.url))),
+      builderSha256: hash(builderBytes),
       configSha256: hash(configBytes),
       files: await inventory(bundle) }
     await writeFile(join(bundle, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n')
