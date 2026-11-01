@@ -7,9 +7,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import assert from 'node:assert/strict'
 
 export const root = fileURLToPath(new URL('../../../', import.meta.url))
-export const runnerInputs = ['services/runner', 'services/api/src/main/resources/network/site-policy.json', 'templates/vue',
+export const runnerInputs = ['services/runner', 'services/api/agent-runner.mjs', 'services/api/src/main/resources/network/site-policy.json', 'templates/vue',
   'infra/runner', 'infra/build-image', 'infra/preview', 'infra/hosting', 'infra/public',
-  'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml']
+  'docs/generated-project-readme.md', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml']
 export const inputs = [...runnerInputs, 'apps/web',
   'infra/release/client', 'tests/e2e/admin/wire-fixture.ts',
   'services/api/src/test/resources/network/site-cases.json', 'contracts/examples/v0/valid']
@@ -99,6 +99,14 @@ export async function build(commit, destination) {
     const runner = join(output, 'runner-check'); await mkdir(runner)
     command('tar', ['-xf', join(bundle, 'runner.tar'), '-C', runner])
     await writeFile(join(output, 'runner-install.log'), pnpm(['install', '--frozen-lockfile'], { cwd: runner, env }) + '\n')
+    // These exact relative paths are fixed by Java LocalBuildGateway and public worker IPC.
+    const bridgePath = 'services/api/agent-runner.mjs'
+    const bridge = join(runner, bridgePath)
+    assert.ok((await lstat(bridge)).isFile(), 'Missing trusted API build bridge')
+    const bridgeProbe = spawnSync(process.execPath, [bridge], { cwd: runner, env, encoding: 'utf8', windowsHide: true, timeout: 10000 })
+    assert.equal(bridgeProbe.status, 2, 'Shipped bridge must load and reject missing arguments')
+    assert.equal(bridgeProbe.signal, null)
+    assert.doesNotMatch(bridgeProbe.stderr, /MODULE_NOT_FOUND|ERR_MODULE_NOT_FOUND/)
     // Actual syntax validation of every packaged runner module and import closure.
     const runnerFiles = await inventory(join(source, 'services/runner'))
     for (const name of Object.keys(runnerFiles).filter(p => p.endsWith('.mjs'))) command(process.execPath, ['--check', join(source, 'services/runner', name)])
@@ -115,6 +123,9 @@ export async function build(commit, destination) {
       lockSha256: hash(await readFile(join(source, 'pnpm-lock.yaml'))),
       builderSha256: hash(builderBytes),
       configSha256: hash(configBytes),
+      repositoryLayout: { agentRepositoryRoot: 'runner.tar extraction root', bridgePath,
+        bridgeGitBlob: command('git', ['rev-parse', `${commit}:${bridgePath}`]),
+        bridgeSha256: hash(await readFile(bridge)), bridgeArgumentRejectionExitCode: bridgeProbe.status },
       files: await inventory(bundle) }
     await writeFile(join(bundle, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n')
     await verify(bundle, commit)
