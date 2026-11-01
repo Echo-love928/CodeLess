@@ -155,7 +155,7 @@ class AgentLoopIntegrationTest extends PostgresTestBase {
         new TaskScheduler(queue,loop(provider,gateway)).tick();
         var task=queue.find(seed.owner(),seed.task()).orElseThrow();var events=journal.read(seed.task());
         var actual=AgentJournal.latest(events,"runner.result");
-        assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_ACTION_FAILED");
+        assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).as("Runner evidence before failure-code assertion: %s", actual).isEqualTo("AGENT_ACTION_FAILED");
         assertThat(actual.path("build").path("status").asText()).isEqualTo("SUCCEEDED");
         assertThat(actual.path("build").path("exitCode").asInt(-1)).isZero();
         assertThat(actual.path("verification").path("status").asText()).isEqualTo("FAILED");

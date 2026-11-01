@@ -32,6 +32,13 @@ class PackageIntegrity(unittest.TestCase):
         self.assertEqual(process.returncode, 0)
         self.assertEqual(json.loads(process.stdout)['status'], 'VERIFIED')
 
+    def test_inventory_order_is_portable_posix_case_sensitive(self):
+        repository = self.package / 'repository'; repository.mkdir()
+        (repository / 'Z-file').write_bytes(b'upper')
+        (repository / 'a-file').write_bytes(b'lower')
+        names = [row['path'] for row in r.inventory(self.package)]
+        self.assertEqual(names, sorted(names))
+
     def test_bytes_tampered(self):
         (self.package / 'api.jar').write_bytes(b'changed')
         with self.assertRaisesRegex(ValueError, 'RELEASE_FILES_MISMATCH'): self.verify()

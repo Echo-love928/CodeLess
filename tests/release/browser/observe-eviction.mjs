@@ -33,3 +33,29 @@ fs.rmdir = function (path, ...args) {
   }
   return original.call(this, path, ...args)
 }
+
+// Only an error escaping fs.rm is an eviction failure; initial rmdir ENOTEMPTY can be normal traversal.
+const originalRm = fs.promises.rm
+fs.promises.rm = async function (path, ...args) {
+  try { return await originalRm.call(this, path, ...args) }
+  catch (error) {
+    const value = resolve(path.toString())
+    if (value.includes('codeless-d22-') && value.includes('queue') &&
+        !relative(resolve(tmpdir()), value).startsWith('..')) {
+      const event = { event: 'escaping-rm-error', code: error.code, syscall: error.syscall,
+        path: relative(resolve(tmpdir()), value), time: new Date().toISOString(), entries: [], retries: 0 }
+      try {
+        for (const name of fs.readdirSync(value).slice(0, 5)) {
+          const stat = fs.lstatSync(join(value, name))
+          event.entries.push({ name, type: stat.isSymbolicLink() ? 'link' : stat.isFile() ? 'file' : 'directory',
+            bytes: stat.size, mtimeMs: stat.mtimeMs, nlink: stat.nlink })
+        }
+      } catch (diagnosticError) { event.metadataError = diagnosticError.code }
+      try { fs.appendFileSync(output, JSON.stringify(event) + '\n') } catch { /* preserve original error */ }
+    }
+    throw error
+  }
+}
+// Update the named builtin rm export before the original test module is imported.
+const { syncBuiltinESMExports } = await import('node:module')
+syncBuiltinESMExports()

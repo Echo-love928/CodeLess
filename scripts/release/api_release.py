@@ -68,7 +68,8 @@ def safe(path):
 def inventory(directory):
     safe(directory)
     entries, aliases = [], set()
-    for path in sorted(directory.rglob('*')):
+    # Path ordering follows host case rules; manifests must use one portable order.
+    for path in sorted(directory.rglob('*'), key=lambda item: item.relative_to(directory).as_posix()):
         safe(path)
         name = path.relative_to(directory).as_posix()
         portable(name)
