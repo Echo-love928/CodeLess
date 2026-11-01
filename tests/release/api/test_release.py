@@ -69,6 +69,16 @@ class PackageIntegrity(unittest.TestCase):
         os.link(self.package / 'api.jar', self.package / 'alias')
         with self.assertRaisesRegex(ValueError, 'HARDLINK'): self.verify()
 
+    def test_directory_link_rejected(self):
+        target = Path(self.temp.name) / 'outside-package'; target.mkdir()
+        link = self.package / 'linked-directory'
+        if os.name == 'nt':
+            import _winapi
+            _winapi.CreateJunction(str(target), str(link))
+        else:
+            os.symlink(target, link, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, 'LINK_REJECTED'): self.verify()
+
     def test_cli_failure_native_nonzero(self):
         (self.package / 'api.jar').write_bytes(b'corrupted')
         process = subprocess.run([sys.executable, '-B', str(ROOT / 'scripts/release/api_release.py'),

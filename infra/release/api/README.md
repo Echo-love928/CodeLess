@@ -13,6 +13,8 @@ python -B scripts/release/api_release.py verify --package <release根>/api --man
 
 构建器从 Git blob 白名单提取 API 主源码、Maven wrapper、运行时契约/提示词、Vue模板、runner、共享站点策略、安装/备份/发布工具及手册；不取开发 checkout、旧 target/JAR、测试类、秘密或 node_modules。包外全新 build 目录执行 `-DskipTests package`，退出非零不封存，不删除失败目录，不覆盖既有包。此命令明确只打包；必需门禁另执行，不能据此报告测试通过。
 
+runner还跨目录依赖 `infra/runner/policy.mjs` / `profiles.mjs`；该固定目录也必须入包。封存前使用锁定Node真实解析包内preview、build workflow、publish、capture四条模块import图，不启动作业或浏览器；缺模块原生非零直接拒绝构建。这个预检不替代B的runner/browser复现或Docker镜像验收。
+
 包中 `api.jar` 是真实 Spring Boot 主类可执行包；`repository/` 保留精确 Git 字节及每项 gitBlob/SHA256 来源。`release.json` 列全体文件大小/SHA256、源码候选、工具链、构建日志摘要和 HOLD 状态；`SHA256SUMS` 含 manifest 本身。校验器要求包外可信 manifest 摘要并核对全部文件，篡改、缺件、多件、大小写别名、链接、硬链接及不受控路径均拒绝。SHA256不是签名；操作员需在受保护交付渠道保存 manifest 摘要并收紧 release 写权限。传输后、安装前及恢复后再次 verify。
 
 `configuration.json` 是配置名称清单，无真实值。环境凭据、TLS、Docker配置和会话均不属于包。参考包内 `repository/infra/public/install-runtime.py` 配置最小权限、独立 origin、IPC 和容器隔离；API/preview/生成容器不得获得 Docker socket 或平台密钥。包内 runner 是 API 的固定依赖源码，不取代 B 的构建/浏览器/runner 发布复现。

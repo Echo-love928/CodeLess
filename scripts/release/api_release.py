@@ -18,7 +18,7 @@ INPUTS = ('services/api/pom.xml', 'services/api/mvnw', 'services/api/mvnw.cmd',
           'services/runner/src', 'templates/vue', 'contracts/tools/registry.json',
           'contracts/plan', 'prompts/runtime', 'docs/generated-project-readme.md',
           'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml',
-          'infra/build-image', 'infra/public', 'infra/preview', 'infra/hosting',
+          'infra/build-image', 'infra/runner', 'infra/public', 'infra/preview', 'infra/hosting',
           'scripts/backup/backup.py', 'infra/backup', 'scripts/release',
           'infra/release/api', 'docs/operations.md', 'docs/release-notes.md')
 CONTROL = {'release.json', 'SHA256SUMS'}
@@ -92,6 +92,7 @@ def checksums(entries, manifest):
 def verify(directory, expected):
     directory = Path(directory).absolute()
     safe(directory)
+    safe(directory / 'release.json'); safe(directory / 'SHA256SUMS')
     require(re.fullmatch('[a-f0-9]{64}', expected or ''), 'TRUSTED_MANIFEST_SHA256_REQUIRED')
     manifest = (directory / 'release.json').read_bytes()
     require(sha(manifest) == expected, 'RELEASE_MANIFEST_MISMATCH')
@@ -129,6 +130,8 @@ def build(revision, output, log):
     java = jdk / 'bin' / ('java.exe' if os.name == 'nt' else 'java')
     r = subprocess.run([str(java), '-version'], capture_output=True)
     require(r.returncode == 0 and re.search(rb'version "21\.', r.stdout + r.stderr), 'JAVA21_REQUIRED')
+    node_version = subprocess.run(['node', '--version'], capture_output=True)
+    require(node_version.returncode == 0 and node_version.stdout.strip() == b'v24.22.1', 'LOCKED_NODE_REQUIRED')
     output.mkdir(parents=True)
     repo = output / 'repository'
     request = ''.join(blob + '\n' for _, blob, _ in files).encode()
@@ -155,7 +158,15 @@ def build(revision, output, log):
     command = ([os.environ.get('COMSPEC', 'cmd.exe'), '/d', '/c', str(wrapper)] if os.name == 'nt' else [str(wrapper)])
     command += ['-B', '-f', str(work / 'services/api/pom.xml'), '-DskipTests', 'package']
     log.parent.mkdir(parents=True, exist_ok=True)
+    runtime_preflight = []
     with log.open('xb') as stream:
+        for name in ('preview/main.mjs', 'verify/workflow.mjs', 'publish/frozen-gateway.mjs', 'screenshot/capture.mjs'):
+            target = repo / 'services/runner/src' / name
+            preflight = subprocess.run(['node', '--input-type=module', '-e',
+                "import {pathToFileURL} from 'node:url'; const target=process.argv[1]; process.argv[1]=''; await import(pathToFileURL(target));",
+                str(target)], cwd=repo, stdout=stream, stderr=subprocess.STDOUT, timeout=30)
+            runtime_preflight.append({'module': name, 'exitCode': preflight.returncode})
+            require(preflight.returncode == 0, 'RUNTIME_IMPORT_FAILED_' + name)
         result = subprocess.run(command, cwd=work, stdout=stream, stderr=subprocess.STDOUT)
     require(result.returncode == 0, 'API_PACKAGE_BUILD_FAILED')
     jar = work / 'services/api/target/codeless-api-0.0.0-SNAPSHOT.jar'
@@ -171,6 +182,7 @@ def build(revision, output, log):
              'build': {'command': ['mvnw', '-B', '-f', 'services/api/pom.xml', '-DskipTests', 'package'],
                        'exitCode': result.returncode, 'logSha256': sha(log.read_bytes()),
                        'javaVersion': (r.stdout + r.stderr).decode().strip(), 'tests': 'NOT_RUN_BY_PACKAGE_BUILD'},
+             'runtimeImportPreflight': runtime_preflight,
              'toolchain': {'java': '21', 'maven': '3.9.11', 'springBoot': '4.1.1', 'springAi': '2.0.1',
                            'node': '24.22.1', 'pnpm': '12.6.0', 'postgres': '17.6'},
              'clientBundle': 'NOT_INCLUDED_D27_B_REQUIRED', 'activation': 'NOT_AUTHORIZED_BY_BUILD'}
@@ -211,7 +223,7 @@ def main():
         elif args.action == 'verify-backup': result = verify_backup(args.backup, args.manifest_sha256)
         else: result = verify(args.package, args.manifest_sha256)
         print(json.dumps({'status': 'VERIFIED', 'sourceCommit': result['sourceCommit']} if args.action == 'verify' else result))
-    except (ValueError, OSError, KeyError, subprocess.SubprocessError, zipfile.BadZipFile) as error:
+    except (ValueError, RuntimeError, OSError, KeyError, subprocess.SubprocessError, zipfile.BadZipFile) as error:
         # Logs can contain private paths; never echo subprocess output or credential data.
         print(json.dumps({'status': 'FAILED', 'code': str(error) if isinstance(error, ValueError) else type(error).__name__}), file=sys.stderr)
         return 1

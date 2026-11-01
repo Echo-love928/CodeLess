@@ -147,6 +147,9 @@ def main():
                 report['commands'].append({'operation': label, 'exitCode': code,
                                            'logSha256': release.sha((output / (label + '.log')).read_bytes())})
                 checked('EXPECTED_MIGRATION_STARTUP_FAILURE', expect_failure and code != 0)
+                if expect_failure:
+                    raw = (output / (label + '.log')).read_bytes()
+                    checked('FLYWAY_CHECKSUM_MISMATCH_REPORTED', b'Migration checksum mismatch' in raw and b'Validate failed' in raw)
                 return None
             try:
                 if request(client(), base, 'auth/csrf')[0] == 200:
