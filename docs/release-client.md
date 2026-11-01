@@ -23,7 +23,7 @@ node --test tests/release/browser/package.test.mjs
 ## 候选环境部署步骤
 
 1. 获取 D27-A 同提交 API/JAR/迁移、客户端 bundle 和受信 manifest 摘要；先核验摘要及 `verify`，禁止混用两个提交。既有备份/恢复与 A 的空环境迁移验证是启用前置。
-2. 新建只读版本目录，展开 runner 归档保持仓库相对布局，将 `CODELESS_AGENT_REPOSITORY_ROOT` 指向此版本；平台 dist 指向 `bundle/web`。保留旧版本目录及持久私有卷，不将新版本覆盖旧发布目录。安装 root workspace 依赖不是 runner 容器运行步骤。
+2. 新建版本目录，展开 runner 归档保持仓库相对布局，在可信宿主按归档内原根锁运行 `corepack pnpm install --frozen-lockfile`，再以锁定 Playwright 安装 Chromium 及其系统前置；完成后设置版本目录只读。打包器已在单独展开的归档中真实执行 frozen install 及主入口/Playwright 导入，不借用前端安装目录。归档保留原根 package 元数据，根 CI scripts 需完整源码 checkout，不能在该运行包内调用。将 `CODELESS_AGENT_REPOSITORY_ROOT` 指向此版本；平台 dist 指向 `bundle/web`。保留旧版本目录及持久私有卷，不将新版本覆盖旧发布目录。宿主依赖安装不发生在生成代码容器内。
 3. 通过私密渠道在服务器配置现有 `/etc/codeless/` 受保护配置，复用 `infra/public/README.md` 的服务账号、worker IPC、隔离镜像、私有根及防火墙。不要复制配置、密码、cookie 或 TLS 私钥到构建目录。API/preview 和生成容器不得取得 Docker socket。
 4. DNS/TLS 必须覆盖三个独立站点：平台 `app.codeless-platform.top`、`v*.preview.codeless-preview.top`、`d*.sites.codeless-publish.top`（实际通配符为 `*.preview...` / `*.sites...`）。候选 `ingress/*.conf` 由现有正式 renderer 生成，预览网关8788、API8080保持私有；edge 只开放443。沿用 `infra/public/compose.yml`，将候选配置和 web 以只读挂载装配。先运行 compose `config --quiet` 和容器 `nginx -t`，再在候选入口启用。正式证书必须通过系统信任验证，不能 ignoreHTTPSErrors/hosts 覆盖冒充公网。
 5. 复核 `infra/hosting/preflight.mjs`、`infra/public/host-preflight.sh` 与只读 `check-final.py`；按既有服务器验收入口使用全新 run-id 和实际 deployed SHA。它需要真实受保护 reviewer 会话及 API/runner，同一 SHA 身份核验不能省略。不要自动调用发布；真实发布需由已鉴权用户显式确认已验证不可变版本。

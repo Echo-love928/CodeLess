@@ -8,8 +8,9 @@ import assert from 'node:assert/strict'
 
 export const root = fileURLToPath(new URL('../../../', import.meta.url))
 export const runnerInputs = ['services/runner', 'services/api/src/main/resources/network/site-policy.json', 'templates/vue',
-  'infra/runner', 'infra/build-image', 'infra/preview', 'infra/hosting', 'infra/public']
-export const inputs = [...runnerInputs, 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'apps/web',
+  'infra/runner', 'infra/build-image', 'infra/preview', 'infra/hosting', 'infra/public',
+  'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml']
+export const inputs = [...runnerInputs, 'apps/web',
   'infra/release/client', 'tests/e2e/admin/wire-fixture.ts',
   'services/api/src/test/resources/network/site-cases.json', 'contracts/examples/v0/valid']
 export const hash = bytes => createHash('sha256').update(bytes).digest('hex')
@@ -95,12 +96,16 @@ export async function build(commit, destination) {
     await cp(join(source, 'apps/web/dist'), join(bundle, 'web'), { recursive: true, errorOnExist: true })
     await writeFile(join(bundle, 'web/codeless-publication-config.json'), JSON.stringify({ publicOrigin: config.publicOrigin }) + '\n')
     command('git', ['archive', '--format=tar', `--output=${join(bundle, 'runner.tar')}`, commit, ...runnerInputs])
+    const runner = join(output, 'runner-check'); await mkdir(runner)
+    command('tar', ['-xf', join(bundle, 'runner.tar'), '-C', runner])
+    await writeFile(join(output, 'runner-install.log'), pnpm(['install', '--frozen-lockfile'], { cwd: runner, env }) + '\n')
     // Actual syntax validation of every packaged runner module and import closure.
     const runnerFiles = await inventory(join(source, 'services/runner'))
     for (const name of Object.keys(runnerFiles).filter(p => p.endsWith('.mjs'))) command(process.execPath, ['--check', join(source, 'services/runner', name)])
     for (const entry of ['preview/main.mjs', 'verify/workflow.mjs', 'publish/frozen-gateway.mjs', 'screenshot/gateway.mjs']) {
-      command(process.execPath, ['--input-type=module', '-e', `await import(${JSON.stringify(pathToFileURL(join(source, 'services/runner/src', entry)).href)})`], { env })
+      command(process.execPath, ['--input-type=module', '-e', `await import(${JSON.stringify(pathToFileURL(join(runner, 'services/runner/src', entry)).href)})`], { env })
     }
+    command(process.execPath, ['--input-type=module', '-e', "await import('@playwright/test')"], { env, cwd: runner })
     const ingress = join(bundle, 'ingress'); await mkdir(ingress)
     for (const name of ['edge', 'platform', 'hosting']) await writeFile(join(ingress, name + '.conf'), gateway[name])
     const manifest = { schema: 1, commit, sourceTree: command('git', ['rev-parse', `${commit}^{tree}`]),
