@@ -56,6 +56,8 @@ D27-B 的 API/client manifest Git blob SHA 分别为 `e488c594cd32ac3bcf7b76faff
 
 最终原四阶段：**static0 / API1（427/428、error0/skip0） / runner0（285/285） / E2E0（80/80+完整平台browserExit0） / ci-gate1**。四阶段原命令均实际执行，无重试。90份本次JUnit及日志摘要全部复算一致，源码/HEAD前后相同；summary退出1/HOLD，provenanceMismatches=[]。精确2be远端六success独立记录，不覆盖本机失败。
 
+交付为 [草稿PR94](https://github.com/Echo-love928/CodeLess/pull/94)，新PR当前HEAD检查另行运行，未等待/未继承旧结果。summary的 `NOT_RUN_LOCAL_DRAFT` 是其生成时的发布前快照；当前发布状态看 `publication.json`。整体仍HOLD，未批准/合并。
+
 ## 失败、新候选及合并条件
 
 代码、base 或候选集合变化后必须新身份与受影响重测，不手改 report.success、不用历史成功替换失败。若有产品修复，交对应维护者最小 PR；本卡不跨模块修权限、runner、CI 或预算。所有结果、严重问题、当前精确 SHA 的六项远端检查、最新 main、未解决讨论及另一位成员批准同时满足后才可考虑合并。当前未批准、未合并。
