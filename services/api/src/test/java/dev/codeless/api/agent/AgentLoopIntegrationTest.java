@@ -155,6 +155,18 @@ class AgentLoopIntegrationTest extends PostgresTestBase {
         new TaskScheduler(queue,loop(provider,gateway)).tick();
         var task=queue.find(seed.owner(),seed.task()).orElseThrow();var events=journal.read(seed.task());
         var actual=AgentJournal.latest(events,"runner.result");
+        // Preserve the real receipt before an assertion can abort the report (D27-A CI).
+        report("D09-A-ambiguous-browser",Map.of("task",task,"runner",actual,"modelProvider","deterministic-mock",
+                "realBuild",true,"realBrowser",true,"modelQualityEvidence",false));
+        if(!"AGENT_ACTION_FAILED".equals(task.failureCode())) {
+            var browser=actual.path("verification");var build=actual.path("build");
+            System.out.println("D27_AMBIGUOUS_RUNNER_DIAGNOSTIC="+json.writeValueAsString(Map.of(
+                    "buildStatus",build.path("status"),"buildFailure",build.path("failure"),"buildCleanup",build.path("cleanup"),
+                    "verificationFailure",browser.path("failure"),"workerExitCode",browser.path("workerExitCode"),
+                    "timedOut",browser.path("timedOut"),"phase",browser.path("phase"),"browserCleanup",browser.path("cleanup"),
+                    "timingsMs",browser.path("diagnostics").path("timingsMs"),
+                    "error",browser.path("error").asText("").replaceAll("(?i)(?:https?|wss?)://[^\\s\\\"<>]+","<redacted-url>"))));
+        }
         assertThat(task.status()).isEqualTo(TaskStatus.FAILED);assertThat(task.failureCode()).isEqualTo("AGENT_ACTION_FAILED");
         assertThat(actual.path("build").path("status").asText()).isEqualTo("SUCCEEDED");
         assertThat(actual.path("build").path("exitCode").asInt(-1)).isZero();
@@ -165,8 +177,6 @@ class AgentLoopIntegrationTest extends PostgresTestBase {
                 .param(seed.app()).query(Integer.class).single()).isZero();
         assertThat(jdbc.sql("SELECT latest_ready_version_id IS NULL FROM applications WHERE id=?")
                 .param(seed.app()).query(Boolean.class).single()).isTrue();
-        report("D09-A-ambiguous-browser",Map.of("task",task,"runner",actual,"modelProvider","deterministic-mock",
-                "realBuild",true,"realBrowser",true,"modelQualityEvidence",false));
     }
     @Test @Order(2) void D09AT2_modelCannotForgeSuccessOrInvokeVerifyToolsInGenerate() throws Exception {
         var outcomes=new ArrayList<Object>();

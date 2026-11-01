@@ -4,7 +4,8 @@
 
 原先API JAR、运行时依赖、配置和恢复过程没有绑定到一套可核验的固定发布产物。本变更从精确Git blob独立构建生产JAR，封存259项文件、可信manifest摘要与SHA256SUMS；打包前真实解析四条runner依赖闭包。同一封存包通过空库安装、V4→V5前迁和已有真实演示库的版本/源码/导出兼容验证，并提供源候选成组备份、独立恢复和失败回退说明。
 
-- 范围：`infra/release/api/**`、`scripts/release/**`、`docs/release-notes.md`、`tests/release/api/**`、`docs/handoffs/D27-A.md`。API/runner生产源码、迁移、公共契约、根锁、CI及client目录无改动。
+- 当前CI阻塞：HEAD94ab4dd 的 API 428项有1失败（预期 ACTION_FAILED，实际 CLEANUP_FAILED），ci-gate失败；其它四门禁成功。原日志摘录保留，根因UNKNOWN。仅扩展现有API集成测试中的失败回执落盘/脱敏诊断，原断言及生产/隔离/超时/CI不变；本机定向1/1通过不等同修复，补丁后的完整远端检查待执行。
+- 范围：`infra/release/api/**`、`scripts/release/**`、`docs/release-notes.md`、`tests/release/api/**`、`docs/handoffs/D27-A.md`。除上述一个现有API测试诊断外，API/runner生产源码、迁移、公共契约、根锁、CI及client目录无改动。
 - 子项：A01不可覆盖产物/配置/摘要；A02真实PG空库、前迁与现有演示库读取；A03全库/源码/发布卷/release恢复绑定；A04能力与已知限制说明。
 - 发布专项：unit16/16、live40检查、既有D23真实生成演示库22检查、四模块import、真实归档/258个Git blob/JAR五份迁移核验均native0。直接运行包内verify/verify-backup原生0；错误候选绑定原生1。原账号/版本/build/source/latestReady/publication和原ZIP保持，原备份字节不变。模型只有明确mock，构建/PG/浏览器真实。
 - 阶段门禁：原static0（64 Node/206 UI）、API0（90类428项）、runner1（284/285，队列腾位rm的ENOTEMPTY机制未知）、原E2E1（两份Playwright）。修复本地锁定依赖链接后，Root E2E又因误发现旧私有peer共155项而超时，154通过/1未运行；两轮失败保留。固定提交干净worktree的原E2E80/80与完整平台browserExitCode0、原生0。未改配置/超时/断言，不重复runner掩盖失败，原ci-gate仍1，最终HEAD远端检查以本PR实时状态为准，不继承旧SHA成功。
