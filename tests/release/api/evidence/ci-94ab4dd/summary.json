@@ -1,0 +1,25 @@
+{
+  "pr": 93,
+  "head": "94ab4ddccf5cedb7d62ddb94e73ab026d009f8fe",
+  "runId": 41284105720,
+  "apiJobId": 124781789181,
+  "apiNativeExitCode": 1,
+  "apiTests": 428,
+  "failures": 1,
+  "errors": 0,
+  "skipped": 0,
+  "failedCase": "AgentLoopIntegrationTest.ambiguousBrowserTargetsCannotPromoteEvenAfterARealSuccessfulBuild",
+  "expected": "AGENT_ACTION_FAILED",
+  "actual": "AGENT_CLEANUP_FAILED",
+  "originalLogSha256": "f7c7e244b76a2de11b45e0801ea3aa95295f6a35f6c3c2e1a6167bf09582a195",
+  "originalLogBytes": 676107,
+  "cause": "UNKNOWN_NO_RUNNER_RECEIPT_IN_ORIGINAL_CI",
+  "ciGate": "failure_due_to_api",
+  "unchangedSuccess": [
+    "verify:static",
+    "verify:runner",
+    "verify:e2e",
+    "infra-preflight"
+  ],
+  "followupScope": "One original API test writes existing receipt before unchanged assertions and emits bounded URL-redacted diagnostics on unexpected failure. No production code, test assertion, timeout, isolation or CI changes."
+}

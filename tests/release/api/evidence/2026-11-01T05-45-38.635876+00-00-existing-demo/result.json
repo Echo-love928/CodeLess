@@ -1,0 +1,95 @@
+{
+  "T2": "PASSED_EXISTING_REAL_GENERATED_DEMO_V5_COMPATIBILITY",
+  "apiJarSha256": "d2c1bc7bccd9df9eec194fde509fa012f5c41eb3a7703aad669aaa447e067446",
+  "apiLogSha256": "86533a1c69ad79fab3f634280d8439114e36040d2dc320d384753ed11b8b64ec",
+  "binding": {
+    "applicationId": "6a4661ee-b78a-4c48-931c-da932496e4fa",
+    "artifactDigest": "sha256:05dc193860ef0024013f76933f991b4603faa12d981d0b935877a9339d004393",
+    "buildId": "176f2da1-de83-415d-b358-3225089ef8a1",
+    "publicationId": "6e4e2f67-9994-8050-9f76-1966059ca1d6",
+    "reportDigest": "sha256:67601c66abfa70b5b0d496b4d361547433a61a190a95b66df916a1abbc231f00",
+    "sourceDigest": "sha256:2239f682cdf36d1fccd9adb61fe0c64736730a0d33191ec3364b09316179b9e9",
+    "taskId": "008f39b0-17e2-4218-8052-d3725d6936c0",
+    "versionId": "65436fc4-239c-49db-9e58-36b664fa371b"
+  },
+  "case": "T2-existing-real-generated-D23-demo",
+  "checks": [
+    "LOCKED_JAVA21",
+    "D23_SOURCE_ACCEPTANCE_PASSED",
+    "D23_BACKUP_MANIFEST_IDENTITY",
+    "D23_DATABASE_DUMP_IDENTITY",
+    "D23_FULL_DATABASE_AND_FILES_RESTORED",
+    "V5_SCHEMA_BEFORE_CANDIDATE",
+    "D27_PRODUCTION_MAIN_STARTS_ON_EXISTING_V5",
+    "ORIGINAL_DEMO_CREDENTIALS_LOGIN",
+    "EXISTING_VERIFIED_VERSION_AND_BUILD",
+    "EXISTING_SOURCE_FILES",
+    "EXISTING_SOURCE_CONTENT_DIGEST",
+    "EXISTING_SOURCE_CONTENT_DIGEST",
+    "EXISTING_LATEST_READY_POINTER",
+    "EXISTING_PUBLICATION",
+    "EXISTING_EXPORT_HTTP",
+    "EXISTING_EXPORT_IDENTICAL_TO_D23_BYTES",
+    "ANONYMOUS_VERSION_401",
+    "REFERENCE_TABLES_UNCHANGED_BY_CANDIDATE",
+    "MIGRATIONS_VALIDATED_WITHOUT_NEW_SCHEMA",
+    "D23_INPUT_BACKUP_BYTES_UNCHANGED",
+    "OWNED_CONTAINER_LABEL",
+    "FINAL_D23_INPUT_UNCHANGED"
+  ],
+  "cleanupErrors": [],
+  "command": [
+    "python",
+    "-B",
+    "tests/release/api/existing_demo.py",
+    "--backup",
+    "<private canonical D23 backup>",
+    "--source-evidence",
+    "tests/backup/evidence/2026-10-28T15-24-05.683508+00-00-application/application-summary.json"
+  ],
+  "commands": [
+    {
+      "exitCode": 0,
+      "operation": "create-owned-pg",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "ebcd80151ad921e38f7fe64f0f4decd5cbd0aa9f6939bf78f51822c62af2bfd8"
+    },
+    {
+      "exitCode": 0,
+      "operation": "pg-port-binding",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "98baa6eb429813979e7bd819c97cf031d3b7e1447d8a9ea9c68d6d23089b0491"
+    },
+    {
+      "exitCode": 0,
+      "operation": "cleanup-label",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74"
+    },
+    {
+      "exitCode": 0,
+      "operation": "cleanup-owned-pg",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "3ad34f3189ceb6db85a8dac83cc5df5722855892c987c2d925188b9d4ce6391c"
+    }
+  ],
+  "exitCode": 0,
+  "exportArchiveSha256": "sha256:d2ab933e0cbb02545e7e674561c6a995af46b62b5a6360ca83295caaa5ebda86",
+  "finishedAt": "2026-11-01T05:46:15.266280+00:00",
+  "harnessSha256": "fc0747846668eb1b2f57f0891640aa7f180223b1d9171b83e206db776f357792",
+  "history": "retained D23 real generation/build/browser demo; original model deterministic-mock",
+  "manifestSha256": "30204e1510a7715a8d985028d8505f33d41e4c9392145fc32600dcf053614f26",
+  "modelProvider": "deterministic-mock",
+  "newModelRequests": 0,
+  "paidModelRequests": 0,
+  "previewAcceptance": "NOT_RUN_STAGING_PATHS",
+  "productionAcceptance": false,
+  "sourceBackupId": "73b83923-c744-4779-b201-2680492e4e5d",
+  "sourceBackupManifestSha256": "sha256:c4aec6d3861c86eac0550fe3c946681433272e602f858055aef5d0c0fb0755e5",
+  "sourceCommit": "1f072dc361bd6e05b899390c7e84678711716f20",
+  "sourceEvidence": "tests/backup/evidence/2026-10-28T15-24-05.683508+00-00-application/application-summary.json",
+  "sourceEvidenceSha256": "f25e3474bc550e810086dae100e2898de0910bebf66abc33593c9fc85575189f",
+  "startedAt": "2026-11-01T05:45:38.636548+00:00",
+  "status": "PASSED",
+  "task": "D27-A"
+}

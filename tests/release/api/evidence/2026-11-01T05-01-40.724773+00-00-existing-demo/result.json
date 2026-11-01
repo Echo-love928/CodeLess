@@ -1,0 +1,78 @@
+{
+  "apiJarSha256": "d2c1bc7bccd9df9eec194fde509fa012f5c41eb3a7703aad669aaa447e067446",
+  "apiLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "binding": {
+    "applicationId": "6a4661ee-b78a-4c48-931c-da932496e4fa",
+    "artifactDigest": "sha256:05dc193860ef0024013f76933f991b4603faa12d981d0b935877a9339d004393",
+    "buildId": "176f2da1-de83-415d-b358-3225089ef8a1",
+    "publicationId": "6e4e2f67-9994-8050-9f76-1966059ca1d6",
+    "reportDigest": "sha256:67601c66abfa70b5b0d496b4d361547433a61a190a95b66df916a1abbc231f00",
+    "sourceDigest": "sha256:2239f682cdf36d1fccd9adb61fe0c64736730a0d33191ec3364b09316179b9e9",
+    "taskId": "008f39b0-17e2-4218-8052-d3725d6936c0",
+    "versionId": "65436fc4-239c-49db-9e58-36b664fa371b"
+  },
+  "case": "T2-existing-real-generated-D23-demo",
+  "checks": [
+    "D23_SOURCE_ACCEPTANCE_PASSED",
+    "D23_BACKUP_MANIFEST_IDENTITY",
+    "D23_DATABASE_DUMP_IDENTITY",
+    "D23_FULL_DATABASE_AND_FILES_RESTORED",
+    "V5_SCHEMA_BEFORE_CANDIDATE",
+    "OWNED_CONTAINER_LABEL",
+    "FINAL_D23_INPUT_UNCHANGED"
+  ],
+  "cleanupErrors": [],
+  "command": [
+    "python",
+    "-B",
+    "tests/release/api/existing_demo.py",
+    "--backup",
+    "<private canonical D23 backup>",
+    "--source-evidence",
+    "tests/backup/evidence/2026-10-28T15-24-05.683508+00-00-application/application-summary.json"
+  ],
+  "commands": [
+    {
+      "exitCode": 0,
+      "operation": "create-owned-pg",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "55758af4bdb1c0c1c81822c6ab77fb1a245a639e83aa1312f1b7ebd1e0e5a386"
+    },
+    {
+      "exitCode": 0,
+      "operation": "pg-port-binding",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "704a862ca373d1f250945a3bd238c1568b6b56cf174f0ea5f8f9f3409576e196"
+    },
+    {
+      "exitCode": 0,
+      "operation": "cleanup-label",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74"
+    },
+    {
+      "exitCode": 0,
+      "operation": "cleanup-owned-pg",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "1393624062f74e053d5e25f490cfd83aa0bf443789d001a9f0acd4fd2b8a4550"
+    }
+  ],
+  "errorCode": "FileNotFoundError",
+  "exitCode": 1,
+  "finishedAt": "2026-11-01T05:02:03.297090+00:00",
+  "history": "retained D23 real generation/build/browser demo; original model deterministic-mock",
+  "manifestSha256": "92c1c22f455385362fd033fe5dce2d37463414ce1be93428961125ef61e384bc",
+  "modelProvider": "deterministic-mock",
+  "newModelRequests": 0,
+  "paidModelRequests": 0,
+  "previewAcceptance": "NOT_RUN_STAGING_PATHS",
+  "productionAcceptance": false,
+  "sourceBackupId": "73b83923-c744-4779-b201-2680492e4e5d",
+  "sourceBackupManifestSha256": "sha256:c4aec6d3861c86eac0550fe3c946681433272e602f858055aef5d0c0fb0755e5",
+  "sourceCommit": "268ac771ee6884e53f96f332ea322bd884c1b026",
+  "sourceEvidence": "tests/backup/evidence/2026-10-28T15-24-05.683508+00-00-application/application-summary.json",
+  "sourceEvidenceSha256": "f25e3474bc550e810086dae100e2898de0910bebf66abc33593c9fc85575189f",
+  "startedAt": "2026-11-01T05:01:40.725405+00:00",
+  "status": "FAILED",
+  "task": "D27-A"
+}

@@ -17,6 +17,46 @@ worker = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(worker)
 
 
+class BuildScratchBindingTest(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(prefix='d27-ipc-binding-')
+        self.addCleanup(self.temp.cleanup)
+        previous = worker.PRIVATE
+        self.addCleanup(setattr, worker, 'PRIVATE', previous)
+        worker.PRIVATE = Path(self.temp.name) / 'agent'
+        self.source = worker.PRIVATE / 'versions/1432f5fa-b3e6-488f-9122-92b42979ff1f/source'
+        self.source.mkdir(parents=True)
+        (worker.PRIVATE / 'work').mkdir()
+        self.task = 'b245b9ba-101e-4c1d-9295-3bc84bcd9891'
+
+    def envelope(self, scratch):
+        args = [str(worker.REPOSITORY / 'services/api/agent-runner.mjs'), str(scratch),
+                *[str(worker.PRIVATE / name) for name in ('artifacts', 'evidence', 'receipts')]]
+        job = {'sourceDirectory': str(self.source), 'sourceDigest': 'sha256:' + 'a' * 64, 'actions': []}
+        return {'argv': args, 'input': base64.b64encode(json.dumps(job).encode()).decode()}
+
+    def test_java_task_scoped_scratch_and_legacy_base(self):
+        for scratch in [worker.PRIVATE / 'work', worker.PRIVATE / 'work' / self.task]:
+            bound = worker.binding(self.envelope(scratch))
+            self.assertEqual(bound[0][1], str(scratch))
+            self.assertEqual(bound[-1], 'build')
+
+    def test_task_scratch_cannot_select_arbitrary_roots_or_aliases(self):
+        work = worker.PRIVATE / 'work'
+        for scratch in [work / 'not-a-task', work / self.task / 'child', work / '..' / self.task,
+                        worker.PRIVATE / self.task, work / self.task.upper()]:
+            with self.subTest(path=str(scratch)), self.assertRaises(ValueError):
+                worker.binding(self.envelope(scratch))
+        link = work / self.task
+        if os.name == 'nt':
+            import _winapi
+            _winapi.CreateJunction(str(Path(self.temp.name)), str(link))
+        else:
+            link.symlink_to(Path(self.temp.name), target_is_directory=True)
+        with self.assertRaises(ValueError):
+            worker.binding(self.envelope(link))
+
+
 @unittest.skipUnless(sys.platform == 'linux', 'Production worker requires Linux process ownership')
 class WorkerBoundaryTest(unittest.TestCase):
     def envelope(self, argv, payload):

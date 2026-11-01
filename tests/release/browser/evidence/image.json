@@ -1,0 +1,197 @@
+{
+  "task": "D27-B",
+  "commit": "46e79aae5bb40569cd3828b67f0db705d91fdc12",
+  "status": "BUILT",
+  "imageReference": "codeless-d27-b:46e79aae5bb40569cd3828b67f0db705d91fdc12",
+  "buildToolSha256": "e627acb73f7778d2781c10757984e6ca24cc6f9137b95f5004b3250928e62f71",
+  "steps": [
+    {
+      "command": [
+        "docker",
+        "build",
+        "--label",
+        "org.opencontainers.image.revision=46e79aae5bb40569cd3828b67f0db705d91fdc12",
+        "--tag",
+        "codeless-d27-b:46e79aae5bb40569cd3828b67f0db705d91fdc12",
+        "--file",
+        ".local-data\\d27-b\\image-2\\context\\infra\\build-image\\Dockerfile",
+        ".local-data\\d27-b\\image-2\\context"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network=none",
+        "--read-only",
+        "<fixed isolated version probe>"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "save",
+        "--output",
+        ".local-data\\d27-b\\image-2\\runner-build-image.tar",
+        "codeless-d27-b:46e79aae5bb40569cd3828b67f0db705d91fdc12"
+      ],
+      "exitCode": 0,
+      "signal": null
+    }
+  ],
+  "exported": true,
+  "publishedToRegistry": false,
+  "policyTagPromoted": false,
+  "reproducibility": "frozen source and exported bytes; no cold-cache image byte equality claim",
+  "sourceArchiveSha256": "e69150b1fa301cc17302e86a546406a485e8038330f3e27adf32d9c16da95dfb",
+  "sources": {
+    "infra/build-image/Dockerfile": {
+      "bytes": 795,
+      "sha256": "371149e8a7050822db05aa8bdbbc303259fc9b1a2072c5062a9d066b68ac1ff1"
+    },
+    "infra/build-image/Dockerfile.dockerignore": {
+      "bytes": 412,
+      "sha256": "daa6d06520d2a756bb0ee80a45d470d2b71ec14aa2b63129c63ccde13fa15e77"
+    },
+    "infra/build-image/build-image.ps1": {
+      "bytes": 336,
+      "sha256": "0b307eeee7607d2d593a62b47dbd95a501108710b56a6a945cbe20ed663b5033"
+    },
+    "infra/build-image/container-build.mjs": {
+      "bytes": 1997,
+      "sha256": "a5b9e62315be8f3431b35429e329bc9bc0f15bf98f325c1f05a0858702ff5f19"
+    },
+    "infra/build-image/verify-dependencies.mjs": {
+      "bytes": 870,
+      "sha256": "1dca26ce02f251eaa2490905c271d169184fd48028ca783ef8b06fdf3d9d3d4c"
+    },
+    "templates/vue/.gitkeep": {
+      "bytes": 2,
+      "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+    },
+    "templates/vue/README.md": {
+      "bytes": 1454,
+      "sha256": "d0cda80bced1759a0ae9595998783ccdf59b59ba39a9794866eb576b2e7a50df"
+    },
+    "templates/vue/allowed-dependencies.json": {
+      "bytes": 208,
+      "sha256": "4a6144fa3596bb9e06898e0a6b968e0f8007615fd44165a3f93e9fad13015a4d"
+    },
+    "templates/vue/fixtures/catalog/src/pages/CatalogPage.vue": {
+      "bytes": 1924,
+      "sha256": "ea53dc0e51d715e30e8d9e09d85f5b75ae2808dbc8eb9e80a2ff23be5e184926"
+    },
+    "templates/vue/fixtures/mapping/src/components/SharedCard.vue": {
+      "bytes": 190,
+      "sha256": "65ec81b23ac6f84dd1df0b45740be29545c8c5e008d0591d2f788457daa12dc9"
+    },
+    "templates/vue/fixtures/mapping/src/pages/HomePage.vue": {
+      "bytes": 376,
+      "sha256": "33f1ce80bc0ed5b7f6fde7685fb346f92b083182723fe1935562f17fad137a3a"
+    },
+    "templates/vue/fixtures/showcase/src/pages/HomePage.vue": {
+      "bytes": 1091,
+      "sha256": "97e89389a1b60c2ba5dfded5c8a339ac0f298e95011e07c43bd47613d8644c37"
+    },
+    "templates/vue/fixtures/tasks/src/pages/TasksPage.vue": {
+      "bytes": 1876,
+      "sha256": "2a3e7d147b8f077000600e82efcb85bb30a47f64653371c4d3bf53de382115f8"
+    },
+    "templates/vue/index.html": {
+      "bytes": 263,
+      "sha256": "84eff9c259555bd0b3c78312ce4c9f72b85ff2a0b74dc69d757043c66aa7df87"
+    },
+    "templates/vue/package.json": {
+      "bytes": 448,
+      "sha256": "7d011ea866bf56006fdc25ee81d7e19a47ab523b57b70133466b6605aee601f4"
+    },
+    "templates/vue/pnpm-lock.yaml": {
+      "bytes": 32530,
+      "sha256": "874081f812956eb4bb2c052551a50b3cae617132ccc0fe97e4f1ca024132cdd5"
+    },
+    "templates/vue/pnpm-workspace.yaml": {
+      "bytes": 49,
+      "sha256": "7bb91bb52adad825af75ce5492864b101167572c982ff37a0d3f080d8d6fcc53"
+    },
+    "templates/vue/preview-bridge/README.md": {
+      "bytes": 2793,
+      "sha256": "2749bb607186e2d3349c7a723c4bda0ae80f59158fdaee5a9b64c652685e5608"
+    },
+    "templates/vue/preview-bridge/selector.mjs": {
+      "bytes": 5151,
+      "sha256": "0e3a0249c3b88bb86b63274d14abef3ea60dc15a6b5c68baac9f1cac025d2aa3"
+    },
+    "templates/vue/src/App.vue": {
+      "bytes": 38,
+      "sha256": "a24602d6e7518244319bbd01d899c582c14a20074f4c24a110130b6580ea6355"
+    },
+    "templates/vue/src/build-node.d.ts": {
+      "bytes": 584,
+      "sha256": "56014a76d9104d45f2f90c887f2c33d0714258486518ec2d346e180e95cb1ba0"
+    },
+    "templates/vue/src/main.ts": {
+      "bytes": 137,
+      "sha256": "fad878badc626d8609bb70fcf3815164faa52c7269e46922a8f166e58297d079"
+    },
+    "templates/vue/src/pages/CatalogPage.vue": {
+      "bytes": 109,
+      "sha256": "5efc1c4c9216449341b90c1c2919b0966db437d0291e7f8bd1feb07147294b5b"
+    },
+    "templates/vue/src/pages/HomePage.vue": {
+      "bytes": 120,
+      "sha256": "5629ad4797b6c262cfd77dc0d2a27ed0337645a6a926d7bd8f0266c190d44b5b"
+    },
+    "templates/vue/src/pages/TasksPage.vue": {
+      "bytes": 107,
+      "sha256": "f20450a12e04f974d54fcb327a37fe97575b9dd14a37ef9e43ef4eec9953cfa2"
+    },
+    "templates/vue/src/router.ts": {
+      "bytes": 429,
+      "sha256": "a37dd921ede8553748398499eb0e2ca53b3ec839bcb46c2a6b39130c687cb932"
+    },
+    "templates/vue/tsconfig.json": {
+      "bytes": 356,
+      "sha256": "fb6b94f16fc0db3d6895ce4e6a5ff5fdb451a51576bca833ae6563a33b3f32e5"
+    },
+    "templates/vue/vite.config.ts": {
+      "bytes": 4877,
+      "sha256": "cd0f31eb449367f9b99e816780f2fa50a5e43e74e94ee11fbfc5e3e3a09e709a"
+    }
+  },
+  "baseImage": "node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205",
+  "imageId": "sha256:892d2ea3228bf6e2764ec9ecaa29c35c33b82f9da89bde6e63e49b29bf54145c",
+  "os": "linux",
+  "architecture": "amd64",
+  "descriptor": {
+    "mediaType": "application/vnd.oci.image.index.v1+json",
+    "digest": "sha256:892d2ea3228bf6e2764ec9ecaa29c35c33b82f9da89bde6e63e49b29bf54145c",
+    "size": 856
+  },
+  "localImageBytes": 549831574,
+  "registryDigests": [
+    "codeless-d27-b@sha256:892d2ea3228bf6e2764ec9ecaa29c35c33b82f9da89bde6e63e49b29bf54145c"
+  ],
+  "runtime": {
+    "node": "v24.22.1",
+    "vue": "3.5.13",
+    "vite": "6.2.3",
+    "typescript": "5.8.2"
+  },
+  "artifact": {
+    "path": ".local-data/d27-b/image-2/runner-build-image.tar",
+    "sha256": "fe79f476832c11cae91908726388e2841089b8358c82c290f768a5eab4161df1",
+    "bytes": 130745856
+  },
+  "archiveIdentity": {
+    "verified": true,
+    "sourceRevisionLabel": "46e79aae5bb40569cd3828b67f0db705d91fdc12",
+    "configDigest": "sha256:8762b14e59d3a896f822236a9c5a8c337fc19e3d6492647ffb83ddd7eed430e2",
+    "imageId": "sha256:892d2ea3228bf6e2764ec9ecaa29c35c33b82f9da89bde6e63e49b29bf54145c"
+  }
+}

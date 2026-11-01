@@ -1,0 +1,72 @@
+{
+  "sourceCommit": "2d39852035a534c2d2c36bb1fc6b45e919289212",
+  "status": "WITHDRAWN",
+  "nativeExitCode": 1,
+  "commands": [
+    {
+      "name": "client-build",
+      "command": [
+        "E:\\nodejs\\node.exe",
+        "infra/release/client/package.mjs",
+        "build",
+        "2d39852035a534c2d2c36bb1fc6b45e919289212",
+        ".local-data/d27-b/combined-2d39852/client-build"
+      ],
+      "startedAt": "2026-11-01T07:29:06.454Z",
+      "exitCode": 0,
+      "signal": null,
+      "completedAt": "2026-11-01T07:30:31.733Z",
+      "logSha256": "e28dc0a9cd27c4179fce0a90b39282423506fef8a85445cd709f89dea5e6e42a"
+    },
+    {
+      "name": "api-build",
+      "command": [
+        "python",
+        "-B",
+        "scripts/release/api_release.py",
+        "build",
+        "--revision",
+        "2d39852035a534c2d2c36bb1fc6b45e919289212",
+        "--output",
+        ".local-data/d27-b/combined-2d39852/release/api",
+        "--log",
+        ".local-data/d27-b/combined-2d39852/api-maven.log"
+      ],
+      "startedAt": "2026-11-01T07:29:06.455Z",
+      "exitCode": 0,
+      "signal": null,
+      "completedAt": "2026-11-01T07:30:12.629Z",
+      "logSha256": "d0988be853ff7daf143df0f7c616c8dea237a36aabd69b0f48cf33ea2363727c"
+    },
+    {
+      "name": "api-verify",
+      "command": [
+        "python",
+        "-B",
+        "scripts/release/api_release.py",
+        "verify",
+        "--package",
+        ".local-data/d27-b/combined-2d39852/release/api",
+        "--manifest-sha256",
+        "e0e26b98d0fbab0da03773b44eee7b11cb59592de0b1a249b072151decb59e29"
+      ],
+      "startedAt": "2026-11-01T07:30:31.783Z",
+      "exitCode": 0,
+      "signal": null,
+      "completedAt": "2026-11-01T07:30:32.391Z",
+      "logSha256": "77e9391d112b26e5a43c2f705e7e75426c943d0b306c577af4bbb5bb0d15aa15"
+    }
+  ],
+  "reason": "shared runtime raw-byte mismatch: B git archive applied global core.autocrlf=true; API raw Git blobs LF",
+  "diagnosis": {
+    "samples": [
+      "templates/vue/vite.config.ts",
+      "infra/build-image/Dockerfile",
+      "services/api/agent-runner.mjs"
+    ],
+    "onlyCRLFDifference": true
+  },
+  "replacement": "6d5d72d884deb2499b19fae8ea7a280ee5f226e8",
+  "normalizationUsedToAccept": false,
+  "privateEvidence": ".local-data/d27-b/combined-2d39852"
+}

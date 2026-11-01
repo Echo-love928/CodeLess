@@ -1,0 +1,10 @@
+{
+  "schema": "codeless-api-configuration-v1",
+  "secretsOutsidePackage": ["CODELESS_DATABASE_PASSWORD", "CODELESS_MODEL_API_KEY", "CODELESS_DEMO_PASSWORD", "CODELESS_ADMIN_PASSWORD", "CODELESS_PREVIEW_SIGNING_KEY", "CODELESS_PREVIEW_REGISTRY_KEY"],
+  "requiredOperatorConfiguration": ["CODELESS_DATABASE_URL", "CODELESS_DATABASE_USER", "CODELESS_DATABASE_PASSWORD", "CODELESS_COOKIE_SECURE", "CODELESS_PLATFORM_ORIGIN", "CODELESS_PREVIEW_ORIGIN", "CODELESS_PUBLICATION_ORIGIN", "CODELESS_MODEL_PROVIDER"],
+  "recoveryFirstStartArguments": ["--codeless.tasks.enabled=false", "--codeless.agent.enabled=false", "--codeless.deploy.worker-enabled=false", "--codeless.recovery.sweep-enabled=false", "--codeless.cover.enabled=false"],
+  "persistentRoots": ["codeless.agent.private-root", "codeless.versions.root", "codeless.deploy.root", "codeless.admin.audit-root", "CODELESS_FILE_WORKSPACE_ROOT", "CODELESS_MODEL_AUDIT_ROOT", "CODELESS_FILE_AUDIT_ROOT", "CODELESS_HOSTING_ROOT"],
+  "runtimeBindings": ["codeless.agent.repository-root", "codeless.export.repository-root", "codeless.agent.node", "CODELESS_NODE_EXECUTABLE", "CODELESS_PUBLICATION_GATEWAY_ENTRY", "CODELESS_COVER_GATEWAY_ENTRY", "CODELESS_PREVIEW_GATEWAY_INTERNAL_ORIGIN"],
+  "defaults": {"CODELESS_COOKIE_SECURE": true, "CODELESS_MODEL_PROVIDER": "deterministic-mock", "CODELESS_PUBLICATION_ENABLED": false, "CODELESS_COVER_ENABLED": false},
+  "notes": "Names only; operator supplies protected values. Read docs/operations.md and infra/public/install-runtime.py for preview/worker IPC, origins, UID/GID and TLS. Keep all restored data at original absolute paths. This list is not an environment file or production activation approval."
+}

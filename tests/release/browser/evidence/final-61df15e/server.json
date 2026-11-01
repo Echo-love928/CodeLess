@@ -1,0 +1,473 @@
+{
+  "sourceCommit": "61df15eba456422762a667aaed7734b7d13b48e7",
+  "stage": {
+    "sourceCommit": "61df15eba456422762a667aaed7734b7d13b48e7",
+    "productionChanged": false,
+    "status": "STAGED_VERIFIED",
+    "commands": [
+      {
+        "command": [
+          "python3",
+          "/srv/codeless/releases/d27-61df15eba456422762a667aaed7734b7d13b48e7-review/release/api/repository/scripts/release/api_release.py",
+          "verify",
+          "--package",
+          "/srv/codeless/releases/d27-61df15eba456422762a667aaed7734b7d13b48e7-review/release/api",
+          "--manifest-sha256",
+          "e488c594cd32ac3bcf7b76faffba7810bc400a7f9c8bd8daa19340ae76a7246c"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "/usr/sbin/runuser",
+          "-u",
+          "codeless-worker",
+          "--",
+          "/opt/codeless/tools/node-v24.22.1-linux-x64/bin/corepack",
+          "pnpm",
+          "--dir",
+          "/srv/codeless/releases/d27-61df15eba456422762a667aaed7734b7d13b48e7-review/runtime/repository",
+          "install",
+          "--frozen-lockfile"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "docker",
+          "image",
+          "load",
+          "--input",
+          "<operator-home>/d27-61df15e-incoming/runner-build-image.tar"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "python3",
+          "/srv/codeless/releases/d27-61df15eba456422762a667aaed7734b7d13b48e7-review/release/api/repository/scripts/release/api_release.py",
+          "verify",
+          "--package",
+          "/srv/codeless/releases/d27-61df15eba456422762a667aaed7734b7d13b48e7-review/release/api",
+          "--manifest-sha256",
+          "e488c594cd32ac3bcf7b76faffba7810bc400a7f9c8bd8daa19340ae76a7246c"
+        ],
+        "exitCode": 0
+      }
+    ],
+    "apiManifestSha256": "e488c594cd32ac3bcf7b76faffba7810bc400a7f9c8bd8daa19340ae76a7246c",
+    "clientManifestSha256": "676635224f6e6dc28e0d8794daf34c87da6e3773b265cc0ee93485e38dee943b",
+    "repositoryRoot": "/srv/codeless/releases/d27-61df15eba456422762a667aaed7734b7d13b48e7-review/runtime/repository",
+    "selectedImageId": "sha256:e3d4431bcf42d644b8e89fe703af596c51b848d7c4ea9e68bcc983514cfbb850",
+    "imageRevision": "61df15eba456422762a667aaed7734b7d13b48e7"
+  },
+  "boundary": {
+    "sourceCommit": "61df15eba456422762a667aaed7734b7d13b48e7",
+    "nativeExitCode": 0,
+    "platform": "linux",
+    "logSha256": "c9b703a32b3da16436f47ac3a4a5f833bca6882e43f5f81c33b8e3d6eada2987",
+    "productionChanged": false
+  },
+  "browser": {
+    "status": "PASSED",
+    "cases": 11,
+    "selectedImageId": "sha256:e3d4431bcf42d644b8e89fe703af596c51b848d7c4ea9e68bcc983514cfbb850",
+    "productionChanged": false
+  },
+  "ipc": {
+    "sourceCommit": "61df15eba456422762a667aaed7734b7d13b48e7",
+    "scope": "isolated roots, real non-root worker role, Unix socket peer fixture; not public acceptance",
+    "uid": 997,
+    "taskScopedScratch": "/srv/codeless/releases/d27-61df15eba456422762a667aaed7734b7d13b48e7-review/ipc-composite-worker/work/0895cc6b-29f5-4ec2-b412-bbe122c8e243",
+    "brokerExit": 0,
+    "resultStatus": "VERIFIED",
+    "resultFailure": null,
+    "buildStatus": "SUCCEEDED",
+    "verificationStatus": "PASSED",
+    "browserClosed": true,
+    "workerSha256": "311ed218b65e7a6bf5ceb309b8c7ff6c9f8f8fc73a6671faa3d5c50ae475cbaa",
+    "productionChanged": false,
+    "publicAcceptance": false
+  },
+  "realBackupCompatibility": {
+    "sourceCommit": "61df15eba456422762a667aaed7734b7d13b48e7",
+    "dataset": "real D25 server rollback backup; NOT the canonical D23 backup",
+    "sourceBackupSha256": "513876749614c85f758fc288434b0a36048fff8e16214bf40b0536a41eeeea5f",
+    "publicAcceptance": false,
+    "productionChanged": false,
+    "status": "PASSED",
+    "checks": [
+      "REAL_DATABASE_BACKUP_RESTORED_IN_OWNED_CLUSTER",
+      "REAL_PUBLISHED_VERSION_PRESENT",
+      "SEALED_CANDIDATE_JAR_STARTS_ON_REAL_BACKUP",
+      "REAL_OWNER_LOGIN",
+      "EXISTING_VERIFIED_VERSION_READABLE",
+      "EXISTING_SOURCE_LIST_READABLE",
+      "REAL_AUTHENTICATED_SOURCE_ZIP",
+      "ANONYMOUS_VERSION_IS_401",
+      "IMMUTABLE_VERSIONS_PUBLICATIONS_MODEL_LEDGER_UNCHANGED",
+      "ORIGINAL_BACKUP_UNCHANGED"
+    ],
+    "cleanupErrors": [],
+    "exportSha256": "02ea134e46dabc1b950e0343438d6fb865385983b982a2fc2c56e615fc1311af",
+    "liveJarUnchanged": true,
+    "productionImageTagUnchanged": true
+  },
+  "publicAcceptance": {
+    "status": "PASSED",
+    "authenticatedPublicFlow": true,
+    "fixtureApi": false,
+    "fixtureSigning": false,
+    "modelProvider": "deterministic-mock",
+    "modelQualityAccepted": false,
+    "origin": "https://app.codeless-platform.top",
+    "applicationId": "c49612da-859b-43ed-9e0e-ccd3135079a8",
+    "taskId": "a472b97a-a588-4254-9a7a-33a5cf1691cb",
+    "versionId": "45c63088-a897-4c54-823e-417431537afd",
+    "sourceDigest": "sha256:2239f682cdf36d1fccd9adb61fe0c64736730a0d33191ec3364b09316179b9e9",
+    "artifactDigest": "sha256:05dc193860ef0024013f76933f991b4603faa12d981d0b935877a9339d004393",
+    "publication": {
+      "id": "8acce259-0cf0-8eb4-9e69-3b5140c7f0c1",
+      "applicationId": "c49612da-859b-43ed-9e0e-ccd3135079a8",
+      "versionId": "45c63088-a897-4c54-823e-417431537afd",
+      "requestedBy": "8ad7c426-ed13-4586-a99b-61acec13d06e",
+      "status": "PUBLISHED",
+      "url": "https://d8acce2590cf08eb49e693b5140c7f0c1.sites.codeless-publish.top/",
+      "createdAt": "2026-11-01T10:53:54.996945Z",
+      "publishedAt": "2026-11-01T10:53:56.565799Z"
+    },
+    "editedVersionId": "ee737fb9-9d8d-4637-a528-0880dc39ce8e",
+    "failedPublication": {
+      "id": "be073415-9fda-805b-8874-abaf65c278e2",
+      "applicationId": "c49612da-859b-43ed-9e0e-ccd3135079a8",
+      "versionId": "ee737fb9-9d8d-4637-a528-0880dc39ce8e",
+      "requestedBy": "8ad7c426-ed13-4586-a99b-61acec13d06e",
+      "status": "FAILED",
+      "createdAt": "2026-11-01T10:54:06.6488Z"
+    },
+    "checks": {
+      "realBrowserLogin": true,
+      "secureHostOnlyPlatformCookie": true,
+      "draftAndUnauthenticatedCannotPublish": true,
+      "realSseAndReadyTask": true,
+      "actualPartitionedPreviewAndSiteIsolation": true,
+      "csrfWrongDigestAndForeignOwnerCannotPublish": true,
+      "realFailedVersionCannotPublish": true,
+      "explicitPublishAndIdempotentReplay": true,
+      "publicManifestBytesRoutesRefreshAndPrivatePaths": true,
+      "editingRetainsExactPublishedVersionAndBytes": true,
+      "realProbeFailureAndColdSessionRetainOldSuccess": true
+    },
+    "publishedFiles": [
+      {
+        "path": "assets/index-DC4JO8RG.js",
+        "bytes": 83569,
+        "digest": "sha256:bd85b138e06b49250c0d7d336a995ea3c255de14f3b2d8529021c4f8bb4aee4f"
+      },
+      {
+        "path": "index.html",
+        "bytes": 289,
+        "digest": "sha256:9643495e8389a6dcd645c8afcb5ac3d66d5d23636d0e336e1e71405601cd9091"
+      }
+    ],
+    "rejectedFailedVersion": {
+      "applicationId": "d83b28da-198c-4477-85e3-420ecbf83582",
+      "versionId": "cded4f60-49d7-4978-b3fd-7f89416f2168"
+    },
+    "publicationStatusWhenEditAccepted": "REQUESTED",
+    "successDeployment": {
+      "publication": {
+        "id": "8acce259-0cf0-8eb4-9e69-3b5140c7f0c1",
+        "applicationId": "c49612da-859b-43ed-9e0e-ccd3135079a8",
+        "versionId": "45c63088-a897-4c54-823e-417431537afd",
+        "requestedBy": "8ad7c426-ed13-4586-a99b-61acec13d06e",
+        "status": "PUBLISHED",
+        "url": "https://d8acce2590cf08eb49e693b5140c7f0c1.sites.codeless-publish.top/",
+        "createdAt": "2026-11-01T10:53:54.996945Z",
+        "publishedAt": "2026-11-01T10:53:56.565799Z"
+      },
+      "phase": "SUCCEEDED",
+      "sourceDigest": "sha256:2239f682cdf36d1fccd9adb61fe0c64736730a0d33191ec3364b09316179b9e9",
+      "artifactDigest": "sha256:05dc193860ef0024013f76933f991b4603faa12d981d0b935877a9339d004393",
+      "reportDigest": "sha256:7658659e7e466b05f4d6b78bf9ae6e676717284dda32933513d86bfc65328e58",
+      "history": [
+        {
+          "phase": "PREPARING",
+          "at": "2026-11-01T10:53:55.021506187Z",
+          "failureCode": null
+        },
+        {
+          "phase": "PUBLISHING",
+          "at": "2026-11-01T10:53:55.153945433Z",
+          "failureCode": null
+        },
+        {
+          "phase": "PROBING",
+          "at": "2026-11-01T10:53:55.392140792Z",
+          "failureCode": null
+        },
+        {
+          "phase": "SUCCEEDED",
+          "at": "2026-11-01T10:53:56.571560503Z",
+          "failureCode": null
+        }
+      ],
+      "failureCode": null,
+      "latestSuccessful": {
+        "id": "8acce259-0cf0-8eb4-9e69-3b5140c7f0c1",
+        "applicationId": "c49612da-859b-43ed-9e0e-ccd3135079a8",
+        "versionId": "45c63088-a897-4c54-823e-417431537afd",
+        "requestedBy": "8ad7c426-ed13-4586-a99b-61acec13d06e",
+        "status": "PUBLISHED",
+        "url": "https://d8acce2590cf08eb49e693b5140c7f0c1.sites.codeless-publish.top/",
+        "createdAt": "2026-11-01T10:53:54.996945Z",
+        "publishedAt": "2026-11-01T10:53:56.565799Z"
+      }
+    },
+    "failedDeployment": {
+      "publication": {
+        "id": "be073415-9fda-805b-8874-abaf65c278e2",
+        "applicationId": "c49612da-859b-43ed-9e0e-ccd3135079a8",
+        "versionId": "ee737fb9-9d8d-4637-a528-0880dc39ce8e",
+        "requestedBy": "8ad7c426-ed13-4586-a99b-61acec13d06e",
+        "status": "FAILED",
+        "createdAt": "2026-11-01T10:54:06.6488Z"
+      },
+      "phase": "FAILED",
+      "sourceDigest": "sha256:0d28a9f989aa04de5cb3d8d4c0e5b9ab67e0cefb74a392fe9572002513ed0b56",
+      "artifactDigest": "sha256:d98b7e57410e3d63ded1615c06ca9de2f0f5ad95fd05c664372036dec2dee509",
+      "reportDigest": "sha256:af7a5be6a2e94f52f12dae43b570f7f7154bc3731cf1331b958664e3d9b3eaba",
+      "history": [
+        {
+          "phase": "PREPARING",
+          "at": "2026-11-01T10:54:06.658589548Z",
+          "failureCode": null
+        },
+        {
+          "phase": "PUBLISHING",
+          "at": "2026-11-01T10:54:07.611292239Z",
+          "failureCode": null
+        },
+        {
+          "phase": "PROBING",
+          "at": "2026-11-01T10:54:07.849774362Z",
+          "failureCode": null
+        },
+        {
+          "phase": "FAILED",
+          "at": "2026-11-01T10:54:08.765268189Z",
+          "failureCode": "DEPLOYMENT_PROBE_FAILED"
+        }
+      ],
+      "failureCode": "DEPLOYMENT_PROBE_FAILED",
+      "latestSuccessful": {
+        "id": "8acce259-0cf0-8eb4-9e69-3b5140c7f0c1",
+        "applicationId": "c49612da-859b-43ed-9e0e-ccd3135079a8",
+        "versionId": "45c63088-a897-4c54-823e-417431537afd",
+        "requestedBy": "8ad7c426-ed13-4586-a99b-61acec13d06e",
+        "status": "PUBLISHED",
+        "url": "https://d8acce2590cf08eb49e693b5140c7f0c1.sites.codeless-publish.top/",
+        "createdAt": "2026-11-01T10:53:54.996945Z",
+        "publishedAt": "2026-11-01T10:53:56.565799Z"
+      }
+    },
+    "publicMilestoneReached": false,
+    "note": "Awaiting independent external published-page verification and SQL/operator checks.",
+    "deployedCommit": "61df15eba456422762a667aaed7734b7d13b48e7",
+    "serverJarSha256": "d2c1bc7bccd9df9eec194fde509fa012f5c41eb3a7703aad669aaa447e067446",
+    "sourceArchiveSha256": "f4c9209e778422918b3e7f5094867a50c81a52924f2849f8f18d3321be0024ea",
+    "freshRun": true
+  },
+  "authenticatedDownload": {
+    "sourceCommit": "61df15eba456422762a667aaed7734b7d13b48e7",
+    "applicationId": "c49612da-859b-43ed-9e0e-ccd3135079a8",
+    "versionId": "45c63088-a897-4c54-823e-417431537afd",
+    "publicationUrl": "https://d8acce2590cf08eb49e693b5140c7f0c1.sites.codeless-publish.top/",
+    "status": "PASSED",
+    "checks": [
+      "FRESH_BROWSER_REAL_LOGIN",
+      "REAL_SELECTED_VERSION_PREVIEW",
+      "ACTUAL_UI_ZIP_DOWNLOAD_MATCHES_AUTHENTICATED_RESPONSE",
+      "REAL_PLATFORM_SESSION_ABSENT_FROM_GENERATED_SITE_REQUESTS_AND_COOKIE_JAR",
+      "PLATFORM_SESSION_REMAINS_AUTHENTICATED"
+    ],
+    "credentialsExported": false,
+    "tlsExceptions": false,
+    "mockedRequests": false,
+    "sourceZipSha256": "17b5fcb49736808a357a521513d203e65e2e9a4226feb24ffbad5399101729a7",
+    "sourceZipBytes": 21081
+  },
+  "firstDownloadAttempt": {
+    "sourceCommit": "61df15eba456422762a667aaed7734b7d13b48e7",
+    "applicationId": "c49612da-859b-43ed-9e0e-ccd3135079a8",
+    "versionId": "45c63088-a897-4c54-823e-417431537afd",
+    "publicationUrl": "https://d8acce2590cf08eb49e693b5140c7f0c1.sites.codeless-publish.top/",
+    "status": "FAILED",
+    "checks": [
+      "FRESH_BROWSER_REAL_LOGIN",
+      "REAL_SELECTED_VERSION_PREVIEW"
+    ],
+    "credentialsExported": false,
+    "tlsExceptions": false,
+    "mockedRequests": false,
+    "errorType": "Error"
+  },
+  "serverFinal": {
+    "status": "PASSED",
+    "sqlFrozenVersionBuildAndOwnerMatched": true,
+    "latestSuccessUnchanged": true,
+    "oneSuccessfulLogicalPublication": true,
+    "publicationCounts": {
+      "successful": 1,
+      "pending": 0,
+      "total": 2
+    },
+    "rolesAndContainersIsolated": true,
+    "privateSnapshotsAndReceiptModesVerified": true,
+    "failedAttemptNotPublic": true,
+    "noOwnedContainersLeft": true,
+    "serverJarSha256": "d2c1bc7bccd9df9eec194fde509fa012f5c41eb3a7703aad669aaa447e067446",
+    "sourceHashes": {
+      "infra/public/worker.py": "311ed218b65e7a6bf5ceb309b8c7ff6c9f8f8fc73a6671faa3d5c50ae475cbaa",
+      "infra/public/worker-client.py": "2eb59b9491ba6711b1df784a24228117046847cc7ac7f57a6f1c9ec7dd758cc4",
+      "infra/public/docker-job.py": "a0001cae2cee965bdbeb40649e660ee7708bb772e570e782d82d5d0010ec69c5",
+      "infra/public/reap.py": "3323814c0bb5bdae1f39eadf2599b426677881c3d4b85b9f1ad7be00fd475769",
+      "services/runner/src/publish/store.mjs": "aaadb6c8658acdb3a7c493070ae9d7c40edceab60723d50fae15d1bd7ebe4201"
+    },
+    "publicationId": "8acce259-0cf0-8eb4-9e69-3b5140c7f0c1",
+    "failedPublicationId": "be073415-9fda-805b-8874-abaf65c278e2",
+    "publicationPermissions": {
+      "status": "PASSED",
+      "siteEntriesChecked": 38,
+      "onlyWorkerOwnsAndWritesSites": true,
+      "accounts": {
+        "codeless-api": {
+          "readable": true,
+          "writesDenied": {
+            "createAtRoot": true,
+            "createInPublication": true,
+            "overwrite": true,
+            "unlink": true,
+            "renamePublication": true
+          },
+          "mountReadOnly": false
+        },
+        "codeless-preview": {
+          "readable": true,
+          "writesDenied": {
+            "createAtRoot": true,
+            "createInPublication": true,
+            "overwrite": true,
+            "unlink": true,
+            "renamePublication": true
+          },
+          "mountReadOnly": false
+        }
+      },
+      "runningNamespaces": {
+        "codeless-api": {
+          "readable": true,
+          "writesDenied": {
+            "createAtRoot": true,
+            "createInPublication": true,
+            "overwrite": true,
+            "unlink": true,
+            "renamePublication": true
+          },
+          "mountReadOnly": true
+        },
+        "codeless-preview": {
+          "readable": true,
+          "writesDenied": {
+            "createAtRoot": true,
+            "createInPublication": true,
+            "overwrite": true,
+            "unlink": true,
+            "renamePublication": true
+          },
+          "mountReadOnly": true
+        }
+      },
+      "workerNamespaceWritable": true,
+      "existingPublicationsModified": false,
+      "publicMilestoneReached": false
+    },
+    "deployedCommit": "61df15eba456422762a667aaed7734b7d13b48e7",
+    "sourceFilesVerified": 258,
+    "publicMilestoneReached": false
+  },
+  "ingressSync": {
+    "sourceCommit": "61df15eba456422762a667aaed7734b7d13b48e7",
+    "previousSha256": "654ae0a978913c4e6d5fa085862a45cfa123bd7fd313dcb1df9c21ac3eff6222",
+    "candidateSha256": "00a7c82619cef6198608af2561c5a2b559291519dbb3306a26fd4c1e2a954519",
+    "backup": "/srv/codeless/deployment-patches/d27-61df15eba456422762a667aaed7734b7d13b48e7-20261101T104925Z/ingress-platform.conf",
+    "status": "BYTE_IDENTICAL_CONFIG_DEPLOYED_AND_RELOADED",
+    "normalizationAcceptedAsDeployment": false,
+    "commands": [
+      {
+        "command": [
+          "docker",
+          "exec",
+          "codeless-public-platform-1",
+          "nginx",
+          "-t"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "docker",
+          "exec",
+          "codeless-public-platform-1",
+          "nginx",
+          "-s",
+          "reload"
+        ],
+        "exitCode": 0
+      }
+    ],
+    "mountedSha256": "00a7c82619cef6198608af2561c5a2b559291519dbb3306a26fd4c1e2a954519"
+  },
+  "ingressMapping": [
+    {
+      "name": "edge.conf",
+      "sha256": "4214525dec79359c8161893cb00478e6af6178fac7fc8817e7c2f07f11ae6517",
+      "byteIdentical": true
+    },
+    {
+      "name": "hosting.conf",
+      "sha256": "ae91bd9bc28cb562474f29b48844d23deb1b4c78bfb415eb22e1c731be4958ca",
+      "byteIdentical": true
+    },
+    {
+      "name": "platform.conf",
+      "sha256": "00a7c82619cef6198608af2561c5a2b559291519dbb3306a26fd4c1e2a954519",
+      "byteIdentical": true
+    }
+  ],
+  "actualBuild": {
+    "taskId": "a472b97a-a588-4254-9a7a-33a5cf1691cb",
+    "executionId": "d1d10832-12c5-42a9-b547-644fa6961678",
+    "buildId": "4e666fe7-f417-4978-a464-a0d80047e6c3",
+    "imageId": "sha256:e3d4431bcf42d644b8e89fe703af596c51b848d7c4ea9e68bcc983514cfbb850",
+    "buildExitCode": 0,
+    "cleanup": {
+      "containerRemoved": true,
+      "workspaceRemoved": true,
+      "errors": []
+    },
+    "verificationId": "6d8035b9-bbf3-442f-b069-d76802ed81b8",
+    "browserExitCode": 0,
+    "browserClosed": true,
+    "sourceDigest": "sha256:2239f682cdf36d1fccd9adb61fe0c64736730a0d33191ec3364b09316179b9e9",
+    "artifactDigest": "sha256:05dc193860ef0024013f76933f991b4603faa12d981d0b935877a9339d004393"
+  },
+  "actualModelAudit": {
+    "providers": [
+      "deterministic-mock"
+    ],
+    "calls": 7
+  },
+  "paidModelRequests": 0,
+  "secretsExported": false
+}
