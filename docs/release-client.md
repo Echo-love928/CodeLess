@@ -22,6 +22,10 @@ node --test tests/release/browser/package.test.mjs
 
 本轮全新目录复用宿主 pnpm 下载缓存，不宣称冷缓存安装。可用 `node tests/release/browser/record.mjs build|verify|unit|audit|compare ...` 保存原生命令退出码、signal 和日志摘要。`compare` 参数为候选 SHA、两个 bundle 路径。
 
+另用 `node tests/release/browser/record.mjs image <候选SHA> .local-data/d27-b/image-2` 从相同 SHA 的 `infra/build-image` 和 `templates/vue` 独立归档上下文，真实构建、运行版本探针并 `docker image save`。独立 tag 为 `codeless-d27-b:<完整SHA>`；不提升本机已有 runner tag，不上传 registry。`image.json` 记录固定基础镜像、源文件摘要、实际 image ID/架构、Node/Vue/Vite/TypeScript 运行版本及离线镜像归档 SHA256。探针使用非 root、禁网、只读根与原资源上限。Docker build 可命中缓存，不将它声称为冷缓存镜像字节复现。
+
+最终交付集合为客户端归档和单独的 runner 构建镜像归档，二者源提交相同，见 `evidence/artifact-set.json`。目标候选宿主先核验归档 SHA256，再离线 `docker image load --input <runner-build-image.tar>`，检查版本标签、源 revision label 和实际镜像身份，再由维护者按既有 worker 配置提升允许的固定 tag。本机 containerd 的 image ID 是 OCI index 摘要，归档的 configDigest 另列；两个摘要均已从导出归档核验，不能混用。目标环境的导入/后端兼容性尚未演练，出现未知身份必须 HOLD。API/生成容器不参与镜像导入或获得 Docker socket。
+
 ## 候选环境部署步骤
 
 1. 获取 D27-A 同提交 API/JAR/迁移、客户端 bundle 和受信 manifest 摘要；先核验摘要及 `verify`，禁止混用两个提交。既有备份/恢复与 A 的空环境迁移验证是启用前置。

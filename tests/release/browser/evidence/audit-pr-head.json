@@ -1,0 +1,32 @@
+{
+  "task": "D27-B-T4",
+  "commit": "238cd3d1b2dc3f12a0e33c80ad55a0b63c70c9db",
+  "status": "PASSED",
+  "scope": "Git-tracked release/product/document text; high-confidence token/private-key/reviewer-password literals",
+  "excluded": [
+    "test fixtures",
+    "eval fixtures",
+    "historical evidence"
+  ],
+  "limitation": "Pattern scan cannot identify all real passwords. Reviewer credentials remain server-only; no private credential was fetched or copied.",
+  "findings": [],
+  "testFixtures": [
+    {
+      "rule": "privateKey",
+      "path": "services/api/src/test/java/dev/codeless/api/admin/AdminIntegrationTest.java"
+    },
+    {
+      "rule": "privateKey",
+      "path": "services/api/src/test/java/dev/codeless/api/admin/AdminRedactionTest.java"
+    },
+    {
+      "rule": "privateKey",
+      "path": "services/api/src/test/java/dev/codeless/api/export/ExportTemplateTest.java"
+    },
+    {
+      "rule": "privateKey",
+      "path": "services/api/src/test/java/dev/codeless/api/export/SourceExportIntegrationTest.java"
+    }
+  ],
+  "secretsPrinted": false
+}
