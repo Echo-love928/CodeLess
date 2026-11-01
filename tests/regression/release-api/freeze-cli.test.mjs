@@ -49,6 +49,8 @@ test('real freeze CLI accepts only reviewed checkout EOL forms and rejects conte
   const historical = frozen.failures[0].source
   put(historical,Buffer.concat([readFileSync(join(root,historical)),Buffer.from('\n')]))
   check('historical failure whitespace mutation',1)
-  const report = join(root,'tests/regression/release-api/evidence/followup-2026-10-31/freeze-cli.json')
+  const evidence = process.env.CODELESS_D26_REVIEW_EVIDENCE_DIR ?? join(root,'.local-data/d26-a/followup/freeze-cli-runs',randomUUID())
+  mkdirSync(evidence,{recursive:true})
+  const report = join(evidence,'freeze-cli.json')
   writeFileSync(report,JSON.stringify({ fixture, fixtureRetained:true, results },null,2)+'\n')
 })

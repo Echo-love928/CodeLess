@@ -1,5 +1,19 @@
 # D26-A 限定回归
 
+## PR90/d4d250f 复审建议补充
+
+本轮仅补非阻塞建议，生产代码不变：`record.mjs followup` 现在运行原10项加真实IPC取消交错/敏感性负对照2项，共12项。`screenshot-cancel-ipc.test.mjs` 的独立子进程观察真实worker请求，在生产许可回调前取消；无公网fixture保留真实IPC、native清理和失败状态，不修改正式模块。负对照是私有内存副本，不是历史产品红测。
+
+```powershell
+node --test tests/regression/release-api/screenshot-cancel-ipc.test.mjs
+node tests/regression/release-api/record.mjs followup
+node tests/regression/release-api/extract-combination-counts.mjs check
+```
+
+原A组合计数57字节摘录与原日志SHA/字节范围在 `evidence/review-2026-11-01/combination-e2e-counts.txt/json`。`capture`仅首次生成并拒绝覆盖，`check`需要本机原私有日志；B没有原日志时不能宣称独立重算。摘录不含会话/SQL/路径，不产生新E2E执行，不与B远端75项混成80。旧回执保持原样。
+
+冻结CLI测试报告写入本轮记录器目录，直接运行测试则使用独立私有新目录，避免覆盖旧公开freeze-cli.json。整体HOLD，原事故与真实质量仍未关闭。
+
 ## B 复审后的独立修复
 
 后续分支 `codex/d26-a-cleanup-followup` 基于 PR88 最终 `6ceeb5a`，不覆盖下方历史结果。两份 runner 文件是为复现截图清理失败而进行的最小跨模块扩展；没有修改公共契约、依赖、隔离、超时或原断言。PR89 的 signal/cleanupProof 诊断仍是独立依赖，不把诊断 PR 当修复。

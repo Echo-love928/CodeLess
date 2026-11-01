@@ -2,6 +2,8 @@
 
 ## B 复审后增量状态
 
+2026-11-01 B对PR90/d4d250f复审明确**无新增生产代码阻塞**。本轮独立分支 `codex/d26-a-review-evidence` 只补两项非阻塞建议：真实IPC请求/取消交错及敏感性负对照2项通过，限定回归12/12；原A组合80通过行和full-product终态从原39107字节日志核对后导出57字节去会话摘录，旧回执不改、不冒称B独立80实跑。原静态入口0、Node64/UI206；生产/API/提示词/隔离/依赖未改。旧PR90精确d4d250f六项远端SUCCESS已独立复核，不继承到新HEAD。原镜像/Maven机制UNKNOWN、真实质量和生产capture缺口继续OPEN/HOLD；建议补齐不代表原事故或发布阻塞关闭。详情见交接顶部和 `tests/regression/release-api/evidence/review-2026-11-01/`。
+
 2026-11-01续交付：代码222bc90、组合3a0d786，当前原入口 **static0 / API0(428/428) / runner0(285/285) / E2E0(80/80+完整平台链)**，sourceBytesUnchanged=true。新增10项及原截图7项通过。四入口分别执行，总ci-gate未重跑；新候选未上传，远端检查未开始，不能继承PR88的success。详细原生回执与局限见交接顶部最终续交付。原事故、原真实质量与新公开载荷授权阻塞继续保持，不把旧失败改写。
 
 独立后续分支 `codex/d26-a-cleanup-followup` 基于 PR88 最终6ceeb5a；以下不覆盖原门禁失败。总体仍 **HOLD**，具体原生回执与组合身份见 `docs/handoffs/D26-A.md` 最新补记。

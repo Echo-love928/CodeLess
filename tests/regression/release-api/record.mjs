@@ -45,6 +45,7 @@ env[pathKey] = join(jdk, 'bin') + (process.platform === 'win32' ? ';' : ':') + e
 env.NO_PROXY = env.no_proxy = '127.0.0.1,localhost,::1'
 env.D26_STAGE_EXITS = join(privateRoot, 'stages.jsonl')
 if (mode === 'screenshot-diagnostic') env.CODELESS_SHARE_EVIDENCE_DIR = join(privateRoot, 'screenshot')
+if (mode === 'followup') env.CODELESS_D26_REVIEW_EVIDENCE_DIR = output
 if (['runner', 'e2e'].includes(mode) && process.env.CODELESS_D26_OBSERVER === '1') {
   env.D26_PROCESS_OBSERVER = join(privateRoot, 'process-observer')
   env.NODE_OPTIONS = `--import=${new URL('./followup/process-observer.mjs', import.meta.url).href}`
@@ -60,7 +61,7 @@ const command = ['gate', 'mapping-diagnostic', 'screenshot-diagnostic', 'followu
 const args = mode === 'gate' ? ['--import', new URL('./stage-observer.mjs', import.meta.url).href, 'scripts/ci-gate.mjs']
   : mode === 'mapping-diagnostic' ? ['--test', 'tests/infra/mapping.test.mjs']
   : mode === 'screenshot-diagnostic' ? ['--test', 'tests/regression/release-api/.diagnostic-screenshot.mjs']
-  : mode === 'followup' ? ['--test', ...['freeze-portability', 'freeze-cli', 'screenshot-launch-permit', 'screenshot-cleanup-proof', 'process-observer'].map(n => `tests/regression/release-api/${n}.test.mjs`)]
+  : mode === 'followup' ? ['--test', ...['freeze-portability', 'freeze-cli', 'screenshot-launch-permit', 'screenshot-cleanup-proof', 'screenshot-cancel-ipc', 'process-observer'].map(n => `tests/regression/release-api/${n}.test.mjs`)]
   : ['static', 'api', 'runner', 'e2e'].includes(mode) ? [...(win ? ['/d', '/c', 'corepack'] : []), 'pnpm', 'run', `verify:${mode}`]
   : [...(win ? ['/d', '/c', 'services\\api\\mvnw.cmd'] : []), '-f', 'services/api/pom.xml', `-Dtest=${selected[mode]}`, 'test']
 const startedAt = new Date().toISOString()
@@ -105,7 +106,7 @@ const report = { task: 'D26-A', mode, head, branch, startedAt, completedAt: new 
   sourceBytesUnchanged, headUnchanged: head === git('rev-parse', 'HEAD'), restoredScreenshots,
   privateLog: relative(root, join(privateRoot, 'command.log')).replaceAll('\\', '/'), logSha256: hash(log), logBytes: log.length,
   modelProvider: 'deterministic-mock', paidModelCalls: 0, realModelQuality: 'NOT_EVALUATED',
-  summaries: log.toString('utf8').split(/\r?\n/).filter(l => /Tests run:|BUILD SUCCESS|BUILD FAILURE|^(?:ℹ |# )(?:tests|pass|fail|skipped) \d+|\[ci-gate\]/.test(l)),
+  summaries: log.toString('utf8').split(/\r?\n/).filter(l => /Tests run:|BUILD SUCCESS|BUILD FAILURE|^(?:ℹ |# )(?:tests|pass|fail|skipped) \d+|\[ci-gate\]|^\s*\d+ passed \([\d.]+[smh]\)\s*$/.test(l)),
 }
 writeFileSync(join(output, 'command.json'), JSON.stringify(report, null, 2))
 console.log(JSON.stringify({ evidence: relative(root, output), ...result, status: report.status, sourceBytesUnchanged, stages, junit }))
