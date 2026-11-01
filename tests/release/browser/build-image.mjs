@@ -6,7 +6,7 @@ import { createReadStream } from 'node:fs'
 import { readFile, writeFile, mkdir, stat } from 'node:fs/promises'
 import { resolve, relative, join, isAbsolute } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { root, hash, command, inventory } from '../../../infra/release/client/package.mjs'
+import { root, hash, command, inventory, gitArchive } from '../../../infra/release/client/package.mjs'
 const [commit, destination] = process.argv.slice(2)
 assert.match(commit, /^[a-f0-9]{40}$/)
 assert.equal(command('git', ['rev-parse', `${commit}^{commit}`]), commit)
@@ -21,7 +21,7 @@ await save()
 try {
   const context = join(output, 'context'); await mkdir(context)
   const sourceArchive = join(output, 'context.tar')
-  command('git', ['archive', '--format=tar', `--output=${sourceArchive}`, commit, 'infra/build-image', 'templates/vue'])
+  gitArchive(commit, ['infra/build-image', 'templates/vue'], sourceArchive)
   command('tar', ['-xf', sourceArchive, '-C', context])
   report.sourceArchiveSha256 = hash(await readFile(sourceArchive))
   report.sources = await inventory(context)

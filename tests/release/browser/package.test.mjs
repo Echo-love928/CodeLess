@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdtemp, mkdir, writeFile, rm, readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { inventory, verify, build, runnerInputs, command, root } from '../../../infra/release/client/package.mjs'
+import { inventory, verify, build, runnerInputs, command, root, gitArchive } from '../../../infra/release/client/package.mjs'
 const commit = 'a'.repeat(40)
 
 test('release verifier rejects tamper, unexpected commit, missing and extra files', async () => {
@@ -35,7 +35,7 @@ test('runner archive starts the exact bridge required by LocalBuildGateway and w
   await mkdir(parent, { recursive: true })
   const dir = await mkdtemp(join(parent, 'bridge-layout-'))
   const revision = command('git', ['rev-parse', 'HEAD'])
-  command('git', ['archive', '--format=tar', '--output=' + join(dir, 'runner.tar'), revision, ...runnerInputs])
+  gitArchive(revision, runnerInputs, join(dir, 'runner.tar'))
   await mkdir(join(dir, 'repository'))
   command('tar', ['-xf', join(dir, 'runner.tar'), '-C', join(dir, 'repository')])
   const { spawnSync } = await import('node:child_process')
@@ -44,6 +44,10 @@ test('runner archive starts the exact bridge required by LocalBuildGateway and w
   })
   assert.equal(result.status, 2, 'Bridge must load its real module graph and reject missing arguments; ' + result.stderr)
   assert.doesNotMatch(result.stderr, /MODULE_NOT_FOUND|ERR_MODULE_NOT_FOUND/)
+  const blob = spawnSync('git', ['cat-file', 'blob', `${revision}:services/api/agent-runner.mjs`], { windowsHide: true })
+  assert.equal(blob.status, 0)
+  assert.deepEqual(await readFile(join(dir, 'repository/services/api/agent-runner.mjs')), blob.stdout,
+    'Archive must contain canonical Git bytes, not checkout-filtered CRLF')
 })
 
 test('formal ingress keeps private APIs and platform cookies off generated hosts', async () => {

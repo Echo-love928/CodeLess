@@ -29,6 +29,11 @@ export function pnpm(args, options = {}) {
     ? command(process.env.ComSpec ?? 'cmd.exe', ['/d', '/c', 'corepack', 'pnpm', ...args], options)
     : command('corepack', ['pnpm', ...args], options)
 }
+export function gitArchive(commit, paths, output) {
+  // Archive normally applies the operator's checkout EOL filter. API releases use raw blobs.
+  return command('git', ['-c', 'core.autocrlf=false', '-c', 'core.eol=lf',
+    'archive', '--format=tar', `--output=${output}`, commit, ...paths])
+}
 export async function inventory(directory) {
   const files = {}
   async function visit(path) {
@@ -74,7 +79,7 @@ export async function build(commit, destination) {
     const source = join(output, 'source'), bundle = join(output, 'bundle')
     await mkdir(source); await mkdir(bundle)
     const archive = join(output, 'source.tar')
-    command('git', ['archive', '--format=tar', `--output=${archive}`, commit, ...inputs])
+    gitArchive(commit, inputs, archive)
     command('tar', ['-xf', archive, '-C', source])
     const pkg = JSON.parse(await readFile(join(source, 'package.json'), 'utf8'))
     assert.equal(process.version, 'v' + pkg.engines.node, 'Locked Node required')
@@ -95,7 +100,7 @@ export async function build(commit, destination) {
     await writeFile(join(output, 'web-build.log'), pnpm(['--filter', '@codeless/web', 'build'], { cwd: source, env }) + '\n')
     await cp(join(source, 'apps/web/dist'), join(bundle, 'web'), { recursive: true, errorOnExist: true })
     await writeFile(join(bundle, 'web/codeless-publication-config.json'), JSON.stringify({ publicOrigin: config.publicOrigin }) + '\n')
-    command('git', ['archive', '--format=tar', `--output=${join(bundle, 'runner.tar')}`, commit, ...runnerInputs])
+    gitArchive(commit, runnerInputs, join(bundle, 'runner.tar'))
     const runner = join(output, 'runner-check'); await mkdir(runner)
     command('tar', ['-xf', join(bundle, 'runner.tar'), '-C', runner])
     await writeFile(join(output, 'runner-install.log'), pnpm(['install', '--frozen-lockfile'], { cwd: runner, env }) + '\n')
@@ -118,7 +123,8 @@ export async function build(commit, destination) {
     for (const name of ['edge', 'platform', 'hosting']) await writeFile(join(ingress, name + '.conf'), gateway[name])
     const manifest = { schema: 1, commit, sourceTree: command('git', ['rev-parse', `${commit}^{tree}`]),
       toolchain: { node: process.version, pnpm: pkg.engines.pnpm }, config,
-      runnerFormat: 'uncompiled Node ESM source + locked template + policies + operator adapters; not a Docker image',
+      runnerFormat: 'uncompiled Node ESM source + trusted API bridge + locked template + policies + operator adapters; not a Docker image',
+      archivePolicy: 'core.autocrlf=false; core.eol=lf; shared runtime bytes must match API Git blobs exactly',
       sourceArchiveSha256: hash(await readFile(archive)),
       lockSha256: hash(await readFile(join(source, 'pnpm-lock.yaml'))),
       builderSha256: hash(builderBytes),

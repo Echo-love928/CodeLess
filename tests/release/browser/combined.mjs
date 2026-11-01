@@ -80,5 +80,5 @@ try {
     workerFixedRoot: '/srv/codeless/repository', workerInstallation: 'NOT_DEPLOYED; operator must install this same runtime snapshot at the fixed worker root',
     platformDist: portable(join(output, 'release/client/web')) }
   report.status = 'BUILT_AND_BRIDGES_VERIFIED_HOLD'
-} catch (error) { report.status = 'FAILED'; report.error = error.code ?? error.message; process.exitCode = 1 }
+} catch (error) { report.status = 'FAILED'; report.error = { code: error.code ?? error.name, message: error.message }; process.exitCode = 1 }
 await save(); console.log(JSON.stringify(report))
