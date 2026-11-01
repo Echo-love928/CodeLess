@@ -76,6 +76,9 @@ def main():
         # Never export container args (fixture credentials) or SQL/JVM logs.
         report['commands'].append({'operation': label, 'exitCode': r.returncode,
                                    'stdoutSha256': release.sha(r.stdout), 'stderrSha256': release.sha(r.stderr)})
+        if r.returncode != 0:
+            # Private diagnostics only; never export SQL/credentials with receipts.
+            (output / ('command-' + str(len(report['commands'])) + '-' + label + '.stderr')).write_bytes(r.stderr)
         release.require(r.returncode == 0, 'COMMAND_FAILED_' + label)
         return r.stdout.decode().strip()
     def docker(*argv, label='docker'):
@@ -92,7 +95,9 @@ def main():
         containers.append(name)
         deadline = time.monotonic() + 60
         while True:
-            r = subprocess.run(['docker', 'exec', name, 'pg_isready', '-U', 'd27_fixture', '-d', 'd27_fixture'], capture_output=True, timeout=5)
+            # The image's bootstrap server accepts Unix sockets before the
+            # requested database exists. JDBC requires the final TCP server.
+            r = subprocess.run(['docker', 'exec', name, 'pg_isready', '-h', '127.0.0.1', '-U', 'd27_fixture', '-d', 'd27_fixture'], capture_output=True, timeout=5)
             if r.returncode == 0: break
             release.require(time.monotonic() < deadline, 'PG_NOT_READY'); time.sleep(.2)
         binding = json.loads(docker('inspect', '--format', '{{json .NetworkSettings.Ports}}', name))
@@ -175,7 +180,15 @@ def main():
         stop(); dispose(source_db[0])
         legacy = db()
         checked('T2_EMPTY_LEGACY_DATABASE', sql(legacy[0], "SELECT count(*) FROM information_schema.tables WHERE table_schema='public';") == '0')
-        start(legacy, 'legacy-target-V4', target='4', seeds=True); stop()
+        start(legacy, 'legacy-target-V4', target='4', seeds=True)
+        # Tomcat/CSRF can be live before ApplicationRunner finishes its two
+        # BCrypt seed transactions. Wait for the real fixture rows before stop.
+        deadline = time.monotonic() + 30
+        while sql(legacy[0], "SELECT count(*) FROM platform_users u JOIN auth_credentials c ON c.user_id=u.id WHERE u.email IN ('demo@codeless.local','admin@codeless.local');") != '2':
+            release.require(api.poll() is None and time.monotonic() < deadline, 'FIXTURE_ACCOUNT_SEED_TIMEOUT')
+            time.sleep(.1)
+        checked('T2_BOTH_FIXTURE_ACCOUNTS_SEEDED', True)
+        stop()
         checked('T2_BASELINE_V4', sql(legacy[0], 'SELECT max(version) FROM flyway_schema_history WHERE success;') == '4')
         owner = sql(legacy[0], "SELECT id FROM platform_users WHERE email='demo@codeless.local';")
         sql(legacy[0], f"""

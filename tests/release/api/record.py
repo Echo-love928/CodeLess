@@ -46,6 +46,8 @@ elif mode == 'gate':
     env['D26_STAGE_EXITS'] = str(private / 'stages.jsonl')
     observer = (ROOT / 'tests/regression/release-api/stage-observer.mjs').as_uri()
     command = ['node', '--import', observer, 'scripts/ci-gate.mjs']
+elif mode in ('static', 'api', 'runner', 'e2e'):
+    command = ([os.environ.get('COMSPEC', 'cmd.exe'), '/d', '/c', 'corepack'] if os.name == 'nt' else ['corepack']) + ['pnpm', 'run', 'verify:' + mode]
 else: raise ValueError('Unregistered mode')
 head = git_text('rev-parse', 'HEAD')
 before = source_hashes()
@@ -53,7 +55,7 @@ receipt = {'task': 'D27-A', 'mode': mode, 'head': head, 'branch': git_text('bran
            'command': command, 'startedAt': datetime.now(timezone.utc).isoformat(), 'modelProvider': 'deterministic-mock',
            'paidModelRequests': 0, 'realModelQuality': 'NOT_EVALUATED', 'sourceBefore': before}
 (public / 'started.json').write_text(json.dumps(receipt, indent=2) + '\n')
-screenshots = {name: (ROOT / name).read_bytes() for name in git_text('ls-files', '*.png').splitlines()} if mode == 'gate' else {}
+screenshots = {name: (ROOT / name).read_bytes() for name in git_text('ls-files', '*.png').splitlines()} if mode in ('gate', 'runner', 'e2e') else {}
 print(json.dumps({'mode': mode, 'evidence': public.relative_to(ROOT).as_posix()}), flush=True)
 with (private / 'command.log').open('xb') as log:
     process = subprocess.run(command, cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT)
@@ -79,6 +81,9 @@ if mode == 'gate':
         if path.stat().st_mtime < datetime.fromisoformat(receipt['startedAt']).timestamp(): continue
         attrs = ET.fromstring(path.read_bytes()).attrib
         receipt['junit'].append({k: attrs.get(k) for k in ('name', 'tests', 'failures', 'errors', 'skipped')})
+if mode in ('static', 'api', 'runner', 'e2e'):
+    receipt['summaries'] = [line for line in raw.decode(errors='replace').splitlines() if
+                            any(word in line for word in ('Tests run:', 'BUILD SUCCESS', 'BUILD FAILURE', ' passed ('))]
 if mode in ('unit', 'checksum'): (public / 'command.log').write_bytes(raw)
 if mode == 'build' and process.returncode == 0:
     result = json.loads(raw)
