@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path'
 import { root, hash, verify } from '../../../infra/release/client/package.mjs'
 import assert from 'node:assert/strict'
 const [mode, ...args] = process.argv.slice(2)
-const modes = { unit: 'package.test.mjs', audit: 'audit.mjs', public: 'public.mjs', ingress: 'ingress.mjs', sample: 'sample.mjs', image: 'build-image.mjs', bridge: 'bridge.mjs' }
+const modes = { unit: 'package.test.mjs', audit: 'audit.mjs', public: 'public.mjs', ingress: 'ingress.mjs', sample: 'sample.mjs', image: 'build-image.mjs', bridge: 'bridge.mjs', combined: 'combined.mjs' }
 const output = resolve(root, '.local-data/d27-b/commands', new Date().toISOString().replaceAll(':', '-') + '-' + mode)
 await mkdir(output, { recursive: true })
 const git = values => {
