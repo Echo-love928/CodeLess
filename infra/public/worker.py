@@ -155,8 +155,16 @@ def binding(request):
     args = request['argv']
     data = base64.b64decode(request['input'], validate=True)
     job = json.loads(data)
-    if args == [str(REPOSITORY / 'services/api/agent-runner.mjs'),
-                *[str(PRIVATE / name) for name in ('work', 'artifacts', 'evidence', 'receipts')]]:
+    if (len(args) == 5 and args[0] == str(REPOSITORY / 'services/api/agent-runner.mjs') and
+            args[2:] == [str(PRIVATE / name) for name in ('artifacts', 'evidence', 'receipts')]):
+        # Java recovery owns work/<task UUID>; all other output roots stay fixed.
+        # Preserve the legacy base-root call, never accept arbitrary caller paths.
+        scratch, work = Path(args[1]), PRIVATE / 'work'
+        if (str(scratch) != args[1] or
+                (scratch != work and (scratch.parent != work or
+                 not re.fullmatch(r'[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}', scratch.name))) or
+                scratch.resolve(strict=False) != scratch):
+            raise ValueError('Invalid task scratch root')
         if len(data) > 128 * 1024 or set(job) != {'sourceDirectory', 'sourceDigest', 'actions'}:
             raise ValueError('Invalid build request')
         source = Path(job['sourceDirectory'])

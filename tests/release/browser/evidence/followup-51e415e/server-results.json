@@ -1,0 +1,227 @@
+{
+  "stage": {
+    "sourceCommit": "51e415e143ee5c167a25f39476b27b0f37965813",
+    "productionChanged": false,
+    "status": "STAGED_VERIFIED",
+    "commands": [
+      {
+        "command": [
+          "python3",
+          "/srv/codeless/releases/d27-51e415e143ee5c167a25f39476b27b0f37965813-review/release/api/repository/scripts/release/api_release.py",
+          "verify",
+          "--package",
+          "/srv/codeless/releases/d27-51e415e143ee5c167a25f39476b27b0f37965813-review/release/api",
+          "--manifest-sha256",
+          "975a70c26a37e06c1bde8a7b641a1044f77981b29741a268ed4a76017ab77d02"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "/usr/sbin/runuser",
+          "-u",
+          "codeless-worker",
+          "--",
+          "/opt/codeless/tools/node-v24.22.1-linux-x64/bin/corepack",
+          "pnpm",
+          "--dir",
+          "/srv/codeless/releases/d27-51e415e143ee5c167a25f39476b27b0f37965813-review/runtime/repository",
+          "install",
+          "--frozen-lockfile"
+        ],
+        "exitCode": 1
+      },
+      {
+        "command": [
+          "/usr/sbin/runuser",
+          "-u",
+          "codeless-worker",
+          "--",
+          "/opt/codeless/tools/node-v24.22.1-linux-x64/bin/corepack",
+          "pnpm",
+          "install",
+          "--frozen-lockfile"
+        ],
+        "cwd": "/srv/codeless/releases/d27-51e415e143ee5c167a25f39476b27b0f37965813-review/runtime/repository",
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "docker",
+          "image",
+          "load",
+          "--input",
+          "/home/huangjiaqi/d27-51e415e-incoming/runner-build-image.tar"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "python3",
+          "-B",
+          "/srv/codeless/releases/d27-51e415e143ee5c167a25f39476b27b0f37965813-review/release/api/repository/scripts/release/api_release.py",
+          "verify",
+          "--package",
+          "/srv/codeless/releases/d27-51e415e143ee5c167a25f39476b27b0f37965813-review/release/api",
+          "--manifest-sha256",
+          "975a70c26a37e06c1bde8a7b641a1044f77981b29741a268ed4a76017ab77d02"
+        ],
+        "exitCode": 0
+      }
+    ],
+    "errorType": "FileNotFoundError",
+    "resumeReason": "absolute runuser path required in sanitized PATH",
+    "priorStatus": "FAILED",
+    "selectedImageId": "sha256:628712f46b242507f346903d598eed1d9f13bef4e8b33abb937a66952a372550",
+    "imageRevision": "51e415e143ee5c167a25f39476b27b0f37965813",
+    "apiManifestSha256": "975a70c26a37e06c1bde8a7b641a1044f77981b29741a268ed4a76017ab77d02",
+    "clientManifestSha256": "e1563674e28e442ad50cad335a152e01f67cb6fddfa0e8d3361267a57a8c0993",
+    "repositoryRoot": "/srv/codeless/releases/d27-51e415e143ee5c167a25f39476b27b0f37965813-review/runtime/repository"
+  },
+  "browser": {
+    "sourceCommit": "51e415e143ee5c167a25f39476b27b0f37965813",
+    "status": "PASSED",
+    "node": "v24.22.1",
+    "platform": "linux",
+    "selectedImageId": "sha256:628712f46b242507f346903d598eed1d9f13bef4e8b33abb937a66952a372550",
+    "buildStatus": "SUCCEEDED",
+    "artifactDigest": "sha256:f75bcdfeb65ae6836a66ec7ad40b62cccebdd2781e7ac668ceb6b12447ff5643",
+    "cases": [
+      {
+        "case": "positive",
+        "status": "PASSED",
+        "failure": null,
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "workerExitCode": 0
+      },
+      {
+        "case": "ambiguous-target",
+        "status": "FAILED",
+        "failure": "ACTION_FAILED",
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "workerExitCode": 1
+      },
+      {
+        "case": "ambiguous-target",
+        "status": "FAILED",
+        "failure": "ACTION_FAILED",
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "workerExitCode": 1
+      },
+      {
+        "case": "ambiguous-target",
+        "status": "FAILED",
+        "failure": "ACTION_FAILED",
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "workerExitCode": 1
+      },
+      {
+        "case": "ambiguous-target",
+        "status": "FAILED",
+        "failure": "ACTION_FAILED",
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "workerExitCode": 1
+      },
+      {
+        "case": "ambiguous-target",
+        "status": "FAILED",
+        "failure": "ACTION_FAILED",
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "workerExitCode": 1
+      },
+      {
+        "case": "ambiguous-target",
+        "status": "FAILED",
+        "failure": "ACTION_FAILED",
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "workerExitCode": 1
+      },
+      {
+        "case": "ambiguous-target",
+        "status": "FAILED",
+        "failure": "ACTION_FAILED",
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "workerExitCode": 1
+      },
+      {
+        "case": "ambiguous-target",
+        "status": "FAILED",
+        "failure": "ACTION_FAILED",
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "workerExitCode": 1
+      },
+      {
+        "case": "ambiguous-target",
+        "status": "FAILED",
+        "failure": "ACTION_FAILED",
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "workerExitCode": 1
+      },
+      {
+        "case": "ambiguous-target",
+        "status": "FAILED",
+        "failure": "ACTION_FAILED",
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        },
+        "workerExitCode": 1
+      }
+    ],
+    "productionChanged": false
+  },
+  "realBackupCompatibility": {
+    "sourceCommit": "51e415e143ee5c167a25f39476b27b0f37965813",
+    "dataset": "real D25 server rollback backup; NOT the canonical D23 backup",
+    "sourceBackupSha256": "513876749614c85f758fc288434b0a36048fff8e16214bf40b0536a41eeeea5f",
+    "publicAcceptance": false,
+    "productionChanged": false,
+    "status": "PASSED",
+    "checks": [
+      "REAL_DATABASE_BACKUP_RESTORED_IN_OWNED_CLUSTER",
+      "REAL_PUBLISHED_VERSION_PRESENT",
+      "SEALED_CANDIDATE_JAR_STARTS_ON_REAL_BACKUP",
+      "REAL_OWNER_LOGIN",
+      "EXISTING_VERIFIED_VERSION_READABLE",
+      "EXISTING_SOURCE_LIST_READABLE",
+      "REAL_AUTHENTICATED_SOURCE_ZIP",
+      "ANONYMOUS_VERSION_IS_401",
+      "IMMUTABLE_VERSIONS_PUBLICATIONS_MODEL_LEDGER_UNCHANGED",
+      "ORIGINAL_BACKUP_UNCHANGED"
+    ],
+    "cleanupErrors": [],
+    "exportSha256": "02ea134e46dabc1b950e0343438d6fb865385983b982a2fc2c56e615fc1311af",
+    "liveJarUnchanged": true,
+    "productionImageTagUnchanged": true
+  }
+}
