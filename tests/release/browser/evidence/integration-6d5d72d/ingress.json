@@ -1,0 +1,66 @@
+{
+  "task": "D27-B",
+  "commit": "6d5d72d884deb2499b19fae8ea7a280ee5f226e8",
+  "scope": "real pinned nginx / local trusted test CA / formal candidate config; not public deployment",
+  "status": "PASSED",
+  "checks": [
+    {
+      "name": "edge nginx -t",
+      "exitCode": 0
+    },
+    {
+      "name": "platform nginx -t",
+      "exitCode": 0
+    },
+    {
+      "name": "hosting nginx -t",
+      "exitCode": 0
+    },
+    {
+      "name": "formal compose config --quiet (synthetic settings; no up)",
+      "exitCode": 0
+    },
+    {
+      "name": "actual nginx route fallback",
+      "path": "/",
+      "exitCode": 0
+    },
+    {
+      "name": "actual nginx route fallback",
+      "path": "/apps",
+      "exitCode": 0
+    },
+    {
+      "name": "actual nginx route fallback",
+      "path": "/workbench/00000000-0000-4000-8000-000000000001",
+      "exitCode": 0
+    },
+    {
+      "name": "actual nginx asset bytes and MIME",
+      "path": "assets/AdminPage-CDZAMhDg.css",
+      "exitCode": 0
+    },
+    {
+      "name": "actual nginx asset bytes and MIME",
+      "path": "assets/AdminPage-C_JZ6_zr.js",
+      "exitCode": 0
+    },
+    {
+      "name": "actual nginx asset bytes and MIME",
+      "path": "assets/index-CpUOvVjj.js",
+      "exitCode": 0
+    },
+    {
+      "name": "actual nginx asset bytes and MIME",
+      "path": "assets/index-D7MF9nvu.css",
+      "exitCode": 0
+    },
+    {
+      "name": "private route rejected",
+      "exitCode": 0
+    }
+  ],
+  "containerCleanup": "PASSED",
+  "apiDeployed": false,
+  "publicAcceptance": false
+}

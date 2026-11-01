@@ -12,7 +12,7 @@ node infra/release/client/package.mjs verify <40位候选SHA> .local-data/d27-b/
 node --test tests/release/browser/package.test.mjs
 ```
 
-输出目录必须全新；失败保留 `build-status.json`，不覆盖已有候选。源码通过 `git archive <SHA>` 取出，不读取本机未提交的产品代码或 node_modules。构建器自身必须与候选一致；域名配置也来自候选内 `infra/release/client/config.json`。环境只继承操作系统/工具缓存必要项，VITE 只设置已冻结的预览域名，模型/数据库/会话凭据不参与构建。
+输出目录必须全新；失败保留 `build-status.json`，不覆盖已有候选。源码通过 `git -c core.autocrlf=false -c core.eol=lf archive <SHA>` 取出（API/B 重叠文件严格比较原字节，不做换行归一化放行），不读取本机未提交的产品代码或 node_modules。构建器自身必须与候选一致；域名配置也来自候选内 `infra/release/client/config.json`。环境只继承操作系统/工具缓存必要项，VITE 只设置已冻结的预览域名，模型/数据库/会话凭据不参与构建。
 
 `bundle/web` 是实际 vue-tsc/Vite 产物，含公开发布域 JSON；`bundle/runner.tar` 是从同一提交直接归档的 Node ESM runner、Vue 锁定模板、隔离策略、镜像构建文件、网关和操作员适配器。runner 本身不编译；逐模块执行 Node 语法检查并导入主要入口验证相对依赖闭包。归档不是 Docker 镜像，不包含 API JAR、node_modules、浏览器二进制、TLS 私钥或环境文件。按现有 `tests/agent/prepare-runtime.mjs` 在可信宿主构建/检查固定 runner 镜像；镜像 tag 不等于不可变 image ID，实际运行证据仍以每次 runner 回执的 imageId 为准。
 
@@ -24,14 +24,14 @@ node --test tests/release/browser/package.test.mjs
 
 另用 `node tests/release/browser/record.mjs image <候选SHA> .local-data/d27-b/image-2` 从相同 SHA 的 `infra/build-image` 和 `templates/vue` 独立归档上下文，真实构建、运行版本探针并 `docker image save`。独立 tag 为 `codeless-d27-b:<完整SHA>`；不提升本机已有 runner tag，不上传 registry。`image.json` 记录固定基础镜像、源文件摘要、实际 image ID/架构、Node/Vue/Vite/TypeScript 运行版本及离线镜像归档 SHA256。探针使用非 root、禁网、只读根与原资源上限。Docker build 可命中缓存，不将它声称为冷缓存镜像字节复现。
 
-最终交付集合为客户端归档和单独的 runner 构建镜像归档，二者源提交相同，见 `evidence/artifact-set.json`。目标候选宿主先核验归档 SHA256，再离线 `docker image load --input <runner-build-image.tar>`，检查版本标签、源 revision label 和实际镜像身份，再由维护者按既有 worker 配置提升允许的固定 tag。本机 containerd 的 image ID 是 OCI index 摘要，归档的 configDigest 另列；两个摘要均已从导出归档核验，不能混用。目标环境的导入/后端兼容性尚未演练，出现未知身份必须 HOLD。API/生成容器不参与镜像导入或获得 Docker socket。
+当前组合交付集合含 API/client 成组归档和单独的 runner 构建镜像归档，源提交均为 `6d5d72d884deb2499b19fae8ea7a280ee5f226e8`，见 `tests/release/browser/evidence/integration-6d5d72d/selected.json`；旧 `artifact-set.json` 仅为历史 B-only 集合。目标候选宿主先核验归档 SHA256，再离线 `docker image load --input <runner-build-image.tar>`，检查版本标签、源 revision label 和实际镜像身份，再由维护者按既有 worker 配置提升允许的固定 tag。本机 containerd 的 image ID 是 OCI index 摘要，归档的 configDigest 另列；两个摘要均已从导出归档核验，不能混用。目标环境的导入/后端兼容性尚未演练，出现未知身份必须 HOLD。API/生成容器不参与镜像导入或获得 Docker socket。
 
 ## 候选环境部署步骤
 
 1. 获取 D27-A 同提交 API/JAR/迁移、客户端 bundle 和受信 manifest 摘要；先核验摘要及 `verify`，禁止混用两个提交。既有备份/恢复与 A 的空环境迁移验证是启用前置。
-2. 新建组合版本目录，选用同提交的 **`release/api/repository` 作为完整受信 repository 根**，平台 dist 指向 `release/client/web`。`CODELESS_AGENT_REPOSITORY_ROOT` 和 `codeless.export.repository-root` 均指向该 API repository；其中 `services/api/agent-runner.mjs` 是 Java LocalBuildGateway 与 worker IPC 固定调用的桥。Linux public worker 固定根为 `/srv/codeless/repository`，操作员必须把已核验的同源 API repository 安装到该路径；不能只更改 API 环境变量而让 worker 继续读取另一份源码。现有 systemd/worker 固定路径未在本卡修改，实际主机映射还需部署身份验收。
+2. 新建组合版本目录，保持封存的 `release/api/repository` 不变，将其完整复制到 **`runtime/repository` 作为实际受信 repository 根**，平台 dist 指向 `release/client/web`。`CODELESS_AGENT_REPOSITORY_ROOT` 和 `codeless.export.repository-root` 均指向该 runtime repository；其中 `services/api/agent-runner.mjs` 是 Java LocalBuildGateway 与 worker IPC 固定调用的桥。Linux public worker 固定根为 `/srv/codeless/repository`，操作员必须把已核验的同源 runtime repository 安装到该路径；不能只更改 API 环境变量而让 worker 继续读取另一份源码。现有 systemd/worker 固定路径未在本卡修改，实际主机映射还需部署身份验收。
 
-   B 的 runner.tar 同样补入该受信桥和导出 README，可单独展开作桥/runner 验证；它不是包含 API 配置与安装输入的完整 API repository。两包重叠源码必须逐字节相同，不能把不同候选覆盖拼装。可信宿主按原根锁 `corepack pnpm install --frozen-lockfile`，再执行 `corepack pnpm exec playwright install chromium` 并满足系统前置；完成后将源码设只读。打包器已从单独展开的 runner 真实安装依赖/加载桥，专项另以有效受控 Vue 输入实际跑桥→Docker→Chromium→receipt。归档内原根 CI scripts 仍需完整开发源码，不能在运行包调用。构建镜像可从归档内直接执行 `docker build -f infra/build-image/Dockerfile -t <受信候选tag> .`；原文提到的 tests/agent/prepare-runtime.mjs 仅在完整开发 checkout 存在。保留旧版本目录与私有卷，宿主依赖安装不发生在生成代码容器内。
+   B 的 runner.tar 同样补入该受信桥和导出 README，可单独展开作桥/runner 验证；它不是包含 API 配置与安装输入的完整 API repository。两包重叠源码必须逐字节相同，不能把不同候选覆盖拼装。可信宿主仅在 runtime 副本内按原根锁 `corepack pnpm install --frozen-lockfile`，再执行 `corepack pnpm exec playwright install chromium` 并满足系统前置；完成后核验封存源文件摘要未变，再将源码设只读；不要向封存 API 包内安装 node_modules。打包器已从单独展开的 runner 真实安装依赖/加载桥，专项另以有效受控 Vue 输入实际跑桥→Docker→Chromium→receipt。归档内原根 CI scripts 仍需完整开发源码，不能在运行包调用。构建镜像可从归档内直接执行 `docker build -f infra/build-image/Dockerfile -t <受信候选tag> .`；原文提到的 tests/agent/prepare-runtime.mjs 仅在完整开发 checkout 存在。保留旧版本目录与私有卷，宿主依赖安装不发生在生成代码容器内。
 3. 通过私密渠道在服务器配置现有 `/etc/codeless/` 受保护配置，复用 `infra/public/README.md` 的服务账号、worker IPC、隔离镜像、私有根及防火墙。不要复制配置、密码、cookie 或 TLS 私钥到构建目录。API/preview 和生成容器不得取得 Docker socket。
 4. DNS/TLS 必须覆盖三个独立站点：平台 `app.codeless-platform.top`、`v*.preview.codeless-preview.top`、`d*.sites.codeless-publish.top`（实际通配符为 `*.preview...` / `*.sites...`）。候选 `ingress/*.conf` 由现有正式 renderer 生成，预览网关8788、API8080保持私有；edge 只开放443。沿用 `infra/public/compose.yml`，将候选配置和 web 以只读挂载装配。先运行 compose `config --quiet` 和容器 `nginx -t`，再在候选入口启用。正式证书必须通过系统信任验证，不能 ignoreHTTPSErrors/hosts 覆盖冒充公网。
 5. 复核 `infra/hosting/preflight.mjs`、`infra/public/host-preflight.sh` 与只读 `check-final.py`；按既有服务器验收入口使用全新 run-id 和实际 deployed SHA。它需要真实受保护 reviewer 会话及 API/runner，同一 SHA 身份核验不能省略。不要自动调用发布；真实发布需由已鉴权用户显式确认已验证不可变版本。
@@ -55,3 +55,14 @@ node tests/release/browser/record.mjs sample .local-data/d27-b/sample-1
 - 评审账号由部署维护者在既有私密渠道按受控试用名单交付。服务器随机初始凭据仅保留 root 0600 文件；本说明不列密码、不读取/复制它。需要评审者尚未获账号时，由维护者私下提供；不能用仓库示例数据库口令或合成 canary 登录。
 
 当前执行结果、候选 SHA、证据与阻塞见 `docs/handoffs/D27-B.md`。未经另一人批准、当前 HEAD 全部门禁成功和无未解决讨论，不具备合并条件。
+
+## 同提交组合复现（当前选定 6d5d72d）
+
+先构建同源镜像，再在全新输出目录组合；以下操作需要可信宿主 Docker、Java21、锁定 Node/pnpm 和 Chromium 前置。组合工具从同一 Git 提交分别构建 API/client，逐字节核对113个重叠文件，复制 runtime，实际执行两种展开根的受信桥并验证 Docker/Chromium/持久化回执。测试期间仅临时绑定本机策略 tag，finally 校验并恢复原 image ID；不向 registry 推送。
+
+```sh
+node tests/release/browser/record.mjs image <完整SHA> .local-data/d27-b/image-new
+node tests/release/browser/record.mjs combined <完整SHA> .local-data/d27-b/combined-new codeless-d27-b:<完整SHA>
+```
+
+本机实际根为 `.local-data/d27-b/combined-6d5d72d/runtime/repository`；`release/client/web` 是平台资源。`bridge-runner-only.json` 只验证独立 runner 根契约，正式 API/worker 采用完整 runtime 根。Linux `/srv/codeless/repository` 尚未安装，公开主机映射 UNKNOWN。当前没有 D27 候选主机、正式 reviewer 会话或部署身份，不能把历史 D15/合成 Cookie 报告当作新候选验收。
