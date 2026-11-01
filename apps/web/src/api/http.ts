@@ -25,10 +25,15 @@ export async function requestJson<T>(path: string, init: RequestInit = {}): Prom
   } catch {
     throw new ApiError('network')
   }
-  if (response.status === 401) throw new ApiError('unauthorized', 401)
-  if (response.status === 403) throw new ApiError('forbidden', 403)
-  if (response.status === 429) throw new ApiError('rate-limited', 429)
-  if (!response.ok) throw new ApiError('server', response.status)
+  if (!response.ok) {
+    // These error bodies are unused. Release the stream before rejecting so the
+    // browser can finish the request (including anonymous session bootstrap).
+    try { await response.body?.cancel() } catch { /* Preserve the original HTTP error. */ }
+    if (response.status === 401) throw new ApiError('unauthorized', 401)
+    if (response.status === 403) throw new ApiError('forbidden', 403)
+    if (response.status === 429) throw new ApiError('rate-limited', 429)
+    throw new ApiError('server', response.status)
+  }
   if (response.status === 204) return undefined as T
   try {
     return await response.json() as T
