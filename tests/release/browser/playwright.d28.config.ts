@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test'
 if (!process.env.CODELESS_FULL_OUTPUT || !process.env.CODELESS_FULL_ORIGIN) throw new Error('Start tests/e2e/full/run.mjs first')
 export default defineConfig({
   testDir: '.', testMatch: 'd28-user-flow.spec.ts', workers: 1, retries: 0,
-  timeout: 360_000, globalTimeout: 380_000,
+  timeout: 480_000, globalTimeout: 500_000,
   outputDir: process.env.CODELESS_FULL_OUTPUT + '/browser',
   reporter: [['list'], ['json', { outputFile: process.env.CODELESS_FULL_OUTPUT + '/playwright.json' }]],
   expect: { timeout: 15_000 },

@@ -207,6 +207,16 @@ test('D28-B T1–T3: real repair and responsive routes; two isolated users gener
     expect((await call(a.page, 'versions/' + randomUUID() + '/export')).status).toBe(404)
     ids.wrongVersion = { stale: stale.status, staleCode: stale.body.code, mismatchedArtifact: wrong.status }
 
+    // The first actor idled while the second actor performed two real builds.
+    // Use the product's explicit recovery action; do not extend or bypass the
+    // production preview credential lifetime or inject a replacement credential.
+    const expired = await a.page.getByText('预览访问已过期，请刷新预览。', { exact: true }).isVisible()
+    await a.page.getByRole('button', { name: '刷新预览', exact: true }).click()
+    await expect(frame(a.page).getByTestId('profile-name')).toHaveText('Hedy Lamarr')
+    expect((await get(a.page, 'applications/' + a.app)).latestReadyVersionId).toBe(a.edited)
+    ids.previewCredentialRecovery = { observedExpired: expired, explicitUiRefresh: true, versionId: a.edited }
+    await persist()
+
     // Actual compilation fails; SQL and UI must keep the latest usable version.
     await a.page.getByLabel('选择组件进行修改').check()
     await frame(a.page).getByTestId('profile-name').click()
