@@ -35,22 +35,27 @@
     "noConcurrentBuildOrRetag": "coordination reservation; recheck actual state before every workload"
   },
   "budget": {
-    "currency": "CNY",
-    "cumulativeCap": "2",
-    "userReportedSpentAtAuthorization": "0",
-    "BSpent": "0",
-    "BPaidRequests": 0,
-    "ledgerOwner": "A, one shared cumulative ledger",
-    "ledgerCurrentStateVerifiedByB": false,
-    "noSecondBAllowance": true,
-    "admissionFormula": "settled + worst-case pending/UNKNOWN reservations + next whole-task reservation <=2; stop before exceeding cap",
-    "covers": "all subsequent real-model batches and user-flow model calls including failed/UNKNOWN calls"
+    "authority": "23.136.172.128:/srv/codeless-handoff/d28/20261102-cny2/budget-ledger.sqlite3; JSON is snapshot only",
+    "cumulativeCapCny": "2",
+    "revision": 2,
+    "auditChainVerified": true,
+    "executionOwner": "B",
+    "bReconciled": true,
+    "settledUpperCny": "0",
+    "reservedUpperCny": "0",
+    "spendableCny": "2",
+    "candidateBinding": "00fd43333f35c5cb0cce425721fdce9cd1d0f956",
+    "new7dbCandidateAdmitted": false,
+    "newReservationMade": false,
+    "realModelBatchStarted": false,
+    "noSecondAllowance": true,
+    "evidence": "tests/release/browser/evidence/d28/intake/budget.json"
   },
   "requiredSequence": [
     "A/B review7db delta and all affected failures",
     "A/API/runner maintainers obtain original historical failure trace and close root causes with minimal confirmed fix and affected retests",
     "Freeze final source candidate; any further code creates another candidate",
-    "Reseal API/client/worker/image with same exact source and digests; controlled original bytes handed to B; all members independently verified",
+    "Reseal API/client/worker/image with same exact source and digests; controlled final candidate bytes handed to B and independently verified (old00fd original already275/275 verified)",
     "Synchronize one current cumulative2CNY ledger; fresh B TLS preflight before any paid requests",
     "Deployment maintainer group-switch only after blockers closed; retain rollback",
     "Both sides independently verify actual process/file/source/image identity",
@@ -58,5 +63,7 @@
   ],
   "approved": false,
   "merged": false,
-  "M5": "HOLD"
+  "M5": "HOLD",
+  "original00fdArchiveVerifiedByB": true,
+  "originalArchiveVerification": "tests/release/browser/evidence/d28/intake/original.json"
 }
