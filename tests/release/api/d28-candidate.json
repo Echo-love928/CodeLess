@@ -28,7 +28,7 @@
     {
       "id": "D28-A-API-ARTIFACT-EPERM",
       "state": "OPEN",
-      "reason": "Current candidate full API 427/428 native1: RoundFiveRegressionTest BARE expected NO_PROGRESS, got ARTIFACT_INVALID; build exit0 then artifact rename EPERM, actor/mechanism UNKNOWN; no rerun, no fixed candidate available"
+      "reason": "Original2be Windows full API427/428 native1 after build0 then rename EPERM. Original full438 on same Windows now native0,428/428,failure/error/skip0,source/HEAD unchanged; BARE expected NO_PROGRESS. Authorized ETW sees internal rename access-denied then success, not original Node-level EPERM. Historical actor/mechanism still UNKNOWN; no production fix and not closed by passing rerun."
     },
     {
       "id": "D27-A-RUNNER-ENOTEMPTY",
@@ -44,11 +44,6 @@
       "id": "REAL-QUALITY-COVER",
       "state": "HOLD",
       "reason": "Real model quality/natural failure and production cover acceptance remain unresolved; mock results do not replace them"
-    },
-    {
-      "id": "PR94-438c0f5-E2E-TIMEOUT",
-      "state": "FIX_IN_VALIDATION",
-      "reason": "Original exact-head E2E 79 passed/1 did not run/2 suite errors, native1. Same 80 cases scheduled native-first; global120s/assertions/retries unchanged; new exact-head execution pending."
     }
   ],
   "approval": "NOT_APPROVED",
@@ -65,7 +60,7 @@
     },
     {
       "id": "B-CI-LOG-DIGEST",
-      "state": "RESOLVED_AS_UNEXPLAINED_MISMATCH",
+      "state": "RESOLVED_ACQUISITION_FORMAT_DIFFERENCE",
       "reason": "B documents gh run view --log vs direct jobs logs acquisition. A direct bytes match B direct; B exact gh reproduction matches original declarations. A gh execution not rerun; no product normalization.",
       "evidence": "tests/release/api/evidence/d28-fix/peer95-review.json"
     },
@@ -74,14 +69,32 @@
       "state": "VERIFIED_EXISTING_61_DEPLOYMENT_ONLY",
       "reason": "Authorized strict-host SSH read proves running JAR, worker, image,258 runtime sources,7 web files match61 manifest. New candidate was not deployed.",
       "evidence": "tests/release/api/evidence/d28-fix/live-identity-2026-11-02T07-51-38.317154+00-00.json"
+    },
+    {
+      "id": "PR94-438c0f5-E2E-TIMEOUT",
+      "state": "FIX_VERIFIED_4EB9595",
+      "reason": "4eb9595 exact-head six checks success, E2E80/80 plus full-product browserExit0. Original438 timeout preserved; same80 case identities,global120s,retries0.",
+      "evidence": "tests/release/api/evidence/d28-fix/ci-4eb9595-2026-11-02T08-29-39.428736+00-00/result.json"
     }
   ],
   "fixValidation": {
-    "state": "IN_PROGRESS",
+    "state": "CHECKS_PASSED_HISTORICAL_BLOCKERS_OPEN",
     "initialReviewedHead": "438c0f5e81ba08656bf110f162beb15e5d6ba21d",
     "testConfigChange": "apps/web/playwright.config.ts: native D08 first project, same80 cases/global120s/retries0",
     "runtimeProductionSourceChanged": false,
     "originalFailureSnapshotsPreserved": true,
-    "notes": "Initial sourceCommit/package above remain frozen2be artifact; new test candidate is fixed by subsequent validation receipts, not claimed deployed."
+    "notes": "Initial sourceCommit/package above remain frozen2be artifact; new test candidate is fixed by subsequent validation receipts, not claimed deployed.",
+    "testedHead": "4eb9595f513696abf95ace3dc4bf5670b0cbeec3",
+    "ciRunId": 41411371862,
+    "requiredChecks": "ALL_SIX_SUCCESS_AT_TESTED_HEAD",
+    "ciEvidence": "tests/release/api/evidence/d28-fix/ci-4eb9595-2026-11-02T08-29-39.428736+00-00/result.json",
+    "windowsTraceEvidence": "tests/release/api/evidence/d28-fix/windows-file-trace.json",
+    "windowsApiEvidence": "tests/release/api/evidence/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/command.json",
+    "windowsApiNativeExit": 0,
+    "windowsApiTests": 428,
+    "windowsApiFailures": 0,
+    "windowsApiErrors": 0,
+    "windowsApiSkipped": 0,
+    "windowsApiSourceAndHeadUnchanged": true
   }
 }

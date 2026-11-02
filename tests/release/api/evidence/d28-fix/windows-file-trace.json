@@ -1,0 +1,143 @@
+{
+  "task": "D28-A-fix",
+  "candidate": "438c0f5e81ba08656bf110f162beb15e5d6ba21d",
+  "observedAt": "2026-11-02T08:30:50.405437+00:00",
+  "status": "CAPTURE_ANALYSED_NO_HISTORICAL_ROOT_CAUSE_CLOSURE",
+  "trace": {
+    "task": "D28-A-fix",
+    "session": "CodeLess-D28-Ready-73e1bac03479",
+    "startedAt": "2026-11-02T07:54:38.2562800+00:00",
+    "oldSessionStopExitCode": 0,
+    "oldCaptureScope": "Docker-unavailable attempt, not EPERM reproduction",
+    "status": "CAPTURED_PENDING_ANALYSIS",
+    "maximumMiB": 128,
+    "fileContentsCaptured": false,
+    "startExitCode": 0,
+    "bare": {
+      "failureCode": "AGENT_REPAIR_NO_PROGRESS",
+      "status": "FAILED"
+    },
+    "stopReason": "BARE report observed",
+    "stopExitCode": 0,
+    "finishedAt": "2026-11-02T08:14:09.7105352+00:00",
+    "etlBytes": 134217728,
+    "etlSha256": "ed64669cdcd72b2e7973f579825312259bbc693f810ad0af1e25d347f4792d82"
+  },
+  "filter": {
+    "actorPidCounts": {
+      "4": 16,
+      "68296": 442,
+      "7008": 46,
+      "41220": 7
+    },
+    "eventIdCounts": {
+      "14": 38,
+      "17": 4,
+      "13": 41,
+      "27": 2,
+      "20": 4,
+      "22": 84,
+      "12": 58,
+      "19": 2,
+      "24": 248,
+      "10": 7,
+      "15": 8,
+      "11": 1,
+      "30": 6,
+      "16": 8
+    },
+    "rootCauseClosure": false,
+    "outputLimited": false,
+    "targetEventsRetained": 511,
+    "filteredSha256": "143b04e483efc0cd7fc2975946ed556ceb7b0ca5b2552a79fb421de6c96170d7",
+    "eventsRead": 1049017,
+    "statusCounts": {
+      "3221225506": 1,
+      "2147483653": 16,
+      "2147483654": 2,
+      "3221225525": 4,
+      "0": 207,
+      "3221225524": 6,
+      "3221225530": 8,
+      "3221225489": 4
+    },
+    "scope": "Only target artifact subtree and correlated file objects/IRPs; raw kernel pointers stay private",
+    "etlSha256": "ed64669cdcd72b2e7973f579825312259bbc693f810ad0af1e25d347f4792d82",
+    "task": "D28-A-fix",
+    "shareAccessCounts": {
+      "0": 7,
+      "7": 39,
+      "3": 18
+    }
+  },
+  "filterCommand": [
+    "powershell",
+    "-File",
+    "tests/release/api/d28_etw_filter.ps1",
+    "-Trace",
+    "<task-private>/file-metadata.etl",
+    "-ArtifactRoot",
+    "<clean-worktree>/services/api/target/repair-integration/runtime/artifacts",
+    "-Output",
+    "<task-private>/artifact-events.jsonl"
+  ],
+  "filterExitCode": 0,
+  "filterSourceSha256": "39308ec6cca6c04065b50e58d62e28af984745bdd3e985612a99c1d303bcf3d9",
+  "targetRetainedInterval": [
+    "2026-11-02T08:13:58.6866846Z",
+    "2026-11-02T08:14:07.8238310Z"
+  ],
+  "renames": [
+    {
+      "at": "2026-11-02T08:14:04.8394318Z",
+      "pid": 68296,
+      "relativeSourceAsMapped": ".build-k1yjob",
+      "infoClass": "10",
+      "completionAt": "2026-11-02T08:14:04.8395013Z",
+      "ntstatus": "0xc0000022"
+    },
+    {
+      "at": "2026-11-02T08:14:04.8400167Z",
+      "pid": 68296,
+      "relativeSourceAsMapped": "59fc2f39-9498-4e45-bc7c-28b76430a202",
+      "infoClass": "10",
+      "completionAt": "2026-11-02T08:14:04.8401316Z",
+      "ntstatus": "0x0"
+    }
+  ],
+  "bare": {
+    "sha256": "33fbb594cbc66850ce3a2da16f0989d6f39466351d9ff095bfb809a543d42867",
+    "status": "FAILED",
+    "failureCode": "AGENT_REPAIR_NO_PROGRESS",
+    "repairAttempts": 1,
+    "runs": [
+      {
+        "build": "SUCCEEDED",
+        "browser": "FAILED",
+        "failure": "ACTION_TIMEOUT",
+        "buildExit": 0
+      },
+      {
+        "build": "SUCCEEDED",
+        "browser": "FAILED",
+        "failure": "ACTION_TIMEOUT",
+        "buildExit": 0
+      }
+    ],
+    "paidCalls": 0,
+    "modelQualityEvidence": false
+  },
+  "findings": [
+    "Bounded 128MiB circular metadata trace started/stopped0. Earlier events may be overwritten; do not infer absence of other handles from this capture.",
+    "Two correlated rename operations for same directory in this run: first NTSTATUS 0xc0000022, second0 less than1ms later. BARE build runs both exit0 and expected NO_PROGRESS; this is not a reproduced Node-level EPERM.",
+    "PID7008 read the generated JS with ShareAccess7 (READ|WRITE|DELETE); this does not prove a rename-blocking handle. A later process query names PID7008 avp but process start was inaccessible, so capture-time identity and causal attribution remain unproven.",
+    "PID41220 later identified as ChatGPT with start before trace; file metadata accesses are present. No evidence proves its handle caused the historical EPERM.",
+    "No assertions, application retries, cleanup limits, dependencies or isolation changed. Do not close historical EPERM/ENOTEMPTY/CLEANUP_FAILED on this passing BARE."
+  ],
+  "rootCauseClosure": false,
+  "references": [
+    "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/596a1078-e883-4972-9bbc-49e60bebca55",
+    "https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew",
+    "https://raw.githubusercontent.com/nodejs/node/v24.22.1/deps/uv/src/win/fs.c"
+  ]
+}

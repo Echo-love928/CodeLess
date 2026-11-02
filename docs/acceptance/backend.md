@@ -4,7 +4,7 @@
 
 PR94原精确HEAD `438c0f5` 的远端结果已取回：static/API/runner/infra success，**E2E和ci-gate failure**，[run41321844346](https://github.com/Echo-love928/CodeLess/actions/runs/41321844346)。79 passed、1 did not run、2 suite errors，原120秒suite/teardown截止；`evidence/d28-fix/ci-438c0f5-failure.json`及原日志/trace摘要保留。下面原“PENDING”仅是发布时快照，不再作为当前状态。
 
-最小范围扩展仅 `apps/web/playwright.config.ts`：D08原生验收另列首项目，其余79项仍用原Chromium；原80个file/title身份逐项相同、无重复/遗漏，globalTimeout仍120000、retries仍0，原测试断言没有修改。原trace显示D08约第78秒才开始而自身预算115秒；调度修复须由新HEAD实测证明，未提前记成功。公共契约、锁、CI、迁移与产品运行代码均未变；B仅需注意D08项目名/trace路径变化。
+最小范围扩展仅 `apps/web/playwright.config.ts`：D08原生验收另列首项目，其余79项仍用原Chromium；原80个file/title身份逐项相同、无重复/遗漏，globalTimeout仍120000、retries仍0，原测试断言没有修改。原trace显示D08约第78秒才开始而自身预算115秒。**修复提交 `4eb9595f513696abf95ace3dc4bf5670b0cbeec3` 六项必需检查已全部success**，[run41411371862](https://github.com/Echo-love928/CodeLess/actions/runs/41411371862)：E2E80通过且完整平台browserExit0，API428/428、runner285/285、static64+212、infra和ci-gate通过。GET取证入口 `d28_ci_snapshot.py --head <完整SHA> --run 41411371862` 原生0；原日志摘要、精确head绑定及六项检查见 `evidence/d28-fix/ci-4eb9595-2026-11-02T08-29-39.428736+00-00/result.json`。GitHub不提供的子进程退出仍null。公共契约、锁、CI、迁移与产品运行代码均未变；B仅需注意D08项目名/trace路径变化。后续交接提交自身检查必须另查，不继承4eb的success。
 
 `d28_record.py`改为探测显式 `--java-home`、标准JAVA_HOME_21_X64/JAVA_HOME/PATH并验证Java21；错误major或探测失败拒绝，不再依赖A机器路径。任务私有pnpm shim由当前运行生成。新增4项可移植性负对照与原4项证据接纳测试均通过；假版本探针只证明选择策略，实际完整API仍使用真实Java21/PG/Docker/Chromium。
 
@@ -12,7 +12,19 @@ PR94原精确HEAD `438c0f5` 的远端结果已取回：static/API/runner/infra s
 
 用户提供既有SSH密钥目录后，当前部署61已独立**只读**取证9项通过：运行JAR的打开fd摘要、worker及其启动绑定、镜像ID/revision、258源码与7个Web文件、agent/export路径均匹配选定清单。`live-identity-2026-11-02T07-51-38.317154+00-00.json` native0；没有部署新候选、重启或改服务器。首次测量用/proc整秒btime误判约1秒，失败回执保留；改用CLOCK_BOOTTIME的同次采样纠正测量，未改部署字节。当前61身份已证，不再声称缺访问；新候选是否部署仍单列false。
 
-原Windows完整API首次复现遇Docker Desktop未运行，在Testcontainers前置失败，未触发BARE；原记录保留，不算EPERM复现。既有Docker29.9.2恢复后已启动第二次原完整入口，用户授权的本卡独有128MiB管理员文件元数据追踪覆盖BARE现场；报告未结束不记0。旧EPERM/ENOTEMPTY/CLEANUP_FAILED和真实质量/cover仍未因此关闭。修复进行中，整体HOLD。
+原Windows完整API首次复现遇Docker Desktop未运行，在Testcontainers前置失败，未触发BARE；原记录保留，不算EPERM复现。既有Docker29.9.2恢复后，在原Windows干净438提交执行原 `corepack pnpm verify:api` **原生0，428/428、failure0/error0/skip0**，90份本次JUnit及日志摘要逐项复算无差异，sourceBytesUnchanged/headUnchanged均true。用户授权的本卡独有128MiB管理员文件元数据追踪覆盖BARE现场。最终命令回执为 `evidence/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/command.json`。
+
+管理员追踪start/stop均0，128MiB ETL仅私存；筛选1049017个事件，保留511个目标事件。`evidence/d28-fix/windows-file-trace.json`记录同一产物目录一次底层rename的0xc0000022随后不到1ms另一次rename成功；本次BARE两次build均0、按原断言得到NO_PROGRESS，**没有复现Node层EPERM**。同时出现的进程访问不能证明历史占用者；ShareAccess7允许DELETE，不能据此归因杀软。循环记录可能覆盖早期事件，无拒绝堆栈，原历史actor/mechanism仍UNKNOWN。复现及解码均不改生产动作/重试；不增加无计划第三轮全量重跑。
+
+| 当前判据 | 结论 |
+| --- | --- |
+| T1 | 本次4eb远端六项success、原Windows438完整API428/428原生0均已独立取证，无skip/neutral代替；原2be失败保留并作为T2历史事故继续阻塞，不能据新绿宣称根因关闭 |
+| T2 | **未通过**；原EPERM、ENOTEMPTY、CLEANUP_FAILED及真实模型质量/生产cover仍OPEN/HOLD，不能宣称严重缺陷零 |
+| T3 | 现部署61的API/worker/镜像/源码已独立证明；新候选未部署，不能宣称新候选的部署验收通过 |
+| T4 | 已完成结论均有提交/命令/退出或GitHub状态/结果/SHA；PR95与原日志获取方法已更新，未执行与未知仍明确保留 |
+| M5 / 合并 | **HOLD**；无另一人批准，未合并。最终HEAD检查见PR；历史严重阻塞关闭前不得放行 |
+
+后续最小交接：API/runner维护者需对历史产物rename/终态淘汰/cleanup失败取得同一次失败的句柄生命周期和拒绝栈，形成最小修复及新候选；本次成功现场只能帮助缩小观测范围，不能替代历史事故闭环。真实模型及生产cover验收另需对应维护者提供授权范围和原始结果，不开展未授权付费调用或生产写入。
 
 ## 以下为初始交付与原失败快照（保留，不覆盖当前增量）
 
