@@ -28,12 +28,12 @@ async function call(page: Page, path: string, method = 'GET', body?: unknown, ke
 async function get(page: Page, path: string) {
   const result = await call(page, path); expect(result.status, path).toBe(200); return result.body
 }
-async function terminal(page: Page, id: string, expected = 'READY') {
+async function terminal(page: Page, id: string, expected = 'READY', timeout = 60_000) {
   let state: any
   await expect.poll(async () => {
     state = await get(page, 'tasks/' + id)
     return ['READY', 'FAILED'].includes(state.status)
-  }, { timeout: 60_000, intervals: [200, 500, 1000], message: 'Real task ' + id + ' terminal state' }).toBe(true)
+  }, { timeout, intervals: [200, 500, 1000], message: 'Real task ' + id + ' terminal state' }).toBe(true)
   expect(state.status, 'Authoritative terminal state for ' + id).toBe(expected)
   return state
 }
@@ -96,7 +96,9 @@ test('D28-B T1–T3: real repair and responsive routes; two isolated users gener
         await page.getByRole('button', { name: '刷新任务', exact: true }).click()
         ids.offlineReconnect = { taskId: generation, actualBrowserOffline: true, manualRefresh: true }
       }
-      const repaired = await terminal(page, generation)
+      // This new scenario performs two real builds, unlike D20's single-build
+      // generation. Bound the added repair explicitly; mandatory D20 stays intact.
+      const repaired = await terminal(page, generation, 'READY', 120_000)
       expect(repaired.repairAttempts).toBe(1)
       ids.realRepairs ??= []
       ;(ids.realRepairs as unknown[]).push({ taskId: generation, repairAttempts: repaired.repairAttempts })
