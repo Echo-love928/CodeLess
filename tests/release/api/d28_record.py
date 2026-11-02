@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -40,15 +41,35 @@ def digest_manifest(value):
     return sha(json.dumps(value, sort_keys=True, separators=(',', ':')).encode())
 
 
-def clean_environment(work):
+def java21_home(env, explicit=None):
+    executable = 'java.exe' if os.name == 'nt' else 'java'
+    from_path = shutil.which('java', path=next((v for k, v in env.items() if k.lower() == 'path'), ''))
+    candidates = [explicit] if explicit else [env.get('JAVA_HOME_21_X64'), env.get('JAVA_HOME'),
+                                              str(Path(from_path).resolve().parent.parent) if from_path else None]
+    for home in dict.fromkeys(p for p in candidates if p):
+        binary = Path(home) / 'bin' / executable
+        if not binary.is_file():
+            continue
+        result = subprocess.run([str(binary), '-version'], capture_output=True, timeout=5)
+        if result.returncode == 0 and re.search(r'version\s+"21\.', (result.stdout + result.stderr).decode(errors='replace')):
+            return Path(home).resolve()
+    raise RuntimeError('Java21 required: pass --java-home or configure JAVA_HOME_21_X64/JAVA_HOME/PATH')
+
+
+def clean_environment(work, explicit_java=None, bin_dir=None):
     env = {k: v for k, v in os.environ.items() if not k.upper().startswith(
         ('CODELESS_', 'SPRING_', 'NODE_OPTIONS', 'JAVA_TOOL_OPTIONS', 'JDK_JAVA_OPTIONS', 'GIT_CONFIG_'))}
-    jdk = ROOT / '.local-data/d07-a/tools/java21/jdk-21.0.12.1+1'
-    if not (jdk / 'bin/java.exe').is_file():
-        raise RuntimeError('Locked Java21 installation unavailable')
+    jdk = java21_home(env, explicit_java)
     env['JAVA_HOME'] = str(jdk)
     path_key = next((k for k in env if k.lower() == 'path'), 'PATH')
-    env[path_key] = str(ROOT / '.local-data/d07-a/bin') + os.pathsep + str(jdk / 'bin') + os.pathsep + env.get(path_key, '')
+    shim = Path(bin_dir) if bin_dir else work / '.local-data/d28-tools/bin'
+    shim.mkdir(parents=True, exist_ok=True)
+    (shim / ('pnpm.cmd' if os.name == 'nt' else 'pnpm')).write_text(
+        '@echo off\ncall corepack pnpm %*\nexit /b %ERRORLEVEL%\n' if os.name == 'nt'
+        else '#!/bin/sh\nexec corepack pnpm "$@"\n', encoding='utf-8')
+    if os.name != 'nt':
+        (shim / 'pnpm').chmod(0o755)
+    env[path_key] = str(shim) + os.pathsep + str(jdk / 'bin') + os.pathsep + env.get(path_key, '')
     env.update(CI='true', CODELESS_MODEL_PROVIDER='deterministic-mock', NO_PROXY='127.0.0.1,localhost,::1',
                no_proxy='127.0.0.1,localhost,::1', GIT_CONFIG_COUNT='1',
                GIT_CONFIG_KEY_0='safe.directory', GIT_CONFIG_VALUE_0=work.as_posix())
@@ -57,11 +78,12 @@ def clean_environment(work):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('gate', 'release-unit', 'peer-unit', 'candidate-build', 'candidate-live', 'candidate-checksum'))
+    parser.add_argument('mode', choices=('gate', 'api', 'e2e', 'release-unit', 'peer-unit', 'candidate-build', 'candidate-live', 'candidate-checksum'))
     parser.add_argument('--worktree', required=True)
     parser.add_argument('--candidate', required=True)
     parser.add_argument('--package')
     parser.add_argument('--manifest-sha256')
+    parser.add_argument('--java-home', help='Existing Java21 installation; validated before any command')
     args = parser.parse_args()
     work = Path(args.worktree).resolve()
     if not work.is_relative_to(ROOT / '.local-data/d28-a'):
@@ -89,7 +111,7 @@ def main():
         (public / 'command.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     save()
     print(json.dumps({'evidence': public.relative_to(ROOT).as_posix(), 'status': 'RUNNING'}), flush=True)
-    env = clean_environment(work)
+    env = None
     corepack = [os.environ.get('COMSPEC', 'cmd.exe'), '/d', '/c', 'corepack'] if os.name == 'nt' else ['corepack']
     screenshots = {p: (work / p).read_bytes() for p in before if p.endswith('.png')}
     def run(label, command):
@@ -106,7 +128,9 @@ def main():
         print(json.dumps({'operation': label, 'exitCode': result.returncode}), flush=True)
         return result.returncode, raw
     try:
-        if args.mode in ('gate', 'peer-unit'):
+        env = clean_environment(work, args.java_home, private / 'bin')
+        report['javaHome'] = env['JAVA_HOME']
+        if args.mode in ('gate', 'peer-unit', 'api', 'e2e'):
             code, _ = run('install', [*corepack, 'pnpm', 'install', '--offline', '--frozen-lockfile'])
         else:
             code = 0
@@ -129,6 +153,8 @@ def main():
                     shutil.copyfile(path, saved)
                     report['junit'].append({**{k: attrs.get(k) for k in ('name', 'tests', 'failures', 'errors', 'skipped')},
                                             'sha256': sha(saved.read_bytes()), 'privateReport': saved.relative_to(ROOT).as_posix()})
+            elif args.mode in ('api', 'e2e'):
+                code, raw = run(args.mode, [*corepack, 'pnpm', 'run', 'verify:' + args.mode])
             elif args.mode == 'release-unit':
                 code, raw = run('release-unit', [sys.executable, '-B', 'tests/release/api/test_release.py'])
                 (public / 'unit.log').write_bytes(raw)

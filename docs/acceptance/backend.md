@@ -1,5 +1,21 @@
 # D28-A 候选版本服务端独立验收
 
+## 2026-11-02 B复审后的当前修复状态
+
+PR94原精确HEAD `438c0f5` 的远端结果已取回：static/API/runner/infra success，**E2E和ci-gate failure**，[run41321844346](https://github.com/Echo-love928/CodeLess/actions/runs/41321844346)。79 passed、1 did not run、2 suite errors，原120秒suite/teardown截止；`evidence/d28-fix/ci-438c0f5-failure.json`及原日志/trace摘要保留。下面原“PENDING”仅是发布时快照，不再作为当前状态。
+
+最小范围扩展仅 `apps/web/playwright.config.ts`：D08原生验收另列首项目，其余79项仍用原Chromium；原80个file/title身份逐项相同、无重复/遗漏，globalTimeout仍120000、retries仍0，原测试断言没有修改。原trace显示D08约第78秒才开始而自身预算115秒；调度修复须由新HEAD实测证明，未提前记成功。公共契约、锁、CI、迁移与产品运行代码均未变；B仅需注意D08项目名/trace路径变化。
+
+`d28_record.py`改为探测显式 `--java-home`、标准JAVA_HOME_21_X64/JAVA_HOME/PATH并验证Java21；错误major或探测失败拒绝，不再依赖A机器路径。任务私有pnpm shim由当前运行生成。新增4项可移植性负对照与原4项证据接纳测试均通过；假版本探针只证明选择策略，实际完整API仍使用真实Java21/PG/Docker/Chromium。
+
+旧缺件结论已更新：PR95@`80205692`已只读审查，23处Git blob证据引用SHA全部匹配；B原gh获取方式与direct API字节两组证据已核对，不再将其当未解释摘要阻塞。见 `evidence/d28-fix/peer95-review.json`，未冒称A独立执行了gh或重跑B私有浏览器链。PR95自身全门禁失败仍保留、未批准。
+
+用户提供既有SSH密钥目录后，当前部署61已独立**只读**取证9项通过：运行JAR的打开fd摘要、worker及其启动绑定、镜像ID/revision、258源码与7个Web文件、agent/export路径均匹配选定清单。`live-identity-2026-11-02T07-51-38.317154+00-00.json` native0；没有部署新候选、重启或改服务器。首次测量用/proc整秒btime误判约1秒，失败回执保留；改用CLOCK_BOOTTIME的同次采样纠正测量，未改部署字节。当前61身份已证，不再声称缺访问；新候选是否部署仍单列false。
+
+原Windows完整API首次复现遇Docker Desktop未运行，在Testcontainers前置失败，未触发BARE；原记录保留，不算EPERM复现。既有Docker29.9.2恢复后已启动第二次原完整入口，用户授权的本卡独有128MiB管理员文件元数据追踪覆盖BARE现场；报告未结束不记0。旧EPERM/ENOTEMPTY/CLEANUP_FAILED和真实质量/cover仍未因此关闭。修复进行中，整体HOLD。
+
+## 以下为初始交付与原失败快照（保留，不覆盖当前增量）
+
 结论：**HOLD；不得据本记录合并或宣布 M5 通过。** 四阶段实际终态、专项、已知缺陷、部署身份与同伴材料是独立条件，不以其中一项成功覆盖另一项。最终逐项汇总见 `tests/release/api/evidence/d28/summary.json`；原始失败及每次命令回执分别保留。
 
 本次完整API已原生 **1，427/428、failure1/error0/skip0**：`RoundFiveRegressionTest.controlBareDoneWithoutChangingSourceStillStopsAsNoProgress`（测试129–133行）预期 `AGENT_REPAIR_NO_PROGRESS`，实际 `AGENT_ARTIFACT_INVALID`。真实第二次build退出0后，`services/runner/src/build/runner.mjs:278` 捕获产物目录提升rename的 **EPERM**；容器/工作区清理均true、errors=[]，浏览器未启动字段保持null。原始46份JUnit/场景/journal文件已私存并逐项SHA；公开受控投影 `evidence/d28/api-failure.json`。实际占用者/权限机制UNKNOWN，未归因偶发/杀软、未重试或更改断言。**T1失败，远端六项success不能覆盖它。**

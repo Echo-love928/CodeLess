@@ -134,11 +134,13 @@ def main():
         report['peerArtifacts'] = [{'kind': key, 'sha256': selected[key]['sha256'],
                                     'availableLocally': (ROOT / selected[key]['path']).is_file()}
                                    for key in ('archive', 'imageArchive')]
-        report['blocked'].extend(['Historical ENOTEMPTY and CLEANUP_FAILED root causes OPEN',
-                                  'Real-model quality and production cover HOLD',
-                                  'D28-B PR/contract diff/critical E2E report not present in local main',
-                                  'Current authenticated deployment/API/worker identity not independently accessed',
-                                  'B-host original execution logs and sealed archives not available locally'])
+        # The immutable61/2be source checks above are reproducible history. Current
+        # blockers come from the explicitly maintained registry, not stale prose.
+        registry_bytes = (BASE / 'd28-candidate.json').read_bytes()
+        registry = json.loads(registry_bytes)
+        report['currentRegistrySha256'] = sha(registry_bytes)
+        report['resolvedOrNarrowedBlockers'] = registry.get('resolvedOrNarrowedBlockers', [])
+        report['blocked'].extend(item['reason'] for item in registry['openBlockers'])
         if args.network or args.public_only:
             report['network'] = []
             repo = 'https://api.github.com/repos/Echo-love928/CodeLess'

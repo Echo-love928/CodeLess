@@ -25,15 +25,63 @@
     "remoteFinal": "tests/release/api/evidence/d28/remote-final.json"
   },
   "openBlockers": [
-    {"id": "D28-A-API-ARTIFACT-EPERM", "state": "OPEN", "reason": "Current candidate full API 427/428 native1: RoundFiveRegressionTest BARE expected NO_PROGRESS, got ARTIFACT_INVALID; build exit0 then artifact rename EPERM, actor/mechanism UNKNOWN; no rerun, no fixed candidate available"},
-    {"id": "D27-A-RUNNER-ENOTEMPTY", "state": "OPEN", "reason": "Original Windows terminal eviction 284/285 native1; actor/mechanism UNKNOWN"},
-    {"id": "PR93-94ab4dd-CLEANUP_FAILED", "state": "OPEN", "reason": "Original 427/428 CI native1; exact historical cleanup cause UNKNOWN"},
-    {"id": "REAL-QUALITY-COVER", "state": "HOLD", "reason": "Real model quality/natural failure and production cover acceptance remain unresolved; mock results do not replace them"},
-    {"id": "D28-B-MATERIAL", "state": "BLOCKED", "reason": "D28-B PR, exact candidate critical E2E and handoff not available at recorded lookup"},
-    {"id": "INDEPENDENT-LIVE-PROVENANCE", "state": "BLOCKED", "reason": "B-host sealed archives and current authenticated API/worker/image identity not independently accessed"},
-    {"id": "B-CI-LOG-DIGEST", "state": "OPEN", "reason": "Four original GitHub logs retrieved; static/E2E match B declared digests exactly; API/runner digests differ, exact representation cause UNKNOWN; B same-digest originals/acquisition method required"}
+    {
+      "id": "D28-A-API-ARTIFACT-EPERM",
+      "state": "OPEN",
+      "reason": "Current candidate full API 427/428 native1: RoundFiveRegressionTest BARE expected NO_PROGRESS, got ARTIFACT_INVALID; build exit0 then artifact rename EPERM, actor/mechanism UNKNOWN; no rerun, no fixed candidate available"
+    },
+    {
+      "id": "D27-A-RUNNER-ENOTEMPTY",
+      "state": "OPEN",
+      "reason": "Original Windows terminal eviction 284/285 native1; actor/mechanism UNKNOWN"
+    },
+    {
+      "id": "PR93-94ab4dd-CLEANUP_FAILED",
+      "state": "OPEN",
+      "reason": "Original 427/428 CI native1; exact historical cleanup cause UNKNOWN"
+    },
+    {
+      "id": "REAL-QUALITY-COVER",
+      "state": "HOLD",
+      "reason": "Real model quality/natural failure and production cover acceptance remain unresolved; mock results do not replace them"
+    },
+    {
+      "id": "PR94-438c0f5-E2E-TIMEOUT",
+      "state": "FIX_IN_VALIDATION",
+      "reason": "Original exact-head E2E 79 passed/1 did not run/2 suite errors, native1. Same 80 cases scheduled native-first; global120s/assertions/retries unchanged; new exact-head execution pending."
+    }
   ],
   "approval": "NOT_APPROVED",
   "mergePerformed": false,
-  "releaseApproved": false
+  "releaseApproved": false,
+  "resolvedOrNarrowedBlockers": [
+    {
+      "id": "D28-B-MATERIAL",
+      "state": "RESOLVED_MATERIAL_RECEIVED_REVIEWED",
+      "pr": "https://github.com/Echo-love928/CodeLess/pull/95",
+      "head": "80205692b94a33622e2799941076ae902a82071b",
+      "evidence": "tests/release/api/evidence/d28-fix/peer95-review.json",
+      "approval": "NOT_APPROVED_B_ORIGINAL_GATE_FAILED"
+    },
+    {
+      "id": "B-CI-LOG-DIGEST",
+      "state": "RESOLVED_AS_UNEXPLAINED_MISMATCH",
+      "reason": "B documents gh run view --log vs direct jobs logs acquisition. A direct bytes match B direct; B exact gh reproduction matches original declarations. A gh execution not rerun; no product normalization.",
+      "evidence": "tests/release/api/evidence/d28-fix/peer95-review.json"
+    },
+    {
+      "id": "INDEPENDENT-LIVE-PROVENANCE",
+      "state": "VERIFIED_EXISTING_61_DEPLOYMENT_ONLY",
+      "reason": "Authorized strict-host SSH read proves running JAR, worker, image,258 runtime sources,7 web files match61 manifest. New candidate was not deployed.",
+      "evidence": "tests/release/api/evidence/d28-fix/live-identity-2026-11-02T07-51-38.317154+00-00.json"
+    }
+  ],
+  "fixValidation": {
+    "state": "IN_PROGRESS",
+    "initialReviewedHead": "438c0f5e81ba08656bf110f162beb15e5d6ba21d",
+    "testConfigChange": "apps/web/playwright.config.ts: native D08 first project, same80 cases/global120s/retries0",
+    "runtimeProductionSourceChanged": false,
+    "originalFailureSnapshotsPreserved": true,
+    "notes": "Initial sourceCommit/package above remain frozen2be artifact; new test candidate is fixed by subsequent validation receipts, not claimed deployed."
+  }
 }

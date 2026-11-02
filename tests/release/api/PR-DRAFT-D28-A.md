@@ -1,14 +1,12 @@
-任务ID：D28-A｜候选版本服务端独立验收（HOLD）
+D28-A｜候选版本服务端独立验收与复审修复（HOLD）
 
-此前没有把D28独立门禁、封存API、前置B报告、当前部署和未关闭缺陷放在同一可审计记录中。新增只读验收记录器与逐项证据，将新main候选 `2be793dc3318c2308d18a7fd45afb201342206a7` 的真实检查与已部署61候选分开绑定；缺失、错误和未知均保持非成功。
+PR94@438c0f5的原E2E在120秒全局截止处留下79通过/1未运行和suite/teardown错误；trace显示耗时D08验收约第78秒才开始。将原D08放入首项目排队，其余79项保持原Chromium配置，避免它在总预算末尾才获得执行机会。修改前后80个file/title身份完全相同，原断言、120秒全局截止、零重试及隔离均未改变；新精确HEAD实际门禁仍须验证，不提前记绿。
 
-- 范围：`docs/acceptance/backend.md`、`tests/release/api/**`、`docs/handoffs/D28-A.md`。对应A01–A04；无产品源码、公共契约、依赖、根锁、CI、迁移或权限配置变更。起始他人未跟踪目录保留。
-- 验证：精确命令/原生退出/输入与日志摘要/JUnit见 `tests/release/api/d28-candidate.json` 的显式回执引用及 `evidence/d28/summary.json`。原四阶段在干净固定提交worktree真实执行；最终交接提交不继承候选或旧61的CI。
-- 当前新失败：完整API native1、427/428、failure1/error0/skip0；RoundFive BARE预期NO_PROGRESS、实际ARTIFACT_INVALID，build0后产物rename EPERM。46份原现场私存/公开SHA，原因UNKNOWN，未重试或放宽断言；T1失败。需要对应维护者修复并形成新候选，当前没有可放行的新版本。
-- 最终原门禁：static0（Node64/UI212）、API1（427/428）、runner0（285/285）、E2E0（80/80+完整平台browserExit0）、ci-gate1。源码/HEAD前后相同，90份JUnit与原日志摘要复算无不一致；汇总native1/HOLD。精确2be远端六success单列，未覆盖本机失败。
-- 失败/边界：权限与CSRF、预算/取消/恢复、不可变版本由本次API具体用例关联；新封存JAR另执行真实PG空库/前迁/恢复/权限/坏摘要，包与模块闭包单测/实测分账。证据接受负对照拒绝stale/skip/neutral/缺件/重复检查名。
-- B互审：`evidence/d28/peer-review.md`。61两份manifest和258源码blob已严格核验，公开7+2文件与匿名401/404独立验证；取回4份原CI日志，static/E2E摘要一致，API/runner与B声明不一致，原因UNKNOWN，不作归一化放行。原桥缺件已由B修复，不再当当前缺陷。
-- 模型：deterministic-mock/明确loopback provider fixture；PG、Docker/Vue构建、Chromium真实。无新付费模型请求；真实模型效果与生产cover HOLD不解除。开发token与合成运行用量UNKNOWN，分账保存。
-- 数据/配置：仅创建本机隔离候选/临时PG与私有日志；不部署、发布、改生产DB、启用cover或重置旧失败。新API包独立manifest，JAR与61相同；归档/备份/凭据/原日志不上传。
-- 剩余限制：原ENOTEMPTY、PR93历史CLEANUP_FAILED未闭环；D28-B PR/报告未出现；B同摘要原日志/成组包及当前受保护部署身份仍待交付。T2/T3/T4与M5不能宣称通过。
-- 审查者：另一位成员，未自批。当前为草稿/HOLD；最新main、当前PR精确HEAD全部必需success、无未解决讨论及同伴批准前不得合并。代码或base变化后新候选与受影响重测，不手改绿。
+- 最小范围扩展：仅apps/web/playwright.config.ts的测试项目调度；B仅需同步D08项目名/trace路径。无产品运行代码、公共契约、锁、CI或迁移变更，其余改动在A验收/交接允许范围。
+- 验收器修复：Java从显式--java-home或JAVA_HOME_21_X64/JAVA_HOME/PATH发现并验证major21，错误major/探测失败拒绝；当前运行自建pnpm shim。新增4项可移植性控制与原4项证据接纳控制均通过；不把假版本探针当真实JVM验收。
+- 原失败保留：438远端E2E/ci-gate失败、2be本机API427/428、ARTIFACT_INVALID/rename EPERM及历史ENOTEMPTY/CLEANUP_FAILED均保留。原Windows完整API在Docker未运行时前置失败已保留；恢复既有Docker29.9.2后第二次原入口及用户授权管理员128MiB文件元数据追踪进行中，不插桩生产、不重试求绿、未结束不填0。
+- 当前部署身份：用户授权strict-host SSH只读核验现部署61的实际API打开JAR fd、worker、镜像ID/revision、258源码、7web及agent/export根，9项native0。没有部署新候选、重启、发布或改生产数据。首次整秒btime量化导致的测量失败与CLOCK_BOOTTIME修正回执都保留。
+- B互审更新：PR95@80205692材料已审，23处Git blob证据SHA匹配；原gh日志与direct获取方式两组字节已对照，不再列为未解释摘要/材料缺失。A没有安装/独立执行gh，也没有冒称重跑B私有全链。B原完整门禁失败/中断仍保留，未批准或发送review/comment。
+- 证据：tests/release/api/evidence/d28-fix/；当前状态见docs/acceptance/backend.md与docs/handoffs/D28-A.md顶部，旧发布/失败快照原样保留。默认明确mock，数据库/Docker/Vue/Chromium真实；付费请求0，合成总用量和开发token UNKNOWN，分别记账。
+
+当前HOLD：新SHA六项必需检查、Windows根因及受影响重测、真实质量/生产cover等尚未同时闭环。未自批、未合并。提交/base变化后只按实际受影响范围验证，旧SHA success不得继承。
