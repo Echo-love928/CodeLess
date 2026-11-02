@@ -1,0 +1,100 @@
+{
+  "task": "D28-A",
+  "branch": "codex/d28-a-backend-acceptance-main",
+  "baseline": "2be793dc3318c2308d18a7fd45afb201342206a7",
+  "sourceCommit": "2be793dc3318c2308d18a7fd45afb201342206a7",
+  "deployedSourceCommit": "61df15eba456422762a667aaed7734b7d13b48e7",
+  "newCandidateDeployed": false,
+  "status": "CANDIDATE_HOLD",
+  "manifestSha256": "54d2cc55eb579073ca9570620a56ebe45598166ac7e01fd45121399a0377f453",
+  "apiJarSha256": "d2c1bc7bccd9df9eec194fde509fa012f5c41eb3a7703aad669aaa447e067446",
+  "fileCount": 259,
+  "package": "tests/release/api/.private/d28/2026-11-01T14-37-41.544800+00-00-candidate-build/release/api",
+  "receipts": {
+    "gate": "tests/release/api/evidence/d28/2026-11-01T14-32-37.236887+00-00-gate/command.json",
+    "build": "tests/release/api/evidence/d28/2026-11-01T14-37-41.544800+00-00-candidate-build/command.json",
+    "checksumAndImports": "tests/release/api/evidence/d28/2026-11-01T14-58-02.016251+00-00-candidate-checksum/command.json",
+    "candidateAttestation": "tests/release/api/evidence/d28/candidate-attestation.json",
+    "live": "tests/release/api/evidence/d28/2026-11-01T14-58-37.996978+00-00-candidate-live/command.json",
+    "auditInitial": "tests/release/api/evidence/d28/2026-11-01T14-35-10.500275+00-00-audit/result.json",
+    "auditPublic": "tests/release/api/evidence/d28/2026-11-01T14-40-51.493315+00-00-audit/result.json",
+    "releaseUnit": "tests/release/api/evidence/d28/release-unit/command.json",
+    "peerUnitSandbox": "tests/release/api/evidence/d28/peer-unit/command.json",
+    "peerUnitOperator": "tests/release/api/evidence/d28/peer-unit-operator/command.json",
+    "harnessControls": "tests/release/api/evidence/d28/harness-controls-final/command.json",
+    "remoteFinal": "tests/release/api/evidence/d28/remote-final.json"
+  },
+  "openBlockers": [
+    {
+      "id": "D28-A-API-ARTIFACT-EPERM",
+      "state": "OPEN",
+      "reason": "Original2be Windows full API427/428 native1 after build0 then rename EPERM. Original full438 on same Windows now native0,428/428,failure/error/skip0,source/HEAD unchanged; BARE expected NO_PROGRESS. Authorized ETW sees internal rename access-denied then success, not original Node-level EPERM. Historical actor/mechanism still UNKNOWN; no production fix and not closed by passing rerun."
+    },
+    {
+      "id": "D27-A-RUNNER-ENOTEMPTY",
+      "state": "OPEN",
+      "reason": "Original Windows terminal eviction 284/285 native1; actor/mechanism UNKNOWN"
+    },
+    {
+      "id": "PR93-94ab4dd-CLEANUP_FAILED",
+      "state": "OPEN",
+      "reason": "Original 427/428 CI native1; exact historical cleanup cause UNKNOWN"
+    },
+    {
+      "id": "REAL-QUALITY-COVER",
+      "state": "HOLD",
+      "reason": "Real model quality/natural failure and production cover acceptance remain unresolved; mock results do not replace them"
+    }
+  ],
+  "approval": "NOT_APPROVED",
+  "mergePerformed": false,
+  "releaseApproved": false,
+  "resolvedOrNarrowedBlockers": [
+    {
+      "id": "D28-B-MATERIAL",
+      "state": "RESOLVED_MATERIAL_RECEIVED_REVIEWED",
+      "pr": "https://github.com/Echo-love928/CodeLess/pull/95",
+      "head": "80205692b94a33622e2799941076ae902a82071b",
+      "evidence": "tests/release/api/evidence/d28-fix/peer95-review.json",
+      "approval": "NOT_APPROVED_B_ORIGINAL_GATE_FAILED"
+    },
+    {
+      "id": "B-CI-LOG-DIGEST",
+      "state": "RESOLVED_ACQUISITION_FORMAT_DIFFERENCE",
+      "reason": "B documents gh run view --log vs direct jobs logs acquisition. A direct bytes match B direct; B exact gh reproduction matches original declarations. A gh execution not rerun; no product normalization.",
+      "evidence": "tests/release/api/evidence/d28-fix/peer95-review.json"
+    },
+    {
+      "id": "INDEPENDENT-LIVE-PROVENANCE",
+      "state": "VERIFIED_EXISTING_61_DEPLOYMENT_ONLY",
+      "reason": "Authorized strict-host SSH read proves running JAR, worker, image,258 runtime sources,7 web files match61 manifest. New candidate was not deployed.",
+      "evidence": "tests/release/api/evidence/d28-fix/live-identity-2026-11-02T07-51-38.317154+00-00.json"
+    },
+    {
+      "id": "PR94-438c0f5-E2E-TIMEOUT",
+      "state": "FIX_VERIFIED_4EB9595",
+      "reason": "4eb9595 exact-head six checks success, E2E80/80 plus full-product browserExit0. Original438 timeout preserved; same80 case identities,global120s,retries0.",
+      "evidence": "tests/release/api/evidence/d28-fix/ci-4eb9595-2026-11-02T08-29-39.428736+00-00/result.json"
+    }
+  ],
+  "fixValidation": {
+    "state": "CHECKS_PASSED_HISTORICAL_BLOCKERS_OPEN",
+    "initialReviewedHead": "438c0f5e81ba08656bf110f162beb15e5d6ba21d",
+    "testConfigChange": "apps/web/playwright.config.ts: native D08 first project, same80 cases/global120s/retries0",
+    "runtimeProductionSourceChanged": false,
+    "originalFailureSnapshotsPreserved": true,
+    "notes": "Initial sourceCommit/package above remain frozen2be artifact; new test candidate is fixed by subsequent validation receipts, not claimed deployed.",
+    "testedHead": "4eb9595f513696abf95ace3dc4bf5670b0cbeec3",
+    "ciRunId": 41411371862,
+    "requiredChecks": "ALL_SIX_SUCCESS_AT_TESTED_HEAD",
+    "ciEvidence": "tests/release/api/evidence/d28-fix/ci-4eb9595-2026-11-02T08-29-39.428736+00-00/result.json",
+    "windowsTraceEvidence": "tests/release/api/evidence/d28-fix/windows-file-trace.json",
+    "windowsApiEvidence": "tests/release/api/evidence/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/command.json",
+    "windowsApiNativeExit": 0,
+    "windowsApiTests": 428,
+    "windowsApiFailures": 0,
+    "windowsApiErrors": 0,
+    "windowsApiSkipped": 0,
+    "windowsApiSourceAndHeadUnchanged": true
+  }
+}

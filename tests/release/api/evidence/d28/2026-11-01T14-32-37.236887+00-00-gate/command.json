@@ -1,0 +1,1016 @@
+{
+  "task": "D28-A",
+  "mode": "gate",
+  "candidate": "2be793dc3318c2308d18a7fd45afb201342206a7",
+  "cwd": ".local-data/d28-a/candidate-2be793d",
+  "startedAt": "2026-11-01T14:32:38.684621+00:00",
+  "status": "FAILED",
+  "exitCode": 1,
+  "trackedFiles": 5622,
+  "inputsSha256": "e8b4432a9e2aebdcd7e942c3d07c948421d6ea06c30fd06db2161c6ad83446b2",
+  "recorderSha256": "61593f3ecdb447db729100d1ee060ea6865a089a4ba3a36972a78aedad2ebeeb",
+  "commands": [
+    {
+      "operation": "install",
+      "command": [
+        "C:\\Windows\\system32\\cmd.exe",
+        "/d",
+        "/c",
+        "corepack",
+        "pnpm",
+        "install",
+        "--offline",
+        "--frozen-lockfile"
+      ],
+      "startedAt": "2026-11-01T14:32:38.766674+00:00",
+      "finishedAt": "2026-11-01T14:32:52.601593+00:00",
+      "exitCode": 0,
+      "privateLog": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/install.log",
+      "logSha256": "291a3a5dd03f6c8c5e8e20f7cd3b209a95e0ec6532715d8403d076edc66a8841",
+      "logBytes": 1043
+    },
+    {
+      "operation": "gate",
+      "command": [
+        "node",
+        "--import",
+        "file:///F:/JAVA/CodeLess/CodeLess/.local-data/d28-a/candidate-2be793d/tests/regression/release-api/stage-observer.mjs",
+        "scripts/ci-gate.mjs"
+      ],
+      "startedAt": "2026-11-01T14:32:52.651179+00:00",
+      "finishedAt": "2026-11-01T15:27:07.809222+00:00",
+      "exitCode": 1,
+      "privateLog": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/gate.log",
+      "logSha256": "534c08ddb46eae0c7b4f1c1564943c8be4151c56f1444028c4c5e691ccb5a6a8",
+      "logBytes": 638448
+    }
+  ],
+  "modelProvider": "deterministic-mock",
+  "paidModelRequests": 0,
+  "runtimeMockTokens": null,
+  "realModelQuality": "NOT_EVALUATED",
+  "stageObserverSha256": "1f4564be1585f2bbcc1acb565554913f97e00ddee954366bde9cadbb6ecf5298",
+  "stages": [
+    {
+      "stage": "verify:static",
+      "startedAt": "2026-11-01T14:32:52.746Z",
+      "completedAt": "2026-11-01T14:34:04.896Z",
+      "exitCode": 0,
+      "signal": null,
+      "launchError": null
+    },
+    {
+      "stage": "verify:api",
+      "startedAt": "2026-11-01T14:34:04.898Z",
+      "completedAt": "2026-11-01T15:15:15.182Z",
+      "exitCode": 1,
+      "signal": null,
+      "launchError": null
+    },
+    {
+      "stage": "verify:runner",
+      "startedAt": "2026-11-01T15:15:15.185Z",
+      "completedAt": "2026-11-01T15:23:29.373Z",
+      "exitCode": 0,
+      "signal": null,
+      "launchError": null
+    },
+    {
+      "stage": "verify:e2e",
+      "startedAt": "2026-11-01T15:23:29.379Z",
+      "completedAt": "2026-11-01T15:27:07.763Z",
+      "exitCode": 0,
+      "signal": null,
+      "launchError": null
+    }
+  ],
+  "summaries": [
+    "[ci-gate] verify:static",
+    " Test Files  27 passed (27)",
+    "      Tests  212 passed (212)",
+    "[ci-gate] verify:api",
+    "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.883 s -- in dev.codeless.api.admin.AdminAuditLogTest",
+    "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 21.31 s -- in dev.codeless.api.admin.AdminIntegrationTest",
+    "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in dev.codeless.api.admin.AdminRedactionTest",
+    "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.046 s -- in dev.codeless.api.agent.AcceptanceActionsTest",
+    "[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 108.1 s -- in dev.codeless.api.agent.AgentLoopIntegrationTest",
+    "[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.031 s -- in dev.codeless.api.agent.ComponentIdsTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.83 s -- in dev.codeless.api.agent.CsrfDuringGenerationTest",
+    "[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in dev.codeless.api.agent.D25ProposalFeedbackTest",
+    "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in dev.codeless.api.agent.D25QualityPolicyTest",
+    "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 156.3 s -- in dev.codeless.api.agent.D25QualityRegressionTest",
+    "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 47.79 s -- in dev.codeless.api.agent.D26ReleaseBoundaryTest",
+    "[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in dev.codeless.api.agent.GenerationContextTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.592 s -- in dev.codeless.api.agent.LocalBuildGatewayTest",
+    "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in dev.codeless.api.agent.LocalGenerationContextTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.626 s -- in dev.codeless.api.agent.PreparationProcessTest",
+    "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 117.7 s -- in dev.codeless.api.agent.RepairBudgetRegressionTest",
+    "[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.070 s -- in dev.codeless.api.agent.RepairContextTest",
+    "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.027 s -- in dev.codeless.api.agent.RepairInputCompactionTest",
+    "[INFO] Tests run: 30, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 536.4 s -- in dev.codeless.api.agent.RepairLoopIntegrationTest",
+    "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.020 s -- in dev.codeless.api.agent.RepairPolicyTest",
+    "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in dev.codeless.api.agent.RoundFiveContextTest",
+    "[ERROR] Tests run: 4, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 115.2 s <<< FAILURE! -- in dev.codeless.api.agent.RoundFiveRegressionTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.608 s -- in dev.codeless.api.ApplicationSmokeTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.894 s -- in dev.codeless.api.apps.ApplicationHttpTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.304 s -- in dev.codeless.api.apps.ApplicationIntegrationTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.771 s -- in dev.codeless.api.auth.ApiRequestBodyTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.933 s -- in dev.codeless.api.auth.AuthHttpTest",
+    "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.109 s -- in dev.codeless.api.auth.AuthIntegrationTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in dev.codeless.api.auth.LoginAttemptsTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.358 s -- in dev.codeless.api.auth.RequestBodyBoundaryHttpTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.200 s -- in dev.codeless.api.auth.RequestBodyBoundaryTest",
+    "[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 380.3 s -- in dev.codeless.api.concurrency.ConcurrencyConsistencyTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.026 s -- in dev.codeless.api.cover.CoverEntryProofTest",
+    "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 44.01 s -- in dev.codeless.api.cover.CoverHttpIntegrationTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.362 s -- in dev.codeless.api.cover.CoverStoreTest",
+    "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 21.09 s -- in dev.codeless.api.cover.D26CoverCoordinatorTest",
+    "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.864 s -- in dev.codeless.api.cover.NodeCoverGatewayTest",
+    "[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.939 s -- in dev.codeless.api.data.DataIntegrationTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.966 s -- in dev.codeless.api.data.PostgresContextLifecycleTest",
+    "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.157 s -- in dev.codeless.api.data.TaskDiagnosticsTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.110 s -- in dev.codeless.api.data.VersionSourceMigrationTest",
+    "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.343 s -- in dev.codeless.api.deploy.DeploymentRecordsTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.859 s -- in dev.codeless.api.deploy.PublicationGatewayConfigurationTest",
+    "[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 38.85 s -- in dev.codeless.api.deploy.PublicationIntegrationTest",
+    "[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 128.7 s -- in dev.codeless.api.edit.EditLifecycleIntegrationTest",
+    "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 73.56 s -- in dev.codeless.api.edit.EditVerificationIntegrationTest",
+    "[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 105.3 s -- in dev.codeless.api.edit.LocalEditScopeIntegrationTest",
+    "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in dev.codeless.api.edit.LocalEditScopeTest",
+    "[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.186 s -- in dev.codeless.api.error.GlobalExceptionHandlerTest",
+    "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.155 s -- in dev.codeless.api.export.ExportArchiveTest",
+    "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.145 s -- in dev.codeless.api.export.ExportTemplateTest",
+    "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.105 s -- in dev.codeless.api.export.SourceExportComposeTest",
+    "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 253.0 s -- in dev.codeless.api.export.SourceExportIntegrationTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in dev.codeless.api.model.D25EntrySerializationTest",
+    "[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.317 s -- in dev.codeless.api.model.DeepSeekModelProviderTest",
+    "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.884 s -- in dev.codeless.api.model.PlanAcceptanceCliTest",
+    "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.149 s -- in dev.codeless.api.model.PlanModelIntegrationTest",
+    "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.028 s -- in dev.codeless.api.model.PlanValidatorTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.122 s -- in dev.codeless.api.model.PrivateModelCaptureTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in dev.codeless.api.network.SitePolicyTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.044 s -- in dev.codeless.api.performance.ApiCapacityMeasurementTest",
+    "[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in dev.codeless.api.performance.BoundedModelProviderTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in dev.codeless.api.performance.CapacityPolicyTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.266 s -- in dev.codeless.api.performance.DefaultCapacityCalibrationTest",
+    "[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.035 s -- in dev.codeless.api.performance.TaskTimingTest",
+    "[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 34.11 s -- in dev.codeless.api.preview.PreviewAcceptanceProcessTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.969 s -- in dev.codeless.api.preview.PreviewCnHttpTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.080 s -- in dev.codeless.api.preview.PreviewHttpTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 72.65 s -- in dev.codeless.api.preview.PreviewPlatformIntegrationTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.213 s -- in dev.codeless.api.preview.PreviewReadinessTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.175 s -- in dev.codeless.api.preview.PreviewRegistryHttpTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.294 s -- in dev.codeless.api.preview.PreviewTopHttpTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in dev.codeless.api.preview.RepairProviderMetadataTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 38.05 s -- in dev.codeless.api.recovery.ProcessRestartRecoveryTest",
+    "[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 23.50 s -- in dev.codeless.api.recovery.RecoveryConvergenceTest",
+    "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.800 s -- in dev.codeless.api.recovery.StorageSweeperTest",
+    "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.51 s -- in dev.codeless.api.security.ApiSecurityMatrixTest",
+    "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in dev.codeless.api.system.HealthControllerTest",
+    "[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.112 s -- in dev.codeless.api.tasks.TaskEventStreamsTest",
+    "[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.892 s -- in dev.codeless.api.tasks.TaskHttpTest",
+    "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.057 s -- in dev.codeless.api.tasks.TaskQueueIntegrationTest",
+    "[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.349 s -- in dev.codeless.api.tasks.TaskSseHttpTest",
+    "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in dev.codeless.api.tools.FileToolRegistryTest",
+    "[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.19 s -- in dev.codeless.api.tools.FileToolsIntegrationTest",
+    "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.197 s -- in dev.codeless.api.tools.OwnedWorkspaceCleanupTest",
+    "[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.500 s -- in dev.codeless.api.versions.LocalVolumeSnapshotStoreTest",
+    "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.332 s -- in dev.codeless.api.versions.SharedSnapshotPermissionsTest",
+    "[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.557 s -- in dev.codeless.api.versions.SnapshotSourceBytesTest",
+    "[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in dev.codeless.api.versions.VersionFixtureGateTest",
+    "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 24.10 s -- in dev.codeless.api.versions.VersionHttpIntegrationTest",
+    "[ERROR] Tests run: 428, Failures: 1, Errors: 0, Skipped: 0",
+    "[INFO] BUILD FAILURE",
+    "[ci-gate] verify:runner",
+    "[ci-gate] verify:e2e",
+    "  80 passed (1.3m)",
+    "[ci-gate] failed with exit code 1"
+  ],
+  "junit": [
+    {
+      "name": "dev.codeless.api.admin.AdminAuditLogTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "ba3d20537bdcaf7c4de7e50e131458ef5ba11a5b5d3edfce7b0c4829af50bf3c",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.admin.AdminAuditLogTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.admin.AdminIntegrationTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "06f7429b709238700be7637d18deb80a5be13b06297434653e0c42355f4487d2",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.admin.AdminIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.admin.AdminRedactionTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "8cf7a7dc128d5027db11000110d686a5f08050a626e00be5ef4f4077d320c9b0",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.admin.AdminRedactionTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.AcceptanceActionsTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "0f11146d3663144c8980cc74d325830cc5bd8c1ed64dbc68e0d6f08facec3ffe",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.AcceptanceActionsTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.AgentLoopIntegrationTest",
+      "tests": "11",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "04a0ce65424a09c4775b3bdaa955aeee441ad9d1384381e7ec21b5a306873827",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.AgentLoopIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.ComponentIdsTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "b29760c67eebe48494478d7c4ddf0f19cb24cbd34ddda72e188a1405b5ea20d0",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.ComponentIdsTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.CsrfDuringGenerationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "cdeaf57c59ceacd229e5d558fd66ccc95fdfefdb7458f02c63cc30dda2f6f692",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.CsrfDuringGenerationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.D25ProposalFeedbackTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "171c3a9e7aa68386037f089d013c21d983e869387e5f0b62b2e51c3c3b55d5cb",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.D25ProposalFeedbackTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.D25QualityPolicyTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "9777a11328ae809ace7e028023a50fbf88a7756a84b0db5756cd0d5509523009",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.D25QualityPolicyTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.D25QualityRegressionTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "86e29aa0723533537f44e49d5f5bb2030f4a62d807de7d4d29a97aadb67cd150",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.D25QualityRegressionTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.D26ReleaseBoundaryTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "6fb48b343ce42cce2f862ae45f6338ccd4bcc8d16b4b657dc05f220acee1ffb2",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.D26ReleaseBoundaryTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.GenerationContextTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "65667f9ef94fb88f84b9bb7c3cda4dd649fc6e7343408764160a31f61e312027",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.GenerationContextTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.LocalBuildGatewayTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "bacabe28db2a7490d129e164ad839be304dffb1cca4e7380621edd5ff8c83ec3",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.LocalBuildGatewayTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.LocalGenerationContextTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "19f174ee40f7c0d6c0415928f71e184de81b044b55c55283263bb817c7c4dd04",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.LocalGenerationContextTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.PreparationProcessTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "7b0916d111d9ebfc39affde97a954899995b631701d1262a4925ed72d356617b",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.PreparationProcessTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.RepairBudgetRegressionTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "ac11e6d25ef3b0df57ed7fda6334fee0a1f040d55e4527b110a34b820bc2697d",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.RepairBudgetRegressionTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.RepairContextTest",
+      "tests": "16",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "f3154a8553fffe5c86121c9f27e8b7132e119457530ce05864116fbd68fba134",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.RepairContextTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.RepairInputCompactionTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "fbef006f053847bc94adce8411d659fbeb90cfac41ffa398d9a8320bde263913",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.RepairInputCompactionTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.RepairLoopIntegrationTest",
+      "tests": "30",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "efdb1c82a97b2beabca227a6ba50422c18e45d12aa66cc1d5498f86f4b0d3f5e",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.RepairLoopIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.RepairPolicyTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "1ef91ef67a8995abf84f5c8521926eff13dc65b25e964488b2da98f8b0e20741",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.RepairPolicyTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.RoundFiveContextTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "eb74300cc2e02a232c7c50f509f965de19ce8e7b83437b57cd7359b49bf94687",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.RoundFiveContextTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.agent.RoundFiveRegressionTest",
+      "tests": "4",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "0e3ea44cc606e91c061d1e0a12f270adc2cb130fffa6b70f9f9ab16b8b7a76f0",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.agent.RoundFiveRegressionTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.ApplicationSmokeTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "e40ba1dc27a550524d2011323ddb09a9259c54d3bd72251e36b980e92aeef88f",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.ApplicationSmokeTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.apps.ApplicationHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "241328f477312c9dce8e3a40fd20ded8f5b1a829297cd094b466f83cd9705207",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.apps.ApplicationHttpTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.apps.ApplicationIntegrationTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "fbbba0a2d7f11e78fe77fcdec659626cde2bce4eea18806f1cc66033f3ac73a4",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.apps.ApplicationIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.auth.ApiRequestBodyTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "17fe4138e40dadea1931fda2c6420c50b5a96a07c3b09974a2a3db8b4db87177",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.auth.ApiRequestBodyTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.auth.AuthHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "a9e4d4cc00d485f1a6ff9ea1676552eb331e083c1268aeb458490bbc786d5c82",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.auth.AuthHttpTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.auth.AuthIntegrationTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "673b4dab6c7e9c06a7471d71cfc5655337e1d57bc3fcbc89c0af8ae9ab0e7dd4",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.auth.AuthIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.auth.LoginAttemptsTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "e70fd9cd79a9d4eb5e9710bda3158fc5a341aa40276efb24455ceff3888ae695",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.auth.LoginAttemptsTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.auth.RequestBodyBoundaryHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "ce02bfec7655238ae21010a38c1cb735f8dbf9a38f932fa53b628a893230d0ef",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.auth.RequestBodyBoundaryHttpTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.auth.RequestBodyBoundaryTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "7ae1ece87f8c5e0a0d74a5a4294ce0131850d2e16c739e7c2e535cabf9625636",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.auth.RequestBodyBoundaryTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.concurrency.ConcurrencyConsistencyTest",
+      "tests": "11",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "aba6fc783848da4f12103a6842844ba643817f45c1b867b231bf488d876ed054",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.concurrency.ConcurrencyConsistencyTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.cover.CoverEntryProofTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "a8c1b585ef426cddcf9158321e64687587ced1de4f1e16c53b8b6f0cd78c7645",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.cover.CoverEntryProofTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.cover.CoverHttpIntegrationTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "1634f39f02dfab92c02eecd7d852a225d9f971a873937111ebc014a9eb80a358",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.cover.CoverHttpIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.cover.CoverStoreTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "39f71c070faf4ddb58834324cdb2e13534fa925c5f91587bb7be906bfeea2c41",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.cover.CoverStoreTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.cover.D26CoverCoordinatorTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "9e6ca97b716b617df9eccf939ea3fd5d82922f7a94b76c850fad3d3dbee79342",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.cover.D26CoverCoordinatorTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.cover.NodeCoverGatewayTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "f60b2486a093508935adaf76ffa1c995302839efdbdf1c26d56521d8934c62b8",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.cover.NodeCoverGatewayTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.data.DataIntegrationTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "6ecda7ac9de2785d54099036c8dc89b034254c208e0410d325bc20be5507ad45",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.data.DataIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.data.PostgresContextLifecycleTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "246192e40c84089562e53bd26159fd946a544f2d2dc79b785663b894c6d20736",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.data.PostgresContextLifecycleTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.data.TaskDiagnosticsTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "b59eb8460ee41876831d3c7d6cb5741bf5104447e09fdd68d7a94fc6b4cfe93d",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.data.TaskDiagnosticsTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.data.VersionSourceMigrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "03caefacbd717e718889df1d156d3a2b3408fd65137c94474009e0b82890d710",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.data.VersionSourceMigrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.deploy.DeploymentRecordsTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "e82ec004d1cf9ad9914fa6f9384f598899171f50256169f6f961df5f83650cf8",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.deploy.DeploymentRecordsTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.deploy.PublicationGatewayConfigurationTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "f1b6f1fe7993e2026a5ad5b883293f5ebdf228eb472eb358eccf87dfb46f2998",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.deploy.PublicationGatewayConfigurationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.deploy.PublicationIntegrationTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "cae10f17821a99e92929d109dc060fa16a83be398ccc2682a2766ab944c01b1e",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.deploy.PublicationIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.edit.EditLifecycleIntegrationTest",
+      "tests": "15",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "0ab460812b559f5fdf60e79c445d4de3c021884bcf983e498c369614266b3a24",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.edit.EditLifecycleIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.edit.EditVerificationIntegrationTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "75bfbbb82197b3f35966f8f125976b04900a5867c5aab080d24ff9820c35a032",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.edit.EditVerificationIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.edit.LocalEditScopeIntegrationTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "154b2e903048c1e562528e2ad9c29688ec73ea20f47a8a811bf7c85636280bb4",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.edit.LocalEditScopeIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.edit.LocalEditScopeTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "6f4bbc8403e473c15733a34e7bf4351b52b0653fe4debe94e2be8eed275176dd",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.edit.LocalEditScopeTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.error.GlobalExceptionHandlerTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "e62148c3df161f57e939d215136c34468f2de9f078304b800d7657f652e007ce",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.error.GlobalExceptionHandlerTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.export.ExportArchiveTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "d6492f68779550fc0b033cba12c880749e81821e3c54468d72a8db65d94fca9d",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.export.ExportArchiveTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.export.ExportTemplateTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "3edb8d3a23d3d5d8907d247cb7f3ffc7bdafc6731e8c1fbda469043aa5c58c9e",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.export.ExportTemplateTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.export.SourceExportComposeTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "3fe72748bcda2ebf5fd339aab1928b78455ce4d60ad38d12e7b3b4e35c9b7393",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.export.SourceExportComposeTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.export.SourceExportIntegrationTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "b2ace43f48fd455f7fa1ea762725fde3de634ba9192a5627918d32ddfca60abe",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.export.SourceExportIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.model.D25EntrySerializationTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "361530f92f186e7260c708b7e778ddd84e053e830c4aeb7e0b4fadc92843e074",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.model.D25EntrySerializationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.model.DeepSeekModelProviderTest",
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "59757628b7dc94e7957827b3856cb999fe5460bfe90a2196235bb25b477e423b",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.model.DeepSeekModelProviderTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.model.PlanAcceptanceCliTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "7ca762a7940dbbd7ee2456307454a71b19b4f2f807f4bdc06cebc019a19da25d",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.model.PlanAcceptanceCliTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.model.PlanModelIntegrationTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "66628f34c9d7cacc8381322d6d91db4e68b7113cb80aef7124bfbca83e5be97b",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.model.PlanModelIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.model.PlanValidatorTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "2ec1aa95c62333ef510510285a947b26f205b2446dd930679b371accdec44e52",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.model.PlanValidatorTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.model.PrivateModelCaptureTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "c74f11d9c56d08a3b1191516599c788dbfaf8ee85b502690aeed940cd7cb31db",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.model.PrivateModelCaptureTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.network.SitePolicyTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "ceabc4f85cf947c2d0b79a7518b4e53e1a80097d111d9c9741ea421f50b5e2a9",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.network.SitePolicyTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.performance.ApiCapacityMeasurementTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "2bbf0089ec682e9a094e4d7a12eae46727581e3b471bcbf0e60dbf8ad8eeed42",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.performance.ApiCapacityMeasurementTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.performance.BoundedModelProviderTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "2a46e5aea35e74b8078bbbc3b68308bb71481c155f0e636f2a5026d1f4ab771b",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.performance.BoundedModelProviderTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.performance.CapacityPolicyTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "1e8408f8d9f24d99c8e08a5455e102266a1041020681b2a1085373d43107ecfb",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.performance.CapacityPolicyTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.performance.DefaultCapacityCalibrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "c29bd854852ddf993cac129ebf01ac12adcdb596cf08437e5835417f981b8266",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.performance.DefaultCapacityCalibrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.performance.TaskTimingTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "dff9accb149ec0ddbef5a13ae47f869c034296239828901093a2cbd02058d152",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.performance.TaskTimingTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewAcceptanceProcessTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "405a2c667a580ace6ec29a27b1053ebd7a0894f9cbffdda70070ae68a00d3b64",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.preview.PreviewAcceptanceProcessTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewCnHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "5545b24c2eb639f7fa6a4bbbb00e331e27d796356d4a7c44dea520caadcaaa73",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.preview.PreviewCnHttpTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "21979a0825846940e390fa77cb08457f16e37d39092a42961ac96b0e33e8390b",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.preview.PreviewHttpTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewPlatformIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "45b6cacdf59b396b614352fe691c1eec84693ecfd699cb53d081ea1c1bd8691a",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.preview.PreviewPlatformIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewReadinessTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "bd2c170c34f20ad8270486208e0b2da551edc62419e17168deb5022034a818c1",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.preview.PreviewReadinessTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewRegistryHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "b61fcf0f7e197650e687611138710c6ad6729bcedba30a082a38736fd8a3ca16",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.preview.PreviewRegistryHttpTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewTopHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "d2f27cc1e4ba2ba7fa5f7c6d6c453b669dea89e8c4df31c606c9bd4d53f61d9c",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.preview.PreviewTopHttpTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.preview.RepairProviderMetadataTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "7a4401cfbe4581143044f39fd9973fd1b0cc1557e68a9be5672dee6ce4eaec18",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.preview.RepairProviderMetadataTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.recovery.ProcessRestartRecoveryTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "cdd797639157ff52079e6249a740c2546176403f81df9558ff99f0ced9b5b016",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.recovery.ProcessRestartRecoveryTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.recovery.RecoveryConvergenceTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "5174a6e021c4a341384fffee61bf746e60aaa79d4d2a6f2fc792090c000dfec4",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.recovery.RecoveryConvergenceTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.recovery.StorageSweeperTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "e70ed85a848bd68a7eba68de438ac5e405a829e39fc16e32795699800588f1dd",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.recovery.StorageSweeperTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.security.ApiSecurityMatrixTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "e7cbae8d25f70d4fe335f648fe8a25998d3a76989cc22093e7bd18fab8d7d439",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.security.ApiSecurityMatrixTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.system.HealthControllerTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "fae25ed0cabf8e078c3e1156153a0bbbe6f2b1a14d82fb4373b9cb814b2c8d47",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.system.HealthControllerTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.tasks.TaskEventStreamsTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "7e4e0e50387a34ef6272d9cb02d88cef72e20976236d6289f3c77f58a9c45b9f",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.tasks.TaskEventStreamsTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.tasks.TaskHttpTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "680512283a59e47e86a0d48b4b80c2fedf8b40903882a96bf4dee7312d264c4b",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.tasks.TaskHttpTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.tasks.TaskQueueIntegrationTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "a5e32ec2a7d20011355576d184201900ca775b4e00f7021fbf23702ed019e23c",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.tasks.TaskQueueIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.tasks.TaskSseHttpTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "b3b680b543a92dfbeb6adae1cf0107228212f27f686ea3ad1e4f705f408e781f",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.tasks.TaskSseHttpTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.tools.FileToolRegistryTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "64f3abe61a40dbefbdadba797709cde182256b5bb641c1a5a8137afab63390ff",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.tools.FileToolRegistryTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.tools.FileToolsIntegrationTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "6a168c5e5561bc1df316cea191e6f25f0971eb639461351d99333cb95b68b8b5",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.tools.FileToolsIntegrationTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.tools.OwnedWorkspaceCleanupTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "8154f071fe48cc9a5f781998c686f538d0a5ae1cf1e5fd46b963480d484f2cfe",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.tools.OwnedWorkspaceCleanupTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.versions.LocalVolumeSnapshotStoreTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "4e3305b74b03aec1c7b71dbcea43a97b0d97c1f9e683e5582a5f509642609c54",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.versions.LocalVolumeSnapshotStoreTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.versions.SharedSnapshotPermissionsTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "3d563cd468ddfb4960425ed276b3a072426012858e5f39f499bf5ba59805905a",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.versions.SharedSnapshotPermissionsTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.versions.SnapshotSourceBytesTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "c648be0cd611de0da4dd0a63a0a9cefe6a611ff7ebe5ff2f15ea0afe95d6a931",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.versions.SnapshotSourceBytesTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.versions.VersionFixtureGateTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "3f6a217a2923e7a7cf241adb604782b4ab92947ae7dfcb5b302e3ff74fb0c962",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.versions.VersionFixtureGateTest.xml"
+    },
+    {
+      "name": "dev.codeless.api.versions.VersionHttpIntegrationTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "sha256": "09a7e5b7e7c041f3f4f0c8db32a3fa00fa9d4515c1e948fb5231a6bf6a54b9a6",
+      "privateReport": "tests/release/api/.private/d28/2026-11-01T14-32-37.236887+00-00-gate/junit/TEST-dev.codeless.api.versions.VersionHttpIntegrationTest.xml"
+    }
+  ],
+  "generatedScreenshotsPreserved": [
+    "docs/evidence/D10/deterministic/cancelled.png",
+    "docs/evidence/D10/deterministic/failure.png",
+    "docs/evidence/D10/deterministic/recovered.png",
+    "docs/evidence/D10/deterministic/success.png",
+    "tests/e2e/share/evidence/2026-10-19/T2-mobile-placeholder.png",
+    "tests/e2e/versions/evidence/2026-10-12/fixture/T1-version-switch.png",
+    "tests/e2e/versions/evidence/2026-10-12/fixture/T2-source-error.png",
+    "tests/e2e/versions/evidence/2026-10-12/fixture/T3-failed-keeps-preview.png",
+    "tests/e2e/versions/evidence/2026-10-12/fixture/T4-script-as-text.png"
+  ],
+  "finishedAt": "2026-11-01T15:27:10.856440+00:00",
+  "sourceBytesUnchanged": true,
+  "headUnchanged": true,
+  "changedTrackedFiles": []
+}

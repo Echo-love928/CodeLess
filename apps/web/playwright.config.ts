@@ -8,8 +8,19 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:4173',
     trace: 'retain-on-failure',
   },
+  // This native acceptance has its own 115s budget. Enqueue it before UI
+  // files so it gets the existing global budget instead of starting at ~78s.
+  // The two projects partition the same tests; neither deadlines nor retries change.
   projects: [{
+    name: 'runner-chromium',
+    testMatch: '**/e2e/runner/browser.spec.ts',
+    use: {
+      ...devices['Desktop Chrome'],
+      channel: process.env.CODELESS_PLAYWRIGHT_CHANNEL === 'chrome' ? 'chrome' : undefined,
+    },
+  }, {
     name: 'chromium',
+    testIgnore: '**/e2e/runner/browser.spec.ts',
     use: {
       ...devices['Desktop Chrome'],
       channel: process.env.CODELESS_PLAYWRIGHT_CHANNEL === 'chrome' ? 'chrome' : undefined,
