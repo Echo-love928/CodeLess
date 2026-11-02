@@ -1,24 +1,20 @@
-D28-A｜封存统一候选00fd并补齐迁移/真实历史恢复（HOLD）
+D28-A｜原失败现场交付与候选预算审计（HOLD）
 
-B已将A a16ac25与B80205692合为00fd43333f35c5cb0cce425721fdce9cd1d0f956。本轮从该提交独立封存API、client及带00fd revision标签的镜像，明确源码/JAR/worker/镜像清单，替代分别引用不同候选的验收安排；当前未部署新候选。00fd精确六项CI全部success：[run41424603409](https://github.com/Echo-love928/CodeLess/actions/runs/41424603409)。后续交接HEAD自身检查另看PR，不继承旧SHA。
+本PR记录候选服务端独立验收，并保留失败、未知及部署身份差异。本轮解决A原失败现场仅存在本地路径、B不能联合复核的问题：55成员原件包已交付既有受控SSH目录，服务端逐项校验0。历史EPERM只留message、CLEANUP_FAILED断言前未落runner回执，缺失的同次拒绝栈/OS句柄仍未恢复，不宣称修复或严重缺陷归零。
 
-- 同源完整性：258个API源文件逐字节核对Git blob、JAR五迁移一致；API/client113共享文件相同。统一包275成员逐项复算，SHA52e49be4...；原包现已传入受保护VPS SSH目录，路径与取回方式见下方当前交付。
-- 新00fd JAR：真实空库/合成V4迁移与独立restore40项退出0；原D23真实生成备份按原manifest/dump摘要只读恢复，在新PG核验原版本/源码/导出22项退出0，原备份不变、cleanupErrors=[]。保留原模型mock及生产预览未验边界。
-- 新明确镜像ID配封存源码：真实Docker/Vue/Chromium正常和歧义目标两路径按预期通过，build0、浏览器失败分支worker1/ACTION_FAILED，清理成功，断言前回执保留；不冒称旧CLEANUP_FAILED复现或关闭。
-- A范围内工具增加显式候选/新输出与只读新部署比较；原默认、断言、预算、隔离不变。原8项控制及路径/覆盖负对照通过，旧报告不覆盖。仅新增两份自有注册表按原字节保存。
-- 原47份失败材料摘要全部匹配，私有取证包未上传；旧EPERM无拒绝栈，旧CI失败缺同次runner/JUnit/句柄，rootCause仍null。一次128MiB带栈追踪启动遭Windows UAC取消，两个定向API用例未执行、Maven exit=null；未重新触发UAC。没有猜测性产品修复或加重试。
-- SSH只读比较现部署与00fd退出1：部署记录、清单、镜像仍61；相同JAR/worker/源码不能替代新候选部署证明。真实模型已有凭据，本轮已获用户最多2元授权、CNY足额核验通过，但原TLS前置11/12有预期证书、末次无证书链，命令1；付费批次未启动、模型请求/支出0，不放宽门禁或重跑求绿。旧fb79财务sidecar授权不沿用；生产cover未执行。
+主要变化：
+- 提供原件校验/封存器及下一次宿主Node文件操作取证工具；不加重试、不改原错误/断言/截止/隔离，不将观察器接入模型或产品权限。
+- 同一2元预算账本增加CAS候选重绑定：核对实际包/组件及精确SHA六项success，追加历史，旧支出、UNKNOWN占用、样本和事件不重置。新工具仅旁置验证，现用控制器和数据库未改。
+- 只读审查B的7db取消补读修复；在A隔离工作树独立执行工作台14/14。旧00fd原包保留，不能替代含前端修复的后继候选。
 
-范围：本轮仅docs/acceptance/backend.md、docs/handoffs/D28-A.md、tests/release/api/**；此前D08调度修复为唯一apps/web/playwright.config.ts范围扩展。无产品运行代码、公共契约、锁、CI或迁移修改；未修改B文件或main，未批准/合并。新候选完整证据与剩余阻塞见evidence/d28-followup/summary.json及两份文档顶部。开发token未知；本轮付费模型请求0，合成累计用量未知、分账。
+验证：观察器本机3/3；预算本机/VPS各10/10；原件保护本机/VPS各2/2；55原件成员本机及VPS均匹配。全部列出实际命令、原生退出、日志/回执SHA，均无付费模型调用。新交接HEAD的四阶段/ci-gate看当前PR精确检查，不能继承旧SHA。
 
+受控原件：`23.136.172.128:/srv/codeless-handoff/d28/20261103-a-diagnosis/a-original-failures.tar`，2416640字节，SHA256 `56a0f6bbe1ee4135c066dea0699848993eaf0f50c32aee5513a6ca6ab693f571`。使用B既有授权SSH身份，原件不上传GitHub。原00fd包及其下载/275成员核验仍保留在原受控目录，B已确认实际取得。
 
-当前原包/预算交付：
+共享预算当前只读观测：原唯一账本revision2、B已对账零历史用量、无活动/预约、可花2元；A冻结付费，仍绑定00fd。最终候选尚未确定，因此未重封新包、未重绑定、未部署。未来须保留现用工具原字节，再将已审新版本用于同一数据库，按实时revision/eventHead追加绑定，不新建额度。
 
-- 主机23.136.172.128，B使用既有授权SSH身份；目录 `/srv/codeless-handoff/d28/20261102-cny2`，root0700，未开公共下载端口。
-- 原包 `unified-00fd-kit.tar`，167813120字节，完整SHA `52e49be4fca54ca6b09ca77846bfd5453ef68c84026ccd484e6017ecf216c206`；服务器原字节核验0，未重打包。
-- `ACCESS.json`/`README.md`给出B端实际解包路径和校验命令，不需要A的F盘路径。
-- 同目录 `budget-ledger.sqlite3` 为唯一权威预算，`budget-ledger.json`是快照。查询：`ssh root@23.136.172.128 python3 /srv/codeless-handoff/d28/20261102-cny2/d28_shared_budget.py status`。
-- 累计上限2元、已知A支出0，A已冻结付费启动、交由B执行；B旧用量UNKNOWN，先用自己的机器证据claim-b，再逐任务预约。不是A/B各2元，也不把未知填0。Windows/VPS金融控制fixture各6项通过，无模型调用。
-- 上传中断和后续成功校验分别保留，原包和机密凭据没有上传GitHub；详见D28-B-CONTROLLED-HANDOFF.md与evidence/d28-transfer/。发布验收HOLD不变。
+剩余阻塞：原EPERM/ENOTEMPTY/CLEANUP_FAILED未确定根因；B电脑已关机，API中断、D19清理超时、7db重下载原件待补。Windows完整门禁、真实质量、最终候选公网/ZIP身份及生产cover仍HOLD。已为联合时间线和定向捕获列出同次证据要求，不无计划重复全套测试。
 
-- A额外下载回读600秒超时，59146240字节前缀验证一致；没有将其记为完整回读。原包服务端完整SHA已核验，B可SFTP reget继续下载并核验完整SHA，见远端DOWNLOAD-NOTE.md。
+范围仅A允许的docs/acceptance/backend.md、docs/handoffs/D28-A.md和tests/release/api/**；本轮无产品、契约、锁、CI、迁移或B文件变更。此前D08调度扩展及旧快照详见backend.md，不重写历史失败。未自批、合并或改main。开发token UNKNOWN；平台付费请求0/支出0，fixture与真实效果分账。
+
+交接及可复现命令：`tests/release/api/D28-JOINT-DIAGNOSIS.md`；本轮证据：`tests/release/api/evidence/d28-diagnosis/`；完整验收记录：`docs/acceptance/backend.md`。

@@ -1,5 +1,20 @@
 # D28-A 候选版本服务端独立验收
 
+## 2026-11-03 原失败原件交付与后继候选准备（当前）
+
+结论仍 **HOLD**。B最新报告HEAD `a264cf11d17af7897019969a8b1aa3d65b11cfc9`，产品修复候选为 `7db2eaf9086c508d22785f7d1a8c329ba14bba93`；它不是旧00fd封存包。用户确认B电脑关机，先完成A独立部分。
+
+- **原件实际可取**：A的历史EPERM、ENOTEMPTY完整日志、旧CLEANUP_FAILED CI API日志及来源共55成员，逐项核验并上传 `/srv/codeless-handoff/d28/20261103-a-diagnosis/a-original-failures.tar`，2416640字节，SHA256 `56a0f6bbe1ee4135c066dea0699848993eaf0f50c32aee5513a6ca6ab693f571`；服务器校验原生0。原始私有内容不进入GitHub。原D22报告本次才独立计算SHA，显式标记非旧回执锚定。
+- **缺失不补造**：原EPERM只存message，原CLEANUP_FAILED断言前没有runner回执；同次拒绝栈/OS句柄不能事后恢复。原ENOTEMPTY临时根已清理。B的API中断、D19超时和7db重下载原件待其开机补传，当前只读其公开投影；根因仍null，没有猜测性产品修复或重跑全套求绿。
+- **下一次取证**：新增宿主Node文件操作观察器（原参数/同一Error、不重试、内容不采集、调用/拒绝栈和单调时序/观察到的句柄、4MiB截断显式标记），本机3/3原生0。它不覆盖API白名单清理后的子进程，不能替代同次128MiB管理员ETW。原件收集保护本机/VPS各2/2原生0。
+- **B修复只读复核**：A在隔离7db工作树离线锁定安装0，工作台14/14原生0，源码/HEAD未变；不替代完整E2E或失败后重下载。未触碰B指定Docker runner。
+- **预算当前已更新事实**：只读核验唯一账本revision2、B已对账历史0、无entries/active、可花2元、事件链通过；仍绑定00fd，A冻结付费。本轮没有改写数据库或现用控制器。
+- **重绑定工具已备妥未启用**：新增同一账本CAS追加候选绑定，核对实际成组包/六组件和新SHA六项success，保留旧支出、UNKNOWN占用、样本/事件历史，拒绝活跃进程、旧revision、篡改/换标和neutral。本机/VPS各10/10原生0；新版本仅放受控next-tools目录，兼容只读查询0且真实SQLite字节未变。
+
+最终候选未确定，尚未重封API/client/worker/镜像、绑定新候选或切换生产；这些按“根因最小修复及受影响重测→冻结成组封存→B复核→同账本追加绑定→维护者切换→独立实物核验”顺序执行。四阶段/ci-gate在本轮新交接HEAD须看其精确CI，不继承191/7db的结果；本轮未另跑本机四阶段，因未形成根因修复候选且B独占runner。T2/T3/M5未通过，T4仅已执行部分有原始证据。
+
+详细操作/同次证据清单：`tests/release/api/D28-JOINT-DIAGNOSIS.md`；命令、原生退出与SHA：`tests/release/api/evidence/d28-diagnosis/`。开发input/output/total和计量来源UNKNOWN；平台本轮付费请求0、支出0，fixture不调用模型。未自批、合并、改main或生产。
+
 ## 2026-11-02 原包及共享预算已转入受控远端目录（当前）
 
 已按用户本次明确交付授权，将**原统一包**复制到既有VPS的独立SSH/SFTP目录 `/srv/codeless-handoff/d28/20261102-cny2`（root:0700，不在生产web/生成容器挂载目录）。没有重建/重新打包、开HTTP端口或切换生产。包 `unified-00fd-kit.tar` 为167813120字节，服务器独立SHA256仍为 `52e49be4fca54ca6b09ca77846bfd5453ef68c84026ccd484e6017ecf216c206`，文件0440；控件/原清单/工具也逐项核对原字节。README小文件与首次校验会话的传输中断保留，仅补小文件后单会话完成校验。

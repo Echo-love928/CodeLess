@@ -1,11 +1,13 @@
 """Financial admission controls only: fixtures never invoke a model or spend money."""
 import concurrent.futures
 import json
+import io
 from pathlib import Path
 import sqlite3
 import subprocess
 import sys
 import tempfile
+import tarfile
 import unittest
 import d28_shared_budget as budget
 
@@ -117,6 +119,106 @@ class SharedBudgetTests(unittest.TestCase):
         self.assertEqual(budget.exposure(json.loads(output.read_bytes()))['upperNanos'], budget.RESERVATION)
         with self.assertRaises(FileExistsError):
             budget.project_usage(source, output)
+
+    def binding_fixture(self):
+        """Named synthetic group, never a real release or CI claim."""
+        candidate = '7' * 40
+        pieces = {'release/api/release.json': b'FIXTURE_API_MANIFEST',
+                  'release/client/manifest.json': b'FIXTURE_CLIENT_MANIFEST',
+                  'release/api/api.jar': b'FIXTURE_JAR',
+                  'release/api/repository/infra/public/worker.py': b'FIXTURE_WORKER',
+                  'release/image/runner-build-image.tar': b'FIXTURE_IMAGE'}
+        selection = {'sourceCommit': candidate, 'manifestSha256': budget.sha(pieces['release/api/release.json']),
+                     'clientManifestSha256': budget.sha(pieces['release/client/manifest.json']),
+                     'apiJarSha256': budget.sha(pieces['release/api/api.jar']),
+                     'worker': {'sha256': budget.sha(pieces['release/api/repository/infra/public/worker.py'])},
+                     'image': {'id': 'sha256:' + 'a' * 64, 'sourceRevision': candidate, 'archive': {'sha256': budget.sha(pieces['release/image/runner-build-image.tar'])}},
+                     'sharedSourceMismatches': []}
+        def save(name, data):
+            path = self.directory / name
+            path.write_bytes(json.dumps(data).encode() if not isinstance(data, bytes) else data)
+            return {'path': name, 'sha256': budget.sha(path.read_bytes())}
+        selection_ref = save('FIXTURE-selection.json', selection)
+        pieces['release/selection.json'] = (self.directory / selection_ref['path']).read_bytes()
+        archive = self.directory / 'FIXTURE-group.tar'
+        with tarfile.open(archive, 'w') as tar:
+            for name, raw in pieces.items():
+                member = tarfile.TarInfo(name); member.size = len(raw); tar.addfile(member, io.BytesIO(raw))
+        archive_ref = {'path': archive.name, 'sha256': budget.sha(archive.read_bytes())}
+        group = {'candidate': candidate, 'nativeExitCode': 0, 'mismatches': [], 'missing': [],
+                 'archiveSha256': archive_ref['sha256'], 'membersVerified': len(pieces)}
+        checks = [{'name': name, 'head_sha': candidate, 'status': 'completed', 'conclusion': 'success'} for name in
+                  ('ci-gate', 'verify:static', 'verify:api', 'verify:runner', 'verify:e2e', 'infra-preflight')]
+        state = budget.operate(self.directory, 'status')
+        proof = {'ledgerId': state['ledgerId'], 'expectedRevision': state['revision'], 'expectedEventHead': state['eventHeadSha256'],
+                 'fromCandidate': state['candidate'], 'fromArtifactSha256': state['artifactSha256'],
+                 'selection': selection_ref, 'archive': archive_ref,
+                 'groupVerification': save('FIXTURE-group-verification.json', group), 'checks': save('FIXTURE-checks.json', checks)}
+        path = self.directory / 'FIXTURE-rebind.json'; path.write_text(json.dumps(proof))
+        return path, proof
+
+    def test_rebind_retains_unknown_spend_cap_claim_and_audit_history(self):
+        self.claim()
+        row = budget.operate(self.directory, 'reserve', sample='SHOW-01')
+        before = self.settle(row, 'SHOW-01', {'mode': 'REAL', 'harnessError': 'FIXTURE_UNKNOWN_USAGE'}, 1)
+        path, proof = self.binding_fixture()
+        after = budget.operate(self.directory, 'rebind-candidate', evidence=str(path))
+        for key in ('ledgerId', 'authorizationId', 'authorizedCapCny', 'entries', 'settledUpperCny', 'remainingAfterKnownExposureCny', 'bReconciled'):
+            self.assertEqual(before[key], after[key], key)
+        self.assertEqual(after['revision'], before['revision'] + 1)
+        self.assertEqual(after['bindingHistory'][0]['eventHead'], before['eventHeadSha256'])
+        self.assertEqual(after['candidate'], '7' * 40); self.assertFalse(after['releaseApproved'])
+        with self.assertRaisesRegex(ValueError, 'NEVER_RETRY'):
+            budget.operate(self.directory, 'reserve', sample='SHOW-01')
+        new = budget.operate(self.directory, 'reserve', sample='SHOW-02')
+        self.assertEqual(new['entries'][-1]['candidate'], '7' * 40)
+        with self.assertRaisesRegex(ValueError, 'NATIVE_TERMINAL'):
+            self.settle(new, 'SHOW-02', {'mode': 'REAL', 'harnessError': 'FIXTURE_UNKNOWN'}, 1)
+        self.assertEqual(budget.operate(self.directory, 'status')['active'], new['reservationId'])
+        native_path = self.directory / 'SHOW-02-native.json'
+        native = json.loads(native_path.read_bytes()); native['candidate'] = '7' * 40
+        native_path.write_text(json.dumps(native))
+        settled = budget.operate(self.directory, 'settle', reservation=new['reservationId'],
+                                 record=str(self.directory / 'SHOW-02.json'), native=str(native_path))
+        self.assertEqual(settled['settledUpperCny'], '0.8')
+        self.assertEqual(settled['remainingAfterKnownExposureCny'], '1.2')
+
+    def test_rebind_rejects_active_and_stale_events_without_mutation(self):
+        self.claim()
+        path, proof = self.binding_fixture()
+        row = budget.operate(self.directory, 'reserve', sample='SHOW-01')
+        with self.assertRaisesRegex(ValueError, 'ACTIVE_PROCESS'):
+            budget.operate(self.directory, 'rebind-candidate', evidence=str(path))
+        self.settle(row, 'SHOW-01', {'mode': 'REAL', 'harnessError': 'FIXTURE_UNKNOWN'}, 1)
+        before = budget.operate(self.directory, 'status')
+        with self.assertRaisesRegex(ValueError, 'COMPARE_AND_SWAP'):
+            budget.operate(self.directory, 'rebind-candidate', evidence=str(path))
+        self.assertEqual(before, budget.operate(self.directory, 'status'))
+
+    def test_rebind_rejects_corruption_and_neutral_checks_without_mutation(self):
+        self.claim(); path, proof = self.binding_fixture()
+        before = budget.operate(self.directory, 'status')
+        archive = self.directory / proof['archive']['path']; original = archive.read_bytes(); archive.write_bytes(original + b'TAMPER')
+        with self.assertRaisesRegex(ValueError, 'DIGEST_MISMATCH'):
+            budget.operate(self.directory, 'rebind-candidate', evidence=str(path))
+        archive.write_bytes(original)
+        checks_path = self.directory / proof['checks']['path']; checks = json.loads(checks_path.read_bytes()); checks[0]['conclusion'] = 'neutral'
+        checks_path.write_text(json.dumps(checks)); proof['checks']['sha256'] = budget.sha(checks_path.read_bytes()); path.write_text(json.dumps(proof))
+        with self.assertRaisesRegex(ValueError, 'SIX_SUCCESS'):
+            budget.operate(self.directory, 'rebind-candidate', evidence=str(path))
+        self.assertEqual(before, budget.operate(self.directory, 'status'))
+
+    def test_rebind_rejects_relabelled_archive(self):
+        self.claim(); path, proof = self.binding_fixture()
+        before = budget.operate(self.directory, 'status')
+        selection_path = self.directory / proof['selection']['path']
+        selection = json.loads(selection_path.read_bytes())
+        selection['apiJarSha256'] = '0' * 64
+        selection_path.write_text(json.dumps(selection))
+        proof['selection']['sha256'] = budget.sha(selection_path.read_bytes()); path.write_text(json.dumps(proof))
+        with self.assertRaisesRegex(ValueError, 'COMPONENT_MISMATCH'):
+            budget.operate(self.directory, 'rebind-candidate', evidence=str(path))
+        self.assertEqual(before, budget.operate(self.directory, 'status'))
 
 
 if __name__ == '__main__':

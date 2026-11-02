@@ -1,0 +1,81 @@
+{
+  "task": "D28-A-original-timeline",
+  "candidate": "2be793dc3318c2308d18a7fd45afb201342206a7",
+  "source": "retained original journal bytes with original-digest anchors in original-inventory.json",
+  "events": [
+    {
+      "journalSequence": 27,
+      "journalPersistedAt": "2026-11-01T14:52:58.846849100Z",
+      "taskId": "c69a63a7-4b5e-4441-bbe3-22a6aae8bc48",
+      "executionId": "383b2698-a653-4489-95cd-d5cba8eba0af",
+      "runnerStatus": "FAILED",
+      "build": {
+        "id": "bbcec993-8424-4924-96e2-939c58fe83b0",
+        "createdAt": "2026-11-01T14:52:49.060Z",
+        "completedAt": "2026-11-01T14:52:55.692Z",
+        "status": "SUCCEEDED",
+        "failure": null,
+        "exitCode": 0,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        }
+      },
+      "buildDiagnosticCode": null,
+      "browser": {
+        "status": "FAILED",
+        "failure": "ACTION_TIMEOUT",
+        "workerExitCode": 1,
+        "cleanup": {
+          "browserClosed": true,
+          "processTreeTerminated": null
+        }
+      },
+      "original": {
+        "path": "tests/release/api/.private/d28/api-failure/029-0027.json",
+        "sha256": "41e984f6a4b6ad79eaa975f75b9f522f9ed5fda1d999cde3931d9f3fce75fc24"
+      },
+      "nativeFilesystemOperationAt": null,
+      "sameFailureOpenHandles": null,
+      "sameFailureRejectionStack": null
+    },
+    {
+      "journalSequence": 41,
+      "journalPersistedAt": "2026-11-01T14:53:10.412780200Z",
+      "taskId": "c69a63a7-4b5e-4441-bbe3-22a6aae8bc48",
+      "executionId": "a9881cb9-3476-4c94-af72-195cc2943ed5",
+      "runnerStatus": "FAILED",
+      "build": {
+        "id": "9cebb055-115d-43e0-9a19-71cb8ce5f164",
+        "createdAt": "2026-11-01T14:53:01.701Z",
+        "completedAt": "2026-11-01T14:53:10.289Z",
+        "status": "FAILED",
+        "failure": "ARTIFACT_INVALID",
+        "exitCode": 0,
+        "cleanup": {
+          "containerRemoved": true,
+          "workspaceRemoved": true,
+          "errors": []
+        }
+      },
+      "buildDiagnosticCode": "EPERM",
+      "browser": {
+        "status": null,
+        "failure": null,
+        "workerExitCode": null,
+        "cleanup": null
+      },
+      "original": {
+        "path": "tests/release/api/.private/d28/api-failure/043-0041.json",
+        "sha256": "1e657797e03b2d65dcc5badd4ee18e2a1c3b2b86a3d20d95ffedb1531bc6bcb5"
+      },
+      "nativeFilesystemOperationAt": null,
+      "sameFailureOpenHandles": null,
+      "sameFailureRejectionStack": null
+    }
+  ],
+  "interpretation": "Journal time is persistence, not a filesystem denial timestamp. Two successful build exits; second artifact promotion failed. Cleanup flags do not identify the rejecting actor or mechanism.",
+  "rootCause": null,
+  "historicalClosure": false
+}

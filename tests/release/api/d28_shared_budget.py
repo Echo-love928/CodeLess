@@ -12,6 +12,7 @@ from pathlib import Path
 import re
 import sqlite3
 import sys
+import tarfile
 import uuid
 
 CAP = 2_000_000_000
@@ -124,6 +125,74 @@ def append(connection, state, previous, operation, details):
     return view(state, digest)
 
 
+def rebinding(directory, state, head, evidence):
+    """Verify an operator's sealed-group receipts; never authorize deployment.
+
+    The existing ledger, cap, past admissions, unknown charges and event chain
+    survive the change. A stale writer or an active process cannot rebind.
+    """
+    require(state['active'] is None, 'ACTIVE_PROCESS_PREVENTS_REBIND')
+    proof_raw = Path(evidence).read_bytes()
+    proof = json.loads(proof_raw)
+    require(proof.get('ledgerId') == state['ledgerId'] and
+            type(proof.get('expectedRevision')) is int and proof['expectedRevision'] == state['revision'] and
+            proof.get('expectedEventHead') == head and proof.get('fromCandidate') == state['candidate'] and
+            proof.get('fromArtifactSha256') == state['artifactSha256'], 'REBIND_COMPARE_AND_SWAP_MISMATCH')
+
+    def retained(ref):
+        path = directory / ref['path']
+        require(not path.is_symlink() and path.resolve().is_relative_to(directory.resolve()) and
+                all(not p.is_symlink() and not getattr(p, 'is_junction', lambda: False)() for p in [path, *path.parents] if p != directory),
+                'REBIND_EVIDENCE_PATH_REJECTED')
+        with path.open('rb') as stream:
+            digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+        require(digest == ref['sha256'], 'REBIND_EVIDENCE_DIGEST_MISMATCH')
+        return path
+
+    selection_path = retained(proof['selection'])
+    selection = json.loads(selection_path.read_bytes())
+    candidate = selection['sourceCommit']
+    require(re.fullmatch(r'[a-f0-9]{40}', candidate) and candidate != state['candidate'] and
+            selection['image']['sourceRevision'] == candidate and re.fullmatch(r'sha256:[a-f0-9]{64}', selection['image']['id']) and
+            selection.get('sharedSourceMismatches') == [],
+            'REBIND_NEW_SAME_SOURCE_GROUP_REQUIRED')
+    group = json.loads(retained(proof['groupVerification']).read_bytes())
+    archive_path = retained(proof['archive'])
+    require(proof['archive']['sha256'] != state['artifactSha256'] and
+            group.get('candidate') == candidate and type(group.get('nativeExitCode')) is int and group['nativeExitCode'] == 0 and
+            group.get('mismatches') == [] and group.get('missing') == [] and
+            group.get('archiveSha256') == proof['archive']['sha256'], 'REBIND_GROUP_NOT_VERIFIED')
+    checks = json.loads(retained(proof['checks']).read_bytes())
+    names = {'ci-gate', 'verify:static', 'verify:api', 'verify:runner', 'verify:e2e', 'infra-preflight'}
+    require(isinstance(checks, list) and len(checks) == 6 and {c.get('name') for c in checks} == names and
+            all(c.get('head_sha') == candidate and c.get('status') == 'completed' and c.get('conclusion') == 'success' for c in checks),
+            'REBIND_EXACT_HEAD_SIX_SUCCESS_REQUIRED')
+    # Verify actual controlled bytes as well as the receipt. This rejects an old
+    # archive given a new label; nothing is extracted or executed.
+    with tarfile.open(archive_path) as archive:
+        members = archive.getmembers()
+        require(len(members) <= 10000 and len(members) == group.get('membersVerified') and
+                len({m.name for m in members}) == len(members) and
+                all(m.isfile() and not m.name.startswith(('/', '\\')) and '..' not in m.name.replace('\\', '/').split('/') for m in members),
+                'REBIND_ARCHIVE_INVALID')
+        expected = {'release/selection.json': proof['selection']['sha256'],
+                    'release/api/release.json': selection['manifestSha256'],
+                    'release/client/manifest.json': selection['clientManifestSha256'],
+                    'release/api/api.jar': selection['apiJarSha256'],
+                    'release/api/repository/infra/public/worker.py': selection['worker']['sha256'],
+                    'release/image/runner-build-image.tar': selection['image']['archive']['sha256']}
+        for name, digest in expected.items():
+            with archive.extractfile(name) as stream:
+                require(hashlib.file_digest(stream, 'sha256').hexdigest() == digest, 'REBIND_COMPONENT_MISMATCH')
+    previous = {'candidate': state['candidate'], 'artifactSha256': state['artifactSha256'], 'eventHead': head,
+                'revision': state['revision']}
+    state.setdefault('bindingHistory', []).append(previous)
+    state['candidate'], state['artifactSha256'] = candidate, proof['archive']['sha256']
+    state['releaseApproved'] = False
+    return {'from': previous, 'toCandidate': candidate, 'toArtifactSha256': state['artifactSha256'],
+            'evidenceSha256': sha(proof_raw), 'authorizationExtended': False, 'deploymentApproved': False}
+
+
 def operate(directory, operation, **args):
     directory = Path(directory)
     require(directory.is_dir() and not directory.is_symlink(), 'OWNED_DIRECTORY_REQUIRED')
@@ -172,7 +241,7 @@ def operate(directory, operation, **args):
                 require(not state['bReconciled'] and not state['entries'], 'CLAIM_NOT_REPEATABLE')
                 evidence = Path(args['evidence']).read_bytes()
                 proof = json.loads(evidence)
-                require(proof.get('candidate') == CANDIDATE and proof.get('artifactSha256') == ARTIFACT and
+                require(proof.get('candidate') == state['candidate'] and proof.get('artifactSha256') == state['artifactSha256'] and
                         proof.get('priorPaidRequests') == 0 and type(proof.get('priorPaidRequests')) is int and
                         proof.get('activePaidJobs') == 0 and type(proof.get('activePaidJobs')) is int and
                         proof.get('priorSpentUpperCny') == '0' and proof.get('measurementSource') and proof.get('evidence'), 'B_PRIOR_USAGE_NOT_RECONCILED')
@@ -192,6 +261,7 @@ def operate(directory, operation, **args):
                 remaining = CAP - sum(e['upperNanos'] for e in state['entries'])
                 admitted = remaining >= RESERVATION
                 entry = {'sampleId': sample, 'reservationId': str(uuid.uuid4()),
+                         'candidate': state['candidate'], 'artifactSha256': state['artifactSha256'],
                          'state': 'RESERVED' if admitted else 'BUDGET_NOT_STARTED',
                          'upperNanos': RESERVATION if admitted else 0, 'usage': 'UNKNOWN', 'actualCny': None}
                 state['entries'].append(entry)
@@ -204,7 +274,7 @@ def operate(directory, operation, **args):
                 native_bytes = Path(args['native']).read_bytes()
                 native, record = json.loads(native_bytes), json.loads(record_bytes)
                 entry = next(e for e in state['entries'] if e['reservationId'] == state['active'])
-                require(native.get('candidate') == CANDIDATE and native.get('reservationId') == state['active'] and
+                require(native.get('candidate') == state['candidate'] and native.get('reservationId') == state['active'] and
                         native.get('sampleId') == entry['sampleId'] and native.get('processEnded') is True and
                         type(native.get('nativeExitCode')) is int and native.get('recordSha256') == sha(record_bytes) and
                         record.get('sampleId') == entry['sampleId'], 'NATIVE_TERMINAL_PROOF_REQUIRED')
@@ -213,6 +283,8 @@ def operate(directory, operation, **args):
                 require(sum(e['upperNanos'] for e in state['entries']) <= CAP, 'CAP_EXCEEDED')
                 state['active'] = None
                 details = {'reservationId': entry['reservationId'], 'recordSha256': sha(record_bytes), 'nativeReceiptSha256': sha(native_bytes), **cost}
+            elif operation == 'rebind-candidate':
+                details = rebinding(directory, state, head, args['evidence'])
             else:
                 raise ValueError('UNKNOWN_OPERATION')
             result = append(connection, state, head, operation, details)
@@ -252,6 +324,7 @@ def main():
     p = commands.add_parser('project-usage'); p.add_argument('--record', required=True); p.add_argument('--output', required=True)
     p = commands.add_parser('init'); p.add_argument('--opening', required=True)
     p = commands.add_parser('claim-b'); p.add_argument('--evidence', required=True)
+    p = commands.add_parser('rebind-candidate'); p.add_argument('--evidence', required=True)
     p = commands.add_parser('reserve'); p.add_argument('--sample', required=True)
     p = commands.add_parser('settle')
     for name in ('reservation', 'record', 'native'):
