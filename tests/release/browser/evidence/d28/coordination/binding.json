@@ -1,0 +1,74 @@
+{
+  "task": "D28-B-formal-acceptance-binding",
+  "status": "BLOCKED_BEFORE_LOGIN",
+  "artifactCandidate": "00fd43333f35c5cb0cce425721fdce9cd1d0f956",
+  "artifactSourceTree": "423f924f49a65eccb251cadb350dec2c5af2276f",
+  "reviewedAHead": "c44592fa529637cbfa49aa86908d5cb767a67c87",
+  "knownDeployedCandidate": "61df15eba456422762a667aaed7734b7d13b48e7",
+  "knownDeploymentSource": "user statement and A read-only mismatch receipt; no B production write",
+  "expected": {
+    "apiManifestSha256": "3d0e52103de6bf1614bc751302566d51e6364459054fdbb4e6030cb8144486a9",
+    "apiJarSha256": "d2c1bc7bccd9df9eec194fde509fa012f5c41eb3a7703aad669aaa447e067446",
+    "clientManifestSha256": "db83cd46801ab1c587cdb85e022533ec14735a6efe3b5301682cabc4f04f6fbe",
+    "workerSha256": "311ed218b65e7a6bf5ceb309b8c7ff6c9f8f8fc73a6671faa3d5c50ae475cbaa",
+    "imageId": "sha256:e73196cae90d4f114cc1dd0c3e285524c3449a1b193e2befd49f8dcf05ccd445",
+    "imageSourceRevision": "00fd43333f35c5cb0cce425721fdce9cd1d0f956",
+    "imageArchiveSha256": "453e0f1ca248156677ae80dfbcbaf1052148a7a8894463fe4e06cb7bbfad9ddc",
+    "transportSha256": "52e49be4fca54ca6b09ca77846bfd5453ef68c84026ccd484e6017ecf216c206",
+    "transportBytes": 167813120
+  },
+  "runner": {
+    "owner": "B, directly designated by user",
+    "engineFingerprint": "af5f9ddde52028586624a365bb11d0d06c83d6e6894691e3037ae5d03942e99f",
+    "newCandidateImagePresent": false,
+    "credentialFreeTlsGatesPassed": 2,
+    "technicalGlobalMutexEnforced": false,
+    "noConcurrentBuildOrRetag": "coordination reservation; recheck actual state before every workload"
+  },
+  "modelBudget": {
+    "currency": "CNY",
+    "cumulativeCap": "2",
+    "userReportedSpentAtAuthorization": "0",
+    "BSpent": "0",
+    "BPaidRequests": 0,
+    "ledgerOwner": "A, one shared cumulative ledger",
+    "ledgerCurrentStateVerifiedByB": false,
+    "noSecondBAllowance": true,
+    "admissionFormula": "settled + worst-case pending/UNKNOWN reservations + next whole-task reservation <=2; stop before exceeding cap",
+    "covers": "all subsequent real-model batches and user-flow model calls including failed/UNKNOWN calls"
+  },
+  "newUserFlow": {
+    "state": "NOT_RUN_UNTIL_DEPLOYMENT_IDENTITY_MATCHES",
+    "releaseCandidate": "00fd43333f35c5cb0cce425721fdce9cd1d0f956",
+    "applicationId": null,
+    "versionId": null,
+    "sourceDigest": null,
+    "artifactDigest": null,
+    "publicUrl": null,
+    "exportArchiveSha256": null
+  },
+  "requiredSequence": [
+    "Controlled original transport received; raw52e49...SHA/size and all275regular members verified without traversal/links",
+    "Frozen candidate/API/JAR/worker/client/image manifests agree on exact source and digests; no relabeling/rebuilding to substitute old bytes",
+    "Same designated B engine, fresh unchanged TLS/JVM gate and one current sharedCNY2 ledger; no concurrent policy-tag mutator",
+    "A closes historical root causes; deployment maintainer only then switches candidate as a group with rollback retained",
+    "Both members independently attest active JAR fd, worker process/source, exact imageId/revision, live web bytes and source against selected manifests",
+    "Only then create clean ordinary-user sessions against the new deployment, run login/generate/repair/edit/publish/download and keyE2E on the selected candidate",
+    "Bind platform candidate plus application/version/sourceDigest/artifactDigest/publicURL/exportSHA in every receipt; historical61URL and localc7ZIP cannot be combined",
+    "Any code change requires a new frozen candidate and affected retest scope; B existingc7local flows are independent prior evidence, not00fdpublic acceptance"
+  ],
+  "requiredChecks": [
+    "verify:static",
+    "verify:api",
+    "verify:runner",
+    "verify:e2e",
+    "infra-preflight",
+    "ci-gate"
+  ],
+  "noSkipNeutralOrUnknownAsSuccess": true,
+  "unresolvedSeriousDefectsMustBeZero": true,
+  "currentReleaseApproved": false,
+  "productionCover": "NOT_RUN",
+  "newCandidateDeployment": "NOT_RUN",
+  "privateHandoffRequested": "https://github.com/Echo-love928/CodeLess/pull/94#issuecomment-6577659974"
+}
