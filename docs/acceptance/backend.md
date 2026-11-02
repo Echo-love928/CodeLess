@@ -1,5 +1,26 @@
 # D28-A 候选版本服务端独立验收
 
+## 2026-11-02 第二次复审：统一候选与原阻塞闭环（当前）
+
+**结论仍HOLD；本轮没有声称修复历史EPERM/CLEANUP_FAILED，也没有部署或付费模型调用。** B已在PR95将A的a16ac25与B的80205692合为 **`00fd43333f35c5cb0cce425721fdce9cd1d0f956`**。本轮据此准备同源候选，独立worktree为 `.local-data/d28-a/unified-00fd433`，没有修改B文件或main。主分支仍2be。统一候选清单 `tests/release/api/d28-unified-candidate.json` 固定该源码/tree、API/JAR、client、worker及独立镜像；这是验收候选，不是根因修复或发布批准。
+
+本轮实际完成：
+
+- **精确00fd门禁六success**：[run41424603409](https://github.com/Echo-love928/CodeLess/actions/runs/41424603409)，`d28_ci_snapshot.py --head 00fd43333f35c5cb0cce425721fdce9cd1d0f956 --run 41424603409` 退出0；原日志私存，`evidence/d28-fix/ci-00fd433-2026-11-02T10-14-06.654200+00-00/result.json`。不继承a16或旧61成功，后续A交接HEAD自身检查另看PR。
+- **同源封存**：API manifest `3d0e52103de6bf1614bc751302566d51e6364459054fdbb4e6030cb8144486a9`，JAR仍 `d2c1bc7...`；client manifest `db83cd46801ab1c587cdb85e022533ec14735a6efe3b5301682cabc4f04f6fbe`；独立镜像 `sha256:e73196cae90d4f114cc1dd0c3e285524c3449a1b193e2befd49f8dcf05ccd445`，revision标签00fd、归档内容与配置摘要已核对。258个API源文件逐字节核对Git blob、JAR五迁移一致，API/client共享113文件全部相同。没有改共享策略tag或推送镜像。
+- **迁移/恢复**：新00fd JAR的空库/合成V4 dump→源cluster销毁→新cluster restore→迁移/权限等 **40项原生0**。另找回A机原D23机密备份，原manifest/dump摘要匹配，恢复至全新PG，用新候选JAR验证旧版本/源码/导出及权限 **22项原生0**；原备份字节不变，cleanupErrors=[]。这22项是真实历史生成数据（原模型mock），不是生产Linux绝对路径预览或新真实模型效果证明。原D23备份没有上传。
+- **新镜像真实回归**：封存API源码配明确e731镜像ID，真实Docker/Vue/Chromium正常路径通过；歧义目标按原要求ACTION_FAILED、worker exit1，两个build均0，容器/工作区/浏览器清理成功。回执在断言前保存。`evidence/d28-followup/unified-runtime.json` 记录两个场景、命令/原生0/摘要；不声称复现旧CLEANUP_FAILED。
+- **工具最小改动**：仅A允许范围内给 `existing_demo.py` 增加显式候选参数、`d28_attest.py` 增加候选/新输出参数；原默认和断言不变，新输出拒绝覆盖。`d28_live_identity.py`增加显式新候选/实际已安装manifest路径比较。8项原控制通过，路径越界/覆盖负对照按预期非零；新产物及原报告保持。
+
+尚未闭环的具体证据与下一步：
+
+1. **EPERM/CLEANUP_FAILED仍OPEN**。46份EPERM原JUnit/场景/journal及676107字节原CI API日志均复算匹配，47文件私有取证包SHA `2dcc9613a2b03c16cb290d330a6819b14f8aa7fb819632682a7db33b9fbf5488`，未上传。原EPERM仅存error.message而未存stack；原CLEANUP_FAILED在断言后才落报告，原同次runner/JUnit/句柄与拒绝栈缺失。当前GET旧run artifacts总数0，不能据此断言其历史上从未存在。`evidence/d28-followup/original-failure-chain.json`逐项列可用与缺失，rootCause=null；无法从新428/428倒推历史占用者。
+2. **有界带栈诊断受阻**。准备的 `d28_stack_trace.ps1` 仅启用独有命名的Kernel-File用户provider、stack、128MiB循环文件、7分钟截止；不改注册表或全局kernel logger。本次Windows UAC明确返回“operation canceled by user”，追踪未启动，两个原定向API用例没有执行；父记录器退出1、Maven退出null、JUnit=[]，不重启UAC或补0。脚本只有语法检查，实际stack捕获尚未验证。后续需原保留现场，或在用户再次允许且具备管理员会话时作一次有目标的新失败捕获；未确定机制前不写猜测性产品修复或添加重试。
+3. **新候选部署证明仍未通过**。已授权SSH只读将现部署与00fd清单比较，原生 **1**：运行JAR/worker/258源码/7web字节相同，但deployed记录、封存manifest和实际策略镜像仍61，三项失败。`evidence/d28-fix/live-identity-2026-11-02T10-25-19.254660+00-00.json`保留真实不匹配；旧61核验继续保留，不能当00fd已部署。根因/发布阻塞关闭后由部署维护者成组切换，再提供实际manifest路径，运行同一只读新候选比较入口。
+4. **真实质量/生产cover仍NOT_RUN**。现有主机模型凭据已配置，本轮不再称缺密钥；用户已明确授权本轮最多 **2元，额度不足即停止**，账号CNY/足额只读核验通过，证明仅私存。但原免凭据TLS前置12次中11次取得预期证书，第12次certs=0/subjectNONE/issuerNONE，原命令退出1；JVM探针和付费批次未到达。`evidence/d28-followup/real-admission.json`及原字节TLS观测保留；没有放宽证书门禁或重复求绿，新模型请求/支出0，本轮2元授权保留。`d28-real-acceptance-plan.json`给出00fd、原14样本/冻结运行时上限/无外层重试和当前官方峰值计价上界；旧fb79财务sidecar固定旧候选，不能借用其批准。需eval维护者绑定新候选并协调独占runner窗口；生产cover另需对应维护者完成新部署后的真实capture账本与已服务截图字节验收，不以本地截图代替。
+
+汇总 `tests/release/api/evidence/d28-followup/summary.json` 关联每份回执及SHA。T1本轮统一候选必需检查通过；T2仍未证明严重缺陷零；T3本轮迁移/恢复与包同源通过，但新部署比较失败；T4已执行部分有原始结果、完整验收仍不成立。M5保持HOLD。开发input/output/total与计量来源UNKNOWN；本轮付费模型请求0、合成累计请求/token UNKNOWN，分账记录。未批准、未合并。
+
 ## 2026-11-02 B复审后的当前修复状态
 
 PR94原精确HEAD `438c0f5` 的远端结果已取回：static/API/runner/infra success，**E2E和ci-gate failure**，[run41321844346](https://github.com/Echo-love928/CodeLess/actions/runs/41321844346)。79 passed、1 did not run、2 suite errors，原120秒suite/teardown截止；`evidence/d28-fix/ci-438c0f5-failure.json`及原日志/trace摘要保留。下面原“PENDING”仅是发布时快照，不再作为当前状态。

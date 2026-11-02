@@ -1,5 +1,6 @@
 """Independent raw-byte attestation of the explicitly selected new D28 API."""
 from datetime import datetime, timezone
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -17,10 +18,20 @@ def sha(data):
 
 
 def main():
-    selected = json.loads((BASE / 'd28-candidate.json').read_text(encoding='utf-8'))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--candidate', default='tests/release/api/d28-candidate.json')
+    parser.add_argument('--output', default='tests/release/api/evidence/d28/candidate-attestation.json')
+    args = parser.parse_args()
+    selected_path = (ROOT / args.candidate).resolve()
+    output = (ROOT / args.output).resolve()
+    if not selected_path.is_relative_to(BASE) or not output.is_relative_to(BASE / 'evidence'):
+        parser.error('Require task-owned registry and public evidence path')
+    if args.output != parser.get_default('output') and output.exists():
+        parser.error('Refuse evidence overwrite')
+    selected = json.loads(selected_path.read_text(encoding='utf-8'))
     package = (ROOT / selected['package']).resolve()
     head = selected['sourceCommit']
-    report = {'task': 'D28-A', 'candidate': head, 'command': [sys.executable, '-B', 'tests/release/api/d28_attest.py'],
+    report = {'task': 'D28-A', 'candidate': head, 'command': [sys.executable, '-B', 'tests/release/api/d28_attest.py', *sys.argv[1:]],
               'startedAt': datetime.now(timezone.utc).isoformat(), 'checks': [], 'status': 'RUNNING', 'exitCode': None}
     try:
         assert re.fullmatch('[0-9a-f]{40}', head) and package.is_relative_to(BASE / '.private/d28')
@@ -57,7 +68,8 @@ def main():
     except Exception as error:
         report.update(status='FAILED', exitCode=1, errorType=type(error).__name__)
     report['finishedAt'] = datetime.now(timezone.utc).isoformat()
-    (BASE / 'evidence/d28/candidate-attestation.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(report))
     return report['exitCode']
 
