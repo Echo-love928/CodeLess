@@ -1,0 +1,125 @@
+{
+  "task": "D28-B",
+  "command": [
+    "corepack",
+    "pnpm",
+    "ci:gate"
+  ],
+  "candidate": "2be793dc3318c2308d18a7fd45afb201342206a7",
+  "startedAt": "2026-11-02T00:21:19.170Z",
+  "completedAt": "2026-11-02T00:37:25.644Z",
+  "nativeExitCode": 1,
+  "signal": null,
+  "status": "FAILED",
+  "canonical": false,
+  "canonicalLimitation": "Acceptance-only untracked files were added during run; HEAD and all initially recorded source bytes unchanged. No product/contract/lock/CI edits.",
+  "changedOriginalSources": [],
+  "privateReceipt": ".local-data/d20-b/commands/2026-11-02T00-21-18.674Z-gate/run.json",
+  "privateReceiptSha256": "66581747bbf8c842c7a83168648559c1e070777265db186c7241ddc5a3d37dea",
+  "privateLog": ".local-data/d20-b/commands/2026-11-02T00-21-18.674Z-gate/command.log",
+  "logSha256": "022055a08af2539196a99f8934d65d4a514356ed90cb51a2dae969bec2db63ce",
+  "logBytes": 364428,
+  "stages": [
+    {
+      "stage": "verify:static",
+      "nativeParentObservedExitCode": null,
+      "nodeCounters": {
+        "tests": 64,
+        "pass": 64,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "uiPassed": [
+        212
+      ],
+      "suitePassed": [
+        27,
+        212
+      ],
+      "failed": null,
+      "didNotRun": null
+    },
+    {
+      "stage": "verify:api",
+      "nativeParentObservedExitCode": null,
+      "nodeCounters": {},
+      "uiPassed": [],
+      "suitePassed": [],
+      "failed": null,
+      "didNotRun": null
+    },
+    {
+      "stage": "verify:runner",
+      "nativeParentObservedExitCode": null,
+      "nodeCounters": {
+        "tests": 285,
+        "pass": 282,
+        "fail": 1,
+        "cancelled": 2,
+        "skipped": 0,
+        "todo": 0
+      },
+      "uiPassed": [],
+      "suitePassed": [],
+      "failed": null,
+      "didNotRun": null
+    },
+    {
+      "stage": "verify:e2e",
+      "nativeParentObservedExitCode": null,
+      "nodeCounters": {
+        "tests": 1,
+        "pass": 0,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "uiPassed": [],
+      "suitePassed": [
+        77
+      ],
+      "failed": 2,
+      "didNotRun": 1
+    }
+  ],
+  "firstApiJUnit": {
+    "tests": 305,
+    "failures": 1,
+    "errors": 110,
+    "skipped": 0
+  },
+  "setupFailures": [
+    "Testcontainers did not discover current Docker context; missing explicit DOCKER_HOST",
+    "NodeCoverGateway rejects symbolic NVM Node path; original 3 tests passed using same-version real Node path"
+  ],
+  "runnerFailures": [
+    "Maven wrapper persistent429 timeout25000ms",
+    "Maven wrapper404 childSIGTERM/null instead of22",
+    "D19 private canary browser test timeout30000ms"
+  ],
+  "fullProductStarted": false,
+  "retriedToCloseFailures": false,
+  "compileOnly": {
+    "mavenDependencyExitCode": 0,
+    "javacExitCode": 0,
+    "productAcceptance": false
+  },
+  "targetedCover": {
+    "command": [
+      "services/api/mvnw.cmd",
+      "-f",
+      "services/api/pom.xml",
+      "-Dtest=NodeCoverGatewayTest",
+      "test"
+    ],
+    "nativeExitCode": 0,
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "logSha256": "ef0688645def647a0671a58b4885a464d3f1382037bd302c2c69dd6fb33e021b"
+  }
+}
