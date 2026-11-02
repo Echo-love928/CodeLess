@@ -40,3 +40,5 @@ Node须使用真实路径；本机 `E:/nodejs` 是NVM符号链接，生产路径
 `python -B tests/release/browser/d28-api-summary.py --remaining-command <明确的api-remaining目录>` 校验原73份私存XML、补验17份XML的新鲜度/字节/原生退出，输出 `api-configured.json` 并原生1/HOLD。17类78项原生0不代表完整API原生0，90类报告也不等于428个case body均已执行。原完整门禁入口仍为 `corepack pnpm verify:api`。
 
 `python -B tests/release/browser/d28-archive.py --prior-worktree ../D27-B-work` 只读检查封存tar、镜像、259/11文件及258 Git blob/JAR；需先具备固定61提交Git对象和受保护的原件，不自动获取凭据或部署。每次保存新的独立结果目录、校验器SHA和真实argv，不提取归档、不做字节归一化。
+
+公开证据按采集原字节冻结：`evidence/d28/.gitattributes` 仅对本目录JSON设置 `-text`，禁止Git默认换行转换改变公开文件SHA。它不作用于产品、契约或私有原件，也不是CRLF/LF等价放行；旧报告提交ec212的12处发布字节差异单列 `serialization-audit.json`。`node tests/release/browser/d28-evidence-integrity.mjs` 直接读取Git blob验证23处公开引用；`--staged`检查索引。该检查通过只说明报告引用字节一致，不改变HOLD或任何功能/门禁结果。

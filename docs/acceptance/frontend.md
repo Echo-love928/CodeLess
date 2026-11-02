@@ -6,6 +6,8 @@ API恢复后的最终补验：剩余17类/78用例，原生0、failure/error/ski
 
 恢复后重新执行 `d28-record.mjs public`，原生0；当前匿名公网证据见 `public-run-receipt.json`、`public-result.json` 和新trace，初次记录另存 `public-initial-*`。最终汇总 `tests/release/browser/evidence/d28/summary.json` 逐项绑定15份实际证据SHA。两次配置API日志记录的12个测试容器均已不存在，未做全局清理，见 `resource-audit.json`。
 
+报告层字节修正：旧ec212提交的Git文本转换令12份JSON发布字节与采集SHA不同。当前仅在D28证据目录禁止JSON文本转换，按原采集字节入Git；原日志/产物/测试值未改，差异记录 `serialization-audit.json`。Git blob及索引的23处引用由 `d28-evidence-integrity.mjs` 直接逐字节验证，不用换行等价代替SHA相等，也不改变HOLD。
+
 - 分支：`codex/d28-b-candidate-acceptance`；[草稿 PR95](https://github.com/Echo-love928/CodeLess/pull/95)。
 - 基线：从实际 `git fetch origin main` 得到 `2be793dc3318c2308d18a7fd45afb201342206a7`，在独立 `D28-B-work` 工作树执行。原 main `782406964da6f727f632a55c17c7910495f0e1fb` 及其原有未提交改动未触碰。
 - 最新用户流程测试候选：`c707bb8a334358632c362d45fa8ad9fd51338c45`。之前209/c272/afd/4660分别是四个被保留的失败测试候选，不是通过候选。实际结果见 `tests/release/browser/evidence/d28/flow-final.json`。

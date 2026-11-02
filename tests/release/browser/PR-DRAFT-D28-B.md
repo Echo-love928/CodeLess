@@ -8,6 +8,7 @@ D28-B｜候选版本用户流程独立验收，**HOLD**。
 - 正确配置API原命令在重启恢复阶段中断，最终native未知；封存73类/316计数/22失败/error0/skip0，包含CLEANUP_TIMEOUT和前置不可用的连锁失败。仅补验未完成17类，78用例原生0；观察合计90类/394计数/22失败，不能声称428个case body全部通过或完整API原生0。原始失败不重跑求绿。
 - 恢复后重新只读公网检查原生0，正常DNS/TLS、1440/390px三路由刷新、资源字节、匿名保护及源码/元数据拒绝；匿名trace49条网络记录无凭据头。示例是D27历史站点，当前受保护API/worker/image身份仍UNKNOWN，未将本地ZIP与另一公网版本拼接为同源结论。
 - D27原件六项SHA、259/11文件、258源码blob与JAR已独立核验；gh原日志获取方式精确重现声明摘要，直接job接口产生另一组字节，未归一化放行。A的PR94@438c0f5当前E2E/ci-gate失败，独立审查记录三类结论；未批准或发送review/comment。
+- 公开JSON在D28自有证据目录以 `-text` 保存原采集字节，避免Git换行转换改变SHA。旧ec212的12处发布字节差异单列；23处公开引用直接校验Git blob/索引。原日志、产物和测试结果未改，HOLD不变。
 
 [验收记录](https://github.com/Echo-love928/CodeLess/blob/codex/d28-b-candidate-acceptance/docs/acceptance/frontend.md)、[交接](https://github.com/Echo-love928/CodeLess/blob/codex/d28-b-candidate-acceptance/docs/handoffs/D28-B.md)、[逐项证据汇总](https://github.com/Echo-love928/CodeLess/blob/codex/d28-b-candidate-acceptance/tests/release/browser/evidence/d28/summary.json)。原日志、认证trace、ZIP、备份和二进制保持私有；公开路径/长度/SHA及限定匿名截图/trace。
 
