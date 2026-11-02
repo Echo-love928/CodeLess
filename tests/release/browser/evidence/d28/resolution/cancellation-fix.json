@@ -1,0 +1,53 @@
+{
+  "task": "D28-B-confirmed-cancellation-fix",
+  "candidate": "7db2eaf9086c508d22785f7d1a8c329ba14bba93",
+  "rootCause": "After a successful terminal cancellation response, workbench updated task status but left event catch-up waiting for the existing subscription reconnect backoff. Under load the terminal history event exceeded the original five-second UI assertion.",
+  "implementation": "Reattach same task event history immediately for a terminal mutation response; subscription generation invalidates late old callbacks. No duplicate cancel/create, timeout/assertion/retry changes.",
+  "files": [
+    "apps/web/src/features/workbench/use-workbench-task.ts",
+    "apps/web/src/features/workbench/use-workbench-task.test.ts"
+  ],
+  "regressionBefore": {
+    "nativeExit": 1,
+    "tests": 14,
+    "passed": 13,
+    "failed": 1,
+    "log": {
+      "privatePath": ".local-data/d28-b/d06-regression-before-native.log",
+      "sha256": "5464a26f0db71cf2552982ee076fbdb1fd5eb5190feccf250bb834a214c89d99",
+      "bytes": 3007
+    }
+  },
+  "afterAllWebUnits": {
+    "nativeExit": 0,
+    "passed": 213,
+    "files": 27,
+    "log": {
+      "privatePath": ".local-data/d28-b/d06-web-unit-after.log",
+      "sha256": "6c30add6bc28136f0407b82ec1edc265e2b84e0676e3492baa3bda4bad642fd5",
+      "bytes": 1973
+    }
+  },
+  "initialToolLaunchFailure": {
+    "kind": "Corepack registry DNS ENOTFOUND before tests; used installed pinned Vitest directly",
+    "log": {
+      "privatePath": ".local-data/d28-b/d06-regression-before.log",
+      "sha256": "fd29513893ef67797a94a657bf7d6f409de29f432896f93d879b521b63be5cb4",
+      "bytes": 1411
+    }
+  },
+  "realBrowserRegression": {
+    "originalFullSuiteD06Assertion": "PASSED on7db",
+    "affectedOriginalBrowserFiles": "26/26 native0"
+  },
+  "evidenceLimitation": "Original f9 D06 trace was inspected during this session but not sealed before the next Playwright output cleanup and is no longer available. Do not claim a trace digest or deliverable original. Original CLI failure log remains sealed; deterministic before/after regression independently reproduces missing immediate catch-up. Later failing Playwright directory was copied privately before further runs.",
+  "Acoordination": "https://github.com/Echo-love928/CodeLess/pull/94#issuecomment-6578519170",
+  "retestScope": [
+    "all web units",
+    "events/recovery/auth browser files",
+    "full original verify:e2e (FAILED retained)",
+    "same7db independent two-user flow",
+    "exact7db remote four-stage/six-check CI separately verified"
+  ],
+  "unresolved": "D16 and historicalEPERM/ENOTEMPTY/CLEANUP_FAILED are distinct; not closed by this fix."
+}
