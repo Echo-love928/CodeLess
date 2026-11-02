@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '../../api/http'
 import taskFixture from '../../../../../contracts/examples/v0/valid/task.json'
+import eventFixture from '../../../../../contracts/examples/v0/valid/event.json'
 import { useWorkbenchTask } from './use-workbench-task'
 import { cancelTask, createTask, getTask } from './task-api'
 import { connectTaskEvents } from '../../lib/events/task-events'
@@ -16,6 +17,37 @@ beforeEach(() => {
 })
 
 describe('workbench action and lifecycle constraints', () => {
+  it('confirmed cancellation backfills terminal events without waiting for the old reconnect delay', async () => {
+    const state = useWorkbenchTask(async () => false)
+    await state.restore(running.applicationId, 'owner')
+    vi.mocked(createTask).mockResolvedValue(running)
+    await state.start('Build a page')
+    const old = vi.mocked(connectTaskEvents).mock.calls[0][0]
+    const stopOld = vi.mocked(connectTaskEvents).mock.results[0].value
+    const first = { ...eventFixture, taskId: running.id, sequence: 1 }
+    old.onEvents([first])
+    old.onConnection('reconnecting')
+    vi.mocked(cancelTask).mockResolvedValue({ ...running, status: 'FAILED', failureCode: 'CANCELLED' })
+
+    await state.cancel()
+
+    expect(stopOld).toHaveBeenCalledTimes(1)
+    expect(connectTaskEvents).toHaveBeenCalledTimes(2)
+    const current = vi.mocked(connectTaskEvents).mock.calls[1][0]
+    expect(current.taskId).toBe(running.id)
+    current.onEvents([first, { ...first, sequence: 2, type: 'TASK_FAILED', stage: 'FAILED' }])
+    current.onConnection('complete')
+    old.onEvents([])
+    old.onConnection('reconnecting')
+    old.onTask(running)
+    expect(state.events.value.map(value => value.sequence)).toEqual([1, 2])
+    expect(state.connection.value).toBe('complete')
+    expect(state.task.value?.failureCode).toBe('CANCELLED')
+    expect(createTask).toHaveBeenCalledTimes(1)
+    expect(cancelTask).toHaveBeenCalledTimes(1)
+    state.dispose()
+  })
+
   it('failed cancellation keeps the active task; pending cancellation cannot retry', async () => {
     const state = useWorkbenchTask(async () => false)
     vi.mocked(createTask).mockResolvedValue(running)

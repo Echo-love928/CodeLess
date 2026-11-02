@@ -169,7 +169,13 @@ export function useWorkbenchTask(onError: (error: unknown) => Promise<boolean>) 
     cancelling.value = true; error.value = ''
     try {
       const value = await cancelTask(id, appId)
-      if (version === epoch) { updateTask(value); void loadDiagnostics(id, version) }
+      if (version === epoch) {
+        updateTask(value)
+        // A confirmed terminal mutation must not wait for an older SSE backoff
+        // before fetching the final durable events. attach invalidates old callbacks.
+        if (!running(value)) attach(id, version)
+        else void loadDiagnostics(id, version)
+      }
     } catch (cause) {
       await report(cause, version)
       if (version === epoch && task.value?.id === id && running(task.value) && error.value && cause instanceof ApiError && ['network', 'server'].includes(cause.kind))
