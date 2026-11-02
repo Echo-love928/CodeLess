@@ -134,7 +134,7 @@ try {
   assert.equal(report.sql.publications.length, 2)
   assert.ok(report.sql.publications.every(p => p.status === 'PUBLISHED'))
   assert.equal(report.sql.builds.filter(b => b.status === 'SUCCEEDED' && b.exitCode === 0).length, 4)
-  assert.equal(report.sql.builds.filter(b => b.status === 'FAILED' && b.exitCode !== null && b.exitCode !== 0).length, 3)
+  assert.equal(report.sql.builds.filter(b => b.status === 'FAILED' && b.exitCode !== null && b.exitCode !== 0).length, 4)
   assert.ok(report.sql.models.length > 0 && report.sql.models.every(m => m.provider === 'deterministic-mock'))
   report.status = 'PASSED'
 } catch (error) {

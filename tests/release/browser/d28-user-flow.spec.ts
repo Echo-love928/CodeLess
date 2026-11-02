@@ -227,7 +227,9 @@ test('D28-B T1–T3: real repair and responsive routes; two isolated users gener
     const failedResponse = await failing; expect(failedResponse.status()).toBe(202)
     const failedTask = (await failedResponse.json()).task.id
     ids.failedTaskId = failedTask; await persist()
-    const failure = await terminal(a.page, failedTask, 'FAILED')
+    // Repair-enabled bare done re-verifies the unchanged failed candidate once
+    // before the production no-progress stop: this is also a two-build task.
+    const failure = await terminal(a.page, failedTask, 'FAILED', 120_000)
     expect(failure.failureCode).toBe('AGENT_REPAIR_NO_PROGRESS')
     await expect(a.page.getByRole('region', { name: '组件修改任务', exact: true })).toContainText('旧版本仍可用')
     expect((await get(a.page, 'applications/' + a.app)).latestReadyVersionId).toBe(a.edited)
