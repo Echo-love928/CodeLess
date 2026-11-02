@@ -34,3 +34,9 @@ Node须使用真实路径；本机 `E:/nodejs` 是NVM符号链接，生产路径
 `d28-record.mjs` 的 flow/public/api/e2e/gate 模式记录原生命令、退出/信号、HEAD、输入字节摘要和私有日志摘要，不重试。gate仅在父进程复用已有被动 stage-observer，记录原 ci-gate 各阶段退出；不注入子进程。原门禁生成的历史 evidence 文件先私存新字节再恢复旧字节，避免覆盖历史证据。
 
 全部新运行在 `.local-data/d28-b/`；认证 trace、ZIP、原日志只保留本机，公开证据提供其长度/摘要/定位。匿名 trace 经请求头检查后方可公开。最终结果以 `evidence/d28/`、`docs/acceptance/frontend.md` 与 `docs/handoffs/D28-B.md` 为准。缺凭据/部署证明及同伴失败必须保留 BLOCKED/HOLD，不能由局部绿测推导 M5。
+
+恢复补验：原正确配置API命令在重启恢复阶段失联，未留下最终native；73类JUnit中316计数/22失败已由 `d28-api-audit.py` 一次性私存，原receipt不重写。`d28-api-remaining.mjs` 仅对固定候选c707下缺少完整新JUnit的17类补验，输入见 `evidence/d28/api-remaining-plan.json`（执行现场副本位于 `.local-data/d28-b/api-remaining-plan.json`）；已失败套件不重跑。该脚本是此次冻结现场的恢复记录器，不是任意HEAD的完整门禁替代入口。
+
+`python -B tests/release/browser/d28-api-summary.py --remaining-command <明确的api-remaining目录>` 校验原73份私存XML、补验17份XML的新鲜度/字节/原生退出，输出 `api-configured.json` 并原生1/HOLD。17类78项原生0不代表完整API原生0，90类报告也不等于428个case body均已执行。原完整门禁入口仍为 `corepack pnpm verify:api`。
+
+`python -B tests/release/browser/d28-archive.py --prior-worktree ../D27-B-work` 只读检查封存tar、镜像、259/11文件及258 Git blob/JAR；需先具备固定61提交Git对象和受保护的原件，不自动获取凭据或部署。每次保存新的独立结果目录、校验器SHA和真实argv，不提取归档、不做字节归一化。
