@@ -1,5 +1,43 @@
 # D28-B 候选版本用户流程独立验收
 
+## 2026-11-02 统一候选修复与补验（当前结论）
+
+**HOLD，M5 未通过，未批准、未合并、未部署新候选。** 统一候选 `00fd43333f35c5cb0cce425721fdce9cd1d0f956` 合入 A PR94@a16ac252 的调度与 Java 可移植性修复；再以 `c7c75efdcef2e2b7fda33e99e7a13ce40c72ed7a` 修复短租约测试夹具，并补齐预览构建终止诊断。两份候选各自精确 SHA 的远端六项检查均全部 completed/success；它们不覆盖本机原失败。后续证据/校验工具提交使用其自身 CI，不继承 c7 检查。
+
+最新逐项证据：`tests/release/browser/evidence/d28/followup/summary.json`。原 c707、802、438 等执行记录及所有原失败均保留，以下历史内容不作为当前 SHA 的检查结论。
+
+| 执行范围 / 固定源码 | 原生结果与证据 |
+| --- | --- |
+| Windows 完整四阶段 / 00fd433 | static0；API1（428项、2失败、0错误/跳过、90份新JUnit）；runner1（279/285、4失败/2取消/0跳过）；E2E1（72通过/5失败/3未运行，后续完整平台suite未启动）；ci-gate1。源码/HEAD前后相同，初末工作区干净。`followup/gate.json` |
+| 修复影响范围 / c7c75ef | 仅恢复全类6项与预览1项，原生1：恢复6/6通过；预览1失败。构建原生0、5518ms，后续GET任务收到HTTP502；同次ingress记录upstream504,502、request60.040s。根因UNKNOWN，未延长30秒构建截止或放宽断言。`followup/affected-api.json` |
+| Maven/D19 单独诊断 / c7c75ef | 原生0，11项通过；串行文件调度，私有观察器只记录原sh/taskkill的spawn/exit/close/kill事件，没有新增终止、重试或放宽限制。本次未复现异常终止，不能替代完整runner门禁或关闭历史原因。`followup/runner-diagnostic.json` |
+| 两用户全链路 / c7c75ef | 原生0、浏览器0、canonical=true、cleanupErrors=[]；真实PG/Docker/Vue/Chromium，登录→生成→真实编译失败→REPAIR→编辑→显式发布→ZIP下载；两用户权限、离线重连、预览过期恢复、失败后保留旧版本、错误版本下载拦截通过。两用户各1440/390宽度与三路由，共12条刷新/无横向溢出观测。`followup/flow.json` |
+| 精确SHA远端 / 00fd433、c7c75ef | 各自六success，原日志私存、获取命令和摘要公开；c7实际日志含API428/0/0/0、runner285、E2E80、完整平台browserExit0。`followup/ci-*.json` |
+| 证据接纳与工具链 | 8项控制原生0；默认沙箱临时目录权限错误不当作产品失败，使用任务内临时目录。旧23引用与新增10引用直接核对Git blob/索引，校验通过不代表M5通过。 |
+
+### 最小修复与范围扩展
+
+- `services/api/src/test/java/dev/codeless/api/recovery/RecoveryConvergenceTest.java`：原来claim一秒租约后再freezeSource/创建多份文件，检查有效租约时已可能过期。把不依赖claim的文件准备前移；保留一秒租期、1200ms等待及有效/过期/迟到READY/清理断言，未改生产队列逻辑。新恢复全类6项通过，仅关闭该夹具时序问题，不关闭历史事故。
+- `tests/e2e/preview/platform.acceptance.mjs`：原断言遗漏原生signal/error，使status=null无法辨别终止原因。新增任务私有`platform-build.json`，仅记录耗时、状态、信号、错误码/消息；不记录环境或会话，保留原30秒截止与成功断言。原全量失败与新502分别保存，没有重试到绿。
+- 以上两项为共同API验收入口的必要最小范围扩展，已向A提交具体文件、影响和方案：[联合定位交接](https://github.com/Echo-love928/CodeLess/pull/94#issuecomment-6575565193)。A已审调度配置随统一候选合入。无生产源码、公共契约、依赖锁、CI、迁移或生产配置变更。
+- 最终追加证据与证据校验器；产品与业务用例输入保持c7，重测范围为证据字节校验及最终精确HEAD远端门禁，不能沿用旧SHA检查结论。
+
+### 仍需关闭的阻塞与交接
+
+B负责本机runner/E2E失败与Windows原ENOTEMPTY现场：完整runner新增D07空启动标记、cover捕获失败、Maven恢复子进程status=null、D19截止/清理证明失败；D19 CPU用例同次结果为CLEANUP_TIMEOUT、browserClosed=false/processTreeTerminated=false。新单独11项通过不关闭这些失败。需要同次原生终止/句柄生命周期证据、确认机制后的最小修复和新候选受影响重测；不删除断言或加重试。
+
+A与B联合处理预览API：新c7预览已通过真实构建并进入鉴权UI，但任务读取出现502，代理记录上游504后502；需关联同次API/连接/代理时间线定位，不推断是模型、Vite或生产故障。当前两轮已保留不同失败，停止无计划重复整套测试。A原EPERM、历史CLEANUP_FAILED与ENOTEMPTY原因仍OPEN；原B中断日志及73份XML重算全部匹配，原最终native仍UNKNOWN，不补成零。
+
+新流程的URL、部署和ZIP在**本地独立HTTPS托管fixture**内按版本/源码/产物摘要核对；真实公网仍是61。A对现部署61的9项只读取证已审阅，不能标注新候选已部署或将历史公网与本地ZIP拼为同源证明。新候选公网部署/下载/源码成组身份、真实模型质量、生产cover及规范备份独立验收仍受阻。阻塞未关闭及另一成员未批准前保持草稿，不合并。
+
+### 证据与资源边界
+
+原日志、认证trace、ZIP、内核/线程原现场私存；公开限定投影和SHA。五秒进程采样按启动时间修正PID复用，6个不满足时序的身份被排除；未发现已验证身份的本轮残留，未终止任何其他进程。采样不能证明未采到的句柄不存在。线程栈只读观测过主线程校验快照，未据此归因历史故障。两张公开截图只展示静态目录占位页，不证明CRUD或真实模型质量。
+
+付费模型请求0；本次专项17次明确mock，合成用量不冒充实测；开发input/output/total及跨全量实际累计用量UNKNOWN，分账记录。main本地指针7824069、远端基线2be793d未修改。
+
+## 以下为历史初始执行记录
+
 结论：**HOLD，M5 未通过，PR 保持草稿。** 本卡独立全链路专项已完整通过：原生0、浏览器1/1、两个普通用户、4个READY/1个真实FAILED、4成功/4失败build、2个PUBLISHED、cleanupErrors=[]，canonical=true。 新增用户流程专项与原四阶段门禁分账；任何局部通过均不覆盖原失败、取消、未执行或未知状态。
 
 API恢复后的最终补验：剩余17类/78用例，原生0、failure/error/skip均0；与已封存73类合看90类报告、394个框架计数、22失败/error0/skip0。原完整命令最终native仍UNKNOWN，setup失败阻止的case body不补成成功。汇总器原生1/HOLD不是原完整API的退出码。

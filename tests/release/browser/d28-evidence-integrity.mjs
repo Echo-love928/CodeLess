@@ -15,6 +15,7 @@ const hash = bytes => createHash('sha256').update(bytes).digest('hex')
 let checked = 0
 const verify = (path, expected) => { assert.match(expected, /^[a-f0-9]{64}$/); assert.equal(hash(read(path)), expected, path); checked++ }
 for (const entry of Object.values(json('summary.json').evidence)) verify(entry.path, entry.sha256)
+for (const entry of Object.values(json('followup/summary.json').evidence)) verify(entry.path, entry.sha256)
 for (const entry of json('runtime-usage.json').runs) {
   assert.match(entry.receipt, /^flow-[a-z-]+\.json$/)
   verify(prefix + entry.receipt, entry.sha256)

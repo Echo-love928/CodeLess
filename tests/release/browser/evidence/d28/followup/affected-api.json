@@ -1,0 +1,95 @@
+{
+  "head": "c7c75efdcef2e2b7fda33e99e7a13ce40c72ed7a",
+  "command": [
+    "C:\\WINDOWS\\system32\\cmd.exe",
+    "/d",
+    "/c",
+    "services\\api\\mvnw.cmd",
+    "-f",
+    "services/api/pom.xml",
+    "-Dtest=RecoveryConvergenceTest,PreviewPlatformIntegrationTest",
+    "verify"
+  ],
+  "startedAt": "2026-11-02T11:21:08.447Z",
+  "completedAt": "2026-11-02T11:26:50.700Z",
+  "status": "FAILED",
+  "exitCode": 1,
+  "signal": null,
+  "headUnchanged": true,
+  "sourceBytesUnchanged": true,
+  "changedSources": [],
+  "privateReceipt": ".local-data/d28-b/commands/2026-11-02T11-21-06.970Z-affected-api/run.json",
+  "receiptSha256": "55b59c0ccaf8fbc387aa66f8fb9be80d5be7bed4e90ec4c2f854d9a6c4c017a6",
+  "privateLog": ".local-data/d28-b/commands/2026-11-02T11-21-06.970Z-affected-api/command.log",
+  "logSha256": "a90345395246e41b4ec3d3e0c145dff50e304be6d8c5b951d82e6008611681a2",
+  "scope": "Only RecoveryConvergenceTest (6) and PreviewPlatformIntegrationTest (1), not full API",
+  "junit": [
+    {
+      "name": "dev.codeless.api.preview.PreviewPlatformIntegrationTest",
+      "tests": "1",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": ".local-data/d28-b/commands/2026-11-02T11-21-06.970Z-affected-api/junit/TEST-dev.codeless.api.preview.PreviewPlatformIntegrationTest.xml",
+      "sha256": "37310ed85b57fe827e473f9d6144c1144468efde177e5d2d16731b538968effe"
+    },
+    {
+      "name": "dev.codeless.api.recovery.RecoveryConvergenceTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": ".local-data/d28-b/commands/2026-11-02T11-21-06.970Z-affected-api/junit/TEST-dev.codeless.api.recovery.RecoveryConvergenceTest.xml",
+      "sha256": "610ee74d374093212c1a16cf7388f9ba6a5053ca562ce12e3f08b744e3406fd8"
+    }
+  ],
+  "totals": {
+    "tests": 7,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0
+  },
+  "previewBuild": {
+    "timeoutMs": 30000,
+    "elapsedMs": 5518,
+    "status": 0,
+    "signal": null,
+    "error": null
+  },
+  "previewBuildPrivateReceipt": {
+    "path": "services/api/target/preview-platform-4ff6c4e8-62a2-4742-8a1b-09b1ae3b7e61/evidence/platform-build.json",
+    "sha256": "fc96c2a420c3da55a2f0d7b94c367af120242b32273f974a59a440b37915ee0f"
+  },
+  "newPreviewFailure": {
+    "kind": "PLATFORM_HTTP_NON_JSON",
+    "route": "/api/v0/tasks/:id",
+    "status": 502,
+    "ingressCaptureNativeExit": 0,
+    "observations": [
+      {
+        "route": "task",
+        "at": "2026-11-02T11:25:00+00:00",
+        "status": 502,
+        "requestSeconds": "60.040",
+        "connectSeconds": "-, -",
+        "headerSeconds": "-, -",
+        "responseSeconds": "60.045, 0.000",
+        "upstreamStatus": "504, 502"
+      },
+      {
+        "route": "task",
+        "at": "2026-11-02T11:25:00+00:00",
+        "status": 502,
+        "requestSeconds": "0.000",
+        "connectSeconds": null,
+        "headerSeconds": null,
+        "responseSeconds": "0.000",
+        "upstreamStatus": "502"
+      }
+    ],
+    "privateTimingReceipt": "services/api/target/preview-platform-4ff6c4e8-62a2-4742-8a1b-09b1ae3b7e61/evidence/ingress-api-timings.json",
+    "timingReceiptSha256": "55b8e7825ab23091bb7f4345b9405b7add184ed56b92ce6d3c73b167a0284186",
+    "rootCause": "UNKNOWN"
+  },
+  "leaseFixtureFix": "Six recovery cases pass after filesystem setup moved before claim; original1s lease/1200ms wait/assertions retained"
+}
