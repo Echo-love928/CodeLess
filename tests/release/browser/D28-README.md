@@ -17,6 +17,8 @@ Node须使用真实路径；本机 `E:/nodejs` 是NVM符号链接，生产路径
 
 `d28-flow.mjs` 和 `d28-user-flow.spec.ts` 从基线 D20 完整业务验收复制基础设施与原断言，仅在本卡允许目录独立扩展，未替换原门禁。`D28FixtureApplication.java` 只在测试 classpath 编译，不进入生产 JAR，也没有生产 profile/HTTP 开关。明确的 deterministic-mock 首次提供缺组件导入；真实 Docker 构建失败，生产 REPAIR 用可信源码摘要更新导入，再真实构建和 Chromium 验证。两个全新普通用户分别完成登录、生成、修复、共享组件编辑、显式发布、下载和 ZIP 独立核验。每个用户还验证桌面/390px 移动端三路由、刷新和横向溢出。
 
+本卡mock每次调用声明100输入/100输出/200合计的**合成预算fixture值**，标记 `DECLARED_SYNTHETIC_NOT_MEASURED`，不能充当模型实测用量。首轮继承unknown usage时，第5次REPAIR调用被真实保守预算拒绝，`AGENT_MODEL_BUDGET_EXCEEDED`；原失败回执保留。改为显式合成账本用于测试后续流程，生产预算、未知记账、模型凭据与既有断言不变。
+
 保留原跨用户404、过期编辑409、错误摘要拒绝、真实离线恢复、错误版本下载拦截与历史源码核验。新增用例启用修复，因此末尾明确语法错误后的 bare done 应以 `AGENT_REPAIR_NO_PROGRESS` 终止；它必须保留旧预览、发布和源码。SQL断言实际失败构建3个、成功构建4个，不能用模型声明代替结果。新用例独立截止240秒/总260秒、零重试；原必需用例的超时/断言/重试不变。
 
 该本地链使用显式 loopback DNS/自签 TLS/托管 probe fixture，生产公网探测限制不变。它不证明公网部署或真实模型效果。Tasks/Catalog 是受控模板占位页；路由检查不宣称已生成任务 CRUD/目录筛选功能。

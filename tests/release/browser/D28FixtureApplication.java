@@ -63,7 +63,11 @@ public class D28FixtureApplication {
                         ((ObjectNode) arguments).put("content", "<script setup lang=\"ts\">const broken = ;</script><template><p>broken</p></template>");
                     content = output.toString();
                 }
-                return new Reply(content, new Evidence(model(), "d28-explicit-fixture", "d28-explicit-fixture", Usage.unknown()));
+                // Declared synthetic fixture accounting, not measured model tokens.
+                // Unknown usage conservatively exhausts the production budget before
+                // a fifth repair call. Never weaken that production reservation.
+                return new Reply(content, new Evidence(model(), "d28-explicit-synthetic-usage-fixture", "d28-explicit-synthetic-usage-fixture",
+                        new Usage(100, 100, 200, json.valueToTree(Map.of("measurement", "DECLARED_SYNTHETIC_NOT_MEASURED", "paidRequests", 0)))));
             }
         };
     }

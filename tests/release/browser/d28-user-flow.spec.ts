@@ -32,8 +32,9 @@ async function terminal(page: Page, id: string, expected = 'READY') {
   let state: any
   await expect.poll(async () => {
     state = await get(page, 'tasks/' + id)
-    return ['READY', 'FAILED'].includes(state.status) ? state.status : 'RUNNING'
-  }, { timeout: 60_000, intervals: [200, 500, 1000], message: 'Real task ' + id + ' terminal state' }).toBe(expected)
+    return ['READY', 'FAILED'].includes(state.status)
+  }, { timeout: 60_000, intervals: [200, 500, 1000], message: 'Real task ' + id + ' terminal state' }).toBe(true)
+  expect(state.status, 'Authoritative terminal state for ' + id).toBe(expected)
   return state
 }
 type Actor = { page: Page; context: BrowserContext; app: string; generation: string; original: string; edited?: string; edit?: string; publication?: any; downloadDigest?: string }
