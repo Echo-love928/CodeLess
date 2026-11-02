@@ -1,5 +1,27 @@
 # D28-A 候选版本服务端独立验收
 
+## 2026-11-02 原包及共享预算已转入受控远端目录（当前）
+
+已按用户本次明确交付授权，将**原统一包**复制到既有VPS的独立SSH/SFTP目录 `/srv/codeless-handoff/d28/20261102-cny2`（root:0700，不在生产web/生成容器挂载目录）。没有重建/重新打包、开HTTP端口或切换生产。包 `unified-00fd-kit.tar` 为167813120字节，服务器独立SHA256仍为 `52e49be4fca54ca6b09ca77846bfd5453ef68c84026ccd484e6017ecf216c206`，文件0440；控件/原清单/工具也逐项核对原字节。README小文件与首次校验会话的传输中断保留，仅补小文件后单会话完成校验。
+
+A额外全量回读在600秒时限内超时（父进程1，scp终态未知），已读59146240字节的前缀SHA与原包一致；不冒称完整回读成功或B已完成下载。服务器已对完整原包计算SHA成功，B可用无该诊断时限的scp或SFTP `reget`续传后验证完整SHA；说明位于远端 `DOWNLOAD-NOTE.md`。
+
+B使用自己的D27既有VPS SSH身份（无需A的F盘或私钥路径）：
+
+```sh
+scp root@23.136.172.128:/srv/codeless-handoff/d28/20261102-cny2/unified-00fd-kit.tar ./unified-00fd-kit.tar
+scp root@23.136.172.128:/srv/codeless-handoff/d28/20261102-cny2/ACCESS.json ./ACCESS.json
+ssh root@23.136.172.128 python3 /srv/codeless-handoff/d28/20261102-cny2/d28_shared_budget.py status
+```
+
+`ACCESS.json`给出B解包后的组件路径和显式校验命令；原selection中的A路径仅作来源证明，不修改原manifest来迁就路径。操作手册 `tests/release/api/D28-B-CONTROLLED-HANDOFF.md` 与远端README相同。
+
+**共同预算只有一份权威账本**：远端 `budget-ledger.sqlite3`，快照 `budget-ledger.json`；ledgerId `e5762985-8989-410e-9d15-b58a83d7451e`，初始revision1。用户本轮累计上限2元，A已确认支出0并冻结后续付费启动，执行方交B。B先前用量未知，未由A猜成0：B用机器调用/活跃任务清单完成claim-b前，spendable=0；remainingAfterKnownExposure=2只是扣除已知占用后的上界。任何已发生/未知B用量先对账，不重置或另开2元账本。
+
+共享控制器以SQLite事务串行预约，一次仅一个活跃任务，按原50000tokens/峰值输出价先留0.4元；失败调用计费，未知保留0.4元，未确认进程结束不释放，重复样本/超额拒绝。事件链校验、只读快照与去敏用量投影均已实现；本机6/6、VPS6/6原生0，均为财务fixture，不发模型调用。A新SSH读取会话已成功查询真实账本及事件链；没有冒称已在B独立主机执行其SSH身份。
+
+证据 `tests/release/api/evidence/d28-transfer/transfer.json`、`server-delivery.json`、`ledger-initial-readback.json`；B须从实时status取余额，不依赖Git中的静态快照。此处只关闭“B取不到原包/共同账本”的A侧交付缺口，历史根因、新部署、真实质量、生产cover及M5仍HOLD；未批准、未合并。
+
 ## 2026-11-02 第二次复审：统一候选与原阻塞闭环（当前）
 
 **结论仍HOLD；本轮没有声称修复历史EPERM/CLEANUP_FAILED，也没有部署或付费模型调用。** B已在PR95将A的a16ac25与B的80205692合为 **`00fd43333f35c5cb0cce425721fdce9cd1d0f956`**。本轮据此准备同源候选，独立worktree为 `.local-data/d28-a/unified-00fd433`，没有修改B文件或main。主分支仍2be。统一候选清单 `tests/release/api/d28-unified-candidate.json` 固定该源码/tree、API/JAR、client、worker及独立镜像；这是验收候选，不是根因修复或发布批准。

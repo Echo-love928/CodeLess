@@ -1,0 +1,23 @@
+{
+  "task": "D28-A-transfer",
+  "at": "2026-11-02T13:49:43.988038+00:00",
+  "command": [
+    "python",
+    "-B",
+    "tests/release/api/test_d28_shared_budget.py"
+  ],
+  "exitCode": 0,
+  "logSha256": "975c59e118d19a468e23d59e0b21f7e537766abf66985e912a5f4a7216fbb384",
+  "sourceSha256": "df10369ec17284ea51b3263b91432a4c115a4e6f373b56fa6a265623e433575b",
+  "scope": "Financial fixture tests only, no model calls/spending",
+  "initialAttempt": {
+    "exitCode": 1,
+    "source": "Initial direct tool output; diagnostic projection, not a reconstructed raw log",
+    "errors": 2,
+    "causes": [
+      "Test snapshot read omitted UTF8 on Windows GBK locale",
+      "Test-only tamper connection was committed but not closed before temporary-directory cleanup"
+    ],
+    "fix": "Explicit UTF8 and close fixture sqlite handle; no assertion, retry, limit or isolation changes"
+  }
+}
