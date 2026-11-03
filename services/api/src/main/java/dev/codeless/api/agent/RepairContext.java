@@ -187,6 +187,25 @@ final class RepairContext {
     static JsonNode compactInput(JsonNode input,JsonNode originalActions) {
         var json=JsonMapper.builder().build();
         var compact=(tools.jackson.databind.node.ObjectNode)compactCompletion(input,originalActions).deepCopy();
+        compactToolDefinitions(compact);
+        for(var observed:compact.path("observations"))if(observed.isObject()) {
+            var receipt=(tools.jackson.databind.node.ObjectNode)observed;
+            receipt.remove("callId");
+            for(var name:new ArrayList<>(receipt.propertyNames()))if(receipt.path(name).isNull())receipt.remove(name);
+            if(receipt.has("afterDigest")&&receipt.path("beforeDigest").equals(receipt.path("afterDigest")))receipt.remove("beforeDigest");
+        }
+        for(var file:compact.path("sourceFiles"))if(file.isObject()&&file.path("digest").isTextual()) {
+            for(var receipt:compact.path("observations"))if(receipt.path("status").asText().equals("SUCCEEDED")
+                    &&!receipt.path("stale").asBoolean()&&receipt.path("path").equals(file.path("path"))
+                    &&receipt.path("afterDigest").equals(file.path("digest"))) {
+                ((tools.jackson.databind.node.ObjectNode)file).remove("digest");break;
+            }
+        }
+        return compact.toString().getBytes(StandardCharsets.UTF_8).length<input.toString().getBytes(StandardCharsets.UTF_8).length?compact:input;
+    }
+    /** Lossless factoring shared by GENERATE and REPAIR; unfamiliar schemas retain their full definitions. */
+    static void compactToolDefinitions(tools.jackson.databind.node.ObjectNode compact) {
+        var json=JsonMapper.builder().build();
         var rules=json.createObjectNode();var signatures=json.createArrayNode();
         var toolNames=new HashSet<String>();
         boolean supported=compact.path("tools").isArray()&&!compact.path("tools").isEmpty();
@@ -214,20 +233,6 @@ final class RepairContext {
             compact.set("tools",signatures);compact.set("toolArgumentSchemas",rules);
             compact.put("toolArgumentPolicy","All requiredArguments are mandatory; no other argument keys are allowed.");
         }
-        for(var observed:compact.path("observations"))if(observed.isObject()) {
-            var receipt=(tools.jackson.databind.node.ObjectNode)observed;
-            receipt.remove("callId");
-            for(var name:new ArrayList<>(receipt.propertyNames()))if(receipt.path(name).isNull())receipt.remove(name);
-            if(receipt.has("afterDigest")&&receipt.path("beforeDigest").equals(receipt.path("afterDigest")))receipt.remove("beforeDigest");
-        }
-        for(var file:compact.path("sourceFiles"))if(file.isObject()&&file.path("digest").isTextual()) {
-            for(var receipt:compact.path("observations"))if(receipt.path("status").asText().equals("SUCCEEDED")
-                    &&!receipt.path("stale").asBoolean()&&receipt.path("path").equals(file.path("path"))
-                    &&receipt.path("afterDigest").equals(file.path("digest"))) {
-                ((tools.jackson.databind.node.ObjectNode)file).remove("digest");break;
-            }
-        }
-        return compact.toString().getBytes(StandardCharsets.UTF_8).length<input.toString().getBytes(StandardCharsets.UTF_8).length?compact:input;
     }
     List<JsonNode> observations(){return List.copyOf(latest.values());}
     JsonNode sourceFiles(){return sourceFiles;}

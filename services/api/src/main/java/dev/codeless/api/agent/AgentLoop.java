@@ -145,6 +145,7 @@ public final class AgentLoop implements TaskStageRunner {
                     request=input(stage,context,plan,local,edit,true,true,observations,failure,originalActions,repairContext,meter,componentIds);
                 }
             }
+            if(!repair) request=GenerationContext.compactInput(request);
             // A reply may name only a tool this very request offered.
             Set<String> offered=new HashSet<>();request.path("tools").forEach(t -> offered.add(t.path("name").asText()));
             JsonNode reply=model.call(claim,stage,policy,request);

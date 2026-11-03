@@ -14,6 +14,16 @@ final class GenerationContext {
         }
         return false;
     }
+    /** Preserve plan, acceptance and every source byte; only factor repeated registry rules and audit IDs.
+     * Apply from the first request so earlier input usage cannot starve the last planned file. */
+    static JsonNode compactInput(JsonNode input) {
+        var compact=(ObjectNode)input.deepCopy();
+        RepairContext.compactToolDefinitions(compact);
+        for(var observed:compact.path("observations")) if(observed.isObject())
+            ((ObjectNode)observed).remove("callId");
+        return compact.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8).length
+                <input.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8).length?compact:input;
+    }
     static List<JsonNode> observations(List<JsonNode> actual) {
         if(actual.size()<2) return List.copyOf(actual);
         var result=new ArrayList<JsonNode>();
