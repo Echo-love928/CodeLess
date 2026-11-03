@@ -1,17 +1,22 @@
 import { spawnSync } from 'node:child_process';
-import { openSync, closeSync, writeFileSync, mkdirSync } from 'node:fs';
+import { openSync, closeSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { environment } from '../e2e/full/support.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
-const configured = process.argv.includes('--configured') || process.argv.includes('--configured-static');
-const output = resolve(root, 'tests/release/d29-evidence', configured ? (process.argv.includes('--configured-static') ? 'configured-static' : 'configured') : process.argv.includes('--network-enabled') ? 'network-enabled' : '.');
+const configuredMode = process.argv.find(arg => ['--configured', '--configured-static', '--configured-api'].includes(arg));
+const configured = !!configuredMode;
+const runId = process.argv.find(arg => arg.startsWith('--run-id='))?.slice(9);
+if (runId !== undefined && !/^[A-Za-z0-9_-]+$/.test(runId)) throw new Error('Invalid run ID');
+const output = resolve(root, 'tests/release/d29-evidence', configured ? configuredMode.slice(2) : process.argv.includes('--network-enabled') ? 'network-enabled' : '.', runId ?? '.');
 mkdirSync(output, { recursive: true });
 const env = configured ? environment() : process.env;
 if (configured) env.DOCKER_HOST = 'npipe:////./pipe/dockerDesktopLinuxEngine';
 const receipt = { baseline: 'aefaca193af3019bcadbcf8fdf3f6424baee750c', scope: 'D29 documentation branch; no production deployment or human rehearsal', node: process.version, configuredToolchain: configured, javaHome: env.JAVA_HOME ?? null, commands: [] };
-const stages = configured ? (process.argv.includes('--configured-static') ? ['verify:static'] : ['ci:gate']) : ['verify:static', 'verify:api', 'verify:runner', 'verify:e2e', 'ci:gate'];
+const stages = configured ? (configuredMode === '--configured-static' ? ['verify:static'] : configuredMode === '--configured-api' ? ['verify:api'] : ['ci:gate']) : ['verify:static', 'verify:api', 'verify:runner', 'verify:e2e', 'ci:gate'];
+if (existsSync(resolve(output, 'verification.json')) || stages.some(script => existsSync(resolve(output, `${script.replace(':', '-')}.log`))))
+  throw new Error('Existing evidence must be preserved; use a fresh --run-id=<identifier>');
 for (const script of stages) {
   const name = script.replace(':', '-');
   const fd = openSync(resolve(output, `${name}.log`), 'w');

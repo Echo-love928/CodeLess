@@ -8,6 +8,19 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 const read = path => readFileSync(resolve(root, path), 'utf8');
 const docs = ['docs/delivery/frontend.md', 'docs/demo/full-script.md', 'docs/user-guide.md', 'docs/handoffs/D29-B.md'];
 
+test('current D28 narrative cites final acceptance, preserving the failed requirement', () => {
+  const accepted = JSON.parse(read('tests/release/api/evidence/d28-final-review/summary.json'));
+  const quality = JSON.parse(read('tests/release/api/evidence/d28-final-review/quality.json'));
+  const delivery = read('docs/delivery/frontend.md');
+  assert.ok(delivery.includes(accepted.candidate));
+  assert.ok(delivery.includes('d28-final-review/summary.json'));
+  const score = `${quality.incrementalRequirements.passed}/${quality.incrementalRequirements.denominator}`;
+  for (const path of ['docs/delivery/frontend.md', 'docs/demo/full-script.md']) {
+    assert.ok(read(path).includes(`增量组合${score}`), `${path}: final composite quality`);
+    for (const id of quality.retainedFailedRequirementIds) assert.ok(read(path).includes(id), `${path}: retained failure ${id}`);
+  }
+});
+
 test('D29 local Markdown destinations exist (external reachability is not tested)', () => {
   for (const path of docs) {
     for (const match of read(path).matchAll(/\[[^\]]*\]\(([^)]+)\)/g)) {

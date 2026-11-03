@@ -1,6 +1,6 @@
 # CodeLess 受控试用用户手册
 
-修订日期：2026-11-04（Asia/Tokyo）。界面依据 main `aefaca193af3019bcadbcf8fdf3f6424baee750c`；本文是 D29 文档候选，尚未完成当天双人现场验收。当前发布限制见[前端交付说明](delivery/frontend.md)。
+修订日期：2026-11-04（Asia/Tokyo）。适用于受控试用版，界面基线为 `aefaca193af3019bcadbcf8fdf3f6424baee750c`。当前发布限制见[前端交付说明](delivery/frontend.md)。
 
 ## 可以制作什么
 
