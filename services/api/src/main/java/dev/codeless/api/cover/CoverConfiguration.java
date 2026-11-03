@@ -22,7 +22,7 @@ public class CoverConfiguration {
     @Bean @ConditionalOnMissingBean(CoverGateway.class)
     @ConditionalOnProperty(name="codeless.cover.worker-enabled",havingValue="true",matchIfMissing=true)
     CoverGateway coverGateway(Environment e) {
-        return new NodeCoverGateway(Path.of(e.getRequiredProperty("codeless.deploy.node-executable")),Path.of(e.getRequiredProperty("codeless.cover.gateway-entry")),
+        return new NodeCoverGateway(Path.of(e.getProperty("codeless.cover.node-executable",e.getRequiredProperty("codeless.deploy.node-executable"))),Path.of(e.getRequiredProperty("codeless.cover.gateway-entry")),
                 Path.of(e.getRequiredProperty("codeless.deploy.hosting-root")),root(e).resolve("queue"),e.getRequiredProperty("codeless.deploy.public-origin"),
                 e.getRequiredProperty("codeless.deploy.platform-origin"),e.getRequiredProperty("codeless.deploy.preview-origin"));
     }
