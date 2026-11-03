@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test'
 import { availableParallelism } from 'node:os'
 
 const nativeAcceptances = [
-  '**/e2e/runner/browser.spec.ts', '**/e2e/preview/flow.spec.ts',
+  '**/e2e/preview/flow.spec.ts',
   '**/e2e/deploy/hosting.spec.ts', '**/e2e/share/screenshot.spec.ts',
 ]
 
@@ -16,10 +16,19 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:4173',
     trace: 'retain-on-failure',
   },
-  // Start native work first, one nested workload at a time, alongside UI cases.
-  // The projects retain every existing case and its original deadline/assertions.
+  // D08 keeps its original early slot. The other native workloads share one
+  // additional slot: putting all four in one lane exhausted the120s global
+  // budget before D16. UI work can run alongside these two bounded lanes.
   projects: [{
     name: 'runner-chromium',
+    testMatch: '**/e2e/runner/browser.spec.ts',
+    workers: 1,
+    use: {
+      ...devices['Desktop Chrome'],
+      channel: process.env.CODELESS_PLAYWRIGHT_CHANNEL === 'chrome' ? 'chrome' : undefined,
+    },
+  }, {
+    name: 'native-chromium',
     testMatch: nativeAcceptances,
     workers: 1,
     use: {
@@ -28,7 +37,7 @@ export default defineConfig({
     },
   }, {
     name: 'chromium',
-    testIgnore: nativeAcceptances,
+    testIgnore: ['**/e2e/runner/browser.spec.ts', ...nativeAcceptances],
     use: {
       ...devices['Desktop Chrome'],
       channel: process.env.CODELESS_PLAYWRIGHT_CHANNEL === 'chrome' ? 'chrome' : undefined,
