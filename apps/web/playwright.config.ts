@@ -10,8 +10,9 @@ export default defineConfig({
   testDir: '../../tests',
   testMatch: ['**/e2e/**/*.spec.ts', '**/regression/release-ui/**/*.spec.ts'],
   globalTimeout: 120_000,
-  // Native cases fork additional Docker/Chromium processes beyond these workers.
-  workers: Math.min(4, Math.max(1, Math.floor(availableParallelism() / 2))),
+  // Two native lanes must not occupy every CI worker: retain one runnable UI
+  // slot, while capping developer-host concurrency and nested browser pressure.
+  workers: Math.min(4, Math.max(3, Math.floor(availableParallelism() / 2))),
   use: {
     baseURL: 'http://127.0.0.1:4173',
     trace: 'retain-on-failure',
@@ -37,6 +38,7 @@ export default defineConfig({
     },
   }, {
     name: 'chromium',
+    workers: 2,
     testIgnore: ['**/e2e/runner/browser.spec.ts', ...nativeAcceptances],
     use: {
       ...devices['Desktop Chrome'],
