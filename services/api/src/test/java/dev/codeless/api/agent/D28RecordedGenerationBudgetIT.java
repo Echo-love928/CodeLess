@@ -22,11 +22,11 @@ class D28RecordedGenerationBudgetIT {
         var compact=GenerationContext.compactInput(input);
         int next=RuntimeBudget.inputReservation(policy,compact.toString());
         int allowance=RuntimeBudget.outputAllowance(meter,next);
-        assertThat(allowance).isEqualTo(2544);
+        assertThat(allowance).isEqualTo(2304);
         for(String key:List.of("request","plan","componentIds"))assertThat(compact.path(key)).isEqualTo(input.path(key));
         for(int n=0;n<input.path("observations").size();n++)
             for(String key:input.path("observations").get(n).propertyNames())
-                if(!key.equals("callId"))assertThat(compact.path("observations").get(n).path(key)).isEqualTo(input.path("observations").get(n).path(key));
+                assertThat(compact.path("observations").get(n).path(key)).isEqualTo(input.path("observations").get(n).path(key));
         assertThat(input).isEqualTo(saved);
         var out=Map.of("measurement","EXACT_ORIGINAL_REQUEST_PROJECTION_NOT_MODEL_QUALITY","chargedBefore",27492,
                 "originalInputReservation",original,"projectedInputReservation",next,"originalOutput",351,

@@ -25,7 +25,7 @@ class GenerationInputCompactionTest {
         var input=input();var saved=input.deepCopy();var projected=GenerationContext.compactInput(input);
         for(String key:List.of("phase","request","plan")) assertThat(projected.path(key)).isEqualTo(input.path(key));
         var actual=input.path("observations").get(0);var view=projected.path("observations").get(0);
-        for(String key:actual.propertyNames()) if(!key.equals("callId")) assertThat(view.path(key)).isEqualTo(actual.path(key));
+        for(String key:actual.propertyNames()) assertThat(view.path(key)).isEqualTo(actual.path(key));
         for(int i=0;i<input.path("tools").size();i++) {
             var tool=input.path("tools").get(i);var signature=projected.path("tools").get(i);
             assertThat(signature.path("name")).isEqualTo(tool.path("name"));
@@ -54,6 +54,24 @@ class GenerationInputCompactionTest {
         assertThat(GenerationContext.compactInput(input).path("tools")).isEqualTo(input.path("tools"));
         var small=json.valueToTree(Map.of("completionOnly",true,"tools",List.of(),"observations",List.of()));
         assertThat(GenerationContext.compactInput(small)).isEqualTo(small);
+    }
+    @Test void completeFundedRequestsKeepTheirExistingRepresentationButConstrainedCompletionCanStillFit() {
+        var input=input();
+        assertThat(GenerationContext.project(input,true,false)).isSameAs(input);
+        for(boolean complete:List.of(true,false)) {
+            var projected=GenerationContext.project(input,complete,true);
+            assertThat(projected.path("toolArgumentSchemas").isObject()).isTrue();
+            assertThat(projected.path("observations")).isEqualTo(input.path("observations"));
+        }
+        assertThat(GenerationContext.project(input,false,false).path("toolArgumentSchemas").isObject()).isTrue();
+    }
+    @Test void repairKeepsTheExistingClosedProtocolMarkersAndExplicitlyForbidsAnEnvelope() throws Exception {
+        String policy=new org.springframework.core.io.ClassPathResource("model/prompts/repair/agent-repair-v1.txt")
+                .getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(policy).startsWith("Application proposal protocol")
+                .contains("Each key occurs exactly once","The root type occurs once",
+                        "The host reuses the original actions in input.completionProposal, which cannot change.",
+                        "never a type/response envelope").doesNotContain("json_object","response_format");
     }
     @Test void invalidRoleShorthandRemainsIllegalWhileTheDocumentedTargetIsACompleteJsonObject() throws Exception {
         String policy=new org.springframework.core.io.ClassPathResource("model/prompts/agent-generate-v1.txt")
