@@ -58,4 +58,6 @@ static 检查版本、契约和前端 lint/单测/生产构建；api 执行 Mave
 
 ## 团队与交接
 
-成员 A 主责 API、模型与运维流程，成员 B 主责前端、runner 与交付体验；具体以每日契约和 docs/handoffs 为准。使用独立分支与 PR，由另一位成员审查，不自批、不直接推送 main。必需检查成功且讨论解决后才具备合并条件。D23-B 证据与外部阻塞见 [交接](docs/handoffs/D23-B.md)。
+成员 A 主责 API、模型与运维流程，成员 B 主责前端、runner 与交付体验；具体以每日契约和 docs/handoffs 为准。使用独立分支与 PR，由另一位成员审查，不自批、不直接推送 main。必需检查成功且讨论解决后才具备合并条件。
+
+评审入口：[后端仓库交付材料](docs/delivery/backend.md)、[后端讲解与换手脚本](docs/demo/backend-script.md)、[D29-A 验收与阻塞](docs/handoffs/D29-A.md)。其中记录匿名访问、真实 Git/PR 贡献追溯、状态机/预算/隔离证据，以及尚未完成的双人演练。历史测试、现场运行与真实模型效果分别标注；D28 的历史通过结果不代表 D29 候选门禁通过。安装交付的历史证据见 [D23-B 交接](docs/handoffs/D23-B.md)。

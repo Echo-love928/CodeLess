@@ -1,0 +1,72 @@
+[
+  {
+    "id": "C1",
+    "claim": "状态晋级依赖真实且同源的构建、浏览器、制品和截图回执，模型不能宣告READY。",
+    "references": [
+      {"path": "services/api/src/main/java/dev/codeless/api/agent/AgentEvidence.java", "symbol": "AGENT_BROWSER_EVIDENCE_INVALID"},
+      {"path": "services/api/src/test/java/dev/codeless/api/agent/AgentLoopIntegrationTest.java", "symbol": "D09AT2_wrongSourceArtifactAndScreenshotDigestsCannotPromote"},
+      {"path": "tests/release/api/evidence/d28-final-review/candidate-ci.json"}
+    ]
+  },
+  {
+    "id": "C2",
+    "claim": "仅确认的源码错误进入有限修复；同指纹且源码不变提前停止，最多3轮。",
+    "references": [
+      {"path": "services/api/src/main/java/dev/codeless/api/agent/RepairController.java", "symbol": "AGENT_REPAIR_NO_PROGRESS"},
+      {"path": "services/api/src/test/java/dev/codeless/api/agent/RepairLoopIntegrationTest.java", "symbol": "D10AT2_changingButUnrepairableSourceStopsAfterThreeRounds"},
+      {"path": "services/api/src/test/java/dev/codeless/api/agent/RepairPolicyTest.java", "symbol": "onlyConfirmedCodeErrorsAreRepairableAndNetworkOrUnknownNeverIs"}
+    ]
+  },
+  {
+    "id": "C3",
+    "claim": "预算为12模型请求、20工具调用、50000运行时token、12分钟；未知用量保留预约。",
+    "references": [
+      {"path": "services/api/src/main/java/dev/codeless/api/agent/RuntimeBudget.java", "symbol": "MODEL_CALLS=12, TOOL_CALLS=20, TOKENS=50000, REPAIRS=3"},
+      {"path": "services/api/src/main/java/dev/codeless/api/agent/AgentRunStore.java", "symbol": "AGENT_TOOL_BUDGET_EXCEEDED"},
+      {"path": "services/api/src/main/java/dev/codeless/api/data/PlatformRepository.java", "symbol": "interval '12 minutes'"},
+      {"path": "services/api/src/test/java/dev/codeless/api/agent/RepairLoopIntegrationTest.java", "symbol": "D10AT3_eachBudgetStopsBeforeTheNextUnfundedOperation"},
+      {"path": "services/api/src/test/java/dev/codeless/api/agent/RepairPolicyTest.java", "symbol": "missingCountersUseAvailableUsageAndKeepAnExplicitEstimate"},
+      {"path": "tests/release/api/evidence/d28-final-review/source-budget.json"}
+    ]
+  },
+  {
+    "id": "C4",
+    "claim": "取消、过期lease与晚到写入失败关闭，不覆盖最近可用版本。",
+    "references": [
+      {"path": "services/api/src/main/java/dev/codeless/api/tasks/TaskQueueService.java", "symbol": "lease_expires_at"},
+      {"path": "services/api/src/test/java/dev/codeless/api/agent/RepairLoopIntegrationTest.java", "symbol": "D10AT3_cancelDuringRepairRetainsUsageAndRejectsLateMutation"},
+      {"path": "services/api/src/test/java/dev/codeless/api/agent/AgentLoopIntegrationTest.java", "symbol": "D09AT3_realBuildFailureIsExplainedAndRetainsRecoveryWithoutReplacingReady"}
+    ]
+  },
+  {
+    "id": "C5",
+    "claim": "文件工具受路径白名单和配额限制；生成容器无平台密钥/socket，浏览器拒绝内网目标。",
+    "references": [
+      {"path": "contracts/tools/registry.json"},
+      {"path": "tests/security/runner/build.test.mjs"},
+      {"path": "tests/security/runner/browser.test.mjs"},
+      {"path": "tests/security/runner/network.test.mjs"},
+      {"path": "docs/security-runner.md"},
+      {"path": "tests/release/api/evidence/d28-final-review/permissions.json"}
+    ]
+  },
+  {
+    "id": "C6",
+    "claim": "发布由已鉴权所有者显式选择已验证不可变版本，截图与ZIP有独立实物核对。",
+    "references": [
+      {"path": "contracts/deploy/README.md"},
+      {"path": "services/api/src/test/java/dev/codeless/api/deploy/DeploymentRecordsTest.java"},
+      {"path": "tests/release/api/evidence/d28-final-review/export-cover.json"},
+      {"path": "tests/release/api/evidence/d28-final-review/export-verification.json"},
+      {"path": "tests/release/api/evidence/d28-final-review/live-cover.json"}
+    ]
+  },
+  {
+    "id": "C7",
+    "claim": "deterministic-mock流程证据与REAL质量分账；D28需求增量组合8/9，TASK-03仍失败。",
+    "references": [
+      {"path": "tests/release/api/evidence/d28-final-review/quality.json", "symbol": "retainedFailedRequirementIds"},
+      {"path": "tests/release/api/evidence/d28-final-review/summary.json", "symbol": "actualBill"}
+    ]
+  }
+]
