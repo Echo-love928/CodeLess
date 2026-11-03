@@ -1,3 +1,5 @@
+当前正式审查：A已对PR95@1fe1389提交 [APPROVED](https://github.com/Echo-love928/CodeLess/pull/95#pullrequestreview-5753735658)，已独立回读确认；PR95仍为草稿、未合并，main仍为2be793d。候选/base更新须重新审查。
+
 D28-A：PR95@1fe1389最终增量复审通过
 
 当前技术结论：PR95候选1fe1389独立增量复审通过，需求8/9、代码故障3/3、实机同源与生产cover已核验，六CI全success；历史事件依用户明确决定留档不阻塞。完整三类意见和原生证据见 `D28-B-FINAL-REVIEW.md` 与 `evidence/d28-final-review/summary.json`。PR95草稿/正式review/合并以GitHub实时状态为准；A没有合并或切换部署。生产provider仍为deterministic-mock，独立REAL质量报告单列；A复审新增付费0。下方旧记录保留为历史。

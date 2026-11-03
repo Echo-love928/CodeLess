@@ -2,7 +2,7 @@
 
 日期：2026-11-03（Asia/Tokyo）。审查候选 **1fe1389dee23efbb1b43c30f3ec1b8f546413087**；基线main **2be793d**，此前已审源码 **57d1acf**。A账号与PR作者不同。本记录属于A验收文档，不改变已部署候选。
 
-结论：**技术复审通过；当前增量无阻塞发现。** PR95的草稿、正式review及合并状态以GitHub实时记录为准，不将本文件当作已经批准/合并。用户已在本聊天明确确认“历史事件留档不再阻塞”；EPERM/ENOTEMPTY/CLEANUP_FAILED不宣称根因已修复。
+结论：**技术复审通过；当前增量无阻塞发现。** A已提交并独立回读 [正式APPROVED审查](https://github.com/Echo-love928/CodeLess/pull/95#pullrequestreview-5753735658)，绑定下述候选；PR95仍为草稿、未合并。任何head/base变化须重新检查并批准。用户已在本聊天明确确认“历史事件留档不再阻塞”；EPERM/ENOTEMPTY/CLEANUP_FAILED不宣称根因已修复。
 
 ## 阻塞问题
 
