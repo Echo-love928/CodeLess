@@ -1,15 +1,13 @@
-D28-B｜修复 Windows E2E 资源调度并完成本地完整复核，M5 **HOLD**。
+D28-B｜新统一封存与真实质量复评（HOLD）
 
-原10-worker配置可复现D16失败：截图87.5ms完成，Chromium关闭耗时12.6秒并耗尽任务截止，代理关闭约2ms。保留D08早期独立任务槽，另将D09/D15/D16限制为一个任务槽，并给普通UI保留执行空间；原80项逐项且仅一次、120秒总截止、断言和零重试均保留。两种未奏效的调度方案和旧CI失败也保留，未用新绿覆盖原事故。
+新候选 `0a7e0761114aa25e47ccdfbac02bd9d5fa5d4a6a` 包含 A 已交接的 c28ee94 与 B 修复。用户已取消历史根因作为放行条件，原失败保留且不宣称已修复；此前通过的 Windows四阶段、桌面/390px双用户链及A原件/预算审计复用。本轮未改main、批准、合并或切换线上服务。
 
-下载原trace的10秒中约7.07秒耗在按钮未就绪，实际export只观察约2.89秒即被测试中断，原请求完成时间UNKNOWN。本轮明确分开按钮就绪与下载事件计时，并捕获请求/响应/下载；这是测试同步和诊断变更，未宣称修复服务端性能。另独立核算本轮四次就绪+下载均<10秒，恢复后总9896ms（下载事件3712ms），余量较小，最终统一候选须重测。新增清理前同次代理原日志与API/browser生命周期取证。
+两项最小修复：cover可独立配置Node，避免把截图交给只接受构建/发布的IPC入口；目录验收补足原生/ARIA按钮及可见叶子span展示，不减数量/字段/分类交集/搜索/详情/恢复断言。旧代码回归确实失败；cover受影响23项及YAML3项通过；目录72项正反控制、2项ARIA控制通过，仅重放3份失败目录源码并保留原失败。生产cover仍待实际验收。
 
-固定B源码 `edded45dd40d30d1bc0d83186c3828b22eba4ce7` 的独立结果：原Windows verify:e2e整体native0（80/80及后续完整platform）；原四阶段ci:gate整体native0，static/API/runner/E2E均exit0，API90份新JUnit/428项全通过且failure/error/skip为0，runner285/285；strict双用户链native0/canonical=true、无清理错误，含真实修复/编辑/发布/ZIP、双向权限、失败/离线恢复和12路由视口。源码SHA六项CI均completed/success；后续报告HEAD的CI另查。
+原14样本真实批次已实际执行，14原记录齐/自然退出0/凭据扫描0，未外层重试。但平台与最终需求行为均6/9，低于8/9；代码故障2/3，环境2/2。SHOW-02/03非法JSON、TASK-03协议外包装、FAULT-CODE-03输出额度内未完成仍开放。72次请求、71已知用量/1未知；共用2元上限保持，保守费用暴露1.255074元含UNKNOWN完整占用，不冒充实付账单。原完整批次与认证/诊断原件仅受控交付。
 
-两个生成版本的本地HTTPS URL、源码ZIP及部署/发布文件清单已同源核验；这些是明确mock/loopback fixture，未充当公网、真实模型或生产cover。历史EPERM/ENOTEMPTY/CLEANUP_FAILED及原API中断仍开放；原件及缺失项保留，不因本轮通过关闭。A尚未完成新统一封存包；重封、预算同候选绑定、成组部署及真实公网同源验收、双方复审前不批准或合并。main未改，未部署或启动付费批次。
+新封存包167936000字节、278成员全部一致、113共享源码一致，SHA256 `c18b456e779cc385b2ff8086e8eaf7deb33e56241898a329e99821a049356406`；包内含对应验收源码。精确候选六项检查已全部 completed/success（run 41600787999，无 skip/neutral 替代），同一预算账本 CAS 重绑定已完成，全部旧事件/支出及 UNKNOWN 占用保留。 待部署目录及新镜像引用已准备，未切换线上JAR、服务进程或策略镜像。生成/模型/runner/prompts/templates代码未变，原真实质量失败继续适用；JAR278项仅cover配置类和YAML改变。
 
-范围：本轮3文件为 `apps/web/playwright.config.ts`、`tests/release/browser/d28-user-flow.spec.ts`、`tests/release/browser/d28-flow.mjs`；此前授权的取消终态前端两文件和恢复fixture/预览取证修复保留。无契约、依赖锁、CI工作流、迁移或生产截图/导出配置变更。
+阻塞问题：A须修复真实模型协议/额度内完成性并提供增量证据；B待质量达标后完成成组切换、公网URL/源码ZIP/部署清单与生成版本同源及生产cover。新候选未部署，不能将旧61、mock、补测或六绿作为M5通过。保持HOLD，双方增量复审前不批准或合并。
 
-[当前证据](https://github.com/Echo-love928/CodeLess/tree/codex/d28-b-candidate-acceptance/tests/release/browser/evidence/d28/resolution-20261103) · [验收记录](https://github.com/Echo-love928/CodeLess/blob/codex/d28-b-candidate-acceptance/docs/acceptance/frontend.md) · [交接](https://github.com/Echo-love928/CodeLess/blob/codex/d28-b-candidate-acceptance/docs/handoffs/D28-B.md)。原始认证trace、日志和ZIP仅受控交接，公开摘要/长度及定位；开发token实测UNKNOWN，不将预算当用量。
-
-追加390px平台双用户完整链也已原生0，11个登录/列表/生成/编辑/下载/恢复检查点均无横向溢出，权限和ZIP/部署清单绑定通过。保持原业务断言、480s/500s及零重试，私有视口变体与SHA单列；实际可见trace帧核对完成，原空白过渡帧保留，未改候选源码。恢复重下载事件约781ms、就绪约1872ms。
+[当前证据](https://github.com/Echo-love928/CodeLess/tree/codex/d28-b-candidate-acceptance/tests/release/browser/evidence/d28/release-20261103) · [验收记录](https://github.com/Echo-love928/CodeLess/blob/codex/d28-b-candidate-acceptance/docs/acceptance/frontend.md) · [交接](https://github.com/Echo-love928/CodeLess/blob/codex/d28-b-candidate-acceptance/docs/handoffs/D28-B.md)。
