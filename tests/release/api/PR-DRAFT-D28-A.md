@@ -1,5 +1,9 @@
 D28-A｜原失败现场交付与候选预算审计（HOLD）
 
+最新B原件复核：已独立取回5批280文件、28844335字节，全部摘要匹配。原API中断退出UNKNOWN保留；73/90/2份JUnit分别重算，认证trace只留受控渠道。解析器Windows/VPS各5/5，规范分析报告逐字节一致。重下载原10秒中约7.1秒在等按钮，export后仅观察约2.9秒且无完整响应，不能据此归因服务端；D19和同一日志中稍后的E2E清理超时按原阶段隔离。没有移动计时点、延长deadline或做猜测性产品修复。
+
+B原件取得缺口关闭，根因缺口未关闭；未采集代理日志/拒绝栈等不补造，下一次须同次定向捕获。新交接HEAD自身CI另核，不继承已六success的7b4a88b。完整结论见 `tests/release/api/D28-B-ORIGINALS-REVIEW.md` 与 `evidence/d28-b-originals/`。以下为此前本PR交付范围，当前整体仍HOLD。
+
 本PR记录候选服务端独立验收，并保留失败、未知及部署身份差异。本轮解决A原失败现场仅存在本地路径、B不能联合复核的问题：55成员原件包已交付既有受控SSH目录，服务端逐项校验0。历史EPERM只留message、CLEANUP_FAILED断言前未落runner回执，缺失的同次拒绝栈/OS句柄仍未恢复，不宣称修复或严重缺陷归零。
 
 主要变化：
@@ -13,7 +17,7 @@ D28-A｜原失败现场交付与候选预算审计（HOLD）
 
 共享预算当前只读观测：原唯一账本revision2、B已对账零历史用量、无活动/预约、可花2元；A冻结付费，仍绑定00fd。最终候选尚未确定，因此未重封新包、未重绑定、未部署。未来须保留现用工具原字节，再将已审新版本用于同一数据库，按实时revision/eventHead追加绑定，不新建额度。
 
-剩余阻塞：原EPERM/ENOTEMPTY/CLEANUP_FAILED未确定根因；B电脑已关机，API中断、D19清理超时、7db重下载原件待补。Windows完整门禁、真实质量、最终候选公网/ZIP身份及生产cover仍HOLD。已为联合时间线和定向捕获列出同次证据要求，不无计划重复全套测试。
+剩余阻塞：原EPERM/ENOTEMPTY/CLEANUP_FAILED未确定根因；B五批原件已取得并独立核验，但原未采集的代理日志、拒绝栈/句柄等仍缺。Windows完整门禁、真实质量、最终候选公网/ZIP身份及生产cover仍HOLD。已为联合时间线和定向捕获列出同次证据要求，不无计划重复全套测试。
 
 范围仅A允许的docs/acceptance/backend.md、docs/handoffs/D28-A.md和tests/release/api/**；本轮无产品、契约、锁、CI、迁移或B文件变更。此前D08调度扩展及旧快照详见backend.md，不重写历史失败。未自批、合并或改main。开发token UNKNOWN；平台付费请求0/支出0，fixture与真实效果分账。
 
