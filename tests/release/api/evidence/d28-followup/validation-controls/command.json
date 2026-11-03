@@ -1,0 +1,82 @@
+{
+  "task": "D28-A-followup",
+  "startedAt": "2026-11-02T10:16:57.572666+00:00",
+  "commands": [
+    {
+      "command": [
+        "F:\\python314\\python.exe",
+        "-B",
+        "tests\\release\\api\\test_d28_acceptance.py"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "assertionPassed": true,
+      "log": "tests/release/api/evidence/d28-followup/validation-controls/0.log",
+      "logSha256": "2437d4ec34db81e445513a48cfcc09881fd5bc83c15fc2726380e70087dafeb0"
+    },
+    {
+      "command": [
+        "F:\\python314\\python.exe",
+        "-B",
+        "tests\\release\\api\\test_d28_toolchain.py"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "assertionPassed": true,
+      "log": "tests/release/api/evidence/d28-followup/validation-controls/1.log",
+      "logSha256": "1ccd874bf677459736719c07514e59389d499754177bf88d24f825aeb4f87163"
+    },
+    {
+      "command": [
+        "F:\\python314\\python.exe",
+        "-B",
+        "tests\\release\\api\\d28_attest.py",
+        "--candidate",
+        "package.json",
+        "--output",
+        "tests\\release\\api\\evidence\\d28-followup\\validation-controls\\must-not-exist.json"
+      ],
+      "exitCode": 2,
+      "expectedExitCode": 2,
+      "assertionPassed": true,
+      "log": "tests/release/api/evidence/d28-followup/validation-controls/2.log",
+      "logSha256": "43e8e7443a79598cd7d70d2302fb374adbe02c2ea4fc0094f86139eba9f38ceb"
+    },
+    {
+      "command": [
+        "F:\\python314\\python.exe",
+        "-B",
+        "tests\\release\\api\\d28_attest.py",
+        "--candidate",
+        "tests\\release\\api\\d28-unified-candidate.json",
+        "--output",
+        "tests\\release\\api\\evidence\\d28-followup\\unified-candidate-attestation.json"
+      ],
+      "exitCode": 2,
+      "expectedExitCode": 2,
+      "assertionPassed": true,
+      "log": "tests/release/api/evidence/d28-followup/validation-controls/3.log",
+      "logSha256": "059a226510d1af5ecc547724990ac62cb58d83a6e894f1e0e106e430ff89ace3"
+    },
+    {
+      "command": [
+        "node",
+        "--check",
+        "tests\\release\\api\\d28_candidate_runtime.mjs"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "assertionPassed": true,
+      "log": "tests/release/api/evidence/d28-followup/validation-controls/4.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "syntaxVerified": [
+    "d28_attest.py",
+    "existing_demo.py"
+  ],
+  "priorAttestationUnchanged": true,
+  "deniedOutputAbsent": true,
+  "exitCode": 0,
+  "finishedAt": "2026-11-02T10:16:58.593198+00:00"
+}

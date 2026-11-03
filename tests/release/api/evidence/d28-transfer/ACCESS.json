@@ -1,0 +1,42 @@
+{
+  "task": "D28-A-transfer",
+  "protocol": "Existing B-authorized SSH/SFTP; no HTTP/public token",
+  "host": "23.136.172.128",
+  "sshUser": "root",
+  "remoteDirectory": "/srv/codeless-handoff/d28/20261102-cny2",
+  "candidate": "00fd43333f35c5cb0cce425721fdce9cd1d0f956",
+  "originalArchive": {
+    "remotePath": "/srv/codeless-handoff/d28/20261102-cny2/unified-00fd-kit.tar",
+    "bytes": 167813120,
+    "sha256": "52e49be4fca54ca6b09ca77846bfd5453ef68c84026ccd484e6017ecf216c206",
+    "repacked": false
+  },
+  "relocatedComponentsInsideOriginalArchive": {
+    "api": "release/api",
+    "client": "release/client",
+    "image": "release/image/runner-build-image.tar",
+    "originalSelection": "release/selection.json"
+  },
+  "externalDigests": {
+    "apiManifestSha256": "3d0e52103de6bf1614bc751302566d51e6364459054fdbb4e6030cb8144486a9",
+    "clientManifestSha256": "db83cd46801ab1c587cdb85e022533ec14735a6efe3b5301682cabc4f04f6fbe",
+    "jarSha256": "d2c1bc7bccd9df9eec194fde509fa012f5c41eb3a7703aad669aaa447e067446",
+    "workerSha256": "311ed218b65e7a6bf5ceb309b8c7ff6c9f8f8fc73a6671faa3d5c50ae475cbaa",
+    "imageId": "sha256:e73196cae90d4f114cc1dd0c3e285524c3449a1b193e2befd49f8dcf05ccd445"
+  },
+  "verifyCommandsOnB": [
+    "python -B scripts/release/api_release.py verify --package <B-extraction>/release/api --manifest-sha256 3d0e52103de6bf1614bc751302566d51e6364459054fdbb4e6030cb8144486a9",
+    "node infra/release/client/package.mjs verify 00fd43333f35c5cb0cce425721fdce9cd1d0f956 <B-extraction>/release/client"
+  ],
+  "budget": {
+    "authoritative": "/srv/codeless-handoff/d28/20261102-cny2/budget-ledger.sqlite3",
+    "snapshot": "/srv/codeless-handoff/d28/20261102-cny2/budget-ledger.json",
+    "helper": "/srv/codeless-handoff/d28/20261102-cny2/d28_shared_budget.py",
+    "authorizedCapCny": "2",
+    "executionOwner": "B",
+    "aExecution": "FROZEN",
+    "initialPriorBUsage": "UNKNOWN_REQUIRES_B_MACHINE_RECONCILIATION",
+    "resetAllowed": false
+  },
+  "important": "Original selection contains A provenance paths. Do not edit/repackage original files; use B extraction component paths in explicit verifier arguments. B never needs an A F-drive path or A private key."
+}

@@ -1,10 +1,24 @@
-D28-A｜修复候选验收调度并补齐独立取证（HOLD）
+D28-A｜原失败现场交付与候选预算审计（HOLD）
 
-原PR94@438c0f5的D08原生验收约第78秒才开始，在120秒全局截止处造成79通过/1未运行及suite/teardown错误。将D08放入首项目排队，其余79项保持原Chromium配置；80个file/title身份逐项相同，原断言、120秒全局截止、零重试及隔离不变。修复提交4eb9595六项必需检查全部success：E2E80及完整平台browserExit0、API428/428、runner285/285、static64+212、infra/ci-gate。[运行41411371862](https://github.com/Echo-love928/CodeLess/actions/runs/41411371862)。后续证据提交自身检查另看PR，不继承旧SHA。
+最新B原件复核：已独立取回5批280文件、28844335字节，全部摘要匹配。原API中断退出UNKNOWN保留；73/90/2份JUnit分别重算，认证trace只留受控渠道。解析器Windows/VPS各5/5，规范分析报告逐字节一致。重下载原10秒中约7.1秒在等按钮，export后仅观察约2.9秒且无完整响应，不能据此归因服务端；D19和同一日志中稍后的E2E清理超时按原阶段隔离。没有移动计时点、延长deadline或做猜测性产品修复。
 
-- 最小范围扩展仅apps/web/playwright.config.ts的调度，对B影响仅D08项目名/trace路径；无产品运行代码、公共契约、锁、CI或迁移变更。
-- d28_record.py改为显式参数/标准环境发现Java21并拒绝错误版本，移除A机器路径依赖；4项新增可移植性控制及原4项证据接纳控制通过。补充只读精确HEAD CI记录器和私有ETW筛选器。
-- 原Windows干净438提交完整corepack pnpm verify:api原生0，428/428、fail/error/skip0；90份新JUnit与日志摘要复算一致，源码/HEAD前后相同。首次Docker未运行导致的前置失败完整保留。授权128MiB管理员文件元数据追踪start0/stop0，ETL私存；本次BARE预期NO_PROGRESS。底层rename拒绝后另一rename成功，不等于复现原Node EPERM，不将同时出现的进程访问归因为历史占用者；无断言、应用重试或清理限制变更。
-- 当前部署61经授权strict-host SSH只读取证9项通过：实际JAR fd、worker、镜像ID/revision、258源码、7web及agent/export根匹配选定清单。未部署新候选、重启或改生产数据。PR95@80205692已审，23处Git blob证据摘要匹配；原gh与direct日志获取差异已有证据，不再列为材料/未解释摘要缺件。
+B原件取得缺口关闭，根因缺口未关闭；未采集代理日志/拒绝栈等不补造，下一次须同次定向捕获。新交接HEAD自身CI另核，不继承已六success的7b4a88b。完整结论见 `tests/release/api/D28-B-ORIGINALS-REVIEW.md` 与 `evidence/d28-b-originals/`。以下为此前本PR交付范围，当前整体仍HOLD。
 
-当前HOLD：历史EPERM/ENOTEMPTY/CLEANUP_FAILED根因、真实模型质量和生产cover未闭环，新候选未部署；新绿结果不关闭旧事故。API/runner维护者需取得同次失败的句柄生命周期/拒绝栈并给出最小修复及新候选受影响重测。证据见tests/release/api/evidence/d28-fix/和验收/交接文档顶部。付费模型请求0，合成累计用量与开发token UNKNOWN、分账记录。未批准、未发送review/comment、未合并。
+本PR记录候选服务端独立验收，并保留失败、未知及部署身份差异。本轮解决A原失败现场仅存在本地路径、B不能联合复核的问题：55成员原件包已交付既有受控SSH目录，服务端逐项校验0。历史EPERM只留message、CLEANUP_FAILED断言前未落runner回执，缺失的同次拒绝栈/OS句柄仍未恢复，不宣称修复或严重缺陷归零。
+
+主要变化：
+- 提供原件校验/封存器及下一次宿主Node文件操作取证工具；不加重试、不改原错误/断言/截止/隔离，不将观察器接入模型或产品权限。
+- 同一2元预算账本增加CAS候选重绑定：核对实际包/组件及精确SHA六项success，追加历史，旧支出、UNKNOWN占用、样本和事件不重置。新工具仅旁置验证，现用控制器和数据库未改。
+- 只读审查B的7db取消补读修复；在A隔离工作树独立执行工作台14/14。旧00fd原包保留，不能替代含前端修复的后继候选。
+
+验证：观察器本机3/3；预算本机/VPS各10/10；原件保护本机/VPS各2/2；55原件成员本机及VPS均匹配。全部列出实际命令、原生退出、日志/回执SHA，均无付费模型调用。新交接HEAD的四阶段/ci-gate看当前PR精确检查，不能继承旧SHA。
+
+受控原件：`23.136.172.128:/srv/codeless-handoff/d28/20261103-a-diagnosis/a-original-failures.tar`，2416640字节，SHA256 `56a0f6bbe1ee4135c066dea0699848993eaf0f50c32aee5513a6ca6ab693f571`。使用B既有授权SSH身份，原件不上传GitHub。原00fd包及其下载/275成员核验仍保留在原受控目录，B已确认实际取得。
+
+共享预算当前只读观测：原唯一账本revision2、B已对账零历史用量、无活动/预约、可花2元；A冻结付费，仍绑定00fd。最终候选尚未确定，因此未重封新包、未重绑定、未部署。未来须保留现用工具原字节，再将已审新版本用于同一数据库，按实时revision/eventHead追加绑定，不新建额度。
+
+剩余阻塞：原EPERM/ENOTEMPTY/CLEANUP_FAILED未确定根因；B五批原件已取得并独立核验，但原未采集的代理日志、拒绝栈/句柄等仍缺。Windows完整门禁、真实质量、最终候选公网/ZIP身份及生产cover仍HOLD。已为联合时间线和定向捕获列出同次证据要求，不无计划重复全套测试。
+
+范围仅A允许的docs/acceptance/backend.md、docs/handoffs/D28-A.md和tests/release/api/**；本轮无产品、契约、锁、CI、迁移或B文件变更。此前D08调度扩展及旧快照详见backend.md，不重写历史失败。未自批、合并或改main。开发token UNKNOWN；平台付费请求0/支出0，fixture与真实效果分账。
+
+交接及可复现命令：`tests/release/api/D28-JOINT-DIAGNOSIS.md`；本轮证据：`tests/release/api/evidence/d28-diagnosis/`；完整验收记录：`docs/acceptance/backend.md`。

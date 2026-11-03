@@ -1,5 +1,15 @@
 # D28-A 对 B 侧只读互审
 
+## 2026-11-02 统一候选00fd追加复核
+
+**阻塞问题**：PR95已合入A a16形成00fd，六项CI success不关闭A历史EPERM/CLEANUP_FAILED，也不证明新候选已部署。A只读新候选部署比较native1，实际deployed/manifest/image仍61；真实质量/生产cover尚无新验收。B的 `tests/release/browser/d28-candidate.json.testedUserFlowHead`仍明确c707，是历史专项身份；不能把它直接标为00fd已跑。新部署后需B在同一选定候选及清单上运行其用户链与公网URL/源码/关键E2E，保留失败。
+
+**建议**：以A新 `d28-unified-candidate.json`和275成员交付包为复核对象，核对API3d0e5210...、clientdb83cd46...、镜像e731...及worker311ed218...；相同JAR不替代两个manifest与实际镜像身份。原D23同摘要备份现可在A复现22项，原件只私有保存；B独立复现须经既有私密渠道取得同摘要副本，不公开备份/账号/认证trace。
+
+**已核验内容**：00fd为80205692与a16ac25的实际merge，main仍2be。A新封存API258源码Git blobs、五迁移、双方113共享文件一致；镜像label00fd、导出归档/配置SHA、两个真实Docker/Chromium场景、空库/合成恢复40及真实D23历史22均有原生0证据。精确00fd六success原日志已取回。没有修改B文件，没有提交review/comment、批准或合并；后续A交接HEAD检查另列，不继承此结果。
+
+以下原复核记录保留原提交/时间范围。
+
 ## 2026-11-02 当前增量（替代下面的“材料缺失”当前判断）
 
 已只读审查PR95@80205692；23处公开引用逐Git blob SHA匹配，产品/契约/锁/CI无变动。原文件缺失项关闭；A direct日志与B direct严格相同，B的gh旧声明按原gh命令精确重现证据已审，不把不同获取格式当未解释字节篡改。A未独立运行gh，未将B私有专项冒称A重跑。详见 `../d28-fix/peer95-review.json`。

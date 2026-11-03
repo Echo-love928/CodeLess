@@ -31,13 +31,18 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--backup', required=True)
     parser.add_argument('--source-evidence', required=True)
+    parser.add_argument('--candidate', default='tests/release/api/candidate.json', help='Explicit release registry; original default retained')
     args = parser.parse_args()
     backup_path = Path(args.backup).absolute()
     summary_path = Path(args.source_evidence).absolute()
     summary = json.loads(summary_path.read_text(encoding='utf-8'))
-    candidate = json.loads((ROOT / 'tests/release/api/candidate.json').read_text(encoding='utf-8'))
+    candidate_path = (ROOT / args.candidate).resolve()
+    release.require(candidate_path.is_relative_to(ROOT / 'tests/release/api'), 'TASK_CANDIDATE_REGISTRY_REQUIRED')
+    candidate = json.loads(candidate_path.read_text(encoding='utf-8'))
     package = ROOT / candidate['package']
     manifest = release.verify(package, candidate['manifestSha256'])
+    release.require(manifest['sourceCommit'] == candidate['sourceCommit'], 'CANDIDATE_COMMIT_MISMATCH')
+    release.require(release.sha((package / 'api.jar').read_bytes()) == candidate['apiJarSha256'], 'CANDIDATE_JAR_MISMATCH')
     stamp = datetime.now(timezone.utc).isoformat().replace(':', '-') + '-existing-demo'
     output = ROOT / 'tests/release/api/.private/runs' / stamp
     public = ROOT / 'tests/release/api/evidence' / stamp
@@ -45,6 +50,8 @@ def main():
     report = {'task': 'D27-A', 'case': 'T2-existing-real-generated-D23-demo', 'status': 'RUNNING',
               'startedAt': datetime.now(timezone.utc).isoformat(), 'sourceCommit': manifest['sourceCommit'],
               'manifestSha256': candidate['manifestSha256'], 'apiJarSha256': candidate['apiJarSha256'],
+              'candidateRegistry': candidate_path.relative_to(ROOT).as_posix(),
+              'candidateRegistrySha256': release.sha(candidate_path.read_bytes()),
               'history': 'retained D23 real generation/build/browser demo; original model deterministic-mock',
               'sourceEvidence': summary_path.relative_to(ROOT).as_posix(), 'sourceEvidenceSha256': release.sha(summary_path.read_bytes()),
               'modelProvider': 'deterministic-mock', 'newModelRequests': 0, 'paidModelRequests': 0,
@@ -180,7 +187,7 @@ def main():
         report['finishedAt'] = datetime.now(timezone.utc).isoformat()
         report['harnessSha256'] = release.sha(Path(__file__).read_bytes())
         if (output / 'api.log').exists(): report['apiLogSha256'] = release.sha((output / 'api.log').read_bytes())
-        report['command'] = ['python', '-B', 'tests/release/api/existing_demo.py', '--backup', '<private canonical D23 backup>', '--source-evidence', report['sourceEvidence']]
+        report['command'] = ['python', '-B', 'tests/release/api/existing_demo.py', '--backup', '<private canonical D23 backup>', '--source-evidence', report['sourceEvidence'], '--candidate', report['candidateRegistry']]
         report['exitCode'] = 0 if report['status'] == 'PASSED' else 1
         (public / 'result.json').write_bytes(release.canonical(report))
         print(json.dumps({'status': report['status'], 'exitCode': report['exitCode'], 'checks': len(report['checks']),

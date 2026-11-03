@@ -1,5 +1,73 @@
 # D28-A 候选版本服务端独立验收
 
+## 2026-11-03 B五批原件已独立取回并分析（当前）
+
+B交付的280文件（28844335字节）已由A独立取回并逐项核验，SHA/长度无差异；“B关机无法取得原件”已由本段更新。五个原批次分别保留，原API中断native=null不补0。只读解析器Windows/VPS各5/5通过，双方规范分析报告10236字节、SHA `02b4c0fe573c328b052fb38002d74a4755ed9d673dc6e8a16d20e0ac25e10c13`完全一致；原认证trace/日志不上传GitHub。
+
+**新事实**：重下载原10秒监听中，7070.790ms用于等待按钮出现；export到原失败只观察2887.500ms，原HAR未有完整响应，不能称为“服务端10秒超时”。02全量日志的D19清理超时与稍后E2E清理超时已按原阶段分开；D19同次原生终止、拒绝栈/句柄仍未记录。73份中断JUnit316项/22失败、90份全量JUnit428项/2失败、c7两份JUnit7项/1失败均独立重算，不跨批拼成功。
+
+**HOLD不变**：原未采集的代理完整日志、拒绝栈/句柄以及未输出JUnit明确缺失，不再要求B补造旧件；下一步为B专用runner上保持原断言/deadline的定向同次捕获，关联版本就绪/下载请求/代理/宿主与原生清理结果，机制确定后做最小修复。A原历史EPERM/ENOTEMPTY/CLEANUP_FAILED仍OPEN。本轮未改产品或B文件，未放宽任何检查。
+
+A7b4a88b精确六CI已success；本轮新交接HEAD另看自身检查。没有最终新候选，未重封API/client/worker/镜像、重绑定账本或部署，未合并；付费请求/支出0，开发token计量UNKNOWN。操作、同次时间线和三类互审意见见 `tests/release/api/D28-B-ORIGINALS-REVIEW.md`，真实命令/退出/SHA见 `tests/release/api/evidence/d28-b-originals/`。
+
+## 2026-11-03 原失败原件交付与后继候选准备（历史：B待传状态已更新）
+
+结论仍 **HOLD**。B最新报告HEAD `a264cf11d17af7897019969a8b1aa3d65b11cfc9`，产品修复候选为 `7db2eaf9086c508d22785f7d1a8c329ba14bba93`；它不是旧00fd封存包。用户确认B电脑关机，先完成A独立部分。
+
+- **原件实际可取**：A的历史EPERM、ENOTEMPTY完整日志、旧CLEANUP_FAILED CI API日志及来源共55成员，逐项核验并上传 `/srv/codeless-handoff/d28/20261103-a-diagnosis/a-original-failures.tar`，2416640字节，SHA256 `56a0f6bbe1ee4135c066dea0699848993eaf0f50c32aee5513a6ca6ab693f571`；服务器校验原生0。原始私有内容不进入GitHub。原D22报告本次才独立计算SHA，显式标记非旧回执锚定。
+- **缺失不补造**：原EPERM只存message，原CLEANUP_FAILED断言前没有runner回执；同次拒绝栈/OS句柄不能事后恢复。原ENOTEMPTY临时根已清理。B的API中断、D19超时和7db重下载原件待其开机补传，当前只读其公开投影；根因仍null，没有猜测性产品修复或重跑全套求绿。
+- **下一次取证**：新增宿主Node文件操作观察器（原参数/同一Error、不重试、内容不采集、调用/拒绝栈和单调时序/观察到的句柄、4MiB截断显式标记），本机3/3原生0。它不覆盖API白名单清理后的子进程，不能替代同次128MiB管理员ETW。原件收集保护本机/VPS各2/2原生0。
+- **B修复只读复核**：A在隔离7db工作树离线锁定安装0，工作台14/14原生0，源码/HEAD未变；不替代完整E2E或失败后重下载。未触碰B指定Docker runner。
+- **预算当前已更新事实**：只读核验唯一账本revision2、B已对账历史0、无entries/active、可花2元、事件链通过；仍绑定00fd，A冻结付费。本轮没有改写数据库或现用控制器。
+- **重绑定工具已备妥未启用**：新增同一账本CAS追加候选绑定，核对实际成组包/六组件和新SHA六项success，保留旧支出、UNKNOWN占用、样本/事件历史，拒绝活跃进程、旧revision、篡改/换标和neutral。本机/VPS各10/10原生0；新版本仅放受控next-tools目录，兼容只读查询0且真实SQLite字节未变。
+
+最终候选未确定，尚未重封API/client/worker/镜像、绑定新候选或切换生产；这些按“根因最小修复及受影响重测→冻结成组封存→B复核→同账本追加绑定→维护者切换→独立实物核验”顺序执行。四阶段/ci-gate在本轮新交接HEAD须看其精确CI，不继承191/7db的结果；本轮未另跑本机四阶段，因未形成根因修复候选且B独占runner。T2/T3/M5未通过，T4仅已执行部分有原始证据。
+
+详细操作/同次证据清单：`tests/release/api/D28-JOINT-DIAGNOSIS.md`；命令、原生退出与SHA：`tests/release/api/evidence/d28-diagnosis/`。开发input/output/total和计量来源UNKNOWN；平台本轮付费请求0、支出0，fixture不调用模型。未自批、合并、改main或生产。
+
+## 2026-11-02 原包及共享预算已转入受控远端目录（当前）
+
+已按用户本次明确交付授权，将**原统一包**复制到既有VPS的独立SSH/SFTP目录 `/srv/codeless-handoff/d28/20261102-cny2`（root:0700，不在生产web/生成容器挂载目录）。没有重建/重新打包、开HTTP端口或切换生产。包 `unified-00fd-kit.tar` 为167813120字节，服务器独立SHA256仍为 `52e49be4fca54ca6b09ca77846bfd5453ef68c84026ccd484e6017ecf216c206`，文件0440；控件/原清单/工具也逐项核对原字节。README小文件与首次校验会话的传输中断保留，仅补小文件后单会话完成校验。
+
+A额外全量回读在600秒时限内超时（父进程1，scp终态未知），已读59146240字节的前缀SHA与原包一致；不冒称完整回读成功或B已完成下载。服务器已对完整原包计算SHA成功，B可用无该诊断时限的scp或SFTP `reget`续传后验证完整SHA；说明位于远端 `DOWNLOAD-NOTE.md`。
+
+B使用自己的D27既有VPS SSH身份（无需A的F盘或私钥路径）：
+
+```sh
+scp root@23.136.172.128:/srv/codeless-handoff/d28/20261102-cny2/unified-00fd-kit.tar ./unified-00fd-kit.tar
+scp root@23.136.172.128:/srv/codeless-handoff/d28/20261102-cny2/ACCESS.json ./ACCESS.json
+ssh root@23.136.172.128 python3 /srv/codeless-handoff/d28/20261102-cny2/d28_shared_budget.py status
+```
+
+`ACCESS.json`给出B解包后的组件路径和显式校验命令；原selection中的A路径仅作来源证明，不修改原manifest来迁就路径。操作手册 `tests/release/api/D28-B-CONTROLLED-HANDOFF.md` 与远端README相同。
+
+**共同预算只有一份权威账本**：远端 `budget-ledger.sqlite3`，快照 `budget-ledger.json`；ledgerId `e5762985-8989-410e-9d15-b58a83d7451e`，初始revision1。用户本轮累计上限2元，A已确认支出0并冻结后续付费启动，执行方交B。B先前用量未知，未由A猜成0：B用机器调用/活跃任务清单完成claim-b前，spendable=0；remainingAfterKnownExposure=2只是扣除已知占用后的上界。任何已发生/未知B用量先对账，不重置或另开2元账本。
+
+共享控制器以SQLite事务串行预约，一次仅一个活跃任务，按原50000tokens/峰值输出价先留0.4元；失败调用计费，未知保留0.4元，未确认进程结束不释放，重复样本/超额拒绝。事件链校验、只读快照与去敏用量投影均已实现；本机6/6、VPS6/6原生0，均为财务fixture，不发模型调用。A新SSH读取会话已成功查询真实账本及事件链；没有冒称已在B独立主机执行其SSH身份。
+
+证据 `tests/release/api/evidence/d28-transfer/transfer.json`、`server-delivery.json`、`ledger-initial-readback.json`；B须从实时status取余额，不依赖Git中的静态快照。此处只关闭“B取不到原包/共同账本”的A侧交付缺口，历史根因、新部署、真实质量、生产cover及M5仍HOLD；未批准、未合并。
+
+## 2026-11-02 第二次复审：统一候选与原阻塞闭环（当前）
+
+**结论仍HOLD；本轮没有声称修复历史EPERM/CLEANUP_FAILED，也没有部署或付费模型调用。** B已在PR95将A的a16ac25与B的80205692合为 **`00fd43333f35c5cb0cce425721fdce9cd1d0f956`**。本轮据此准备同源候选，独立worktree为 `.local-data/d28-a/unified-00fd433`，没有修改B文件或main。主分支仍2be。统一候选清单 `tests/release/api/d28-unified-candidate.json` 固定该源码/tree、API/JAR、client、worker及独立镜像；这是验收候选，不是根因修复或发布批准。
+
+本轮实际完成：
+
+- **精确00fd门禁六success**：[run41424603409](https://github.com/Echo-love928/CodeLess/actions/runs/41424603409)，`d28_ci_snapshot.py --head 00fd43333f35c5cb0cce425721fdce9cd1d0f956 --run 41424603409` 退出0；原日志私存，`evidence/d28-fix/ci-00fd433-2026-11-02T10-14-06.654200+00-00/result.json`。不继承a16或旧61成功，后续A交接HEAD自身检查另看PR。
+- **同源封存**：API manifest `3d0e52103de6bf1614bc751302566d51e6364459054fdbb4e6030cb8144486a9`，JAR仍 `d2c1bc7...`；client manifest `db83cd46801ab1c587cdb85e022533ec14735a6efe3b5301682cabc4f04f6fbe`；独立镜像 `sha256:e73196cae90d4f114cc1dd0c3e285524c3449a1b193e2befd49f8dcf05ccd445`，revision标签00fd、归档内容与配置摘要已核对。258个API源文件逐字节核对Git blob、JAR五迁移一致，API/client共享113文件全部相同。没有改共享策略tag或推送镜像。
+- **迁移/恢复**：新00fd JAR的空库/合成V4 dump→源cluster销毁→新cluster restore→迁移/权限等 **40项原生0**。另找回A机原D23机密备份，原manifest/dump摘要匹配，恢复至全新PG，用新候选JAR验证旧版本/源码/导出及权限 **22项原生0**；原备份字节不变，cleanupErrors=[]。这22项是真实历史生成数据（原模型mock），不是生产Linux绝对路径预览或新真实模型效果证明。原D23备份没有上传。
+- **新镜像真实回归**：封存API源码配明确e731镜像ID，真实Docker/Vue/Chromium正常路径通过；歧义目标按原要求ACTION_FAILED、worker exit1，两个build均0，容器/工作区/浏览器清理成功。回执在断言前保存。`evidence/d28-followup/unified-runtime.json` 记录两个场景、命令/原生0/摘要；不声称复现旧CLEANUP_FAILED。
+- **工具最小改动**：仅A允许范围内给 `existing_demo.py` 增加显式候选参数、`d28_attest.py` 增加候选/新输出参数；原默认和断言不变，新输出拒绝覆盖。`d28_live_identity.py`增加显式新候选/实际已安装manifest路径比较。8项原控制通过，路径越界/覆盖负对照按预期非零；新产物及原报告保持。
+
+尚未闭环的具体证据与下一步：
+
+1. **EPERM/CLEANUP_FAILED仍OPEN**。46份EPERM原JUnit/场景/journal及676107字节原CI API日志均复算匹配，47文件私有取证包SHA `2dcc9613a2b03c16cb290d330a6819b14f8aa7fb819632682a7db33b9fbf5488`，未上传。原EPERM仅存error.message而未存stack；原CLEANUP_FAILED在断言后才落报告，原同次runner/JUnit/句柄与拒绝栈缺失。当前GET旧run artifacts总数0，不能据此断言其历史上从未存在。`evidence/d28-followup/original-failure-chain.json`逐项列可用与缺失，rootCause=null；无法从新428/428倒推历史占用者。
+2. **有界带栈诊断受阻**。准备的 `d28_stack_trace.ps1` 仅启用独有命名的Kernel-File用户provider、stack、128MiB循环文件、7分钟截止；不改注册表或全局kernel logger。本次Windows UAC明确返回“operation canceled by user”，追踪未启动，两个原定向API用例没有执行；父记录器退出1、Maven退出null、JUnit=[]，不重启UAC或补0。脚本只有语法检查，实际stack捕获尚未验证。后续需原保留现场，或在用户再次允许且具备管理员会话时作一次有目标的新失败捕获；未确定机制前不写猜测性产品修复或添加重试。
+3. **新候选部署证明仍未通过**。已授权SSH只读将现部署与00fd清单比较，原生 **1**：运行JAR/worker/258源码/7web字节相同，但deployed记录、封存manifest和实际策略镜像仍61，三项失败。`evidence/d28-fix/live-identity-2026-11-02T10-25-19.254660+00-00.json`保留真实不匹配；旧61核验继续保留，不能当00fd已部署。根因/发布阻塞关闭后由部署维护者成组切换，再提供实际manifest路径，运行同一只读新候选比较入口。
+4. **真实质量/生产cover仍NOT_RUN**。现有主机模型凭据已配置，本轮不再称缺密钥；用户已明确授权本轮最多 **2元，额度不足即停止**，账号CNY/足额只读核验通过，证明仅私存。但原免凭据TLS前置12次中11次取得预期证书，第12次certs=0/subjectNONE/issuerNONE，原命令退出1；JVM探针和付费批次未到达。`evidence/d28-followup/real-admission.json`及原字节TLS观测保留；没有放宽证书门禁或重复求绿，新模型请求/支出0，本轮2元授权保留。`d28-real-acceptance-plan.json`给出00fd、原14样本/冻结运行时上限/无外层重试和当前官方峰值计价上界；旧fb79财务sidecar固定旧候选，不能借用其批准。需eval维护者绑定新候选并协调独占runner窗口；生产cover另需对应维护者完成新部署后的真实capture账本与已服务截图字节验收，不以本地截图代替。
+
+汇总 `tests/release/api/evidence/d28-followup/summary.json` 关联每份回执及SHA。T1本轮统一候选必需检查通过；T2仍未证明严重缺陷零；T3本轮迁移/恢复与包同源通过，但新部署比较失败；T4已执行部分有原始结果、完整验收仍不成立。M5保持HOLD。开发input/output/total与计量来源UNKNOWN；本轮付费模型请求0、合成累计请求/token UNKNOWN，分账记录。未批准、未合并。
+
 ## 2026-11-02 B复审后的当前修复状态
 
 PR94原精确HEAD `438c0f5` 的远端结果已取回：static/API/runner/infra success，**E2E和ci-gate failure**，[run41321844346](https://github.com/Echo-love928/CodeLess/actions/runs/41321844346)。79 passed、1 did not run、2 suite errors，原120秒suite/teardown截止；`evidence/d28-fix/ci-438c0f5-failure.json`及原日志/trace摘要保留。下面原“PENDING”仅是发布时快照，不再作为当前状态。
