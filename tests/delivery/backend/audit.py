@@ -132,6 +132,8 @@ def offline():
     result = {'observedAt': now(), 'head': git('rev-parse', 'HEAD'), 'errors': errors, 'references': checked,
               'localLinks': links, 'd28HashesChecked': len(old['receipts'] + old['verifierSources']),
               'secretScan': {'paths': sorted(scan_files), 'rules': list(patterns), 'findings': findings,
+                             'sourceHashes': {name: sha((ROOT / name).read_bytes()) for name in sorted(scan_files)
+                                              if name != 'tests/delivery/backend/evidence/materials.json'},
                              'limitation': 'High-confidence scan of D29 delivery material only; no entropy scan, raw private logs or full historical blob scan.'},
               'scope': 'Evidence/index/link checks, not re-execution of historical tests or proof of model quality.',
               'exitCode': 1 if errors else 0}

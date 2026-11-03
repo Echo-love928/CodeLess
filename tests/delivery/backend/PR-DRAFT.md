@@ -11,3 +11,5 @@
 - 接纳：保持草稿，M6前置HOLD；另一人审批、最新main组合全部必需success、无未解决讨论后才具备合并条件。作者不自批、不推main、不合并。
 
 详细命令、退出码、证据路径与token UNKNOWN均见docs/handoffs/D29-A.md。开发与平台运行时用量分账。
+
+草稿PR：[PR98](https://github.com/Echo-love928/CodeLess/pull/98)。主要材料b325a0a，最终head以PR为准；初始五阶段远端queued，ci-gate未出现，未获同伴批准，禁止继承旧SHA检查结果。
