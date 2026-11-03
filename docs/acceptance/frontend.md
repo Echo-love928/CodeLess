@@ -1,5 +1,29 @@
 ## 受控材料接收与原包核验（2026-11-03）
 
+## 2026-11-03 B 当前增量：本地完整门禁通过，M5 继续 HOLD
+
+B 固定源码 `edded45dd40d30d1bc0d83186c3828b22eba4ce7`。本次三文件变更是 E2E 资源调度、下载测试同步和同次代理/进程取证；生产截图、服务端导出、契约、依赖锁及生产超时均未修改。此前 `7db2eaf` 的取消终态事件补读前端修复保留。源码在全部测试期间不变；后续报告提交不冒充已测试或已部署的产品源码。A 尚未交付新的统一封存包，本轮不部署、批准或合并，main 未改。
+
+| 项目 | 定位、修复与证据边界 |
+| --- | --- |
+| D16 超时 | 原10-worker配置实际复现79pass/1fail。截图87.5ms已完成，Chromium close耗时12635ms，代理关闭约2ms且无活动/升级连接。`apps/web/playwright.config.ts` 保留D08早期独立lane，D09/D15/D16共用另一lane，另保留UI槽；同80项各一次、原120秒/零重试/断言保留。没有宣称找回历史OS拒绝栈或修改生产截图清理。 |
+| Windows失败/未运行项 | 原失败、全native单lane导致79pass/1notrun、仅降到2workers仍全局超时、10e3在CI缺UI槽的失败均保留。最终CI实际3workers、Windows4workers，全80项通过；原完整platform后续阶段也实际通过，原verify:e2e整体native0。 |
+| 失败后旧版本下载 | 原7db trace中7.07秒在等待按钮可用，export仅观察约2.89秒即被测试中断；原请求最终完成时间仍UNKNOWN。`d28-user-flow.spec.ts` 明确先就绪再起10秒下载事件计时，这是测试同步变化，不能称服务端性能修复，也不能称原组合计时语义不变。额外独立核算本轮4次就绪+下载总时长均<10秒；恢复后事件3712ms、就绪6183ms、合计9896ms，余量约104ms。下一候选必须重测此边界。 |
+| 同次现场 | `d28-flow.mjs` 在清理前捕获本次proxy stdout/stderr及摘要，记录API/browser PID、exit/close、是否主动清理。浏览器自然退出0；API退出1发生在显式清理阶段，不能记作新的API中断。 |
+
+最终源码原始 Windows 四阶段 `ci:gate` 整体native0，static/API/runner/E2E各自真实exit0、signal=null。API完整90份本批JUnit、428/428，failure/error/skip全0；runner285/285；E2E80/80并完成原full-platform链路。独立strict D28双用户链native0、canonical=true、cleanupErrors=[]；2应用、5任务、8真实构建、2发布、17次明确mock调用，双向16项跨资源404、过期版本/错误摘要409、真实离线/凭据恢复、失败保留可用版本、历史ZIP与错版本拒绝、12路由/视口实际验证。
+
+追加平台390px全链路同源验证也已原生0：两个独立用户重复原登录→生成→修复→编辑→发布→下载及权限/恢复断言，11个平台检查点宽度390且无横向溢出。原480秒/总500秒/零重试不变；仅私有验收输入改变初始视口、等价导入路径并增加只读布局/截图断言，输入与SHA单列，不冒充原桌面测试输入未变。移动恢复重下载事件约781ms、就绪约1872ms；其两份ZIP/部署清单独立复算一致。原始390px可见trace帧确认工作台Ada组件可见可选、发布页Hedy内容可见；保留长页面嵌入区空白及导航过渡空白帧，不仅凭长页PNG判断渲染。详见同目录mobile.json。
+
+两个用户的applicationId/versionId/sourceDigest/artifactDigest/publicationId、实际ZIP SHA与清单、部署清单及全部发布文件摘要逐项一致。地址均为本地HTTPS fixture，`productionPublicUrl=null`；当前结果不能充当公网版本/服务器API/worker/image/生产cover验收。生产仍以已知61历史身份记录，未以本地新版本替换。真实模型质量不在mock结论内，本轮不启动付费请求。
+
+复现入口：锁定仓库Node/pnpm/Java与本机实际DOCKER_HOST后执行 `corepack pnpm ci:gate`；专项使用 `node tests/release/browser/d28-record.mjs flow`。旧10-worker复现须从a264配置另存等价绝对路径副本，并单独挂载只读D16相位观察器，不改主分支、断言、截止或重试。原件经受控渠道交接，认证trace/原日志不公开。证据见 `tests/release/browser/evidence/d28/resolution-20261103/`，公开引用由 `d28-evidence-integrity.mjs` 直接校验Git blob字节。
+
+放行仍阻塞：历史EPERM/ENOTEMPTY/CLEANUP_FAILED和原API中断尚无完整同次根因证据；最终A+B统一候选须重新封存并绑定唯一预算，成组部署后独立核验公网URL/源码ZIP/部署清单与生成版本；真实质量、生产cover及双方增量复审未完成。最终报告HEAD另查精确六项检查，不继承源码SHA的绿灯。
+
+**以下为历史采集记录，保留原失败/未知及旧提交结论；当前状态以上述增量和对应证据为准。**
+
+
 已实际接收A@1915777交付的原统一包：167813120字节、完整SHA25652e49be4…一致，275/275成员路径、长度和摘要全部匹配；原镜像OCI索引到平台manifest、配置/层摘要链及源码revision00fd逐级复算通过，API/client原包校验器均原生0。未load/build/retag或部署。初次连接中断及私有校验器两处OCI解释错误保留在核验历史，最终原包字节未改。
 
 配套受控材料已取得并完成本轮对账，6项独立财务控制fixture通过；访问配置、权威操作记录及详细对账仅保留在受控私有渠道。本轮未启动付费批次，也未对当前候选作付费准入。
