@@ -26,10 +26,32 @@ def sha(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def git(*args):
+def git_bytes(*args):
     result = subprocess.run(['git', '-c', 'safe.directory=' + ROOT.as_posix(), *args],
                             cwd=ROOT, capture_output=True, check=True)
-    return result.stdout.decode('utf-8').strip()
+    return result.stdout
+
+
+def git(*args):
+    return git_bytes(*args).decode('utf-8').strip()
+
+
+def historical_reference(ref, revision, *, source=False):
+    """Bind immutable evidence to Git bytes and still reject worktree tampering.
+
+    Only the explicitly listed Python verifier sources may have Git's LF->CRLF
+    checkout conversion. Receipt/log/binary bytes are never normalized.
+    """
+    blob = git_bytes('show', revision + ':' + ref['path'])
+    working = (ROOT / ref['path']).read_bytes()
+    exact = working == blob
+    crlf = (source and ref['path'].endswith('.py') and b'\r' not in blob and b'\0' not in blob
+            and working == blob.replace(b'\n', b'\r\n'))
+    blob_matches = sha(blob) == ref['sha256']
+    return {'path': ref['path'], 'revision': revision, 'expectedSha256': ref['sha256'],
+            'gitBlobSha256': sha(blob), 'worktreeSha256': sha(working),
+            'worktreeComparison': 'EXACT' if exact else 'LF_TO_CRLF_ONLY' if crlf else 'DIFFERENT',
+            'gitMatchesExpected': blob_matches, 'passed': blob_matches and (exact or crlf)}
 
 
 def save(name, data):
@@ -101,9 +123,14 @@ def offline():
                 errors.append(claim['id'] + ': missing symbol ' + ref['symbol'])
             checked.append({'claim': claim['id'], **ref, 'sha256': sha(data)})
     old = json.loads((ROOT / 'tests/release/api/evidence/d28-final-review/summary.json').read_text(encoding='utf-8'))
-    for ref in old['receipts'] + old['verifierSources']:
-        if sha((ROOT / ref['path']).read_bytes()) != ref['sha256']:
-            errors.append('D28 receipt hash mismatch: ' + ref['path'])
+    revision = git('rev-parse', 'HEAD')
+    historical = []
+    for group in ['receipts', 'verifierSources']:
+        for ref in old[group]:
+            row = historical_reference(ref, revision, source=group == 'verifierSources')
+            historical.append(row)
+            if not row['passed']:
+                errors.append('D28 historical reference mismatch: ' + ref['path'])
     links = []
     for name in DOCS:
         text = (ROOT / name).read_text(encoding='utf-8')
@@ -130,7 +157,8 @@ def offline():
                 findings.append({'path': name, 'line': text.count('\n', 0, m.start()) + 1, 'rule': rule})
     errors.extend('Secret candidate: ' + str(f) for f in findings)
     result = {'observedAt': now(), 'head': git('rev-parse', 'HEAD'), 'errors': errors, 'references': checked,
-              'localLinks': links, 'd28HashesChecked': len(old['receipts'] + old['verifierSources']),
+              'localLinks': links, 'd28HashesChecked': len(historical), 'historicalReferences': historical,
+              'historicalHashPolicy': 'Git blob SHA256 plus exact worktree bytes; only listed Python verifier sources permit LF->CRLF checkout conversion. No receipt/log/binary normalization.',
               'secretScan': {'paths': sorted(scan_files), 'rules': list(patterns), 'findings': findings,
                              'sourceHashes': {name: sha((ROOT / name).read_bytes()) for name in sorted(scan_files)
                                               if name != 'tests/delivery/backend/evidence/materials.json'},
@@ -212,12 +240,14 @@ def peer():
     files, fr = get('/pulls/97/files?per_page=100')
     if p['changed_files'] > 100:
         raise ValueError('Peer file pagination required')
-    head = git('rev-parse', 'origin/pr97-review')
+    head = git('rev-parse', p['head']['sha'])
     # Copy exact read-only PR blobs into a task-private fixture root. Never execute B gate recorder.
     paths = [f['filename'] for f in files]
     paths += ['docs/environment.md', 'docs/scope.md', 'docs/architecture.md', 'docs/install.md',
-              'docs/troubleshooting.md', 'docs/demo/D25-B.md', 'docs/handoffs/D28-B.md', 'contracts/README.md',
+              'docs/troubleshooting.md', 'docs/demo/D25-B.md', 'docs/handoffs/D28-A.md', 'docs/handoffs/D28-B.md', 'contracts/README.md',
               'tests/release/browser/evidence/d28/release-20261103/status.json']
+    paths += ['tests/release/api/evidence/d28-final-review/' + name + '.json' for name in
+              ['summary', 'quality', 'live-identity', 'export-verification', 'live-cover']]
     paths += ['apps/web/src/features/' + f for f in [
         'apps/AppsPage.vue', 'workbench/WorkbenchPage.vue', 'versions/VersionWorkspace.vue',
         'visual-edit/VisualEditSelector.vue', 'visual-edit/VisualComponentEditor.vue',
@@ -245,7 +275,7 @@ def peer():
               'linkedHistoricalStatus': status,
               'limits': 'B documentation tests only: no human rehearsal, video playback or browser step validation. No B file changed, no PR approval.',
               'exitCode': 0 if tested.returncode == 0 and head == p['head']['sha'] else 1}
-    save('peer97', result)
+    save('peer97-' + head[:7], result)
     print(json.dumps({'head': head, 'liveHead': p['head']['sha'], 'testExit': tested.returncode, 'exitCode': result['exitCode']}))
     return result['exitCode']
 

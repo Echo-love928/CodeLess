@@ -1,15 +1,14 @@
 任务ID：D29-A
 
-新访问者缺少仓库权限、成员贡献和后端技术声明的统一评审入口。本PR补充README入口、后端交付材料和讲解/换手脚本，以真实匿名GET、Git/PR快照和逐项代码/测试/历史回执支撑讲解；当天不增加功能。
+本PR提供仓库匿名访问与成员贡献追溯、README评审入口、后端C1–C7技术证据和讲解脚本。针对B发现的Windows复现阻塞，材料校验改用Git原始摘要并校验工作区内容，只允许三个明确的Python历史校验器存在LF→CRLF检出差异，其他源码修改、JSON/日志/PNG/ZIP字节差异仍失败。
 
-- 范围：README、docs/delivery/backend.md、docs/demo/backend-script.md、docs/handoffs/D29-A.md与本卡tests/delivery/backend。无依赖、配置、迁移、契约或生产变更。
-- 验证：匿名访问/历史收集原生0；材料28证据引用、17份D28摘要及本地链接检查0；安装回归5/5；static0（前端213测试及构建）；API1（JAVA_HOME无效）、runner1（110项76过34失败，含Docker缺失）、E2E1（4173被占用）。本机ci-gate派生FAILED，不继承D28历史绿色。
-- 失败与边界：保留初版收集器错误、材料自链接首次失败和所有阶段真实退出；未知不补0；PR94/95 closed但merged=false，main仅一个作者，需PR与评审共同追溯。T4仅本卡高置信秘密格式扫描，不冒称全历史审计。
-- 模型来源：D29未启动REAL/付费请求；mock编排、真实构建/DB/浏览器与D28 REAL8/9增量组合分别标注，TASK-03失败和账单UNKNOWN保留。
-- 同伴审查：PR97@28037c5只读六文件、独立B文档检查2/2；发现过时D28当前状态、未交付门禁报告和真人/录像缺口，见review-D29-B.md，未批准。
-- 未完成：真人A/B换手演练、B材料修正/互审批准、本机资源与端口协调后的真实检查、最终候选远端六门禁。
-- 接纳：保持草稿，M6前置HOLD；另一人审批、最新main组合全部必需success、无未解决讨论后才具备合并条件。作者不自批、不推main、不合并。
+- 范围：README、后端delivery/demo/handoff与本卡tests/delivery/backend；无产品、公共契约、锁、CI、迁移、生产或全局Git配置改动。
+- 受影响验证：8项回归通过；真实core.autocrlf=true副本保留旧默认1、旧Git原字节0、修复后默认0和篡改拒绝1；原失败不改写。材料校验覆盖28引用、17历史摘要、链接与本卡秘密格式扫描；安装回归5/5。命令/原生退出/原件SHA见docs/handoffs/D29-A.md与evidence/crlf-review/replay.json。
+- 范围调整：按用户2026-11-04最新反馈，真人彩排和完整录像取消，不列缺口，不伪造交付。讲解顺序、现场/mock/历史标识和证据边界保留。
+- 同伴材料：PR97@28037c5审查仅作历史；按最终cc60340增量复核，原文档检查3/3，见review-D29-B-final.md。未修改B文件或提交批准。
+- 阶段门禁：旧3d15a92六项success（API437、runner293、E2E80）有真实原日志；旧本机API/runner/E2E退出1仍保留。新HEAD触发原门禁并读取精确新SHA终态，不继承旧结果；最终状态同步本PR正文。
+- 失败与边界：匿名/未知/缺文件/坏摘要失败关闭；PR94/95 closed但merged=false；TASK-03仍失败，8/9为增量组合；账单与开发token UNKNOWN。秘密检查只限本卡高置信格式，不冒称全历史审计。
+- 模型与配置：本次无REAL/付费模型请求，无新运行配置或数据变化；开发input/output/total及计量来源UNKNOWN，平台用量另列。
+- 接手/合并：B按新SHA增量复核并决定批准；全部必需检查真实success、最新main同步、无未解决讨论及另一人批准后才具备合并条件。保持草稿，作者不自批、不合并。
 
-详细命令、退出码、证据路径与token UNKNOWN均见docs/handoffs/D29-A.md。开发与平台运行时用量分账。
-
-草稿PR：[PR98](https://github.com/Echo-love928/CodeLess/pull/98)。主要材料b325a0a，最终head以PR为准；初始五阶段远端queued，ci-gate未出现，未获同伴批准，禁止继承旧SHA检查结果。
+草稿：[PR98](https://github.com/Echo-love928/CodeLess/pull/98)。基线 `aefaca193af3019bcadbcf8fdf3f6424baee750c`，B已审旧候选 `3d15a920e189579d7c48b89961a986035bf81b3e`；当前修复候选以PR head为准。

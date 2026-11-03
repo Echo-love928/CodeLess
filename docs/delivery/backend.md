@@ -39,13 +39,15 @@ PR 原提交对象可能不在新 clone 的主线历史中。若 `git show` 报�
 | [architecture](../architecture.md)、[contracts](../../contracts/README.md) | 单一生成策略、真值状态机、API/执行面隔离、v0 契约。 |
 | [安装](../install.md)、[环境](../environment.md)、[排障](../troubleshooting.md) | 锁定版本、真实 PG/Docker/Chromium、账号初始化和清理方法。 |
 | [服务端验收](../acceptance/backend.md)、[D28-A](../handoffs/D28-A.md) | D28 当前索引及历史失败，不把早期 HOLD 与最终候选混用。 |
-| [后端讲解脚本](../demo/backend-script.md) | 操作者步骤、逐项声明与演练记录。 |
+| [后端讲解脚本](../demo/backend-script.md) | 操作者步骤、逐项声明与材料走查；真人彩排和完整录像已取消。 |
 
 沿用 Java21、Boot4.1.1、Spring AI2.0.1、Maven3.9.11、Node24.22.1、pnpm12.6.0、PG17.6-alpine、Playwright1.60.0；以已锁文件/ADR为准。本任务不安装新版本、不修改依赖、CI、迁移或公共契约。`docs/task-state.md` 包含 D05 的历史适配器说明；当前管线以 `AgentLoop`、`AgentEvidence` 和 D28 实际验收为依据，不能引用 D05 的“未接模型”作为当前实现描述。
 
 ## 技术声明与证据索引
 
 [claims.json](../../tests/delivery/backend/claims.json) 给出每条声明的代码符号、测试及原始证据路径；[材料校验回执](../../tests/delivery/backend/evidence/materials.json) 记录 SHA256、D28 原回执摘要核验和本地链接检查。索引检查通过只证明材料可定位且摘要一致，不表示重新执行了对应测试。
+
+历史摘要使用当前提交中的 Git 原始 blob 字节核对，同时检查工作区没有内容变化。仅 D28 索引明确列出的三个 Python 校验器允许完整的 LF→CRLF 检出转换，并分别记录 Git/工作区 SHA256；其他差异仍失败。JSON 回执、日志、PNG、ZIP 不作换行归一化。不要求 Windows 用户关闭 `core.autocrlf` 或改全仓属性。默认 CRLF 检出旧命令退出1、同一 Git 原字节下旧命令退出0、新校验器默认检出退出0和篡改拒绝退出1均保留在 [CRLF 对照](../../tests/delivery/backend/evidence/crlf-review/replay.json)。
 
 | 编号 | 讲解内容及边界 | 正常、失败及边界证据 |
 | --- | --- | --- |
@@ -61,6 +63,9 @@ PR 原提交对象可能不在新 clone 的主线历史中。若 `git show` 报�
 
 ```powershell
 python tests/delivery/backend/audit.py offline
+python tests/delivery/backend/test_audit.py -v
+# 独立副本复现旧/新校验器对照，需要本机Git及可用临时磁盘；不运行产品或付费模型
+python tests/delivery/backend/crlf_replay.py
 python tests/delivery/backend/audit.py static
 python tests/delivery/backend/audit.py api
 python tests/delivery/backend/audit.py runner
@@ -70,4 +75,4 @@ python tests/delivery/backend/audit.py ci --head <最终40位PR提交>
 
 四个 stage 分别运行根 `corepack pnpm verify:*`，不修改断言、重试、隔离或成功条件。原生日志位于忽略的 `.local-data/d29-a/`，公开回执仅记录命令、退出码和日志摘要；既有测试重写历史 evidence 时，保存新观察并还原原字节。CI 快照私存，避免为记录最终SHA而再次改动该SHA；远端结果不得继承给后续提交。
 
-T4 的扫描仅覆盖本卡交付材料，检查私钥头、已知token格式和带密码URL，输出仅含路径/行号/规则；不输出命中值。它不是历史全量秘密审计或所有格式的完备证明。原请求、Cookie、私钥、数据库备份、完整生产日志不得加入材料；D28仅链接已有去敏投影及其摘要。开发token实测未知；D29不启动付费模型，不续用D28剩余额度。真人换手、D29-B审查和最终门禁未完成时，M6前置保持HOLD。
+T4 的扫描仅覆盖本卡交付材料，检查私钥头、已知token格式和带密码URL，输出仅含路径/行号/规则；不输出命中值。它不是历史全量秘密审计或所有格式的完备证明。原请求、Cookie、私钥、数据库备份、完整生产日志不得加入材料；D28仅链接已有去敏投影及其摘要。开发token实测未知；D29不启动付费模型，不续用D28剩余额度。用户最新反馈已取消真人彩排和完整录像，不补造记录，也不将取消项继续列为阻塞。合并仍要求新HEAD真实门禁、同伴增量复审和批准，不能继承旧SHA成功。
