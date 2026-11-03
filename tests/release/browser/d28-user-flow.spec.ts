@@ -1,6 +1,6 @@
 // D28 independent extension of D20 business suite at main 2be793d.
-import { expect, test, type Page, type BrowserContext } from '@playwright/test'
-import { readFile, writeFile } from 'node:fs/promises'
+import { expect, test, type Page, type BrowserContext, type Locator, type Request, type Response } from '@playwright/test'
+import { readFile, writeFile, appendFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { verify, sha } from '../../export/verify-export.mjs'
@@ -9,6 +9,39 @@ import { openInitialLogin } from '../../e2e/full/initial-navigation.mjs'
 import { awaitDeployment } from '../../e2e/full/deployment-terminal.mjs'
 
 const output = process.env.CODELESS_FULL_OUTPUT!
+async function downloadReadyVersion(page: Page, button: Locator, version: { id: string; sourceDigest: string }) {
+  const preparationStarted = performance.now()
+  let downloadStarted: number | undefined
+  let request: Request | undefined
+  let completed = false
+  const events: { phase: string; elapsedMs: number; status?: number }[] = []
+  const mark = (phase: string, status?: number) => events.push({ phase, elapsedMs: performance.now() - downloadStarted!, ...(status === undefined ? {} : { status }) })
+  const onRequest = (value: Request) => {
+    if (new URL(value.url()).pathname === `/api/v0/versions/${version.id}/export`) { request = value; mark('request') }
+  }
+  const onResponse = (value: Response) => { if (value.request() === request) mark('response', value.status()) }
+  const onFinished = (value: Request) => { if (value === request) mark('body-finished') }
+  try {
+    // The original trace spent7.1s locating a not-yet-loaded button while the
+    // download timer was already running. Keep the action/readiness budget and
+    // the actual click/download event deadline at their original10s each.
+    await expect(button).toBeEnabled({ timeout: 10_000 })
+    downloadStarted = performance.now()
+    page.on('request', onRequest); page.on('response', onResponse); page.on('requestfinished', onFinished)
+    const [download] = await Promise.all([
+      page.waitForEvent('download', { timeout: 10_000 }),
+      button.click({ timeout: 10_000 }),
+    ])
+    mark('download'); completed = true
+    return download
+  } finally {
+    page.off('request', onRequest); page.off('response', onResponse); page.off('requestfinished', onFinished)
+    await appendFile(join(output, 'download-observations.jsonl'), JSON.stringify({
+      versionId: version.id, sourceDigest: version.sourceDigest, eventDeadlineMs: 10_000,
+      readinessMs: (downloadStarted ?? performance.now()) - preparationStarted, completed, events,
+    }) + '\n')
+  }
+}
 const frame = (page: Page) => page.frameLocator('iframe[title="当前版本预览"]')
 async function call(page: Page, path: string, method = 'GET', body?: unknown, key?: string) {
   return page.evaluate(async ({ path, method, body, key }) => {
@@ -166,9 +199,7 @@ test('D28-B T1–T3: real repair and responsive routes; two isolated users gener
       await persist()
       await publicPage.close()
       const selected = await get(page, 'versions/' + actor.edited)
-      const downloading = page.waitForEvent('download')
-      await panel.getByRole('button', { name: '下载源码 · v' + selected.number, exact: true }).click()
-      const download = await downloading
+      const download = await downloadReadyVersion(page, panel.getByRole('button', { name: '下载源码 · v' + selected.number, exact: true }), selected)
       expect(download.suggestedFilename()).toBe('codeless-' + actor.edited + '.zip')
       const zip = await readFile((await download.path())!)
       expect(readZip(zip).find((file: any) => file.name.endsWith('/src/components/ProfileCard.vue'))!.data.toString('utf8')).toContain('Hedy Lamarr')
@@ -242,18 +273,16 @@ test('D28-B T1–T3: real repair and responsive routes; two isolated users gener
     expect((await get(a.page, 'applications/' + a.app + '/publications')).latestSuccessful.id).toBe(a.publication.id)
     await a.page.reload(); await expect(frame(a.page).getByTestId('profile-name')).toHaveText('Hedy Lamarr', { timeout: 30_000 })
     const usable = await get(a.page, 'versions/' + a.edited)
-    const usableDownload = a.page.waitForEvent('download')
-    await a.page.getByRole('region', { name: '只读源码' }).getByRole('button', { name: '下载源码 · v' + usable.number, exact: true }).click()
-    expect(sha(await readFile((await (await usableDownload).path())!))).toBe(a.downloadDigest)
+    const usableDownload = await downloadReadyVersion(a.page, a.page.getByRole('region', { name: '只读源码' }).getByRole('button', { name: '下载源码 · v' + usable.number, exact: true }), usable)
+    expect(sha(await readFile((await usableDownload.path())!))).toBe(a.downloadDigest)
     const publicPage = await a.context.newPage()
     await publicPage.goto(a.publication.url); await expect(publicPage.getByTestId('profile-name')).toHaveText('Hedy Lamarr'); await publicPage.close()
     // Historical version download uses its own source and must retain Ada after edit/failure.
     const original = await get(a.page, 'versions/' + a.original)
     await a.page.locator(`[data-version-id="${a.original}"]`).getByRole('button').click()
     const source = a.page.getByRole('region', { name: '只读源码' })
-    const downloading = a.page.waitForEvent('download')
-    await source.getByRole('button', { name: '下载源码 · v' + original.number, exact: true }).click()
-    const download = await downloading, historical = await readFile((await download.path())!)
+    const download = await downloadReadyVersion(a.page, source.getByRole('button', { name: '下载源码 · v' + original.number, exact: true }), original)
+    const historical = await readFile((await download.path())!)
     expect(readZip(historical).find((file: any) => file.name.endsWith('/src/components/ProfileCard.vue'))!.data.toString('utf8')).toContain('Ada Lovelace')
     const historicalValidation = verify(historical, { versionId: a.original, sourceDigest: original.sourceDigest })
     expect(historicalValidation.status).toBe('PASSED')

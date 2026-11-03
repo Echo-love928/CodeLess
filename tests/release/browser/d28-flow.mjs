@@ -26,6 +26,14 @@ report.sources = Object.fromEntries(await Promise.all(paths.map(async p => [p, s
 await writeFile(join(output, 'run.json'), JSON.stringify(report, null, 2))
 console.log(JSON.stringify({ output, task: 'D28-B', status: 'RUNNING' }))
 let database, hosting, tls, runtime, api, browser
+report.processLifecycle = []
+const cleaning = new Set()
+function observeProcess(child, resource) {
+  report.processLifecycle.push({ resource, event: 'started', pid: child.pid, at: new Date().toISOString() })
+  for (const event of ['exit', 'close']) child.once(event, (code, signal) => {
+    report.processLifecycle.push({ resource, event, pid: child.pid, code, signal, duringCleanup: cleaning.has(resource), at: new Date().toISOString() })
+  })
+}
 const docker = args => run('docker', args, { timeout: 60000 })
 const port = async () => { const server = createServer(); server.listen(0, '127.0.0.1'); await once(server, 'listening'); const value = server.address().port; await new Promise(done => server.close(done)); return value }
 const sleep = ms => new Promise(done => setTimeout(done, ms))
@@ -100,6 +108,7 @@ try {
     '--codeless.agent.repository-root=' + root, '--codeless.agent.private-root=' + env.CODELESS_AGENT_PRIVATE_ROOT,
     '--codeless.agent.node=' + process.execPath, '--codeless.tasks.poll-ms=100', '--codeless.deploy.poll-ms=100',
     '--CODELESS_PREVIEW_GATEWAY_INTERNAL_ORIGIN=http://127.0.0.1:' + controlPort], env, join(output, 'api.log'))
+  observeProcess(api, 'api')
   const readyEnd = Date.now() + 60000
   while (true) {
     assert.equal(api.exitCode, null, 'API exited; inspect api.log')
@@ -121,6 +130,7 @@ try {
     '--mount', `type=bind,source=${join(output, 'tls/test-key.pem')},target=/certs/server.key,readonly`, 'nginx:1.27.5-alpine'])
   docker(['exec', hosting, 'nginx', '-t'])
   browser = start(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', '--config', 'tests/release/browser/playwright.d28.config.ts'], env, join(output, 'browser.log'))
+  observeProcess(browser, 'browser')
   const [exitCode, signal] = await once(browser, 'close')
   report.browserExitCode = exitCode; report.browserSignal = signal
   report.sql = JSON.parse(sql("SELECT json_build_object('applications',(SELECT json_agg(json_build_object('id',id,'ownerId',owner_id,'latestReadyVersionId',latest_ready_version_id)) FROM applications),'tasks',(SELECT json_agg(json_build_object('id',id,'applicationId',application_id,'status',status,'failureCode',failure_code)) FROM generation_tasks),'builds',(SELECT json_agg(json_build_object('id',id,'taskId',task_id,'versionId',version_id,'status',status,'exitCode',exit_code,'artifactDigest',artifact_digest)) FROM builds),'publications',(SELECT json_agg(json_build_object('id',id,'applicationId',application_id,'versionId',version_id,'status',status)) FROM publications),'models',(SELECT json_agg(json_build_object('provider',provider,'status',status,'inputTokens',input_tokens,'outputTokens',output_tokens)) FROM model_calls))"))
@@ -141,7 +151,22 @@ try {
   report.status = 'FAILED'; report.error = error.stack; console.error(error)
 } finally {
   report.cleanupErrors = []
+  // Capture this exact fixture's proxy logs before API/runtime shutdown adds
+  // cleanup traffic. Never substitute another batch's proxy evidence.
+  if (hosting) {
+    try {
+      const info = JSON.parse(docker(['inspect', hosting]))[0]
+      assert.equal(info.Id, hosting); assert.equal(info.Config.Labels['codeless.test'], 'd20-full')
+      const captured = spawnSync('docker', ['logs', hosting], { windowsHide: true, timeout: 10000 })
+      await writeFile(join(output, 'proxy.stdout.log'), captured.stdout ?? Buffer.alloc(0))
+      await writeFile(join(output, 'proxy.stderr.log'), captured.stderr ?? Buffer.alloc(0))
+      report.proxyLogs = { capturedAt: new Date().toISOString(), nativeExitCode: captured.status,
+        signal: captured.signal, errorCode: captured.error?.code ?? null,
+        stdoutSha256: sha(captured.stdout ?? Buffer.alloc(0)), stderrSha256: sha(captured.stderr ?? Buffer.alloc(0)) }
+    } catch (error) { report.proxyLogs = { status: 'UNAVAILABLE', errorCode: error.code ?? error.name } }
+  }
   for (const [name, cleanup] of [['browser', () => stop(browser)], ['api', () => stop(api)], ['runtime', () => runtime?.close()], ['tls', () => tls && closeServer(tls)]]) {
+    cleaning.add(name)
     try { await cleanup() } catch (error) { report.cleanupErrors.push({ resource: name, error: error.message }) }
   }
   for (const [name, id] of [['hosting', hosting], ['database', database]]) if (id) {

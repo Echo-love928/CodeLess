@@ -1,26 +1,34 @@
 import { defineConfig, devices } from '@playwright/test'
+import { availableParallelism } from 'node:os'
+
+const nativeAcceptances = [
+  '**/e2e/runner/browser.spec.ts', '**/e2e/preview/flow.spec.ts',
+  '**/e2e/deploy/hosting.spec.ts', '**/e2e/share/screenshot.spec.ts',
+]
 
 export default defineConfig({
   testDir: '../../tests',
   testMatch: ['**/e2e/**/*.spec.ts', '**/regression/release-ui/**/*.spec.ts'],
   globalTimeout: 120_000,
+  // Native cases fork additional Docker/Chromium processes beyond these workers.
+  workers: Math.min(4, Math.max(1, Math.floor(availableParallelism() / 2))),
   use: {
     baseURL: 'http://127.0.0.1:4173',
     trace: 'retain-on-failure',
   },
-  // This native acceptance has its own 115s budget. Enqueue it before UI
-  // files so it gets the existing global budget instead of starting at ~78s.
-  // The two projects partition the same tests; neither deadlines nor retries change.
+  // Start native work first, one nested workload at a time, alongside UI cases.
+  // The projects retain every existing case and its original deadline/assertions.
   projects: [{
     name: 'runner-chromium',
-    testMatch: '**/e2e/runner/browser.spec.ts',
+    testMatch: nativeAcceptances,
+    workers: 1,
     use: {
       ...devices['Desktop Chrome'],
       channel: process.env.CODELESS_PLAYWRIGHT_CHANNEL === 'chrome' ? 'chrome' : undefined,
     },
   }, {
     name: 'chromium',
-    testIgnore: '**/e2e/runner/browser.spec.ts',
+    testIgnore: nativeAcceptances,
     use: {
       ...devices['Desktop Chrome'],
       channel: process.env.CODELESS_PLAYWRIGHT_CHANNEL === 'chrome' ? 'chrome' : undefined,
