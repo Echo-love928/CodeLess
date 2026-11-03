@@ -15,6 +15,7 @@ import re
 import select
 import signal
 import socket
+import stat
 import struct
 import subprocess
 import sys
@@ -214,6 +215,42 @@ def cleanup(job, deadline):
     return final.returncode == 0 and not final.stdout.strip()
 
 
+def share_publication_receipt(config, data, output):
+    """Only the successful publish receipt becomes readable to the API IPC group.
+
+    Its content and public modes stay immutable. The preview/hosting accounts do
+    not join this group, and neither the group nor anyone else receives write.
+    """
+    request, response = json.loads(data), json.loads(output)
+    payload = request['payload']
+    identifier = payload['publicationId']
+    if (request.get('action') != 'publish' or type(config.get('apiUid')) is not int
+            or config['apiUid'] == os.geteuid() or not isinstance(identifier, str)
+            or str(uuid.UUID(identifier)) != identifier):
+        raise ValueError('Invalid publication receipt binding')
+    root = ROOT / 'publication/sites'
+    directory = root / identifier
+    if root.is_symlink() or directory.is_symlink() or directory.resolve() != directory:
+        raise ValueError('Publication receipt path rejected')
+    path = directory / '__deployment.json'
+    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    try:
+        info = os.fstat(descriptor)
+        if (not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or info.st_uid != os.geteuid()
+                or info.st_gid != os.getegid() or info.st_size > 1024 * 1024
+                or stat.S_IMODE(info.st_mode) not in (0o600, 0o640)):
+            raise ValueError('Publication receipt ownership rejected')
+        receipt = json.loads(os.read(descriptor, 1024 * 1024 + 1))
+        if (receipt.get('deploymentId') != identifier or receipt.get('versionId') != payload['versionId']
+                or receipt.get('artifactDigest') != payload['artifactDigest']
+                or response != {'url': receipt.get('url')}):
+            raise ValueError('Publication receipt identity rejected')
+        os.fchmod(descriptor, 0o640)
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
 def handle(connection, config):
     pid, uid, gid = struct.unpack('3i', connection.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
     if uid != config['apiUid']:
@@ -266,6 +303,15 @@ def handle(connection, config):
                           'processesCleaned': processes_cleaned}), flush=True)
     if not processes_cleaned:
         raise ProcessCleanupFailure('Host job cleanup could not be confirmed')
+    if code == 0 and action == 'publish':
+        try:
+            share_publication_receipt(config, data, output)
+        except Exception:
+            # Never acknowledge a publication whose private receipt the fixed
+            # API cover coordinator cannot validate. No arbitrary file is shared.
+            code, output = 2, b''
+            print(json.dumps({'job': job, 'action': action, 'exit': code,
+                              'reason': 'PublicationReceiptReadSharingRejected'}), flush=True)
     response = json.dumps({'exit': code, 'output': base64.b64encode(output).decode('ascii')}).encode()
     connection.sendall(struct.pack('!I', len(response)) + response)
 
