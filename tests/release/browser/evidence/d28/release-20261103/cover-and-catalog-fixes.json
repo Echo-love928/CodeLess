@@ -1,0 +1,139 @@
+{
+  "candidate": "0a7e0761114aa25e47ccdfbac02bd9d5fa5d4a6a",
+  "cover": {
+    "rootCause": "Production cover inherited a publish/build-only IPC executable; its screenshot entry was refused",
+    "readOnlyReproduction": "ValueError: Unsupported entry or roots",
+    "configuration": "CODELESS_COVER_NODE_EXECUTABLE, default CODELESS_NODE_EXECUTABLE",
+    "source": "services/api/src/main/java/dev/codeless/api/cover/CoverConfiguration.java",
+    "before": {
+      "path": ".local-data/d28-b/release-final/cover-regression-before/native.json",
+      "sha256": "7ad848c44f13eb6c3fe97e20db2d1cf8eced14ebb07e51448e9998c20a6b563a",
+      "bytes": 360,
+      "exitCode": 1,
+      "signal": null,
+      "command": [
+        "C:\\WINDOWS\\system32\\cmd.exe",
+        "/d",
+        "/c",
+        "services\\api\\mvnw.cmd",
+        "-B",
+        "-ntp",
+        "-f",
+        "services/api/pom.xml",
+        "-Dtest=CoverConfigurationTest",
+        "test"
+      ],
+      "logSha256": "a6540c7d1904983873db7e5ca93390577e8eb735f4bec865d3696323dc78cb4a"
+    },
+    "affectedSuite": {
+      "path": ".local-data/d28-b/release-final/cover-regression-after/native.json",
+      "sha256": "fea883aea6d4fe3ae71e83eedea0966e62e96c7d3b92270765123e263fa8734d",
+      "bytes": 465,
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "C:\\WINDOWS\\system32\\cmd.exe",
+        "/d",
+        "/c",
+        "services\\api\\mvnw.cmd",
+        "-B",
+        "-ntp",
+        "-f",
+        "services/api/pom.xml",
+        "-Dtest=CoverConfigurationTest,NodeCoverGatewayTest,CoverStoreTest,D26CoverCoordinatorTest,CoverEntryProofTest,CoverHttpIntegrationTest",
+        "test"
+      ],
+      "logSha256": "2ce2a36b0f081e44cc208fdf28fab8cbd326d852e0e527be5fdc2476d6cb75d4"
+    },
+    "affectedCases": 23,
+    "yamlInitialFailure": {
+      "path": ".local-data/d28-b/release-final/cover-yaml-regression/native.json",
+      "sha256": "41e2fb22009d9d08a178cdf76d506225cc140f198d6114393bdeb706092c78f1",
+      "bytes": 360,
+      "exitCode": 1,
+      "signal": null,
+      "command": [
+        "C:\\WINDOWS\\system32\\cmd.exe",
+        "/d",
+        "/c",
+        "services\\api\\mvnw.cmd",
+        "-B",
+        "-ntp",
+        "-f",
+        "services/api/pom.xml",
+        "-Dtest=CoverConfigurationTest",
+        "test"
+      ],
+      "logSha256": "ddb6344ddd6483d92d47569b85d88206dce40a961839976a8eb085044aaed4cc"
+    },
+    "yamlCorrected": {
+      "path": ".local-data/d28-b/release-final/cover-yaml-regression-corrected/native.json",
+      "sha256": "c106690a2dbc733a48940482a1080801601fe8d3d900f74d79c4ed78c9e3a288",
+      "bytes": 360,
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "C:\\WINDOWS\\system32\\cmd.exe",
+        "/d",
+        "/c",
+        "services\\api\\mvnw.cmd",
+        "-B",
+        "-ntp",
+        "-f",
+        "services/api/pom.xml",
+        "-Dtest=CoverConfigurationTest",
+        "test"
+      ],
+      "logSha256": "7a1204c94be4e41321ee8be2b9ded868cf423ffc4e2df84c77b44d3d49dd9f45"
+    },
+    "yamlCases": 3,
+    "productionCapture": "NOT_RUN; quality gate failed; no configuration activation or queue reset"
+  },
+  "catalog": {
+    "rootCause": "Card/title and metadata selectors rejected valid native/ARIA buttons and visible leaf span fields",
+    "source": "evals/browser/cases.mjs",
+    "affectedControls": {
+      "path": ".local-data/d28-b/release-final/catalog-display-regression/native.json",
+      "sha256": "f565587cebd9f43bc67ed977b3a1edce7249da1e6519e6eeb463a3d7d31bd2b6",
+      "bytes": 306,
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "E:\\nvm\\v24.22.1\\node.exe",
+        "--test",
+        "--test-name-pattern",
+        "CAT-|catalog|D25",
+        "tests/eval/browser/behavior.test.mjs"
+      ],
+      "logSha256": "41578782574248115c1dd3ad80f4e65ff7c307add83f60c5b14382df7cc90ff0"
+    },
+    "affectedControlCount": 72,
+    "ariaControls": {
+      "path": ".local-data/d28-b/release-final/catalog-aria-regression/native.json",
+      "sha256": "924a77fbffdef1d5b8ca9cdcbae6a0548d12faed4581f171b5d3fff8dc735bf5",
+      "bytes": 302,
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "E:\\nvm\\v24.22.1\\node.exe",
+        "--test",
+        "--test-name-pattern",
+        "CAT-02: ARIA",
+        "tests/eval/browser/behavior.test.mjs"
+      ],
+      "logSha256": "6c43647bb863100e8696d6522b5e35863d057a596a8e5b82516a9932f2b54049"
+    },
+    "ariaControlCount": 2,
+    "invariants": [
+      "fixed 8/6/9 card counts",
+      "three nonempty metadata values",
+      "name/author search",
+      "category intersection",
+      "details and correct field values",
+      "empty state and full reset",
+      "zero model calls",
+      "no retries"
+    ],
+    "originalFailuresRetained": true
+  }
+}

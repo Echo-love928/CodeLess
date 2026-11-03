@@ -1,0 +1,560 @@
+{
+  "task": "D28-B",
+  "recordedAt": "2026-11-02T06:55:44.580705+00:00",
+  "status": "HOLD_FAILED_AND_INCOMPLETE_FULL_GATE",
+  "summaryExitCode": 1,
+  "fullOriginalNativeExitCode": null,
+  "fullApiGatePassed": false,
+  "originalReceipt": {
+    "path": "tests/release/browser/evidence/d28/api-interrupted.json",
+    "sha256": "70d24748f223c058a3cdf805ae319422b8418f0181f1c289c088b1f034b2a4fd",
+    "completedSuites": 73,
+    "totals": {
+      "tests": 316,
+      "failures": 22,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "remainingReceipt": {
+    "privatePath": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/run.json",
+    "sha256": "5643aaabf02329b7be06c35b67889cf935a1e80631f98a503affc6b2b117f2a8",
+    "command": [
+      "C:\\WINDOWS\\system32\\cmd.exe",
+      "/d",
+      "/c",
+      "services\\api\\mvnw.cmd",
+      "-f",
+      "services/api/pom.xml",
+      "-Dtest=dev.codeless.api.recovery.ProcessRestartRecoveryTest,dev.codeless.api.recovery.RecoveryConvergenceTest,dev.codeless.api.recovery.StorageSweeperTest,dev.codeless.api.security.ApiSecurityMatrixTest,dev.codeless.api.system.HealthControllerTest,dev.codeless.api.tasks.TaskEventStreamsTest,dev.codeless.api.tasks.TaskHttpTest,dev.codeless.api.tasks.TaskQueueIntegrationTest,dev.codeless.api.tasks.TaskSseHttpTest,dev.codeless.api.tools.FileToolRegistryTest,dev.codeless.api.tools.FileToolsIntegrationTest,dev.codeless.api.tools.OwnedWorkspaceCleanupTest,dev.codeless.api.versions.LocalVolumeSnapshotStoreTest,dev.codeless.api.versions.SharedSnapshotPermissionsTest,dev.codeless.api.versions.SnapshotSourceBytesTest,dev.codeless.api.versions.VersionFixtureGateTest,dev.codeless.api.versions.VersionHttpIntegrationTest",
+      "verify"
+    ],
+    "nativeExitCode": 0,
+    "signal": null,
+    "sourceBytesUnchanged": true,
+    "headUnchanged": true,
+    "logSha256": "7d9a175498e3e31403e7639ed2727878f8be0b4ff01fec7562635595b7100971",
+    "suites": 17,
+    "junit": [
+      {
+        "name": "dev.codeless.api.recovery.ProcessRestartRecoveryTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "6decfdefdeb6c84a29dc1e01bd41a0daa5a773c68055971292c07a66edceed9c",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.recovery.ProcessRestartRecoveryTest.xml",
+        "cases": [
+          {
+            "name": "d18aT1ProcessKillAndRestartNeitherRepublishesNorReportsSuccess",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.recovery.RecoveryConvergenceTest",
+        "tests": "6",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "82d46d92106b7df567ff18e85b01dee6746259ed89761eb24b3ad310b1e419c3",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.recovery.RecoveryConvergenceTest.xml",
+        "cases": [
+          {
+            "name": "d18aT2RepeatedAndConcurrentCancelsConvergeOnceAndNeverThrow",
+            "status": "PASSED"
+          },
+          {
+            "name": "rolledBackCancelLeavesNoReportAndExpiryFreezesTheCommittedCode",
+            "status": "PASSED"
+          },
+          {
+            "name": "heartbeatKeepsLiveLeaseAndCancelledWorkerIsReleasedOnlyAfterItStops",
+            "status": "PASSED"
+          },
+          {
+            "name": "existingReportCountsOnlyWhenItCarriesTheSameFailureCode",
+            "status": "PASSED"
+          },
+          {
+            "name": "abandonedLeaseConvergesToInterruptedWithinOneLeaseAndReleasesResources",
+            "status": "PASSED"
+          },
+          {
+            "name": "firstCancelRacingExpiryRecoveryConvergesOnceWithAMatchingReport",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.recovery.StorageSweeperTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "369636b028d3b2a550001defbc8e333bba5af24134c4143472d9b59b568ceed6",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.recovery.StorageSweeperTest.xml",
+        "cases": [
+          {
+            "name": "retentionBelowOneHourIsRefused",
+            "status": "PASSED"
+          },
+          {
+            "name": "d18aT3ExpiredTaskResourcesAreReclaimedOnlyWhenUnreferencedAndPastRetention",
+            "status": "PASSED"
+          },
+          {
+            "name": "d18aT4CleanupNeverDeletesPublishedPreviewOrUsableVersions",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.security.ApiSecurityMatrixTest",
+        "tests": "7",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "204bf6af8abbbffb0790f0315073659e60e8a1c55e80fef5f14ce3790632ff90",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.security.ApiSecurityMatrixTest.xml",
+        "cases": [
+          {
+            "name": "everyRegisteredRouteIsClassifiedInTheSecurityMatrix",
+            "status": "PASSED"
+          },
+          {
+            "name": "d19aT1EveryPrivateResourceRejectsAnotherUser",
+            "status": "PASSED"
+          },
+          {
+            "name": "d19aT2WritesCannotBypassCsrf",
+            "status": "PASSED"
+          },
+          {
+            "name": "d19aLoginLimitHoldsForSpellingsAndConcurrentGuesses",
+            "status": "PASSED"
+          },
+          {
+            "name": "d19aFieldLengthsAndIdempotencyKeysAreEnforced",
+            "status": "PASSED"
+          },
+          {
+            "name": "d19aT4IllegalInputCreatesNoExecutableFileOrDeployment",
+            "status": "PASSED"
+          },
+          {
+            "name": "d19aT3LogsCarryNoSecretOrPassword",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.system.HealthControllerTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "8a23b64214d43f2f10fecf70190e26609ee8903f8f16fa5e4191c8f4daccf359",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.system.HealthControllerTest.xml",
+        "cases": [
+          {
+            "name": "healthReturnsExpectedStatus",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.tasks.TaskEventStreamsTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "37b9215d0942f447e76ac37c78fa8a6ade400b0ed97594da2d40b4c3da502d8d",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.tasks.TaskEventStreamsTest.xml",
+        "cases": [
+          {
+            "name": "bothTerminalStatesAndUnknownCursorRemainExplicit",
+            "status": "PASSED"
+          },
+          {
+            "name": "capacityRejectsSixtyFifthConnectionAndShutdownReleasesSlots",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.tasks.TaskHttpTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "057c1843420d55b0c5102e883a554da4f4452adce5ca10463a2d032fb219bc6e",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.tasks.TaskHttpTest.xml",
+        "cases": [
+          {
+            "name": "rejectsForeignAnonymousMalformedAndConflictingRequests",
+            "status": "PASSED"
+          },
+          {
+            "name": "createReplayReadEventsAndCancelThroughAuthenticatedHttp",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.tasks.TaskQueueIntegrationTest",
+        "tests": "7",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "e9c68a649eee8729d04364363f81af0a5fe085fc21a9559e54001b314ce2d789",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.tasks.TaskQueueIntegrationTest.xml",
+        "cases": [
+          {
+            "name": "duplicateIdempotencyRequestsCreateOneTaskAndOneEvent",
+            "status": "PASSED"
+          },
+          {
+            "name": "queuedDeadlineExpiresWithoutRunnerClaimOrFalseSuccess",
+            "status": "PASSED"
+          },
+          {
+            "name": "twoConsumersCannotClaimSameTaskOrRunTwoTasksForOneApplication",
+            "status": "PASSED"
+          },
+          {
+            "name": "runnerFixtureCannotDeclareReadyWithoutRealVerifiedBuild",
+            "status": "PASSED"
+          },
+          {
+            "name": "cancellationAndTerminalStateRejectLateWorkerWrites",
+            "status": "PASSED"
+          },
+          {
+            "name": "leaseExpiryWhileWaitingForTaskRowLockRejectsStageAndEvent",
+            "status": "PASSED"
+          },
+          {
+            "name": "freshSchedulerRecoversAbandonedExpiredLeaseAsInterruptedNeverReady",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.tasks.TaskSseHttpTest",
+        "tests": "10",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "36541543bac340e1b8d6d950509c13a175a9892ba7795a09b9f8632fe2211670",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.tasks.TaskSseHttpTest.xml",
+        "cases": [
+          {
+            "name": "D06_A_T2_stableRepeatedIdsAndExclusiveCursorCannotMutateOrRegressState",
+            "status": "PASSED"
+          },
+          {
+            "name": "backlogThatAppearsAfterConnectSendsControlErrorWithoutAdvancingEventId",
+            "status": "PASSED"
+          },
+          {
+            "name": "D06_A_T4_heartbeatHasNoBusinessIdAndTerminalStatusRemainsQueryable",
+            "status": "PASSED"
+          },
+          {
+            "name": "disablingAccountClosesExistingStreamAndRejectsEveryNewConnection",
+            "status": "PASSED"
+          },
+          {
+            "name": "historicalMessagesAreSanitizedInJsonAndSseWithoutChangingDurableRecords",
+            "status": "PASSED"
+          },
+          {
+            "name": "missingDurableEventFailsInsteadOfPretendingTerminalReplaySucceeded",
+            "status": "PASSED"
+          },
+          {
+            "name": "backlogIsBoundedAndJsonPagesRecoverAllEventsBeforeSseResume",
+            "status": "PASSED"
+          },
+          {
+            "name": "malformedAheadAndQueryCursorsHaveExplicitErrorsAndHeaderTakesPrecedence",
+            "status": "PASSED"
+          },
+          {
+            "name": "D06_A_T3_foreignAndAnonymousCannotSubscribeAndLogoutInvalidatesReconnect",
+            "status": "PASSED"
+          },
+          {
+            "name": "D06_A_T1_disconnectCancelAndReconnectReplaysEveryMissedDurableEvent",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.tools.FileToolRegistryTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "6223cee1123a82e0676cdd9fe161c597d5bb5dfea024da7404eb7b7b27b2b54c",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.tools.FileToolRegistryTest.xml",
+        "cases": [
+          {
+            "name": "registryExposesExactlyFiveFileToolsWithClosedSchemas",
+            "status": "PASSED"
+          },
+          {
+            "name": "pathsAreCanonicalPortableBusinessFilesAndNeverProtectedTemplateConfiguration",
+            "status": "PASSED"
+          },
+          {
+            "name": "invalidSchemasDuplicateKeysAndTrailingDataFailClosed",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.tools.FileToolsIntegrationTest",
+        "tests": "10",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "ba11a035e7ec70bd50df7fce8931ba48bfb018b860ef995fcfd69572eeafc94c",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.tools.FileToolsIntegrationTest.xml",
+        "cases": [
+          {
+            "name": "d08aT4MissingExistingDigestConflictAndUnknownShellNeverBecomeSuccessfulEvents",
+            "status": "PASSED"
+          },
+          {
+            "name": "workspaceRootAncestorLinkAndUnexpectedProtectedFilesFailClosed",
+            "status": "PASSED"
+          },
+          {
+            "name": "d08aT3TasksAndCopiedSnapshotsAreIsolatedEvenForIdenticalRelativeNames",
+            "status": "PASSED"
+          },
+          {
+            "name": "cancelledExpiredWrongStageAndOldTokensDoNotReadOrWriteAndTwentyCallsIsAHardLimit",
+            "status": "PASSED"
+          },
+          {
+            "name": "fileBytesTotalBytesCountAndPortableCaseCollisionAreEnforcedBeforeWriting",
+            "status": "PASSED"
+          },
+          {
+            "name": "d08aT1RealCreateReadUpdateDeleteAreAuditedWithObservedHashesAndNoSourceInAudit",
+            "status": "PASSED"
+          },
+          {
+            "name": "d08aT2TraversalAbsoluteProtectedFilesAndSymlinkDirectoriesAreRejected",
+            "status": "PASSED"
+          },
+          {
+            "name": "fixedProjectSourceIsCreatedByRealToolsAndCopiedForRunnerAndBrowserAcceptance",
+            "status": "PASSED"
+          },
+          {
+            "name": "requestAuditFailureStopsMutationAndDatabaseFailureCannotCreateSuccessReceipt",
+            "status": "PASSED"
+          },
+          {
+            "name": "twoApiInstancesCreatingOnePathSerializeOnTheTaskRowAndProduceOneSuccess",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.tools.OwnedWorkspaceCleanupTest",
+        "tests": "5",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "58d8732280e4063f6523565ef6bcb744ac0692d6d548c2fcfc75733d1400e5a6",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.tools.OwnedWorkspaceCleanupTest.xml",
+        "cases": [
+          {
+            "name": "foreignOwnershipRejectsBeforeWalkingOrDeleting",
+            "status": "PASSED"
+          },
+          {
+            "name": "realDirectoryLinkIsRemovedWithoutDeletingItsForeignTarget",
+            "status": "PASSED"
+          },
+          {
+            "name": "realAuditTreeDeletionBeginsOnlyAfterEnumerationIsClosed",
+            "status": "PASSED"
+          },
+          {
+            "name": "actualDeletionFailureIsPropagatedWithoutRetryOrSuccess",
+            "status": "PASSED"
+          },
+          {
+            "name": "realDirectoryNotEmptyCapturesRemainingStateAndKeepsOriginalFailureWithoutRetry",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.versions.LocalVolumeSnapshotStoreTest",
+        "tests": "8",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "b1a6fffac924c65ec637bd1c5ba24a4059e266b11440216961c4d0a97280d105",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.versions.LocalVolumeSnapshotStoreTest.xml",
+        "cases": [
+          {
+            "name": "unknownFailureExitRemainsNullAndReportCannotBeOverwritten",
+            "status": "PASSED"
+          },
+          {
+            "name": "immutableBytesSurviveDraftMutationAndStoreRestart",
+            "status": "PASSED"
+          },
+          {
+            "name": "traversalAliasesAndWindowsDevicesAreRejected",
+            "status": "PASSED"
+          },
+          {
+            "name": "sourceLimitsAreRealUtf8Bytes",
+            "status": "PASSED"
+          },
+          {
+            "name": "unexpectedOutcomeFailureRetainsPrivateCauseAndPublicCode",
+            "status": "PASSED"
+          },
+          {
+            "name": "linkedAncestorIsRejectedUsingRealLinkOrWindowsJunction",
+            "status": "PASSED"
+          },
+          {
+            "name": "sourceCorruptionAndDigestMismatchFailClosed",
+            "status": "PASSED"
+          },
+          {
+            "name": "artifactAndReportAreFrozenIndependentlyAndTamperingDetected",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.versions.SharedSnapshotPermissionsTest",
+        "tests": "4",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "c944e4007c3a3a3df0a4dd088d30955f231256a685cef605a50c0fdb46304728",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.versions.SharedSnapshotPermissionsTest.xml",
+        "cases": [
+          {
+            "name": "verifiedFrozenArtifactAndReportAreReadableWithoutGroupWrite",
+            "status": "PASSED"
+          },
+          {
+            "name": "unsupportedFilesystemsRejectOperatorOptInBeforeWriting",
+            "status": "PASSED"
+          },
+          {
+            "name": "defaultOwnerOnlySnapshotBehaviorIsRetained",
+            "status": "PASSED"
+          },
+          {
+            "name": "sharedSourceAndFailedReportRemainReadOnlyAndHashChecked",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.versions.SnapshotSourceBytesTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "7bf1ab8d7f6249991dbd4ddfd677c0bcd5345040f0d197edec2d1a7d3de2d9d7",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.versions.SnapshotSourceBytesTest.xml",
+        "cases": [
+          {
+            "name": "plantedOrTamperedFrozenFilesFailClosed",
+            "status": "PASSED"
+          },
+          {
+            "name": "returnsExactBytesOfTheRequestedVersionOnly",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.versions.VersionFixtureGateTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "15c222216ba8a856d8a05b5ba777101d4035acb75ec3bb6c63fe93559f5e7659",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.versions.VersionFixtureGateTest.xml",
+        "cases": [
+          {
+            "name": "completedPrerequisiteAllowsTheUnmodifiedAcceptanceAssertions",
+            "status": "PASSED"
+          },
+          {
+            "name": "missingOrFailedPrerequisiteNeverAllowsAnAcceptanceCase",
+            "status": "PASSED"
+          }
+        ]
+      },
+      {
+        "name": "dev.codeless.api.versions.VersionHttpIntegrationTest",
+        "tests": "5",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "sha256": "19b9773cde7846d992fe0511d2ae8b4b213ae073f397e46206a3b03ea5301e04",
+        "privateReport": ".local-data/d28-b/commands/2026-11-02T06-46-23.494Z-api-remaining/junit/TEST-dev.codeless.api.versions.VersionHttpIntegrationTest.xml",
+        "cases": [
+          {
+            "name": "d11aT1NewDraftMutationDoesNotChangeVerifiedSourceOrArtifact",
+            "status": "PASSED"
+          },
+          {
+            "name": "d11aT2FailedAndDraftVersionsCannotBecomePublicationSources",
+            "status": "PASSED"
+          },
+          {
+            "name": "d11aT3VersionReadHashesMatchManifestAndRealPreviewBinding",
+            "status": "PASSED"
+          },
+          {
+            "name": "d11aT4UnauthorizedUsersCannotReadSourceSnapshotOrMetadata",
+            "status": "PASSED"
+          },
+          {
+            "name": "emptyListsInvalidPathsMissingSnapshotsAndReadonlyMethodsAreExplicit",
+            "status": "PASSED"
+          }
+        ]
+      }
+    ],
+    "totals": {
+      "tests": 78,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "observedCombinedTotals": {
+    "tests": 394,
+    "failures": 22,
+    "errors": 0,
+    "skipped": 0
+  },
+  "suiteInventory": {
+    "expected": 90,
+    "completedReports": 90,
+    "failedSuitesRetried": false
+  },
+  "limitation": "90 suite reports do not mean 428 case bodies passed: prerequisite/BeforeAll failures prevented later case bodies; full original exit remains UNKNOWN.",
+  "nativeResultsNotMergedIntoSuccess": true,
+  "verifierSha256": "112fb4a1a6c3175ed999e4e0a7b04a4e63f00446d324ea68005c3ea3d0af24ac"
+}

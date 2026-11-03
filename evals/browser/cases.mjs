@@ -173,14 +173,14 @@ export async function behavior(page, id, expect) {
     // Keep the ancestor exclusion outside the relative hasNot query: scoping it inside
     // a list item would make that item's own heading button appear to be another card.
     const cards = cardCandidates.filter({ hasNot: cardCandidates }).or(page.locator(
-      'button:has(h1,h2,h3,h4,h5,h6):not(article button, li button, [role="listitem"] button)'))
+      ':is(button, [role="button"]):has(h1,h2,h3,h4,h5,h6,span + span):not(article button, article [role="button"], li button, li [role="button"], [role="listitem"] button, [role="listitem"] [role="button"])'))
     const size = { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
     await expect(cards).toHaveCount(size)
     // Labels are presentation: compare the field values even when cards/details label them differently.
     const fieldValue = value => value.trim().replace(/^(?:作者|分类|类别|所在城区|城区|地区|评分|招牌饮品|招牌|推荐饮品|一句简介|简介|简短描述|描述|许可证|许可协议|开源许可证|开源许可)(?:\s*[：:]\s*|\s+)/, '').trim()
     const cardName = async card => {
       // Inline details may add their own heading later; retain the card's first title/control.
-      const title = card.locator('h1,h2,h3,h4,h5,h6,button').first()
+      const title = await card.evaluate(node => node.tagName === 'BUTTON' || node.getAttribute('role') === 'button') ? card : card.locator('h1,h2,h3,h4,h5,h6,button').first()
       if (await title.evaluate(node => /^H[1-6]$/.test(node.tagName))) return (await title.innerText()).trim()
       const nestedHeading = title.getByRole('heading').first()
       if (await nestedHeading.count()) return (await nestedHeading.innerText()).trim()
@@ -211,7 +211,12 @@ export async function behavior(page, id, expect) {
     const initial = []
     for (const card of await cards.all()) {
       const name = await cardName(card)
-      let rawFields = await card.locator('p, dd').allTextContents()
+      // Display tags are not data fields. Read visible leaf spans as well as paragraphs,
+      // excluding nested duplicates and the title; the same three-field guard still applies.
+      let rawFields = await card.locator('p, dd, span:not(:has(span, p, dd)):not(p span, dd span)').evaluateAll(nodes =>
+        [...new Set(nodes.filter(node => node.getClientRects().length && getComputedStyle(node).visibility !== 'hidden')
+          .map(node => node.textContent.trim()).filter(Boolean))])
+      rawFields = rawFields.filter(value => value !== name)
       if (id === 'CAT-03') rawFields = rawFields.flatMap(value => value.split(/\s+[·•|｜]\s+/u)).flatMap(value => {
         // Split an explicitly labelled category/license pair, never arbitrary prose or
         // whitespace. Missing category, license or summary must still fail the field guard.

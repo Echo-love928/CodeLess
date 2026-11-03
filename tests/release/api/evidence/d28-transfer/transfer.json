@@ -1,0 +1,84 @@
+{
+  "task": "D28-A-transfer",
+  "at": "2026-11-02T14:14:15.510170+00:00",
+  "status": "REMOTE_ORIGINAL_AND_SHARED_LEDGER_READY",
+  "host": "23.136.172.128",
+  "remoteDirectory": "/srv/codeless-handoff/d28/20261102-cny2",
+  "access": "B existing authorized VPS SSH identity; no A local F path/private key dependency",
+  "artifact": {
+    "name": "unified-00fd-kit.tar",
+    "bytes": 167813120,
+    "sha256": "52e49be4fca54ca6b09ca77846bfd5453ef68c84026ccd484e6017ecf216c206",
+    "mode": "0o440"
+  },
+  "remoteDirectoryMode": "0700 root",
+  "filesMode": "0440 root",
+  "httpServerStarted": false,
+  "productionChanged": false,
+  "serverTests": {
+    "exitCode": 0,
+    "logSha256": "6b20271996d118d3652599fa176dfad5b8b47296e77e81ab7c88f9c83607bf48"
+  },
+  "ledger": {
+    "ledgerId": "e5762985-8989-410e-9d15-b58a83d7451e",
+    "revision": 1,
+    "eventHeadSha256": "6fdf7532b5304fe445372ed6bc7d9f7332d4f2a59d1139f1fb765f02e1d6303d",
+    "authoritative": "/srv/codeless-handoff/d28/20261102-cny2/budget-ledger.sqlite3",
+    "snapshot": "/srv/codeless-handoff/d28/20261102-cny2/budget-ledger.json",
+    "authorizedCapCny": "2",
+    "knownASpentCny": "0",
+    "priorBUsage": "UNKNOWN",
+    "spendableCny": "0",
+    "remainingAfterKnownExposureCny": "2",
+    "executionOwner": "B",
+    "aExecution": "FROZEN_AFTER_HANDOFF"
+  },
+  "readback": {
+    "operation": [
+      "ssh",
+      "-i",
+      "<A existing authorized operator key>",
+      "root@23.136.172.128",
+      "python3 -B /srv/codeless-handoff/d28/20261102-cny2/d28_shared_budget.py status"
+    ],
+    "exitCode": 0,
+    "verifiedReader": "A operator using a new SSH session; B must use its existing authorized VPS identity",
+    "auditChainVerified": true,
+    "statusStdoutSha256": "d47138d6cf12a0196fc12a03fb91738562a81d5813434bcd2e4808fbe3101727"
+  },
+  "firstTransportFailuresRetained": [
+    {
+      "operation": "SCP README small file",
+      "nativeExitCode": 1,
+      "message": "lost connection",
+      "largeArchiveTransferExitCode": 0
+    },
+    {
+      "operation": "first SSH finalize",
+      "message": "kex_exchange_identification: Connection closed by remote host; remote code not started",
+      "orchestratorExitCode": 1,
+      "sshNativeExitCode": null,
+      "reason": "SSH child exit was not separately persisted; do not fabricate it from the parent assertion."
+    }
+  ],
+  "sameSessionFinalize": {
+    "nativeExitCode": 0,
+    "sourceSha256": "01c23fdc7c8f9cf60abd5178432281f1c92f100b586fba783b030c6a6314a4bb",
+    "stdoutSha256": "abe7db5ae4cc04b3ab0e02875577e25ec8f2f3db330425633a751e6fd1e16c32"
+  },
+  "paidModelRequests": 0,
+  "AExecution": "FROZEN_AFTER_HANDOFF",
+  "BIndependentHostRead": "NOT_CLAIMED; B uses the supplied remote commands with existing identity",
+  "acceptanceStatus": "HOLD_UNCHANGED",
+  "downloadReadbackEvidence": "tests/release/api/evidence/d28-transfer/download-readback.json",
+  "downloadReadback": {
+    "fullCompleted": false,
+    "orchestratorExitCode": 1,
+    "timeoutSeconds": 600,
+    "verifiedPrefixBytes": 59146240,
+    "prefixMatchesOriginal": true,
+    "remoteFullArchiveShaVerified": true
+  },
+  "resumableDownloadNote": "/srv/codeless-handoff/d28/20261102-cny2/DOWNLOAD-NOTE.md",
+  "liveLedgerStatusEvidence": "tests/release/api/evidence/d28-transfer/ledger-final-status.json"
+}

@@ -34,8 +34,13 @@ const paid=modelMode==='deepseek',replay=modelMode==='recorded-source-replay'
 try {
   runtime=await startPreviewRuntime({...process.env,CODELESS_PREVIEW_GATEWAY_HOST:'0.0.0.0'})
   const dist=join(evidence,'platform-dist')
+  const buildStarted=Date.now()
   const build=spawnSync(process.execPath,['node_modules/vite/bin/vite.js','build','--outDir',dist],{cwd:join(root,'apps/web'),encoding:'utf8',timeout:30000,windowsHide:true,env:{...process.env,VITE_CODELESS_PREVIEW_ORIGIN:previewOrigin}})
-  assert.equal(build.status,0,build.stdout+build.stderr)
+  const buildReceipt={timeoutMs:30000,elapsedMs:Date.now()-buildStarted,status:build.status,signal:build.signal,
+    error:build.error?{name:build.error.name,code:build.error.code??null,message:build.error.message}:null}
+  // This directory is task-private. Preserve native termination details without environment/session data.
+  await writeFile(join(evidence,'platform-build.json'),JSON.stringify(buildReceipt,null,2)+'\n',{flag:'wx'})
+  assert.equal(build.status,0,JSON.stringify(buildReceipt)+'\n'+build.stdout+build.stderr)
   tls=await tlsServer(join(evidence,'tls'),()=>{});await closeServer(tls);tls=null
   deployment=await renderPreviewDeployment({...process.env,CODELESS_PREVIEW_DEPLOY_ROOT:join(evidence,'ingress'),CODELESS_TLS_CERT:join(evidence,'tls/test-cert.pem'),CODELESS_TLS_KEY:join(evidence,'tls/test-key.pem'),CODELESS_WEB_DIST:dist,CODELESS_API_PORT:new URL(apiOrigin).port,CODELESS_PREVIEW_GATEWAY_PORT:String(runtime.gateway.server.address().port)})
   recordPreviewDeployment(evidence,project,deployment,process.env.CODELESS_PREVIEW_CLEANUP_NONCE??randomUUID())

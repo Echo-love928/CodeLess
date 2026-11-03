@@ -316,9 +316,11 @@ class RecoveryConvergenceTest extends PostgresTestBase {
     @Test void abandonedLeaseConvergesToInterruptedWithinOneLeaseAndReleasesResources() throws Exception {
         var seed = RecoveryFixtures.seed(repository, "D18 abandoned lease");
         UUID task = RecoveryFixtures.queuedTask(repository, seed.app(), "Worker process disappears");
-        var claim = queue.claim(Duration.ofSeconds(1)).orElseThrow(); // no heartbeat: the owning process is gone
         var draft = RecoveryFixtures.draft(jdbc, snapshots, temporary.resolve("src"), seed.app(), task, 1);
         var paths = resources(task);
+        // Prepare filesystem fixtures before starting the real one-second lease.
+        // Slow snapshot I/O must not consume the lease before the valid-lease assertion.
+        var claim = queue.claim(Duration.ofSeconds(1)).orElseThrow(); // no heartbeat: the owning process is gone
         assertThat(queue.recoverExpired()).as("a valid lease is never stolen").isEmpty();
 
         var invoked = new CopyOnWriteArrayList<UUID>();

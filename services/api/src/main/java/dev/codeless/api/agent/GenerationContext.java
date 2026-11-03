@@ -14,6 +14,17 @@ final class GenerationContext {
         }
         return false;
     }
+    /** Preserve plan, acceptance and entire tool receipts; factor only repeated registry rules. */
+    static JsonNode compactInput(JsonNode input) {
+        var compact=(ObjectNode)input.deepCopy();
+        RepairContext.compactToolDefinitions(compact);
+        return compact.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8).length
+                <input.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8).length?compact:input;
+    }
+    /** Preserve the existing completion representation when all files exist and full output fits. */
+    static JsonNode project(JsonNode input,boolean complete,boolean constrained) {
+        return complete&&!constrained?input:compactInput(input);
+    }
     static List<JsonNode> observations(List<JsonNode> actual) {
         if(actual.size()<2) return List.copyOf(actual);
         var result=new ArrayList<JsonNode>();

@@ -46,3 +46,16 @@ node infra/public/check-external.mjs <public-acceptance.json> <evidence-director
 
 各分项证明保留 `publicMilestoneReached=false`；只有独立外部访问、服务器 SQL/隔离、真实成功及真实探测失败都通过后，汇总证明才设置 true。
 TLS 到期时间为北京时间 2027-01-16 09:19:27，目前采用手工 DNS 验证，自动续期尚未配置。
+
+# D28 cover activation
+
+Set `CODELESS_COVER_NODE_EXECUTABLE` to the installed, locked Node executable when
+`CODELESS_NODE_EXECUTABLE` is the publication/build IPC client. The broker accepts
+only its fixed build/publish operations; screenshot capture runs as the API service
+under its existing filesystem and process restrictions. The cover child retains
+the existing environment allowlist, target validation and deadline. Without the
+new variable the existing Node setting remains the default.
+
+Enable the production cover worker only with a verified release group and its
+production acceptance window. Keep the previous cover queue and any unknown
+in-flight state; do not clear quarantine or reset the cursor to make a check pass.

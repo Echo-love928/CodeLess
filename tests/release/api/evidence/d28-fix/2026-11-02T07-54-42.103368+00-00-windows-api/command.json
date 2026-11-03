@@ -1,0 +1,878 @@
+{
+  "task": "D28-A-fix",
+  "candidate": "438c0f5e81ba08656bf110f162beb15e5d6ba21d",
+  "status": "PASSED_NO_ROOT_CAUSE_CLOSURE",
+  "exitCode": 0,
+  "startedAt": "2026-11-02T07:54:44.467965+00:00",
+  "sourceInputsSha256": "a6a2dea866ca6d4e40a97890efe00c4260543b6de5123617668aec937a5330fa",
+  "commands": [
+    {
+      "operation": "docker-preflight",
+      "command": [
+        "docker",
+        "version",
+        "--format",
+        "{{.Server.Version}}"
+      ],
+      "exitCode": 0,
+      "privateLog": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/docker-preflight.log",
+      "logSha256": "3795a4b1e2c6937a65f1be5ac40e8c7998963c6077c5cb1d19874a2d2474db02"
+    },
+    {
+      "operation": "install",
+      "command": [
+        "C:\\Windows\\system32\\cmd.exe",
+        "/d",
+        "/c",
+        "corepack",
+        "pnpm",
+        "install",
+        "--offline",
+        "--frozen-lockfile"
+      ],
+      "exitCode": 0,
+      "privateLog": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/install.log",
+      "logSha256": "43230ad41efacf8cfd69e7a59da9509cd0838633b0e94dc8065c2bf9c1827756"
+    },
+    {
+      "operation": "api",
+      "command": [
+        "C:\\Windows\\system32\\cmd.exe",
+        "/d",
+        "/c",
+        "corepack",
+        "pnpm",
+        "verify:api"
+      ],
+      "exitCode": 0,
+      "privateLog": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/api.log",
+      "logSha256": "92449b202cbf533ab2baab0f55e8ba638c612fc2fa8c1942436e57a7ce9fa9c9"
+    }
+  ],
+  "trace": {
+    "session": "CodeLess-D28-96eff86664344897",
+    "started": false,
+    "privateFile": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/file-metadata.etl",
+    "maximumMiB": 128,
+    "fileContentsCaptured": false,
+    "externalAdminController": true,
+    "source": "Microsoft-Windows-Kernel-File metadata; no driver installed"
+  },
+  "junit": [
+    {
+      "name": "dev.codeless.api.admin.AdminAuditLogTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.admin.AdminAuditLogTest.xml",
+      "sha256": "3684586dced353be8b7827c8e950272dbc660b102dbbddaab48d04bd7f854ee4"
+    },
+    {
+      "name": "dev.codeless.api.admin.AdminIntegrationTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.admin.AdminIntegrationTest.xml",
+      "sha256": "15e19f7888385b6c770ef89075fcd49eff22b68de0dd442d61167bc3a871a3e9"
+    },
+    {
+      "name": "dev.codeless.api.admin.AdminRedactionTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.admin.AdminRedactionTest.xml",
+      "sha256": "439256377e7817de6f34b3f205d7e03f6f077d7f8efe6be1f23a497866a319e3"
+    },
+    {
+      "name": "dev.codeless.api.agent.AcceptanceActionsTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.AcceptanceActionsTest.xml",
+      "sha256": "700a34ece27f9f095c9b70f7295b435fbf3d6d21281b062c2a1ffca0d33b403c"
+    },
+    {
+      "name": "dev.codeless.api.agent.AgentLoopIntegrationTest",
+      "tests": "11",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.AgentLoopIntegrationTest.xml",
+      "sha256": "dfd54d3ca4b085e5000d18ede44d756fa6a62cb3f9be3c1b63ff7fdb612ad93a"
+    },
+    {
+      "name": "dev.codeless.api.agent.ComponentIdsTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.ComponentIdsTest.xml",
+      "sha256": "cf2ed0b8d7601c64dd5aaa070198fa92dad9bacca472b603ad9ec05cd8ece69e"
+    },
+    {
+      "name": "dev.codeless.api.agent.CsrfDuringGenerationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.CsrfDuringGenerationTest.xml",
+      "sha256": "122ab490ec3c7866dd83295be7754f80e64fbb2069ceb182ca72f9a78d1acb10"
+    },
+    {
+      "name": "dev.codeless.api.agent.D25ProposalFeedbackTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.D25ProposalFeedbackTest.xml",
+      "sha256": "007ab13f224403ba1d9da27d5c722eb52dbc47313a2c88c0112972bad5b2fd4c"
+    },
+    {
+      "name": "dev.codeless.api.agent.D25QualityPolicyTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.D25QualityPolicyTest.xml",
+      "sha256": "eac45f5aa9692a063c1b8b870d97e871e08a194c66dc2712db961696f970790c"
+    },
+    {
+      "name": "dev.codeless.api.agent.D25QualityRegressionTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.D25QualityRegressionTest.xml",
+      "sha256": "c76789f2cd4fd10324df4e29d84d354d095b6a80053eb0ca9d3ffa845e291aa6"
+    },
+    {
+      "name": "dev.codeless.api.agent.D26ReleaseBoundaryTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.D26ReleaseBoundaryTest.xml",
+      "sha256": "ecf9ff13b1b3dec685808db283056d9ebde91f0fb8ab67519e08fbbbf33762b2"
+    },
+    {
+      "name": "dev.codeless.api.agent.GenerationContextTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.GenerationContextTest.xml",
+      "sha256": "304ca6c88ecd9a40c56b93980078a81c7603e05e2546c914d6e8606ccc6f5f1d"
+    },
+    {
+      "name": "dev.codeless.api.agent.LocalBuildGatewayTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.LocalBuildGatewayTest.xml",
+      "sha256": "404aa5d18170d9fb1cf0c7a0d83337a8e51090e1ba1fe6766863f762c363b685"
+    },
+    {
+      "name": "dev.codeless.api.agent.LocalGenerationContextTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.LocalGenerationContextTest.xml",
+      "sha256": "85b6abec111fc14ad983fb6cbbfc49d3fe8fee2e49739ec670725845773e3c1c"
+    },
+    {
+      "name": "dev.codeless.api.agent.PreparationProcessTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.PreparationProcessTest.xml",
+      "sha256": "c1e894cf55fd96ab56f1e145b24c3a19d3f33b2f8b6a52b1b0d6f122903bc01a"
+    },
+    {
+      "name": "dev.codeless.api.agent.RepairBudgetRegressionTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.RepairBudgetRegressionTest.xml",
+      "sha256": "fda5f171ed687025d5118bb77725241a3adba7acb618209d82df7d5093897e91"
+    },
+    {
+      "name": "dev.codeless.api.agent.RepairContextTest",
+      "tests": "16",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.RepairContextTest.xml",
+      "sha256": "23ac8191b2879508f4cfbc0dfc2dd96c5ac8317786b3ca5c8816826ebc153778"
+    },
+    {
+      "name": "dev.codeless.api.agent.RepairInputCompactionTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.RepairInputCompactionTest.xml",
+      "sha256": "74eb5dae9a7789058af8c361e25557f1313f8a689315f733b3fb28084ebb1873"
+    },
+    {
+      "name": "dev.codeless.api.agent.RepairLoopIntegrationTest",
+      "tests": "30",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.RepairLoopIntegrationTest.xml",
+      "sha256": "22f2f66cbb18790bbbe4ee4222a47f9956d05cf1f8aebbddae0a0aefa1d70935"
+    },
+    {
+      "name": "dev.codeless.api.agent.RepairPolicyTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.RepairPolicyTest.xml",
+      "sha256": "d1eb1c266cf20804a29e7d857b88063790203e4f38ca3a4a68e8d4b5f7fecd85"
+    },
+    {
+      "name": "dev.codeless.api.agent.RoundFiveContextTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.RoundFiveContextTest.xml",
+      "sha256": "f0511af175f1d43c79f9273db6c2f4e6c8d5edc7a9a18be6574bada40d5cfbb0"
+    },
+    {
+      "name": "dev.codeless.api.agent.RoundFiveRegressionTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.agent.RoundFiveRegressionTest.xml",
+      "sha256": "e4c8142c70a0ba1518fbd2940842f952f44892b691d9cbf50f6e74bb9211fa7a"
+    },
+    {
+      "name": "dev.codeless.api.ApplicationSmokeTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.ApplicationSmokeTest.xml",
+      "sha256": "605f0f072ba2d642de10f8674ad91b55107dc66a9fd59423ff46eabb2ca4f204"
+    },
+    {
+      "name": "dev.codeless.api.apps.ApplicationHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.apps.ApplicationHttpTest.xml",
+      "sha256": "6c7a68892684c966e8ab17945aa1d2793fe5afceae0f78f11462f224a742c002"
+    },
+    {
+      "name": "dev.codeless.api.apps.ApplicationIntegrationTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.apps.ApplicationIntegrationTest.xml",
+      "sha256": "31b780e0002541d6b4b5507bf0c7bf45bfa9910256f2ba199ea6253fa5da8adf"
+    },
+    {
+      "name": "dev.codeless.api.auth.ApiRequestBodyTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.auth.ApiRequestBodyTest.xml",
+      "sha256": "78311498764903e043dc78f8616aa7883f3a28ca6504e9dbbffd68ba386f41c4"
+    },
+    {
+      "name": "dev.codeless.api.auth.AuthHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.auth.AuthHttpTest.xml",
+      "sha256": "27854b18696767e6a3440b73f7abe40f3f471015756ee0609de3f0f8cddec541"
+    },
+    {
+      "name": "dev.codeless.api.auth.AuthIntegrationTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.auth.AuthIntegrationTest.xml",
+      "sha256": "583f1c88b2acba4b928fd4ac1a0a7612db86156527d86634e5ac61fefb11cc15"
+    },
+    {
+      "name": "dev.codeless.api.auth.LoginAttemptsTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.auth.LoginAttemptsTest.xml",
+      "sha256": "88993078e31e623bd8b026fd45ddce09b39756b02170ebe3ea1acba69618841e"
+    },
+    {
+      "name": "dev.codeless.api.auth.RequestBodyBoundaryHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.auth.RequestBodyBoundaryHttpTest.xml",
+      "sha256": "73fc78227680d831c893c42f6ab30551e4f7cef92c1fd6ab4e30ae8587513421"
+    },
+    {
+      "name": "dev.codeless.api.auth.RequestBodyBoundaryTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.auth.RequestBodyBoundaryTest.xml",
+      "sha256": "aff0424d66e49237116c1bfc0a5fa48c1cda32fab8c18f6b084a6a1d50aa49a0"
+    },
+    {
+      "name": "dev.codeless.api.concurrency.ConcurrencyConsistencyTest",
+      "tests": "11",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.concurrency.ConcurrencyConsistencyTest.xml",
+      "sha256": "0330ac74517a028504927c8db15dd03890a86c6daae0488c7ed0d109f1d8c772"
+    },
+    {
+      "name": "dev.codeless.api.cover.CoverEntryProofTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.cover.CoverEntryProofTest.xml",
+      "sha256": "29df4be8aeeb85fdda659fe7101ff16f7ef48764e5995ca2547f50ea16bcf046"
+    },
+    {
+      "name": "dev.codeless.api.cover.CoverHttpIntegrationTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.cover.CoverHttpIntegrationTest.xml",
+      "sha256": "c57acccc681cbc33d2c22166623c54f8fbdce7f8d08c60dff343bef4ceba475a"
+    },
+    {
+      "name": "dev.codeless.api.cover.CoverStoreTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.cover.CoverStoreTest.xml",
+      "sha256": "89448a7a2d08f9cfb4bef97e6ee72eae06ea2d1024625299722a4d3ca8cf3f95"
+    },
+    {
+      "name": "dev.codeless.api.cover.D26CoverCoordinatorTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.cover.D26CoverCoordinatorTest.xml",
+      "sha256": "b6e74756019a1e5b4908992a34f64c8adf2ea1c8dd5ed0a724a6b2dd5ea1479c"
+    },
+    {
+      "name": "dev.codeless.api.cover.NodeCoverGatewayTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.cover.NodeCoverGatewayTest.xml",
+      "sha256": "7842aaad7f32ea66d9e70895b739fb4742c2d7058c554b503de6950572006fce"
+    },
+    {
+      "name": "dev.codeless.api.data.DataIntegrationTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.data.DataIntegrationTest.xml",
+      "sha256": "6954d60d91c80c915f7370f80106eae83d1825ca7a917390b17a0bb70ee889c7"
+    },
+    {
+      "name": "dev.codeless.api.data.PostgresContextLifecycleTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.data.PostgresContextLifecycleTest.xml",
+      "sha256": "55280c8a4c0e78efac355442f82c5f0f3cf5aa3eaeb9d75bd848cfd8fc946158"
+    },
+    {
+      "name": "dev.codeless.api.data.TaskDiagnosticsTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.data.TaskDiagnosticsTest.xml",
+      "sha256": "be0a007ec7011335dfe2fdf6ebbc19693faed7d132b6bf3e47e3f20e8dbbfb07"
+    },
+    {
+      "name": "dev.codeless.api.data.VersionSourceMigrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.data.VersionSourceMigrationTest.xml",
+      "sha256": "dfe5146a321e77e8f773e31288fda4d4fef2362ff338d2dd920ea81ffbb2c14d"
+    },
+    {
+      "name": "dev.codeless.api.deploy.DeploymentRecordsTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.deploy.DeploymentRecordsTest.xml",
+      "sha256": "fd1ee329341da781ab5b62608489a269edd292f9b1a8ed18c8820fd2f4cd4347"
+    },
+    {
+      "name": "dev.codeless.api.deploy.PublicationGatewayConfigurationTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.deploy.PublicationGatewayConfigurationTest.xml",
+      "sha256": "2c93a5e63c8aeedc18ce10a8666cd20b13902fe6f80fccf5bed79929322f8b42"
+    },
+    {
+      "name": "dev.codeless.api.deploy.PublicationIntegrationTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.deploy.PublicationIntegrationTest.xml",
+      "sha256": "721c9c0432a9f555e34d493ea6bfcabbf1e21858b549ef54be16dff5bcaf502f"
+    },
+    {
+      "name": "dev.codeless.api.edit.EditLifecycleIntegrationTest",
+      "tests": "15",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.edit.EditLifecycleIntegrationTest.xml",
+      "sha256": "e9f39a331da36dbac76109e922d561d55235489e2abbb6e48735aca74288fbe0"
+    },
+    {
+      "name": "dev.codeless.api.edit.EditVerificationIntegrationTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.edit.EditVerificationIntegrationTest.xml",
+      "sha256": "41dff9b1d565205ab1c9563a0e12fda4815bdb1f5b6a00ca734e28758d035096"
+    },
+    {
+      "name": "dev.codeless.api.edit.LocalEditScopeIntegrationTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.edit.LocalEditScopeIntegrationTest.xml",
+      "sha256": "c47b4a5468908b26027f4126b6ae56fcc14b81bb6e301825c5a0f326aa0f499f"
+    },
+    {
+      "name": "dev.codeless.api.edit.LocalEditScopeTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.edit.LocalEditScopeTest.xml",
+      "sha256": "e43077bd8d5b7ba89067467fdc1734b5d5f1e26feaafdfe14b0f5405a7f33246"
+    },
+    {
+      "name": "dev.codeless.api.error.GlobalExceptionHandlerTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.error.GlobalExceptionHandlerTest.xml",
+      "sha256": "66b142627416895538d26e1e74576ef6e65a7de7db442dd808f2f9074bb3be67"
+    },
+    {
+      "name": "dev.codeless.api.export.ExportArchiveTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.export.ExportArchiveTest.xml",
+      "sha256": "05c58cd2ff48ef5d3eb9aadc8f6610b2fbee6f702c71ca0592ad48617470a3da"
+    },
+    {
+      "name": "dev.codeless.api.export.ExportTemplateTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.export.ExportTemplateTest.xml",
+      "sha256": "b87b788ea790e49d5e5a7031f98d1d84d406cdb843bd60c21d796f7bfaeb196a"
+    },
+    {
+      "name": "dev.codeless.api.export.SourceExportComposeTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.export.SourceExportComposeTest.xml",
+      "sha256": "0cc004d4b0554bc895cec4f2ad82a040c5f5bfbaf062f71e638270afac6582a0"
+    },
+    {
+      "name": "dev.codeless.api.export.SourceExportIntegrationTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.export.SourceExportIntegrationTest.xml",
+      "sha256": "b80f369d3ed20dc7351cd5aba4986066da1ba6c7e48b3b1c68b764e2b6eecf24"
+    },
+    {
+      "name": "dev.codeless.api.model.D25EntrySerializationTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.model.D25EntrySerializationTest.xml",
+      "sha256": "c8c39a5960258a5514af7eb8369d4157aac92eaabcc9db3c1ca48166759bec5e"
+    },
+    {
+      "name": "dev.codeless.api.model.DeepSeekModelProviderTest",
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.model.DeepSeekModelProviderTest.xml",
+      "sha256": "b07b3bab97e45211151ad7216400e482b8dda0ed8a99fa29e86b9f6a1448de03"
+    },
+    {
+      "name": "dev.codeless.api.model.PlanAcceptanceCliTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.model.PlanAcceptanceCliTest.xml",
+      "sha256": "be653e52d38392068e5de3a66562e46531ae5ea76603c5512252783b49cd4d95"
+    },
+    {
+      "name": "dev.codeless.api.model.PlanModelIntegrationTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.model.PlanModelIntegrationTest.xml",
+      "sha256": "76bb8fcbdaf310e54a23f74dedb47f2381e9d993b83c9512c450a85a5c8bcbee"
+    },
+    {
+      "name": "dev.codeless.api.model.PlanValidatorTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.model.PlanValidatorTest.xml",
+      "sha256": "146adfa09e1b2a3b06f75a9a12e0a503638ebcb461abceb7684c6a95197c1c18"
+    },
+    {
+      "name": "dev.codeless.api.model.PrivateModelCaptureTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.model.PrivateModelCaptureTest.xml",
+      "sha256": "98662552965c1aa4b45f0eda24abbde464ec2a5599f2376ecd52be7bf5ac03c1"
+    },
+    {
+      "name": "dev.codeless.api.network.SitePolicyTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.network.SitePolicyTest.xml",
+      "sha256": "6123b0f34bbc4afd4bbb4d5529d7887bb272cbe816001cc4eb74427c11514018"
+    },
+    {
+      "name": "dev.codeless.api.performance.ApiCapacityMeasurementTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.performance.ApiCapacityMeasurementTest.xml",
+      "sha256": "982a4fb942e8271ce642a34692612be010ca2ec43aebdd66b6d7b456997f34ac"
+    },
+    {
+      "name": "dev.codeless.api.performance.BoundedModelProviderTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.performance.BoundedModelProviderTest.xml",
+      "sha256": "764dd2583ede2e1ac240896926037e09aad2369cbabeda8162df3ddd72ba8e19"
+    },
+    {
+      "name": "dev.codeless.api.performance.CapacityPolicyTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.performance.CapacityPolicyTest.xml",
+      "sha256": "047b3c0308134dd7055859a1967e953bd7b7a038c6d11dd525d9feb760bd47b4"
+    },
+    {
+      "name": "dev.codeless.api.performance.DefaultCapacityCalibrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.performance.DefaultCapacityCalibrationTest.xml",
+      "sha256": "0bfa86ae206a23db84dbc109fd5bcdf255165d11220aebc682aeca5bb20c7dfb"
+    },
+    {
+      "name": "dev.codeless.api.performance.TaskTimingTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.performance.TaskTimingTest.xml",
+      "sha256": "0069357c452a5f97599a2ce53e5fe54ab82fafa63f05502c3fdfa5cbe9e542a4"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewAcceptanceProcessTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.preview.PreviewAcceptanceProcessTest.xml",
+      "sha256": "9352bf8f7eede7745b5dc84dbaf736327519475699abffaaebba781af2cd5652"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewCnHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.preview.PreviewCnHttpTest.xml",
+      "sha256": "87a86387fc7bb3705d50bb2bbf8a3583faff1862e302ac4996dc67f463c05789"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.preview.PreviewHttpTest.xml",
+      "sha256": "469505217773838ebef44a4c91727bb82232dad486dfe720d4e1907db14d47cc"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewPlatformIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.preview.PreviewPlatformIntegrationTest.xml",
+      "sha256": "460734bcfe68ebcd679a281eaed2dfcdda743913f46becb8ff92e1bebcec6dc7"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewReadinessTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.preview.PreviewReadinessTest.xml",
+      "sha256": "e022c4baad32079ff44034a02f66aaf08259eef13d9ad8ec92af8ff427e15039"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewRegistryHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.preview.PreviewRegistryHttpTest.xml",
+      "sha256": "d804e272fd9936e355863344d4742eeb3146add3b1fa7bb4a2fc5fb79296bdf8"
+    },
+    {
+      "name": "dev.codeless.api.preview.PreviewTopHttpTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.preview.PreviewTopHttpTest.xml",
+      "sha256": "77aaca4e17160d69eb00f7688e6b244c1ca15f3b037fa8c0b9a828ac484beaf1"
+    },
+    {
+      "name": "dev.codeless.api.preview.RepairProviderMetadataTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.preview.RepairProviderMetadataTest.xml",
+      "sha256": "76964166bd6c2ce397ae582a7899e6605aee652dd434c2571285982328e8d71f"
+    },
+    {
+      "name": "dev.codeless.api.recovery.ProcessRestartRecoveryTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.recovery.ProcessRestartRecoveryTest.xml",
+      "sha256": "ded47b58e8515fa32f0eb4ed62b83b21e0615c11136f386e6b38dc77cbec2c48"
+    },
+    {
+      "name": "dev.codeless.api.recovery.RecoveryConvergenceTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.recovery.RecoveryConvergenceTest.xml",
+      "sha256": "6280742db9132d36ebd78343914fcdefed804b11a3e16137ce5267cb7463a256"
+    },
+    {
+      "name": "dev.codeless.api.recovery.StorageSweeperTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.recovery.StorageSweeperTest.xml",
+      "sha256": "aeaeb8abba04ffe868e677d379b9e23aea49832f8e45e1a5fe57409019332c93"
+    },
+    {
+      "name": "dev.codeless.api.security.ApiSecurityMatrixTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.security.ApiSecurityMatrixTest.xml",
+      "sha256": "0d5b1e1f85a547acdbf6f83754d5ccf2c3ff91eef9b36a7f5a7b87cd47e734d0"
+    },
+    {
+      "name": "dev.codeless.api.system.HealthControllerTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.system.HealthControllerTest.xml",
+      "sha256": "4038c6777a5858b59e3fb9be394bcd6d0c34d3516fec36f37898ceba07184011"
+    },
+    {
+      "name": "dev.codeless.api.tasks.TaskEventStreamsTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.tasks.TaskEventStreamsTest.xml",
+      "sha256": "73c64cb3561d48515577a29dc3f53d161d74bddac1890460c710ee9b4795cacd"
+    },
+    {
+      "name": "dev.codeless.api.tasks.TaskHttpTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.tasks.TaskHttpTest.xml",
+      "sha256": "c6242298e9602ce328effd51220a4ebb52e56e3190611b1a753fba86adb98062"
+    },
+    {
+      "name": "dev.codeless.api.tasks.TaskQueueIntegrationTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.tasks.TaskQueueIntegrationTest.xml",
+      "sha256": "bc4bf6410bb0eb81faaebeabc6a9c7e60be4280f0a08ad8472f34672cbd5ae08"
+    },
+    {
+      "name": "dev.codeless.api.tasks.TaskSseHttpTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.tasks.TaskSseHttpTest.xml",
+      "sha256": "077769d9a4e3366a12bd148c9724c26c935e01e2311b700283f78d6ff8255c68"
+    },
+    {
+      "name": "dev.codeless.api.tools.FileToolRegistryTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.tools.FileToolRegistryTest.xml",
+      "sha256": "aa251dbd6f4ca8e63afb219aba27e1b6e3980f11f1df526d565075519ffd6846"
+    },
+    {
+      "name": "dev.codeless.api.tools.FileToolsIntegrationTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.tools.FileToolsIntegrationTest.xml",
+      "sha256": "560332374d0e49aacc4420413ff61ef2b8f5625bb67415690bccfa8f9c912f90"
+    },
+    {
+      "name": "dev.codeless.api.tools.OwnedWorkspaceCleanupTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.tools.OwnedWorkspaceCleanupTest.xml",
+      "sha256": "20081094d3eed330219f8e1ea3ca49bd7709ec5ef889e1da7b3738582dee5728"
+    },
+    {
+      "name": "dev.codeless.api.versions.LocalVolumeSnapshotStoreTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.versions.LocalVolumeSnapshotStoreTest.xml",
+      "sha256": "4ae25df78c73a13d0a1b80d97b7cddc940424216539bda5dc6afe759f33eb4d3"
+    },
+    {
+      "name": "dev.codeless.api.versions.SharedSnapshotPermissionsTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.versions.SharedSnapshotPermissionsTest.xml",
+      "sha256": "f0cc855871cbc3161612818bf368c97b329ebb528fe99de6e21b55e8b38e5184"
+    },
+    {
+      "name": "dev.codeless.api.versions.SnapshotSourceBytesTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.versions.SnapshotSourceBytesTest.xml",
+      "sha256": "6c3c86800c20827d64de8711461a67af2f58d40e39b5f69b7aa69e72b69b1146"
+    },
+    {
+      "name": "dev.codeless.api.versions.VersionFixtureGateTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.versions.VersionFixtureGateTest.xml",
+      "sha256": "3ee01e15f78a8b44d16ddb9783d2874b06f44db806199aa55d1496f3ed3ce1ba"
+    },
+    {
+      "name": "dev.codeless.api.versions.VersionHttpIntegrationTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "privateReport": "tests/release/api/.private/d28-fix/2026-11-02T07-54-42.103368+00-00-windows-api/junit/TEST-dev.codeless.api.versions.VersionHttpIntegrationTest.xml",
+      "sha256": "0bd6b3723cf7f997681fbb34858f9915b691538ef1c3c0642c8074a0948d8b66"
+    }
+  ],
+  "paidModelRequests": 0,
+  "modelProvider": "deterministic-mock",
+  "sourceBytesUnchanged": true,
+  "headUnchanged": true,
+  "finishedAt": "2026-11-02T08:37:01.419206+00:00"
+}

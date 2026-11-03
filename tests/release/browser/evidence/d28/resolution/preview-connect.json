@@ -1,0 +1,94 @@
+{
+  "task": "D28-B-preview-502-triage",
+  "sourceCandidate": "c7c75efdcef2e2b7fda33e99e7a13ce40c72ed7a",
+  "originalNativeExit": 1,
+  "originalFailurePreserved": true,
+  "apiLifecycle": {
+    "started": 366,
+    "finished": 366,
+    "unmatchedStarted": 0,
+    "maxFinishedMs": 72,
+    "lastFinished": {
+      "id": "2164b104-3aae-442f-8199-9e72e55c3024",
+      "at": "2026-11-02T11:24:00.524956500Z",
+      "elapsedMs": 0,
+      "status": 200
+    }
+  },
+  "ingressTailWithoutAddresses": [
+    {
+      "kind": "ingress.api",
+      "route": "csrf",
+      "at": "2026-11-02T11:24:00+00:00",
+      "id": "2164b104-3aae-442f-8199-9e72e55c3024",
+      "status": 200,
+      "requestSeconds": "0.005",
+      "connectSeconds": "0.002",
+      "headerSeconds": "0.004",
+      "responseSeconds": "0.004",
+      "upstreamStatus": "200"
+    },
+    {
+      "kind": "ingress.error",
+      "route": "task",
+      "phase": "CONNECT",
+      "errorClass": "TIMEOUT",
+      "errno": null,
+      "timedOut": true
+    },
+    {
+      "kind": "ingress.error",
+      "route": "task",
+      "phase": "CONNECT",
+      "errorClass": "UNKNOWN",
+      "errno": null,
+      "timedOut": false
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-11-02T11:25:00+00:00",
+      "id": null,
+      "status": 502,
+      "requestSeconds": "60.040",
+      "connectSeconds": "-, -",
+      "headerSeconds": "-, -",
+      "responseSeconds": "60.045, 0.000",
+      "upstreamStatus": "504, 502"
+    },
+    {
+      "kind": "ingress.api",
+      "route": "task",
+      "at": "2026-11-02T11:25:00+00:00",
+      "id": null,
+      "status": 502,
+      "requestSeconds": "0.000",
+      "connectSeconds": null,
+      "headerSeconds": null,
+      "responseSeconds": "0.000",
+      "upstreamStatus": "502"
+    },
+    {
+      "kind": "ingress.error",
+      "route": "task",
+      "phase": "CONNECT",
+      "errorClass": "UNKNOWN",
+      "errno": null,
+      "timedOut": false
+    }
+  ],
+  "finding": "Recorded failure is at upstream CONNECT before response headers; no unmatched API diagnostic lifecycle observed. This narrows investigation to ingress/host transport, but does not prove cause or exclude dropped/unrecorded lifecycle messages.",
+  "rootCause": "UNKNOWN",
+  "closed": false,
+  "rawLog": {
+    "path": ".local-data\\d28-b\\commands\\2026-11-02T11-21-06.970Z-affected-api\\command.log",
+    "sha256": "a90345395246e41b4ec3d3e0c145dff50e304be6d8c5b951d82e6008611681a2",
+    "bytes": 306310
+  },
+  "rawIngress": {
+    "path": "services\\api\\target\\preview-platform-4ff6c4e8-62a2-4742-8a1b-09b1ae3b7e61\\evidence\\ingress-api-timings.json",
+    "sha256": "55b8e7825ab23091bb7f4345b9405b7add184ed56b92ce6d3c73b167a0284186",
+    "bytes": 96980
+  },
+  "nextEvidence": "Same failing request: Nginx connect address and timing, Windows listening port/process identity and Docker Desktop host-forwarder connectivity; preserve TLS, upstream request deadline, auth and assertions."
+}

@@ -25,7 +25,8 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
   itemTag = 'article', sparse = false, namedDetail = false, cardLabelSeparator = '：', detailRating = '4.5', allLabel = '全部', brokenReset = false,
   combinedFields = false, inlineDetail = false, categorySelect = false, detailLicense = 'MIT', missingDescription = false, nameOverlap = false,
   wrapperTag = null, countOverride = null, detailDescription = true, fieldSeparator = ' · ', categorySpan = false, detailNameParagraph = false,
-  coffeeMetaSeparator = null, coffeeMissingRating = false, coffeeExtraAddress = false, coffeeAddressInsteadOfDrink = false } = {}) {
+  coffeeMetaSeparator = null, coffeeMissingRating = false, coffeeExtraAddress = false, coffeeAddressInsteadOfDrink = false,
+  titleTag = 'h3', metadataTag = 'p', roleButton = false } = {}) {
   const count = countOverride ?? { 'CAT-01': 8, 'CAT-02': 6, 'CAT-03': 9 }[id]
   const categories = id === 'CAT-01' ? ['小说', '科技', '历史'] : id === 'CAT-02' ? ['西湖区', '上城区', '拱墅区'] : ['构建', '测试', '文档']
   return `<!doctype html><html lang="zh"><meta charset="utf-8"><body><h1>独立目录实现</h1>
@@ -42,7 +43,7 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
       if(${sparse}||${JSON.stringify(detailLayout)}==='paragraphs'){for(const value of values.slice(1,4)){const p=document.createElement('p');p.textContent=value;body.append(p)}if(${detailNameParagraph}){const p=document.createElement('p');p.textContent=item.name;body.append(p)}}
       else if(${JSON.stringify(detailLayout)}==='dl'){const dl=document.createElement('dl');values.forEach((value,i)=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=['名称','作者','所在城区','一句简介','评分','许可证'][i];dd.textContent=value;dl.append(dt,dd)});body.append(dl)}else body.textContent=values.join(' ')}
     function render(){main.replaceChildren();const visible=items.filter(item=>(category==='全部'||${combine ? 'item.category===category' : 'search.value||item.category===category'})&&(item.name.includes(search.value)||item.author.includes(search.value)));
-      for(const item of visible){const card=document.createElement(${JSON.stringify(itemTag)}),heading=document.createElement('h3');heading.textContent=item.name;
+      for(const item of visible){const card=document.createElement(${JSON.stringify(itemTag)}),heading=document.createElement(${JSON.stringify(titleTag)});if(${roleButton}){card.setAttribute('role','button');card.tabIndex=0}heading.textContent=item.name;
         if(${sparse}){const button=document.createElement('button');for(const value of [item.name,item.author]){const span=document.createElement('span');span.textContent=value;button.append(span)}button.onclick=()=>show(item);card.append(button);main.append(card);continue}
         if(id==='CAT-03'&&${nameOnly}){if(${JSON.stringify(nameControl)}==='heading')heading.onclick=()=>show(item);else{const control=document.createElement(${JSON.stringify(nameControl)}==='link'?'a':'button');control.textContent=item.name;if(control.tagName==='A')control.href='#';if(${JSON.stringify(nameControl)}==='button-wide')control.style.width='100%';control.onclick=event=>{event.preventDefault();show(item)};heading.replaceChildren(control)}}else card.onclick=()=>show(item);card.append(heading);
         const author=id==='CAT-02'?'评分：4.5':id==='CAT-03'?'许可证：MIT':'作者：'+item.author;
@@ -50,7 +51,7 @@ function catalog(id, { labels = false, authorFirst = true, categoryFirst = false
         if(${missingDescription})fields.pop();if(${categoryFirst})fields.unshift(fields.splice(1,1)[0]);if(!authorFirst)fields.reverse();
         const display=fields.map(raw=>labels?raw.replace('：',${JSON.stringify(cardLabelSeparator)}):raw.replace(/^[^：]+：/,''));
         const coffeeFields=${JSON.stringify(coffeeMetaSeparator)}&&id==='CAT-02'?[item.category+(${coffeeMissingRating}?'':${JSON.stringify(coffeeMetaSeparator)}+'评分 4.5')+(${coffeeExtraAddress}?${JSON.stringify(coffeeMetaSeparator)}+'地址：地址'+items.indexOf(item):''),...(${missingDescription}?[]:[${coffeeAddressInsteadOfDrink}?'地址：地址'+items.indexOf(item):'招牌饮品：'+item.description])]:display;
-        for(const raw of ${combinedFields}?[display.join(${JSON.stringify(fieldSeparator)})]:coffeeFields){const p=document.createElement(${categorySpan}&&raw.includes(item.category)?'span':'p');p.textContent=raw;card.append(p)}if(${JSON.stringify(wrapperTag)}){const wrapper=document.createElement(${JSON.stringify(wrapperTag)});wrapper.append(card);main.append(wrapper)}else main.append(card)}
+        for(const raw of ${combinedFields}?[display.join(${JSON.stringify(fieldSeparator)})]:coffeeFields){const p=document.createElement(${categorySpan}&&raw.includes(item.category)?'span':${JSON.stringify(metadataTag)});p.textContent=raw;card.append(p)}if(${JSON.stringify(wrapperTag)}){const wrapper=document.createElement(${JSON.stringify(wrapperTag)});wrapper.append(card);main.append(wrapper)}else main.append(card)}
       document.querySelector('#empty').hidden=visible.length>0;
       if(${inlineDetail}&&selectedName)[...main.children].find(node=>node.querySelector('h3')?.textContent===selectedName)?.append(detail);
     }
@@ -88,6 +89,25 @@ async function custom(html, name, action) {
   return inspect(browser, { directory, files: [{ path: 'index.html', digest: sha(html) }] },
     { route: '/', output: join(directory, 'evidence'), action })
 }
+
+for (const id of ['CAT-01','CAT-02','CAT-03']) {
+  const display = id === 'CAT-03' ? { itemTag: 'li', titleTag: 'button', metadataTag: 'span' }
+    : { itemTag: 'button', titleTag: 'span', metadataTag: 'span' }
+  test(id + ': title controls and visible span fields preserve the full catalog contract', async () => {
+    const result = await check(id,catalog(id,display),'span-fields-'+id)
+    assert.equal(result.status,'PASSED',JSON.stringify(result))
+  })
+  test(id + ': span fields cannot manufacture a missing description', async () => {
+    const result = await check(id,catalog(id,{...display,missingDescription:true}),'span-missing-description-'+id)
+    assert.equal(result.status,'FAILED');assert.equal(result.failure,'BEHAVIOR_ERROR')
+  })
+}
+
+for (const missingDescription of [false,true]) test('CAT-02: ARIA button card '+(missingDescription?'still rejects missing metadata':'supports the same catalog behavior'),async()=>{
+  const result=await check('CAT-02',catalog('CAT-02',{itemTag:'div',roleButton:true,missingDescription}),'aria-card-'+missingDescription)
+  assert.equal(result.status,missingDescription?'FAILED':'PASSED',JSON.stringify(result))
+  if(missingDescription)assert.equal(result.failure,'BEHAVIOR_ERROR')
+})
 
 test('late mount: load before the first visible render is not a white screen', async () => {
   const result = await custom('<!doctype html><html><body><div id="app"></div><script>setTimeout(()=>{document.getElementById("app").innerHTML="<h1>Ready</h1>"},250)</script></body></html>',

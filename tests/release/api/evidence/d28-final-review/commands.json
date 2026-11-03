@@ -1,0 +1,108 @@
+[
+  {
+    "operation": "original_delta_report_recompute",
+    "command": [
+      "node",
+      "scripts/eval/report.mjs",
+      "$REPOSITORY\\tests\\release\\api\\.private\\d28-final-review\\delta-batch",
+      "--check"
+    ],
+    "nativeExitCode": 0,
+    "logSha256": "69e8d0f412e3b12808d76276bff90ca21f8ebcd903cc3d49e5d3e4e8703e73ef"
+  },
+  {
+    "operation": "old_and_scoped_new_candidate_budget_controls",
+    "command": [
+      "F:\\python314\\python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "$REPOSITORY\\tests\\release\\api\\.private\\d28-final-review\\financial-tests",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "nativeExitCode": 0,
+    "logSha256": "869f3470c615ec1d0e00d26a62e7108d23a4125997655b52bb5e98885a26ae42"
+  },
+  {
+    "operation": "installed_worker_permission_controls",
+    "command": [
+      "CODELESS_WORKER_UNDER_TEST=/opt/codeless/ops/worker.py",
+      "python3",
+      "-B",
+      "/srv/codeless-handoff/d28/20261102-cny2/cover-receipt-fix-v2/tests.py"
+    ],
+    "nativeExitCode": 0,
+    "tests": 8,
+    "logSha256": "2809a3e69f9ba0c99a8cc2fda10927343d052e44a889bf994337ca1f0383b17f"
+  },
+  {
+    "operation": "independent_incremental_quality_and_billing_audit",
+    "command": [
+      "python",
+      "audit_quality.py",
+      "<unchanged original delta records>"
+    ],
+    "nativeExitCode": 0,
+    "result": "quality.json"
+  },
+  {
+    "operation": "independent_source_and_readonly_sqlite_chain_audit",
+    "command": [
+      "python",
+      "audit_source_budget.py",
+      "<readonly ledger snapshot and original API manifest>"
+    ],
+    "nativeExitCode": 0,
+    "result": "source-budget.json"
+  },
+  {
+    "operation": "read_existing_exact_head_CI",
+    "command": [
+      "GET",
+      "https://api.github.com/repos/Echo-love928/CodeLess/actions/runs/41633433960"
+    ],
+    "nativeExitCode": 0,
+    "result": "candidate-ci.json"
+  },
+  {
+    "operation": "independent_anonymous_HTTP",
+    "command": [
+      "curl",
+      "<14 fixed public GETs; normal TLS; no credentials>"
+    ],
+    "nativeExitCode": 0,
+    "result": "public-http.json"
+  },
+  {
+    "operation": "published_quality_verifier",
+    "command": [
+      "python",
+      "-B",
+      "tests/release/api/d28_final_quality_audit.py",
+      "--root",
+      "<private intake>",
+      "--prior-batch",
+      "<original14>"
+    ],
+    "nativeExitCode": 0,
+    "result": "quality.json"
+  },
+  {
+    "operation": "published_source_budget_verifier",
+    "command": [
+      "python",
+      "-B",
+      "tests/release/api/d28_final_source_budget_audit.py",
+      "--root",
+      "<private intake>",
+      "--anchor",
+      "tests/release/api/evidence/d28-final-review/prior-budget-anchor.json"
+    ],
+    "nativeExitCode": 0,
+    "result": "source-budget.json"
+  }
+]

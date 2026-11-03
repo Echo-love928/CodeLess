@@ -1,0 +1,94 @@
+{
+  "task": "D28-A-fix",
+  "observedAtEpoch": 1793615116.8469372,
+  "scope": "read-only current deployment compared with explicit expected candidate",
+  "productionChanged": false,
+  "checks": [
+    {
+      "name": "DEPLOYED_RECORD_COMMIT",
+      "status": "FAILED"
+    },
+    {
+      "name": "SEALED_MANIFESTS",
+      "status": "FAILED",
+      "apiSha256": "e488c594cd32ac3bcf7b76faffba7810bc400a7f9c8bd8daa19340ae76a7246c",
+      "clientSha256": "676635224f6e6dc28e0d8794daf34c87da6e3773b265cc0ee93485e38dee943b"
+    },
+    {
+      "name": "CURRENT_RUNTIME_SOURCE_BYTES",
+      "status": "PASSED",
+      "files": 258,
+      "mismatched": []
+    },
+    {
+      "name": "CURRENT_API_JAR_BYTES",
+      "status": "PASSED",
+      "sha256": "d2c1bc7bccd9df9eec194fde509fa012f5c41eb3a7703aad669aaa447e067446"
+    },
+    {
+      "name": "RUNNING_API_BINDS_CURRENT_JAR",
+      "status": "PASSED",
+      "pid": 1119672,
+      "jarPath": "/srv/codeless/api.jar",
+      "openJarSha256": [
+        "d2c1bc7bccd9df9eec194fde509fa012f5c41eb3a7703aad669aaa447e067446",
+        "d2c1bc7bccd9df9eec194fde509fa012f5c41eb3a7703aad669aaa447e067446"
+      ],
+      "jarModifiedBeforeProcessStart": true
+    },
+    {
+      "name": "RUNNING_WORKER_BINDS_SOURCE",
+      "status": "PASSED",
+      "pid": 1119671,
+      "sha256": "311ed218b65e7a6bf5ceb309b8c7ff6c9f8f8fc73a6671faa3d5c50ae475cbaa",
+      "modifiedBeforeProcessStart": true
+    },
+    {
+      "name": "ACTIVE_AGENT_EXPORT_ROOTS",
+      "status": "PASSED",
+      "agentRoot": "/srv/codeless/repository",
+      "effectiveExportRoot": "/srv/codeless/repository"
+    },
+    {
+      "name": "CURRENT_POLICY_IMAGE_ID",
+      "status": "FAILED",
+      "imageId": "sha256:e3d4431bcf42d644b8e89fe703af596c51b848d7c4ea9e68bcc983514cfbb850",
+      "revision": "61df15eba456422762a667aaed7734b7d13b48e7"
+    },
+    {
+      "name": "CURRENT_WEB_MANIFEST_FILES",
+      "status": "PASSED",
+      "files": 7,
+      "mismatched": []
+    }
+  ],
+  "mismatches": [
+    "DEPLOYED_RECORD_COMMIT",
+    "SEALED_MANIFESTS",
+    "CURRENT_POLICY_IMAGE_ID"
+  ],
+  "deployedCommit": "61df15eba456422762a667aaed7734b7d13b48e7",
+  "status": "FAILED",
+  "command": [
+    "ssh",
+    "-i",
+    "<user-provided-key>",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "root@23.136.172.128",
+    "python3 -"
+  ],
+  "nativeExitCode": 1,
+  "expectedDeployedCommit": "00fd43333f35c5cb0cce425721fdce9cd1d0f956",
+  "stdoutSha256": "408f13c92c7a87e33697045f0439aca54175b1c59c8e2e4733d0e0ad25413881",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "newCandidateDeployed": false,
+  "credentialsExported": false,
+  "candidateRegistry": "tests/release/api/d28-unified-candidate.json",
+  "actualManifestPaths": [
+    "/srv/codeless/releases/d27-61df15eba456422762a667aaed7734b7d13b48e7-review/release/api/release.json",
+    "/srv/codeless/releases/d27-61df15eba456422762a667aaed7734b7d13b48e7-review/release/client/manifest.json"
+  ]
+}
