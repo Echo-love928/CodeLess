@@ -1,6 +1,7 @@
 import { chromium, expect } from '@playwright/test'
 import { locate, validateActions, limits as validateLimits } from './actions.mjs'
 import { artifactFile, isDocumentRoute } from '../artifacts/routes.mjs'
+import { closeVerificationBrowser } from './browser-cleanup.mjs'
 
 const sendPhase = (phase) => process.send?.({ phase })
 let input = ''
@@ -159,7 +160,7 @@ try {
   enter('CLEANUP')
   if (server) {
     try {
-      await server.close()
+      await closeVerificationBrowser(server, { timeoutFailure: result.failure?.endsWith('_TIMEOUT') === true })
       result.browserClosed = true
     } catch (error) { result.failure = 'CLEANUP_FAILED'; result.status = 'FAILED'; result.error = short(error.message) }
   }
