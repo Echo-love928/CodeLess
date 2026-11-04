@@ -1,0 +1,119 @@
+{
+  "task": "D29-B",
+  "date": "2026-11-04 Asia/Tokyo",
+  "baseline": "aefaca193af3019bcadbcf8fdf3f6424baee750c",
+  "status": "HOLD",
+  "deliveryStatus": "COMPLETE_FOR_ADJUSTED_DOCUMENT_SCOPE",
+  "mergeStatus": "HOLD",
+  "documentationCheck": {
+    "command": "node --test tests/release/d29-docs.test.mjs",
+    "firstExitCode": 1,
+    "finalExitCode": 0,
+    "finalPassed": 3,
+    "limitation": "local file destinations and source control names only; not browser or human acceptance",
+    "signal": null
+  },
+  "requirementChange": {
+    "authority": "user instruction in current chat, 2026-11-04 Asia/Tokyo",
+    "instruction": "不需要真人彩排以及完整录像",
+    "humanRehearsal": "REMOVED_FROM_SCOPE",
+    "fullRecording": "REMOVED_FROM_SCOPE"
+  },
+  "attempts": [
+    {
+      "receipt": "tests\\release\\d29-evidence\\configured-api\\verification.json",
+      "commands": [
+        {
+          "command": "corepack pnpm verify:api",
+          "exitCode": 0,
+          "signal": null
+        }
+      ]
+    },
+    {
+      "receipt": "tests\\release\\d29-evidence\\configured-static\\verification.json",
+      "commands": [
+        {
+          "command": "corepack pnpm verify:static",
+          "exitCode": 0,
+          "signal": null
+        }
+      ]
+    },
+    {
+      "receipt": "tests\\release\\d29-evidence\\network-enabled\\verification.json",
+      "commands": [
+        {
+          "command": "corepack pnpm verify:static",
+          "exitCode": 1,
+          "signal": null
+        },
+        {
+          "command": "corepack pnpm verify:api",
+          "exitCode": 1,
+          "signal": null
+        },
+        {
+          "command": "corepack pnpm verify:runner",
+          "exitCode": 1,
+          "signal": null
+        },
+        {
+          "command": "corepack pnpm verify:e2e",
+          "exitCode": 1,
+          "signal": null
+        },
+        {
+          "command": "corepack pnpm ci:gate",
+          "exitCode": 1,
+          "signal": null
+        }
+      ]
+    },
+    {
+      "receipt": "tests\\release\\d29-evidence\\verification.json",
+      "commands": [
+        {
+          "command": "corepack pnpm verify:static",
+          "exitCode": 1,
+          "signal": null
+        },
+        {
+          "command": "corepack pnpm verify:api",
+          "exitCode": 1,
+          "signal": null
+        },
+        {
+          "command": "corepack pnpm verify:runner",
+          "exitCode": 1,
+          "signal": null
+        },
+        {
+          "command": "corepack pnpm verify:e2e",
+          "exitCode": 1,
+          "signal": null
+        },
+        {
+          "command": "corepack pnpm ci:gate",
+          "exitCode": 1,
+          "signal": null
+        }
+      ]
+    }
+  ],
+  "acceptance": {
+    "T1": "Adjusted scope: seven-scene script and source entry review complete; human exchange removed",
+    "T2": "Adjusted scope: live/mock/historical date/version labeling rules complete; full recording removed",
+    "T3": "Local links pass; external/private reachability not tested",
+    "T4": "Source controls/state logic matched and existing UI 213/213 passed; no additional manual browser walkthrough"
+  },
+  "runtimePaidModelRequestsInitiatedByTask": 0,
+  "runtimeMockUsage": "UNKNOWN; see raw gate logs",
+  "developmentTokens": {
+    "input": null,
+    "output": null,
+    "total": null,
+    "source": "UNKNOWN"
+  },
+  "rawLogPolicy": "Original logs and receipts retained under .local-data/d29-b/raw, bound by byte length and SHA256; not public attachments."
+}
