@@ -1,6 +1,6 @@
 # CodeLess 最终交付索引（D30-B）
 
-核验日期：2026-11-04，Asia/Tokyo。材料基线 main `6998a42395004d3e358d1cb127261e815456b05e`，分支 `codex/D30-B`。本轮仅交付材料及核验工具，部署身份不能用文档提交号代替。
+核验日期：2026-11-04，Asia/Tokyo。后续超时/代理修复及仅失败项补验见[交接首节](../handoffs/D30-B.md)，以下原始交付与聚合失败快照保留，不将旧原生1改写为0。材料基线 main `6998a42395004d3e358d1cb127261e815456b05e`，分支 `codex/D30-B`。初始任务仅交付材料及核验工具；后续按用户新增授权修复评测代理和runner超时关闭，部署身份不能用文档提交号代替。
 
 真人彩排和完整录像已按用户要求取消，不计未完成或阻塞，不提供虚构视频或真人记录。
 
@@ -30,7 +30,7 @@
 - [用户手册](../user-guide.md)：登录、新建、生成修复、组件编辑、发布、封面、下载、失败恢复。
 - [安装](../install.md)、[排障](../troubleshooting.md)、[环境](../environment.md)、[后台](../admin-usage.md)、[恢复](../recovery.md)。
 - [七镜头脚本](../demo/full-script.md)、[前端交付](frontend.md)、[后端交付](backend.md)、[后端讲解](../demo/backend-script.md)。现场REAL、现场mock与历史证据须标明，不要求录像。
-- D30-A当前[最终服务端归档（精确70a1751）](https://github.com/Echo-love928/CodeLess/blob/70a1751ea92bfeb67d2ed164e9c07a2de0ea14a6/docs/delivery/final-backend.md)、[PR100](https://github.com/Echo-love928/CodeLess/pull/100)、[B只读互审](../../tests/delivery/client/review-D30-A.md)。A已交付，尚未合入本分支；不虚构本地文件，正式标签/生产异机恢复仍HOLD。
+- D30-A当前[最终服务端归档（精确70a1751）](https://github.com/Echo-love928/CodeLess/blob/70a1751ea92bfeb67d2ed164e9c07a2de0ea14a6/docs/delivery/final-backend.md)、[PR100](https://github.com/Echo-love928/CodeLess/pull/100)、[B只读互审](../../tests/delivery/client/review-D30-A.md)。A已交付，同一70a1751已获[B线上批准](https://github.com/Echo-love928/CodeLess/pull/100#pullrequestreview-5764707508)，尚未合入本分支；不虚构本地文件，正式标签/生产异机恢复仍HOLD。
 - [scope](../scope.md)、[architecture](../architecture.md)、[契约入口](../../contracts/README.md)、[导出契约](../../contracts/export/README.md)、[封面契约](../../contracts/cover/README.md)。
 
 ## 验收和测试索引

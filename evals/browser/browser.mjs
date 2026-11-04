@@ -17,18 +17,27 @@ export async function inspect(browser, artifact, { id, route, query = '', output
     assert.equal(sha(bytes), file.digest); content.set(path, bytes)
   }
   const server = createServer((request, response) => {
-    const path = new URL(request.url, 'http://fixture.test').pathname
+    const target = new URL(request.url, origin)
+    if (target.origin !== origin || target.username || target.password || request.headers.host !== new URL(origin).host || !['GET', 'HEAD'].includes(request.method)) {
+      response.writeHead(403); response.end(); return
+    }
+    const path = target.pathname
     const key = ['/', '/tasks', '/catalog'].includes(path) ? '/index.html' : path
     if (!content.has(key)) { response.writeHead(404); response.end(); return }
     response.writeHead(200, { 'Content-Type': key.endsWith('.js') ? 'text/javascript' : key.endsWith('.css') ? 'text/css' : key.endsWith('.json') ? 'application/json' : 'text/html', 'Cache-Control': 'no-store' })
     response.end(content.get(key))
   })
+  server.on('connect', (_request, socket) => socket.end('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n'))
+  server.on('upgrade', (_request, socket) => socket.end('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n'))
   server.listen(0, '127.0.0.1'); await once(server, 'listening')
   const origin = 'http://127.0.0.1:' + server.address().port
   let context, page
   const result = { status: 'FAILED', failure: null, pageErrors: [], consoleErrors: [], blockedRequests: [], failedRequests: [], screenshot: null, trace: null }
   try {
-    context = await browser.newContext({ serviceWorkers: 'block', viewport: { width: 1280, height: 900 } })
+    // Do not inherit host/PAC/browser proxy configuration for this owned fixture.
+    // The loopback server is a non-forwarding proxy; foreign origins still fail closed.
+    context = await browser.newContext({ serviceWorkers: 'block', viewport: { width: 1280, height: 900 },
+      proxy: { server: origin, bypass: '<-loopback>' } })
     await context.route('**/*', async request => {
       const url = new URL(request.request().url())
       if (url.origin === origin && (approved.has(url.pathname) || ['/', '/tasks', '/catalog'].includes(url.pathname))) return request.continue()
@@ -69,7 +78,7 @@ export async function inspect(browser, artifact, { id, route, query = '', output
       if (context) { await context.tracing.stop({ path: join(output, 'trace.zip') }); result.trace = { path: 'trace.zip', digest: sha(await readFile(join(output, 'trace.zip'))) } }
     } catch (error) { result.status = 'FAILED'; result.failure = 'EVIDENCE_ERROR'; result.evidenceError = error.message }
     await context?.close()
-    await new Promise(done => server.close(done))
+    await new Promise(done => { server.close(done); server.closeAllConnections() })
   }
   return result
 }

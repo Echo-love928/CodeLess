@@ -1,4 +1,10 @@
-# D30-A 只读互审
+# D30-A 互审与精确提交批准
+
+最新状态：按用户新增授权，对同一head `70a1751ea92bfeb67d2ed164e9c07a2de0ea14a6` / base6998a42仅回读状态，未重复已过测试；六项CI success、未解决线程为空。已由Echo-love928（作者为yuanqizuimeng）提交并独立回读 [APPROVED 5764707508](https://github.com/Echo-love928/CodeLess/pull/100#pullrequestreview-5764707508)。批准仅适用于A该材料候选；B新runner源码修复未继承此批准，M6正式签发仍HOLD。
+
+以下保留初次只读审查快照，其中“未批准”等语句只表示当时状态。
+
+---
 
 被审：PR100，`70a1751ea92bfeb67d2ed164e9c07a2de0ea14a6`，base `6998a42395004d3e358d1cb127261e815456b05e`。在 `.local-data/d30-b/peer-a` 独立detached worktree执行；未改A分支、未评论/批准、未打标签或合并。[33文件Git字节索引](evidence/peer70/review.json)。
 
