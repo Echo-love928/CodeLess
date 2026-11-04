@@ -48,7 +48,7 @@ describe('PreviewPanel lifecycle', () => {
     expect(wrapper.text()).toContain('已过期'); expect(wrapper.find('iframe').exists()).toBe(false)
     wrapper.unmount()
   })
-  it('renews the credential when a loaded preview is denied after expiry', async () => {
+  it.each(['unavailable', 'load-error'])('renews the credential when a loaded preview reports %s after expiry', async reported => {
     get.mockResolvedValue(value())
     // Attached, so each iframe has its own contentWindow for the message source check.
     const wrapper = mount(PreviewPanel, { props: { applicationId: app, versionId: version }, attachTo: document.body })
@@ -60,16 +60,49 @@ describe('PreviewPanel lifecycle', () => {
     post('loaded'); await flushPromises()
     await vi.advanceTimersByTimeAsync(120_000)
     // E.g. a full-page link inside the loaded app now reaches the gateway's deny document.
-    post('unavailable'); await flushPromises()
+    post(reported); await flushPromises()
     expect(get).toHaveBeenCalledTimes(2)
     expect(wrapper.find('iframe').exists()).toBe(true); expect(wrapper.text()).toContain('正在加载')
     expect(wrapper.find('.preview-panel__message[role="alert"]').exists()).toBe(false)
     // The replaced document's late messages are ignored.
-    post('unavailable'); await flushPromises()
+    post(reported); await flushPromises()
     expect(get).toHaveBeenCalledTimes(2); expect(wrapper.find('.preview-panel__message[role="alert"]').exists()).toBe(false)
     wrapper.unmount()
   })
-  it('a loaded preview that fails before expiry shows the error instead of reloading', async () => {
+  it('keeps a loaded preview with a warning when its page reports a runtime error, also after expiry', async () => {
+    get.mockResolvedValue(value())
+    const wrapper = mount(PreviewPanel, { props: { applicationId: app, versionId: version } })
+    await flushPromises()
+    const source = (wrapper.get('iframe').element as HTMLIFrameElement).contentWindow
+    const post = (state: string) => window.dispatchEvent(new MessageEvent('message', {
+      origin: new URL(value().url).origin, source, data: { type: 'codeless-preview', state } }))
+    post('loaded'); await flushPromises()
+    expect(wrapper.find('.preview-panel__warning').exists()).toBe(false)
+    // E.g. a lazily loaded resource that the gateway denies once the credential has lapsed.
+    await vi.advanceTimersByTimeAsync(120_000)
+    post('runtime-error'); await flushPromises()
+    expect(wrapper.get('.preview-panel__warning').text()).toContain('运行时出错')
+    expect(wrapper.find('iframe').exists()).toBe(true); expect(wrapper.find('.preview-panel__workspace--ready').exists()).toBe(true)
+    expect(wrapper.find('.preview-panel__message[role="alert"]').exists()).toBe(false); expect(get).toHaveBeenCalledTimes(1)
+    // A new document in the frame (reload, full-page link) that starts cleanly clears the warning.
+    post('loaded'); await flushPromises()
+    expect(wrapper.find('.preview-panel__warning').exists()).toBe(false)
+    wrapper.unmount()
+  })
+  it('a page that fails to start shows a load error, not a credential error', async () => {
+    get.mockResolvedValue(value())
+    const wrapper = mount(PreviewPanel, { props: { applicationId: app, versionId: version } })
+    await flushPromises()
+    const source = (wrapper.get('iframe').element as HTMLIFrameElement).contentWindow
+    window.dispatchEvent(new MessageEvent('message', { origin: new URL(value().url).origin, source,
+      data: { type: 'codeless-preview', state: 'load-error' } }))
+    await flushPromises()
+    const alert = wrapper.get('.preview-panel__message[role="alert"]').text()
+    expect(alert).toContain('加载出错'); expect(alert).not.toContain('凭据')
+    expect(wrapper.find('iframe').exists()).toBe(false); expect(get).toHaveBeenCalledTimes(1)
+    wrapper.unmount()
+  })
+  it('a loaded preview whose next document is denied before expiry shows the error instead of reloading', async () => {
     get.mockResolvedValue(value())
     const wrapper = mount(PreviewPanel, { props: { applicationId: app, versionId: version } })
     await flushPromises()
