@@ -1,0 +1,32 @@
+{
+  "command": [
+    "node",
+    "tests/delivery/client/check-preview.mjs",
+    ".local-data/d30-b/export-20261104/clean-build/out/dist",
+    "tests/delivery/client/evidence/export-20261104/browser.json"
+  ],
+  "builtIndexSha256": "9643495e8389a6dcd645c8afcb5ac3d66d5d23636d0e336e1e71405601cd9091",
+  "scope": "Independent exported dist on loopback static server; not a new production deployment or full CRUD test",
+  "checks": [
+    {
+      "path": "/",
+      "http": 200,
+      "renderedAndRefreshed": true,
+      "expectedText": "CodeLess Showcase"
+    },
+    {
+      "path": "/tasks",
+      "http": 200,
+      "renderedAndRefreshed": true,
+      "expectedText": "待添加任务。"
+    },
+    {
+      "path": "/catalog",
+      "http": 200,
+      "renderedAndRefreshed": true,
+      "expectedText": "待添加目录。"
+    }
+  ],
+  "status": "PASSED",
+  "nativeExitCode": 0
+}
