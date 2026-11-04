@@ -61,6 +61,10 @@ def offline():
                            'recordStatus': 'HANDOFF_EXISTS_NOT_BLANKET_ACCEPTANCE' if exists else 'NOT_DELIVERED_AT_BASELINE',
                            'input_tokens': None, 'output_tokens': None, 'total_tokens': None,
                            'measurement': 'UNKNOWN; original per-task receipt takes precedence, budget is not consumption'})
+            if day == 30 and member == 'A' and (ROOT / 'tests/delivery/client/evidence/peer70/review.json').is_file():
+                ledger[-1].update(recordStatus='DELIVERED_IN_PR_NOT_MERGED; READ_ONLY_REVIEW_RECORDED',
+                                  externalHandoff='https://github.com/Echo-love928/CodeLess/pull/100',
+                                  reviewedHead='70a1751ea92bfeb67d2ed164e9c07a2de0ea14a6')
     return {'mode': 'offline', 'baseline': BASE, 'head': git('rev-parse', 'HEAD').decode().strip(),
             'documents': [{'path': p, 'bytes': (ROOT / p).stat().st_size, 'sha256': sha((ROOT / p).read_bytes())} for p in DOCS],
             'links': checks, 'historicalReceipts': receipts, 'repositoryRequirements': repository,
@@ -92,6 +96,13 @@ def public():
                 if len(data) > 2 * 1024 * 1024:
                     raise ValueError('Response too large')
                 item.update(httpStatus=response.code, bytes=len(data), sha256=sha(data), finalUrl=response.url, passed=response.code == expected)
+                if response.code == 200 and url in [platform + '/login', site + '/']:
+                    # Follow only the fixed pages' same-origin asset paths, never external URLs.
+                    assets = sorted(set(re.findall(r'''(?:src|href)=["'](/assets/[^"']+)["']''', data.decode('utf-8'))))
+                    if not assets or len(assets) > 16:
+                        raise ValueError('Missing or excessive entry assets')
+                    origin = platform if url.startswith(platform + '/') else site
+                    targets.extend((origin + asset, 200) for asset in assets)
                 if url.endswith('/CodeLess'):
                     repo = json.loads(data)
                     item['repositoryPublic'] = repo['private'] is False

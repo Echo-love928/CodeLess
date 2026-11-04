@@ -1,0 +1,46 @@
+{
+  "status": "FAILED",
+  "ciGateNativeExitCode": 1,
+  "signal": null,
+  "separateEarlierStages": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "aggregateStages": {
+    "static": "Node64/64, UI213/213",
+    "api": {
+      "tests": 437,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "failureReceipt": "aggregate-api-failures.json"
+    },
+    "runner": {
+      "tests": 293,
+      "passed": 292,
+      "failed": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "failedCase": "CAT-01: title controls and visible span fields preserve the full catalog contract",
+      "location": "tests/eval/browser/behavior.test.mjs:96",
+      "observation": "page.goto /catalog waiting for load exceeded original 10000ms"
+    },
+    "e2e": {
+      "passed": 79,
+      "failed": 1,
+      "failedCase": "D08-B runner: build artifacts, controlled browser actions and isolation",
+      "location": "tests/e2e/runner/browser.spec.ts:6",
+      "observations": [
+        "nested D08-B-T1 test timed out after 25000ms",
+        "D08-B-T2 expected PAGE_OPEN_TIMEOUT, observed CLEANUP_TIMEOUT; browserClosed=false, processTreeTerminated=true"
+      ],
+      "fullPlatform": "NOT_RUN after failed browser suite"
+    }
+  },
+  "aggregateChildNativeExitCodes": null,
+  "rootCauses": "UNKNOWN; no retry or timeout/assertion changes",
+  "rawLog": ".local-data/d30-b/configured-20261104/ci-gate.log",
+  "rawLogSha256": "cb10e5ee0060ab12f39c6b6815cb9adeb02836359bcd7e7eeea9df3c51dc7886"
+}

@@ -14,7 +14,7 @@
 | 生成源码包 | [所有者下载接口](https://app.codeless-platform.top/api/v0/versions/bc53e8eb-08c3-4e1c-b41c-9667b98ac0fe/export) | 本轮匿名 401 为预期；所有者选择版本后“下载源码”。不是公开免登录下载。原 ZIP 21087 字节/16成员，按包内说明运行，见[最终客户端说明](final-client.md)。 |
 | 仓库与历史 | [GitHub](https://github.com/Echo-love928/CodeLess) | 本轮匿名 API 确认 public；[D29历史与PR溯源](../../tests/delivery/backend/evidence/history.json)。 |
 
-以上新观测：[匿名HTTP回执](../../tests/delivery/client/evidence/public-first.json)。它不包含新的所有者登录，也不重新证明当前服务器的源码身份；新候选切换后必须重验。
+以上新观测：[首轮匿名HTTP回执](../../tests/delivery/client/evidence/public-first.json)、[含入口JS/CSS的10项核验](../../tests/delivery/client/evidence/public-assets.json)。它不包含新的所有者登录，也不重新证明当前服务器的源码身份；新候选切换后必须重验。
 
 | 绑定项 | 精确值 / 证据 |
 | --- | --- |
@@ -30,6 +30,7 @@
 - [用户手册](../user-guide.md)：登录、新建、生成修复、组件编辑、发布、封面、下载、失败恢复。
 - [安装](../install.md)、[排障](../troubleshooting.md)、[环境](../environment.md)、[后台](../admin-usage.md)、[恢复](../recovery.md)。
 - [七镜头脚本](../demo/full-script.md)、[前端交付](frontend.md)、[后端交付](backend.md)、[后端讲解](../demo/backend-script.md)。现场REAL、现场mock与历史证据须标明，不要求录像。
+- D30-A当前[最终服务端归档（精确70a1751）](https://github.com/Echo-love928/CodeLess/blob/70a1751ea92bfeb67d2ed164e9c07a2de0ea14a6/docs/delivery/final-backend.md)、[PR100](https://github.com/Echo-love928/CodeLess/pull/100)、[B只读互审](../../tests/delivery/client/review-D30-A.md)。A已交付，尚未合入本分支；不虚构本地文件，正式标签/生产异机恢复仍HOLD。
 - [scope](../scope.md)、[architecture](../architecture.md)、[契约入口](../../contracts/README.md)、[导出契约](../../contracts/export/README.md)、[封面契约](../../contracts/cover/README.md)。
 
 ## 验收和测试索引
@@ -40,7 +41,7 @@
 | [质量与原始记录定位](../../tests/release/api/evidence/d28-final-review/quality.json) | 独立REAL批次与生产mock分账；实际账单UNKNOWN。历史失败保留，不因整理文档改写。 |
 | [前端独立流程验收](../acceptance/frontend.md)及[D28-B交接](../handoffs/D28-B.md) | 含两个独立用户、权限拒绝、失败保留版本、桌面/390px真实浏览器；早期HOLD为历史，当前取D28-A最终复审。 |
 | [D29-B回执](../../tests/release/d29-evidence/summary.json)及[交接](../handoffs/D29-B.md) | UI213/213、static/API补验通过；本机原runner/E2E/聚合失败保留。取消真人/录像不取消门禁。 |
-| [本轮门禁](../../tests/delivery/client/evidence/configured-20261104/gates.json) | 按命令逐项查看 nativeExitCode/signal；日志原件在当前克隆的 .local-data/d30-b，公开只列摘要，不把历史绿灯当本轮通过。 |
+| [本轮门禁](../../tests/delivery/client/evidence/configured-20261104/gates.json) | 独立四阶段均原生0；单独聚合原生1，[聚合汇总](../../tests/delivery/client/evidence/aggregate-summary.json)保留API437项/1失败、runner292/293、E2E79/80及后续full-platform未运行。失败不被前批/远端绿灯关闭，M6 HOLD。日志原件在 .local-data/d30-b，公开只列摘要。 |
 | 本轮符合性与60任务机器账本：`tests/delivery/client/evidence/offline-final.json` | 核验本索引本地文件目标、D28历史摘要、仓库五项证据。与[本卡交接](../handoffs/D30-B.md)一起接收。 |
 
 ## 截图所列仓库五项要求
@@ -57,7 +58,7 @@
 
 ## 30天成员任务账本
 
-以下按60个任务ID登记交接；“已交接”只说明原报告存在，不将原报告中的失败/未知改为完成。每卡子项、原命令和实际验收以链接中的报告为准。没有统一可信的60卡验收计数，整体完成率保持UNKNOWN。D28以最终复审覆盖早期状态，D29按取消要求交付材料。D30-A未交付时不列完成。
+以下按60个任务ID登记交接；“已交接”只说明原报告存在，不将原报告中的失败/未知改为完成。每卡子项、原命令和实际验收以链接中的报告为准。没有统一可信的60卡验收计数，整体完成率保持UNKNOWN。D28以最终复审覆盖早期状态，D29按取消要求交付材料。D30-A已在PR100交付并只读审查，尚非正式发布完成。
 
 所有卡的开发 input_tokens / output_tokens / 合计及计量来源在本轮汇总均为 **UNKNOWN / UNKNOWN / UNKNOWN / UNKNOWN**；原卡若有实测局部值，仍以原报告为准，缺跨批累计不相加伪造总量。每天60,000预算不是实际消耗。机器账本逐行保留null；本卡运行时付费请求0、mock累计UNKNOWN，独立REAL预算及UNKNOWN占用见D28质量账本，不混入开发token。
 
@@ -92,11 +93,11 @@
 | D27 | [D27-A](../handoffs/D27-A.md) | [D27-B](../handoffs/D27-B.md) | 已交接；子项通过/失败/未知见各原报告，本轮不重新验收 |
 | D28 | [D28-A](../handoffs/D28-A.md) | [D28-B](../handoffs/D28-B.md) | 最终技术验收通过；以D28-A最终复审为准，TASK-03保留失败 |
 | D29 | [D29-A](../handoffs/D29-A.md) | [D29-B](../handoffs/D29-B.md) | 调整后材料已交付；本机历史门禁失败保留，不含真人/录像要求 |
-| D30 | D30-A 未交付 | [D30-B](../handoffs/D30-B.md) | A待交付/互审；B本卡验收见交接，未声称M6整体完成 |
+| D30 | [D30-A PR100](https://github.com/Echo-love928/CodeLess/pull/100) | [D30-B](../handoffs/D30-B.md) | A材料已交付/B只读互审完成，正式归档HOLD；B本卡验收见交接，未声称M6整体完成 |
 
 ## 后续优先级
 
-1. P0：收齐D30-A最终版本归档、恢复/权限/质量原件交接并独立互审；本PR精确HEAD所有必需CI真实success、同伴批准及讨论解决前不合并。
-2. P1：按本轮门禁的实际失败定位环境或产品问题，跨模块修复另由维护者处理；不得靠重试删除首轮失败。
+1. P0：A归档材料已收并只读审查；最终版本标签/生产异机恢复及同候选M6仍待维护者。本PR精确HEAD所有必需CI真实success、同伴批准及讨论解决前不合并。
+2. P1：API/预览维护者定位聚合前端构建30秒ETIMEDOUT；runner/浏览器维护者定位CAT-01 load超时和D08超时/清理断言。根因均UNKNOWN，跨模块修复另交最小变更与受影响证据，不靠重试删除本轮失败。
 3. P1：TASK-03真实模型失败与精确账单UNKNOWN继续登记；本轮没有付费复评授权，不重跑历史批次。
 4. P2：新部署发生变化时成组验证身份、用户授权下载、封面和公开资源；本轮已有可达性不等于新部署验收。
