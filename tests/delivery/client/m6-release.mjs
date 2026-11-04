@@ -98,5 +98,5 @@ with tarfile.open(client/'runner.tar') as t:
 result={'status':'PASSED','candidate':head,'sharedSourceFiles':len(common),'apiManifestSha256':hashlib.sha256((api/'release.json').read_bytes()).hexdigest(),'clientManifestSha256':hashlib.sha256((client/'manifest.json').read_bytes()).hexdigest(),'apiJarSha256':hashlib.sha256((api/'api.jar').read_bytes()).hexdigest(),'newCleanupModuleIncluded':True,'deployed':False}
 (out/'package-binding.json').write_text(json.dumps(result,indent=2)+'\\n',encoding='utf8',newline='\\n')
 print(json.dumps(result))`;
-  run('package-binding', 'python', ['-c', code, root, output, head]);
+  run('package-binding-command', 'python', ['-c', code, root, output, head]);
 }
