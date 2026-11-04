@@ -1,6 +1,6 @@
 # CodeLess 最终交付索引（D30-B）
 
-核验日期：2026-11-04，Asia/Tokyo。后续超时/代理修复及仅失败项补验见[交接首节](../handoffs/D30-B.md)，以下原始交付与聚合失败快照保留，不将旧原生1改写为0。材料基线 main `6998a42395004d3e358d1cb127261e815456b05e`，分支 `codex/D30-B`。初始任务仅交付材料及核验工具；后续按用户新增授权修复评测代理和runner超时关闭，部署身份不能用文档提交号代替。
+核验日期：2026-11-04，Asia/Tokyo。当前聚合失败后续验收为 **SUCCESS**：按用户明确口径复用已经通过的定向复验，历史超时根因未知不再阻塞本轮；[验收决定](../../tests/delivery/client/evidence/timeout-acceptance.json)。本次仅更新状态，不重跑测试。后续超时/代理修复及仅失败项补验见[交接首节](../handoffs/D30-B.md)，以下原始交付与聚合失败快照保留，不将旧原生1改写为0。材料基线 main `6998a42395004d3e358d1cb127261e815456b05e`，分支 `codex/D30-B`。初始任务仅交付材料及核验工具；后续按用户新增授权修复评测代理和runner超时关闭，部署身份不能用文档提交号代替。
 
 真人彩排和完整录像已按用户要求取消，不计未完成或阻塞，不提供虚构视频或真人记录。
 
@@ -41,7 +41,7 @@
 | [质量与原始记录定位](../../tests/release/api/evidence/d28-final-review/quality.json) | 独立REAL批次与生产mock分账；实际账单UNKNOWN。历史失败保留，不因整理文档改写。 |
 | [前端独立流程验收](../acceptance/frontend.md)及[D28-B交接](../handoffs/D28-B.md) | 含两个独立用户、权限拒绝、失败保留版本、桌面/390px真实浏览器；早期HOLD为历史，当前取D28-A最终复审。 |
 | [D29-B回执](../../tests/release/d29-evidence/summary.json)及[交接](../handoffs/D29-B.md) | UI213/213、static/API补验通过；本机原runner/E2E/聚合失败保留。取消真人/录像不取消门禁。 |
-| [本轮门禁](../../tests/delivery/client/evidence/configured-20261104/gates.json) | 独立四阶段均原生0；单独聚合原生1，[聚合汇总](../../tests/delivery/client/evidence/aggregate-summary.json)保留API437项/1失败、runner292/293、E2E79/80及后续full-platform未运行。失败不被前批/远端绿灯关闭，M6 HOLD。日志原件在 .local-data/d30-b，公开只列摘要。 |
+| [本轮门禁](../../tests/delivery/client/evidence/configured-20261104/gates.json) | 独立四阶段均原生0；单独聚合原生1，[聚合汇总](../../tests/delivery/client/evidence/aggregate-summary.json)保留API437项/1失败、runner292/293、E2E79/80及后续full-platform未运行。原生1保留为历史；现按用户明确口径接纳已通过的后续定向复验，本轮验收SUCCESS。M6其余正式发布条件另行核对。日志原件在 .local-data/d30-b，公开只列摘要。 |
 | 本轮符合性与60任务机器账本：`tests/delivery/client/evidence/offline-final.json` | 核验本索引本地文件目标、D28历史摘要、仓库五项证据。与[本卡交接](../handoffs/D30-B.md)一起接收。 |
 
 ## 截图所列仓库五项要求
@@ -98,6 +98,6 @@
 ## 后续优先级
 
 1. P0：A归档材料已收并只读审查；最终版本标签/生产异机恢复及同候选M6仍待维护者。本PR精确HEAD所有必需CI真实success、同伴批准及讨论解决前不合并。
-2. P1：API/预览维护者定位聚合前端构建30秒ETIMEDOUT；runner/浏览器维护者定位CAT-01 load超时和D08超时/清理断言。根因均UNKNOWN，跨模块修复另交最小变更与受影响证据，不靠重试删除本轮失败。
+2. P2（可选后续）：历史API构建/D08-T1超时根因未确认，依用户明确决定不再阻塞本轮已通过复验的验收；原失败与成功复验分账保留，不重复已通过测试。
 3. P1：TASK-03真实模型失败与精确账单UNKNOWN继续登记；本轮没有付费复评授权，不重跑历史批次。
 4. P2：新部署发生变化时成组验证身份、用户授权下载、封面和公开资源；本轮已有可达性不等于新部署验收。

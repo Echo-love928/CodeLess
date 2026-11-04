@@ -1,0 +1,55 @@
+{
+  "task": "D30-B aggregate gate follow-up",
+  "date": "2026-11-04 Asia/Tokyo",
+  "currentAcceptanceStatus": "SUCCESS",
+  "acceptedSourceCommit": "b5e9aebe5536cea9a24f26ef155d010d2eff8efb",
+  "decisionAuthority": "Explicit user instruction in this chat",
+  "decision": "根因未确认但重跑时能够正常通过也算成功；前面已经有正常通过的测试不用再次重跑，更改状态为成功即可",
+  "acceptancePolicy": {
+    "reuseExistingPassingResults": true,
+    "rootCauseConfirmationRequired": false,
+    "unconfirmedHistoricalRootCauseBlocksThisAcceptance": false
+  },
+  "reusedResults": [
+    {
+      "case": "PreviewPlatformIntegrationTest#realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures",
+      "nativeExitCode": 0,
+      "passed": 1,
+      "receipt": ".local-data/d30-b/targeted-api-engine-ready/receipt.json",
+      "logSha256": "74c36a537f7f33082a826f4b8908057bdaa9a32f72969dc725843a4ef3efbc4f",
+      "buildElapsedMs": 7020,
+      "unchangedBuildTimeoutMs": 30000
+    },
+    {
+      "case": "CAT-01: title controls and visible span fields preserve the full catalog contract",
+      "nativeExitCode": 0,
+      "passed": 1,
+      "log": ".local-data/d30-b/timeout-fix/cat-after.log",
+      "logSha256": "c12a83a266b30fa533f01abca903d09cbb8f5da916ed6a90552e82603ce58c09"
+    },
+    {
+      "case": "D08-B-T1 blank/uncaught exception and D08-B-T2 timeout phases",
+      "nativeExitCode": 0,
+      "passed": 2,
+      "source": "Existing native tool execution transcript; before timeout cleanup fix, no separate disk log claimed"
+    },
+    {
+      "case": "D08-B-T2 timeout phases after fix",
+      "nativeExitCode": 0,
+      "passed": 1,
+      "log": ".local-data/d30-b/timeout-fix/d08-after.log",
+      "logSha256": "2947635ed2f19a394ed088bbeca0273237a0ab7f05124b660a0785233d7efa7b"
+    }
+  ],
+  "newRegressionControlsPreviouslyPassed": 4,
+  "historicalAggregate": {
+    "receipt": "tests/delivery/client/evidence/aggregate-summary.json",
+    "nativeExitCode": 1,
+    "recordModified": false,
+    "disposition": "Historical failure retained; successful follow-up accepted by user, no longer an acceptance blocker"
+  },
+  "testsRerunForThisDecision": false,
+  "freshFullGateRunPerformed": false,
+  "freshFullGateNativeExitCode": null,
+  "releaseScope": "This accepts the aggregate-failure follow-up; it does not create a tag, merge, deploy or certify an unverified final combined release"
+}
