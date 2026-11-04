@@ -126,7 +126,12 @@ async function logout() {
     <aside class="app-sidebar">
       <router-link class="brand-link" to="/apps"><BrandLogo /></router-link>
       <div class="workspace-switch"><span class="workspace-avatar">{{ session.user?.displayName?.slice(0, 1) || '我' }}</span><span>个人空间<small>让小想法有个落点</small></span></div>
-      <nav class="app-nav" aria-label="主导航"><p>工作空间</p><router-link class="app-nav__item is-active" to="/apps" aria-current="page"><UiIcon name="grid" />我的应用<span class="app-nav__count">{{ apps.length }}</span></router-link><button class="app-nav__item" type="button" @click="openDialog"><UiIcon name="book" />开始使用</button></nav>
+      <nav class="app-nav" aria-label="主导航">
+        <p>工作空间</p>
+        <router-link class="app-nav__item is-active" to="/apps" aria-current="page"><UiIcon name="grid" />我的应用<span class="app-nav__count">{{ apps.length }}</span></router-link>
+        <button class="app-nav__item" type="button" @click="openDialog"><UiIcon name="book" />开始使用</button>
+        <router-link v-if="session.status === 'authenticated' && session.user?.role === 'ADMIN'" class="app-nav__item" to="/admin"><UiIcon name="lock" />后台管理</router-link>
+      </nav>
       <div class="sidebar-foot"><div class="sidebar-guide"><strong>从一页开始就很好。</strong><p>一个活动、一次展示，<br />把你的想法变成可以分享的页面。</p></div><div class="sidebar-profile"><span class="workspace-avatar">{{ session.user?.displayName?.slice(0, 1) || '我' }}</span><span>{{ session.user?.displayName }}<small>{{ session.user?.email }}</small></span><button type="button" :disabled="signingOut" @click="logout">{{ signingOut ? '退出中…' : '退出' }}</button></div></div>
     </aside>
     <div class="app-content">
