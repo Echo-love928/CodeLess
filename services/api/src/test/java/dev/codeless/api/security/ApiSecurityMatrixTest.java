@@ -208,6 +208,11 @@ class ApiSecurityMatrixTest extends PostgresTestBase {
                 new Route("ANY /error", Access.FRAMEWORK, t -> get("/error"), 0),
                 new Route("ANY /error [text/html]", Access.FRAMEWORK, t -> get("/error"), 0),
                 new Route("GET /api/v0/applications/{applicationId}", Access.OWNER, t -> get("/api/v0/applications/" + t.app()), 200),
+                new Route("DELETE /api/v0/applications/{applicationId}", Access.OWNER,
+                        t -> new Call("DELETE", "/api/v0/applications/" + t.app(), null, null, "application/json"), 204),
+                // This security fixture has no browser screenshot evidence; an authorized read fails closed.
+                new Route("GET /api/v0/applications/{applicationId}/versions/{versionId}/cover", Access.OWNER,
+                        t -> get("/api/v0/applications/" + t.app() + "/versions/" + t.version() + "/cover"), 503),
                 new Route("GET /api/v0/versions/{versionId}", Access.OWNER, t -> get("/api/v0/versions/" + t.version()), 200),
                 new Route("GET /api/v0/applications/{applicationId}/versions", Access.OWNER,
                         t -> get("/api/v0/applications/" + t.app() + "/versions"), 200),
@@ -294,6 +299,7 @@ class ApiSecurityMatrixTest extends PostgresTestBase {
         // Own container + foreign child: the foreign child is indistinguishable from a random one and never accepted.
         List<Map<String, Object>> crossObject = new ArrayList<>();
         for (Calls cross : List.<Calls>of(
+                t -> get("/api/v0/applications/" + attackerApp + "/versions/" + t.version() + "/cover"),
                 t -> post("/api/v0/applications/" + attackerApp + "/edits", Map.of("baseVersionId", t.version().toString(),
                         "prompt", "cross-object edit", "source", Map.of("type", "CHAT"))),
                 t -> post("/api/v0/applications/" + attackerApp + "/component-edits", Map.of("baseVersionId", t.version().toString(),
@@ -332,12 +338,25 @@ class ApiSecurityMatrixTest extends PostgresTestBase {
         boolean unchanged = after.equals(before);
         if (!unchanged) violations.add("rejected requests changed state: " + changed(before, after));
 
-        // Positive controls: the owner's identical requests succeed, so every 404 above is an authorization decision.
+        // Owner controls distinguish authorization failures from the documented missing-evidence response.
         List<Map<String, Object>> controls = new ArrayList<>();
         for (Route route : routes()) {
             if (route.access() != Access.OWNER) continue;
-            Res own = call(victim, route.call().on(owned));
+            Call ownerCall = route.call().on(owned);
+            UUID disposable = null;
+            if (route.key().equals("DELETE /api/v0/applications/{applicationId}")) {
+                // Delete a separate idle project so later security cases keep their shared fixture intact.
+                disposable = UUID.randomUUID();
+                repository.createApplication(disposable, victimAccount.id(), "D19A archive control", DataMode.MOCK);
+                ownerCall = new Call("DELETE", "/api/v0/applications/" + disposable, null, null, "application/json");
+            }
+            Res own = call(victim, ownerCall);
             if (own.status() != route.ownerStatus()) violations.add(route.key() + " owner control " + own.status() + " " + code(own));
+            if (disposable != null) {
+                assertThat(sql.sql("SELECT status FROM applications WHERE id=?").param(disposable).query(String.class).single()).isEqualTo("ARCHIVED");
+                assertThat(call(victim, ownerCall).status()).isEqualTo(204);
+                assertThat(call(victim, get("/api/v0/applications/" + disposable)).status()).isEqualTo(404);
+            }
             controls.add(row("route", route.key(), "ownerStatus", own.status()));
             if (route.key().contains("preview-credentials") && own.status() == 200) {
                 String url = tree(own).path("url").asText();

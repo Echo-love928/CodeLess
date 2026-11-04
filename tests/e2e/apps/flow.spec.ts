@@ -9,8 +9,11 @@ test('D04-B-T1 contract fixture: authenticated create opens its own workbench', 
   await page.getByRole('dialog').getByRole('button', { name: '创建' }).click()
   await expect(page).toHaveURL(/\/workbench\/00000000-0000-4000-8000-000000000001$/)
   await expect(page.locator('.workbench-header__name')).toContainText('我的活动页')
-  await expect(page.getByText(/初始草稿版本：10000000-0000-4000-8000-000000000001/)).toBeVisible()
-  await expect(page.getByText('暂无可预览版本')).toBeVisible()
+  await expect(page.locator('.page-path')).toHaveText('页面预览')
+  await expect(page.locator('.page-path')).not.toContainText('10000000-0000-4000-8000-000000000001')
+  await expect(page.locator('.preview-panel__controls > span')).toHaveText('暂无可预览内容')
+  await expect(page.getByText('完成生成与验证后即可预览。', { exact: true })).toBeVisible()
+  await expect(page.locator('iframe')).toHaveCount(0)
   expect(auth.getCreateCount()).toBe(1)
 })
 

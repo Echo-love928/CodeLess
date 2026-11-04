@@ -100,7 +100,11 @@ class EditVerificationIntegrationTest extends PostgresTestBase {
     }
     JsonNode draft(UUID task) {return AgentJournal.latest(journal.read(task),"draft");}
     UUID version(JsonNode d) {return UUID.fromString(d.path("versionId").asText());}
-    void pointer(UUID expected) {assertThat(apps.find(owner,app).orElseThrow().latestReadyVersionId()).isEqualTo(expected);}
+    void pointer(UUID expected) {
+        // Archived projects are hidden from workspace reads; their retained pointer must still be unchanged.
+        assertThat(jdbc.sql("SELECT latest_ready_version_id FROM applications WHERE id=? AND owner_id=?")
+                .params(app,owner).query(UUID.class).single()).isEqualTo(expected);
+    }
     JsonNode source(UUID version) throws Exception {return get("versions/"+version+"/files/content?path="+TARGET);}
     void retainSource(UUID version,String digest) throws Exception {
         var source=snapshots.source(version,digest);Path root=evidenceRoot().resolve("source").resolve(version.toString());
@@ -232,7 +236,7 @@ class EditVerificationIntegrationTest extends PostgresTestBase {
         Path present=volume.resolve(base.toString()),hidden=volume.resolve(".unavailable-"+base);Files.move(present,hidden);
         try {var missing=restore(base,current);assertThat(missing.statusCode()).isEqualTo(409);pointer(current);}finally {Files.move(hidden,present);}
         jdbc.sql("UPDATE applications SET status='ARCHIVED' WHERE id=?").param(app).update();
-        try {assertThat(restore(base,current).statusCode()).isEqualTo(409);pointer(current);}finally {jdbc.sql("UPDATE applications SET status='ACTIVE' WHERE id=?").param(app).update();}
+        try {assertThat(apps.find(owner,app)).isEmpty();assertThat(restore(base,current).statusCode()).isEqualTo(409);pointer(current);}finally {jdbc.sql("UPDATE applications SET status='ACTIVE' WHERE id=?").param(app).update();}
         report("restore-boundaries",Map.of("anonymous",401,"csrf",403,"otherOwner",404,"foreignVersion",404,"stale","RESTORE_VERSION_CONFLICT","active","RESTORE_TASK_ACTIVE","corrupt",503,"missing",409,"archived",409));
     }
     @Test @Order(6) void concurrentRestoreWithSameExpectedPointerHasOneWinner() throws Exception {

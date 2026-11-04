@@ -23,7 +23,7 @@ public class EditTaskService {
     public record View(TaskQueueService.TaskView task, UUID baseVersionId, EditMetadata.Source source) {}
     @Transactional
     public View create(UUID owner, UUID app, UUID base, String prompt, EditMetadata.Source source, String key) {
-        jdbc.sql("SELECT id FROM applications WHERE id=? AND owner_id=? FOR UPDATE").params(app,owner)
+        jdbc.sql("SELECT id FROM applications WHERE id=? AND owner_id=? AND status='ACTIVE' FOR UPDATE").params(app,owner)
                 .query(UUID.class).optional().orElseThrow(() -> new AuthFailure(HttpStatus.NOT_FOUND,"NOT_FOUND"));
         if("COMPONENT".equals(source.type())) {
             // Resolve before task creation under the same ownership/base lock. No client path is used.

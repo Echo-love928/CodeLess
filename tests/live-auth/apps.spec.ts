@@ -27,8 +27,11 @@ test('D04-B-T1/T2: real login, create, workbench and cross-user denial', async (
   const application = await detail.json() as { baseVersionId: string; latestReadyVersionId?: string }
   expect(application.baseVersionId).toMatch(/^[0-9a-f-]{36}$/)
   expect(application.latestReadyVersionId).toBeUndefined()
-  await expect(page.getByText(`初始草稿版本：${application.baseVersionId}`, { exact: false })).toBeVisible()
-  await expect(page.getByText('暂无可预览版本')).toBeVisible()
+  await expect(page.locator('.page-path')).toHaveText('页面预览')
+  await expect(page.locator('.page-path')).not.toContainText(application.baseVersionId)
+  await expect(page.locator('.preview-panel__controls > span')).toHaveText('暂无可预览内容')
+  await expect(page.getByText('完成生成与验证后即可预览。', { exact: true })).toBeVisible()
+  await expect(page.locator('iframe')).toHaveCount(0)
   const version = await page.request.get(`/api/v0/versions/${application.baseVersionId}`)
   expect(version.status()).toBe(200)
   expect((await version.json()).status).toBe('DRAFT')
