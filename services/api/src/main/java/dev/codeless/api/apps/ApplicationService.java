@@ -49,14 +49,14 @@ public class ApplicationService {
     }
 
     public Optional<ApplicationView> find(UUID ownerId, UUID applicationId) {
-        return jdbc.sql(SELECT + " WHERE a.id = ? AND a.owner_id = ?")
+        return jdbc.sql(SELECT + " WHERE a.id = ? AND a.owner_id = ? AND a.status = 'ACTIVE'")
                 .params(applicationId, ownerId).query(ApplicationService::application).optional();
     }
 
     public PageView list(UUID ownerId, int page, int size) {
-        long total = jdbc.sql("SELECT count(*) FROM applications WHERE owner_id = ?")
+        long total = jdbc.sql("SELECT count(*) FROM applications WHERE owner_id = ? AND status = 'ACTIVE'")
                 .param(ownerId).query(Long.class).single();
-        List<ApplicationView> items = jdbc.sql(SELECT + " WHERE a.owner_id = ? "
+        List<ApplicationView> items = jdbc.sql(SELECT + " WHERE a.owner_id = ? AND a.status = 'ACTIVE' "
                 + "ORDER BY a.created_at DESC, a.id DESC LIMIT ? OFFSET ?")
                 .params(ownerId, size, (long) page * size)
                 .query(ApplicationService::application).list();
@@ -66,10 +66,26 @@ public class ApplicationService {
     @Transactional
     public ApplicationView rename(UUID ownerId, UUID applicationId, String name) {
         int changed = jdbc.sql("UPDATE applications SET name = ?, row_version = row_version + 1, "
-                + "updated_at = now() WHERE id = ? AND owner_id = ?")
+                + "updated_at = now() WHERE id = ? AND owner_id = ? AND status = 'ACTIVE'")
                 .params(name, applicationId, ownerId).update();
         if (changed != 1) throw new AuthFailure(HttpStatus.NOT_FOUND, "NOT_FOUND");
         return find(ownerId, applicationId).orElseThrow();
+    }
+
+    /** Keep referenced versions, billing/audit records and published sites; remove the project from the workspace. */
+    @Transactional
+    public void archive(UUID ownerId, UUID applicationId) {
+        String status = jdbc.sql("SELECT status FROM applications WHERE id = ? AND owner_id = ? FOR UPDATE")
+                .params(applicationId, ownerId).query(String.class).optional()
+                .orElseThrow(() -> new AuthFailure(HttpStatus.NOT_FOUND, "NOT_FOUND"));
+        if ("ARCHIVED".equals(status)) return;
+        boolean busy = jdbc.sql("""
+                SELECT EXISTS(SELECT 1 FROM generation_tasks WHERE application_id = ? AND status NOT IN ('READY','FAILED'))
+                    OR EXISTS(SELECT 1 FROM publications WHERE application_id = ? AND status = 'REQUESTED')
+                """).params(applicationId, applicationId).query(Boolean.class).single();
+        if (busy) throw new AuthFailure(HttpStatus.CONFLICT, "APPLICATION_BUSY");
+        jdbc.sql("UPDATE applications SET status = 'ARCHIVED', row_version = row_version + 1, updated_at = now() WHERE id = ?")
+                .param(applicationId).update();
     }
 
     public Optional<VersionView> version(UUID ownerId, UUID versionId) {

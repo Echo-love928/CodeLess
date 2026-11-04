@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import BrandLogo from '../../components/BrandLogo.vue'
 import UiIcon from '../../components/UiIcon.vue'
 import { ApiError } from '../../api/http'
-import { type Application, createApplication, listApplications } from './application-api'
+import { type Application, createApplication, deleteApplication, listApplications } from './application-api'
+import ApplicationCover from './ApplicationCover.vue'
 import { redirectOnUnauthorized } from './redirect-on-unauthorized'
 import { clearSession, session, signOut } from '../auth/session'
 
@@ -24,6 +25,10 @@ const dataMode = ref<Application['dataMode']>('MOCK')
 const creating = ref(false)
 const createError = ref('')
 const signingOut = ref(false)
+const deleteDialog = ref<HTMLDialogElement>()
+const deleteTarget = ref<Application>()
+const deleting = ref(false)
+const deleteError = ref('')
 const filtered = computed(() => apps.value.filter(app => `${app.name} ${app.description ?? ''}`.includes(search.value.trim())))
 
 async function load() {
@@ -42,6 +47,40 @@ async function load() {
   finally { loading.value = false }
 }
 onMounted(load)
+
+async function openDelete(app: Application) {
+  if (deleting.value) return
+  deleteTarget.value = app
+  deleteError.value = ''
+  await nextTick()
+  deleteDialog.value?.showModal()
+}
+function cancelDelete() {
+  if (!deleting.value) deleteDialog.value?.close()
+}
+function escapeDelete(event: Event) {
+  if (deleting.value) event.preventDefault()
+}
+async function confirmDelete() {
+  const app = deleteTarget.value
+  if (!app || deleting.value) return
+  deleting.value = true
+  deleteError.value = ''
+  try {
+    await deleteApplication(app.id)
+    const remaining = Math.max(0, total.value - 1)
+    if (page.value > 0 && page.value * pageSize >= remaining) page.value--
+    deleteDialog.value?.close()
+    feedback.value = `已删除项目“${app.name}”。`
+    await load()
+  } catch (cause) {
+    if (!(await redirectOnUnauthorized(cause, router))) {
+      deleteError.value = cause instanceof ApiError && cause.status === 409
+        ? '项目正在生成或发布，请等待任务结束后再删除。'
+        : cause instanceof Error ? cause.message : '删除失败，请重试。'
+    }
+  } finally { deleting.value = false }
+}
 
 function openDialog() {
   name.value = ''
@@ -98,7 +137,18 @@ async function logout() {
         <p v-if="loading" role="status">正在加载应用…</p>
         <div v-else-if="loadError" role="alert" class="search-empty"><h3>应用列表加载失败</h3><p>{{ loadError }}</p><button class="button-secondary" type="button" @click="load">重试</button></div>
         <div v-else class="dashboard-grid">
-          <template v-if="filtered.length"><article v-for="app in filtered" :key="app.id" class="project-card"><div class="project-cover"><div class="mock-cover">Vue 应用</div></div><div class="project-info"><div><h3>{{ app.name }}</h3><p><span class="draft-label">{{ app.latestReadyVersionId ? '已有可用版本' : '尚无可用版本' }}</span><span class="dot-separator">·</span>{{ app.description || '尚无描述' }}</p></div><button class="button-secondary" type="button" @click="router.push(`/workbench/${app.id}`)">打开工作台 <UiIcon name="arrow" :size="16" /></button></div></article></template>
+          <template v-if="filtered.length">
+            <article v-for="app in filtered" :key="app.id" class="project-card">
+              <div class="project-cover"><ApplicationCover :application-id="app.id" :version-id="app.latestReadyVersionId" :name="app.name" /></div>
+              <div class="project-info">
+                <div class="project-details"><h3>{{ app.name }}</h3><p><span class="draft-label">{{ app.latestReadyVersionId ? '已有可用版本' : '尚无可用版本' }}</span><span class="dot-separator">·</span>{{ app.description || '尚无描述' }}</p></div>
+                <div class="project-actions">
+                  <button class="button-secondary" type="button" @click="router.push(`/workbench/${app.id}`)">打开工作台 <UiIcon name="arrow" :size="16" /></button>
+                  <button class="project-delete" type="button" :aria-label="`删除项目${app.name}`" :disabled="deleting" @click="openDelete(app)">删除项目</button>
+                </div>
+              </div>
+            </article>
+          </template>
           <div v-else class="search-empty"><h3>{{ search ? '没有找到这个应用' : '还没有应用' }}</h3><p>{{ search ? '试试其他关键词。' : '创建第一个应用，开始整理你的想法。' }}</p><button v-if="search" class="button-secondary" type="button" @click="search = ''">清除搜索</button><button v-else class="button-secondary" type="button" @click="openDialog">新建应用</button></div>
           <div class="brief-card"><div class="brief-card__title"><UiIcon name="pen" :size="20" /><h2>下一个，想做什么？</h2></div><p>先给应用起个名字，再选择数据模式。</p><button class="button-primary" type="button" @click="openDialog">开始创建</button></div>
         </div>
@@ -107,6 +157,14 @@ async function logout() {
       </main>
     </div>
     <div v-if="dialogOpen" class="dialog-backdrop" @click.self="dialogOpen = false"><form class="create-dialog" role="dialog" aria-modal="true" aria-labelledby="create-title" @submit.prevent="createApp"><h2 id="create-title">新建应用</h2><p>创建 Vue 应用，稍后可在工作台描述你的需求。</p><label>应用名称<input v-model="name" required :disabled="creating" autofocus /></label><label>简介<input v-model="description" :disabled="creating" /></label><label>数据模式<select v-model="dataMode" :disabled="creating"><option value="STATIC">静态数据</option><option value="MOCK">Mock 数据</option><option value="LOCAL_STORAGE">LocalStorage</option></select></label><p v-if="createError" role="alert">{{ createError }}</p><div class="dialog-actions"><button type="button" class="button-secondary" :disabled="creating" @click="dialogOpen = false">取消</button><button type="submit" class="button-primary" :disabled="creating">{{ creating ? '创建中…' : '创建' }}</button></div></form></div>
+    <dialog ref="deleteDialog" class="create-dialog delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description" @cancel="escapeDelete" @close="deleteTarget = undefined">
+      <form v-if="deleteTarget" @submit.prevent="confirmDelete">
+        <h2 id="delete-title">删除项目“{{ deleteTarget.name }}”？</h2>
+        <p id="delete-description">项目将从“我的应用”中移除，已发布的网站、历史版本和调用记录会保留。</p>
+        <p v-if="deleteError" role="alert">{{ deleteError }}</p>
+        <div class="dialog-actions"><button type="button" class="button-secondary" :disabled="deleting" autofocus @click="cancelDelete">取消</button><button type="submit" class="button-danger" :disabled="deleting">{{ deleting ? '删除中…' : '确认删除' }}</button></div>
+      </form>
+    </dialog>
     <div v-if="feedback" class="ui-toast" role="status"><span>{{ feedback }}</span><button type="button" aria-label="关闭提示" @click="feedback = ''">×</button></div>
   </div>
 </template>
@@ -114,7 +172,20 @@ async function logout() {
 <style scoped>
 .sidebar-profile button { margin-left: auto; white-space: nowrap; color: var(--blue); font-size: 12px; }
 .sidebar-profile button:disabled { opacity: .6; }
-.mock-cover { height: 100%; display: grid; place-items: center; color: #5c725f; font-size: 20px; }
+.project-cover { padding: 0; }
+.project-details { min-width: 0; }
+.project-details h3 { overflow-wrap: anywhere; }
+.project-actions { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; gap: 4px; }
+.project-actions .button-secondary { white-space: nowrap; }
+.project-delete { min-height: 44px; padding: 8px 12px; border-radius: 6px; color: #b42318; font-size: 12px; }
+.project-delete:hover { background: #fff0ee; }
+.project-delete:disabled { opacity: .5; cursor: wait; }
+.delete-dialog { border: 0; margin: auto; max-height: calc(100vh - 32px); overflow: auto; }
+.delete-dialog::backdrop { background: #1f283e80; }
+.delete-dialog form > p { color: var(--muted); font-size: 13px; line-height: 1.7; }
+.delete-dialog form > [role="alert"] { color: #a13630; }
+.button-danger { min-height: 44px; padding: 10px 16px; border: 0; border-radius: 6px; background: #b42318; color: white; font-size: 13px; }
+.button-danger:hover { background: #931d15; }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 24px; font-size: 12px; }
 .pagination button:disabled { opacity: .5; cursor: default; }
 .dialog-backdrop { position: fixed; inset: 0; z-index: 40; background: #1f283e80; display: grid; place-items: center; padding: 16px; }
