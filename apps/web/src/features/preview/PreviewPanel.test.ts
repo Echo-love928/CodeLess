@@ -18,7 +18,7 @@ describe('PreviewPanel lifecycle', () => {
     expect(wrapper.text()).toContain('构建失败'); expect(get).not.toHaveBeenCalled(); expect(wrapper.find('iframe').exists()).toBe(false)
     wrapper.unmount()
   })
-  it('restricts iframe capabilities, ignores unrelated messages, expires and renews credentials', async () => {
+  it('restricts iframe capabilities, ignores unrelated messages, keeps a loaded preview past expiry', async () => {
     get.mockResolvedValue(value())
     const wrapper = mount(PreviewPanel, { props: { applicationId: app, versionId: version } })
     await flushPromises()
@@ -32,11 +32,56 @@ describe('PreviewPanel lifecycle', () => {
       data: { type: 'codeless-preview', state: 'loaded' } }))
     await flushPromises()
     expect(wrapper.text()).not.toContain('正在加载')
-    await vi.advanceTimersByTimeAsync(120_000)
-    expect(wrapper.text()).toContain('已过期'); expect(wrapper.find('iframe').exists()).toBe(false)
+    await vi.advanceTimersByTimeAsync(10 * 60_000)
+    expect(wrapper.text()).not.toContain('已过期'); expect(wrapper.find('.preview-panel__workspace--ready').exists()).toBe(true)
+    expect(wrapper.find('iframe').exists()).toBe(true); expect(get).toHaveBeenCalledTimes(1)
     get.mockResolvedValue(value())
     await wrapper.get('button').trigger('click'); await flushPromises()
     expect(get).toHaveBeenCalledTimes(2)
+    wrapper.unmount()
+  })
+  it('a credential that lapses before its document loads shows the expired state', async () => {
+    get.mockResolvedValue({ ...value(), expiresAt: new Date(Date.now() + 1000).toISOString() })
+    const wrapper = mount(PreviewPanel, { props: { applicationId: app, versionId: version } })
+    await flushPromises()
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(wrapper.text()).toContain('已过期'); expect(wrapper.find('iframe').exists()).toBe(false)
+    wrapper.unmount()
+  })
+  it('renews the credential when a loaded preview is denied after expiry', async () => {
+    get.mockResolvedValue(value())
+    // Attached, so each iframe has its own contentWindow for the message source check.
+    const wrapper = mount(PreviewPanel, { props: { applicationId: app, versionId: version }, attachTo: document.body })
+    await flushPromises()
+    const source = (wrapper.get('iframe').element as HTMLIFrameElement).contentWindow
+    expect(source).not.toBeNull()
+    const post = (state: string) => window.dispatchEvent(new MessageEvent('message', {
+      origin: new URL(value().url).origin, source, data: { type: 'codeless-preview', state } }))
+    post('loaded'); await flushPromises()
+    await vi.advanceTimersByTimeAsync(120_000)
+    // E.g. a full-page link inside the loaded app now reaches the gateway's deny document.
+    post('unavailable'); await flushPromises()
+    expect(get).toHaveBeenCalledTimes(2)
+    expect(wrapper.find('iframe').exists()).toBe(true); expect(wrapper.text()).toContain('正在加载')
+    expect(wrapper.find('.preview-panel__message[role="alert"]').exists()).toBe(false)
+    // The replaced document's late messages are ignored.
+    post('unavailable'); await flushPromises()
+    expect(get).toHaveBeenCalledTimes(2); expect(wrapper.find('.preview-panel__message[role="alert"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+  it('a loaded preview that fails before expiry shows the error instead of reloading', async () => {
+    get.mockResolvedValue(value())
+    const wrapper = mount(PreviewPanel, { props: { applicationId: app, versionId: version } })
+    await flushPromises()
+    const source = (wrapper.get('iframe').element as HTMLIFrameElement).contentWindow
+    const post = (state: string) => window.dispatchEvent(new MessageEvent('message', {
+      origin: new URL(value().url).origin, source, data: { type: 'codeless-preview', state } }))
+    post('loaded'); await flushPromises()
+    await vi.advanceTimersByTimeAsync(60_000)
+    post('unavailable'); await flushPromises()
+    expect(get).toHaveBeenCalledTimes(1)
+    expect(wrapper.get('[role="alert"]').text()).toContain('凭据失效')
+    expect(wrapper.find('iframe').exists()).toBe(false)
     wrapper.unmount()
   })
   it('does not attach a credential returned for a previous application/version after a switch', async () => {

@@ -56,8 +56,14 @@ function message(event: MessageEvent) {
   if (!credential.value || event.source !== frame.value?.contentWindow ||
       event.origin !== new URL(credential.value.url).origin) return
   if (event.data?.type !== 'codeless-preview') return
-  if (event.data.state === 'loaded') { clearTimeout(loadTimeout); state.value = 'ready' }
+  // The credential only admits new requests. A loaded document keeps working after it lapses:
+  // in-app routes stay client-side and visual editing talks to the platform API.
+  if (event.data.state === 'loaded') { clearTimeout(loadTimeout); clearTimeout(expiry); state.value = 'ready' }
   if (event.data.state === 'unavailable') {
+    // After expiry the gateway denies the next document the loaded preview opens (reload,
+    // full-page link), so fetch a new credential. Only an expired credential is renewed, so a
+    // page that keeps failing still ends in the error below instead of reloading in a loop.
+    if (state.value === 'ready' && Date.now() >= Date.parse(credential.value.expiresAt)) { void load(); return }
     clearTimeout(loadTimeout); credential.value = null; state.value = 'error'
     error.value = '预览凭据失效或产物不可用，请刷新预览。'
   }
