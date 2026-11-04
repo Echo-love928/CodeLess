@@ -9,6 +9,12 @@ The fixed router exposes `/`, `/tasks`, and `/catalog`. Every build uses the
 same three page slots. A generated app can populate any of these slots with
 static data, explicit mock data, or browser LocalStorage.
 
+The template's own page files are placeholders marked with
+`export const templatePlaceholder = true`. If generated input fills `/tasks` or
+`/catalog` but leaves the home slot as the placeholder, `/` redirects to the
+first generated page (`/tasks`, then `/catalog`). Previews, published sites and
+exports therefore open on generated content instead of the welcome placeholder.
+
 `infra/build-image/build-image.ps1` builds the trusted image while online.
 `node services/runner/src/template/build.mjs <source-dir> <output-dir>` then
 validates generated files and builds with Docker `--network none`. The runner
