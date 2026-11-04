@@ -63,3 +63,10 @@ export async function createApplication(input: CreateApplicationInput): Promise<
     body: JSON.stringify({ name, ...(description ? { description } : {}), dataMode: input.dataMode }),
   }))
 }
+
+export async function deleteApplication(id: string): Promise<void> {
+  await requestJson<void>(`${base}/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: { 'X-CSRF-Token': requireCsrfToken() },
+  })
+}

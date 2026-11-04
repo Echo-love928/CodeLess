@@ -46,7 +46,7 @@ public class TaskQueueService {
 
     @Transactional
     public TaskView create(UUID ownerId, UUID applicationId, String prompt, String key) {
-        boolean owned = jdbc.sql("SELECT id FROM applications WHERE id = ? AND owner_id = ? FOR UPDATE")
+        boolean owned = jdbc.sql("SELECT id FROM applications WHERE id = ? AND owner_id = ? AND status = 'ACTIVE' FOR UPDATE")
                 .params(applicationId, ownerId).query(UUID.class).optional().isPresent();
         if (!owned) throw new AuthFailure(HttpStatus.NOT_FOUND, "NOT_FOUND");
         if (key != null) {

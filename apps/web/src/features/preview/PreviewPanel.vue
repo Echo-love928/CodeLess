@@ -87,7 +87,7 @@ onBeforeUnmount(() => { dispose(); window.removeEventListener('message', message
 
 <template>
   <div class="preview-panel">
-    <div class="preview-panel__controls"><span v-if="versionId">版本 {{ versionId }}</span><span v-else>暂无可预览版本</span><button type="button" class="button-secondary" :disabled="state === 'loading'" @click="refresh">刷新预览</button></div>
+    <div class="preview-panel__controls"><span>{{ versionId ? '页面预览' : '暂无可预览内容' }}</span><button type="button" class="button-secondary" :disabled="state === 'loading'" @click="refresh">刷新预览</button></div>
     <p v-if="buildFailed" class="preview-panel__warning" role="status">本次生成失败。已有可用版本会继续保留。</p>
     <p v-if="state === 'empty'" class="preview-panel__message" role="status">{{ buildFailed ? '构建失败，暂无已验证版本。' : '完成生成与验证后即可预览。' }}</p>
     <p v-if="state === 'loading'" class="preview-panel__message" role="status">正在加载已验证版本…</p>
