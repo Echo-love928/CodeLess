@@ -1,3 +1,9 @@
+# 最终受控试用交付状态
+
+本候选已组合A归档及B修复；最新同源联调、包身份、独立批准和正式标签以[M6签发索引](delivery/M6-release.md)及PR99/Release签发回执为准。以下D30/D27的HOLD描述保留其原快照含义，不覆盖后续真实签发结果。
+
+---
+
 # CodeLess D30 最终归档说明（待正式发布）
 
 2026-11-04（Asia/Tokyo）。**RELEASE HOLD；没有正式标签、没有合并或新部署。** 当前入口：[最终服务端交接与归档索引](delivery/final-backend.md)、[D30-A交接](handoffs/D30-A.md)。以下D27段落完整保留为历史快照，其中旧HOLD原因不能覆盖D28最终技术复审。
