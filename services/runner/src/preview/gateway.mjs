@@ -4,6 +4,20 @@ import { artifactFile } from '../artifacts/routes.mjs'
 import { readCredential, signingKey, previewOrigins, versionHost, uuid } from './credentials.mjs'
 import { renderPreviewSelector } from '../../../../templates/vue/preview-bridge/selector.mjs'
 
+// Installed before the app's module and resources, so it observes every failure. window.load also fires
+// after failed resources: an error before it means the page did not start ("load-error"), and "loaded"
+// reports a clean start only. A started page stays usable, so a later script error, rejection or failed
+// resource is reported once as "runtime-error". The deny document reports "unavailable". Messages carry
+// no details from the generated application.
+export function renderPreviewBridge({ platformOrigin, versionId, sourceDigest }) {
+  const componentBridge = renderPreviewSelector({ platformOrigin, versionId, sourceDigest })
+  return '<script>(()=>{' + componentBridge + 'let loaded=false,reported=false;' +
+    'const report=state=>parent.postMessage({type:"codeless-preview",state},' + JSON.stringify(platformOrigin) + ');' +
+    'const fail=()=>{if(!reported){reported=true;report(loaded?"runtime-error":"load-error")}};' +
+    'addEventListener("error",fail,true);addEventListener("unhandledrejection",fail);' +
+    'addEventListener("load",()=>{loaded=true;if(!reported)report("loaded")})})()</script>'
+}
+
 // Trusted coordinator API only: mappings cannot be registered through HTTP or model arguments.
 export function createPreviewGateway({ signingKeyHex, previewOrigin, platformOrigin, now = Date.now, isAvailable = () => true }) {
   const key = signingKey(signingKeyHex)
@@ -61,12 +75,7 @@ export function createPreviewGateway({ signingKeyHex, previewOrigin, platformOri
       // No user headers or platform/preview cookies leave this gateway. No arbitrary proxy destinations.
       let bytes = request.method === 'HEAD' ? undefined : Buffer.from(await upstream.arrayBuffer())
       if (bytes && name === 'index.html') {
-        // Install before module/resources: window.load also fires after failed resources.
-          const componentBridge = renderPreviewSelector({ platformOrigin: platform.origin, versionId: claims.version, sourceDigest: claims.source })
-          const bridge = '<script>(()=>{' + componentBridge + 'let failed=false;const report=state=>parent.postMessage({type:"codeless-preview",state},' +
-          JSON.stringify(platform.origin) + ');const fail=()=>{failed=true;report("unavailable")};' +
-          'addEventListener("error",fail,true);addEventListener("unhandledrejection",fail);' +
-          'addEventListener("load",()=>report(failed?"unavailable":"loaded"))})()</script>'
+        const bridge = renderPreviewBridge({ platformOrigin: platform.origin, versionId: claims.version, sourceDigest: claims.source })
         const html = bytes.toString('utf8')
         // HTML may use an implicit head; preserve its doctype and install before any resource.
         const boundary = html.match(/^\s*<!doctype html[^>]*>/i)?.[0].length ?? 0

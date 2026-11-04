@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { randomUUID } from 'node:crypto'
 import { request } from 'node:http'
+import { runInNewContext } from 'node:vm'
 import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, dirname, resolve } from 'node:path'
@@ -17,6 +18,25 @@ function get(origin, host, path = '/', cookie, headers = {}, method = 'GET') {
       let body = ''; response.on('data', chunk => { body += chunk }); response.on('end', () => done({ status: response.statusCode, headers: response.headers, body }))
     }); req.on('error', reject); req.end()
   })
+}
+// Runs a document's first inline script (the injected bridge) against a minimal window, replays window
+// events and returns the codeless-preview states it posts to the platform.
+function bridgeStates(html, events) {
+  const listeners = [], states = []
+  runInNewContext(html.match(/<script>([\s\S]*?)<\/script>/)[1], {
+    crypto: { randomUUID },
+    parent: { postMessage(data, target) {
+      assert.equal(target, 'https://platform.codeless.test')
+      if (data.type === 'codeless-preview') { assert.deepEqual(Object.keys(data), ['type', 'state']); states.push(data.state) }
+    } },
+    addEventListener(type, listener, options) {
+      // Failed resources fire non-bubbling error events on their elements: only a capture listener sees them.
+      if (type === 'error') assert.equal(options, true)
+      listeners.push({ type, listener })
+    }
+  })
+  for (const type of events) for (const entry of listeners) if (entry.type === type) entry.listener({ type })
+  return states
 }
 async function fixture(run) {
   const scratch = await mkdtemp(join(tmpdir(), 'codeless-d09-gateway-'))
@@ -53,6 +73,20 @@ test('D09-B-T1/T4: bootstrap scopes a secure preview cookie; documents/resources
     assert.equal((await get(origin, host, '/tasks', cookie, { 'Sec-Fetch-Dest': 'empty' })).status, 404)
     await writeFile(join(built.build.artifact.directory, 'index.html'), 'stale disk replacement')
     assert.equal((await get(origin, host, '/', cookie)).body, root.body)
+  })
+})
+test('injected bridge: a failed start is fatal, later errors are reported once and keep the page', async () => {
+  await fixture(async ({ origin, host, cookie }) => {
+    const html = (await get(origin, host, '/', cookie)).body
+    assert.deepEqual(bridgeStates(html, ['load']), ['loaded'])
+    // After a clean start, a script error, rejection or failed resource must not turn into "unavailable".
+    assert.deepEqual(bridgeStates(html, ['load', 'error', 'unhandledrejection', 'error']), ['loaded', 'runtime-error'])
+    // window.load still fires after a failed resource: a failed start never reports "loaded".
+    assert.deepEqual(bridgeStates(html, ['error', 'load', 'error']), ['load-error'])
+    assert.deepEqual(bridgeStates(html, ['unhandledrejection', 'load']), ['load-error'])
+    // Only the gateway's deny document reports a credential or artifact problem.
+    const denied = await get(origin, host, '/')
+    assert.equal(denied.status, 403); assert.deepEqual(bridgeStates(denied.body, []), ['unavailable'])
   })
 })
 test('D09-B-T2: missing/expired/forged credentials and altered version/host/path/method are rejected', async () => {

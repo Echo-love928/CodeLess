@@ -11,6 +11,7 @@ const credential = ref<PreviewCredential | null>(null)
 const previewOrigin = computed(() => credential.value ? new URL(credential.value.url).origin : '')
 const state = ref<'empty' | 'loading' | 'ready' | 'expired' | 'error'>('empty')
 const error = ref('')
+const runtimeError = ref(false)
 let generation = 0
 let abort: AbortController | undefined
 let expiry: ReturnType<typeof setTimeout> | undefined
@@ -19,7 +20,7 @@ let loadTimeout: ReturnType<typeof setTimeout> | undefined
 function dispose() {
   generation++; abort?.abort()
   clearTimeout(expiry); clearTimeout(loadTimeout)
-  credential.value = null
+  credential.value = null; runtimeError.value = false
 }
 async function load() {
   dispose()
@@ -56,16 +57,21 @@ function message(event: MessageEvent) {
   if (!credential.value || event.source !== frame.value?.contentWindow ||
       event.origin !== new URL(credential.value.url).origin) return
   if (event.data?.type !== 'codeless-preview') return
+  const reported = event.data.state
   // The credential only admits new requests. A loaded document keeps working after it lapses:
   // in-app routes stay client-side and visual editing talks to the platform API.
-  if (event.data.state === 'loaded') { clearTimeout(loadTimeout); clearTimeout(expiry); state.value = 'ready' }
-  if (event.data.state === 'unavailable') {
+  if (reported === 'loaded') { clearTimeout(loadTimeout); clearTimeout(expiry); state.value = 'ready'; runtimeError.value = false }
+  // A started page stays usable after a later script error or failed resource: keep it and warn.
+  if (reported === 'runtime-error') runtimeError.value = true
+  // "unavailable" comes from the gateway's deny document; "load-error" from a page that failed to start.
+  if (reported === 'unavailable' || reported === 'load-error') {
     // After expiry the gateway denies the next document the loaded preview opens (reload,
     // full-page link), so fetch a new credential. Only an expired credential is renewed, so a
     // page that keeps failing still ends in the error below instead of reloading in a loop.
     if (state.value === 'ready' && Date.now() >= Date.parse(credential.value.expiresAt)) { void load(); return }
     clearTimeout(loadTimeout); credential.value = null; state.value = 'error'
-    error.value = '预览凭据失效或产物不可用，请刷新预览。'
+    error.value = reported === 'unavailable' ? '预览凭据失效或产物不可用，请刷新预览。'
+      : '预览页面加载出错（脚本异常或资源加载失败），请刷新预览。'
   }
 }
 async function refresh() {
@@ -95,6 +101,7 @@ onBeforeUnmount(() => { dispose(); window.removeEventListener('message', message
   <div class="preview-panel">
     <div class="preview-panel__controls"><span>{{ versionId ? '页面预览' : '暂无可预览内容' }}</span><button type="button" class="button-secondary" :disabled="state === 'loading'" @click="refresh">刷新预览</button></div>
     <p v-if="buildFailed" class="preview-panel__warning" role="status">本次生成失败。已有可用版本会继续保留。</p>
+    <p v-if="state === 'ready' && runtimeError" class="preview-panel__warning" role="status">预览页面运行时出错，部分内容或功能可能异常。可刷新预览重试。</p>
     <p v-if="state === 'empty'" class="preview-panel__message" role="status">{{ buildFailed ? '构建失败，暂无已验证版本。' : '完成生成与验证后即可预览。' }}</p>
     <p v-if="state === 'loading'" class="preview-panel__message" role="status">正在加载已验证版本…</p>
     <p v-if="state === 'expired'" class="preview-panel__message" role="status">预览访问已过期，请刷新预览。</p>
