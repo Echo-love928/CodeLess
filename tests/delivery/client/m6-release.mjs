@@ -6,7 +6,9 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { environment } from '../../e2e/full/support.mjs';
 const root = fileURLToPath(new URL('../../../', import.meta.url));
-const output = resolve(root, '.local-data/d30-b/m6-final');
+const runId = process.argv[3] ?? 'final';
+if (!/^[a-zA-Z0-9_-]+$/.test(runId)) throw Error('Invalid run id');
+const output = resolve(root, '.local-data/d30-b/m6-' + runId);
 mkdirSync(output, { recursive: true });
 const sha = b => createHash('sha256').update(b).digest('hex');
 const git = args => {
@@ -48,8 +50,8 @@ function run(label, command, args) {
 }
 if (mode === 'integration') {
   run('integration', process.env.ComSpec ?? 'cmd.exe', ['/d', '/c', 'services\\api\\mvnw.cmd', '-f', 'services/api/pom.xml',
-    '-Dtest=PreviewPlatformIntegrationTest#realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures', 'test']);
-  const xml = resolve(root, 'services/api/target/surefire-reports/TEST-dev.codeless.api.preview.PreviewPlatformIntegrationTest.xml');
+    '-Dtest=M6SameSourceIT#realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures', 'test']);
+  const xml = resolve(root, 'services/api/target/surefire-reports/TEST-dev.codeless.api.preview.M6SameSourceIT.xml');
   const bytes = readFileSync(xml);
   copyFileSync(xml, resolve(output, 'integration-junit.xml'));
   const text = bytes.toString('utf8');
@@ -70,6 +72,7 @@ if (mode === 'integration') {
     realDockerBuild: a.realDockerBuild, realBrowserVerification: a.realBrowserVerification,
     applicationId: a.applicationId, taskId: a.taskId, versionId: a.versionId, buildId: a.buildId,
     sourceDigest: a.sourceDigest, artifactDigest: a.artifactDigest,
+    acceptanceScope: a.acceptanceScope, reusedChecks: a.reusedChecks,
     residentRestartPassed: a.residentRestartPassed, retentionRevocationPassed: a.retentionRevocationPassed,
     native: receipt }, null, 2) + '\n', { flag: 'wx' });
 } else if (mode === 'api') {

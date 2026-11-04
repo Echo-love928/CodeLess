@@ -4,9 +4,11 @@
 
 平台、公开示例、源码ZIP独立运行、REAL评测、手册及真实Git历史直接复用[交付索引](index.md)和[验收决定](../../tests/delivery/client/evidence/timeout-acceptance.json)，不重跑已通过用例。TASK-03失败、8/9增量组合、未知账单、mock与REAL分账继续保留。
 
-只为新组合候选补一条真实API↔runner↔Chromium同源联调：`node tests/delivery/client/m6-release.mjs integration`。只选择 `PreviewPlatformIntegrationTest#realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures`，不是重跑437个API、293个runner或80个E2E测试。该联调使用真实PostgreSQL、构建、鉴权、签名、预览、源版本绑定和重启/吊销检查，模型明确为deterministic-mock，不代表新增REAL效果评测。
+只为新组合候选补一条真实API↔runner↔Chromium同源联调：`node tests/delivery/client/m6-release.mjs integration focused`。只选择显式启用的 `M6SameSourceIT#realAuthenticatedPlatformGeneratesAndPreviewsWithoutApiOrSigningFixtures`，复用真实PostgreSQL与API测试宿主，实际走鉴权、生成、Docker构建、浏览器验证、签名预览及SQL/源码摘要绑定。模型明确为deterministic-mock，不代表新增REAL效果评测。已通过的平台UI、Nginx、重启/吊销检查仍复用原证据。
 
-同一40位候选分别执行 `m6-release.mjs api`、`client`、`bind`。前两者为交付构建及包验证，不运行已通过测试；后者核对API/client提交一致、所有共享源码字节与Git来源一致，确保新cleanup模块实际进入两个包。原始日志、JUnit、认证/浏览器材料只留忽略目录 `.local-data/d30-b/m6-final`，可公开投影与包摘要随最终签发一起交付。
+此前借用完整预览入口的两次尝试分别遇到映射同步状态和Docker Desktop跨宿主Nginx上游连接失败，原始失败保存在 `.local-data/d30-b/m6-final`，没有改写成0，也没有删改原用例的断言。最小联调只新增当前组合尚缺的同源证据，默认完整CI仍保留原测试。
+
+同一40位候选分别执行 `m6-release.mjs api focused`、`client focused`、`bind focused`。前两者为交付构建及包验证，不运行已通过测试；后者核对API/client提交一致、所有共享源码字节与Git来源一致，确保新cleanup模块实际进入两个包。原始日志、JUnit、认证/浏览器材料只留忽略目录 `.local-data/d30-b/m6-focused`，可公开投影与包摘要随最终签发一起交付。
 
 正式标签拟用 `codeless-v0-controlled-trial`，创建前确认不存在，不覆盖或移动旧标签。签发要求：最终新候选已推送、原有必需门禁真实success、不同作者对该SHA独立批准、无未解决讨论、上述新增同源联调和包绑定通过。新候选推送后由仓库既有工作流检查，本地不手动重跑无关通过用例；不得用旧批准、旧绿灯或伪造原生0替代。
 
