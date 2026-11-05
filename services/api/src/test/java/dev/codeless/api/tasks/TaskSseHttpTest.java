@@ -386,27 +386,47 @@ class TaskSseHttpTest extends PostgresTestBase {
             try (Wire wire = new Wire(owner.stream(task, null, ""))) {
                 wire.event();
                 jdbc.update("UPDATE platform_users SET status='DISABLED' WHERE id=?", user);
-                boolean closed = false;
+                Frame error = null;
                 for (int i = 0; i < 200; i++) {
                     Frame frame = wire.next();
-                    // The session-version fence may close before the owner replay observes DISABLED.
-                    if (frame.equals(Frame.EOF)) { closed = true; break; }
-                    if ("stream-error".equals(frame.name())) {
-                        assertThat(frame.id()).isNull();
-                        assertThat(mapper.readTree(frame.data()).get("code").asText()).isEqualTo("NOT_FOUND");
-                        assertThat(wire.next()).isEqualTo(Frame.EOF);
-                        closed = true;
-                        break;
-                    }
-                    // Heartbeats are permitted while closing; no task data may follow revocation.
+                    if ("stream-error".equals(frame.name())) { error = frame; break; }
                     assertThat(frame.name()).isNull();
-                    assertThat(frame.data()).isNull();
                 }
-                assertThat(closed).as("disabled account stream closes within the frame bound").isTrue();
+                assertThat(error).isNotNull();
+                assertThat(error.id()).isNull();
+                assertThat(mapper.readTree(error.data()).get("code").asText()).isEqualTo("NOT_FOUND");
+                assertThat(wire.next()).isEqualTo(Frame.EOF);
                 error(owner, task, "1", 401, "UNAUTHENTICATED");
             } finally {
                 jdbc.update("UPDATE platform_users SET status='ACTIVE' WHERE id=?", user);
             }
         }
     }
+    @Test void resettingSessionVersionClosesExistingStreamAndRejectsReconnect() throws Exception {
+        try (Browser owner = new Browser(false)) {
+            UUID task = owner.task();
+            UUID user = UUID.fromString(json(owner.get("/auth/me")).get("id").asText());
+            long version = jdbc.queryForObject("SELECT session_version FROM auth_credentials WHERE user_id=?", Long.class, user);
+            try (Wire wire = new Wire(owner.stream(task, null, ""))) {
+                wire.event();
+                // Password resets invalidate all sessions by incrementing this persisted generation.
+                jdbc.update("UPDATE auth_credentials SET session_version=session_version+1 WHERE user_id=?", user);
+                Frame error = null;
+                for (int i = 0; i < 200; i++) {
+                    Frame frame = wire.next();
+                    if ("stream-error".equals(frame.name())) { error = frame; break; }
+                    assertThat(frame).isNotEqualTo(Frame.EOF);
+                    assertThat(frame.name()).isNull();
+                }
+                assertThat(error).isNotNull();
+                assertThat(error.id()).isNull();
+                assertThat(mapper.readTree(error.data()).get("code").asText()).isEqualTo("NOT_FOUND");
+                assertThat(wire.next()).isEqualTo(Frame.EOF);
+                error(owner, task, "1", 401, "UNAUTHENTICATED");
+            } finally {
+                jdbc.update("UPDATE auth_credentials SET session_version=? WHERE user_id=?", version, user);
+            }
+        }
+    }
+
 }

@@ -78,7 +78,13 @@ public class TaskController {
         HttpSession session = request.getSession(false);
         int cursor = TaskEventReplay.cursor(lastEventId == null ? afterEventId : lastEventId);
         SseEmitter emitter = streams.open(owner, uuid(taskId), cursor, () -> {
-            try { return session != null && owner.equals(session.getAttribute(AuthFilter.USER_ID)) && accounts.sessionActive(session); }
+            try {
+                if (session == null || !owner.equals(session.getAttribute(AuthFilter.USER_ID))) return false;
+                // A revoked account/session must send the same redacted control error as lost ownership.
+                // Returning false is reserved for logout/expiry, which closes the stream quietly.
+                if (!accounts.sessionActive(session)) throw new AuthFailure(HttpStatus.NOT_FOUND, "NOT_FOUND");
+                return true;
+            }
             catch (IllegalStateException exception) { return false; }
         });
         return ResponseEntity.ok().header("Cache-Control", "no-store")

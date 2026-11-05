@@ -96,6 +96,8 @@ test('D10-B cancellation fixture: pending -> authoritative CANCELLED -> explicit
   await expect(page.locator('.task-status')).toHaveClass(/task-status--cancelled/)
   await expect(page.locator('.task-status')).toHaveAttribute('role', 'status')
   await expect(page.locator('.preview-panel')).not.toContainText('本次生成失败')
+  await expect(page.locator('.task-status')).toContainText('本次任务已取消')
+  await expect(page.locator('.task-status')).not.toContainText('生成失败')
   await expect(page.locator('iframe')).toHaveAttribute('src', new RegExp(fixture.oldVersion.replaceAll('-', '')))
   await page.screenshot({ path: join(evidence, 'cancelled.png'), fullPage: true })
   await page.getByRole('button', { name: '重试生成' }).click()
