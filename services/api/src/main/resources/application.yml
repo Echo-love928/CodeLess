@@ -10,6 +10,12 @@ spring:
   jackson:
     default-property-inclusion: non-null
 server:
+  forward-headers-strategy: native
+  tomcat:
+    remoteip:
+      remote-ip-header: X-Forwarded-For
+      # The public ingress network is firewalled; other peers cannot supply a client address.
+      internal-proxies: '${CODELESS_AUTH_PROXY_PATTERN:172\.28\.0\.[0-9]+}'
   shutdown: graceful
   servlet:
     session:

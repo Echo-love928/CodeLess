@@ -28,7 +28,7 @@ public class OwnershipGuard {
     }
 
     public void requireApplication(HttpServletRequest request, UUID applicationId) {
-        boolean owned = jdbc.sql("SELECT EXISTS (SELECT 1 FROM applications WHERE id = ? AND owner_id = ?)")
+        boolean owned = jdbc.sql("SELECT EXISTS (SELECT 1 FROM applications WHERE id = ? AND owner_id = ? AND status = 'ACTIVE')")
                 .params(applicationId, userId(request)).query(Boolean.class).single();
         if (!owned) throw new AuthFailure(HttpStatus.NOT_FOUND, "NOT_FOUND");
     }
@@ -36,7 +36,7 @@ public class OwnershipGuard {
     public void requireTask(HttpServletRequest request, UUID taskId) {
         boolean owned = jdbc.sql("""
                 SELECT EXISTS (SELECT 1 FROM generation_tasks t JOIN applications a ON a.id = t.application_id
-                WHERE t.id = ? AND a.owner_id = ?)
+                WHERE t.id = ? AND a.owner_id = ? AND a.status = 'ACTIVE')
                 """).params(taskId, userId(request)).query(Boolean.class).single();
         if (!owned) throw new AuthFailure(HttpStatus.NOT_FOUND, "NOT_FOUND");
     }
@@ -44,7 +44,7 @@ public class OwnershipGuard {
     public void requireVersion(HttpServletRequest request, UUID versionId) {
         boolean owned = jdbc.sql("""
                 SELECT EXISTS (SELECT 1 FROM application_versions v JOIN applications a ON a.id = v.application_id
-                WHERE v.id = ? AND a.owner_id = ?)
+                WHERE v.id = ? AND a.owner_id = ? AND a.status = 'ACTIVE')
                 """).params(versionId, userId(request)).query(Boolean.class).single();
         if (!owned) throw new AuthFailure(HttpStatus.NOT_FOUND, "NOT_FOUND");
     }

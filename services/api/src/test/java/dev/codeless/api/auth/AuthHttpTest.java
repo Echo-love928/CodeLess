@@ -22,6 +22,22 @@ class AuthHttpTest extends PostgresTestBase {
     @Value("${local.server.port}") int port;
     private final HttpClient client = HttpClient.newHttpClient();
 
+    @Test void untrustedPeersCannotResetLimitsByForgingForwardedAddresses() throws Exception {
+        String base = "http://127.0.0.1:" + port + "/api/v0/auth/";
+        var csrf = client.send(HttpRequest.newBuilder(URI.create(base + "csrf")).GET().build(), HttpResponse.BodyHandlers.ofString());
+        String token = csrf.body().split("\"")[3];
+        String cookie = csrf.headers().firstValue("set-cookie").orElseThrow().split(";", 2)[0];
+        String email = "unknown-" + java.util.UUID.randomUUID() + "@example.test";
+        for (int i = 0; i < 6; i++) {
+            var reply = client.send(HttpRequest.newBuilder(URI.create(base + "login"))
+                    .header("Cookie", cookie).header("X-CSRF-Token", token)
+                    .header("X-Forwarded-For", "192.0.2." + (i + 1))
+                    .header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(
+                            "{\"email\":\"" + email + "\",\"password\":\"wrong\"}")).build(), HttpResponse.BodyHandlers.ofString());
+            assertThat(reply.statusCode()).isEqualTo(i < 5 ? 401 : 429);
+        }
+    }
+
     @Test
     void realHttpSessionHasHostOnlyHttpOnlySecureCookieAndLogoutRevokesIt() throws Exception {
         String base = "http://127.0.0.1:" + port + "/api/v0/auth/";

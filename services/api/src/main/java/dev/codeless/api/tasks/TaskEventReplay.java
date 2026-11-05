@@ -93,12 +93,20 @@ public class TaskEventReplay {
     }
 
     private static String safeMessage(EventType type, TaskStatus stage) {
+        String label = switch (stage) {
+            case PLAN -> "需求规划";
+            case GENERATE -> "页面生成";
+            case VERIFY -> "页面检查";
+            case REPAIR -> "自动修复";
+            case READY -> "生成完成";
+            case FAILED -> "任务结束";
+        };
         return switch (type) {
-            case STAGE_STARTED -> "Stage started: " + stage;
-            case STAGE_COMPLETED -> "Stage completed: " + stage;
-            case TOOL_RESULT -> "Tool result recorded: " + stage;
-            case REPAIR_REQUESTED -> "Repair requested: " + stage;
-            case TASK_FAILED -> "Task failed; query task status for failure code";
+            case STAGE_STARTED -> "开始" + label;
+            case STAGE_COMPLETED -> label + "已完成";
+            case TOOL_RESULT -> label + "进度已更新";
+            case REPAIR_REQUESTED -> "正在尝试自动修复页面";
+            case TASK_FAILED -> "任务已结束，请查看任务状态了解原因";
         };
     }
 }

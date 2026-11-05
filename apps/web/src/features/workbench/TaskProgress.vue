@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { formatDateTime, stageLabel } from '../../lib/display'
 import { eventTypes, type TaskEvent } from '../../lib/events/task-events'
 import { stages } from './task-api'
 import type { TaskDiagnostics } from './task-diagnostics'
@@ -18,31 +19,31 @@ const buildLabel = { QUEUED: '排队中', RUNNING: '构建中', SUCCEEDED: '构�
     <p v-if="!events.length">尚未收到任务事件。</p>
     <ol v-else class="task-progress__list" tabindex="0" aria-label="任务事件日志，可滚动查看">
       <li v-for="event in events" :key="event.id" :data-sequence="event.sequence">
-        <strong>#{{ event.sequence }} · {{ event.stage }}</strong>
+        <strong>#{{ event.sequence }} · {{ stageLabel(event.stage) }}</strong>
         <span v-if="!known(event)">未知事件（{{ event.type }}），保留诊断信息。</span>
-        <LogMessage :message="event.message" /><time :datetime="event.occurredAt">{{ event.occurredAt }}</time>
+        <LogMessage :message="event.message.startsWith('PREVIEW_READY ') ? '页面已准备好，可以预览。' : event.message" /><time :datetime="event.occurredAt">{{ formatDateTime(event.occurredAt) }}</time>
       </li>
     </ol>
     <p v-if="diagnosticsError" role="alert">{{ diagnosticsError }}</p>
     <h3>文件变更</h3>
-    <p v-if="!diagnostics?.files.available">尚无文件变更记录；生成生产者还未提供结果。</p>
-    <p v-else-if="!diagnostics.files.changes.length">生产者已确认本轮无文件变更。</p>
+    <p v-if="!diagnostics?.files.available">文件生成后，变更记录会显示在这里。</p>
+    <p v-else-if="!diagnostics.files.changes.length">本次任务没有文件变更。</p>
     <ul v-else class="file-changes">
       <li v-for="change in diagnostics.files.changes" :key="change.path" :data-file-path="change.path">
         <strong>{{ changeLabel[change.operation] }} · {{ change.path }}</strong>
-        <p>变更前：{{ change.beforeDigest ?? '文件不存在' }}<br>变更后：{{ change.afterDigest ?? '文件已删除' }}</p>
+        <details><summary>文件校验详情</summary><p>变更前：{{ change.beforeDigest ?? '文件不存在' }}<br>变更后：{{ change.afterDigest ?? '文件已删除' }}</p></details>
       </li>
     </ul>
     <h3>构建与工具摘要</h3>
-    <p v-if="!diagnostics?.builds.length">尚无持久化构建结果，不能视为构建成功。</p>
+    <p v-if="!diagnostics?.builds.length">还没有构建结果，请等待页面生成。</p>
     <article v-for="build in diagnostics?.builds ?? []" :key="build.id" :data-build-id="build.id">
       <strong>{{ buildLabel[build.status] }}</strong>
-      <p>构建 {{ build.id }} · 版本 {{ build.versionId }}<br>退出码：{{ build.exitCode ?? '尚无结果' }}<br>制品摘要：{{ build.artifactDigest ?? '尚无制品' }}<br>开始：{{ build.createdAt }}<br>完成：{{ build.completedAt ?? '尚未完成' }}</p>
+      <details><summary>构建详情</summary><p>构建 {{ build.id }} · 版本 {{ build.versionId }}<br>退出码：{{ build.exitCode ?? '尚无结果' }}<br>制品摘要：{{ build.artifactDigest ?? '尚无制品' }}<br>开始：{{ formatDateTime(build.createdAt) }}<br>完成：{{ build.completedAt ? formatDateTime(build.completedAt) : '尚未完成' }}</p></details>
     </article>
     <p v-if="!tools.length">尚未收到工具事件。</p>
-    <LogMessage v-for="event in tools" :key="event.id" :message="`${event.message}（${event.stage}）`" />
+    <LogMessage v-for="event in tools" :key="event.id" :message="`${event.message}（${stageLabel(event.stage)}）`" />
     <h3>错误摘要</h3>
-    <p v-if="!failures.length">尚未收到错误事件；任务最终结果以状态查询为准。</p>
+    <p v-if="!failures.length">暂无错误记录。</p>
     <LogMessage v-for="event in failures" :key="event.id" :message="event.message" />
   </section>
 </template>

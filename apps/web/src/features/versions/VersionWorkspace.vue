@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, provide, ref, watch } from 'vue'
+import { formatDateTime } from '../../lib/display'
 import { ApiError } from '../../api/http'
 import PreviewPanel from '../preview/PreviewPanel.vue'
 import SourcePanel from '../source/SourcePanel.vue'
@@ -19,6 +20,7 @@ const loading = ref(false)
 const error = ref('')
 const labels = { DRAFT: '草稿 · 未验证', VERIFIED: '已通过验证', FAILED: '验证失败' }
 const sourceTask = (item: Version) => item.taskId
+const initialDraft = (item: Version) => item.status === 'DRAFT' && !item.taskId && !item.buildId && item.sourceDigest === 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
 let generation = 0
 let abort: AbortController | undefined
 const flow = useVisualEditFlow(() => props.applicationId, version => {
@@ -47,7 +49,7 @@ async function load(nextPage = page.value) {
   } catch (cause) {
     if (current !== generation) return
     error.value = cause instanceof ApiError && cause.status === 404
-      ? '版本列表尚不可用或你无权访问。请确认版本接口已接入。'
+      ? '应用不存在或你无权查看版本。'
       : cause instanceof Error ? cause.message : '版本读取失败，请重试。'
     if (cause instanceof ApiError && cause.status === 401) emit('unauthorized')
   } finally { if (current === generation) loading.value = false }
@@ -76,13 +78,13 @@ onBeforeUnmount(() => { generation++; abort?.abort(); flow.reset() })
     <PreviewPanel :application-id="applicationId" :version-id="previewId" :build-failed="buildFailed" :task-cancelled="taskCancelled || editTask?.failureCode === `CANCELLED`" :cancelled-by="editTask?.failureCode === `CANCELLED` ? editTask.cancelledBy : cancelledBy" :refresh-version="refreshVersion" @unauthorized="emit('unauthorized')" />
     <section v-if="accepted" class="edit-result" aria-label="组件修改任务">
       <h2>组件修改任务</h2>
-      <p>组件：{{ component }} · 基版本：{{ accepted.baseVersionId }}</p>
+      <p>组件：{{ component }}</p>
       <p>修改说明：{{ description }}</p>
       <TaskStatus :task="editTask" />
       <p v-if="!editTask" role="status">修改任务已受理，正在读取状态。旧版本继续保留。</p>
-      <p v-if="result" role="status">修改成功，产出此任务的已验证版本 {{ result.id }}。{{ previewId === result.id ? '当前预览已切换至新版本。旧选择已清理，请重新选择组件。' : '当前正在查看其他历史版本。' }}</p>
+      <p v-if="result" role="status">修改成功，新版本已通过检查。{{ previewId === result.id ? '当前预览已切换至新版本。旧选择已清理，请重新选择组件。' : '当前正在查看其他历史版本。' }}</p>
       <p v-else-if="editTask?.status === 'FAILED'" role="status">{{ editTask.failureCode === 'CANCELLED' ? '修改已取消' : '修改失败' }}。旧版本仍可用，可继续预览、选择组件并修改。</p>
-      <p v-else-if="editTask?.status === 'READY'" role="status">任务报告 READY，正在核对确切版本；确认前保留旧预览。</p>
+      <p v-else-if="editTask?.status === 'READY'" role="status">生成已完成，正在准备新版本预览。</p>
       <p v-else-if="editTask" role="status">修改进行中，旧版本可继续预览；验证完成前不能发起下一次修改。</p>
       <p v-if="editError" role="alert">{{ editError }}</p>
       <p v-if="connection">事件连接：{{ connection }}</p>
@@ -99,12 +101,13 @@ onBeforeUnmount(() => { generation++; abort?.abort(); flow.reset() })
       <template v-else>
         <ul>
           <li v-for="item in items" :key="item.id" :data-version-id="item.id">
-            <div><strong>版本 {{ item.number }}</strong> <span>{{ labels[item.status] }}</span><span v-if="item.id === previewId"> · 当前预览</span><span v-if="item.id === versionId"> · 当前可用</span></div>
-            <time :datetime="item.createdAt">{{ new Date(item.createdAt).toLocaleString('zh-CN') }}</time>
-            <p>来源任务：<router-link v-if="sourceTask(item)" :to="{ path: `/workbench/${applicationId}`, query: { taskId: sourceTask(item) } }">{{ sourceTask(item) }}</router-link><span v-else>未提供来源任务</span></p>
+            <p v-if="initialDraft(item)">等待首次生成。提交需求后，即可在这里查看生成的版本。</p>
+            <template v-else><div><strong>版本 {{ item.number }}</strong> <span>{{ labels[item.status] }}</span><span v-if="item.id === previewId"> · 当前预览</span><span v-if="item.id === versionId"> · 当前可用</span></div>
+            <time :datetime="item.createdAt">{{ formatDateTime(item.createdAt) }}</time>
+            <p v-if="sourceTask(item)">来源任务：<router-link :to="{ path: `/workbench/${applicationId}`, query: { taskId: sourceTask(item) } }">查看生成过程</router-link></p>
             <p v-if="item.status === 'FAILED'" class="version-error">错误摘要：{{ item.errorSummary || '服务端未提供错误摘要。' }}</p>
             <button type="button" class="button-secondary" :disabled="locked" :aria-pressed="selected?.id === item.id" @click="select(item)">{{ item.status === 'VERIFIED' ? '查看源码并预览' : '查看源码' }}</button>
-            <span v-if="item.status !== 'VERIFIED'"> 此版本不可预览。</span>
+            <span v-if="item.status !== 'VERIFIED'"> 此版本不可预览。</span></template>
           </li>
         </ul>
         <nav aria-label="版本分页"><button type="button" class="button-secondary" :disabled="page === 0" @click="load(page - 1)">上一页</button><span>第 {{ page + 1 }} 页 · 共 {{ total }} 个版本</span><button type="button" class="button-secondary" :disabled="(page + 1) * 20 >= total" @click="load(page + 1)">下一页</button></nav>

@@ -162,11 +162,32 @@ class AuthIntegrationTest extends PostgresTestBase {
 
     @Test
     void unknownEmailFloodDoesNotBlockCorrectPasswordForAnAccount() throws Exception {
-        for (int i = 0; i < 10_001; i++) attempts.failed("flood-" + i + "@example.test");
+        for (int i = 0; i < 10_001; i++) attempts.acquire("flood-" + i + "@example.test", "192.0.2.1");
         Browser admin = browser();
         login(admin, "admin@codeless.local", "admin-password-for-test-only");
         mvc.perform(get("/api/v0/auth/me").session(admin.session()))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.role").value("ADMIN"));
+    }
+
+    @Test void failedLoginsFromOneAddressDoNotLockTheAdministratorAtAnotherAddress() throws Exception {
+        String email = "admin@codeless.local";
+        Browser attacker = browser();
+        for (int i = 0; i < 5; i++) {
+            mvc.perform(post("/api/v0/auth/login").session(attacker.session()).header("X-CSRF-Token", attacker.csrf())
+                    .with(request -> { request.setRemoteAddr("192.0.2.20"); return request; })
+                    .contentType(MediaType.APPLICATION_JSON).content("{\"email\":\"" + email + "\",\"password\":\"wrong\"}"))
+                    .andExpect(status().isUnauthorized());
+        }
+        mvc.perform(post("/api/v0/auth/login").session(attacker.session()).header("X-CSRF-Token", attacker.csrf())
+                .with(request -> { request.setRemoteAddr("192.0.2.20"); return request; })
+                .header("X-Forwarded-For", "192.0.2.21")
+                .contentType(MediaType.APPLICATION_JSON).content("{\"email\":\"" + email + "\",\"password\":\"wrong\"}"))
+                .andExpect(status().isTooManyRequests());
+        Browser admin = browser();
+        mvc.perform(post("/api/v0/auth/login").session(admin.session()).header("X-CSRF-Token", admin.csrf())
+                .with(request -> { request.setRemoteAddr("192.0.2.21"); return request; })
+                .contentType(MediaType.APPLICATION_JSON).content("{\"email\":\"" + email + "\",\"password\":\"admin-password-for-test-only\"}"))
+                .andExpect(status().isOk());
     }
 
     @RestController

@@ -8,7 +8,6 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
@@ -118,10 +117,8 @@ public class FileToolService {
         audit.write(receipt, "observed");
         if (result.status().equals("SUCCEEDED") && !name.equals("files.list") && !name.equals("files.read")
                 && !java.util.Objects.equals(before, after)) {
-            int revision = jdbc.sql("SELECT revision FROM task_file_snapshots WHERE task_id=?").param(taskId)
-                    .query(Integer.class).optional().orElse(0);
-            diagnostics.recordFiles(taskId, token, revision, List.of(new TaskDiagnosticsService.FileChange(
-                    summary.path(), before == null ? "ADDED" : after == null ? "DELETED" : "MODIFIED", before, after)));
+            diagnostics.recordFileChange(taskId, token, new TaskDiagnosticsService.FileChange(
+                    summary.path(), before == null ? "ADDED" : after == null ? "DELETED" : "MODIFIED", before, after));
         }
         appendEvent(taskId, token, stage, callId, result.status(), result.errorCode());
         return new Observed(result, receipt);

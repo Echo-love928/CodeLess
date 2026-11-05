@@ -89,6 +89,25 @@ test('injected bridge: a failed start is fatal, later errors are reported once a
     assert.equal(denied.status, 403); assert.deepEqual(bridgeStates(denied.body, []), ['unavailable'])
   })
 })
+
+test('bootstrap credentials are single-use even for concurrent exchanges; cookie requests keep working', async () => {
+  await fixture(async ({ origin, host, token, cookie, handle, app, version, now, advance }) => {
+    // A rejected request must not consume the real host's credential.
+    assert.equal((await get(origin, 'wrong.preview.codeless-preview.test', '/__preview/start?credential=' + token)).status, 403)
+    const replies = await Promise.all(Array.from({ length: 8 }, () => get(origin, host, '/__preview/start?credential=' + token)))
+    assert.equal(replies.filter(value => value.status === 303).length, 1)
+    assert.equal(replies.filter(value => value.status === 403).length, 7)
+    assert.equal((await get(origin, host, '/', cookie)).status, 200)
+    assert.equal((await get(origin, host, '/page.js', cookie)).status, 200)
+    const fresh = signed(handle, app, version, now())
+    assert.equal((await get(origin, host, '/__preview/start?credential=' + fresh)).status, 303)
+    assert.equal((await get(origin, host, '/__preview/start?credential=' + fresh)).status, 403)
+    advance(120000)
+    assert.equal((await get(origin, host, '/__preview/start?credential=' + token)).status, 403)
+    const renewed = signed(handle, app, version, now())
+    assert.equal((await get(origin, host, '/__preview/start?credential=' + renewed)).status, 303)
+  })
+})
 test('D09-B-T2: missing/expired/forged credentials and altered version/host/path/method are rejected', async () => {
   await fixture(async ({ origin, host, token, cookie, handle, app, advance, now }) => {
     assert.equal((await get(origin, host)).status, 403)

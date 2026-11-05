@@ -3,7 +3,7 @@ import { createServer } from 'node:https'
 import { execFileSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { readFile, mkdir } from 'node:fs/promises'
-import { dirname, join, resolve } from 'node:path'
+import { join, win32 } from 'node:path'
 export const KEY_HEX = '11'.repeat(32) // Explicit test-only key; never a deployment credential.
 export function signed(handle, app, version, time = Date.now()) {
   const issued = Math.floor(time / 1000)
@@ -14,14 +14,25 @@ export function signed(handle, app, version, time = Date.now()) {
 export const passedFixture = handle => ({ status: 'PASSED', failure: null, workerExitCode: 0, timedOut: false,
   completedAt: new Date().toISOString(), cleanup: { browserClosed: true }, screenshot: { digest: 'fixture' },
   buildId: handle.buildId, sourceDigest: handle.sourceDigest, artifactDigest: handle.artifactDigest })
+export function resolveOpenSSL({ platform = process.platform, run = execFileSync, exists = existsSync } = {}) {
+  const options = { encoding: 'utf8', windowsHide: true, stdio: 'pipe' }
+  try { run('openssl', ['version'], options); return 'openssl' } catch { /* Try Git's bundled executable next. */ }
+  if (platform === 'win32') {
+    let paths = []
+    try { paths = run('where.exe', ['git'], options).trim().split(/\r?\n/).filter(Boolean) } catch { /* No Git on PATH. */ }
+    for (const git of paths) {
+      for (const relative of ['../usr/bin/openssl.exe', '../../usr/bin/openssl.exe', 'openssl.exe']) {
+        const candidate = win32.resolve(win32.dirname(git), relative)
+        if (!exists(candidate)) continue
+        try { run(candidate, ['version'], options); return candidate } catch { /* Try remaining installations. */ }
+      }
+    }
+  }
+  throw new Error('Test TLS requires openssl on PATH or a working Git-bundled openssl')
+}
 export async function tlsServer(directory, listener, port = 0) {
   await mkdir(directory, { recursive: true })
-  let openssl = 'openssl'
-  if (process.platform === 'win32') {
-    const git = execFileSync('where.exe', ['git'], { encoding: 'utf8', windowsHide: true }).trim().split(/\r?\n/)[0]
-    openssl = resolve(dirname(git), '../usr/bin/openssl.exe')
-    if (!existsSync(openssl)) throw new Error('Test TLS requires Git-bundled openssl')
-  }
+  const openssl = resolveOpenSSL()
   const cert = join(directory, 'test-cert.pem'), key = join(directory, 'test-key.pem')
   execFileSync(openssl, ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', key, '-out', cert,
     '-days', '1', '-subj', '/CN=codeless-preview-test', '-addext', 'subjectAltName=DNS:*.preview.codeless-preview.test,DNS:platform.codeless.test'],

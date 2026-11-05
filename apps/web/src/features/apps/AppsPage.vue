@@ -153,7 +153,7 @@ async function logout() {
                 <div class="project-details"><h3>{{ app.name }}</h3><p><span class="draft-label">{{ app.latestReadyVersionId ? '已有可用版本' : '尚无可用版本' }}</span><span class="dot-separator">·</span>{{ app.description || '尚无描述' }}</p></div>
                 <div class="project-actions">
                   <button class="button-secondary" type="button" @click="router.push(`/workbench/${app.id}`)">打开工作台 <UiIcon name="arrow" :size="16" /></button>
-                  <button class="project-delete" type="button" :aria-label="`删除项目${app.name}`" :disabled="deleting" @click="openDelete(app)">删除项目</button>
+                  <button class="project-delete" type="button" :aria-label="`删除项目「${app.name}」`" :disabled="deleting" @click="openDelete(app)">删除项目</button>
                 </div>
               </div>
             </article>
@@ -165,11 +165,11 @@ async function logout() {
         <footer class="dashboard-footer"><span>每个值得做的想法，都可以先有一个小版本。</span><span>CodeLess · 我的应用</span></footer>
       </main>
     </div>
-    <div v-if="dialogOpen" class="dialog-backdrop" @click.self="dialogOpen = false"><form class="create-dialog" role="dialog" aria-modal="true" aria-labelledby="create-title" @submit.prevent="createApp"><h2 id="create-title">新建应用</h2><p>创建 Vue 应用，稍后可在工作台描述你的需求。</p><label>应用名称<input v-model="name" required :disabled="creating" autofocus /></label><label>简介<input v-model="description" :disabled="creating" /></label><label>数据模式<select v-model="dataMode" :disabled="creating"><option value="STATIC">静态数据</option><option value="MOCK">Mock 数据</option><option value="LOCAL_STORAGE">LocalStorage</option></select></label><p v-if="createError" role="alert">{{ createError }}</p><div class="dialog-actions"><button type="button" class="button-secondary" :disabled="creating" @click="dialogOpen = false">取消</button><button type="submit" class="button-primary" :disabled="creating">{{ creating ? '创建中…' : '创建' }}</button></div></form></div>
+    <div v-if="dialogOpen" class="dialog-backdrop" @click.self="dialogOpen = false"><form class="create-dialog" role="dialog" aria-modal="true" aria-labelledby="create-title" @submit.prevent="createApp"><h2 id="create-title">新建应用</h2><p>创建 Vue 应用，稍后可在工作台描述你的需求。</p><label>应用名称<input v-model="name" maxlength="120" required :disabled="creating" autofocus /></label><label>简介<input v-model="description" maxlength="1000" :disabled="creating" /></label><label>数据模式<select v-model="dataMode" :disabled="creating" aria-describedby="data-mode-help"><option value="STATIC">静态数据</option><option value="MOCK">模拟数据</option><option value="LOCAL_STORAGE">浏览器本地保存</option></select></label><p id="data-mode-help">{{ { STATIC: '静态数据：适合内容展示，页面数据不随操作保存。', MOCK: '模拟数据：使用示例数据演示列表和交互，不连接真实服务。', LOCAL_STORAGE: '浏览器本地保存：操作结果保留在当前浏览器，换设备后不会同步。' }[dataMode] }}</p><p v-if="createError" role="alert">{{ createError }}</p><div class="dialog-actions"><button type="button" class="button-secondary" :disabled="creating" @click="dialogOpen = false">取消</button><button type="submit" class="button-primary" :disabled="creating">{{ creating ? '创建中…' : '创建' }}</button></div></form></div>
     <dialog ref="deleteDialog" class="create-dialog delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description" @cancel="escapeDelete" @close="deleteTarget = undefined">
       <form v-if="deleteTarget" @submit.prevent="confirmDelete">
         <h2 id="delete-title">删除项目“{{ deleteTarget.name }}”？</h2>
-        <p id="delete-description">项目将从“我的应用”中移除，历史版本和调用记录会保留。取消勾选后，已发布网站仍可访问。</p>
+        <p id="delete-description">项目将从“我的应用”中移除，暂不支持恢复。历史版本和源码将无法访问，调用记录会保留。取消勾选后，已发布网站仍可访问。</p>
         <label><input v-model="unpublishOnDelete" type="checkbox" :disabled="deleting">同时下线所有已发布网站</label>
         <p v-if="deleteError" role="alert">{{ deleteError }}</p>
         <div class="dialog-actions"><button type="button" class="button-secondary" :disabled="deleting" autofocus @click="cancelDelete">取消</button><button type="submit" class="button-danger" :disabled="deleting">{{ deleting ? '删除中…' : '确认删除' }}</button></div>

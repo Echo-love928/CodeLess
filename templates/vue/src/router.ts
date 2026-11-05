@@ -9,6 +9,11 @@ import CatalogPage from './pages/CatalogPage.vue'
 const pages = import.meta.glob<{ templatePlaceholder?: unknown }>(
   ['./pages/HomePage.vue', './pages/TasksPage.vue', './pages/CatalogPage.vue'], { eager: true })
 const generated = (file: string) => pages[`./pages/${file}`]?.templatePlaceholder !== true
+export const navigation = [
+  { file: 'HomePage.vue', path: '/', label: '首页' },
+  { file: 'TasksPage.vue', path: '/tasks', label: '任务' },
+  { file: 'CatalogPage.vue', path: '/catalog', label: '目录' },
+].filter(page => generated(page.file))
 const entry = generated('HomePage.vue') ? null
   : generated('TasksPage.vue') ? '/tasks'
     : generated('CatalogPage.vue') ? '/catalog' : null

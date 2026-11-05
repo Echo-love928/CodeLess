@@ -51,7 +51,7 @@ public class SourceExportService {
         var v = jdbc.sql("""
                 SELECT v.application_id, v.number, v.status, v.source_digest, v.build_id, v.created_at
                 FROM application_versions v JOIN applications a ON a.id = v.application_id
-                WHERE v.id = ? AND a.owner_id = ?
+                WHERE v.id = ? AND a.owner_id = ? AND a.status = 'ACTIVE'
                 """).params(versionId, owner).query((rs, n) -> new Version(rs.getObject(1, UUID.class), rs.getInt(2), rs.getString(3),
                 rs.getString(4), rs.getObject(5, UUID.class), rs.getObject(6, OffsetDateTime.class))).optional()
                 .orElseThrow(() -> new AuthFailure(HttpStatus.NOT_FOUND, "NOT_FOUND"));

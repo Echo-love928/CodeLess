@@ -17,12 +17,13 @@ function exit() { selecting.value = false; mode() }
 function key(event: KeyboardEvent) { if (selecting.value && event.key === 'Escape') { event.preventDefault(); exit(); toggle.value?.focus() } }
 function connect() {
   session?.close(); connected.value = false; selecting.value = false; selected.value = null
-  if (!props.frame?.contentWindow) return
+  session = undefined
+  if (!props.active || !props.frame?.contentWindow) return
   session = createSelectorSession({ frame: props.frame.contentWindow, origin: props.origin, versionId: props.versionId,
     onSelection: value => { selected.value = value }, onExit: () => { selecting.value = false; toggle.value?.focus() }, onReady: () => { connected.value = true } })
   session.probe()
 }
-watch(() => [props.frame, props.versionId, props.origin], (_value, _old, cleanup) => {
+watch(() => [props.frame, props.versionId, props.origin, props.active], (_value, _old, cleanup) => {
   connect()
   const frame = props.frame
   frame?.addEventListener('load', connect)
