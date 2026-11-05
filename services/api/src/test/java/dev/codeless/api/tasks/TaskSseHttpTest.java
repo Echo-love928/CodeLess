@@ -386,16 +386,23 @@ class TaskSseHttpTest extends PostgresTestBase {
             try (Wire wire = new Wire(owner.stream(task, null, ""))) {
                 wire.event();
                 jdbc.update("UPDATE platform_users SET status='DISABLED' WHERE id=?", user);
-                Frame error = null;
+                boolean closed = false;
                 for (int i = 0; i < 200; i++) {
                     Frame frame = wire.next();
-                    if ("stream-error".equals(frame.name())) { error = frame; break; }
+                    // The session-version fence may close before the owner replay observes DISABLED.
+                    if (frame.equals(Frame.EOF)) { closed = true; break; }
+                    if ("stream-error".equals(frame.name())) {
+                        assertThat(frame.id()).isNull();
+                        assertThat(mapper.readTree(frame.data()).get("code").asText()).isEqualTo("NOT_FOUND");
+                        assertThat(wire.next()).isEqualTo(Frame.EOF);
+                        closed = true;
+                        break;
+                    }
+                    // Heartbeats are permitted while closing; no task data may follow revocation.
                     assertThat(frame.name()).isNull();
+                    assertThat(frame.data()).isNull();
                 }
-                assertThat(error).isNotNull();
-                assertThat(error.id()).isNull();
-                assertThat(mapper.readTree(error.data()).get("code").asText()).isEqualTo("NOT_FOUND");
-                assertThat(wire.next()).isEqualTo(Frame.EOF);
+                assertThat(closed).as("disabled account stream closes within the frame bound").isTrue();
                 error(owner, task, "1", 401, "UNAUTHENTICATED");
             } finally {
                 jdbc.update("UPDATE platform_users SET status='ACTIVE' WHERE id=?", user);
