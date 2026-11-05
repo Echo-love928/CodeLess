@@ -63,7 +63,7 @@ test('D14-B-T2/T4: failed edit keeps old navigation, readable escaped logs and a
   await state.finish('FAILED')
   const result = page.getByRole('region', { name: '组件修改任务', exact: true })
   await expect(result).toContainText('旧版本仍可用')
-  await result.locator('summary').click()
+  await result.getByText('查看修改日志与构建结果', { exact: true }).click()
   await expect(result).toContainText('退出码：2')
   await expect(result).toContainText('Vue 编译失败：语法错误 <script>window.__logExecuted=true</script>')
   expect(await page.evaluate(() => (window as unknown as { __logExecuted?: boolean }).__logExecuted)).toBeUndefined()
