@@ -71,6 +71,7 @@ public class AuthController {
         attempts.succeededKnown(account.id());
         request.changeSessionId();
         request.getSession(false).setAttribute(AuthFilter.USER_ID, account.id());
+        request.getSession(false).setAttribute(AuthFilter.SESSION_VERSION,account.sessionVersion());
         return UserResponse.from(account);
     }
 

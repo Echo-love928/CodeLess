@@ -1,6 +1,6 @@
 // Explain only authoritative codes. Unknown codes retain their identity and never imply success.
 const reasons: Record<string, string> = {
-  CANCELLED: '你已取消本次任务。可以调整需求后重新生成。',
+  CANCELLED: '本次任务已取消。可以调整需求后重新生成。',
   INTERRUPTED: '服务重启、执行中断或超时导致本次任务停止；具体原因请核对诊断。重新生成会创建新任务，旧记录和已有可用版本保留。',
   BUILD_FAILED: '源码未通过构建。请查看构建退出码与文件变更。',
   AGENT_BUILD_FAILED: '源码未通过构建。请查看构建退出码与文件变更。',
@@ -35,6 +35,7 @@ export const publicationFailureDescription = '发布失败。上次成功版本�
 export const publicationUnknownDescription = '提交结果未知，暂停再次发布；请核对服务端发布记录。'
 export const cancellationRecoveryDescription = '取消结果尚未确认。可以刷新任务，或对同一任务再次取消；重复取消是安全的。确认终态前请勿重新生成。'
 
-export function failureDescription(code?: string | null): string {
+export function failureDescription(code?: string | null, cancelledBy?: string | null): string {
+  if (code === 'CANCELLED') return cancelledBy === 'ADMIN' ? '管理员已取消本次任务。已有可用版本会继续保留。' : cancelledBy === 'USER' ? '你已取消本次任务。可以调整需求后重新生成。' : reasons.CANCELLED!
   return code && Object.hasOwn(reasons, code) ? reasons[code]! : '服务端未提供可解释的失败原因。请保留任务 ID 和诊断信息，联系维护者确认。'
 }

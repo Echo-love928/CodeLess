@@ -19,6 +19,7 @@ import subprocess
 import time
 import uuid
 import argparse
+from acceptance_accounts import AcceptanceAccounts
 
 BASE = Path('/srv/codeless')
 SITES = BASE / 'publication/sites'
@@ -52,7 +53,7 @@ def main():
     def verify_release():
         assert json.loads((BASE / 'deployed-release.json').read_text()) == release
         assert hashlib.sha256((BASE / 'api.jar').read_bytes()).hexdigest() == release['jarSha256']
-        manifest_path = BASE / 'releases' / options.commit_sha / 'source-manifest.json'
+        manifest_path = Path(release.get('sourceManifestPath',str(BASE / 'releases' / options.commit_sha / 'source-manifest.json')))
         assert hashlib.sha256(manifest_path.read_bytes()).hexdigest() == release['manifestSha256']
         manifest = json.loads(manifest_path.read_text())
         assert manifest['commit'] == options.commit_sha
@@ -72,101 +73,93 @@ def main():
         path.mkdir(mode=0o700, parents=True, exist_ok=True)
         os.chown(path, evaluator.pw_uid, evaluator.pw_gid)
         path.chmod(0o700)
-    credentials = {}
-    for line in Path('/etc/codeless/api.env').read_text().splitlines():
-        name, value = line.split('=', 1)
-        if name in ('CODELESS_DEMO_PASSWORD', 'CODELESS_ADMIN_PASSWORD'):
-            credentials[name] = shlex.split(value)[0]
-    request = {'password': credentials['CODELESS_DEMO_PASSWORD'], 'adminPassword': credentials['CODELESS_ADMIN_PASSWORD'],
-               'failedVersionApplicationId': 'd83b28da-198c-4477-85e3-420ecbf83582',
-               'retryFailed': os.environ.get('CODELESS_ACCEPTANCE_RETRY_FAILED') == 'true'}
-    env = {'PATH': '/opt/codeless/tools/node-v24.22.1-linux-x64/bin:/usr/bin:/bin',
-           'HOME': str(BASE / 'acceptance-private/home'), 'TMPDIR': str(BASE / 'acceptance-private/home/tmp'),
-           'PLAYWRIGHT_BROWSERS_PATH': '/opt/codeless/browsers', 'LANG': 'C.UTF-8'}
-    child = subprocess.Popen(['/usr/sbin/runuser', '-u', evaluator.pw_name, '--',
-                              '/opt/codeless/tools/node-v24.22.1-linux-x64/bin/node',
-                              str(BASE / 'repository/infra/public/acceptance.mjs'), str(evidence), str(public_evidence / 'acceptance.json')],
-                             stdin=subprocess.PIPE, env=env, start_new_session=True)
-    child.stdin.write(json.dumps(request).encode())
-    child.stdin.close()
-    credentials.clear()
-    request.clear()
-    armed, injected, original_mode, modified = False, False, None, None
-    baseline = set()
-    plan = None
-    started = time.monotonic()
-    try:
-        while child.poll() is None:
-            if time.monotonic() - started > 900:
+    with AcceptanceAccounts(options.run_id) as request:
+        env = {'PATH': '/opt/codeless/tools/node-v24.22.1-linux-x64/bin:/usr/bin:/bin',
+               'HOME': str(BASE / 'acceptance-private/home'), 'TMPDIR': str(BASE / 'acceptance-private/home/tmp'),
+               'PLAYWRIGHT_BROWSERS_PATH': '/opt/codeless/browsers', 'LANG': 'C.UTF-8'}
+        child = subprocess.Popen(['/usr/sbin/runuser', '-u', evaluator.pw_name, '--',
+                                  '/opt/codeless/tools/node-v24.22.1-linux-x64/bin/node',
+                                  str(BASE / 'repository/infra/public/acceptance.mjs'), str(evidence), str(public_evidence / 'acceptance.json')],
+                                 stdin=subprocess.PIPE, env=env, start_new_session=True)
+        child.stdin.write(json.dumps(request).encode())
+        child.stdin.close()
+        request.clear()
+        armed, injected, original_mode, modified = False, False, None, None
+        baseline = set()
+        plan = None
+        started = time.monotonic()
+        try:
+            while child.poll() is None:
+                if time.monotonic() - started > 900:
+                    os.killpg(child.pid, signal.SIGKILL)
+                    raise TimeoutError('Public browser acceptance deadline')
+                plan_path = evidence / 'failure-plan.json'
+                if not armed and plan_path.exists():
+                    plan = json.loads(plan_path.read_text())
+                    for key in ('versionId', 'oldPublicationId', 'applicationId'):
+                        assert str(uuid.UUID(plan[key])) == plan[key]
+                    checkpoint = json.loads((evidence / 'checkpoint.json').read_text())
+                    assert plan['oldPublicationId'] == checkpoint['publication']['id']
+                    assert plan['versionId'] == checkpoint['editedVersionId']
+                    assert sql_status(plan['oldPublicationId']) == 'PUBLISHED'
+                    baseline = {path.name for path in SITES.iterdir()}
+                    (evidence / 'failure-armed.json').write_text(json.dumps({'armed': True}))
+                    (evidence / 'failure-armed.json').chmod(0o644)
+                    armed = True
+                if armed and not injected:
+                    for directory in SITES.iterdir():
+                        if directory.name in baseline or directory.is_symlink() or not re.fullmatch(r'[a-f0-9-]{36}', directory.name):
+                            continue
+                        receipt_path = directory / '__deployment.json'
+                        if not receipt_path.exists():
+                            continue
+                        receipt = json.loads(receipt_path.read_text())
+                        if receipt['versionId'] != plan['versionId']:
+                            continue
+                        assert receipt['deploymentId'] == directory.name
+                        assert sql_status(directory.name) == 'REQUESTED'
+                        name = next(item['path'] for item in receipt['files'] if re.fullmatch(r'assets/[A-Za-z0-9_-]+\.js', item['path']))
+                        modified = directory / name
+                        assert modified.resolve().is_relative_to(directory) and not modified.is_symlink()
+                        original_mode = stat.S_IMODE(modified.stat().st_mode)
+                        # Preserve the worker owner's read access for frozen-byte checks;
+                        # deny only the public Nginx reader so the real HTTPS probe fails.
+                        modified.chmod(0o640)
+                        injected = True
+                        (evidence / 'failure-injected.json').write_text(json.dumps({'publicationId': directory.name,
+                            'path': name, 'injection': 'new_attempt_public_reader_denied', 'oldSuccessModified': False}))
+                        (evidence / 'failure-injected.json').chmod(0o644)
+                        break
+                time.sleep(0.01)
+            code = child.wait()
+        finally:
+            if child.poll() is None:
                 os.killpg(child.pid, signal.SIGKILL)
-                raise TimeoutError('Public browser acceptance deadline')
-            plan_path = evidence / 'failure-plan.json'
-            if not armed and plan_path.exists():
-                plan = json.loads(plan_path.read_text())
-                for key in ('versionId', 'oldPublicationId', 'applicationId'):
-                    assert str(uuid.UUID(plan[key])) == plan[key]
-                checkpoint = json.loads((evidence / 'checkpoint.json').read_text())
-                assert plan['oldPublicationId'] == checkpoint['publication']['id']
-                assert plan['versionId'] == checkpoint['editedVersionId']
-                assert sql_status(plan['oldPublicationId']) == 'PUBLISHED'
-                baseline = {path.name for path in SITES.iterdir()}
-                (evidence / 'failure-armed.json').write_text(json.dumps({'armed': True}))
-                (evidence / 'failure-armed.json').chmod(0o644)
-                armed = True
-            if armed and not injected:
-                for directory in SITES.iterdir():
-                    if directory.name in baseline or directory.is_symlink() or not re.fullmatch(r'[a-f0-9-]{36}', directory.name):
-                        continue
-                    receipt_path = directory / '__deployment.json'
-                    if not receipt_path.exists():
-                        continue
-                    receipt = json.loads(receipt_path.read_text())
-                    if receipt['versionId'] != plan['versionId']:
-                        continue
-                    assert receipt['deploymentId'] == directory.name
-                    assert sql_status(directory.name) == 'REQUESTED'
-                    name = next(item['path'] for item in receipt['files'] if re.fullmatch(r'assets/[A-Za-z0-9_-]+\.js', item['path']))
-                    modified = directory / name
-                    assert modified.resolve().is_relative_to(directory) and not modified.is_symlink()
-                    original_mode = stat.S_IMODE(modified.stat().st_mode)
-                    # Preserve the worker owner's read access for frozen-byte checks;
-                    # deny only the public Nginx reader so the real HTTPS probe fails.
-                    modified.chmod(0o640)
-                    injected = True
-                    (evidence / 'failure-injected.json').write_text(json.dumps({'publicationId': directory.name,
-                        'path': name, 'injection': 'new_attempt_public_reader_denied', 'oldSuccessModified': False}))
-                    (evidence / 'failure-injected.json').chmod(0o644)
-                    break
-            time.sleep(0.01)
-        code = child.wait()
-    finally:
-        if child.poll() is None:
-            os.killpg(child.pid, signal.SIGKILL)
-            child.wait(timeout=5)
-        if modified:
-            identifier = modified.parent.parent.name
-            until = time.monotonic() + 35
-            status = sql_status(identifier)
-            while status == 'REQUESTED' and time.monotonic() < until:
-                time.sleep(0.2)
+                child.wait(timeout=5)
+            if modified:
+                identifier = modified.parent.parent.name
+                until = time.monotonic() + 35
                 status = sql_status(identifier)
-            if status != 'REQUESTED':
-                modified.chmod(original_mode)
-                if status == 'FAILED':
-                    archive = BASE / 'private/deployment-checks'
-                    archive.mkdir(mode=0o700, exist_ok=True)
-                    (SITES / identifier).rename(archive / identifier)
-    if code:
-        raise SystemExit(code)
-    report = json.loads((evidence / 'acceptance.json').read_text())
-    assert report['status'] == 'PASSED'
-    injection = json.loads((evidence / 'failure-injected.json').read_text())
-    assert injection['publicationId'] == report['failedPublication']['id']
-    verify_release()
-    report.update({'deployedCommit': options.commit_sha, 'serverJarSha256': release['jarSha256'],
-                   'sourceArchiveSha256': release['archiveSha256'], 'freshRun': True})
-    for path in (evidence / 'acceptance.json', public_evidence / 'acceptance.json'):
-        path.write_text(json.dumps(report, indent=2))
+                while status == 'REQUESTED' and time.monotonic() < until:
+                    time.sleep(0.2)
+                    status = sql_status(identifier)
+                if status != 'REQUESTED':
+                    modified.chmod(original_mode)
+                    if status == 'FAILED':
+                        archive = BASE / 'private/deployment-checks'
+                        archive.mkdir(mode=0o700, exist_ok=True)
+                        (SITES / identifier).rename(archive / identifier)
+        if code:
+            raise SystemExit(code)
+        report = json.loads((evidence / 'acceptance.json').read_text())
+        assert report['status'] == 'PASSED'
+        injection = json.loads((evidence / 'failure-injected.json').read_text())
+        assert injection['publicationId'] == report['failedPublication']['id']
+        verify_release()
+        report.update({'deployedCommit': options.commit_sha, 'serverJarSha256': release['jarSha256'],
+                       'sourceArchiveSha256': release['archiveSha256'], 'freshRun': True})
+        for path in (evidence / 'acceptance.json', public_evidence / 'acceptance.json'):
+            path.write_text(json.dumps(report, indent=2))
     print(json.dumps({'serverBrowserAcceptance': 'PASSED', 'credentialsExported': False, 'browserHasDockerOrIpcAccess': False,
                       'publicMilestoneReached': False, 'evidence': str(evidence), 'publicEvidence': str(public_evidence)}))
 

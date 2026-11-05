@@ -36,13 +36,13 @@ const labels = { succeeded: '成功', failed: '失败', pending: '进行中', ca
         <h2>{{ key === 'generation' ? '生成成功率' : '部署成功率' }}</h2><strong>{{ successRate(value) }}</strong>
         <p>成功 {{ value.succeeded }} / 失败 {{ value.failed }} · 分母 {{ value.denominator ?? value.succeeded + value.failed }}</p><p>进行中 {{ value.pending }} · 取消 {{ value.cancelled }}</p>
       </article>
-      <article class="metric-card"><h2>模型用量</h2><strong>{{ metrics.usage.unknownCalls ? '部分未知' : metrics.usage.inputTokens === null || metrics.usage.outputTokens === null ? '未知' : '已知用量' }}</strong>
-        <p>输入 {{ metrics.usage.inputTokens ?? '未知' }} / 输出 {{ metrics.usage.outputTokens ?? '未知' }} tokens</p><p>用量未知的调用 {{ metrics.usage.unknownCalls }} 次 · 进行中 {{ metrics.usage.pendingCalls ?? '未知' }} 次</p><p v-if="metrics.usage.knownTotalTokens !== undefined">已知调用用量下限：≥ {{ metrics.usage.knownTotalTokens }} tokens</p></article>
+      <article class="metric-card"><h2>模型用量</h2><strong>{{ metrics.usage.unknownCalls ? '部分调用未返回用量' : metrics.usage.inputTokens === null || metrics.usage.outputTokens === null ? '未知' : '已知用量' }}</strong>
+        <p v-if="metrics.usage.calls !== undefined">调用 {{ metrics.usage.calls }} 次 · 用量已知 {{ metrics.usage.knownCalls }} 次</p><p>输入 {{ metrics.usage.inputTokens ?? '未知' }} / 输出 {{ metrics.usage.outputTokens ?? '未知' }} tokens</p><p>用量未知的调用 {{ metrics.usage.unknownCalls }} 次 · 进行中 {{ metrics.usage.pendingCalls ?? '未知' }} 次</p><p v-if="metrics.usage.knownTotalTokens !== undefined">已知调用用量下限：≥ {{ metrics.usage.knownTotalTokens }} tokens</p></article>
     </div>
     <p class="metric-note">成功率由后台按成功 ÷（成功 + 失败）返回；进行中和取消不计入分母，INTERRUPTED 计为失败。指标仅按时间范围汇总，不受所有者、表格状态或页码影响。</p>
     <p v-if="metrics.repairs" class="metric-note">修复 {{ metrics.repairs.total }} 轮 · {{ metrics.repairs.tasksWithRepairs }} 个任务发生修复 · {{ metrics.repairs.readyAfterRepair }} 个修复后成功</p>
-    <details class="trend" @toggle="expand"><summary>生成任务每日趋势（UTC）</summary>
-      <p>最近最多 7 个 UTC 创建日，按所选时间窗口截取；展开时分别读取真实每日指标，各窗口可能有读取时差。</p>
+    <details class="trend" @toggle="expand"><summary>生成任务每日趋势（北京时间）</summary>
+      <p>最近最多 7 个北京时间创建日，按所选时间窗口截取；展开时分别读取真实每日指标，各窗口可能有读取时差。</p>
       <p v-if="loading" role="status">正在读取每日指标…</p><p v-else-if="error" role="alert">{{ error }}</p>
       <p v-else-if="!trend.length">暂无趋势数据</p>
       <template v-else>

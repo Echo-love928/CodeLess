@@ -2,18 +2,29 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import BrandLogo from '../../components/BrandLogo.vue'
-import { ApiError } from '../../api/http'
+import { requestJson, ApiError } from '../../api/http'
 import { clearSession, session } from '../auth/session'
 import AdminTable from './AdminTable.vue'
 import AdminMetrics from './AdminMetrics.vue'
-import { unpublishSite, CancellationRejected, cancelTask, cancellable, getMetrics, listRecords, query, resources, type AdminRecord, type Filters, type Metrics, type Resource } from './admin-api'
+import AdminUserDialog from './AdminUserDialog.vue'
+import { beijingTime } from './admin-time'
+import { statusLabel, searchOwners, unpublishSite, CancellationRejected, cancelTask, cancellable, getMetrics, listRecords, query, resources, type AdminRecord, type Filters, type Metrics, type Resource } from './admin-api'
 
+const buildVersion = ref<{ commit: string; builtAt: string }>()
+const ownerSearch = ref(''), owners = ref<AdminRecord[]>([]), ownerError = ref('')
+const userAction = ref<{ mode: 'create' | 'status' | 'password'; user?: AdminRecord }>()
+async function lookupOwners() {
+  ownerError.value = ''
+  try { owners.value = await searchOwners(ownerSearch.value) }
+  catch(error) { if(!(await authorizationError(error))) ownerError.value = error instanceof Error ? error.message : '账号加载失败。' }
+}
+function accountSaved() { userAction.value = undefined; feedback.value = '账号已更新。'; feedbackError.value = false; void lookupOwners(); void load() }
 const router = useRouter()
 const labels: Record<Resource, string> = { tasks: '任务', applications: '应用', deployments: '部署', users: '用户', 'model-calls': '模型调用', audit: '取消审计' }
 const statuses: Record<Resource, string[]> = { tasks: ['PLAN', 'GENERATE', 'VERIFY', 'REPAIR', 'READY', 'FAILED'],
   applications: ['ACTIVE', 'ARCHIVED'], deployments: ['REQUESTED', 'PUBLISHED', 'FAILED', 'UNPUBLISHED'],
   users: ['ACTIVE', 'DISABLED'], 'model-calls': ['REQUESTED', 'SUCCEEDED', 'FAILED'], audit: ['CANCELLED', 'ALREADY_TERMINAL', 'NOT_FOUND', 'FAILED', 'UNKNOWN'] }
-const empty = (): Filters => ({ status: '', ownerId: '', from: '', to: '' })
+const empty = (): Filters => ({ status: '', ownerId: '', from: '', to: '', includeTest: false })
 const resource = ref<Resource>('tasks'), draft = ref(empty()), applied = ref(empty())
 const page = ref(0), size = ref(20), total = ref(0), rows = ref<AdminRecord[]>([])
 const loading = ref(false), listError = ref(''), metricsError = ref(''), filterError = ref('')
@@ -59,7 +70,7 @@ async function load() {
   const current = () => requestEpoch === epoch && currentIdentity === identity.value && permitted.value
   const table = listRecords(resource.value, applied.value, page.value, size.value).then(result => {
     if (!current()) return
-    rows.value = result.items; total.value = result.total; loadedAt.value = new Date().toLocaleString()
+    rows.value = result.items; total.value = result.total; loadedAt.value = beijingTime(new Date())
   }).catch(async error => { if (current() && !(await authorizationError(error))) listError.value = error instanceof Error ? error.message : '记录加载失败。' })
   const overview = getMetrics(applied.value).then(result => { if (current()) metrics.value = result })
     .catch(async error => { if (current() && !(await authorizationError(error))) metricsError.value = error instanceof Error ? error.message : '指标加载失败。' })
@@ -106,7 +117,7 @@ async function confirmCancel() {
     const outcome = result.audit.outcome
     feedbackError.value = !['CANCELLED', 'ALREADY_TERMINAL'].includes(outcome)
     rows.value = rows.value.map(row => row.id === selected.id ? result.task : row)
-    feedback.value = `任务 ${selected.id}：${outcome === 'CANCELLED' ? '服务端确认已取消（FAILED / CANCELLED）' : outcome === 'ALREADY_TERMINAL' ? '任务已经终止，本次没有重复取消' : '取消审计结果未知或失败，勿重复提交，请核对审计'}。审计 ID：${result.audit.id}；结果：${outcome}。`
+    feedback.value = `任务 ${selected.id}：${outcome === 'CANCELLED' ? '管理员取消已生效' : outcome === 'ALREADY_TERMINAL' ? '任务已经终止，本次没有重复取消' : '取消审计结果未知或失败，勿重复提交，请核对审计'}。审计 ID：${result.audit.id}；结果：${statusLabel(outcome)}。`
   } catch (error) {
     if (currentIdentity !== identity.value || !permitted.value) return
     const rejected = !submitted || error instanceof CancellationRejected || error instanceof ApiError && ['unauthorized', 'forbidden'].includes(error.kind)
@@ -120,7 +131,7 @@ async function confirmCancel() {
   }
 }
 watch(identity, () => { purge(); if (!permitted.value) void router.replace('/apps'); else { restoreBlocked(); void load() } }, { flush: 'sync' })
-onMounted(() => { restoreBlocked(); void load() })
+onMounted(() => { void requestJson<{ commit: string; builtAt: string }>('/version.json', { cache: 'no-store' }).then(value => { buildVersion.value = value }).catch(() => {}); restoreBlocked(); void lookupOwners(); void load() })
 onUnmounted(() => { epoch++ })
 </script>
 
@@ -128,22 +139,24 @@ onUnmounted(() => { epoch++ })
   <div v-if="permitted" class="admin-page">
     <header class="admin-header"><router-link to="/apps" aria-label="CodeLess 返回我的应用"><BrandLogo /></router-link><span>基础运营后台</span><router-link to="/apps" class="button-secondary">返回我的应用</router-link></header>
     <main>
-      <div class="page-heading"><div><p class="eyebrow">OPERATIONS</p><h1>运行概览</h1><p>查看平台记录，核对结果，并管理仍在执行的任务。</p></div><button class="button-secondary" type="button" :disabled="loading || submitting" @click="load">{{ loading ? '正在刷新…' : '刷新数据' }}</button></div>
+      <div class="page-heading"><div><p class="eyebrow">运营管理</p><h1>运行概览</h1><p>查看平台记录，核对结果，并管理仍在执行的任务。</p></div><button class="button-secondary" type="button" :disabled="loading || submitting" @click="load">{{ loading ? '正在刷新…' : '刷新数据' }}</button></div>
       <section class="filters" aria-label="管理筛选">
         <form @submit.prevent="apply">
-          <label v-if="['tasks', 'applications'].includes(resource)">所有者 ID<input v-model="draft.ownerId" placeholder="全部所有者" :disabled="submitting" /></label>
-          <label>开始时间（本地，含）<input v-model="draft.from" type="datetime-local" :disabled="submitting" /></label>
-          <label>结束时间（本地，不含）<input v-model="draft.to" type="datetime-local" :disabled="submitting" /></label>
-          <label>记录状态<select v-model="draft.status" aria-label="记录状态" :disabled="submitting || !statuses[resource].length"><option value="">全部状态</option><option v-for="status in statuses[resource]" :key="status" :value="status">{{ status }}</option></select></label>
-          <label v-if="resource === 'tasks'">任务结果<select v-model="draft.outcome" aria-label="任务结果" :disabled="submitting"><option value="">全部结果</option><option v-for="outcome in ['ACTIVE', 'READY', 'FAILED', 'CANCELLED']" :key="outcome">{{ outcome }}</option></select></label>
-          <label v-if="resource === 'model-calls'">用量状态<select v-model="draft.usage" aria-label="用量状态" :disabled="submitting"><option value="">全部用量</option><option v-for="usage in ['KNOWN', 'UNKNOWN', 'PENDING']" :key="usage">{{ usage }}</option></select></label>
+          <template v-if="['tasks','applications'].includes(resource)"><label>搜索账号<input v-model="ownerSearch" type="search" placeholder="邮箱或显示名称" :disabled="submitting"></label><button type="button" class="button-secondary" :disabled="submitting" @click="lookupOwners">搜索账号</button><label>所有者<select v-model="draft.ownerId" :disabled="submitting"><option value="">全部所有者</option><option v-for="owner in owners" :key="owner.id" :value="owner.id">{{ owner.name }} · {{ owner.email }}</option></select></label></template>
+          <label>开始时间（北京时间，含）<input v-model="draft.from" type="datetime-local" :disabled="submitting" /></label>
+          <label>结束时间（北京时间，不含）<input v-model="draft.to" type="datetime-local" :disabled="submitting" /></label>
+          <label>记录状态<select v-model="draft.status" aria-label="记录状态" :disabled="submitting || !statuses[resource].length"><option value="">全部状态</option><option v-for="status in statuses[resource]" :key="status" :value="status">{{ statusLabel(status) }}</option></select></label>
+          <label v-if="resource === 'tasks'">任务结果<select v-model="draft.outcome" aria-label="任务结果" :disabled="submitting"><option value="">全部结果</option><option v-for="outcome in ['ACTIVE', 'READY', 'FAILED', 'CANCELLED']" :key="outcome" :value="outcome">{{ outcome === 'ACTIVE' ? '进行中' : statusLabel(outcome) }}</option></select></label>
+          <label v-if="resource === 'model-calls'">用量状态<select v-model="draft.usage" aria-label="用量状态" :disabled="submitting"><option value="">全部用量</option><option v-for="usage in ['KNOWN', 'UNKNOWN', 'PENDING']" :key="usage" :value="usage">{{ statusLabel(usage) }}</option></select></label>
           <label v-if="resource === 'users'">邮箱或显示名<input v-model="draft.q" maxlength="100" :disabled="submitting" /></label>
           <label v-if="resource === 'audit'">审计目标 ID<input v-model="draft.targetId" placeholder="全部任务" :disabled="submitting" /></label>
           <label>每页条数<select v-model="size" :disabled="submitting || loading" @change="page = 0; load()"><option :value="10">10</option><option :value="20">20</option><option :value="50">50</option></select></label>
+          <label>数据范围<select v-model="draft.includeTest" :disabled="submitting"><option :value="false">正式数据（排除测试与模拟调用）</option><option :value="true">全部数据（含测试与模拟调用）</option></select></label>
           <button class="button-primary" :disabled="submitting" type="submit">应用筛选</button>
         </form>
+        <p v-if="ownerError" role="alert">{{ ownerError }}</p>
         <p v-if="filterError" role="alert">{{ filterError }}</p>
-        <p class="active-filters">已应用：所有者 {{ applied.ownerId || '全部' }}；开始 {{ applied.from || '不限' }}；结束 {{ applied.to || '不限' }}；表格状态 {{ applied.status || '全部' }}；任务结果 {{ applied.outcome || '全部' }}；用量 {{ applied.usage || '全部' }}；搜索 {{ applied.q || '不限' }}；审计目标 {{ applied.targetId || '全部' }}。按创建时间降序，ID 降序。</p>
+        <p class="active-filters">数据范围：{{ applied.includeTest ? '全部数据，包含测试与模拟调用' : '正式数据，排除测试账号、测试应用和模拟调用' }}。全部时间按北京时间显示和筛选。</p>
         <p class="active-filters">指标仅按时间窗口统计。时间筛选也适用于任务、部署、模型调用列表；用户、应用、审计列表不支持时间筛选。所有者筛选仅适用于任务和应用。</p>
       </section>
       <p v-if="loading" role="status">正在读取后台记录与指标…</p>
@@ -151,16 +164,18 @@ onUnmounted(() => { epoch++ })
       <AdminMetrics v-if="metrics" :metrics="metrics" :filters="applied" @authorization-error="authorizationError" />
       <nav class="resource-nav" aria-label="管理资源"><button v-for="value in resources" :key="value" :aria-pressed="resource === value" :disabled="submitting" type="button" @click="switchResource(value)">{{ labels[value] }}</button></nav>
       <section :aria-label="`${labels[resource]}列表`">
-        <div class="section-title"><h2>{{ labels[resource] }}记录</h2><span>{{ loadedAt ? `数据读取于 ${loadedAt}` : '尚无已确认快照' }}</span></div>
+        <div class="section-title"><h2>{{ labels[resource] }}记录</h2><button v-if="resource === 'users'" type="button" class="button-primary" :disabled="loading || submitting" @click="userAction = { mode: 'create' }">创建账号</button><span>{{ loadedAt ? `数据读取于 ${loadedAt}` : '尚无已确认快照' }}</span></div>
         <p v-if="feedback" :role="feedbackError ? 'alert' : 'status'" class="operation-result" :class="{ error: feedbackError }">{{ feedback }}</p>
         <p v-if="listError" role="alert" class="error">表格不可用：{{ listError }}</p>
-        <AdminTable v-if="!listError" :resource="resource" :rows="rows" :busy="loading || submitting" :blocked="blocked" @cancel="openCancel" @unpublish="retire" />
+        <AdminTable v-if="!listError" :resource="resource" :rows="rows" :busy="loading || submitting" :blocked="blocked" @cancel="openCancel" @unpublish="retire" @account="userAction = { mode: 'status', user: $event }" @password="userAction = { mode: 'password', user: $event }" />
         <div v-if="!listError" class="pagination"><span>{{ loadedAt ? `共 ${total} 条 · 第 ${page + 1} 页` : '总数未知' }}</span><button type="button" class="button-secondary" :disabled="loading || submitting || page === 0" @click="page--; load()">上一页</button><button type="button" class="button-secondary" :disabled="loading || submitting || (page + 1) * size >= total" @click="page++; load()">下一页</button></div>
       </section>
-      <p class="footnote">后台仅提供观测和必要管理。取消操作以服务端状态与审计为准；刷新前表格保留已读取状态。</p>
+      <p v-if="buildVersion" class="footnote">当前版本 <a href="/version.json" target="_blank" rel="noopener noreferrer">{{ buildVersion.commit.slice(0, 12) }}</a> · 构建于 {{ beijingTime(buildVersion.builtAt) }}（北京时间）</p>
+      <p class="footnote">账号管理和任务取消均由服务端校验权限并保存操作记录。停用账号或重置密码会使旧会话失效。</p>
     </main>
+    <AdminUserDialog v-if="userAction" :mode="userAction.mode" :user="userAction.user" @close="userAction = undefined" @saved="accountSaved" @authorization-error="authorizationError" />
     <dialog v-if="target" ref="dialog" aria-labelledby="cancel-title" @cancel.prevent="closeCancel">
-      <form @submit.prevent="confirmCancel"><h2 id="cancel-title">确认取消任务</h2><p>任务 ID：<strong>{{ target.id }}</strong></p><p>应用 ID：{{ target.applicationId || '未知' }}</p><p>读取时状态：{{ target.status }}。服务端会再次检查目标状态；已完成的任务不可取消。</p><label>取消理由（1–200 字）<textarea v-model="reason" required maxlength="200" rows="3" :disabled="submitting" /></label><p>提交后不会自动重试。未获确认时，需要核对后台审计。</p><div class="dialog-actions"><button class="button-secondary" type="button" :disabled="submitting" @click="closeCancel">返回</button><button class="button-primary" type="submit" :disabled="submitting || !reason.trim()">{{ submitting ? '正在提交…' : '确认取消' }}</button></div></form>
+      <form @submit.prevent="confirmCancel"><h2 id="cancel-title">确认取消任务</h2><p>任务 ID：<strong>{{ target.id }}</strong></p><p>应用：{{ target.applicationName || '历史任务' }} · {{ target.ownerEmail }}</p><p>读取时状态：{{ statusLabel(target.status) }}。服务端会再次检查目标状态；已完成的任务不可取消。</p><label>取消理由（1–200 字）<textarea v-model="reason" required maxlength="200" rows="3" :disabled="submitting" /></label><p>提交后不会自动重试。未获确认时，需要核对后台审计。</p><div class="dialog-actions"><button class="button-secondary" type="button" :disabled="submitting" @click="closeCancel">返回</button><button class="button-primary" type="submit" :disabled="submitting || !reason.trim()">{{ submitting ? '正在提交…' : '确认取消' }}</button></div></form>
     </dialog>
   </div>
   <p v-else role="alert">需要管理员权限。</p>

@@ -40,6 +40,7 @@ server {
         proxy_cache off;
         proxy_read_timeout 600s;
     }
+    location = /version.json { expires -1; try_files $uri =404; }
     location = /api { default_type application/json; return 404 '{"code":"NOT_FOUND"}'; }
     location ^~ /api/ { default_type application/json; return 404 '{"code":"NOT_FOUND"}'; }
     location = /index.html {

@@ -181,7 +181,7 @@ public class PublicationService {
             } catch(RuntimeException failure) {
                 String code=Set.of("HOSTING_UNAVAILABLE","HOSTING_URL_INVALID","DEPLOYMENT_TIMEOUT","DEPLOYMENT_INTERRUPTED","DEPLOYMENT_BINDING_MISMATCH","DEPLOYMENT_PROBE_FAILED")
                         .contains(Objects.toString(failure.getMessage(),"")) ? failure.getMessage() : failure instanceof SnapshotFailure ? "DEPLOYMENT_SNAPSHOT_INVALID" : "DEPLOYMENT_FAILED";
-                jdbc.sql("UPDATE publications SET status='FAILED',url=NULL,published_at=NULL,updated_at=clock_timestamp(),row_version=row_version+1 WHERE id=? AND status='REQUESTED'").param(id).update();
+                jdbc.sql("UPDATE publications SET status='FAILED',failure_code=?,url=NULL,published_at=NULL,updated_at=clock_timestamp(),row_version=row_version+1 WHERE id=? AND status='REQUESTED'").params(code,id).update();
                 terminal(id,"FAILED",code);
             }
         });

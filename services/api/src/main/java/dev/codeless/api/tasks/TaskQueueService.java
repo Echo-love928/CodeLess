@@ -35,11 +35,11 @@ public class TaskQueueService {
 
     public record TaskView(UUID id, UUID applicationId, String prompt, TaskStatus status,
                            int repairAttempts, String failureCode, OffsetDateTime createdAt,
-                           OffsetDateTime updatedAt) {
-        static TaskView from(Task task) {
-            return new TaskView(task.id(), task.applicationId(), task.prompt(), task.status(),
-                    task.repairAttempts(), task.failureCode(), task.createdAt(), task.updatedAt());
-        }
+                           OffsetDateTime updatedAt, String cancelledBy) {}
+    private TaskView view(Task task) {
+        String actor = "CANCELLED".equals(task.failureCode()) ? jdbc.sql("SELECT cancelled_by FROM generation_tasks WHERE id=?")
+                .param(task.id()).query(String.class).optional().orElse("UNKNOWN") : null;
+        return new TaskView(task.id(),task.applicationId(),task.prompt(),task.status(),task.repairAttempts(),task.failureCode(),task.createdAt(),task.updatedAt(),actor);
     }
 
     public record Claim(UUID taskId, UUID token, TaskStatus stage) {}
@@ -55,12 +55,12 @@ public class TaskQueueService {
             if (prior.isPresent()) {
                 if (!prior.get().prompt().equals(prompt) || dev.codeless.api.edit.EditMetadata.find(jdbc,prior.get().id()).isPresent())
                     throw new AuthFailure(HttpStatus.CONFLICT, "IDEMPOTENCY_CONFLICT");
-                return TaskView.from(prior.get());
+                return view(prior.get());
             }
         }
         if (dev.codeless.api.edit.EditMetadata.active(jdbc,applicationId))
             throw new AuthFailure(HttpStatus.CONFLICT, "EDIT_TASK_ACTIVE");
-        return TaskView.from(repository.createTask(UUID.randomUUID(), applicationId, prompt, key));
+        return view(repository.createTask(UUID.randomUUID(), applicationId, prompt, key));
     }
 
     public Optional<TaskView> find(UUID ownerId, UUID taskId) {
@@ -68,7 +68,7 @@ public class TaskQueueService {
                 SELECT t.id FROM generation_tasks t JOIN applications a ON a.id = t.application_id
                 WHERE t.id = ? AND a.owner_id = ?
                 """).params(taskId, ownerId).query(UUID.class).optional()
-                .flatMap(repository::findTask).map(TaskView::from);
+                .flatMap(repository::findTask).map(this::view);
     }
 
     public List<Event> events(UUID ownerId, UUID taskId) {
@@ -79,9 +79,10 @@ public class TaskQueueService {
     @Transactional
     public TaskView cancel(UUID ownerId, UUID taskId) {
         Task task = lockedOwnedTask(ownerId, taskId);
-        if (terminal(task.status())) return TaskView.from(task);
+        if (terminal(task.status())) return view(task);
         progress.transition(taskId, TaskStatus.FAILED, EventType.TASK_FAILED,
                 "Task cancelled by user", "CANCELLED");
+        jdbc.sql("UPDATE generation_tasks SET cancelled_by='USER' WHERE id=?").param(taskId).update();
         finish(taskId);
         drafts.failDrafts(taskId);
         return find(ownerId, taskId).orElseThrow();
@@ -102,6 +103,7 @@ public class TaskQueueService {
         if (terminal(task.status())) return Optional.of(new AdminCancel(task.status(), task.status(), false));
         progress.transition(taskId, TaskStatus.FAILED, EventType.TASK_FAILED,
                 "Task cancelled by administrator", "CANCELLED");
+        jdbc.sql("UPDATE generation_tasks SET cancelled_by='ADMIN' WHERE id=?").param(taskId).update();
         finish(taskId);
         drafts.failDrafts(taskId);
         return Optional.of(new AdminCancel(task.status(), TaskStatus.FAILED, true));
@@ -172,7 +174,7 @@ public class TaskQueueService {
         progress.transitionLeased(claim.taskId(), claim.token(), next, eventType, message, failureCode);
         if (terminal(next)) finish(claim.taskId());
         if (next == TaskStatus.FAILED) drafts.failDrafts(claim.taskId());
-        return TaskView.from(repository.findTask(claim.taskId()).orElseThrow());
+        return view(repository.findTask(claim.taskId()).orElseThrow());
     }
 
     @Transactional

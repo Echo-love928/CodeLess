@@ -8,7 +8,7 @@ import { editContext, useVisualEditFlow } from '../visual-edit/edit-flow'
 import TaskStatus from '../workbench/TaskStatus.vue'
 import TaskProgress from '../workbench/TaskProgress.vue'
 
-const props = defineProps<{ applicationId: string; versionId?: string | null; buildFailed?: boolean; refreshVersion?: () => Promise<void>; refreshKey?: string; taskId?: string; taskVersionIds?: string[] }>()
+const props = defineProps<{ applicationId: string; versionId?: string | null; buildFailed?: boolean; taskCancelled?: boolean; cancelledBy?: string | null; refreshVersion?: () => Promise<void>; refreshKey?: string; taskId?: string; taskVersionIds?: string[] }>()
 const emit = defineEmits<{ unauthorized: [] }>()
 const previewId = ref(props.versionId)
 const selected = ref<Version>()
@@ -73,7 +73,7 @@ onBeforeUnmount(() => { generation++; abort?.abort(); flow.reset() })
 
 <template>
   <div class="version-workspace">
-    <PreviewPanel :application-id="applicationId" :version-id="previewId" :build-failed="buildFailed" :refresh-version="refreshVersion" @unauthorized="emit('unauthorized')" />
+    <PreviewPanel :application-id="applicationId" :version-id="previewId" :build-failed="buildFailed" :task-cancelled="taskCancelled || editTask?.failureCode === `CANCELLED`" :cancelled-by="editTask?.failureCode === `CANCELLED` ? editTask.cancelledBy : cancelledBy" :refresh-version="refreshVersion" @unauthorized="emit('unauthorized')" />
     <section v-if="accepted" class="edit-result" aria-label="组件修改任务">
       <h2>组件修改任务</h2>
       <p>组件：{{ component }} · 基版本：{{ accepted.baseVersionId }}</p>

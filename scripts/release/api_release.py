@@ -157,7 +157,7 @@ def build(revision, output, log):
     shutil.copytree(repo, work)
     wrapper = work / 'services/api' / ('mvnw.cmd' if os.name == 'nt' else 'mvnw')
     command = ([os.environ.get('COMSPEC', 'cmd.exe'), '/d', '/c', str(wrapper)] if os.name == 'nt' else [str(wrapper)])
-    command += ['-B', '-f', str(work / 'services/api/pom.xml'), '-DskipTests', 'package']
+    command += ['-B', '-f', str(work / 'services/api/pom.xml'), '-DskipTests', '-Dcodeless.build.commit=' + revision, 'package']
     log.parent.mkdir(parents=True, exist_ok=True)
     runtime_preflight = []
     with log.open('xb') as stream:
@@ -180,7 +180,7 @@ def build(revision, output, log):
     entries = inventory(output)
     value = {'schema': 'codeless-api-release-v1', 'sourceCommit': revision,
              'component': 'api', 'status': 'CANDIDATE_HOLD', 'files': entries, 'sourceFiles': provenance,
-             'build': {'command': ['mvnw', '-B', '-f', 'services/api/pom.xml', '-DskipTests', 'package'],
+             'build': {'command': ['mvnw', '-B', '-f', 'services/api/pom.xml', '-DskipTests', '-Dcodeless.build.commit=' + revision, 'package'],
                        'exitCode': result.returncode, 'logSha256': sha(log.read_bytes()),
                        'javaVersion': (r.stdout + r.stderr).decode().strip(), 'tests': 'NOT_RUN_BY_PACKAGE_BUILD'},
              'runtimeImportPreflight': runtime_preflight,
