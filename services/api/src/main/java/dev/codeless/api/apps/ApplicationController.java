@@ -105,7 +105,7 @@ public class ApplicationController {
         JsonNode value = body.get(field);
         if (value == null) return null;
         if (!value.isTextual() || value.asText().codePointCount(0, value.asText().length()) > max) invalid();
-        return value.asText();
+        return value.asText().strip();
     }
 
     private static UUID uuid(String value) {

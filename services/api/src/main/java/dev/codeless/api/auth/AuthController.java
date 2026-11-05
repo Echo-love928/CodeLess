@@ -62,13 +62,14 @@ public class AuthController {
         AuthAccountRepository.Account account = accounts.activeByEmail(email).orElse(null);
         // The attempt is counted before the password check: checking first and counting after the slow hash
         // let parallel guesses all pass the limit (D19-A: 17 of 24 concurrent guesses were evaluated).
-        if (!(account == null ? attempts.acquire(email) : attempts.acquireKnown(account.id()))) {
+        String address = request.getRemoteAddr();
+        if (!(account == null ? attempts.acquire(email, address) : attempts.acquireKnown(account.id(), address))) {
             throw new AuthFailure(HttpStatus.TOO_MANY_REQUESTS, "LOGIN_RATE_LIMITED");
         }
         if (account == null || !encoder.matches(password, account.hash())) {
             throw new AuthFailure(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS");
         }
-        attempts.succeededKnown(account.id());
+        attempts.succeededKnown(account.id(), address);
         request.changeSessionId();
         request.getSession(false).setAttribute(AuthFilter.USER_ID, account.id());
         request.getSession(false).setAttribute(AuthFilter.SESSION_VERSION,account.sessionVersion());

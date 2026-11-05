@@ -274,10 +274,10 @@ class TaskSseHttpTest extends PostgresTestBase {
             progress.transition(task, TaskStatus.GENERATE, EventType.STAGE_STARTED, secret, null);
             owner.post("/tasks/" + task + "/cancel", "{}");
             String history = owner.get("/tasks/" + task + "/events").body();
-            assertThat(history).contains("Stage started: GENERATE")
+            assertThat(history).contains("开始页面生成")
                     .doesNotContain("sk-test", "p@ss", "private", "internal.host", "forged");
             try (Wire wire = new Wire(owner.stream(task, "1", ""))) {
-                assertThat(wire.drain().getFirst().data()).contains("Stage started: GENERATE")
+                assertThat(wire.drain().getFirst().data()).contains("开始页面生成")
                         .doesNotContain("sk-test", "p@ss", "private", "internal.host", "forged");
             }
             assertThat(jdbc.queryForObject("SELECT message FROM task_events WHERE task_id=? AND sequence=2",

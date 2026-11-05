@@ -26,6 +26,7 @@ stream {
   server {
     listen 8443;
     ssl_preread on;
+    proxy_protocol on;
     proxy_connect_timeout 2s;
     proxy_timeout 600s;
     proxy_pass $destination;
@@ -39,8 +40,11 @@ stream {
     if (!values[name]) throw new Error('Unknown template field')
     return values[name]
   })
-  return { edge, platform: platformConfig, hosting: await hostingConfig({ publicOrigin: site.origin,
-    platformOrigin: platform.origin, previewOrigin: preview.origin }), publicOrigin: site.origin }
+  // The TCP edge preserves the original address. Only this private bridge may supply PROXY metadata.
+  const clientAddress = config => config.replaceAll('listen 8443 ssl', 'listen 8443 ssl proxy_protocol')
+    .replaceAll('server_tokens off;', 'server_tokens off;\n    set_real_ip_from 172.28.0.0/24;\n    real_ip_header proxy_protocol;')
+  return { edge, platform: clientAddress(platformConfig), hosting: clientAddress(await hostingConfig({ publicOrigin: site.origin,
+    platformOrigin: platform.origin, previewOrigin: preview.origin })), publicOrigin: site.origin }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

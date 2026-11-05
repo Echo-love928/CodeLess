@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
+import { formatDateTime } from '../../lib/display'
 import { ApiError } from '../../api/http'
 import { session } from '../auth/session'
 import { getVersion, type Version } from '../versions/version-api'
@@ -173,14 +174,15 @@ onBeforeUnmount(() => { epoch++; versionRequest++ })
       <p>确认后，此版本会拥有独立的公开地址。</p>
       <p v-if="!configured" role="alert">公开站点尚未配置，暂时无法发布。</p>
       <p v-if="loading" role="status">正在核对待发布版本…</p>
-      <p v-else-if="version">待发布版本：v{{ version.number }} · {{ version.status === 'VERIFIED' ? '已验证' : '未通过验证' }}<code>{{ version.id }}</code><code>{{ version.sourceDigest }}</code></p>
+      <p v-else-if="version">待发布版本：v{{ version.number }} · {{ version.status === 'VERIFIED' ? '已验证' : '未通过验证' }}</p>
       <p v-else>暂无可发布的已验证版本。</p>
-      <p v-if="artifactDigest">构建产物：<code>{{ artifactDigest }}</code></p>
+      <details v-if="artifactDigest"><summary>发布详情</summary><p>构建产物：<code>{{ artifactDigest }}</code></p></details>
       <SourceDownload :version="version" @unauthorized="emit('unauthorized')" />
       <p v-if="version && last && version.id !== last.versionId">当前选定版本与分享版本不同。分享地址对应下方成功发布版本；源码下载对应上方选定版本。</p>
       <label class="deploy-confirm"><input v-model="confirmed" type="checkbox" :disabled="!version || version.status !== 'VERIFIED' || locked">我确认公开发布上方版本</label>
       <button type="button" class="button-primary" :disabled="!canPublish" @click="publish">{{ posting ? '正在提交发布…' : '确认发布' }}</button>
-      <p v-if="current">本次发布：{{ current.id }}<br>版本：{{ current.versionId }}<br>状态：{{ { UNPUBLISHED: '已下线', REQUESTED: '已受理，正在部署与检查', PUBLISHED: '发布成功', FAILED: '发布失败' }[current.status] }}</p>
+      <p v-if="current">发布状态：{{ { UNPUBLISHED: '已下线', REQUESTED: '已受理，正在部署与检查', PUBLISHED: '发布成功', FAILED: '发布失败' }[current.status] }}</p>
+      <details v-if="current"><summary>本次发布详情</summary><p>发布编号：{{ current.id }}<br>版本：{{ current.versionId }}</p></details>
       <p v-if="current?.status === 'FAILED'" role="status">{{ publicationFailureDescription }}再次确认将创建新的发布记录。</p>
       <button type="button" class="button-secondary" :disabled="loading || posting || refreshing || recovering" @click="reload">重新读取版本与发布记录</button>
       <button v-if="current" type="button" class="button-secondary" :disabled="refreshing" @click="refresh">刷新发布状态</button>
@@ -190,7 +192,7 @@ onBeforeUnmount(() => { epoch++; versionRequest++ })
       <p v-if="uncertain" role="status">{{ publicationUnknownDescription }}</p>
       <p v-if="error" role="alert">{{ error }}</p><p v-if="notice" role="status">{{ notice }}</p>
       <p v-if="copyError" role="alert">{{ copyError }}</p>
-      <div v-if="last" class="deploy-success"><h3>上次成功发布</h3><p>分享版本：{{ last.versionId }}<br>部署编号：{{ last.id }}<br>发布时间：{{ last.publishedAt }}</p><DeploymentCover :key="last.id" :publication="last" @unauthorized="emit('unauthorized')" /><a :href="last.url ?? undefined" target="_blank" rel="noopener noreferrer">{{ last.url }}</a><button type="button" class="button-secondary" @click="copy">复制公开地址</button><button type="button" class="button-secondary" :disabled="locked" @click="retire(last)">{{ retiring ? '正在下线…' : '取消发布' }}</button></div>
+      <div v-if="last" class="deploy-success"><h3>上次成功发布</h3><p>发布时间：<time :datetime="last.publishedAt ?? undefined">{{ formatDateTime(last.publishedAt) }}（北京时间）</time></p><details><summary>发布记录详情</summary><p>分享版本：{{ last.versionId }}<br>部署编号：{{ last.id }}</p></details><DeploymentCover :key="last.id" :publication="last" @unauthorized="emit('unauthorized')" /><a :href="last.url ?? undefined" target="_blank" rel="noopener noreferrer">{{ last.url }}</a><button type="button" class="button-secondary" @click="copy">复制公开地址</button><button type="button" class="button-secondary" :disabled="locked" @click="retire(last)">{{ retiring ? '正在下线…' : '取消发布' }}</button></div>
       <section v-if="otherSites.length"><h3>其他在线网站</h3><ul><li v-for="site in otherSites" :key="site.id"><a :href="site.url ?? undefined" target="_blank" rel="noopener noreferrer">{{ site.url }}</a><button type="button" class="button-secondary" :disabled="locked" @click="retire(site)">{{ retiring ? '正在下线…' : '取消发布' }}</button></li></ul></section>
     </section>
   </div>

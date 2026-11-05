@@ -96,6 +96,23 @@ class ApplicationIntegrationTest extends PostgresTestBase {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Renamed"));
     }
 
+    @Test void descriptionsAreTrimmedAndArchivedVersionEndpointsReturnNotFound() throws Exception {
+        Browser demo = login("demo@codeless.local", "demo-password-for-test-only");
+        JsonNode app = create(demo, "{\"name\":\"Archive test\",\"description\":\"  简介  \",\"dataMode\":\"STATIC\"}");
+        assertThat(app.path("description").asText()).isEqualTo("简介");
+        UUID id = UUID.fromString(app.path("id").asText());
+        UUID version = UUID.fromString(app.path("baseVersionId").asText());
+        UUID owner = jdbc.queryForObject("SELECT owner_id FROM applications WHERE id=?", UUID.class, id);
+        applications.archive(owner, id);
+        for (String path : List.of("/applications/" + id, "/applications/" + id + "/versions",
+                "/versions/" + version, "/versions/" + version + "/files", "/versions/" + version + "/snapshot",
+                "/versions/" + version + "/files/content?path=src/pages/HomePage.vue", "/versions/" + version + "/export")) {
+            mvc.perform(get("/api/v0" + path).session(demo.session()))
+                    .andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("NOT_FOUND"));
+        }
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM application_versions WHERE id=?", Long.class, version)).isEqualTo(1L);
+    }
+
     @Test void invalidInputAndAuthenticationAreRejectedWithoutRows() throws Exception {
         Browser demo = login("demo@codeless.local", "demo-password-for-test-only");
         String[] invalid = {
@@ -164,7 +181,7 @@ class ApplicationIntegrationTest extends PostgresTestBase {
         }
         List<String> expected = ids.stream().sorted((a, b) -> b.compareTo(a)).toList();
         UUID ownerId = jdbc.queryForObject("SELECT id FROM platform_users WHERE email = 'demo@codeless.local'", UUID.class);
-        List<String> actual = jdbc.queryForList("SELECT id::text FROM applications WHERE owner_id = ? "
+        List<String> actual = jdbc.queryForList("SELECT id::text FROM applications WHERE owner_id = ? AND status = 'ACTIVE' "
                 + "ORDER BY created_at DESC, id DESC", String.class, ownerId);
         List<String> pageIds = new ArrayList<>();
         for (int page = 0; page < (actual.size() + 1) / 2; page++) {

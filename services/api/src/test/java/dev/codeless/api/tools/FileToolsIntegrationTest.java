@@ -98,13 +98,34 @@ class FileToolsIntegrationTest extends PostgresTestBase {
         assertThat(platform.listEvents(claim.taskId()).stream().filter(e -> e.message().startsWith("File tool")).map(e -> e.message()).toList())
                 .hasSize(5).allMatch(s -> s.contains("SUCCEEDED"));
         assertThat(platform.findTask(claim.taskId()).orElseThrow().status().name()).isEqualTo("GENERATE");
-        assertThat(jdbc.sql("SELECT changes->0->>'operation' FROM task_file_snapshots WHERE task_id=?").param(claim.taskId()).query(String.class).single()).isEqualTo("DELETED");
+        assertThat(jdbc.sql("SELECT jsonb_array_length(changes) FROM task_file_snapshots WHERE task_id=?").param(claim.taskId()).query(Integer.class).single()).isZero();
         evidence("D08-A-T1", java.util.Map.of("case", "D08-A-T1", "taskId", claim.taskId(), "results", List.of(create, read, update, list, delete),
                 "events", platform.listEvents(claim.taskId()), "snapshotSourceDigest", snapshot.source().sourceDigest()));
         var receipts = new java.util.ArrayList<tools.jackson.databind.JsonNode>();
         for (var result : List.of(create, read, update, list, delete))
             receipts.add(mapper.readTree(Files.readString(receipt(claim, result.callId(), "committed"))));
         evidence("tool-receipts", receipts);
+    }
+
+    @Test void diagnosticsRetainEveryChangedFileAndOriginalDigestAcrossToolCalls() throws Exception {
+        var claim = claim();
+        String page = "src/pages/TasksPage.vue", data = "src/data/activities.ts";
+        var first = run(claim, "create", args(page, "<template><h1>Tasks</h1></template>"));
+        var second = run(claim, "create", args(data, "export const activities = []"));
+        var updated = run(claim, "update", java.util.Map.of("path", page,
+                "content", "<template><h1>Updated tasks</h1></template>", "expectedDigest", first.afterDigest()));
+        assertThat(List.of(first.status(), second.status(), updated.status())).containsOnly("SUCCEEDED");
+        var changes = mapper.readTree(jdbc.sql("SELECT changes::text FROM task_file_snapshots WHERE task_id=?")
+                .param(claim.taskId()).query(String.class).single());
+        assertThat(changes.size()).isEqualTo(2);
+        assertThat(changes.get(0).path("path").asText()).isEqualTo(page);
+        assertThat(changes.get(0).path("operation").asText()).isEqualTo("ADDED");
+        assertThat(changes.get(0).path("beforeDigest").isNull()).isTrue();
+        assertThat(changes.get(0).path("afterDigest").asText()).isEqualTo(updated.afterDigest());
+        assertThat(changes.get(1).path("path").asText()).isEqualTo(data);
+        assertThat(run(claim, "delete", java.util.Map.of("path", data, "expectedDigest", second.afterDigest())).status()).isEqualTo("SUCCEEDED");
+        assertThat(jdbc.sql("SELECT jsonb_array_length(changes) FROM task_file_snapshots WHERE task_id=?")
+                .param(claim.taskId()).query(Integer.class).single()).isEqualTo(1);
     }
 
     @Test void d08aT2TraversalAbsoluteProtectedFilesAndSymlinkDirectoriesAreRejected() throws Exception {

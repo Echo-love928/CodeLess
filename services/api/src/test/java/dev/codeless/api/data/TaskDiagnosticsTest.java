@@ -89,6 +89,25 @@ class TaskDiagnosticsTest extends PostgresTestBase {
         assertThat(repository.listEvents(id)).hasSize(5);
     }
 
+    @Test void fileDeltasPreserveOriginalDigestAndRemoveRevertedChanges() {
+        var seed = seed();
+        UUID id = seed.claim().taskId(), token = seed.claim().token();
+        String path = "src/pages/Home.vue", next = "sha256:" + "b".repeat(64);
+        diagnostics.recordFileChange(id, token, new FileChange(path, "MODIFIED", DIGEST, next));
+        diagnostics.recordFileChange(id, token, new FileChange("src/data/activities.ts", "ADDED", null, DIGEST));
+        diagnostics.recordFileChange(id, token, new FileChange(path, "DELETED", next, null));
+        assertThat(diagnostics.read(seed.owner(), id).files().changes()).containsExactly(
+                new FileChange(path, "DELETED", DIGEST, null),
+                new FileChange("src/data/activities.ts", "ADDED", null, DIGEST));
+        diagnostics.recordFileChange(id, token, new FileChange(path, "ADDED", null, DIGEST));
+        assertThat(diagnostics.read(seed.owner(), id).files().changes()).containsExactly(
+                new FileChange("src/data/activities.ts", "ADDED", null, DIGEST));
+        queue.cancel(seed.owner(), id);
+        assertThatThrownBy(() -> diagnostics.recordFileChange(id, token,
+                new FileChange("src/data/activities.ts", "DELETED", DIGEST, null))).isInstanceOf(IllegalStateException.class);
+        assertThat(diagnostics.read(seed.owner(), id).files().changes()).hasSize(1);
+    }
+
     @Test void rejectsUnsafeMetadataAndInvalidLeaseWithoutPartialPersistence() {
         Seed seed = seed();
         UUID id = seed.claim().taskId();

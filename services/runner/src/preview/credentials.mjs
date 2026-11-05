@@ -19,7 +19,7 @@ export function readCredential(token, key, now = Date.now()) {
       ![source, artifact].every(value => digest.test(value)) || !/^\d{10}$/.test(issued) || !/^\d{10}$/.test(expires) ||
       !/^[a-f0-9]{32}$/.test(nonce) || Number(expires) - Number(issued) !== 120 ||
       Number(issued) > Math.floor(now / 1000) || Number(expires) <= Math.floor(now / 1000)) throw new Error('credential rejected')
-  return Object.freeze({ app, version, build, source, artifact, expires: Number(expires) })
+  return Object.freeze({ app, version, build, source, artifact, nonce, expires: Number(expires) })
 }
 export function previewOrigins(previewOrigin, platformOrigin) {
   const preview = new URL(previewOrigin), platform = new URL(platformOrigin)

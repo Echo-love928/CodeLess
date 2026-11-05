@@ -8,6 +8,14 @@ test('unified ingress preserves original isolation templates and routes only bou
   const result = await publicConfiguration(origins)
   assert.match(result.edge, /default 127\.0\.0\.1:9/)
   assert.match(result.edge, /ssl_preread on/)
+  assert.match(result.edge, /proxy_protocol on/)
+  for (const config of [result.platform, result.hosting]) {
+    assert.match(config, /listen 8443 ssl proxy_protocol/)
+    assert.match(config, /set_real_ip_from 172\.28\.0\.0\/24/)
+    assert.match(config, /real_ip_header proxy_protocol/)
+  }
+  assert.match(result.platform, /proxy_set_header X-Forwarded-For \$remote_addr/)
+  assert.match(result.platform, /proxy_set_header Forwarded ""/)
   assert.ok(result.edge.includes('~^v[a-f0-9]{32}\\.preview\\.codeless-preview\\.top$'))
   assert.ok(result.edge.includes('~^d[a-f0-9]{32}\\.sites\\.codeless-publish\\.top$'))
   assert.match(result.platform, /location \^~ \/internal\/ \{ return 404; \}/)

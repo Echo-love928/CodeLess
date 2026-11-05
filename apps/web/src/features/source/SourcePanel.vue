@@ -41,13 +41,12 @@ onBeforeUnmount(() => { generation++; abort?.abort() })
 
 <template>
   <section class="source-panel" aria-label="只读源码">
-    <h2>只读源码 <small v-if="version">版本 {{ version.number }} · {{ version.id }}</small></h2>
+    <h2>只读源码 <small v-if="version">版本 {{ version.number }}</small></h2>
     <SourceDownload :version="version" @unauthorized="emit('unauthorized')" />
     <p v-if="!version" role="status">选择一个版本查看源码。</p>
     <p v-else-if="loading" role="status">正在读取版本源码…</p>
     <div v-else-if="error"><p role="alert">{{ error }}</p><button type="button" class="button-secondary" @click="load">重试读取源码</button></div>
     <template v-else-if="snapshot">
-      <p class="source-digest">源码摘要：{{ snapshot.sourceDigest }}</p>
       <p v-if="!snapshot.files.length" role="status">此版本源码快照为空。</p>
       <template v-else>
         <label :for="`source-file-${version?.id}`">当前文件</label>

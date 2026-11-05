@@ -97,7 +97,7 @@ public class ApplicationService {
         return jdbc.sql("""
                 SELECT v.* FROM application_versions v
                 JOIN applications a ON a.id = v.application_id
-                WHERE v.id = ? AND a.owner_id = ?
+                WHERE v.id = ? AND a.owner_id = ? AND a.status = 'ACTIVE'
                 """).params(versionId, ownerId).query((rs, row) -> new VersionView(
                 uuid(rs, "id"), uuid(rs, "application_id"), rs.getInt("number"),
                 rs.getString("source_digest"), rs.getString("status"), uuid(rs, "build_id"),

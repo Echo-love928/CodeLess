@@ -55,7 +55,9 @@ test('D11-B-T1: versionId selects matching source and rendered preview', async (
   await expect(page.locator('.preview-panel__controls')).not.toContainText(ids[0])
   await expect(page.locator('iframe')).toHaveAttribute('src', new RegExp(`v${ids[0].replaceAll('-', '')}\\.preview\\.`))
   expect(state.sourceIds.at(-1)).toBe(ids[0]); expect(state.credentialIds.at(-1)).toBe(ids[0])
-  await expect(page.locator(`[data-version-id="${ids[0]}"]`)).toContainText('未提供来源任务')
+  const versionRow = page.locator(`[data-version-id="${ids[0]}"]`)
+  await expect(versionRow).not.toContainText('未提供来源任务')
+  await expect(versionRow.getByRole('link', { name: '查看生成过程' })).toHaveCount(0)
   await page.screenshot({ path: resolve(evidence, 'T1-version-switch.png'), fullPage: true })
 })
 

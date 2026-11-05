@@ -3,91 +3,57 @@ package dev.codeless.api.auth;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
+/** A failing client cannot lock an account for clients at other addresses. */
 @Component
 public class LoginAttempts {
-    private static final int MAX_UNKNOWN_KEYS = 10000;
-    // Only accounts already present in PostgreSQL can enter this map. Anonymous
-    // identifiers cannot evict a real account's lockout state.
-    private final ConcurrentHashMap<UUID, Attempt> knownAccounts = new ConcurrentHashMap<>();
-    private final Map<String, Attempt> unknownEmails = new LinkedHashMap<>(16, 0.75f, true);
-    private final Clock clock = Clock.systemUTC();
+    private static final int MAX_KEYS = 10000;
+    private final Map<Key, Attempt> unknown = new LinkedHashMap<>();
+    private final Map<UUID, Map<Key, Attempt>> known = new HashMap<>();
+    private final Clock clock;
+    private record Key(String email, String address) {}
     private record Attempt(int failures, Instant until) {}
 
-    public boolean blockedKnown(UUID accountId) {
-        Attempt attempt = knownAccounts.get(accountId);
-        if (attempt == null) return false;
-        if (!clock.instant().isBefore(attempt.until())) {
-            knownAccounts.remove(accountId, attempt);
-            return false;
+    public LoginAttempts() { this(Clock.systemUTC()); }
+    LoginAttempts(Clock clock) { this.clock = clock; }
+
+    /** Reserve before the slow password hash so parallel guesses share the same limit. */
+    public synchronized boolean acquire(String email, String address) {
+        return acquire(unknown, new Key(email, address));
+    }
+
+    public synchronized boolean acquireKnown(UUID account, String address) {
+        return acquire(known.computeIfAbsent(account, ignored -> new LinkedHashMap<>()), new Key("", address));
+    }
+
+    private boolean acquire(Map<Key, Attempt> attempts, Key key) {
+        Instant now = clock.instant();
+        Attempt prior = attempts.get(key);
+        if (prior != null && !now.isBefore(prior.until())) { attempts.remove(key); prior = null; }
+        if (prior != null && prior.failures() >= 5) return false;
+        if (prior == null && attempts.size() >= MAX_KEYS) {
+            attempts.entrySet().removeIf(entry -> !now.isBefore(entry.getValue().until()));
+            if (attempts.size() >= MAX_KEYS) {
+                // Only real account IDs allocate these maps. A flood of unknown emails cannot affect them.
+                // Discard the oldest key instead of denying every new client when a map is full.
+                attempts.remove(attempts.keySet().iterator().next());
+            }
         }
-        return attempt.failures() >= 5;
-    }
-
-    public void failedKnown(UUID accountId) {
-        knownAccounts.compute(accountId, (ignored, prior) -> next(prior, clock.instant()));
-    }
-
-    /**
-     * Counts this attempt as a failure before the password is checked, atomically with the limit check, so parallel
-     * guesses cannot all pass {@link #blockedKnown} while the slow hash comparison runs. False when already limited.
-     */
-    public boolean acquireKnown(UUID accountId) {
-        boolean[] acquired = {false};
-        knownAccounts.compute(accountId, (ignored, prior) -> {
-            Instant now = clock.instant();
-            if (limited(prior, now)) return prior;
-            acquired[0] = true;
-            return next(prior, now);
-        });
-        return acquired[0];
-    }
-
-    public void succeededKnown(UUID accountId) {
-        knownAccounts.remove(accountId);
-    }
-
-    public synchronized boolean blocked(String email) {
-        Attempt attempt = unknownEmails.get(email);
-        if (attempt == null) return false;
-        if (!clock.instant().isBefore(attempt.until())) {
-            unknownEmails.remove(email);
-            return false;
-        }
-        return attempt.failures() >= 5;
-    }
-
-    /** {@link #acquireKnown} for identifiers without an account. */
-    public synchronized boolean acquire(String email) {
-        if (limited(unknownEmails.get(email), clock.instant())) return false;
-        failed(email);
+        attempts.put(key, new Attempt(prior == null ? 1 : prior.failures() + 1,
+                prior == null ? now.plus(Duration.ofMinutes(15)) : prior.until()));
         return true;
     }
 
-    public synchronized void failed(String email) {
-        Instant now = clock.instant();
-        Attempt prior = unknownEmails.get(email);
-        if (prior == null && unknownEmails.size() >= MAX_UNKNOWN_KEYS) {
-            unknownEmails.entrySet().removeIf(entry -> !now.isBefore(entry.getValue().until()));
-            if (unknownEmails.size() >= MAX_UNKNOWN_KEYS) {
-                String eldest = unknownEmails.keySet().iterator().next();
-                unknownEmails.remove(eldest);
-            }
+    public synchronized void succeededKnown(UUID account, String address) {
+        Map<Key, Attempt> attempts = known.get(account);
+        if (attempts != null) {
+            attempts.remove(new Key("", address));
+            if (attempts.isEmpty()) known.remove(account);
         }
-        unknownEmails.put(email, next(prior, now));
-    }
-
-    private static boolean limited(Attempt attempt, Instant now) {
-        return attempt != null && now.isBefore(attempt.until()) && attempt.failures() >= 5;
-    }
-
-    private static Attempt next(Attempt prior, Instant now) {
-        int failures = prior == null || !now.isBefore(prior.until()) ? 1 : prior.failures() + 1;
-        return new Attempt(failures, now.plus(Duration.ofMinutes(15)));
     }
 }

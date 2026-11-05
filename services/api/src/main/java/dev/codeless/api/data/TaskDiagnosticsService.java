@@ -7,6 +7,7 @@ import dev.codeless.api.data.PlatformModels.TaskStatus;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -37,6 +38,26 @@ public class TaskDiagnosticsService {
     public record BuildView(UUID id, UUID versionId, String status, Integer exitCode,
                             String artifactDigest, OffsetDateTime createdAt, OffsetDateTime completedAt) {}
     public record Diagnostics(UUID taskId, FileSnapshot files, List<BuildView> builds) {}
+
+    /** File tools report deltas; retain every path and its original digest for the whole task. */
+    @Transactional
+    public void recordFileChange(UUID taskId, UUID leaseToken, FileChange change) {
+        validate(List.of(change));
+        repository.lockTask(taskId);
+        FileSnapshot prior = jdbc.sql("SELECT revision, changes FROM task_file_snapshots WHERE task_id = ?")
+                .param(taskId).query((rs, row) -> new FileSnapshot(true, rs.getInt("revision"),
+                        List.of(mapper.readValue(rs.getString("changes"), FileChange[].class))))
+                .optional().orElse(new FileSnapshot(false, 0, List.of()));
+        var merged = new LinkedHashMap<String, FileChange>();
+        prior.changes().forEach(item -> merged.put(item.path(), item));
+        FileChange old = merged.get(change.path());
+        String before = old == null ? change.beforeDigest() : old.beforeDigest();
+        String after = change.afterDigest();
+        if (Objects.equals(before, after)) merged.remove(change.path());
+        else merged.put(change.path(), new FileChange(change.path(),
+                before == null ? "ADDED" : after == null ? "DELETED" : "MODIFIED", before, after));
+        recordFiles(taskId, leaseToken, prior.revision(), List.copyOf(merged.values()));
+    }
 
     /** Future trusted producer entry point: fenced by the active lease and expected snapshot revision. */
     @Transactional

@@ -23,6 +23,7 @@ export function createPreviewGateway({ signingKeyHex, previewOrigin, platformOri
   const key = signingKey(signingKeyHex)
   const { preview, platform } = previewOrigins(previewOrigin, platformOrigin)
   const mappings = new Map()
+  const consumed = new Map()
   const policy = "default-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; " +
     "connect-src 'self'; worker-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; " +
     "sandbox allow-scripts allow-same-origin; frame-ancestors " + platform.origin
@@ -61,6 +62,11 @@ export function createPreviewGateway({ signingKeyHex, previewOrigin, platformOri
       // A closed handle is never resurrected by a stale mapping.
       const target = browserTarget(mapping.handle)
       if (start) {
+        const seconds = Math.floor(now() / 1000)
+        for (const [nonce, expires] of consumed) if (expires <= seconds) consumed.delete(nonce)
+        // Never evict an unexpired nonce: concurrent exchanges must admit exactly one request.
+        if (consumed.has(claims.nonce) || consumed.size >= 10000) return deny(response, 403)
+        consumed.set(claims.nonce, claims.expires)
         response.writeHead(303, { ...headers, Location: '/',
           'Set-Cookie': '__Host-codeless-preview=' + token + '; Path=/; Secure; HttpOnly; SameSite=None; Partitioned; Max-Age=' +
             Math.max(0, claims.expires - Math.floor(now() / 1000)) })
@@ -111,7 +117,7 @@ export function createPreviewGateway({ signingKeyHex, previewOrigin, platformOri
     },
     revoke(applicationId, versionId) { mappings.delete(applicationId + ':' + versionId) },
     close: () => new Promise((done, reject) => {
-      mappings.clear(); server.close(error => error ? reject(error) : done()); server.closeAllConnections()
+      mappings.clear(); consumed.clear(); server.close(error => error ? reject(error) : done()); server.closeAllConnections()
     })
   }
 }

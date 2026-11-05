@@ -45,7 +45,7 @@ onBeforeUnmount(reset)
   <div class="source-download">
     <button ref="button" type="button" class="button-secondary" :disabled="version?.status !== 'VERIFIED' || loading" @click="download">{{ loading ? '正在校验源码包…' : version ? `下载源码 · v${version.number}` : '下载源码' }}</button>
     <p v-if="version && version.status !== 'VERIFIED'" role="status">{{ version.status === 'DRAFT' ? '草稿版本尚未验证，暂不可下载源码。' : '验证失败的版本不可下载源码。' }}</p>
-    <p v-if="version" class="download-binding">下载版本：{{ version.id }}<br>源码摘要：{{ version.sourceDigest }}</p>
+    <details v-if="version" class="download-binding"><summary>版本详情</summary><p>版本编号：{{ version.id }}<br>源码摘要：{{ version.sourceDigest }}</p></details>
     <p v-if="error" role="alert">{{ error }}</p><p v-if="notice" role="status">{{ notice }}</p>
   </div>
 </template>

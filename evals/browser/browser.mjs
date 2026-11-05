@@ -7,6 +7,21 @@ import { expect } from '@playwright/test'
 import { behavior } from './cases.mjs'
 import { sha } from './core.mjs'
 
+// Runs inside Chromium. Shared navigation alone does not prove a generated page rendered.
+export function hasPageContent() {
+  if (!document.body) return false
+  const text = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+  for (let node = text.nextNode(); node; node = text.nextNode()) {
+    const element = node.parentElement
+    if (!node.textContent.trim() || !element || element.closest('nav, [role="navigation"], script, style, template')) continue
+    if (!element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) continue
+    const range = document.createRange()
+    range.selectNodeContents(node)
+    if ([...range.getClientRects()].some(rect => rect.width > 0 && rect.height > 0)) return true
+  }
+  return false
+}
+
 // Only a manifest-backed disposable loopback server is reachable by generated JS.
 export async function inspect(browser, artifact, { id, route, query = '', output, action = null }) {
   await mkdir(output, { recursive: true })
@@ -56,7 +71,7 @@ export async function inspect(browser, artifact, { id, route, query = '', output
     // Use the existing 4s action deadline, once, before deciding the page is blank.
     const started = Date.now()
     try {
-      await page.waitForFunction(() => Boolean(document.body?.innerText.trim() && document.body.getBoundingClientRect().height), null, { timeout: 4000 })
+      await page.waitForFunction(hasPageContent, null, { timeout: 4000 })
       result.readiness = { status: 'VISIBLE', elapsedMs: Date.now() - started }
     } catch (error) {
       result.readiness = { status: 'EMPTY_AT_DEADLINE', elapsedMs: Date.now() - started }
