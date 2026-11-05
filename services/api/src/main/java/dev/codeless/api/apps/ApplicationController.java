@@ -70,8 +70,8 @@ public class ApplicationController {
     }
 
     @DeleteMapping("/applications/{applicationId}")
-    public ResponseEntity<Void> delete(@PathVariable String applicationId, HttpServletRequest request) {
-        applications.archive(ownership.userId(request), uuid(applicationId));
+    public ResponseEntity<Void> delete(@PathVariable String applicationId, @RequestParam(defaultValue="false") boolean unpublish, HttpServletRequest request) {
+        applications.archive(ownership.userId(request), uuid(applicationId),unpublish);
         return ResponseEntity.noContent().header("Cache-Control", "no-store").build();
     }
 

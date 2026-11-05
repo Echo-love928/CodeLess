@@ -351,3 +351,13 @@ button.club-page__title { border: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+.mobile-menu-toggle, .mobile-logout { display: none; }
+@media (max-width: 640px) {
+  .app-sidebar { flex-wrap: wrap; }
+  .mobile-menu-toggle { display: block; min-height: 44px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 6px; }
+  .app-sidebar .app-nav { display: none; width: 100%; }
+  .app-sidebar .app-nav.mobile-open { display: flex; flex-direction: column; gap: 8px; }
+  .app-sidebar .app-nav.mobile-open .app-nav__item { display: flex; min-height: 44px; font-size: 14px; }
+  .app-topbar button { display: inline-flex; min-height: 44px; }
+}

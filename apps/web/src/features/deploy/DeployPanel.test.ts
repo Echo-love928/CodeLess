@@ -128,3 +128,13 @@ it('an old successful idempotent replay reconciles the independent newer success
   expect(wrapper.get('a').attributes('href')).toBe(publication('PUBLISHED', id2).url)
   wrapper.unmount()
 })
+
+it('latest share URL is rendered once and historical publications retain separate unpublish controls', async () => {
+  vi.mocked(listPublications).mockResolvedValue({ items: [publication('PUBLISHED', id2),publication('PUBLISHED', id1)], latestSuccessful: publication('PUBLISHED', id2) })
+  const wrapper = await panel()
+  const urls = wrapper.findAll('a').map(link => link.attributes('href'))
+  expect(urls).toEqual([publication('PUBLISHED', id2).url,publication('PUBLISHED', id1).url])
+  expect(wrapper.findAll('button').filter(button => button.text() === '取消发布')).toHaveLength(2)
+  expect(wrapper.get('.deploy-success a').attributes('href')).toBe(publication('PUBLISHED', id2).url)
+  wrapper.unmount()
+})

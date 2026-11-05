@@ -32,7 +32,15 @@ export function recordCaptureOwner(evidence,args,env=process.env) {
 // Test-private rendered configuration only. Timeouts, upstreams, routes and credential isolation stay unchanged.
 export function instrumentConfig(config) {
   assert.equal(config.split('upstream codeless_preview_gateway {').length,2)
-  assert.equal([...config.matchAll(/access_log off;\r?\n    root /g)].length,1)
+  // Headers may sit between access_log and root. Bind to the one platform server,
+  // never the credential-bearing preview server or an incidental adjacent line.
+  const roots = [...config.matchAll(/^    root \/usr\/share\/nginx\/html;\r?$/gm)]
+  assert.equal(roots.length,1)
+  const rootIndex = roots[0].index, serverStart = config.lastIndexOf('server {', rootIndex)
+  assert.ok(serverStart >= 0)
+  const platform = config.slice(serverStart, rootIndex)
+  assert.equal([...platform.matchAll(/^    access_log off;\r?$/gm)].length,1)
+  const instrumented = config.slice(0,serverStart) + platform.replace(/^    access_log off;/m,'    access_log /dev/stdout d10_api_timing if=$d10_api_route;') + config.slice(rootIndex)
   const format=`log_format d10_api_timing escape=json '{"kind":"ingress.api","route":"$d10_api_route","at":"$time_iso8601","id":"$upstream_http_x_codeless_diagnostic_id","status":$status,"upstream":"$upstream_addr","requestSeconds":"$request_time","connectSeconds":"$upstream_connect_time","headerSeconds":"$upstream_header_time","responseSeconds":"$upstream_response_time","upstreamStatus":"$upstream_status"}';
 map "$request_method:$uri" $d10_api_route {
     default 0;
@@ -42,8 +50,7 @@ map "$request_method:$uri" $d10_api_route {
     "~^GET:/api/v0/tasks/${uuid}$" task;
 }
 `
-  return config.replace('upstream codeless_preview_gateway {',format+'upstream codeless_preview_gateway {')
-    .replace(/access_log off;(\r?\n)    root /,'access_log /dev/stdout d10_api_timing if=$d10_api_route;$1    root ')
+  return instrumented.replace('upstream codeless_preview_gateway {',format+'upstream codeless_preview_gateway {')
 }
 
 // Persist an allowlist, never raw nginx error lines (which may include credential-bearing URIs).

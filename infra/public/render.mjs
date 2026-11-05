@@ -32,7 +32,7 @@ stream {
   }
 }
 `
-  const values = { CODELESS_PLATFORM_HOST: platform.hostname, CODELESS_PREVIEW_HOST: preview.hostname,
+  const values = { CODELESS_PLATFORM_HOST: platform.hostname, CODELESS_PREVIEW_HOST: preview.hostname, CODELESS_PREVIEW_AUTHORITY: preview.host,
     CODELESS_API_PORT: '8080', CODELESS_PREVIEW_GATEWAY_PORT: '8788' }
   const template = await readFile(new URL('../preview/nginx.conf.template', import.meta.url), 'utf8')
   const platformConfig = template.replace(/\$\{(CODELESS_[A-Z_]+)\}/g, (_, name) => {

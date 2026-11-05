@@ -11,6 +11,7 @@ export interface AdminRecord {
   applicationId?: string | null; versionId?: string | null; taskId?: string | null
   name?: string | null; email?: string | null; role?: string | null; model?: string | null
   inputTokens?: number | null; outputTokens?: number | null; failureCode?: string | null
+  dailyTasksUsed?: number; dailyTaskLimit?: number
   cancellable?: boolean
   requestedBy?: string | null; usage?: string | null; actorId?: string; targetId?: string; reason?: string; outcome?: string
 }
@@ -107,7 +108,7 @@ function bucket(value: unknown, deployment = false): Outcomes {
   const succeeded = row[success] as number, failed = row.failed as number, denominator = succeeded + failed
   const cancelled = deployment ? 0 : row.cancelled as number
   const ratio = denominator ? Math.round(succeeded * 10000 / denominator) / 10000 : null
-  if (row.denominator !== denominator || row.successRate !== ratio || row.total !== denominator + (row[pending] as number) + cancelled) invalid()
+  if (row.denominator !== denominator || row.successRate !== ratio || row.total !== denominator + (row[pending] as number) + cancelled + (deployment ? Number(row.unpublished ?? 0) : 0)) invalid()
   return { succeeded, failed, pending: row[pending] as number, cancelled, denominator, rate: ratio }
 }
 export async function getMetrics(filters: Filters): Promise<Metrics> {
@@ -190,8 +191,14 @@ export function successRate(value: Outcomes) {
 }
 export const cancellable = (row: AdminRecord) => row.cancellable === true && ['PLAN', 'GENERATE', 'VERIFY', 'REPAIR'].includes(row.status ?? '')
 export function statusLabel(status?: string | null) {
-  const labels: Record<string, string> = { READY: '成功', PUBLISHED: '成功', SUCCEEDED: '成功', FAILED: '失败',
+  const labels: Record<string, string> = { UNPUBLISHED: '已下线', READY: '成功', PUBLISHED: '成功', SUCCEEDED: '成功', FAILED: '失败',
     PLAN: '计划中', GENERATE: '生成中', VERIFY: '验证中', REPAIR: '修复中', REQUESTED: '等待处理',
     ACTIVE: '启用', DISABLED: '停用', ARCHIVED: '归档', CANCELLED: '已取消', ALREADY_TERMINAL: '已经终止', NOT_FOUND: '目标不存在', UNKNOWN: '未知', USER: '普通用户', ADMIN: '管理员' }
   return status && labels[status] ? `${labels[status]} · ${status}` : `未知${status ? ` · ${status}` : ''}`
+}
+
+export async function unpublishSite(id: string): Promise<void> {
+  requireAdmin()
+  if (!uuid.test(id) || !session.csrfToken) throw new Error('请刷新登录状态。')
+  await requestJson(`${base}/publications/${id}`, { method: 'DELETE', headers: { 'X-CSRF-Token': session.csrfToken } })
 }

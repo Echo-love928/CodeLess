@@ -28,6 +28,15 @@ public class PublicationController {
         return response(HttpStatus.ACCEPTED,service.request(ownership.userId(request),uuid(body.path("applicationId").asText()),
                 uuid(body.path("versionId").asText()),body.path("artifactDigest").asText(),key));
     }
+    @DeleteMapping("/publications/{publicationId}")
+    public ResponseEntity<PublicationService.View> unpublish(@PathVariable String publicationId,HttpServletRequest request) {
+        return response(HttpStatus.OK,service.unpublish(ownership.userId(request),uuid(publicationId),false));
+    }
+    @DeleteMapping("/admin/publications/{publicationId}")
+    public ResponseEntity<PublicationService.View> adminUnpublish(@PathVariable String publicationId,HttpServletRequest request) {
+        ownership.requireAdmin(request);
+        return response(HttpStatus.OK,service.unpublish(ownership.userId(request),uuid(publicationId),true));
+    }
     @GetMapping("/publications/{publicationId}")
     public ResponseEntity<PublicationService.View> get(@PathVariable String publicationId,HttpServletRequest request) {
         return response(HttpStatus.OK,service.get(ownership.userId(request),uuid(publicationId)));

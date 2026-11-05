@@ -4,6 +4,10 @@ spring:
     username: ${CODELESS_TEST_DATABASE_USER}
     password: ${CODELESS_TEST_DATABASE_PASSWORD}
 codeless:
+  capacity:
+    # The integration suite reuses demo users for hundreds of unrelated scenarios.
+    # Quota-specific tests construct their own bounded policy and isolated owners.
+    user-daily-tasks: 10000
   deploy:
     worker-enabled: false
   model:

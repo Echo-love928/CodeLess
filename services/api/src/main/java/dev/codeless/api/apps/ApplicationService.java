@@ -23,7 +23,8 @@ public class ApplicationService {
             """;
     private final JdbcClient jdbc;
 
-    public ApplicationService(JdbcClient jdbc) { this.jdbc = jdbc; }
+    private final dev.codeless.api.deploy.PublicationService publications;
+    public ApplicationService(JdbcClient jdbc,dev.codeless.api.deploy.PublicationService publications) { this.jdbc = jdbc; this.publications=publications; }
 
     public record ApplicationView(UUID id, String name, String description, String template,
                                   String dataMode, String status, UUID baseVersionId,
@@ -74,16 +75,20 @@ public class ApplicationService {
 
     /** Keep referenced versions, billing/audit records and published sites; remove the project from the workspace. */
     @Transactional
-    public void archive(UUID ownerId, UUID applicationId) {
+    public void archive(UUID ownerId, UUID applicationId) { archive(ownerId,applicationId,false); }
+
+    @Transactional
+    public void archive(UUID ownerId, UUID applicationId, boolean unpublish) {
         String status = jdbc.sql("SELECT status FROM applications WHERE id = ? AND owner_id = ? FOR UPDATE")
                 .params(applicationId, ownerId).query(String.class).optional()
                 .orElseThrow(() -> new AuthFailure(HttpStatus.NOT_FOUND, "NOT_FOUND"));
-        if ("ARCHIVED".equals(status)) return;
+        if ("ARCHIVED".equals(status)) { if(unpublish) publications.unpublishApplication(ownerId,applicationId); return; }
         boolean busy = jdbc.sql("""
                 SELECT EXISTS(SELECT 1 FROM generation_tasks WHERE application_id = ? AND status NOT IN ('READY','FAILED'))
                     OR EXISTS(SELECT 1 FROM publications WHERE application_id = ? AND status = 'REQUESTED')
                 """).params(applicationId, applicationId).query(Boolean.class).single();
         if (busy) throw new AuthFailure(HttpStatus.CONFLICT, "APPLICATION_BUSY");
+        if(unpublish) publications.unpublishApplication(ownerId,applicationId);
         jdbc.sql("UPDATE applications SET status = 'ARCHIVED', row_version = row_version + 1, updated_at = now() WHERE id = ?")
                 .param(applicationId).update();
     }

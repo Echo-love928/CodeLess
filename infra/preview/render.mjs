@@ -18,7 +18,7 @@ export async function renderPreviewDeployment(env=process.env) {
     const value=await stat(path);if(key==='CODELESS_WEB_DIST'?!value.isDirectory():!value.isFile())throw new Error('missing deployment input')
   }
   await stat(join(paths.CODELESS_WEB_DIST,'index.html'));await mkdir(output,{recursive:true,mode:0o700})
-  const values={CODELESS_PLATFORM_HOST:platform.hostname,CODELESS_PREVIEW_HOST:preview.hostname,CODELESS_API_PORT:port('CODELESS_API_PORT'),CODELESS_PREVIEW_GATEWAY_PORT:port('CODELESS_PREVIEW_GATEWAY_PORT')}
+  const values={CODELESS_PLATFORM_HOST:platform.hostname,CODELESS_PREVIEW_HOST:preview.hostname,CODELESS_PREVIEW_AUTHORITY:preview.host,CODELESS_API_PORT:port('CODELESS_API_PORT'),CODELESS_PREVIEW_GATEWAY_PORT:port('CODELESS_PREVIEW_GATEWAY_PORT')}
   const template=await readFile(new URL('./nginx.conf.template',import.meta.url),'utf8')
   const config=template.replace(/\u0024\{(CODELESS_[A-Z_]+)\}/g,(_,name)=>{if(!values[name])throw new Error('unknown template field');return values[name]})
   if(config.includes('CODELESS_'))throw new Error('unrendered deployment field')

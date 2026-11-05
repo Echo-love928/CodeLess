@@ -26,6 +26,14 @@ export async function requestJson<T>(path: string, init: RequestInit = {}): Prom
     throw new ApiError('network')
   }
   if (!response.ok) {
+    if (response.status === 429) {
+      const body = await response.json().catch(() => null)
+      if (body?.code === 'USER_DAILY_TASK_LIMIT') {
+        const error = new ApiError('rate-limited',429)
+        error.message = '今日生成与编辑任务配额已用完，请在北京时间次日 00:00 后重试。失败和取消的任务也计入用量。'
+        throw error
+      }
+    }
     // These error bodies are unused. Release the stream before rejecting so the
     // browser can finish the request (including anonymous session bootstrap).
     try { await response.body?.cancel() } catch { /* Preserve the original HTTP error. */ }

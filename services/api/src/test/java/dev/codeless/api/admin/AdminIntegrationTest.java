@@ -490,7 +490,7 @@ class AdminIntegrationTest extends PostgresTestBase {
         assertThat(mapper.writeValueAsString(users)).doesNotContain("$2a$", "password", "hash");
         Set<String> fields = new HashSet<>();
         users.at("/items/0").propertyNames().forEach(fields::add);
-        assertThat(fields).containsExactlyInAnyOrder("id", "email", "displayName", "status", "role", "applicationCount", "createdAt");
+        assertThat(fields).containsExactlyInAnyOrder("id", "email", "displayName", "status", "role", "applicationCount", "createdAt", "dailyTasksUsed", "dailyTaskLimit");
         evidence("D17-A-04.json", Map.of("case", "D17-A-04", "taskPage", page, "userFields", fields));
     }
 

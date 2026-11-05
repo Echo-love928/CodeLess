@@ -78,6 +78,10 @@ public final class NodeDeploymentGateway implements DeploymentGateway {
         catch(Exception failure) {throw new IllegalStateException("DEPLOYMENT_FAILED");}
         finally {if(child!=null && child.isAlive()) child.destroyForcibly();}
     }
+    @Override public void unpublish(UUID id,Instant deadline) {
+        var response=call("unpublish",new Payload(id,id,"",List.of()),null,deadline);
+        if(response==null || !response.path("unpublished").asBoolean()) throw new IllegalStateException("HOSTING_UNAVAILABLE");
+    }
     @Override public String publish(Payload payload,Instant deadline) {
         var response=call("publish",payload,null,deadline);
         if(response==null || !response.isObject() || response.size()!=1 || !response.path("url").isTextual())
