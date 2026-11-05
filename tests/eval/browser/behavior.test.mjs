@@ -4,7 +4,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { chromium } from '@playwright/test'
-import { inspect } from '../../../evals/browser/browser.mjs'
+import { inspect, hasPageContent } from '../../../evals/browser/browser.mjs'
 import { sha } from '../../../evals/browser/core.mjs'
 import { edits, editTarget, observeTarget, workTitles } from '../../../evals/edit/cases.mjs'
 import { resolveTarget, alreadyMatches } from '../../../evals/edit/targets.mjs'
@@ -17,6 +17,20 @@ before(async () => {
   browser = await chromium.launch({ headless: true, env })
 })
 after(async () => { await browser?.close() })
+
+test('shared navigation and hidden content do not hide an empty generated page', async () => {
+  const page = await browser.newPage()
+  try {
+    for (const nav of ['<nav>任务 目录</nav>', '<div role="navigation">任务 目录</div>']) {
+      await page.setContent(nav + '<main></main><section hidden>隐藏内容</section>')
+      assert.equal(await page.evaluate(hasPageContent), false)
+    }
+    await page.setContent('<nav>任务 目录</nav><main>待办事项</main>')
+    assert.equal(await page.evaluate(hasPageContent), true)
+    await page.setContent('<section>无 main 标签的页面内容</section>')
+    assert.equal(await page.evaluate(hasPageContent), true)
+  } finally { await page.close() }
+})
 
 // Independent plain DOM implementations, deliberately different from the Vue fixture.
 // Fields in cards and details use different labels; CAT-03 only opens from the name.

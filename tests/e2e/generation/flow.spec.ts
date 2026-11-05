@@ -50,6 +50,8 @@ test('D10-B success fixture: missing component -> real failed build -> repair ->
   await expect(page.locator('.task-status')).not.toContainText('生成完成')
   fixture.advance('GENERATE'); fixture.advance('VERIFY'); fixture.recordRepairedBuild(); fixture.ready()
   await expect(page.locator('.task-status')).toContainText('生成完成')
+  await expect(page.getByText('已执行修复：1 / 3 轮', { exact: true })).toBeHidden()
+  await page.locator('.task-status summary').click()
   await expect(page.getByText('已执行修复：1 / 3 轮', { exact: true })).toBeVisible()
   await expect(page.locator('iframe')).toHaveAttribute('src', new RegExp(fixture.newVersion.replaceAll('-', '')))
   await expect(page.frameLocator('iframe').getByRole('heading', { name: '林予安，设计与摄影' })).toBeVisible()

@@ -112,11 +112,12 @@ test('fixture: task 401 expires the session; task 404 blocks creation without cl
 
 test('structured diagnostics fixture: files and persisted build result survive reload; corrupt details do not claim success', async ({ page }) => {
   const fixture = await workbench(page)
-  await expect(page.getByText('尚无文件变更记录；生成生产者还未提供结果。')).toBeVisible()
+  await expect(page.getByText('文件生成后，变更记录会显示在这里。')).toBeVisible()
   fixture.setDetails(diagnosticsFixture)
   await expect(page.locator('[data-file-path="src/pages/Home.vue"]')).toContainText('新增')
   await expect(page.locator('[data-build-id]')).toContainText('构建失败')
-  await expect(page.locator('[data-build-id]')).toContainText('退出码：2')
+  await page.locator('[data-build-id]').getByText('构建详情', { exact: true }).click()
+  await expect(page.locator('[data-build-id]').getByText('退出码：2', { exact: false })).toBeVisible()
   await expect(page.locator('.task-status')).toContainText('正在规划')
   await page.reload()
   await expect(page.locator('[data-file-path="src/pages/Home.vue"]')).toBeVisible()
