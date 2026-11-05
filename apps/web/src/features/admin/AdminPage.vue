@@ -6,12 +6,12 @@ import { ApiError } from '../../api/http'
 import { clearSession, session } from '../auth/session'
 import AdminTable from './AdminTable.vue'
 import AdminMetrics from './AdminMetrics.vue'
-import { CancellationRejected, cancelTask, cancellable, getMetrics, listRecords, query, resources, type AdminRecord, type Filters, type Metrics, type Resource } from './admin-api'
+import { unpublishSite, CancellationRejected, cancelTask, cancellable, getMetrics, listRecords, query, resources, type AdminRecord, type Filters, type Metrics, type Resource } from './admin-api'
 
 const router = useRouter()
 const labels: Record<Resource, string> = { tasks: '任务', applications: '应用', deployments: '部署', users: '用户', 'model-calls': '模型调用', audit: '取消审计' }
 const statuses: Record<Resource, string[]> = { tasks: ['PLAN', 'GENERATE', 'VERIFY', 'REPAIR', 'READY', 'FAILED'],
-  applications: ['ACTIVE', 'ARCHIVED'], deployments: ['REQUESTED', 'PUBLISHED', 'FAILED'],
+  applications: ['ACTIVE', 'ARCHIVED'], deployments: ['REQUESTED', 'PUBLISHED', 'FAILED', 'UNPUBLISHED'],
   users: ['ACTIVE', 'DISABLED'], 'model-calls': ['REQUESTED', 'SUCCEEDED', 'FAILED'], audit: ['CANCELLED', 'ALREADY_TERMINAL', 'NOT_FOUND', 'FAILED', 'UNKNOWN'] }
 const empty = (): Filters => ({ status: '', ownerId: '', from: '', to: '' })
 const resource = ref<Resource>('tasks'), draft = ref(empty()), applied = ref(empty())
@@ -81,6 +81,13 @@ function switchResource(value: Resource) {
   }
   page.value = 0; void load()
 }
+async function retire(row: AdminRecord) {
+  if(submitting.value || !window.confirm(`确认下线网站 ${row.id}？原公开地址将停止访问。`)) return
+  submitting.value = true; feedback.value = ''
+  try { await unpublishSite(row.id); await load(); feedback.value = `网站 ${row.id} 已下线。`; feedbackError.value = false }
+  catch(error) { if(!(await authorizationError(error))) { feedback.value = error instanceof Error ? error.message : '下线失败，请刷新核对。'; feedbackError.value = true } }
+  finally { submitting.value = false }
+}
 async function openCancel(row: AdminRecord) {
   if (!permitted.value || !cancellable(row) || blocked.value.includes(row.id) || submitting.value) return
   target.value = { ...row }; reason.value = ''; await nextTick(); dialog.value?.showModal()
@@ -147,7 +154,7 @@ onUnmounted(() => { epoch++ })
         <div class="section-title"><h2>{{ labels[resource] }}记录</h2><span>{{ loadedAt ? `数据读取于 ${loadedAt}` : '尚无已确认快照' }}</span></div>
         <p v-if="feedback" :role="feedbackError ? 'alert' : 'status'" class="operation-result" :class="{ error: feedbackError }">{{ feedback }}</p>
         <p v-if="listError" role="alert" class="error">表格不可用：{{ listError }}</p>
-        <AdminTable v-if="!listError" :resource="resource" :rows="rows" :busy="loading || submitting" :blocked="blocked" @cancel="openCancel" />
+        <AdminTable v-if="!listError" :resource="resource" :rows="rows" :busy="loading || submitting" :blocked="blocked" @cancel="openCancel" @unpublish="retire" />
         <div v-if="!listError" class="pagination"><span>{{ loadedAt ? `共 ${total} 条 · 第 ${page + 1} 页` : '总数未知' }}</span><button type="button" class="button-secondary" :disabled="loading || submitting || page === 0" @click="page--; load()">上一页</button><button type="button" class="button-secondary" :disabled="loading || submitting || (page + 1) * size >= total" @click="page++; load()">下一页</button></div>
       </section>
       <p class="footnote">后台仅提供观测和必要管理。取消操作以服务端状态与审计为准；刷新前表格保留已读取状态。</p>

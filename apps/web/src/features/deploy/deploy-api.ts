@@ -6,7 +6,7 @@ import { dedicatedHostname, siteKey } from './site-policy'
 
 export interface Publication {
   id: string; applicationId: string; versionId: string; requestedBy: string
-  status: 'REQUESTED' | 'PUBLISHED' | 'FAILED'
+  status: 'REQUESTED' | 'PUBLISHED' | 'FAILED' | 'UNPUBLISHED'
   url?: string | null; createdAt: string; publishedAt?: string | null
 }
 let runtimeOrigin = ''
@@ -33,7 +33,7 @@ export async function loadPublicOrigin(): Promise<URL> {
 function publication(value: Publication, applicationId: string, versionId?: string, id?: string): Publication {
   if (!value || !uuid(value.id) || value.applicationId !== applicationId || !uuid(value.versionId) ||
     versionId && value.versionId !== versionId || id && value.id !== id || value.requestedBy !== session.user?.id ||
-    !['REQUESTED', 'PUBLISHED', 'FAILED'].includes(value.status) || !Number.isFinite(Date.parse(value.createdAt)) ||
+    !['REQUESTED', 'PUBLISHED', 'FAILED', 'UNPUBLISHED'].includes(value.status) || !Number.isFinite(Date.parse(value.createdAt)) ||
     value.status !== 'PUBLISHED' && (value.url != null || value.publishedAt != null))
     throw new Error('发布响应无法确认，请刷新发布状态。')
   if (value.status === 'PUBLISHED') {
@@ -89,4 +89,9 @@ export async function listPublications(applicationId: string): Promise<{ items: 
 export async function getPublication(id: string, applicationId: string, versionId?: string): Promise<Publication> {
   if (!uuid(id) || !uuid(applicationId)) throw new Error('发布记录入口无效。')
   return publication(await requestJson<Publication>(`/api/v0/publications/${id}`, { cache: 'no-store' }), applicationId, versionId, id)
+}
+
+export async function unpublishPublication(id: string): Promise<void> {
+  if (!uuid(id) || !session.csrfToken) throw new Error('请登录后取消发布。')
+  await requestJson(`/api/v0/publications/${id}`, { method: 'DELETE', headers: { 'X-CSRF-Token': session.csrfToken } })
 }

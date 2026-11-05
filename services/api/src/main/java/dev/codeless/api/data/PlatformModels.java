@@ -14,7 +14,7 @@ public final class PlatformModels {
     public enum EventType { STAGE_STARTED, STAGE_COMPLETED, TOOL_RESULT, REPAIR_REQUESTED, TASK_FAILED }
     public enum VersionStatus { DRAFT, VERIFIED, FAILED }
     public enum BuildStatus { QUEUED, RUNNING, SUCCEEDED, FAILED }
-    public enum PublicationStatus { REQUESTED, PUBLISHED, FAILED }
+    public enum PublicationStatus { REQUESTED, PUBLISHED, FAILED, UNPUBLISHED }
     public enum ModelCallStatus { REQUESTED, SUCCEEDED, FAILED }
 
     public record User(UUID id, String email, String displayName, UserStatus status,

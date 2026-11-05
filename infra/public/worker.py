@@ -174,7 +174,7 @@ def binding(request):
             raise ValueError('Invalid frozen source')
         return args, data, 240, 2 * 1024 * 1024, 'build'
     if args == [str(REPOSITORY / 'services/runner/src/publish/gateway-cli.mjs')]:
-        if len(data) > 48 * 1024 * 1024 or job.get('action') not in ('publish', 'probe'):
+        if len(data) > 48 * 1024 * 1024 or job.get('action') not in ('publish', 'probe', 'unpublish'):
             raise ValueError('Invalid publication request')
         expected = {'action', 'payload', 'deadline'} | ({'url'} if job['action'] == 'probe' else set())
         if set(job) != expected:

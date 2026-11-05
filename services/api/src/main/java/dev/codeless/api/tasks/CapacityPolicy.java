@@ -13,8 +13,10 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public final class CapacityPolicy {
     private final JdbcClient jdbc;
     private final int queue, user, app;
+    private final int daily;
+    public int dailyLimit() {return daily;}
     public CapacityPolicy(JdbcClient jdbc, Environment environment) {
-        this.jdbc=jdbc;
+        this.jdbc=jdbc; daily=limit(environment,"user-daily-tasks",10);
         queue=limit(environment,"queue",32); user=limit(environment,"user-active",16); app=limit(environment,"app-active",8);
     }
     public static int limit(Environment environment,String name,int fallback) {
@@ -38,6 +40,12 @@ public final class CapacityPolicy {
             throw busy;
         }
         jdbc.sql("SELECT set_config('lock_timeout',?,true)").param(previous).query(String.class).single();
+        long used=jdbc.sql("""
+                SELECT count(*) FROM generation_tasks t JOIN applications a ON a.id=t.application_id
+                WHERE a.owner_id=(SELECT owner_id FROM applications WHERE id=?)
+                  AND t.created_at >= (date_trunc('day',CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Shanghai') AT TIME ZONE 'Asia/Shanghai')
+                """).param(application).query(Long.class).single();
+        if(used>=daily) throw new AuthFailure(HttpStatus.TOO_MANY_REQUESTS,"USER_DAILY_TASK_LIMIT");
         long[] counts=jdbc.sql("""
                 SELECT count(*) FILTER(WHERE t.queue_state='QUEUED') AS queued,
                     count(*) FILTER(WHERE a.owner_id=target.owner_id) AS owned,

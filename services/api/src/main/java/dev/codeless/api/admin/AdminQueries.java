@@ -35,7 +35,7 @@ public class AdminQueries {
     }
     @JsonInclude(JsonInclude.Include.ALWAYS)
     public record User(UUID id, String email, String displayName, String status, String role,
-                       long applicationCount, OffsetDateTime createdAt) {}
+                       long applicationCount, OffsetDateTime createdAt, long dailyTasksUsed, int dailyTaskLimit) {}
     @JsonInclude(JsonInclude.Include.ALWAYS)
     public record Application(UUID id, UUID ownerId, String ownerEmail, String name, String status, String dataMode,
                               UUID latestReadyVersionId, OffsetDateTime createdAt, OffsetDateTime updatedAt) {}
@@ -64,7 +64,7 @@ public class AdminQueries {
     public record Generation(long total, long ready, long failed, long cancelled, long active, long denominator,
                              Double successRate, Map<String, Outcomes> byKind) {}
     @JsonInclude(JsonInclude.Include.ALWAYS)
-    public record Deployments(long total, long published, long failed, long inProgress, long denominator,
+    public record Deployments(long total, long published, long failed, long inProgress, long unpublished, long denominator,
                               Double successRate) {}
     @JsonInclude(JsonInclude.Include.ALWAYS)
     public record Repairs(long total, long tasksWithRepairs, long readyAfterRepair, long denominator,
@@ -100,7 +100,9 @@ public class AdminQueries {
 
     private final JdbcClient jdbc;
 
-    public AdminQueries(JdbcClient jdbc) {
+    private final dev.codeless.api.tasks.CapacityPolicy capacity;
+    public AdminQueries(JdbcClient jdbc, dev.codeless.api.tasks.CapacityPolicy capacity) {
+        this.capacity=capacity;
         this.jdbc = jdbc;
     }
 
@@ -114,11 +116,13 @@ public class AdminQueries {
         }
         return page("""
                 u.id, u.email, u.display_name, u.status, c.role, u.created_at,
-                (SELECT count(*) FROM applications a WHERE a.owner_id = u.id) AS application_count""",
+                (SELECT count(*) FROM applications a WHERE a.owner_id = u.id) AS application_count,
+                (SELECT count(*) FROM generation_tasks t JOIN applications a ON a.id=t.application_id
+                  WHERE a.owner_id=u.id AND t.created_at >= (date_trunc('day',CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Shanghai') AT TIME ZONE 'Asia/Shanghai')) AS daily_tasks_used""",
                 "platform_users u LEFT JOIN auth_credentials c ON c.user_id = u.id", where,
                 "u.created_at DESC, u.id DESC", (rs, n) -> new User(uuid(rs, "id"), rs.getString("email"),
                         rs.getString("display_name"), rs.getString("status"), rs.getString("role"),
-                        rs.getLong("application_count"), time(rs, "created_at")), page, size);
+                        rs.getLong("application_count"), time(rs, "created_at"),rs.getLong("daily_tasks_used"),capacity.dailyLimit()), page, size);
     }
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
@@ -219,10 +223,10 @@ public class AdminQueries {
         Deployments deployments = jdbc.sql("""
                 SELECT count(*) AS total, count(*) FILTER (WHERE p.status = 'PUBLISHED') AS published,
                        count(*) FILTER (WHERE p.status = 'FAILED') AS failed,
-                       count(*) FILTER (WHERE p.status = 'REQUESTED') AS in_progress
+                       count(*) FILTER (WHERE p.status = 'REQUESTED') AS in_progress, count(*) FILTER (WHERE p.status = 'UNPUBLISHED') AS unpublished
                 FROM publications p""" + publications.sql()).params(publications.params).query((rs, n) -> {
                     long published = rs.getLong("published"), failed = rs.getLong("failed");
-                    return new Deployments(rs.getLong("total"), published, failed, rs.getLong("in_progress"),
+                    return new Deployments(rs.getLong("total"), published, failed, rs.getLong("in_progress"),rs.getLong("unpublished"),
                             published + failed, ratio(published, published + failed));
                 }).single();
 

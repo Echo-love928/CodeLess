@@ -9,6 +9,8 @@ import ApplicationCover from './ApplicationCover.vue'
 import { redirectOnUnauthorized } from './redirect-on-unauthorized'
 import { clearSession, session, signOut } from '../auth/session'
 
+const mobileMenu = ref(false)
+const unpublishOnDelete = ref(true)
 const router = useRouter()
 const apps = ref<Application[]>([])
 const page = ref(0)
@@ -67,7 +69,7 @@ async function confirmDelete() {
   deleting.value = true
   deleteError.value = ''
   try {
-    await deleteApplication(app.id)
+    await deleteApplication(app.id,unpublishOnDelete.value)
     const remaining = Math.max(0, total.value - 1)
     if (page.value > 0 && page.value * pageSize >= remaining) page.value--
     deleteDialog.value?.close()
@@ -126,7 +128,14 @@ async function logout() {
     <aside class="app-sidebar">
       <router-link class="brand-link" to="/apps"><BrandLogo /></router-link>
       <div class="workspace-switch"><span class="workspace-avatar">{{ session.user?.displayName?.slice(0, 1) || '我' }}</span><span>个人空间<small>让小想法有个落点</small></span></div>
-      <nav class="app-nav" aria-label="主导航"><p>工作空间</p><router-link class="app-nav__item is-active" to="/apps" aria-current="page"><UiIcon name="grid" />我的应用<span class="app-nav__count">{{ apps.length }}</span></router-link><button class="app-nav__item" type="button" @click="openDialog"><UiIcon name="book" />开始使用</button></nav>
+      <button class="mobile-menu-toggle" type="button" :aria-expanded="mobileMenu" aria-controls="workspace-navigation" @click="mobileMenu = !mobileMenu">{{ mobileMenu ? '收起菜单' : '菜单' }}</button>
+      <nav id="workspace-navigation" class="app-nav" :class="{ 'mobile-open': mobileMenu }" aria-label="主导航">
+        <p>工作空间</p>
+        <router-link class="app-nav__item is-active" to="/apps" aria-current="page"><UiIcon name="grid" />我的应用<span class="app-nav__count">{{ apps.length }}</span></router-link>
+        <button class="app-nav__item" type="button" @click="openDialog"><UiIcon name="book" />开始使用</button>
+        <router-link v-if="session.status === 'authenticated' && session.user?.role === 'ADMIN'" class="app-nav__item" to="/admin"><UiIcon name="lock" />后台管理</router-link>
+        <button class="app-nav__item mobile-logout" type="button" :disabled="signingOut" @click="logout">{{ signingOut ? '退出中…' : '退出登录' }}</button>
+      </nav>
       <div class="sidebar-foot"><div class="sidebar-guide"><strong>从一页开始就很好。</strong><p>一个活动、一次展示，<br />把你的想法变成可以分享的页面。</p></div><div class="sidebar-profile"><span class="workspace-avatar">{{ session.user?.displayName?.slice(0, 1) || '我' }}</span><span>{{ session.user?.displayName }}<small>{{ session.user?.email }}</small></span><button type="button" :disabled="signingOut" @click="logout">{{ signingOut ? '退出中…' : '退出' }}</button></div></div>
     </aside>
     <div class="app-content">
@@ -160,7 +169,8 @@ async function logout() {
     <dialog ref="deleteDialog" class="create-dialog delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description" @cancel="escapeDelete" @close="deleteTarget = undefined">
       <form v-if="deleteTarget" @submit.prevent="confirmDelete">
         <h2 id="delete-title">删除项目“{{ deleteTarget.name }}”？</h2>
-        <p id="delete-description">项目将从“我的应用”中移除，已发布的网站、历史版本和调用记录会保留。</p>
+        <p id="delete-description">项目将从“我的应用”中移除，历史版本和调用记录会保留。取消勾选后，已发布网站仍可访问。</p>
+        <label><input v-model="unpublishOnDelete" type="checkbox" :disabled="deleting">同时下线所有已发布网站</label>
         <p v-if="deleteError" role="alert">{{ deleteError }}</p>
         <div class="dialog-actions"><button type="button" class="button-secondary" :disabled="deleting" autofocus @click="cancelDelete">取消</button><button type="submit" class="button-danger" :disabled="deleting">{{ deleting ? '删除中…' : '确认删除' }}</button></div>
       </form>

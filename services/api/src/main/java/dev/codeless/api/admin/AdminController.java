@@ -90,7 +90,7 @@ public class AdminController {
         ownership.requireAdmin(request);
         Query query = new Query(params, "status", "applicationId", "from", "to");
         return ok(queries.deployments(query.page(), query.size(),
-                query.oneOf("status", Set.of("REQUESTED", "PUBLISHED", "FAILED")), query.uuid("applicationId"),
+                query.oneOf("status", Set.of("REQUESTED", "PUBLISHED", "FAILED", "UNPUBLISHED")), query.uuid("applicationId"),
                 query.window()));
     }
 

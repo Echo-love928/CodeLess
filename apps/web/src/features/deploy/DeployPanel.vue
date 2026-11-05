@@ -3,7 +3,7 @@ import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { ApiError } from '../../api/http'
 import { session } from '../auth/session'
 import { getVersion, type Version } from '../versions/version-api'
-import { createPublication, getPublication, listPublications, verifiedArtifact, loadPublicOrigin, type Publication, type PublicationIntent } from './deploy-api'
+import { unpublishPublication, createPublication, getPublication, listPublications, verifiedArtifact, loadPublicOrigin, type Publication, type PublicationIntent } from './deploy-api'
 import DeploymentCover from './DeploymentCover.vue'
 import SourceDownload from '../source/SourceDownload.vue'
 import { publicationFailureDescription, publicationUnknownDescription } from '../workbench/failure-description'
@@ -17,9 +17,11 @@ const panelId = useId()
 const version = ref<Version>(), confirmed = ref(false), error = ref(''), notice = ref('')
 const copyError = ref('')
 const current = ref<Publication>(), last = ref<Publication>(), uncertain = ref(false)
+const publishedSites = ref<Publication[]>([])
+const retiring = ref(false)
 const configured = ref(false)
 const artifactDigest = ref(''), intent = ref<PublicationIntent>()
-const locked = computed(() => posting.value || refreshing.value || recovering.value || uncertain.value || current.value?.status === 'REQUESTED')
+const locked = computed(() => retiring.value || posting.value || refreshing.value || recovering.value || uncertain.value || current.value?.status === 'REQUESTED')
 const canPublish = computed(() => configured.value && !loading.value && !locked.value && confirmed.value &&
   !!artifactDigest.value && version.value?.status === 'VERIFIED' && version.value.id === props.versionId && session.status === 'authenticated')
 let epoch = 0, versionRequest = 0
@@ -36,9 +38,22 @@ function adopt(value: Publication) {
   if (current.value?.id === value.id && current.value.status !== 'REQUESTED' && value.status !== current.value.status)
     throw new Error('发布状态发生冲突，请联系维护者。')
   current.value = value; uncertain.value = false; intent.value = undefined
-  if (value.status === 'PUBLISHED') { last.value = value; notice.value = '发布成功，公开地址已通过访问检查。' }
+  if (value.status === 'PUBLISHED') { publishedSites.value = [value,...publishedSites.value.filter(site => site.id !== value.id)]; last.value = value; notice.value = '发布成功，公开地址已通过访问检查。' }
   if (value.status === 'FAILED') error.value = publicationFailureDescription
   save()
+}
+async function retire(site: Publication) {
+  if (locked.value || retiring.value || !window.confirm('取消发布后，此公开地址将无法访问。确认下线？')) return
+  const generation = epoch
+  retiring.value = true; error.value = ''
+  try {
+    await unpublishPublication(site.id)
+    if(generation !== epoch) return
+    if(current.value?.id === site.id) current.value = undefined
+    await recover()
+    if(generation === epoch) notice.value = '网站已下线，原公开地址已停止提供内容。'
+  } catch(cause) { if(generation === epoch) report(cause) }
+  finally { if(generation === epoch) retiring.value = false }
 }
 async function loadVersion() {
   const generation = epoch, request = ++versionRequest, id = props.versionId
@@ -60,7 +75,7 @@ async function recover() {
     // Server discovery is authoritative even with empty/disabled/corrupt browser storage.
     const page = await listPublications(applicationId)
     if (generation !== epoch) return
-    last.value = page.latestSuccessful ?? undefined
+    publishedSites.value = page.items.filter(item => item.status === 'PUBLISHED'); last.value = page.latestSuccessful ?? undefined
     current.value = page.items[0]
     let stored: { uncertain?: boolean; intent?: PublicationIntent } = {}
     try { stored = JSON.parse(sessionStorage.getItem(key()) ?? '{}') ?? {} }
@@ -105,7 +120,7 @@ async function refresh() {
     const value = await getPublication(id, applicationId, versionId)
     if (generation === epoch) adopt(value)
     const page = await listPublications(applicationId)
-    if (generation === epoch) { last.value = page.latestSuccessful ?? undefined; uncertain.value = page.uncertain === true; save() }
+    if (generation === epoch) { publishedSites.value = page.items.filter(item => item.status === 'PUBLISHED'); last.value = page.latestSuccessful ?? undefined; uncertain.value = page.uncertain === true; save() }
   } catch (cause) { if (generation === epoch) report(cause) }
   finally { if (generation === epoch) refreshing.value = false }
 }
@@ -131,7 +146,7 @@ async function reload() {
   finally { if (generation === epoch) loading.value = false }
 }
 watch(() => [props.applicationId, session.user?.id], () => {
-  epoch++; current.value = undefined; last.value = undefined; version.value = undefined; artifactDigest.value = ''; intent.value = undefined
+  epoch++; publishedSites.value = []; current.value = undefined; last.value = undefined; version.value = undefined; artifactDigest.value = ''; intent.value = undefined
   posting.value = false; refreshing.value = false; recovering.value = false; uncertain.value = false; error.value = ''; notice.value = ''; copyError.value = ''; open.value = false
   configured.value = false
   const generation = epoch
@@ -164,7 +179,7 @@ onBeforeUnmount(() => { epoch++; versionRequest++ })
       <p v-if="version && last && version.id !== last.versionId">当前选定版本与分享版本不同。分享地址对应下方成功发布版本；源码下载对应上方选定版本。</p>
       <label class="deploy-confirm"><input v-model="confirmed" type="checkbox" :disabled="!version || version.status !== 'VERIFIED' || locked">我确认公开发布上方版本</label>
       <button type="button" class="button-primary" :disabled="!canPublish" @click="publish">{{ posting ? '正在提交发布…' : '确认发布' }}</button>
-      <p v-if="current">本次发布：{{ current.id }}<br>版本：{{ current.versionId }}<br>状态：{{ { REQUESTED: '已受理，正在部署与检查', PUBLISHED: '发布成功', FAILED: '发布失败' }[current.status] }}</p>
+      <p v-if="current">本次发布：{{ current.id }}<br>版本：{{ current.versionId }}<br>状态：{{ { UNPUBLISHED: '已下线', REQUESTED: '已受理，正在部署与检查', PUBLISHED: '发布成功', FAILED: '发布失败' }[current.status] }}</p>
       <p v-if="current?.status === 'FAILED'" role="status">{{ publicationFailureDescription }}再次确认将创建新的发布记录。</p>
       <button type="button" class="button-secondary" :disabled="loading || posting || refreshing || recovering" @click="reload">重新读取版本与发布记录</button>
       <button v-if="current" type="button" class="button-secondary" :disabled="refreshing" @click="refresh">刷新发布状态</button>
@@ -174,6 +189,7 @@ onBeforeUnmount(() => { epoch++; versionRequest++ })
       <p v-if="uncertain" role="status">{{ publicationUnknownDescription }}</p>
       <p v-if="error" role="alert">{{ error }}</p><p v-if="notice" role="status">{{ notice }}</p>
       <p v-if="copyError" role="alert">{{ copyError }}</p>
+      <section v-if="publishedSites.length"><h3>在线网站</h3><ul><li v-for="site in publishedSites" :key="site.id"><a :href="site.url ?? undefined" target="_blank" rel="noopener noreferrer">{{ site.url }}</a><button type="button" class="button-secondary" :disabled="locked" @click="retire(site)">{{ retiring ? '正在下线…' : '取消发布' }}</button></li></ul></section>
       <div v-if="last" class="deploy-success"><h3>上次成功发布</h3><p>分享版本：{{ last.versionId }}<br>部署编号：{{ last.id }}<br>发布时间：{{ last.publishedAt }}</p><DeploymentCover :key="last.id" :publication="last" @unauthorized="emit('unauthorized')" /><a :href="last.url ?? undefined" target="_blank" rel="noopener noreferrer">{{ last.url }}</a><button type="button" class="button-secondary" @click="copy">复制公开地址</button></div>
     </section>
   </div>

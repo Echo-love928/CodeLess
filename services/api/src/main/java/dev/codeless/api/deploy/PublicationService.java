@@ -101,6 +101,27 @@ public class PublicationService {
         if(!p.id().equals(b.id()) || !p.applicationId().equals(b.applicationId()) || !p.versionId().equals(b.versionId()) || !p.requestedBy().equals(b.ownerId()))
             throw new AuthFailure(HttpStatus.SERVICE_UNAVAILABLE,"DEPLOYMENT_RECORD_UNAVAILABLE");
     }
+    public View unpublish(UUID actor,UUID id,boolean admin) {
+        return tx.execute(status->{
+            var p=artifacts.findPublication(id).orElseThrow(()->new AuthFailure(HttpStatus.NOT_FOUND,"NOT_FOUND"));
+            // Match publish/archive lock order: application, then publication.
+            jdbc.sql("SELECT id FROM applications WHERE id=? FOR UPDATE").param(p.applicationId()).query(UUID.class).single();
+            if(!admin) owned(actor,p.applicationId());
+            jdbc.sql("SELECT id FROM publications WHERE id=? FOR UPDATE").param(id).query(UUID.class).single();
+            p=artifacts.findPublication(id).orElseThrow();
+            if(p.status().name().equals("UNPUBLISHED")) return view(p);
+            if(p.status().name().equals("REQUESTED")) throw conflict("PUBLICATION_IN_PROGRESS");
+            try { hosting.unpublish(id,Instant.now().plusSeconds(29)); }
+            catch(RuntimeException failure) { throw new AuthFailure(HttpStatus.SERVICE_UNAVAILABLE,"UNPUBLISH_FAILED"); }
+            jdbc.sql("UPDATE publications SET status='UNPUBLISHED',url=NULL,published_at=NULL,updated_at=clock_timestamp(),row_version=row_version+1 WHERE id=?").param(id).update();
+            return view(artifacts.findPublication(id).orElseThrow());
+        });
+    }
+    public void unpublishApplication(UUID owner,UUID app) {
+        owned(owner,app);
+        var ids=jdbc.sql("SELECT id FROM publications WHERE application_id=? AND status IN ('PUBLISHED','FAILED') ORDER BY id").param(app).query(UUID.class).list();
+        for(var id:ids) unpublish(owner,id,false);
+    }
     public View get(UUID owner,UUID id) {return view(ownedPublication(owner,id));}
     private View latest(UUID app) {
         return jdbc.sql("SELECT id FROM publications WHERE application_id=? AND status='PUBLISHED' ORDER BY published_at DESC,id DESC LIMIT 1")
@@ -118,9 +139,10 @@ public class PublicationService {
         return snapshot.execute(status->{
             var p=ownedPublication(owner,id);var b=records.binding(id);bindingMatches(p,b);var events=records.events(id);
             String phase=events.isEmpty()?"UNKNOWN":events.getLast().phase();
+        if(p.status().name().equals("UNPUBLISHED")) return new Deployment(view(p),"UNPUBLISHED",b.sourceDigest(),b.artifactDigest(),b.reportDigest(),events,null,latest(p.applicationId()));
             // SQL and volume are separate resources; a terminal ledger entry without SQL commit is never success.
             if(!switch(p.status()) {case PUBLISHED -> "SUCCEEDED".equals(phase);case FAILED -> "FAILED".equals(phase);
-                case REQUESTED -> Set.of("PREPARING","PUBLISHING","PROBING").contains(phase);}) phase="UNKNOWN";
+                case UNPUBLISHED -> false; case REQUESTED -> Set.of("PREPARING","PUBLISHING","PROBING").contains(phase);}) phase="UNKNOWN";
             return new Deployment(view(p),phase,b.sourceDigest(),b.artifactDigest(),b.reportDigest(),events,
                     "FAILED".equals(phase)?events.getLast().failureCode():null,latest(p.applicationId()));
         });

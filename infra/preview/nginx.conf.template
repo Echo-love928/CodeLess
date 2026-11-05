@@ -6,6 +6,7 @@ upstream codeless_preview_gateway {
     server host.docker.internal:${CODELESS_PREVIEW_GATEWAY_PORT} max_fails=0;
 }
 server {
+    server_tokens off;
     listen 8443 ssl default_server;
     server_name _;
     ssl_certificate /certs/server.pem;
@@ -14,12 +15,18 @@ server {
     return 404;
 }
 server {
+    server_tokens off;
     listen 8443 ssl;
     server_name ${CODELESS_PLATFORM_HOST};
     ssl_certificate /certs/server.pem;
     ssl_certificate_key /certs/server.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     access_log off;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-src https://*.${CODELESS_PREVIEW_HOST}; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
     root /usr/share/nginx/html;
     location ^~ /internal/ { return 404; }
     location ^~ /api/v0/ {
@@ -33,9 +40,22 @@ server {
         proxy_cache off;
         proxy_read_timeout 600s;
     }
+    location = /api { default_type application/json; return 404 '{"code":"NOT_FOUND"}'; }
+    location ^~ /api/ { default_type application/json; return 404 '{"code":"NOT_FOUND"}'; }
+    location = /index.html {
+    server_tokens off;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-src https://*.${CODELESS_PREVIEW_HOST}; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
+        add_header Cache-Control "no-cache" always;
+        try_files $uri =404;
+    }
     location / { try_files $uri /index.html; }
 }
 server {
+    server_tokens off;
     listen 8443 ssl;
     server_name *.${CODELESS_PREVIEW_HOST};
     ssl_certificate /certs/server.pem;

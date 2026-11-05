@@ -17,5 +17,6 @@ public interface DeploymentGateway {
     /** Create an immutable publication-specific location; never overwrite another publication, even on failure. */
     String publish(Payload payload, Instant deadline);
     /** Fetch only the configured public hosting origin; enforce deadline, deny redirects/private networks, verify served bytes. */
+    default void unpublish(UUID id, Instant deadline) { throw new IllegalStateException("HOSTING_UNAVAILABLE"); }
     Probe probe(Payload payload, String url, Instant deadline);
 }
