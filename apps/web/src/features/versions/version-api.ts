@@ -14,6 +14,7 @@ export interface Version {
   errorSummary?: string | null
 }
 export interface VersionPage { items: Version[]; page: number; size: number; total: number }
+export const VERSION_PAGE_SIZE = 1
 export const digest = (value: unknown): value is string => typeof value === 'string' && /^sha256:[a-f0-9]{64}$/.test(value)
 const optionalUuid = (value: unknown) => value == null || uuid(value)
 
@@ -39,10 +40,10 @@ export async function getVersion(id: string, applicationId: string, signal?: Abo
 
 export async function listVersions(applicationId: string, page = 0, signal?: AbortSignal): Promise<VersionPage> {
   if (!uuid(applicationId)) throw new Error('应用入口无效。')
-  const result = await requestJson<VersionPage>(`/api/v0/applications/${applicationId}/versions?page=${page}&size=20`, { signal, cache: 'no-store' })
-  if (!result || !Array.isArray(result.items) || result.items.length > 20 || result.page !== page || result.size !== 20 ||
+  const result = await requestJson<VersionPage>(`/api/v0/applications/${applicationId}/versions?page=${page}&size=${VERSION_PAGE_SIZE}&order=asc&generatedOnly=true`, { signal, cache: 'no-store' })
+  if (!result || !Array.isArray(result.items) || result.items.length > VERSION_PAGE_SIZE || result.page !== page || result.size !== VERSION_PAGE_SIZE ||
       !Number.isSafeInteger(result.total) || result.total < 0 ||
-      result.items.length !== Math.min(20, Math.max(0, result.total - page * 20)))
+      result.items.length !== Math.min(VERSION_PAGE_SIZE, Math.max(0, result.total - page * VERSION_PAGE_SIZE)))
     throw new Error('版本列表响应无效，请重新读取。')
   result.items.forEach(item => version(item, applicationId))
   if (new Set(result.items.map(item => item.id)).size !== result.items.length ||

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { ids, versions, malicious, manifest, installVersionsFixture, openWorkbench } from './fixture'
+import { ids, versions, malicious, manifest, installVersionsFixture, openWorkbench, showVersion } from './fixture'
 import { platformFetch } from './http-call.mjs'
 
 const evidence = resolve(process.cwd(), '../../tests/e2e/versions/evidence/2026-10-12/fixture')
@@ -48,7 +48,7 @@ test('D11-B-T1: versionId selects matching source and rendered preview', async (
   await openWorkbench(page)
   await expect(page.frameLocator('iframe').getByRole('heading', { name: '版本 2 页面' })).toBeVisible()
   await expect(page.getByLabel('文件内容')).toContainText('版本 2 页面')
-  await page.locator(`[data-version-id="${ids[0]}"]`).getByRole('button').click()
+  await (await showVersion(page, ids[0])).getByRole('button').click()
   await expect(page.frameLocator('iframe').getByRole('heading', { name: '版本 1 页面' })).toBeVisible()
   await expect(page.getByLabel('文件内容')).toContainText('版本 1 页面')
   await expect(page.locator('.preview-panel__controls > span')).toHaveText('页面预览')
@@ -72,6 +72,7 @@ test('D11-B-T2: empty, list failure, source failure and retry are distinct', asy
   await expect(page.getByText('暂无版本记录。完成生成后可在此查看。')).toHaveCount(0)
   state.listStatus = 200; state.records = versions; state.sourceStatus = 409
   await page.getByRole('button', { name: '刷新版本', exact: true }).click()
+  await (await showVersion(page, ids[1])).getByRole('button').click()
   await expect(page.locator('.source-panel [role="alert"]')).toContainText('暂无可读取源码快照')
   await page.screenshot({ path: resolve(evidence, 'T2-source-error.png'), fullPage: true })
   state.sourceStatus = 200
@@ -84,7 +85,7 @@ test('D11-B-T3: draft and failed versions never replace available preview', asyn
   await openWorkbench(page)
   await expect(page.frameLocator('iframe').getByRole('heading', { name: '版本 2 页面' })).toBeVisible()
   for (const index of [2, 3]) {
-    const row = page.locator(`[data-version-id="${ids[index]}"]`)
+    const row = await showVersion(page, ids[index])
     await expect(row).toContainText('此版本不可预览')
     await row.getByRole('button', { name: '查看源码', exact: true }).click()
     await expect(page.getByLabel('文件内容')).toContainText(`版本 ${index + 1} 页面`)
@@ -139,7 +140,7 @@ test('late source from prior selection cannot overwrite the new version', async 
     await route.fulfill({ json: { versionId: ids[1], sourceDigest: versions[1].sourceDigest, files: manifest([{ path: 'src/pages/Old.vue', content: '迟到的旧源码' }]) } }).catch(() => {})
   })
   await openWorkbench(page); await requested
-  await page.locator(`[data-version-id="${ids[0]}"]`).getByRole('button').click()
+  await (await showVersion(page, ids[0])).getByRole('button').click()
   await expect(page.getByLabel('文件内容')).toContainText('版本 1 页面')
   release()
   await expect(page.getByLabel('文件内容')).not.toContainText('迟到的旧源码')
@@ -149,10 +150,10 @@ test('source 401 redirects to login and paginated versions keep selected preview
   const state = await installVersionsFixture(page)
   state.records = Array.from({ length: 21 }, (_, index) => ({ ...versions[0], id: `bbbbbbbb-bbbb-4bbb-8bbb-${String(index).padStart(12, '0')}`, number: index + 5 }))
   await openWorkbench(page)
-  await expect(page.locator('[data-version-id]')).toHaveCount(20)
+  await expect(page.locator('[data-version-id]')).toHaveCount(1)
   await page.getByRole('button', { name: '下一页' }).click()
   await expect(page.locator('[data-version-id]')).toHaveCount(1)
-  await expect(page.locator('.versions-panel')).toContainText('第 2 页')
+  await expect(page.locator('.versions-panel')).toContainText('第 2 / 21 页')
   await expect(page.locator('.preview-panel__controls > span')).toHaveText('页面预览')
   await expect(page.locator('.preview-panel__controls')).not.toContainText(ids[1])
   await expect(page.locator('iframe')).toHaveAttribute('src', new RegExp(`v${ids[1].replaceAll('-', '')}\\.preview\\.`))

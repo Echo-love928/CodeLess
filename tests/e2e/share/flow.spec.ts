@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { readFile, mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { installVersionsFixture, openWorkbench, appId, ids, versions } from '../versions/fixture'
+import { installVersionsFixture, openWorkbench, appId, ids, versions, showVersion } from '../versions/fixture'
 
 const deploymentId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 const publication = { id: deploymentId, applicationId: appId, versionId: ids[0], requestedBy: 'user-1', status: 'PUBLISHED',
@@ -51,7 +51,7 @@ test('T4: actual browser download requests exactly the selected historical versi
     return route.fulfill({ contentType: 'application/zip', body: zip, headers: {
       'X-CodeLess-Version-Id': mismatch ? ids[1] : id, 'X-CodeLess-Source-Digest': version.sourceDigest } })
   })
-  await page.locator(`[data-version-id="${ids[0]}"]`).getByRole('button').click()
+  await (await showVersion(page, ids[0])).getByRole('button').click()
   const source = page.getByRole('region', { name: '只读源码' })
   await expect(source).toContainText(`版本 1`)
   const pending = page.waitForEvent('download')
@@ -66,7 +66,7 @@ test('T4: actual browser download requests exactly the selected historical versi
   await expect(source.getByRole('alert')).toContainText('已停止下载')
   expect(downloads).toEqual([]); expect(requests).toEqual([ids[0], ids[0]])
   for (const index of [2, 3]) {
-    await page.locator(`[data-version-id="${ids[index]}"]`).getByRole('button').click()
+    await (await showVersion(page, ids[index])).getByRole('button').click()
     await expect(source.getByRole('button', { name: `下载源码 · v${index + 1}` })).toBeDisabled()
     await expect(source).toContainText(index === 2 ? '尚未验证' : '验证失败的版本不可下载')
   }

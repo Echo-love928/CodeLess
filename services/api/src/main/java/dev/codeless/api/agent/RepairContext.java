@@ -20,6 +20,7 @@ final class RepairContext {
     private JsonNode sourceFiles;
     private String sourceDigest;
     private int repeatedReads;
+    private int unchangedWrites;
     private boolean changed;
     RepairContext(JsonNode draft){sourceFiles=draft.path("files").deepCopy();sourceDigest=draft.path("sourceDigest").asText();}
     /** The failed candidate's own frozen text; every file must hash to the digest its draft recorded (D24-A round 2). */
@@ -240,8 +241,8 @@ final class RepairContext {
     boolean changed(){return changed;}
     Map<String,Object> progress(){return progress(true);}
     /** The hint never points at a read the request does not offer (D24-A round 2). */
-    Map<String,Object> progress(boolean reads){return Map.of("repeatedReads",repeatedReads,"sourceChanged",changed,
-            "next",changed?"PROPOSE_COMPLETION_OR_NECESSARY_PATCH":repeatedReads>0?"PATCH_USING_OBSERVED_DIGEST":
+    Map<String,Object> progress(boolean reads){return Map.of("repeatedReads",repeatedReads,"unchangedWrites",unchangedWrites,"sourceChanged",changed,
+            "next",changed?"PROPOSE_COMPLETION_OR_NECESSARY_PATCH":unchangedWrites>0?"CHANGE_SOURCE_BYTES_TO_FIX_FAILED_ACTION":repeatedReads>0?"PATCH_USING_OBSERVED_DIGEST":
                     repairSources()!=null?"PATCH_FROM_REPAIR_SOURCES":!reads?"PATCH_WITHOUT_FURTHER_READS":
                     latest.values().stream().anyMatch(o->o.path("tool").asText().equals("files.read"))?
                             "PATCH_OR_READ_MISSING_DEPENDENCY":"READ_REQUIRED_DEPENDENCIES_ONCE");}
@@ -274,6 +275,11 @@ final class RepairContext {
             if(!hash(content).equals(committed)||!committed.equals(current.get(path)))throw new AgentFailure("AGENT_CHECKPOINT_INVALID");
             // This is digest-checked committed write content, not a fabricated files.read receipt.
             observed.put("committedContent",content);observed.put("contentOrigin","COMMITTED_WRITE_DIGEST_MATCHED");
+            if(actual.path("beforeDigest").equals(actual.path("afterDigest"))) {
+                unchangedWrites++;
+                observed.put("writeEffect","UNCHANGED_BYTES");
+                observed.put("correction","This write changed no bytes and cannot fix the failed action. Patch the rendered owner using the exact frozen target and current source digest; do not resubmit identical content.");
+            }
         }
         // Do not duplicate full source text when a genuine later read supersedes the committed write projection.
         if(name.equals("files.read"))for(var entry:latest.entrySet())if(entry.getValue().path("path").asText().equals(path)

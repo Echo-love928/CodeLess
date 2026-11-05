@@ -23,7 +23,9 @@ final class AcceptanceActions {
         for(int index=0;index<actions.size();index++) {
             JsonNode action=actions.get(index);
             String reason=shape(action);
-            if(reason!=null) return invalid(reason,Map.of("index",index));
+            if(reason!=null) return invalid(reason,Map.of("index",index,"actionType",action.path("type").asText(),
+                    "requiredFields",Set.of("fill","select","expectText").contains(action.path("type").asText())?
+                            List.of("type","target","value"):List.of("type","target")));
             String type=action.path("type").asText();
             if(type.equals("navigate")) {
                 route=action.path("path").asText();
@@ -42,7 +44,7 @@ final class AcceptanceActions {
         if(reason.equals("INVALID_TARGET")) detail.put("correction",
                 "target is exactly {testId}, {text}, or {role,name}; value is a sibling of target, never inside it. Use an actual unique rendered target.");
         if(reason.equals("INVALID_VALUE")) detail.put("correction",
-                "expectText and select require a nonblank string value. Only fill accepts an empty string. expectVisible has no value field and only tests visibility; assert actual nonblank result text or counts to test state.");
+                "expectText/select need a nonblank sibling value string with full expected text/option value. Changing target cannot fix missing value. Recheck ALL actions. Only fill accepts an empty string; expectVisible has no value and must not replace text/state assertions.");
         return new Rejection("AGENT_ACCEPTANCE_INVALID",detail);
     }
     private static boolean keys(JsonNode value,Set<String> allowed) {

@@ -42,7 +42,10 @@ public final class AgentRunStore {
                 var source=snapshots.source(link.baseVersionId(),digest);
                 if("COMPONENT".equals(link.source().type())) {
                     dev.codeless.api.edit.LocalEditScope.verify(link,source,snapshots.componentMapping(link.baseVersionId(),digest));
-                    return dev.codeless.api.edit.LocalEditScope.context(link,source,snapshots.readSource(link.baseVersionId(),digest,link.source().sourceFile()));
+                    var context=dev.codeless.api.edit.LocalEditScope.context(link,source,snapshots.readSource(link.baseVersionId(),digest,link.source().sourceFile()));
+                    UUID baseTask=jdbc.sql("SELECT source_task_id FROM application_versions WHERE id=? AND status='VERIFIED'")
+                            .param(link.baseVersionId()).query(UUID.class).single();
+                    return withVerifiedActions(context,link.baseVersionId(),digest,AgentJournal.latest(journal.read(baseTask),"draft"));
                 }
                 var contents=source.manifest().files().stream().map(f -> Map.of("path",f.path(),"digest",f.digest(),
                         "content",snapshots.readSource(link.baseVersionId(),digest,f.path()))).toList();
@@ -50,6 +53,15 @@ public final class AgentRunStore {
                         "baseVersionId",link.baseVersionId(),"source",link.source(),"sourceFiles",contents));
             });
         });
+    }
+    /** Give local edits real selectors and state transitions from this exact verified base, without dependency source. */
+    static JsonNode withVerifiedActions(JsonNode context,UUID version,String digest,JsonNode draft) {
+        if(!version.toString().equals(draft.path("versionId").asText()) || !digest.equals(draft.path("sourceDigest").asText())
+                || !draft.path("actions").isArray() || draft.path("actions").isEmpty())
+            throw new AgentFailure("COMPONENT_BASE_VERIFICATION_MISMATCH");
+        var result=(tools.jackson.databind.node.ObjectNode)context.deepCopy();
+        result.set("verifiedBaseActions",draft.path("actions").deepCopy());
+        return result;
     }
     /** Preserve the validated baseline structure locally; no unrelated plan/source goes to the model. */
     public JsonNode componentPlan(TaskQueueService.Claim claim) {

@@ -4,7 +4,7 @@ import { formatDateTime } from '../../lib/display'
 import { ApiError } from '../../api/http'
 import PreviewPanel from '../preview/PreviewPanel.vue'
 import SourcePanel from '../source/SourcePanel.vue'
-import { listVersions, type Version } from './version-api'
+import { getVersion, listVersions, VERSION_PAGE_SIZE, type Version } from './version-api'
 import { editContext, useVisualEditFlow } from '../visual-edit/edit-flow'
 import TaskStatus from '../workbench/TaskStatus.vue'
 import TaskProgress from '../workbench/TaskProgress.vue'
@@ -20,7 +20,6 @@ const loading = ref(false)
 const error = ref('')
 const labels = { DRAFT: '草稿 · 未验证', VERIFIED: '已通过验证', FAILED: '验证失败' }
 const sourceTask = (item: Version) => item.taskId
-const initialDraft = (item: Version) => item.status === 'DRAFT' && !item.taskId && !item.buildId && item.sourceDigest === 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
 let generation = 0
 let abort: AbortController | undefined
 const flow = useVisualEditFlow(() => props.applicationId, version => {
@@ -45,7 +44,12 @@ async function load(nextPage = page.value) {
     if (current !== generation) return
     items.value = value.items; total.value = value.total; page.value = value.page
     // Keep a selected immutable snapshot across pagination; never silently switch preview.
-    if (!selected.value) selected.value = value.items.find(item => item.id === previewId.value)
+    if (!selected.value) {
+      const id = previewId.value
+      const version = value.items.find(item => item.id === id) ?? (id ? await getVersion(id, props.applicationId, abort.signal) : undefined)
+      if (current !== generation) return
+      if (!selected.value && previewId.value === id) selected.value = version
+    }
   } catch (cause) {
     if (current !== generation) return
     error.value = cause instanceof ApiError && cause.status === 404
@@ -101,16 +105,15 @@ onBeforeUnmount(() => { generation++; abort?.abort(); flow.reset() })
       <template v-else>
         <ul>
           <li v-for="item in items" :key="item.id" :data-version-id="item.id">
-            <p v-if="initialDraft(item)">等待首次生成。提交需求后，即可在这里查看生成的版本。</p>
-            <template v-else><div><strong>版本 {{ item.number }}</strong> <span>{{ labels[item.status] }}</span><span v-if="item.id === previewId"> · 当前预览</span><span v-if="item.id === versionId"> · 当前可用</span></div>
+            <div><strong>版本 {{ item.number }}</strong> <span>{{ labels[item.status] }}</span><span v-if="item.id === previewId"> · 当前预览</span><span v-if="item.id === versionId"> · 当前可用</span></div>
             <time :datetime="item.createdAt">{{ formatDateTime(item.createdAt) }}</time>
             <p v-if="sourceTask(item)">来源任务：<router-link :to="{ path: `/workbench/${applicationId}`, query: { taskId: sourceTask(item) } }">查看生成过程</router-link></p>
             <p v-if="item.status === 'FAILED'" class="version-error">错误摘要：{{ item.errorSummary || '服务端未提供错误摘要。' }}</p>
             <button type="button" class="button-secondary" :disabled="locked" :aria-pressed="selected?.id === item.id" @click="select(item)">{{ item.status === 'VERIFIED' ? '查看源码并预览' : '查看源码' }}</button>
-            <span v-if="item.status !== 'VERIFIED'"> 此版本不可预览。</span></template>
+            <span v-if="item.status !== 'VERIFIED'"> 此版本不可预览。</span>
           </li>
         </ul>
-        <nav aria-label="版本分页"><button type="button" class="button-secondary" :disabled="page === 0" @click="load(page - 1)">上一页</button><span>第 {{ page + 1 }} 页 · 共 {{ total }} 个版本</span><button type="button" class="button-secondary" :disabled="(page + 1) * 20 >= total" @click="load(page + 1)">下一页</button></nav>
+        <nav aria-label="版本分页"><button type="button" class="button-secondary" :disabled="loading || page === 0" @click="load(page - 1)">上一页</button><span aria-live="polite">第 {{ page + 1 }} / {{ Math.ceil(total / VERSION_PAGE_SIZE) }} 页 · 共 {{ total }} 个已生成版本</span><button type="button" class="button-secondary" :disabled="loading || (page + 1) * VERSION_PAGE_SIZE >= total" @click="load(page + 1)">下一页</button></nav>
       </template>
     </section>
     <SourcePanel :version="selected" @unauthorized="emit('unauthorized')" />

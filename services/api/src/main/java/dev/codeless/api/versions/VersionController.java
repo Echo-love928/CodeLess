@@ -65,17 +65,21 @@ public class VersionController {
     @GetMapping("/applications/{applicationId}/versions")
     public ResponseEntity<Page> list(@PathVariable UUID applicationId,
             @RequestParam(defaultValue="0") int page, @RequestParam(defaultValue="20") int size,
-            @RequestParam(required=false) String status, HttpServletRequest request) {
+            @RequestParam(required=false) String status, @RequestParam(defaultValue="desc") String order,
+            @RequestParam(defaultValue="false") boolean generatedOnly, HttpServletRequest request) {
         ownership.requireApplication(request,applicationId);
         if(page<0 || size<1 || size>100 || (long)page*size>Integer.MAX_VALUE
+                || !Set.of("asc","desc").contains(order)
                 || status!=null && !Set.of("DRAFT","VERIFIED","FAILED").contains(status))
             throw new AuthFailure(HttpStatus.BAD_REQUEST,"INVALID_REQUEST");
-        String filter=status==null ? "" : " AND status=:status";
+        String filter=(status==null ? "" : " AND status=:status")+(generatedOnly?
+                " AND NOT (status='DRAFT' AND source_task_id IS NULL AND build_id IS NULL AND source_digest='sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')":"");
+        String ordering=order.equals("asc")?"ASC":"DESC";
         // Page, total and latest pointer come from one snapshot: a READY commit or new draft landing between separate
         // statements otherwise showed the latest pointer as DRAFT, or a total that disagrees with the page (D20-A).
         return ok(snapshot.execute(tx -> {
             var count=jdbc.sql("SELECT count(*) FROM application_versions WHERE application_id=:app"+filter).param("app",applicationId);
-            var select=jdbc.sql("SELECT * FROM application_versions WHERE application_id=:app"+filter+" ORDER BY number DESC LIMIT :size OFFSET :offset")
+            var select=jdbc.sql("SELECT * FROM application_versions WHERE application_id=:app"+filter+" ORDER BY number "+ordering+" LIMIT :size OFFSET :offset")
                     .param("app",applicationId).param("size",size).param("offset",(long)page*size);
             if(status!=null) {count.param("status",status);select.param("status",status);}
             var items=select.query((rs,n)->new VersionView(rs.getObject("id",UUID.class),rs.getObject("application_id",UUID.class),rs.getInt("number"),

@@ -27,8 +27,15 @@ export async function installVersionsFixture(page: Page) {
   await page.route(`**/api/v0/applications/${appId}`, route => route.fulfill({ json: { ...application, status: 'ACTIVE', baseVersionId: ids[2], latestReadyVersionId: ids[1] } }))
   await page.route(`**/api/v0/tasks?**`, route => route.fulfill({ json: { items: [], page: 0, size: 20, total: 0 } }))
   await page.route(`**/api/v0/applications/${appId}/versions?**`, route => {
-    const current = Number(new URL(route.request().url()).searchParams.get('page') ?? 0)
-    return route.fulfill({ status: state.listStatus, json: { items: state.records.slice(current * 20, current * 20 + 20), page: current, size: 20, total: state.records.length } })
+    const query = new URL(route.request().url()).searchParams
+    const current = Number(query.get('page') ?? 0), size = Number(query.get('size') ?? 20)
+    const records = [...state.records].sort((a, b) => query.get('order') === 'asc' ? a.number - b.number : b.number - a.number)
+    return route.fulfill({ status: state.listStatus, json: { items: records.slice(current * size, (current + 1) * size), page: current, size, total: records.length } })
+  })
+  await page.route('**/api/v0/versions/*', route => {
+    const id = new URL(route.request().url()).pathname.split('/').at(-1)
+    const version = state.records.find(item => item.id === id) ?? versions.find(item => item.id === id)
+    return route.fulfill({ status: version ? 200 : 404, json: version ?? { code: 'NOT_FOUND' } })
   })
   await page.route('**/api/v0/versions/*/files', route => {
     const id = route.request().url().split('/versions/')[1].split('/')[0]
@@ -67,4 +74,19 @@ export async function installVersionsFixture(page: Page) {
 export async function openWorkbench(page: Page) {
   await page.goto(`/workbench/${appId}`)
   await expect(page.getByRole('region', { name: '版本记录' })).toBeVisible()
+}
+
+export async function showVersion(page: Page, id: string) {
+  const target = versions.find(item => item.id === id)!
+  const rows = page.locator('[data-version-id]')
+  const row = page.locator(`[data-version-id="${id}"]`)
+  for (let attempt = 0; attempt < versions.length; attempt++) {
+    await expect(rows).toHaveCount(1)
+    if (await row.count()) return row
+    const number = Number((await rows.locator('strong').innerText()).match(/\d+/)![0])
+    await page.getByRole('button', { name: number < target.number ? '下一页' : '上一页', exact: true }).click()
+    await expect(rows.locator('strong')).not.toHaveText(`版本 ${number}`)
+  }
+  await expect(row).toBeVisible()
+  return row
 }

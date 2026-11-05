@@ -5,7 +5,7 @@ const app = '11111111-1111-4111-8111-111111111111'
 const id = '55555555-5555-4555-8555-555555555555'
 const sourceDigest = 'sha256:' + 'a'.repeat(64)
 const item = { id, applicationId: app, number: 1, sourceDigest, status: 'FAILED', createdAt: '2026-10-12T00:00:00Z' }
-const page = { items: [item], page: 0, size: 20, total: 1 }
+const page = { items: [item], page: 0, size: 1, total: 1 }
 const report = { failureCode: 'RUNNER_UNAVAILABLE', buildStatus: null, exitCode: null, verificationStatus: null }
 const snapshot = () => ({ versionId: id, status: 'FAILED', sourceDigest, validation: { status: 'FAILED', sourceDigest, report } })
 function responses(value: unknown, status = 200) {

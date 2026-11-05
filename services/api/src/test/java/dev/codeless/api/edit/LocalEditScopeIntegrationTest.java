@@ -199,7 +199,8 @@ class LocalEditScopeIntegrationTest extends PostgresTestBase {
         for(var input:inputs) {
             assertThat(input.path("editContext").path("sourceFiles").size()).isEqualTo(1);
             assertThat(input.path("verificationRoutes")).isEqualTo(json.valueToTree(List.of("/")));
-            assertThat(input.toString()).doesNotContain("UNRELATED_SOURCE_SENTINEL",OTHER,"CodeLess Showcase");assertThat(input.has("plan")).isFalse();
+            assertThat(input.toString()).doesNotContain("UNRELATED_SOURCE_SENTINEL",OTHER);assertThat(input.has("plan")).isFalse();
+            assertThat(input.path("editContext").path("verifiedBaseActions")).isNotEmpty();
         }
         run(executor,c,TaskStatus.VERIFY,TaskStatus.READY);
         assertThat(apps.find(owner,app).orElseThrow().latestReadyVersionId()).isEqualTo(next);
@@ -212,7 +213,9 @@ class LocalEditScopeIntegrationTest extends PostgresTestBase {
         UUID task=task(edit(selection("home-page")));var c=claim(task);var context=store.editContext(c,TaskStatus.PLAN).orElseThrow();
         assertThat(context.path("sourceFiles").size()).isEqualTo(1);assertThat(context.path("sourceFiles").get(0).path("path").asText()).isEqualTo(OTHER);
         assertThat(context.path("dependencySummaries").size()).isEqualTo(1);assertThat(context.path("dependencySummaries").get(0).path("path").asText()).isEqualTo(TARGET);
-        assertThat(context.toString()).doesNotContain("Hedy Lamarr","UNRELATED_SOURCE_SENTINEL","Ignore scope");queue.cancel(owner,task);
+        var sourceOnly=context.deepCopy();((tools.jackson.databind.node.ObjectNode)sourceOnly).remove("verifiedBaseActions");
+        assertThat(sourceOnly.toString()).doesNotContain("Hedy Lamarr","UNRELATED_SOURCE_SENTINEL","Ignore scope");
+        assertThat(context.path("verifiedBaseActions")).isEqualTo(draft(jdbc.sql("SELECT source_task_id FROM application_versions WHERE id=?").param(base).query(UUID.class).single()).path("actions"));queue.cancel(owner,task);
         report("dependency-context",Map.of("target",OTHER,"sourceFiles",1,"dependencySummaries",context.path("dependencySummaries"),"dependencyContentIncluded",false));
     }
     @Test @Order(8) void runtimeUsageIsSeparateAndExplicitlySynthetic() throws Exception {

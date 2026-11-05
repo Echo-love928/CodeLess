@@ -119,7 +119,7 @@ onBeforeUnmount(() => { dispose(); window.removeEventListener('message', message
 </template>
 
 <style scoped>
-.preview-panel { width: 100%; min-height: 430px; background: white; }
+.preview-panel { width: 100%; min-width: 0; min-height: 430px; background: white; container-type: inline-size; }
 .preview-panel__controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #e1e5ec; color: #687384; font-size: 12px; overflow-wrap: anywhere; }
 .preview-panel__controls button { flex-shrink: 0; }
 .preview-panel__message { padding: 56px 20px; color: #687384; text-align: center; font-size: 14px; }
@@ -128,7 +128,7 @@ iframe { display: block; width: 100%; height: 560px; border: 0; }
 .preview-panel__frame--loading { height: 1px; visibility: hidden; }
 .preview-panel__workspace--ready { display: grid; grid-template-columns: minmax(0, 1fr) 280px; }
 .preview-panel__workspace :deep(.visual-selector) { border-left: 1px solid #e1e5ec; max-height: 560px; overflow: auto; }
-@media (max-width: 1050px) {
+@container (max-width: 700px) {
   .preview-panel__workspace--ready { display: block; }
   .preview-panel__workspace :deep(.visual-selector) { border-left: 0; border-top: 1px solid #e1e5ec; max-height: none; }
 }
