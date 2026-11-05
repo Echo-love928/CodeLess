@@ -60,7 +60,7 @@ public class AdminController {
         ownership.requireAdmin(request);
         Query query = new Query(params, "role", "status", "q");
         return ok(queries.users(query.page(), query.size(), query.oneOf("role", Set.of("USER", "ADMIN")),
-                query.oneOf("status", Set.of("ACTIVE", "DISABLED")), query.text("q", 100)));
+                query.oneOf("status", Set.of("ACTIVE", "DISABLED")), query.text("q", 100),query.includeTest()));
     }
 
     @GetMapping("/applications")
@@ -70,7 +70,7 @@ public class AdminController {
         Query query = new Query(params, "ownerId", "status", "dataMode");
         return ok(queries.applications(query.page(), query.size(), query.uuid("ownerId"),
                 query.oneOf("status", Set.of("ACTIVE", "ARCHIVED")),
-                query.oneOf("dataMode", Set.of("STATIC", "MOCK", "LOCAL_STORAGE"))));
+                query.oneOf("dataMode", Set.of("STATIC", "MOCK", "LOCAL_STORAGE")),query.includeTest()));
     }
 
     @GetMapping("/tasks")
@@ -81,7 +81,7 @@ public class AdminController {
         return ok(queries.tasks(query.page(), query.size(), query.oneOf("status", TASK_STATUS),
                 query.oneOf("outcome", AdminQueries.OUTCOMES.keySet()),
                 query.oneOf("kind", Set.of("GENERATION", "EDIT")), query.uuid("applicationId"), query.uuid("ownerId"),
-                query.window()));
+                query.window(),query.includeTest()));
     }
 
     @GetMapping("/deployments")
@@ -91,7 +91,7 @@ public class AdminController {
         Query query = new Query(params, "status", "applicationId", "from", "to");
         return ok(queries.deployments(query.page(), query.size(),
                 query.oneOf("status", Set.of("REQUESTED", "PUBLISHED", "FAILED", "UNPUBLISHED")), query.uuid("applicationId"),
-                query.window()));
+                query.window(),query.includeTest()));
     }
 
     @GetMapping("/model-calls")
@@ -102,7 +102,7 @@ public class AdminController {
         return ok(queries.modelCalls(query.page(), query.size(),
                 query.oneOf("status", Set.of("REQUESTED", "SUCCEEDED", "FAILED")),
                 query.oneOf("stage", Set.of("PLAN", "GENERATE", "REPAIR")),
-                query.oneOf("usage", AdminQueries.USAGE.keySet()), query.uuid("taskId"), query.window()));
+                query.oneOf("usage", AdminQueries.USAGE.keySet()), query.uuid("taskId"), query.window(),query.includeTest()));
     }
 
     @GetMapping("/metrics")
@@ -110,18 +110,19 @@ public class AdminController {
             @RequestParam MultiValueMap<String, String> params, HttpServletRequest request) {
         ownership.requireAdmin(request);
         Query query = new Query(params, false, "from", "to");
-        return ok(queries.metrics(query.window()));
+        return ok(queries.metrics(query.window(),query.includeTest()));
     }
 
     @GetMapping("/audit")
-    public ResponseEntity<AdminQueries.Page<AdminAuditLog.Entry>> audit(
+    public ResponseEntity<AdminQueries.Page<AdminQueries.AuditView>> audit(
             @RequestParam MultiValueMap<String, String> params, HttpServletRequest request) {
         ownership.requireAdmin(request);
         Query query = new Query(params, "action", "actorId", "targetId", "outcome");
         String action = query.oneOf("action", Set.of(AdminTaskCancellation.ACTION));
         UUID actor = query.uuid("actorId"), target = query.uuid("targetId");
         String outcome = query.oneOf("outcome", AUDIT_OUTCOMES);
-        List<AdminAuditLog.Entry> entries = audit.entries().stream()
+        List<AdminQueries.AuditView> entries = audit.entries().stream().map(queries::auditView)
+                .filter(e -> query.includeTest() || !e.isTest())
                 .filter(e -> action == null || action.equals(e.action()))
                 .filter(e -> actor == null || actor.equals(e.actorId()))
                 .filter(e -> target == null || target.equals(e.targetId()))
@@ -174,14 +175,19 @@ public class AdminController {
 
         Query(MultiValueMap<String, String> params, boolean paged, String... filters) {
             this.params = params;
-            Set<String> allowed = paged ? Set.copyOf(Stream.concat(Stream.of("page", "size"), Stream.of(filters)).toList())
-                    : Set.of(filters);
+            Set<String> allowed = paged ? Set.copyOf(Stream.concat(Stream.of("page", "size", "includeTest"), Stream.of(filters)).toList())
+                    : Set.copyOf(Stream.concat(Stream.of("includeTest"),Stream.of(filters)).toList());
             params.forEach((name, values) -> {
                 if (!allowed.contains(name) || values.size() != 1 || values.getFirst() == null
                         || values.getFirst().isEmpty() || values.getFirst().length() > 200) invalid();
             });
         }
 
+        boolean includeTest() {
+            String value=params.getFirst("includeTest");
+            if(value!=null && !Set.of("true","false").contains(value)) invalid();
+            return "true".equals(value);
+        }
         int page() {
             String value = params.getFirst("page");
             if (value == null) return 0;

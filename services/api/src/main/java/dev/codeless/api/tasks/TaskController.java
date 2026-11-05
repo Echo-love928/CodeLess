@@ -26,13 +26,15 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RestController
 @RequestMapping("/api/v0/tasks")
 public class TaskController {
+    private final dev.codeless.api.auth.AuthAccountRepository accounts;
     private final TaskQueueService tasks;
     private final OwnershipGuard ownership;
     private final TaskEventReplay replay;
     private final TaskEventStreams streams;
 
     public TaskController(TaskQueueService tasks, OwnershipGuard ownership,
-                          TaskEventReplay replay, TaskEventStreams streams) {
+                          TaskEventReplay replay, TaskEventStreams streams, dev.codeless.api.auth.AuthAccountRepository accounts) {
+        this.accounts=accounts;
         this.tasks = tasks;
         this.ownership = ownership;
         this.replay = replay;
@@ -76,7 +78,13 @@ public class TaskController {
         HttpSession session = request.getSession(false);
         int cursor = TaskEventReplay.cursor(lastEventId == null ? afterEventId : lastEventId);
         SseEmitter emitter = streams.open(owner, uuid(taskId), cursor, () -> {
-            try { return session != null && owner.equals(session.getAttribute(AuthFilter.USER_ID)); }
+            try {
+                if (session == null || !owner.equals(session.getAttribute(AuthFilter.USER_ID))) return false;
+                // A revoked account/session must send the same redacted control error as lost ownership.
+                // Returning false is reserved for logout/expiry, which closes the stream quietly.
+                if (!accounts.sessionActive(session)) throw new AuthFailure(HttpStatus.NOT_FOUND, "NOT_FOUND");
+                return true;
+            }
             catch (IllegalStateException exception) { return false; }
         });
         return ResponseEntity.ok().header("Cache-Control", "no-store")

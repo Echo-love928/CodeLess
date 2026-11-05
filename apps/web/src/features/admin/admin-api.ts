@@ -1,17 +1,20 @@
 import { ApiError, requestJson } from '../../api/http'
+import { filterInstant } from './admin-time'
 import type { AuthUser } from '../../api/auth'
 import { session } from '../auth/session'
 
 // Wire DTOs and filters follow contracts/admin, D17-A@f563db2. Normalization is UI-only.
 export const resources = ['tasks', 'applications', 'deployments', 'users', 'model-calls', 'audit'] as const
 export type Resource = typeof resources[number]
-export interface Filters { status: string; ownerId: string; from: string; to: string; outcome?: string; usage?: string; q?: string; targetId?: string }
+export interface Filters { status: string; ownerId: string; from: string; to: string; outcome?: string; usage?: string; q?: string; targetId?: string; includeTest?: boolean }
 export interface AdminRecord {
   id: string; createdAt: string; status?: string | null; ownerId?: string | null
   applicationId?: string | null; versionId?: string | null; taskId?: string | null
   name?: string | null; email?: string | null; role?: string | null; model?: string | null
   inputTokens?: number | null; outputTokens?: number | null; failureCode?: string | null
   dailyTasksUsed?: number; dailyTaskLimit?: number
+  applicationName?: string | null; ownerEmail?: string | null; requestedByEmail?: string | null; actorEmail?: string | null
+  versionNumber?: number; isTest?: boolean; cancelledBy?: string | null; provider?: string | null
   cancellable?: boolean
   requestedBy?: string | null; usage?: string | null; actorId?: string; targetId?: string; reason?: string; outcome?: string
 }
@@ -19,7 +22,7 @@ export interface RecordPage { items: AdminRecord[]; page: number; size: number; 
 export interface Outcomes { succeeded: number; failed: number; pending: number; cancelled: number; rate?: number | null; denominator?: number }
 export interface Metrics {
   generation: Outcomes; deployment: Outcomes
-  usage: { inputTokens: number | null; outputTokens: number | null; unknownCalls: number; pendingCalls?: number; knownTotalTokens?: number }
+  usage: { calls?: number; knownCalls?: number; inputTokens: number | null; outputTokens: number | null; unknownCalls: number; pendingCalls?: number; knownTotalTokens?: number }
   trend: { day: string; generation: Outcomes }[]
   repairs?: { total: number; tasksWithRepairs: number; readyAfterRepair: number }
 }
@@ -51,18 +54,19 @@ export async function checkAdmin(): Promise<boolean> {
 }
 export function query(filters: Filters, includeStatus = true, resource: Resource = 'tasks') {
   const params = new URLSearchParams()
+  params.set('includeTest',String(filters.includeTest === true))
   if (includeStatus && ['tasks', 'applications'].includes(resource) && filters.ownerId) {
     if (!uuid.test(filters.ownerId)) throw new Error('所有者 ID 必须为 UUID。')
     params.set('ownerId', filters.ownerId)
   }
   for (const key of ['from', 'to'] as const) {
     if ((!includeStatus || ['tasks', 'deployments', 'model-calls'].includes(resource)) && filters[key]) {
-      const date = new Date(filters[key])
+      const date = new Date(filterInstant(filters[key]))
       if (!Number.isFinite(date.valueOf())) throw new Error('请输入有效的时间范围。')
       params.set(key, date.toISOString())
     }
   }
-  if (filters.from && filters.to && Date.parse(filters.from) >= Date.parse(filters.to)) throw new Error('结束时间必须晚于开始时间。')
+  if (filters.from && filters.to && filterInstant(filters.from) >= filterInstant(filters.to)) throw new Error('结束时间必须晚于开始时间。')
   if (includeStatus && filters.status) params.set(resource === 'audit' ? 'outcome' : 'status', filters.status)
   if (includeStatus && resource === 'tasks' && filters.outcome) params.set('outcome', filters.outcome)
   if (includeStatus && resource === 'model-calls' && filters.usage) params.set('usage', filters.usage)
@@ -115,7 +119,7 @@ export async function getMetrics(filters: Filters): Promise<Metrics> {
   const result = await read(`/metrics?${query(filters, false)}`)
   if (!object(result) || !timestamp(result.generatedAt) || !object(result.window) || result.window.field !== 'createdAt') invalid()
   for (const key of ['from', 'to'] as const) {
-    const expected = filters[key] ? Date.parse(filters[key]) : null
+    const expected = filters[key] ? filterInstant(filters[key]) : null
     const actual = result.window[key]
     if (expected === null ? actual !== null : !timestamp(actual) || Date.parse(actual) !== expected) invalid()
   }
@@ -127,20 +131,20 @@ export async function getMetrics(filters: Filters): Promise<Metrics> {
     if (tokens.complete ? tokens[key!] !== tokens[known!] : tokens[key!] !== null) invalid()
   }
   const repairs = requireCounts(result.repairs, ['total', 'tasksWithRepairs', 'readyAfterRepair', 'denominator'])
-  return { generation, deployment, usage: { inputTokens: tokens.inputTokens as number | null, outputTokens: tokens.outputTokens as number | null,
+  return { generation, deployment, usage: { calls: tokens.calls as number, knownCalls: tokens.knownCalls as number, inputTokens: tokens.inputTokens as number | null, outputTokens: tokens.outputTokens as number | null,
     unknownCalls: tokens.unknownCalls as number, pendingCalls: tokens.pendingCalls as number, knownTotalTokens: tokens.knownTotalTokens as number },
     repairs: repairs as unknown as Metrics['repairs'], trend: [] }
 }
-// A has no trend endpoint: read seven real UTC day windows only when expanded.
+// Seven actual Beijing-day windows; the browser timezone never changes the query boundaries.
 export async function getGenerationTrend(filters: Filters): Promise<Metrics['trend']> {
   query(filters, false)
-  const end = filters.to ? new Date(filters.to) : new Date()
-  const last = new Date(end.valueOf() - 1); last.setUTCHours(0, 0, 0, 0)
+  const end = filters.to ? new Date(filterInstant(filters.to)) : new Date()
+  const last = new Date(end.valueOf() - 1 + 8 * 3600000); last.setUTCHours(0, 0, 0, 0)
   const rows = Array.from({ length: 7 }, (_, index) => {
-    const day = new Date(last.valueOf() - (6 - index) * 86400000)
-    const from = Math.max(day.valueOf(), filters.from ? Date.parse(filters.from) : -Infinity)
+    const day = new Date(last.valueOf() - 8 * 3600000 - (6 - index) * 86400000)
+    const from = Math.max(day.valueOf(), filters.from ? filterInstant(filters.from) : -Infinity)
     const to = Math.min(day.valueOf() + 86400000, end.valueOf())
-    return { day: day.toISOString().slice(0, 10), from, to }
+    return { day: new Date(day.valueOf() + 8 * 3600000).toISOString().slice(0, 10), from, to }
   }).filter(row => row.from < row.to)
   return Promise.all(rows.map(async row => ({ day: row.day, generation: (await getMetrics({ ...filters, from: new Date(row.from).toISOString(), to: new Date(row.to).toISOString() })).generation })))
 }
@@ -193,12 +197,31 @@ export const cancellable = (row: AdminRecord) => row.cancellable === true && ['P
 export function statusLabel(status?: string | null) {
   const labels: Record<string, string> = { UNPUBLISHED: '已下线', READY: '成功', PUBLISHED: '成功', SUCCEEDED: '成功', FAILED: '失败',
     PLAN: '计划中', GENERATE: '生成中', VERIFY: '验证中', REPAIR: '修复中', REQUESTED: '等待处理',
-    ACTIVE: '启用', DISABLED: '停用', ARCHIVED: '归档', CANCELLED: '已取消', ALREADY_TERMINAL: '已经终止', NOT_FOUND: '目标不存在', UNKNOWN: '未知', USER: '普通用户', ADMIN: '管理员' }
-  return status && labels[status] ? `${labels[status]} · ${status}` : `未知${status ? ` · ${status}` : ''}`
+    KNOWN: '用量已知', PENDING: '进行中', GENERATION: '生成', EDIT: '编辑', STATIC: '静态', MOCK: '模拟数据', LOCAL_STORAGE: '本地存储', TASK_CANCEL: '取消任务', ACTIVE: '启用', DISABLED: '停用', ARCHIVED: '归档', CANCELLED: '已取消', ALREADY_TERMINAL: '已经终止', NOT_FOUND: '目标不存在', UNKNOWN: '未知', USER: '普通用户', ADMIN: '管理员' }
+  return status && labels[status] ? labels[status] : status ? `未知（${status}）` : '未提供'
 }
 
 export async function unpublishSite(id: string): Promise<void> {
   requireAdmin()
   if (!uuid.test(id) || !session.csrfToken) throw new Error('请刷新登录状态。')
   await requestJson(`${base}/publications/${id}`, { method: 'DELETE', headers: { 'X-CSRF-Token': session.csrfToken } })
+}
+
+export async function manageUser(mode: 'create' | 'status' | 'password', id: string | undefined, body: Record<string, unknown>): Promise<void> {
+  requireAdmin()
+  if (!session.csrfToken || mode !== 'create' && !uuid.test(id ?? '')) throw new Error('请刷新登录状态。')
+  const response = await fetch(`${base}/users${mode === 'create' ? '' : `/${id}${mode === 'password' ? '/password' : ''}`}`, {
+    method: mode === 'status' ? 'PATCH' : 'POST', credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(15000),
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': session.csrfToken }, body: JSON.stringify(body),
+  })
+  if (response.status === 401) throw new ApiError('unauthorized',401)
+  if (response.status === 403) throw new ApiError('forbidden',403)
+  if (!response.ok) {
+    const value = await response.json().catch(() => null)
+    const messages: Record<string,string> = { EMAIL_ALREADY_EXISTS: '该邮箱已有账号。', CANNOT_DISABLE_SELF: '不能停用当前登录账号。', LAST_ACTIVE_ADMIN: '至少需要保留一个可用的管理员账号。', INVALID_REQUEST: '请检查填写内容，密码至少 12 个字符且不超过 72 个 UTF-8 字节。' }
+    throw new Error(messages[value?.code] ?? '操作未获确认，请刷新账号状态后核对。')
+  }
+}
+export async function searchOwners(q: string): Promise<AdminRecord[]> {
+  return (await listRecords('users', { status: '', ownerId: '', from: '', to: '', q: q.trim() || undefined, includeTest: true }, 0, 50)).items
 }

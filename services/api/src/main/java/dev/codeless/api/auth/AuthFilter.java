@@ -21,6 +21,7 @@ import org.springframework.web.util.UrlPathHelper;
 
 @Component
 public class AuthFilter extends OncePerRequestFilter {
+    public static final String SESSION_VERSION = "codeless.sessionVersion";
     public static final String USER_ID = "codeless.userId";
     public static final String CSRF = "codeless.csrf";
     public static final String ACCOUNT = "codeless.account";
@@ -60,7 +61,7 @@ public class AuthFilter extends OncePerRequestFilter {
         if (!publicAuth) {
             UUID id = session == null ? null : (UUID) session.getAttribute(USER_ID);
             account = id == null ? null : accounts.activeById(id).orElse(null);
-            if (account == null) {
+            if (account == null || (session.getAttribute(SESSION_VERSION) instanceof Number n ? n.longValue() : 0L) != account.sessionVersion()) {
                 error(response, request, HttpStatus.UNAUTHORIZED, "UNAUTHENTICATED");
                 return;
             }

@@ -339,6 +339,10 @@ class AdminIntegrationTest extends PostgresTestBase {
         call(task, "REPAIR", "FAILED", 0, 0, at.plusMinutes(4));
         call(task, "PLAN", "SUCCEEDED", null, null, OffsetDateTime.parse("2001-04-02T12:00:00Z"));
         call(task, "PLAN", "SUCCEEDED", 8, 4, OffsetDateTime.parse("2001-04-03T12:00:00Z"));
+        Response excluded = send("GET", "/api/v0/admin/model-calls?taskId=" + task, admin, null, false);
+        assertThat(mapper.readTree(excluded.body()).path("totalItems").asLong()).isZero();
+        Response productionMetrics = send("GET", "/api/v0/admin/metrics?from=2001-04-01T00:00:00Z&to=2001-04-02T00:00:00Z", admin, null, false);
+        assertThat(mapper.readTree(productionMetrics.body()).at("/tokens/calls").asLong()).isZero();
         JsonNode mixed = json(admin, "/api/v0/admin/metrics?from=2001-04-01T00:00:00Z&to=2001-04-02T00:00:00Z").get("tokens");
         assertThat(List.of(mixed.get("calls").asLong(), mixed.get("knownCalls").asLong(), mixed.get("unknownCalls").asLong(),
                 mixed.get("pendingCalls").asLong(), mixed.get("knownInputTokens").asLong(), mixed.get("knownOutputTokens").asLong(),
@@ -490,7 +494,7 @@ class AdminIntegrationTest extends PostgresTestBase {
         assertThat(mapper.writeValueAsString(users)).doesNotContain("$2a$", "password", "hash");
         Set<String> fields = new HashSet<>();
         users.at("/items/0").propertyNames().forEach(fields::add);
-        assertThat(fields).containsExactlyInAnyOrder("id", "email", "displayName", "status", "role", "applicationCount", "createdAt", "dailyTasksUsed", "dailyTaskLimit");
+        assertThat(fields).containsExactlyInAnyOrder("id", "email", "displayName", "status", "role", "applicationCount", "createdAt", "dailyTasksUsed", "dailyTaskLimit", "isTest");
         evidence("D17-A-04.json", Map.of("case", "D17-A-04", "taskPage", page, "userFields", fields));
     }
 
@@ -577,9 +581,37 @@ class AdminIntegrationTest extends PostgresTestBase {
     }
 
     private JsonNode json(Browser browser, String path) throws Exception {
-        Response response = send("GET", path, browser, null, false);
+        // Historical fixture assertions explicitly opt into simulated model calls.
+        String fixturePath = path.startsWith("/api/v0/admin/") && !path.contains("includeTest=")
+                ? path + (path.contains("?") ? "&" : "?") + "includeTest=true" : path;
+        Response response = send("GET", fixturePath, browser, null, false);
         assertThat(response.status()).as(path + " " + response.body()).isEqualTo(200);
         return mapper.readTree(response.body());
+    }
+
+    @Test void managedAccountsInvalidateSessionsAndKeepAudit() throws Exception {
+        Browser admin = login("admin@codeless.local", "admin-password-for-test-only");
+        String email = "managed-" + UUID.randomUUID() + "@example.test";
+        String password = "initial-test-password-123";
+        String body = mapper.writeValueAsString(Map.of("email", email, "displayName", "Managed test user",
+                "password", password, "role", "USER", "isTest", true));
+        assertThat(send("POST", "/api/v0/admin/users", admin, body, false).status()).isEqualTo(403);
+        Response created = send("POST", "/api/v0/admin/users", admin, body, true);
+        assertThat(created.status()).as(created.body()).isEqualTo(201);
+        UUID target = UUID.fromString(mapper.readTree(created.body()).path("id").asText());
+        Browser oldSession = login(email, password);
+        String endpoint = "/api/v0/admin/users/" + target;
+        Response hidden = send("GET", "/api/v0/admin/users?q=" + email, admin, null, false);
+        assertThat(mapper.readTree(hidden.body()).path("totalItems").asInt()).isZero();
+        assertThat(json(admin, "/api/v0/admin/users?q=" + email).path("totalItems").asInt()).isEqualTo(1);
+        assertThat(send("POST", endpoint + "/password", admin, "{\"password\":\"replacement-password-123\"}", true).status()).isEqualTo(204);
+        assertThat(send("GET", "/api/v0/auth/me", oldSession, null, false).status()).isEqualTo(401);
+        Browser newSession = login(email, "replacement-password-123");
+        assertThat(send("PATCH", endpoint, admin, "{\"status\":\"DISABLED\",\"isTest\":true}", true).status()).isEqualTo(204);
+        assertThat(send("GET", "/api/v0/auth/me", newSession, null, false).status()).isEqualTo(401);
+        assertThat(send("PATCH", "/api/v0/admin/users/" + id("admin@codeless.local"), admin,
+                "{\"status\":\"DISABLED\",\"isTest\":false}", true).status()).isEqualTo(409);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM admin_user_actions WHERE target_id=?", Long.class, target)).isEqualTo(4L);
     }
 
     private String code(Response response) {

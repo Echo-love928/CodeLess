@@ -14,28 +14,35 @@ public class AuthAccountRepository {
         this.jdbc = jdbc;
     }
 
-    record Account(UUID id, String email, String displayName, String hash, String role) {}
+    record Account(UUID id, String email, String displayName, String hash, String role, long sessionVersion) {}
 
     Optional<Account> activeByEmail(String email) {
         return jdbc.sql("""
-                SELECT u.id, u.email, u.display_name, c.password_hash, c.role
+                SELECT u.id, u.email, u.display_name, c.password_hash, c.role, c.session_version
                 FROM platform_users u JOIN auth_credentials c ON c.user_id = u.id
                 WHERE lower(u.email) = lower(?) AND u.status = 'ACTIVE'
                 """).param(email).query((rs, row) -> new Account(
                 (UUID) rs.getObject("id"), rs.getString("email"), rs.getString("display_name"),
-                rs.getString("password_hash"), rs.getString("role"))).optional();
+                rs.getString("password_hash"), rs.getString("role"),rs.getLong("session_version"))).optional();
     }
 
     Optional<Account> activeById(UUID id) {
         return jdbc.sql("""
-                SELECT u.id, u.email, u.display_name, c.password_hash, c.role
+                SELECT u.id, u.email, u.display_name, c.password_hash, c.role, c.session_version
                 FROM platform_users u JOIN auth_credentials c ON c.user_id = u.id
                 WHERE u.id = ? AND u.status = 'ACTIVE'
                 """).param(id).query((rs, row) -> new Account(
                 (UUID) rs.getObject("id"), rs.getString("email"), rs.getString("display_name"),
-                rs.getString("password_hash"), rs.getString("role"))).optional();
+                rs.getString("password_hash"), rs.getString("role"),rs.getLong("session_version"))).optional();
     }
 
+    public boolean sessionActive(jakarta.servlet.http.HttpSession session) {
+        try {
+            UUID id=(UUID)session.getAttribute(AuthFilter.USER_ID);
+            long version=session.getAttribute(AuthFilter.SESSION_VERSION) instanceof Number n ? n.longValue() : 0L;
+            return id!=null && activeById(id).map(a->a.sessionVersion()==version).orElse(false);
+        } catch(IllegalStateException expired) {return false;}
+    }
     @Transactional
     public void seed(String email, String displayName, String hash, String role) {
         UUID id = jdbc.sql("""

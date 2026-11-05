@@ -29,6 +29,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthFailure.class)
     public ResponseEntity<ApiError> auth(AuthFailure exception, HttpServletRequest request) {
         String message = switch (exception.code()) {
+            case "EMAIL_ALREADY_EXISTS" -> "Email already exists";
+            case "CANNOT_DISABLE_SELF" -> "Cannot disable your own account";
+            case "LAST_ACTIVE_ADMIN" -> "Cannot disable the last active administrator";
             case "INVALID_CREDENTIALS" -> "Invalid email or password";
             case "LOGIN_RATE_LIMITED" -> "Too many login attempts";
             case "UNAUTHENTICATED" -> "Authentication required";

@@ -9,6 +9,7 @@ export interface GenerationTask {
   prompt: string
   status: string
   repairAttempts: number
+  cancelledBy?: 'USER' | 'ADMIN' | 'UNKNOWN' | null
   failureCode?: string | null
   createdAt: string
   updatedAt: string
