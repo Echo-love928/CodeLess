@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 import secrets
 import shlex
+import bcrypt
 import subprocess
 import time
 import urllib.error
@@ -19,6 +20,7 @@ class AcceptanceAccounts:
             raise ValueError('Invalid acceptance run ID')
         self.run_id = run_id
         self.users = []
+        self.operator_id = None
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
 
     def call(self, method, path, data=None):
@@ -32,20 +34,29 @@ class AcceptanceAccounts:
             return json.loads(result) if result else None
 
     def __enter__(self):
-        self.token = self.call('GET', 'auth/csrf')['token']
-        secret = None
-        model_provider = 'deterministic-mock'
-        for line in Path('/etc/codeless/api.env').read_text().splitlines():
-            if line.startswith('CODELESS_MODEL_PROVIDER='):
-                model_provider = shlex.split(line.split('=', 1)[1])[0]
-            if line.startswith('CODELESS_ADMIN_PASSWORD='):
-                secret = shlex.split(line.split('=', 1)[1])[0]
-        if not secret:
-            raise RuntimeError('Operator admin credential missing')
-        self.call('POST', 'auth/login', {'email': 'admin@codeless.local', 'password': secret})
-        secret = None
-        result = {'modelProvider': model_provider}
+        # The shared initialization passwords are intentionally absent in production.
+        # A host-owned, test-tagged operator gets a random password known only to this process.
+        operator_id = str(uuid.uuid4())
+        operator_email = f'acceptance-operator+{self.run_id}@codeless.local'
+        operator_password = secrets.token_urlsafe(24)
+        password_hash = bcrypt.hashpw(operator_password.encode(), bcrypt.gensalt()).decode()
+        query = ("BEGIN; INSERT INTO platform_users(id,email,display_name,status,is_test) VALUES ('" + operator_id + "','" + operator_email +
+            "','临时验收管理账号','ACTIVE',true); INSERT INTO auth_credentials(user_id,password_hash,role) VALUES ('" + operator_id + "','" + password_hash +
+            "','ADMIN'); INSERT INTO admin_user_actions(id,actor_id,target_id,action,previous_status,resulting_status) VALUES ('" + str(uuid.uuid4()) + "','" + operator_id + "','" + operator_id +
+            "','TEST_OPERATOR_CREATE','NEW','ACTIVE'); COMMIT;")
+        self.sql(query)
+        self.operator_id = operator_id
+        result = {}
         try:
+            model_provider = 'deterministic-mock'
+            for line in Path('/etc/codeless/api.env').read_text().splitlines():
+                if line.startswith('CODELESS_MODEL_PROVIDER='):
+                    values = shlex.split(line.split('=', 1)[1])
+                    if values: model_provider = values[0]
+            result['modelProvider'] = model_provider
+            self.token = self.call('GET', 'auth/csrf')['token']
+            self.call('POST', 'auth/login', {'email': operator_email, 'password': operator_password})
+            operator_password = None
             for label in ('owner', 'foreign'):
                 email = f'acceptance-{label}+{self.run_id}@codeless.local'
                 password = secrets.token_urlsafe(24)
@@ -69,22 +80,38 @@ class AcceptanceAccounts:
             self.cleanup()
             raise
 
+    @staticmethod
+    def sql(query):
+        return subprocess.run(['docker', 'exec', '-i', 'codeless-public-postgres-1', 'psql', '-X', '-U', 'codeless', '-d', 'codeless', '-At', '-v', 'ON_ERROR_STOP=1'],
+            input=query, text=True, capture_output=True, check=True, timeout=15).stdout.strip()
+
     def cleanup(self):
         failed = False
-        for user_id in self.users:
-            for attempt in range(4):
+        try:
+            for user_id in self.users:
+                for attempt in range(4):
+                    try:
+                        self.call('POST', 'admin/users/' + str(uuid.UUID(user_id)) + '/cleanup', {})
+                        break
+                    except urllib.error.HTTPError as error:
+                        if error.code == 409 and attempt < 3:
+                            time.sleep(3)
+                            continue
+                        failed = True
+                        break
+                    except Exception:
+                        failed = True
+                        break
+        finally:
+            if self.operator_id:
+                identifier = str(uuid.UUID(self.operator_id))
+                # Serialize with application account writes and preserve the last active administrator.
+                query = ("BEGIN; SELECT pg_advisory_xact_lock(22002,1); DO $guard$ BEGIN IF NOT EXISTS(SELECT 1 FROM platform_users u JOIN auth_credentials c ON c.user_id=u.id WHERE u.status='ACTIVE' AND c.role='ADMIN' AND u.id<>'" + identifier + "') THEN RAISE EXCEPTION 'LAST_ACTIVE_ADMIN'; END IF; END $guard$; UPDATE platform_users SET status='DISABLED',updated_at=now(),row_version=row_version+1 WHERE id='" + identifier + "' AND is_test; UPDATE auth_credentials SET session_version=session_version+1,updated_at=now() WHERE user_id='" + identifier + "'; INSERT INTO admin_user_actions(id,actor_id,target_id,action,previous_status,resulting_status) VALUES ('" + str(uuid.uuid4()) + "','" + identifier + "','" + identifier + "','TEST_OPERATOR_DISABLE','ACTIVE','DISABLED'); COMMIT;")
                 try:
-                    self.call('POST', 'admin/users/' + str(uuid.UUID(user_id)) + '/cleanup', {})
-                    break
-                except urllib.error.HTTPError as error:
-                    if error.code == 409 and attempt < 3:
-                        time.sleep(3)
-                        continue
-                    failed = True
-                    break
+                    self.sql(query)
+                    self.operator_id = None
                 except Exception:
                     failed = True
-                    break
         if failed:
             raise RuntimeError('Acceptance cleanup incomplete; tagged accounts require operator retry')
 
