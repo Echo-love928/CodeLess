@@ -11,6 +11,7 @@
     "prompt": { "type": "string", "minLength": 1, "maxLength": 8000 },
     "status": { "enum": ["PLAN", "GENERATE", "VERIFY", "REPAIR", "READY", "FAILED"] },
     "repairAttempts": { "type": "integer", "minimum": 0, "maximum": 3 },
+    "cancelledBy": { "enum": ["USER", "ADMIN", "UNKNOWN", null] },
     "failureCode": { "type": ["string", "null"], "maxLength": 100 },
     "createdAt": { "type": "string", "format": "date-time" },
     "updatedAt": { "type": "string", "format": "date-time" }

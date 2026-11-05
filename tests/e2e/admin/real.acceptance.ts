@@ -36,14 +36,14 @@ test('real T2/T3: metrics match SQL records, pagination and supported filters; a
   await page.getByRole('button', { name: '应用筛选', exact: true }).click()
   await expect(page.getByText('共 2 条 · 第 1 页')).toBeVisible()
   await expect(page.getByRole('rowheader', { name: task(3), exact: true })).toHaveCount(0)
-  for (const [tab, text] of [['应用', '真实后台联调应用'], ['部署', '成功 · PUBLISHED'], ['用户', 'admin@codeless.local'], ['模型调用', 'fixture-records-no-model-invocation']]) {
+  for (const [tab, text] of [['应用', '真实后台联调应用'], ['部署', '成功'], ['用户', 'admin@codeless.local'], ['模型调用', 'fixture-records-no-model-invocation']]) {
     await page.getByRole('button', { name: tab, exact: true }).click()
     await expect(page.getByRole('cell', { name: text, exact: true }).first()).toBeVisible()
   }
   await page.getByLabel('用量状态').selectOption('UNKNOWN'); await page.getByRole('button', { name: '应用筛选', exact: true }).click()
   await expect(page.getByText('共 2 条 · 第 1 页')).toBeVisible()
   await page.getByRole('button', { name: '取消审计', exact: true }).click(); await expect(page.getByText('当前筛选下没有记录')).toBeVisible()
-  await page.getByText('生成任务每日趋势（UTC）', { exact: true }).click()
+  await page.getByText('生成任务每日趋势（北京时间）', { exact: true }).click()
   await expect(page.getByText('成功 1 / 失败 2 / 进行中 21 / 取消 1')).toBeVisible()
   await writeFile(join(output, 'real-metrics.json'), JSON.stringify(metrics, null, 2))
 })
@@ -80,8 +80,8 @@ test('real cancellation binds actor, target and redacted reason; duplicate cance
   expect(result.task).toMatchObject({ id: task(25), status: 'FAILED', failureCode: 'CANCELLED', cancellable: false })
   expect(result.audit).toMatchObject({ actorId: me.id, targetId: task(25), outcome: 'CANCELLED', previousStatus: 'GENERATE', resultingStatus: 'FAILED' })
   expect(result.audit.reason).toContain('管理员联调停止'); expect(JSON.stringify(result)).not.toContain('sk-live-fixture-secret-for-audit')
-  await expect(page.getByRole('status')).toContainText('服务端确认已取消')
-  await expect(page.getByRole('row', { name: new RegExp(task(25)) })).toContainText('已取消 · FAILED / CANCELLED')
+  await expect(page.getByRole('status')).toContainText('管理员取消已生效')
+  await expect(page.getByRole('row', { name: new RegExp(task(25)) })).toContainText('管理员已取消')
   await page.getByRole('button', { name: '取消审计', exact: true }).click()
   await page.getByLabel('审计目标 ID').fill(task(25)); await page.getByRole('button', { name: '应用筛选', exact: true }).click()
   await expect(page.getByRole('rowheader', { name: result.audit.id, exact: true })).toBeVisible()
@@ -94,8 +94,8 @@ test('real cancellation binds actor, target and redacted reason; duplicate cance
 })
 test('real empty window has null rates and no fake zero success', async ({ page }) => {
   await login(page)
-  await page.getByLabel('开始时间（本地，含）').fill('2026-10-21T00:00')
-  await page.getByLabel('结束时间（本地，不含）').fill('2026-10-22T00:00')
+  await page.getByLabel('开始时间（北京时间，含）').fill('2026-10-21T00:00')
+  await page.getByLabel('结束时间（北京时间，不含）').fill('2026-10-22T00:00')
   await page.getByRole('button', { name: '应用筛选', exact: true }).click()
   await expect(page.getByText('暂无已知终态', { exact: true })).toHaveCount(2)
   await expect(page.getByText('当前筛选下没有记录')).toBeVisible()

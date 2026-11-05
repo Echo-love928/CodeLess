@@ -97,8 +97,8 @@ it('clears the rejected intent and private rows on permission loss', async () =>
 it('renders null failure codes as not applicable only for non-failed tasks', async () => {
   vi.mocked(listRecords).mockResolvedValue({ ...result('current'), items: [{ ...result('current').items[0]!, status: 'READY', failureCode: null }] })
   const view = await page()
-  expect(view.text()).toContain('不适用')
+  expect(view.findAll('td').map(cell => cell.text())).toContain('—')
   vi.mocked(listRecords).mockResolvedValue({ ...result('current'), items: [{ ...result('current').items[0]!, status: 'FAILED', failureCode: null }] })
   await view.findAll('button').find(button => button.text() === '刷新数据')!.trigger('click'); await flushPromises()
-  expect(view.text()).toContain('未知 / 未提供'); expect(view.text()).not.toContain('不适用')
+  expect(view.text()).toContain('历史记录未保存失败原因')
 })

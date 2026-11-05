@@ -28,7 +28,7 @@ it('passes filtering and zero-based pagination to the server without filtering a
   respond({ items: [], page: 2, size: 10, totalItems: 0, totalPages: 0 })
   await listRecords('tasks', { ownerId: id, status: 'FAILED', from: '2026-10-01T00:00:00Z', to: '2026-10-20T00:00:00Z' }, 2, 10)
   const url = new URL(vi.mocked(fetch).mock.calls[0]![0] as string, 'https://platform.test')
-  expect(Object.fromEntries(url.searchParams)).toEqual({ ownerId: id, status: 'FAILED', from: '2026-10-01T00:00:00.000Z', to: '2026-10-20T00:00:00.000Z', page: '2', size: '10' })
+  expect(Object.fromEntries(url.searchParams)).toEqual({ ownerId: id, status: 'FAILED', from: '2026-10-01T00:00:00.000Z', to: '2026-10-20T00:00:00.000Z', includeTest: 'false', page: '2', size: '10' })
 })
 it('refuses a mismatched page or corrupt usage instead of making it look empty', async () => {
   respond({ items: [], page: 0, size: 20, totalItems: 0, totalPages: 0 })
@@ -62,7 +62,7 @@ it.each([[57, 800, 0.0713], [113, 800, 0.1413], [3, 4, 0.75]])(
 )
 it('accepts backend rounding when loading a daily trend window', async () => {
   const value = metrics()
-  const range = { from: '2026-10-19T00:00:00.000Z', to: '2026-10-20T00:00:00.000Z' }
+  const range = { from: '2026-10-18T16:00:00.000Z', to: '2026-10-19T16:00:00.000Z' }
   value.window = { ...range, field: 'createdAt' }
   value.generation = { ...value.generation, total: 800, ready: 57, failed: 743, denominator: 800, successRate: 0.0713 }
   respond(value)
@@ -85,7 +85,7 @@ it('rejects missing usage, false precise totals and inconsistent backend denomin
 it('does not send invalid time/owner filters', async () => {
   respond({})
   await expect(listRecords('tasks', { ...filters, ownerId: '../secret' }, 0, 20)).rejects.toThrow('UUID')
-  await expect(getMetrics({ ...filters, from: '2026-10-20', to: '2026-10-19' })).rejects.toThrow('结束时间')
+  await expect(getMetrics({ ...filters, from: '2026-10-20T00:00', to: '2026-10-19T00:00' })).rejects.toThrow('结束时间')
   expect(fetch).not.toHaveBeenCalled()
 })
 it('submits one exact cancellation target with CSRF and requires an audit receipt', async () => {
@@ -126,5 +126,5 @@ it('does not treat a generic proxy 503, a network error or a malformed receipt a
   await expect(cancelTask(id, 'reason')).rejects.toThrow('不符合约定')
 })
 it('labels a missing audit target without inventing an unknown outcome', () => {
-  expect(statusLabel('NOT_FOUND')).toBe('目标不存在 · NOT_FOUND')
+  expect(statusLabel('NOT_FOUND')).toBe('目标不存在')
 })

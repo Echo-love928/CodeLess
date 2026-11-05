@@ -4,7 +4,7 @@ import { ApiError } from '../../api/http'
 import { getPreviewCredential, type PreviewCredential } from './preview-api'
 import VisualEditSelector from '../visual-edit/VisualEditSelector.vue'
 
-const props = defineProps<{ applicationId: string; versionId?: string | null; buildFailed?: boolean; refreshVersion?: () => Promise<void> }>()
+const props = defineProps<{ applicationId: string; versionId?: string | null; buildFailed?: boolean; taskCancelled?: boolean; cancelledBy?: string | null; refreshVersion?: () => Promise<void> }>()
 const emit = defineEmits<{ unauthorized: [] }>()
 const frame = ref<HTMLIFrameElement>()
 const credential = ref<PreviewCredential | null>(null)
@@ -100,7 +100,8 @@ onBeforeUnmount(() => { dispose(); window.removeEventListener('message', message
 <template>
   <div class="preview-panel">
     <div class="preview-panel__controls"><span>{{ versionId ? '页面预览' : '暂无可预览内容' }}</span><button type="button" class="button-secondary" :disabled="state === 'loading'" @click="refresh">刷新预览</button></div>
-    <p v-if="buildFailed" class="preview-panel__warning" role="status">本次生成失败。已有可用版本会继续保留。</p>
+    <p v-if="taskCancelled" class="preview-panel__warning" role="status">{{ cancelledBy === 'ADMIN' ? '管理员已取消本次任务。' : '本次任务已取消。' }}已有可用版本会继续保留。</p>
+    <p v-else-if="buildFailed" class="preview-panel__warning" role="status">本次生成失败。已有可用版本会继续保留。</p>
     <p v-if="state === 'ready' && runtimeError" class="preview-panel__warning" role="status">预览页面运行时出错，部分内容或功能可能异常。可刷新预览重试。</p>
     <p v-if="state === 'empty'" class="preview-panel__message" role="status">{{ buildFailed ? '构建失败，暂无已验证版本。' : '完成生成与验证后即可预览。' }}</p>
     <p v-if="state === 'loading'" class="preview-panel__message" role="status">正在加载已验证版本…</p>

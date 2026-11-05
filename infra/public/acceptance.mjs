@@ -10,6 +10,8 @@ import { assertConcurrentEditCheckpoint } from './acceptance-checkpoint.mjs'
 let input = ''
 for await (const part of process.stdin) input += part
 const operator = JSON.parse(input)
+assert.ok(/^acceptance-owner\+/.test(operator.email ?? ''), 'Use isolated acceptance accounts, never demo')
+assert.ok(/^acceptance-foreign\+/.test(operator.foreignEmail ?? ''), 'Use an isolated second account')
 input = ''
 const origin = 'https://app.codeless-platform.top'
 const evidence = process.argv[2]
@@ -68,7 +70,7 @@ try {
   })
   progress('real-login')
   await page.goto(origin + '/login')
-  await page.getByLabel('邮箱', { exact: true }).fill('demo@codeless.local')
+  await page.getByLabel('邮箱', { exact: true }).fill(operator.email)
   await page.getByLabel('密码', { exact: true }).fill(operator.password)
   await page.getByRole('button', { name: '登录', exact: true }).click()
   await page.waitForURL('**/apps', { timeout: 20000 })
@@ -152,7 +154,7 @@ try {
   assert.equal(noCsrf.status(), 403)
   await api('POST', '/api/v0/publications', { ...payload, artifactDigest: 'sha256:' + '0'.repeat(64) }, 409, { 'Idempotency-Key': randomUUID() })
   const foreign = await browser.newContext()
-  const login = await foreign.request.post(origin + '/api/v0/auth/login', { data: { email: 'admin@codeless.local', password: operator.adminPassword },
+  const login = await foreign.request.post(origin + '/api/v0/auth/login', { data: { email: operator.foreignEmail, password: operator.foreignPassword },
     headers: { 'X-CSRF-Token': await csrf(foreign.request) } })
   assert.equal(login.status(), 200)
   await api('POST', '/api/v0/publications', payload, 404, { 'Idempotency-Key': randomUUID() }, foreign.request)
@@ -160,10 +162,10 @@ try {
   await record('csrfWrongDigestAndForeignOwnerCannotPublish')
   const failedApplicationId = operator.failedVersionApplicationId ?? app.id
   const failedVersions = await api('GET', '/api/v0/applications/' + failedApplicationId + '/versions?status=FAILED')
-  assert.ok(failedVersions.items.length > 0, 'Retained real failed generation must remain nonpublishable')
+  assert.ok(failedVersions.items.length > 0, 'Isolated explicitly synthetic failed-version fixture must remain nonpublishable')
   await api('POST', '/api/v0/publications', { applicationId: failedApplicationId, versionId: failedVersions.items[0].id,
     artifactDigest: 'sha256:' + '0'.repeat(64) }, 409, { 'Idempotency-Key': randomUUID() })
-  await record('realFailedVersionCannotPublish')
+  await record('isolatedFailedVersionCannotPublish'); await record('failedVersionFixtureSource',operator.failedVersionFixtureSource)
   checkpoint.rejectedFailedVersion = { applicationId: failedApplicationId, versionId: failedVersions.items[0].id }
   await save()
   progress('explicit-publish-and-concurrent-edit')
@@ -273,7 +275,7 @@ try {
   assert.equal(failedDeployment.failureCode, 'DEPLOYMENT_PROBE_FAILED')
   assert.equal(failedDeployment.latestSuccessful.id, publication.id)
   const result = { status: 'PASSED', authenticatedPublicFlow: true, fixtureApi: false, fixtureSigning: false,
-    modelProvider: 'deterministic-mock', modelQualityAccepted: false, origin, applicationId: app.id, taskId: task.id,
+    modelProvider: operator.modelProvider, modelQualityAccepted: false, origin, applicationId: app.id, taskId: task.id,
     versionId, sourceDigest: checkpoint.sourceDigest, artifactDigest: checkpoint.artifactDigest, publication,
     editedVersionId: checkpoint.editedVersionId, failedPublication: failed, checks, publishedFiles: manifests,
     rejectedFailedVersion: checkpoint.rejectedFailedVersion,
